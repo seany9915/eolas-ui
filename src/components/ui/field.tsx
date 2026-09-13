@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 export interface FieldProps extends React.ComponentPropsWithoutRef<typeof BaseField.Root> {
   label?: React.ReactNode;
   description?: React.ReactNode;
+  /** Legacy alias for `description` */
+  hint?: React.ReactNode;
   error?: React.ReactNode;
   required?: boolean;
   children: React.ReactNode;
@@ -14,12 +16,15 @@ export interface FieldProps extends React.ComponentPropsWithoutRef<typeof BaseFi
 const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
   label,
   description,
+  hint,
   error,
   required,
   children,
   className,
   ...props
 }, ref) => {
+  const helperText = description ?? hint;
+
   return (
     <BaseField.Root
       ref={ref}
@@ -35,9 +40,9 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
         </BaseField.Label>
       )}
 
-      {description && (
+      {helperText && (
         <BaseField.Description className="text-xs text-on-surface-variant font-sans">
-          {description}
+          {helperText}
         </BaseField.Description>
       )}
 

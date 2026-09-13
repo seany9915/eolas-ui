@@ -139,7 +139,8 @@
       "tailwind-merge"
     ],
     "registryDependencies": [
-      "utils"
+      "utils",
+      "icon"
     ]
   },
   {

@@ -4,7 +4,11 @@ import { cn } from '@/lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'filled' | 'outlined' | 'text';
+  /** Legacy alias for `variant` */
+  emphasis?: 'filled' | 'outlined' | 'text';
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
+  /** Legacy alias for `colorRole`. If matching a color role name, mapped safely to avoid polluting DOM ARIA role. */
+  role?: string;
   size?: 'sm' | 'md' | 'lg';
   focusableWhenDisabled?: boolean;
   nativeButton?: boolean;
@@ -13,8 +17,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
-  variant = 'filled',
-  colorRole = 'primary',
+  variant,
+  emphasis,
+  colorRole,
+  role,
   size = 'md',
   className,
   children,
@@ -24,8 +30,23 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   render,
   ...props
 }, ref) => {
+  // Backward compatibility resolution
+  const resolvedVariant = variant ?? emphasis ?? 'filled';
+  const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success'];
+  
+  let resolvedColorRole: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' = colorRole ?? 'primary';
+  let domRole: string | undefined = undefined;
+
+  if (role) {
+    if (validColorRoles.includes(role)) {
+      resolvedColorRole = role as any;
+    } else {
+      domRole = role; // valid ARIA role like 'tab', 'switch', etc.
+    }
+  }
+
   // Constraint from DESIGN.md & anti-patterns: Tertiary (Sunny Amber) is filled-only on light surfaces
-  const safeVariant = (colorRole === 'tertiary' && variant !== 'filled') ? 'filled' : variant;
+  const safeVariant = (resolvedColorRole === 'tertiary' && resolvedVariant !== 'filled') ? 'filled' : resolvedVariant;
 
   const baseStyles = 'inline-flex items-center justify-center font-label text-sm font-semibold rounded-[0.5rem] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
 
@@ -63,10 +84,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   };
 
   const variantClass = safeVariant === 'filled' 
-    ? filledStyles[colorRole] 
+    ? filledStyles[resolvedColorRole] 
     : safeVariant === 'outlined' 
-      ? outlinedStyles[colorRole] 
-      : textStyles[colorRole];
+      ? outlinedStyles[resolvedColorRole] 
+      : textStyles[resolvedColorRole];
 
   return (
     <BaseButton
@@ -75,6 +96,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       focusableWhenDisabled={focusableWhenDisabled}
       nativeButton={nativeButton}
       render={render}
+      role={domRole}
       className={cn(baseStyles, sizeStyles[size], variantClass, className)}
       {...props}
     >

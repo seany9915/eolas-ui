@@ -6,7 +6,11 @@ import { cn } from '@/lib/utils';
 export interface ChipProps {
   label: string;
   pattern?: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text';
+  /** Legacy alias for pattern */
+  emphasis?: 'high' | 'default' | 'medium' | 'low' | 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text';
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
+  /** Legacy alias for colorRole */
+  role?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
   icon?: string;
   onRemove?: () => void;
   className?: string;
@@ -14,12 +18,26 @@ export interface ChipProps {
 
 export const Chip: React.FC<ChipProps> = ({
   label,
-  pattern = 'outline-neutral-fill',
-  colorRole = 'primary',
+  pattern,
+  emphasis,
+  colorRole,
+  role,
   icon,
   onRemove,
   className,
 }) => {
+  // Backward compatibility resolution
+  const resolvedColorRole = colorRole ?? role ?? 'primary';
+  let resolvedPattern: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' = 'outline-neutral-fill';
+
+  const rawPattern = pattern ?? emphasis;
+  if (rawPattern === 'high' || rawPattern === 'high-contrast-mixed') {
+    resolvedPattern = 'high-contrast-mixed';
+  } else if (rawPattern === 'low' || rawPattern === 'neutral-fill-accent-text') {
+    resolvedPattern = 'neutral-fill-accent-text';
+  } else {
+    resolvedPattern = 'outline-neutral-fill';
+  }
   // Pattern 1: High-Contrast Mixed Palette (Solid fill + on-color text) - High Emphasis
   const mixedStyles = {
     primary: 'bg-primary text-on-primary border-none',
@@ -50,11 +68,11 @@ export const Chip: React.FC<ChipProps> = ({
     success: 'bg-success-container text-on-success-container border-none',
   };
 
-  const patternClass = pattern === 'high-contrast-mixed'
-    ? mixedStyles[colorRole]
-    : pattern === 'outline-neutral-fill'
-      ? outlineStyles[colorRole]
-      : neutralFillStyles[colorRole];
+  const patternClass = resolvedPattern === 'high-contrast-mixed'
+    ? mixedStyles[resolvedColorRole]
+    : resolvedPattern === 'outline-neutral-fill'
+      ? outlineStyles[resolvedColorRole]
+      : neutralFillStyles[resolvedColorRole];
 
   // WCAG 2.2 SC 2.5.8 Target Size: Expand to 44px (min-h-[44px]) when interactive (onRemove)
   const touchTargetClass = onRemove ? 'min-h-[44px]' : 'min-h-[36px]';

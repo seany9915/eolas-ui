@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   description?: string;
+  /** Legacy alias for description */
+  hint?: string;
   error?: string;
   required?: boolean;
 }
@@ -13,6 +15,7 @@ export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputEleme
 export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
   label,
   description,
+  hint,
   error,
   required,
   className,
@@ -23,7 +26,7 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
   return (
     <Field
       label={label}
-      description={description}
+      description={description ?? hint}
       error={error}
       required={required}
       disabled={disabled}

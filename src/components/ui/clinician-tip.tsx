@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Icon } from '@/components/ui/icon';
+import { Icon } from './icon';
 
 export interface ClinicianTipProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
