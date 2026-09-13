@@ -1,0 +1,20 @@
+{
+  "name": "fieldset",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/fieldset.tsx",
+      "content": "import * as React from 'react';\nimport { Fieldset as BaseFieldset } from '@base-ui/react/fieldset';\nimport { cn } from '@/lib/utils';\n\nexport interface FieldsetProps {\n  legend: string;\n  description?: string;\n  children: React.ReactNode;\n  variant?: 'card' | 'flat';\n  className?: string;\n}\n\nconst FieldsetComponent: React.FC<FieldsetProps> = ({\n  legend,\n  description,\n  children,\n  variant = 'card',\n  className,\n}) => {\n  return (\n    <BaseFieldset.Root\n      className={cn(\n        'p-5 rounded-lg space-y-4 w-full',\n        variant === 'card' && 'bg-surface border border-outline-variant shadow-ambient',\n        variant === 'flat' && 'bg-surface-container/60 border-none',\n        className\n      )}\n    >\n      <BaseFieldset.Legend className=\"px-1\">\n        <span className=\"font-heading text-sm font-bold text-on-surface block\">{legend}</span>\n        {description && (\n          <span className=\"font-sans text-xs text-on-surface-variant block mt-0.5\">{description}</span>\n        )}\n      </BaseFieldset.Legend>\n      <div className=\"space-y-4\">\n        {children}\n      </div>\n    </BaseFieldset.Root>\n  );\n};\n\n// Compound export mapping Base UI primitives\nexport const Fieldset = Object.assign(FieldsetComponent, {\n  Root: BaseFieldset.Root,\n  Legend: BaseFieldset.Legend,\n});\n\n// Re-export Base UI primitives for compound composition\nexport { BaseFieldset };\nexport const FieldsetRoot = BaseFieldset.Root;\nexport const FieldsetLegend = BaseFieldset.Legend;\n\n",
+      "type": "registry:ui",
+      "target": "components/ui/fieldset.tsx"
+    }
+  ]
+}

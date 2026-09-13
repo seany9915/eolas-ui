@@ -1,0 +1,22 @@
+{
+  "name": "toggles",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "toggle",
+    "toggle-group"
+  ],
+  "files": [
+    {
+      "path": "ui/toggles.tsx",
+      "content": "/**\n * Re-exports toggle primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/toggle\n * - @/components/ui/toggle-group\n */\nexport * from './toggle';\nexport * from './toggle-group';\n",
+      "type": "registry:ui",
+      "target": "components/ui/toggles.tsx"
+    }
+  ]
+}

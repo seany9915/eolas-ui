@@ -1,0 +1,20 @@
+{
+  "name": "icon",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/icon.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {\n  name: string;\n  size?: 'sm' | 'md' | 'lg' | 'xl';\n  srLabel?: string;\n  className?: string;\n}\n\nexport const Icon = React.forwardRef<HTMLSpanElement, IconProps>(({\n  name,\n  size = 'lg',\n  srLabel,\n  className,\n  ...props\n}, ref) => {\n  const sizeClasses = {\n    sm: 'text-base text-[16px]',\n    md: 'text-lg text-[20px]',\n    lg: 'text-xl text-[24px]',\n    xl: 'text-2xl text-[32px]',\n  };\n\n  const isDecorative = !srLabel && !props['aria-label'];\n\n  return (\n    <>\n      <span\n        ref={ref}\n        className={cn('material-symbols-outlined select-none inline-block align-middle leading-none', sizeClasses[size], className)}\n        aria-hidden={isDecorative ? 'true' : undefined}\n        aria-label={props['aria-label']}\n        {...props}\n      >\n        {name}\n      </span>\n      {srLabel && <span className=\"sr-only\">{srLabel}</span>}\n    </>\n  );\n});\n\nIcon.displayName = 'Icon';\n",
+      "type": "registry:ui",
+      "target": "components/ui/icon.tsx"
+    }
+  ]
+}

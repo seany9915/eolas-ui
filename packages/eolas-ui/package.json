@@ -1,0 +1,28 @@
+{
+  "name": "@seany9915/eolas-ui",
+  "version": "0.1.0",
+  "description": "Eolas UI CLI - Private Base UI design system component distributor",
+  "type": "module",
+  "bin": {
+    "eolas-ui": "./bin/eolas-ui.js"
+  },
+  "files": [
+    "bin",
+    "registry"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seany9915/eolas-ui.git"
+  },
+  "keywords": [
+    "eolas-ui",
+    "base-ui",
+    "design-system",
+    "components"
+  ],
+  "author": "seany9915",
+  "license": "MIT"
+}

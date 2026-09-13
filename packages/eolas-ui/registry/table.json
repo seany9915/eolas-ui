@@ -1,0 +1,20 @@
+{
+  "name": "table",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/table.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface TableColumn<T> {\n  header: string;\n  accessor: keyof T | ((row: T) => React.ReactNode);\n}\n\nexport interface TableProps<T> {\n  columns: TableColumn<T>[];\n  data: T[];\n  keyExtractor: (row: T) => string | number;\n  className?: string;\n}\n\nexport function Table<T>({\n  columns,\n  data,\n  keyExtractor,\n  className,\n}: TableProps<T>) {\n  return (\n    <div className={cn('w-full overflow-x-auto rounded-[0.75rem] border border-outline-variant bg-surface', className)}>\n      <table className=\"w-full text-left border-collapse font-sans text-sm\">\n        <thead>\n          <tr className=\"border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm\">\n            {columns.map((col, idx) => (\n              <th key={idx} className=\"px-6 py-4 font-semibold\">\n                {col.header}\n              </th>\n            ))}\n          </tr>\n        </thead>\n        <tbody className=\"divide-y divide-outline-variant\">\n          {data.map((row) => (\n            <tr key={keyExtractor(row)} className=\"h-[56px] hover:bg-surface-container/30 transition-colors\">\n              {columns.map((col, cIdx) => (\n                <td key={cIdx} className=\"px-6 py-4 text-on-surface\">\n                  {typeof col.accessor === 'function'\n                    ? col.accessor(row)\n                    : (row[col.accessor] as React.ReactNode)}\n                </td>\n              ))}\n            </tr>\n          ))}\n        </tbody>\n      </table>\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/ui/table.tsx"
+    }
+  ]
+}

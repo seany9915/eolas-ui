@@ -1,0 +1,20 @@
+{
+  "name": "separator",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/separator.tsx",
+      "content": "import * as React from 'react';\nimport { Separator as BaseSeparator } from '@base-ui/react/separator';\nimport { cn } from '@/lib/utils';\n\nexport interface SeparatorProps {\n  orientation?: 'horizontal' | 'vertical';\n  decorative?: boolean;\n  className?: string;\n}\n\nconst SeparatorComponent: React.FC<SeparatorProps> = ({\n  orientation = 'horizontal',\n  decorative = true,\n  className,\n}) => {\n  return (\n    <BaseSeparator\n      orientation={orientation}\n      className={cn(\n        'bg-outline-variant shrink-0',\n        orientation === 'horizontal' ? 'h-[1px] w-full my-3' : 'w-[1px] h-full mx-3',\n        className\n      )}\n    />\n  );\n};\n\n// Compound export mapping Base UI primitives\nexport const Separator = Object.assign(SeparatorComponent, {\n  Root: BaseSeparator,\n});\n\nexport { BaseSeparator };\nexport const SeparatorRoot = BaseSeparator;\n\n",
+      "type": "registry:ui",
+      "target": "components/ui/separator.tsx"
+    }
+  ]
+}

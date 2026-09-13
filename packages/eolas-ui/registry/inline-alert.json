@@ -1,0 +1,20 @@
+{
+  "name": "inline-alert",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/inline-alert.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport { Icon } from '@/components/ui/icon';\n\nexport type InlineAlertRole = 'neutral' | 'warning' | 'error' | 'success';\n\nexport interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {\n  title: string;\n  children: React.ReactNode;\n  role?: InlineAlertRole;\n  icon?: string;\n  action?: React.ReactNode;\n  onClose?: () => void;\n  className?: string;\n}\n\nexport const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({\n  title,\n  children,\n  role = 'neutral',\n  icon,\n  action,\n  onClose,\n  className,\n  ...props\n}, ref) => {\n  const accentBarBg: Record<InlineAlertRole, string> = {\n    neutral: 'bg-on-surface',\n    warning: 'bg-warning',\n    error: 'bg-error',\n    success: 'bg-success',\n  };\n\n  const iconColorClasses: Record<InlineAlertRole, string> = {\n    neutral: 'text-on-surface',\n    warning: 'text-warning',\n    error: 'text-error',\n    success: 'text-success',\n  };\n\n  const defaultIcons: Record<InlineAlertRole, string> = {\n    neutral: 'info',\n    warning: 'warning',\n    error: 'error',\n    success: 'check_circle',\n  };\n\n  const activeIcon = icon || defaultIcons[role];\n  const ariaRole = role === 'error' ? 'alert' : 'status';\n  const ariaLive = role === 'error' ? 'assertive' : 'polite';\n\n  return (\n    <div\n      ref={ref}\n      role={ariaRole}\n      aria-live={ariaLive}\n      aria-atomic=\"true\"\n      className={cn(\n        'relative flex items-start gap-4 p-5 pl-6 rounded-none bg-surface border-none shadow-ambient overflow-hidden text-left',\n        className\n      )}\n      {...props}\n    >\n      {/* Mathematically straight 4px vertical accent bar */}\n      <div\n        className={cn('absolute left-0 top-0 bottom-0 w-1', accentBarBg[role])}\n        aria-hidden=\"true\"\n      />\n      <Icon\n        name={activeIcon}\n        size=\"lg\"\n        className={cn('mt-0.5 shrink-0', iconColorClasses[role])}\n        aria-hidden=\"true\"\n      />\n      <div className=\"flex-1 min-w-0\">\n        <h4 className=\"font-heading text-base font-bold text-on-surface mb-1\">\n          {title}\n        </h4>\n        <div className=\"font-sans text-sm text-on-surface-variant leading-relaxed\">\n          {children}\n        </div>\n        {action && (\n          <div className=\"mt-3 flex items-center gap-3\">\n            {action}\n          </div>\n        )}\n      </div>\n      {onClose && (\n        <button\n          type=\"button\"\n          onClick={onClose}\n          aria-label=\"Dismiss alert\"\n          className=\"shrink-0 p-1 -mr-1 -mt-1 text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded\"\n        >\n          <Icon name=\"close\" size=\"md\" aria-hidden=\"true\" />\n        </button>\n      )}\n    </div>\n  );\n});\n\nInlineAlert.displayName = 'InlineAlert';\n\n",
+      "type": "registry:ui",
+      "target": "components/ui/inline-alert.tsx"
+    }
+  ]
+}

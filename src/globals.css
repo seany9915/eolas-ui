@@ -1,0 +1,367 @@
+@import "tailwindcss";
+
+@theme {
+  --font-heading: "Atkinson Hyperlegible Next", sans-serif;
+  --font-sans: "Lexend", sans-serif;
+  --font-label: "Lexend", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-surface-container: var(--surface-container);
+  --color-surface-variant: var(--surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+
+  --color-warning: var(--warning);
+  --color-on-warning: var(--on-warning);
+  --color-warning-container: var(--warning-container);
+  --color-on-warning-container: var(--on-warning-container);
+
+  --color-success: var(--success);
+  --color-on-success: var(--on-success);
+  --color-success-container: var(--success-container);
+  --color-on-success-container: var(--on-success-container);
+
+  --color-neutral: var(--neutral);
+  --color-on-neutral: var(--on-neutral);
+  --color-neutral-container: var(--neutral-container);
+  --color-on-neutral-container: var(--on-neutral-container);
+
+  --border-width-default: 1px;
+  --border-width-emphasis: 2px;
+  --border-width-accent: 4px;
+  --border-default: 1px;
+  --border-emphasis: 2px;
+  --border-accent: 4px;
+
+  --radius-none: 0px;
+  --radius-default: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  --shadow-ambient: var(--shadow-ambient);
+  --shadow-ambient-hover: var(--shadow-ambient-hover);
+  --shadow-modal: var(--shadow-modal);
+
+  /* Motion Tokens */
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --duration-emphasis: 500ms;
+
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: ease-in-out;
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+
+  --scale-large: 0.96;
+  --scale-medium: 0.97;
+  --scale-small: 0.98;
+  --scale-tiny: 0.99;
+
+  --distance-micro: 4px;
+  --distance-small: 6px;
+  --distance-base: 8px;
+  --distance-medium: 12px;
+
+  --blur-small: 2px;
+  --blur-medium: 3px;
+}
+
+:root {
+  --font-mono: "Roboto Mono", monospace;
+  --background: #F6F7FB;
+  --on-background: #1a1c1e;
+  --surface: #ffffff;
+  --on-surface: #1a1c1e;
+  --on-surface-variant: #434656;
+  --surface-container: #EEF3FF;
+  --surface-variant: #DCE6FA;
+  --outline: #737688;
+  --outline-variant: #C4D5F8;
+  --primary: #0052FF;
+  --on-primary: #ffffff;
+  --primary-container: #dce6ff;
+  --on-primary-container: #1a1c1e;
+  --secondary: #00796B;
+  --on-secondary: #ffffff;
+  --secondary-container: #e0f2f1;
+  --on-secondary-container: #1a1c1e;
+  --tertiary: #F9A825;
+  --on-tertiary: #1a1c1e;
+  --tertiary-container: #fff0c2;
+  --on-tertiary-container: #1a1c1e;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #1a1c1e;
+  --warning: #8a5200;
+  --on-warning: #ffffff;
+  --warning-container: #ffe0b3;
+  --on-warning-container: #1a1c1e;
+  --success: #146c2e;
+  --on-success: #ffffff;
+  --success-container: #c8f5ce;
+  --on-success-container: #1a1c1e;
+
+  --neutral: #1a1c1e;
+  --on-neutral: #ffffff;
+  --neutral-container: #DCE6FA;
+  --on-neutral-container: #1a1c1e;
+
+  --shadow-ambient: 0 4px 12px rgba(26, 28, 30, 0.08);
+  --shadow-ambient-hover: 0 8px 24px rgba(26, 28, 30, 0.12);
+  --shadow-modal: 0 12px 32px rgba(26, 28, 30, 0.18);
+
+  /* Motion Tokens */
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --duration-emphasis: 500ms;
+
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: ease-in-out;
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+
+  --scale-large: 0.96;
+  --scale-medium: 0.97;
+  --scale-small: 0.98;
+  --scale-tiny: 0.99;
+
+  --distance-micro: 4px;
+  --distance-small: 6px;
+  --distance-base: 8px;
+  --distance-medium: 12px;
+
+  --blur-small: 2px;
+  --blur-medium: 3px;
+}
+
+/* Border Width Token Utility Classes */
+.border-default {
+  border-width: 1px;
+}
+
+.border-emphasis {
+  border-width: 2px;
+}
+
+.border-accent {
+  border-width: 4px;
+}
+
+/* Material Symbols icon styling helper */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accessible high-visibility focus ring compatible with forced-colors mode */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Streamlined focus integration for form controls: merges border and focus ring to prevent double-box artifacts */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 0px;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Standardized Type Scale Utility Classes */
+.text-display-lg {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.text-headline-lg {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.text-headline-md {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.text-headline-sm {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-body-lg {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.text-body-md {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.text-label-lg {
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+.text-label-md {
+  font-family: var(--font-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.text-label-sm {
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+}
+
+/* Long-Form Content Rhythm (shadcn Typeset container system) */
+.typeset {
+  --typeset-font-body: var(--font-sans);
+  --typeset-font-heading: var(--font-heading);
+  --typeset-font-mono: var(--font-mono);
+  --typeset-size: 1em;
+  --typeset-leading: 1.5;
+  --typeset-flow: 1.25em;
+
+  font-family: var(--typeset-font-body);
+  font-size: var(--typeset-size);
+  line-height: var(--typeset-leading);
+  max-width: 40rem;
+}
+
+.typeset h1, .typeset h2, .typeset h3, .typeset h4 {
+  font-family: var(--typeset-font-heading);
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: calc(var(--typeset-flow) * 1.2);
+  margin-bottom: calc(var(--typeset-flow) * 0.5);
+  color: var(--on-surface);
+}
+
+.typeset h1 {
+  font-size: 1.875em;
+}
+
+.typeset h2 {
+  font-size: 1.5em;
+}
+
+.typeset h3 {
+  font-size: 1.25em;
+}
+
+.typeset h4 {
+  font-size: 1.125em;
+}
+
+.typeset p, .typeset ul, .typeset ol {
+  margin-top: 0;
+  margin-bottom: var(--typeset-flow);
+  color: var(--on-surface-variant);
+}
+
+.typeset-chat {
+  --typeset-flow: 1em;
+  --typeset-leading: 1.5;
+}
+
+.typeset-guide {
+  --typeset-size: 1.125em;
+  --typeset-leading: 1.55;
+  --typeset-flow: 1.5em;
+}
+
+.typeset-large {
+  --typeset-size: 1.25em;
+  --typeset-leading: 1.8;
+  --typeset-flow: 1.75em;
+}
+

@@ -1,0 +1,20 @@
+{
+  "name": "form",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/form.tsx",
+      "content": "import * as React from 'react';\nimport { Form as BaseForm } from '@base-ui/react/form';\nimport { cn } from '@/lib/utils';\n\nexport interface FormProps<FormValues extends Record<string, any> = Record<string, any>>\n  extends Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {\n  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;\n  onFormSubmit?: (formValues: FormValues, eventDetails: BaseForm.SubmitEventDetails) => void;\n  validationMode?: BaseForm.ValidationMode;\n  errors?: Record<string, string | string[]>;\n  actionsRef?: React.RefObject<BaseForm.Actions | null>;\n  children: React.ReactNode;\n  className?: string;\n}\n\nexport const Form = React.forwardRef<HTMLFormElement, FormProps<any>>(({\n  onSubmit,\n  onFormSubmit,\n  validationMode,\n  errors,\n  actionsRef,\n  children,\n  className,\n  ...props\n}, ref) => {\n  return (\n    <BaseForm\n      ref={ref}\n      validationMode={validationMode}\n      errors={errors}\n      actionsRef={actionsRef}\n      onFormSubmit={onFormSubmit}\n      onSubmit={onSubmit}\n      className={cn('space-y-4 w-full', className)}\n      {...props}\n    >\n      {children}\n    </BaseForm>\n  );\n}) as <FormValues extends Record<string, any> = Record<string, any>>(\n  props: FormProps<FormValues> & { ref?: React.Ref<HTMLFormElement> }\n) => React.JSX.Element;\n\n// Compound Base UI exports\nexport { BaseForm };\nexport const FormRoot = BaseForm;\n\n",
+      "type": "registry:ui",
+      "target": "components/ui/form.tsx"
+    }
+  ]
+}

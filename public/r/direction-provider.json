@@ -1,0 +1,20 @@
+{
+  "name": "direction-provider",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/direction-provider.tsx",
+      "content": "﻿'use client';\n\nexport {\n  DirectionProvider,\n  useDirection,\n  type DirectionProviderProps,\n  type TextDirection,\n} from '@base-ui/react/direction-provider';\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/direction-provider.tsx"
+    }
+  ]
+}

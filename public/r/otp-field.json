@@ -1,0 +1,20 @@
+{
+  "name": "otp-field",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/otp-field.tsx",
+      "content": "import * as React from 'react';\nimport { OTPField as BaseOTPField } from '@base-ui/react/otp-field';\nimport { Field as BaseField } from '@base-ui/react/field';\nimport { cn } from '@/lib/utils';\n\nexport interface OTPFieldProps {\n  label?: string;\n  length?: number;\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  onComplete?: (code: string) => void;\n  name?: string;\n  required?: boolean;\n  readOnly?: boolean;\n  autoFocus?: boolean;\n  disabled?: boolean;\n  autoSubmit?: boolean;\n  mask?: boolean;\n  validationType?: 'numeric' | 'alpha' | 'alphanumeric' | 'none';\n  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];\n  pattern?: string;\n  className?: string;\n}\n\nconst OTPFieldComponent: React.FC<OTPFieldProps> = ({\n  label,\n  length = 4,\n  value,\n  defaultValue,\n  onValueChange,\n  onComplete,\n  name,\n  required,\n  readOnly,\n  autoFocus,\n  disabled,\n  autoSubmit,\n  mask,\n  validationType,\n  inputMode,\n  pattern,\n  className,\n}) => {\n  return (\n    <BaseField.Root className={cn('flex flex-col gap-1.5', className)}>\n      {label && (\n        <BaseField.Label className=\"font-label text-xs font-semibold text-on-surface-variant\">\n          {label}\n        </BaseField.Label>\n      )}\n      <BaseOTPField.Root\n        length={length}\n        value={value}\n        defaultValue={defaultValue}\n        onValueChange={(val) => onValueChange?.(val)}\n        onValueComplete={(val) => onComplete?.(val)}\n        name={name}\n        required={required}\n        readOnly={readOnly}\n        autoFocus={autoFocus}\n        disabled={disabled}\n        autoSubmit={autoSubmit}\n        mask={mask}\n        validationType={validationType}\n        inputMode={inputMode}\n        aria-label={!label ? 'One-time passcode' : undefined}\n        className=\"flex gap-1.5 sm:gap-2 justify-start items-center\"\n      >\n        {Array.from({ length }, (_, idx) => (\n          <BaseOTPField.Input\n            key={idx}\n            pattern={pattern}\n            className=\"w-10 sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg sm:text-xl font-bold rounded-md border-[1px] border-outline bg-surface text-on-surface focus:border-primary focus:outline-2 focus:outline-offset-2 focus:outline-primary transition-colors disabled:opacity-40 shrink-0\"\n          />\n        ))}\n      </BaseOTPField.Root>\n    </BaseField.Root>\n  );\n};\n\n// Compound export mapping Base UI primitives\nexport const OTPField = Object.assign(OTPFieldComponent, {\n  Root: BaseOTPField.Root,\n  Input: BaseOTPField.Input,\n  Separator: BaseOTPField.Separator,\n});\n\n// Re-export Base UI primitives for compound composition\nexport { BaseOTPField };\nexport const OTPFieldRoot = BaseOTPField.Root;\nexport const OTPFieldInput = BaseOTPField.Input;\nexport const OTPFieldSeparator = BaseOTPField.Separator;\n",
+      "type": "registry:ui",
+      "target": "components/ui/otp-field.tsx"
+    }
+  ]
+}

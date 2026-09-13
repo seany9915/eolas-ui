@@ -1,0 +1,20 @@
+{
+  "name": "scroll-area",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/scroll-area.tsx",
+      "content": "import * as React from 'react';\nimport { ScrollArea as BaseScrollArea } from '@base-ui/react/scroll-area';\nimport { cn } from '@/lib/utils';\n\nexport interface ScrollAreaProps {\n  children: React.ReactNode;\n  maxHeight?: string;\n  orientation?: 'vertical' | 'horizontal' | 'both';\n  className?: string;\n}\n\nconst ScrollAreaComponent: React.FC<ScrollAreaProps> = ({\n  children,\n  maxHeight = '240px',\n  orientation = 'vertical',\n  className,\n}) => {\n  const showVertical = orientation === 'vertical' || orientation === 'both';\n  const showHorizontal = orientation === 'horizontal' || orientation === 'both';\n\n  return (\n    <BaseScrollArea.Root className={cn('relative overflow-hidden rounded-[0.75rem] border border-outline-variant bg-surface w-full', className)}>\n      <BaseScrollArea.Viewport style={{ maxHeight }} className=\"w-full h-full p-4 overflow-auto scrollbar-thin\">\n        <BaseScrollArea.Content>{children}</BaseScrollArea.Content>\n      </BaseScrollArea.Viewport>\n      {showVertical && (\n        <BaseScrollArea.Scrollbar orientation=\"vertical\" className=\"flex select-none touch-none p-0.5 bg-surface-container transition-colors w-2.5\">\n          <BaseScrollArea.Thumb className=\"flex-1 bg-outline rounded-full relative hover:bg-on-surface-variant/60\" />\n        </BaseScrollArea.Scrollbar>\n      )}\n      {showHorizontal && (\n        <BaseScrollArea.Scrollbar orientation=\"horizontal\" className=\"flex select-none touch-none p-0.5 bg-surface-container transition-colors h-2.5\">\n          <BaseScrollArea.Thumb className=\"flex-1 bg-outline rounded-full relative hover:bg-on-surface-variant/60\" />\n        </BaseScrollArea.Scrollbar>\n      )}\n      {orientation === 'both' && <BaseScrollArea.Corner className=\"bg-surface-container\" />}\n    </BaseScrollArea.Root>\n  );\n};\n\n// Compound export mapping Base UI primitives\nexport const ScrollArea = Object.assign(ScrollAreaComponent, {\n  Root: BaseScrollArea.Root,\n  Viewport: BaseScrollArea.Viewport,\n  Content: BaseScrollArea.Content,\n  Scrollbar: BaseScrollArea.Scrollbar,\n  Thumb: BaseScrollArea.Thumb,\n  Corner: BaseScrollArea.Corner,\n});\n\n// Re-export Base UI primitives for compound composition\nexport { BaseScrollArea };\nexport const ScrollAreaRoot = BaseScrollArea.Root;\nexport const ScrollAreaViewport = BaseScrollArea.Viewport;\nexport const ScrollAreaContent = BaseScrollArea.Content;\nexport const ScrollAreaScrollbar = BaseScrollArea.Scrollbar;\nexport const ScrollAreaThumb = BaseScrollArea.Thumb;\nexport const ScrollAreaCorner = BaseScrollArea.Corner;\n\n",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-area.tsx"
+    }
+  ]
+}
