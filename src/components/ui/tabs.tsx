@@ -3,10 +3,11 @@ import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { cn } from '@/lib/utils';
 
 export interface TabItemData {
-  id: string;
+  id?: string;
+  value?: string;
   label: string;
   icon?: string;
-  content: React.ReactNode;
+  content?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -109,6 +110,8 @@ export const TabsPanel: React.FC<TabsPanelProps> = ({ value, keepMounted, childr
 
 export interface TabsProps {
   items?: TabItemData[];
+  /** Legacy alias for items */
+  tabs?: TabItemData[];
   value?: any;
   defaultValue?: any;
   onValueChange?: (value: any) => void;
@@ -124,6 +127,7 @@ export interface TabsProps {
 
 const TabsComponent: React.FC<TabsProps> = ({
   items,
+  tabs,
   value,
   defaultValue,
   onValueChange,
@@ -135,7 +139,9 @@ const TabsComponent: React.FC<TabsProps> = ({
   children,
   className,
 }) => {
-  const initialValue = defaultValue ?? (value === undefined && items ? items[0]?.id : undefined);
+  const tabList = items || tabs;
+  const initialValue = defaultValue ?? (value === undefined && tabList ? (tabList[0]?.value ?? tabList[0]?.id) : undefined);
+  const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
 
   return (
     <BaseTabs.Root
@@ -155,17 +161,24 @@ const TabsComponent: React.FC<TabsProps> = ({
         : (
           <>
             <TabsList activateOnFocus={activateOnFocus} loopFocus={loopFocus} variant={variant}>
-              {items?.map((tab) => (
-                <Tab key={tab.id} value={tab.id} icon={tab.icon} disabled={tab.disabled} variant={variant}>
-                  {tab.label}
-                </Tab>
-              ))}
+              {tabList?.map((tab) => {
+                const tabKey = (tab.value ?? tab.id) as string;
+                return (
+                  <Tab key={tabKey} value={tabKey} icon={tab.icon} disabled={tab.disabled} variant={variant}>
+                    {tab.label}
+                  </Tab>
+                );
+              })}
             </TabsList>
-            {items?.map((tab) => (
-              <TabsPanel key={tab.id} value={tab.id}>
-                {tab.content}
-              </TabsPanel>
-            ))}
+            {hasContent && tabList?.map((tab) => {
+              const tabKey = (tab.value ?? tab.id) as string;
+              if (!tab.content) return null;
+              return (
+                <TabsPanel key={tabKey} value={tabKey}>
+                  {tab.content}
+                </TabsPanel>
+              );
+            })}
           </>
         )}
     </BaseTabs.Root>
@@ -176,8 +189,10 @@ const TabsComponent: React.FC<TabsProps> = ({
 export const Tabs = Object.assign(TabsComponent, {
   Root: BaseTabs.Root,
   List: BaseTabs.List,
-  Tab: BaseTabs.Tab,
+  Tab: Tab,
+  Trigger: Tab,
   Panel: BaseTabs.Panel,
+  Content: TabsPanel,
   Indicator: BaseTabs.Indicator,
 });
 
@@ -186,7 +201,13 @@ export { BaseTabs };
 export const TabsRoot = BaseTabs.Root;
 export const TabsListPrimitive = BaseTabs.List;
 export const TabsTabPrimitive = BaseTabs.Tab;
+export const TabsTriggerPrimitive = BaseTabs.Tab;
 export const TabsPanelPrimitive = BaseTabs.Panel;
 export const TabsIndicator = BaseTabs.Indicator;
+
+// Backward-compatible named exports matching radix/shadcn conventions
+export const TabsTrigger = Tab;
+export const TabsContent = TabsPanel;
+export default Tabs;
 
 
