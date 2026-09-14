@@ -6,7 +6,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: 'filled' | 'outlined' | 'text' | 'outline' | 'ghost' | 'tonal' | 'secondary' | 'default';
   /** Legacy alias for `variant` */
   emphasis?: 'filled' | 'outlined' | 'text' | 'outline' | 'ghost' | 'tonal' | 'secondary' | 'default';
-  colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
+  colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' | 'neutral';
   /** Legacy alias for `colorRole`. If matching a color role name, mapped safely to avoid polluting DOM ARIA role. */
   role?: string;
   size?: 'sm' | 'md' | 'lg' | 'icon';
@@ -33,9 +33,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   // Backward compatibility resolution
   const rawVariant = variant ?? emphasis ?? 'filled';
   const normalizedVariant = rawVariant === 'outline' ? 'outlined' : (rawVariant === 'ghost' ? 'text' : (rawVariant === 'default' ? 'filled' : rawVariant));
-  const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success'];
+  const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success', 'neutral'];
   
-  let resolvedColorRole: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' = colorRole ?? 'primary';
+  let resolvedColorRole: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' | 'neutral' = colorRole ?? 'primary';
   if (rawVariant === 'secondary') {
     resolvedColorRole = 'secondary';
   }
@@ -68,6 +68,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     error: 'bg-error text-on-error hover:brightness-95 active:brightness-90',
     warning: 'bg-warning text-on-warning hover:brightness-95 active:brightness-90',
     success: 'bg-success text-on-success hover:brightness-95 active:brightness-90',
+    neutral: 'bg-neutral text-on-neutral hover:brightness-95 active:brightness-90',
   };
 
   const tonalStyles = {
@@ -77,6 +78,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     error: 'bg-error-container text-on-error-container hover:brightness-95 active:brightness-90',
     warning: 'bg-warning-container text-on-warning-container hover:brightness-95 active:brightness-90',
     success: 'bg-success-container text-on-success-container hover:brightness-95 active:brightness-90',
+    neutral: 'bg-neutral-container text-on-neutral-container hover:brightness-95 active:brightness-90',
   };
 
   const outlinedStyles = {
@@ -86,6 +88,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     error: 'bg-surface text-error border-[2px] border-error hover:bg-error-container/20',
     warning: 'bg-surface text-warning border-[2px] border-warning hover:bg-warning-container/20',
     success: 'bg-surface text-success border-[2px] border-success hover:bg-success-container/20',
+    neutral: 'bg-surface text-on-surface border-[2px] border-outline hover:bg-surface-container',
   };
 
   const textStyles = {
@@ -95,6 +98,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     error: 'bg-transparent text-error hover:bg-error-container/30',
     warning: 'bg-transparent text-warning hover:bg-warning-container/30',
     success: 'bg-transparent text-success hover:bg-success-container/30',
+    neutral: 'bg-transparent text-on-surface hover:bg-surface-container',
   };
 
   const variantClass = safeVariant === 'filled' 

@@ -4,15 +4,17 @@ import { cn } from '@/lib/utils';
 
 
 export interface ChipProps {
-  label: string;
+  label?: string;
+  children?: React.ReactNode;
   pattern?: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' | 'soft-wash';
   /** Legacy alias for pattern */
   variant?: 'outline' | 'outlined' | 'filled' | 'neutral' | 'soft-wash' | string;
   /** Legacy alias for pattern */
   emphasis?: 'high' | 'default' | 'medium' | 'low' | 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' | 'soft-wash';
-  colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
+  colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' | 'neutral';
   /** Legacy alias for colorRole */
-  role?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
+  role?: string;
+  size?: 'sm' | 'md' | 'lg';
   icon?: string;
   onRemove?: () => void;
   className?: string;
@@ -20,17 +22,23 @@ export interface ChipProps {
 
 export const Chip: React.FC<ChipProps> = ({
   label,
+  children,
   pattern,
   variant,
   emphasis,
   colorRole,
   role,
+  size = 'md',
   icon,
   onRemove,
   className,
 }) => {
   // Backward compatibility resolution
-  const resolvedColorRole = colorRole ?? role ?? 'primary';
+  const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success', 'neutral'];
+  const resolvedRole = (role && validColorRoles.includes(role)) ? role : undefined;
+  const resolvedColorRole: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' | 'neutral' =
+    (colorRole as any) ?? (resolvedRole as any) ?? 'primary';
+
   let resolvedPattern: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' = 'outline-neutral-fill';
 
   const rawPattern = pattern ?? variant ?? emphasis;
@@ -41,6 +49,7 @@ export const Chip: React.FC<ChipProps> = ({
   } else {
     resolvedPattern = 'outline-neutral-fill';
   }
+
   // Pattern 1: High-Contrast Mixed Palette (Solid fill + on-color text) - High Emphasis
   const mixedStyles = {
     primary: 'bg-primary text-on-primary border-none',
@@ -49,6 +58,7 @@ export const Chip: React.FC<ChipProps> = ({
     error: 'bg-error text-on-error border-none',
     warning: 'bg-warning text-on-warning border-none',
     success: 'bg-success text-on-success border-none',
+    neutral: 'bg-neutral text-on-neutral border-none',
   };
 
   // Pattern 2: Colored Outline + Neutral Surface Fill + Colored Text - Everyday Default
@@ -59,6 +69,7 @@ export const Chip: React.FC<ChipProps> = ({
     error: 'bg-surface text-error border-[1px] border-error',
     warning: 'bg-surface text-warning border-[1px] border-warning',
     success: 'bg-surface text-success border-[1px] border-success',
+    neutral: 'bg-surface text-on-surface border-[1px] border-outline',
   };
 
   // Pattern 3: Soft Container Wash (bg-*-container + on-*-container) - Low/Medium Emphasis
@@ -69,6 +80,7 @@ export const Chip: React.FC<ChipProps> = ({
     error: 'bg-error-container text-on-error-container border-none',
     warning: 'bg-warning-container text-on-warning-container border-none',
     success: 'bg-success-container text-on-success-container border-none',
+    neutral: 'bg-neutral-container text-on-neutral-container border-none',
   };
 
   const patternClass = resolvedPattern === 'high-contrast-mixed'
@@ -77,13 +89,24 @@ export const Chip: React.FC<ChipProps> = ({
       ? outlineStyles[resolvedColorRole]
       : neutralFillStyles[resolvedColorRole];
 
+  const sizeStyles = {
+    sm: 'px-2.5 py-0.5 text-xs',
+    md: 'px-3 py-1.5 text-xs',
+    lg: 'px-4 py-2 text-sm',
+  };
+
   // WCAG 2.2 SC 2.5.8 Target Size: Expand to 44px (min-h-[44px]) when interactive (onRemove)
-  const touchTargetClass = onRemove ? 'min-h-[44px]' : 'min-h-[36px]';
+  const touchTargetClass = onRemove 
+    ? 'min-h-[44px]' 
+    : (size === 'lg' ? 'min-h-[40px]' : size === 'sm' ? 'min-h-[28px]' : 'min-h-[36px]');
+
+  const labelText = typeof children === 'string' ? children : (label || '');
 
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label text-xs font-semibold select-none transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.97]',
+        'inline-flex items-center gap-1.5 rounded-full font-label font-semibold select-none transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.97]',
+        sizeStyles[size],
         touchTargetClass,
         patternClass,
         className
@@ -94,12 +117,12 @@ export const Chip: React.FC<ChipProps> = ({
           {icon}
         </span>
       )}
-      <span>{label}</span>
+      <span>{children ?? label}</span>
       {onRemove && (
         <BaseButton
           onClick={onRemove}
           className="ml-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer inline-flex items-center justify-center p-0.5 rounded-full"
-          aria-label={`Remove ${label}`}
+          aria-label={labelText ? `Remove ${labelText}` : 'Remove'}
         >
           <span className="material-symbols-outlined text-sm" aria-hidden="true">close</span>
         </BaseButton>

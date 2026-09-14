@@ -5,14 +5,23 @@ import { cn } from '@/lib/utils';
 export interface SelectOption {
   value: string;
   label: string;
+  disabled?: boolean;
+}
+
+export interface SelectGroupOption {
+  label: string;
+  options: SelectOption[];
 }
 
 export interface SelectProps {
   label?: string;
-  options: SelectOption[];
+  options?: SelectOption[];
+  items?: SelectOption[];
+  groups?: SelectGroupOption[];
   value?: any;
   defaultValue?: any;
   onValueChange?: (value: any) => void;
+  onChange?: (value: any) => void;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -24,21 +33,26 @@ export interface SelectProps {
   description?: string;
   disabled?: boolean;
   name?: string;
+  id?: string;
   required?: boolean;
   side?: 'top' | 'bottom' | 'left' | 'right';
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  children?: React.ReactNode;
   className?: string;
 }
 
 const SelectComponent: React.FC<SelectProps> = ({
   label,
   options,
+  items,
+  groups,
   value,
   defaultValue,
   onValueChange,
+  onChange,
   open,
   defaultOpen,
   onOpenChange,
@@ -50,31 +64,117 @@ const SelectComponent: React.FC<SelectProps> = ({
   description,
   disabled,
   name,
+  id,
   required,
   side,
   align = 'start',
   sideOffset = 6,
   alignOffset,
   collisionPadding = 8,
+  children,
   className,
 }) => {
+  const handleValueChange = (newVal: any) => {
+    onValueChange?.(newVal);
+    if (newVal !== undefined && newVal !== null) {
+      onChange?.(newVal);
+    }
+  };
+
+  // If children are provided, this is a compound Select (e.g. <Select><SelectTrigger/><SelectPopup/></Select>)
+  if (children) {
+    return (
+      <BaseSelect.Root
+        value={value}
+        defaultValue={defaultValue}
+        onValueChange={handleValueChange}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        multiple={multiple}
+        disabled={disabled}
+        name={name}
+        required={required}
+        modal={modal}
+        actionsRef={actionsRef}
+      >
+        {children}
+      </BaseSelect.Root>
+    );
+  }
+
   const generatedId = React.useId();
-  const selectId = `select-${generatedId}`;
+  const selectId = id || `select-${generatedId}`;
   const descriptionId = description ? `${selectId}-desc` : undefined;
   const errorId = error ? `${selectId}-error` : undefined;
   const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+
+  const normalizedOptions = React.useMemo(() => {
+    const list = options ?? items;
+    if (!list) return [];
+    return list.map((opt: any, index: number) => {
+      if (typeof opt === 'string' || typeof opt === 'number') {
+        return { value: String(opt), label: String(opt), disabled: false };
+      }
+      if (opt && typeof opt === 'object') {
+        const rawVal = opt.value !== undefined ? opt.value : opt.label;
+        const safeVal = typeof rawVal === 'object' && rawVal !== null
+          ? String(rawVal.value || rawVal.label || index)
+          : String(rawVal ?? index);
+
+        const rawLab = opt.label !== undefined ? opt.label : opt.value;
+        const safeLab = typeof rawLab === 'object' && rawLab !== null
+          ? String(rawLab.label || rawLab.value || safeVal)
+          : String(rawLab ?? safeVal);
+
+        return {
+          value: safeVal,
+          label: safeLab,
+          disabled: !!opt.disabled
+        };
+      }
+      return { value: String(opt ?? index), label: String(opt ?? index), disabled: false };
+    });
+  }, [options, items]);
+
+  const normalizedGroups = React.useMemo(() => {
+    if (!groups) return null;
+    return groups.map((group) => ({
+      label: String(group.label || ''),
+      options: (group.options || []).map((opt: any, index: number) => {
+        if (typeof opt === 'string' || typeof opt === 'number') {
+          return { value: String(opt), label: String(opt), disabled: false };
+        }
+        const rawVal = opt?.value !== undefined ? opt.value : opt?.label;
+        const safeVal = typeof rawVal === 'object' && rawVal !== null
+          ? String(rawVal.value || rawVal.label || index)
+          : String(rawVal ?? index);
+
+        const rawLab = opt?.label !== undefined ? opt.label : opt?.value;
+        const safeLab = typeof rawLab === 'object' && rawLab !== null
+          ? String(rawLab.label || rawLab.value || safeVal)
+          : String(rawLab ?? safeVal);
+
+        return {
+          value: safeVal,
+          label: safeLab,
+          disabled: !!opt?.disabled
+        };
+      })
+    }));
+  }, [groups]);
 
   return (
     <BaseSelect.Root
       value={value}
       defaultValue={defaultValue}
-      onValueChange={onValueChange}
+      onValueChange={handleValueChange}
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
       multiple={multiple}
       disabled={disabled}
-      name={name}
+      name={name || selectId}
       required={required}
       modal={modal}
       actionsRef={actionsRef}
@@ -96,11 +196,12 @@ const SelectComponent: React.FC<SelectProps> = ({
           aria-describedby={describedBy}
           className={cn(
             'inline-flex items-center justify-between w-full h-12 px-4 rounded-md border-[1px] border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer min-h-[48px]',
+            'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
             error && 'border-error'
           )}
         >
           <BaseSelect.Value placeholder={placeholder} />
-          <BaseSelect.Icon className="ml-2">
+          <BaseSelect.Icon className="ml-2 shrink-0">
             <span className="material-symbols-outlined text-lg text-on-surface-variant" aria-hidden="true">
               unfold_more
             </span>
@@ -117,22 +218,54 @@ const SelectComponent: React.FC<SelectProps> = ({
           >
             <BaseSelect.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
               <BaseSelect.List className="relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none">
-                {options.map((opt) => (
-                  <BaseSelect.Item
-                    key={opt.value}
-                    value={opt.value}
-                    className={cn(
-                      'flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none',
-                      'hover:bg-surface-variant hover:text-primary data-[highlighted]:bg-surface-variant data-[highlighted]:text-primary data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
-                      'focus:bg-surface-variant focus:text-primary outline-none transition-colors'
-                    )}
-                  >
-                    <BaseSelect.ItemText>{opt.label}</BaseSelect.ItemText>
-                    <BaseSelect.ItemIndicator>
-                      <span className="material-symbols-outlined text-sm text-primary font-bold" aria-hidden="true">check</span>
-                    </BaseSelect.ItemIndicator>
-                  </BaseSelect.Item>
-                ))}
+                {normalizedGroups ? (
+                  normalizedGroups.map((group) => (
+                    <BaseSelect.Group key={group.label} className="py-1">
+                      {group.label && (
+                        <BaseSelect.GroupLabel className="sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none">
+                          {group.label}
+                        </BaseSelect.GroupLabel>
+                      )}
+                      {group.options.map((opt) => (
+                        <BaseSelect.Item
+                          key={opt.value}
+                          value={opt.value}
+                          disabled={opt.disabled}
+                          className={cn(
+                            'flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none',
+                            'hover:bg-surface-variant hover:text-primary data-[highlighted]:bg-surface-variant data-[highlighted]:text-primary data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
+                            'focus:bg-surface-variant focus:text-primary outline-none transition-colors',
+                            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed'
+                          )}
+                        >
+                          <BaseSelect.ItemText>{opt.label}</BaseSelect.ItemText>
+                          <BaseSelect.ItemIndicator>
+                            <span className="material-symbols-outlined text-sm text-primary font-bold" aria-hidden="true">check</span>
+                          </BaseSelect.ItemIndicator>
+                        </BaseSelect.Item>
+                      ))}
+                    </BaseSelect.Group>
+                  ))
+                ) : (
+                  normalizedOptions.map((opt) => (
+                    <BaseSelect.Item
+                      key={opt.value}
+                      value={opt.value}
+                      disabled={opt.disabled}
+                      className={cn(
+                        'flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none',
+                        'hover:bg-surface-variant hover:text-primary data-[highlighted]:bg-surface-variant data-[highlighted]:text-primary data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
+                        'focus:bg-surface-variant focus:text-primary outline-none transition-colors',
+                        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed'
+                      )}
+                    >
+                      <BaseSelect.ItemText>{opt.label}</BaseSelect.ItemText>
+                      <BaseSelect.ItemIndicator>
+                        <span className="material-symbols-outlined text-sm text-primary font-bold" aria-hidden="true">check</span>
+                      </BaseSelect.ItemIndicator>
+                    </BaseSelect.Item>
+                  ))
+                )}
               </BaseSelect.List>
             </BaseSelect.Popup>
           </BaseSelect.Positioner>
@@ -163,6 +296,7 @@ export const Select = Object.assign(SelectComponent, {
   Group: BaseSelect.Group,
   GroupLabel: BaseSelect.GroupLabel,
   Separator: BaseSelect.Separator,
+  Content: BaseSelect.Popup,
 });
 
 // Re-export Base UI primitives for compound composition
@@ -175,6 +309,7 @@ export const SelectIcon = BaseSelect.Icon;
 export const SelectPortal = BaseSelect.Portal;
 export const SelectPositioner = BaseSelect.Positioner;
 export const SelectPopup = BaseSelect.Popup;
+export const SelectContent = BaseSelect.Popup;
 export const SelectItem = BaseSelect.Item;
 export const SelectItemText = BaseSelect.ItemText;
 export const SelectItemIndicator = BaseSelect.ItemIndicator;
@@ -186,4 +321,5 @@ export const SelectScrollUpArrow = BaseSelect.ScrollUpArrow;
 export const SelectScrollDownArrow = BaseSelect.ScrollDownArrow;
 export const SelectBackdrop = BaseSelect.Backdrop;
 export const SelectList = BaseSelect.List;
+
 
