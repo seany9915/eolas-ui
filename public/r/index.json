@@ -299,7 +299,8 @@
     ],
     "registryDependencies": [
       "utils",
-      "field"
+      "field",
+      "textarea"
     ]
   },
   {

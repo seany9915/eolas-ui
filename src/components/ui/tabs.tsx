@@ -13,11 +13,14 @@ export interface TabItemData {
 
 export type TabItem = TabItemData;
 
-export interface TabsListProps {
+export type TabsVariant = 'line' | 'underline' | 'segmented' | 'segment' | 'pills' | 'pill' | 'unstyled' | string;
+
+export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   activateOnFocus?: boolean;
   loopFocus?: boolean;
-  variant?: 'line' | 'segmented';
+  variant?: TabsVariant;
+  showIndicator?: boolean;
   className?: string;
 }
 
@@ -26,70 +29,83 @@ export const TabsList: React.FC<TabsListProps> = ({
   activateOnFocus,
   loopFocus,
   variant = 'line',
+  showIndicator = true,
   className,
-}) => (
-  <BaseTabs.List
-    activateOnFocus={activateOnFocus}
-    loopFocus={loopFocus}
-    className={cn(
-      'relative flex items-center',
-      variant === 'segmented'
-        ? 'p-1 rounded-[0.5rem] bg-surface-container border border-outline-variant w-max gap-1'
-        : cn(
-            'gap-2 border-outline-variant overflow-x-auto',
-            'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
-            'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
-          ),
-      className
-    )}
-  >
-    {children}
-    <BaseTabs.Indicator
+  ...props
+}) => {
+  const isSegmented = variant === 'segmented' || variant === 'segment' || variant === 'pills' || variant === 'pill';
+  return (
+    <BaseTabs.List
+      activateOnFocus={activateOnFocus}
+      loopFocus={loopFocus}
       className={cn(
-        'absolute transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
-        variant === 'segmented'
-          ? 'bg-primary text-on-primary rounded-[0.375rem] shadow-xs data-[orientation=horizontal]:bottom-1 data-[orientation=horizontal]:top-1 data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:h-auto z-0'
-          : cn(
-              'bg-primary rounded-full z-10',
-              'data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:h-[2.5px]',
-              'data-[orientation=vertical]:right-0 data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:w-[2.5px]'
-            )
+        'relative flex items-center',
+        variant === 'unstyled'
+          ? ''
+          : isSegmented
+            ? 'p-1 rounded-[0.5rem] bg-surface-container border border-outline-variant w-max gap-1'
+            : cn(
+                'gap-2 border-outline-variant overflow-x-auto',
+                'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
+                'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+              ),
+        className
       )}
-    />
-  </BaseTabs.List>
-);
+      {...props}
+    >
+      {children}
+      {showIndicator && variant !== 'unstyled' && (
+        <BaseTabs.Indicator
+          className={cn(
+            'absolute transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
+            isSegmented
+              ? 'bg-primary text-on-primary rounded-[0.375rem] shadow-xs data-[orientation=horizontal]:bottom-1 data-[orientation=horizontal]:top-1 data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:h-auto z-0'
+              : cn(
+                  'bg-primary rounded-full z-10',
+                  'data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:h-[2.5px]',
+                  'data-[orientation=vertical]:right-0 data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:w-[2.5px]'
+                )
+          )}
+        />
+      )}
+    </BaseTabs.List>
+  );
+};
 
 export interface TabProps {
   value: string;
   children: React.ReactNode;
   icon?: string;
   disabled?: boolean;
-  variant?: 'line' | 'segmented';
+  variant?: TabsVariant;
   className?: string;
 }
 
-export const Tab: React.FC<TabProps> = ({ value, children, icon, disabled, variant = 'line', className }) => (
-  <BaseTabs.Tab
-    value={value}
-    disabled={disabled}
-    className={cn(
-      'inline-flex items-center gap-2 font-label text-sm font-semibold transition-[color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
-      variant === 'segmented'
-        ? 'py-2 px-3.5 min-h-[40px] rounded-[0.375rem] text-on-surface-variant hover:text-on-surface z-10 data-[selected]:text-on-primary data-[selected]:font-bold data-[selected]:bg-transparent'
-        : 'py-3 px-4 min-h-[48px] rounded-[0.375rem] text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 data-[selected]:text-primary data-[selected]:font-bold data-[selected]:bg-transparent',
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-      'disabled:opacity-50 disabled:cursor-not-allowed',
-      className
-    )}
-  >
-    {icon && (
-      <span className="material-symbols-outlined text-lg" aria-hidden="true">
-        {icon}
-      </span>
-    )}
-    <span>{children}</span>
-  </BaseTabs.Tab>
-);
+export const Tab: React.FC<TabProps> = ({ value, children, icon, disabled, variant = 'line', className }) => {
+  const isSegmented = variant === 'segmented' || variant === 'segment' || variant === 'pills' || variant === 'pill';
+  return (
+    <BaseTabs.Tab
+      value={value}
+      disabled={disabled}
+      className={cn(
+        'inline-flex items-center gap-2 font-label text-sm font-semibold transition-[color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
+        isSegmented
+          ? 'py-2 px-3.5 min-h-[40px] rounded-[0.375rem] text-on-surface-variant hover:text-on-surface z-10 data-[selected]:text-on-primary data-[selected]:font-bold data-[selected]:bg-transparent'
+          : 'py-3 px-4 min-h-[48px] rounded-[0.375rem] text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 data-[selected]:text-primary data-[selected]:font-bold data-[selected]:bg-transparent',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        className
+      )}
+    >
+      {icon && (
+        <span className="material-symbols-outlined text-lg" aria-hidden="true">
+          {icon}
+        </span>
+      )}
+      <span>{children}</span>
+    </BaseTabs.Tab>
+  );
+};
 
 export interface TabsPanelProps {
   value: string;
@@ -107,8 +123,6 @@ export const TabsPanel: React.FC<TabsPanelProps> = ({ value, keepMounted, childr
     {children}
   </BaseTabs.Panel>
 );
-
-export type TabsVariant = 'line' | 'underline' | 'segmented' | 'segment' | 'pills' | 'pill' | 'unstyled' | string;
 
 export interface TabsProps {
   items?: TabItemData[];
