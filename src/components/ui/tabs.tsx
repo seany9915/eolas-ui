@@ -108,6 +108,8 @@ export const TabsPanel: React.FC<TabsPanelProps> = ({ value, keepMounted, childr
   </BaseTabs.Panel>
 );
 
+export type TabsVariant = 'line' | 'underline' | 'segmented' | 'segment' | 'pills' | 'pill' | 'unstyled' | string;
+
 export interface TabsProps {
   items?: TabItemData[];
   /** Legacy alias for items */
@@ -118,7 +120,7 @@ export interface TabsProps {
   orientation?: 'horizontal' | 'vertical';
   activateOnFocus?: boolean;
   loopFocus?: boolean;
-  variant?: 'line' | 'segmented';
+  variant?: TabsVariant;
   /** When true, shrink-wraps the tabs container rather than stretching across full width */
   inline?: boolean;
   children?: React.ReactNode;
@@ -142,6 +144,7 @@ const TabsComponent: React.FC<TabsProps> = ({
   const tabList = items || tabs;
   const initialValue = defaultValue ?? (value === undefined && tabList ? (tabList[0]?.value ?? tabList[0]?.id) : undefined);
   const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
+  const isSegmented = variant === 'segmented' || variant === 'segment' || variant === 'pills' || variant === 'pill';
 
   return (
     <BaseTabs.Root
@@ -151,7 +154,7 @@ const TabsComponent: React.FC<TabsProps> = ({
       orientation={orientation}
       className={cn(
         'flex',
-        inline || variant === 'segmented' ? 'w-max items-start' : 'w-full',
+        inline || isSegmented ? 'w-max items-start' : 'w-full',
         orientation === 'vertical' ? 'flex-row gap-6 items-start' : 'flex-col',
         className
       )}
@@ -160,11 +163,11 @@ const TabsComponent: React.FC<TabsProps> = ({
         ? children
         : (
           <>
-            <TabsList activateOnFocus={activateOnFocus} loopFocus={loopFocus} variant={variant}>
+            <TabsList activateOnFocus={activateOnFocus} loopFocus={loopFocus} variant={isSegmented ? 'segmented' : 'line'}>
               {tabList?.map((tab) => {
                 const tabKey = (tab.value ?? tab.id) as string;
                 return (
-                  <Tab key={tabKey} value={tabKey} icon={tab.icon} disabled={tab.disabled} variant={variant}>
+                  <Tab key={tabKey} value={tabKey} icon={tab.icon} disabled={tab.disabled} variant={isSegmented ? 'segmented' : 'line'}>
                     {tab.label}
                   </Tab>
                 );

@@ -128,3 +128,21 @@ FieldError.displayName = 'FieldError';
 export const FieldValidity = BaseField.Validity;
 export const FieldItem = BaseField.Item;
 export { BaseField };
+
+// Cross-export Input and Textarea for backward compatibility with apps importing from Field
+export { Input } from './input';
+
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => (
+  <textarea
+    ref={ref}
+    className={cn(
+      'w-full min-h-[80px] p-3 rounded-[0.5rem] bg-surface text-on-surface font-sans text-base transition-colors',
+      'border-[1px] border-outline focus:border-primary focus:outline-2 focus:outline-offset-2 focus:outline-primary',
+      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant disabled:cursor-not-allowed',
+      className
+    )}
+    {...props}
+  />
+));
+Textarea.displayName = 'Textarea';

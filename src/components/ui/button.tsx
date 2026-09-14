@@ -3,13 +3,13 @@ import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'filled' | 'outlined' | 'text';
+  variant?: 'filled' | 'outlined' | 'text' | 'outline' | 'ghost' | 'tonal' | 'secondary' | 'default';
   /** Legacy alias for `variant` */
-  emphasis?: 'filled' | 'outlined' | 'text';
+  emphasis?: 'filled' | 'outlined' | 'text' | 'outline' | 'ghost' | 'tonal' | 'secondary' | 'default';
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
   /** Legacy alias for `colorRole`. If matching a color role name, mapped safely to avoid polluting DOM ARIA role. */
   role?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   focusableWhenDisabled?: boolean;
   nativeButton?: boolean;
   render?: BaseButton.Props['render'];
@@ -31,10 +31,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   ...props
 }, ref) => {
   // Backward compatibility resolution
-  const resolvedVariant = variant ?? emphasis ?? 'filled';
+  const rawVariant = variant ?? emphasis ?? 'filled';
+  const normalizedVariant = rawVariant === 'outline' ? 'outlined' : (rawVariant === 'ghost' ? 'text' : (rawVariant === 'default' ? 'filled' : rawVariant));
   const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success'];
   
   let resolvedColorRole: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' = colorRole ?? 'primary';
+  if (rawVariant === 'secondary') {
+    resolvedColorRole = 'secondary';
+  }
   let domRole: string | undefined = undefined;
 
   if (role) {
@@ -46,7 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   }
 
   // Constraint from DESIGN.md & anti-patterns: Tertiary (Sunny Amber) is filled-only on light surfaces
-  const safeVariant = (resolvedColorRole === 'tertiary' && resolvedVariant !== 'filled') ? 'filled' : resolvedVariant;
+  const safeVariant = (resolvedColorRole === 'tertiary' && normalizedVariant !== 'filled') ? 'filled' : normalizedVariant;
 
   const baseStyles = 'inline-flex items-center justify-center font-label text-sm font-semibold rounded-[0.5rem] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
 
@@ -54,6 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     sm: 'h-9 px-3 min-h-[44px]', // min touch target
     md: 'h-12 px-5 min-h-[48px]', // button standard floor 48px
     lg: 'h-14 px-6 min-h-[56px]',
+    icon: 'h-11 w-11 min-h-[44px] min-w-[44px] p-0 shrink-0 inline-flex items-center justify-center',
   };
 
   const filledStyles = {
@@ -63,6 +68,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     error: 'bg-error text-on-error hover:brightness-95 active:brightness-90',
     warning: 'bg-warning text-on-warning hover:brightness-95 active:brightness-90',
     success: 'bg-success text-on-success hover:brightness-95 active:brightness-90',
+  };
+
+  const tonalStyles = {
+    primary: 'bg-primary-container text-on-primary-container hover:brightness-95 active:brightness-90',
+    secondary: 'bg-secondary-container text-on-secondary-container hover:brightness-95 active:brightness-90',
+    tertiary: 'bg-tertiary text-on-tertiary',
+    error: 'bg-error-container text-on-error-container hover:brightness-95 active:brightness-90',
+    warning: 'bg-warning-container text-on-warning-container hover:brightness-95 active:brightness-90',
+    success: 'bg-success-container text-on-success-container hover:brightness-95 active:brightness-90',
   };
 
   const outlinedStyles = {
@@ -85,9 +99,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 
   const variantClass = safeVariant === 'filled' 
     ? filledStyles[resolvedColorRole] 
-    : safeVariant === 'outlined' 
-      ? outlinedStyles[resolvedColorRole] 
-      : textStyles[resolvedColorRole];
+    : safeVariant === 'tonal'
+      ? tonalStyles[resolvedColorRole]
+      : safeVariant === 'outlined' 
+        ? outlinedStyles[resolvedColorRole] 
+        : textStyles[resolvedColorRole];
 
   return (
     <BaseButton
