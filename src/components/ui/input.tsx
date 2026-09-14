@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Input as BaseInput } from '@base-ui/react/input';
-import { Field, BaseField, FieldRoot, FieldLabel, FieldControl, FieldDescription, FieldError, FieldValidity, FieldItem } from './field';
+import { Field, BaseField, FieldRoot, FieldLabel, FieldControl, FieldDescription, FieldError, FieldValidity, FieldItem, Textarea, type TextareaProps } from './field';
 import { cn } from '@/lib/utils';
 
 export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'children'> {
@@ -83,7 +83,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className
 Input.displayName = 'Input';
 
 // Compound Base UI exports
-export { BaseInput, BaseField, FieldRoot, FieldLabel, FieldControl, FieldDescription, FieldError, FieldValidity, FieldItem };
+export { BaseInput, BaseField, FieldRoot, FieldLabel, FieldControl, FieldDescription, FieldError, FieldValidity, FieldItem, Textarea, type TextareaProps };
 export const InputRoot = BaseInput;
+
 
 

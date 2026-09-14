@@ -1,0 +1,21 @@
+{
+  "name": "textarea",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "field"
+  ],
+  "files": [
+    {
+      "path": "ui/textarea.tsx",
+      "content": "export { Textarea, type TextareaProps } from './field';\n",
+      "type": "registry:ui",
+      "target": "components/ui/textarea.tsx"
+    }
+  ]
+}

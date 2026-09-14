@@ -536,6 +536,19 @@
     ]
   },
   {
+    "name": "textarea",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "field"
+    ]
+  },
+  {
     "name": "toast",
     "type": "registry:ui",
     "dependencies": [
