@@ -7,6 +7,8 @@ export interface ChipProps {
   label: string;
   pattern?: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' | 'soft-wash';
   /** Legacy alias for pattern */
+  variant?: 'outline' | 'outlined' | 'filled' | 'neutral' | 'soft-wash' | string;
+  /** Legacy alias for pattern */
   emphasis?: 'high' | 'default' | 'medium' | 'low' | 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' | 'soft-wash';
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success';
   /** Legacy alias for colorRole */
@@ -19,6 +21,7 @@ export interface ChipProps {
 export const Chip: React.FC<ChipProps> = ({
   label,
   pattern,
+  variant,
   emphasis,
   colorRole,
   role,
@@ -30,10 +33,10 @@ export const Chip: React.FC<ChipProps> = ({
   const resolvedColorRole = colorRole ?? role ?? 'primary';
   let resolvedPattern: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' = 'outline-neutral-fill';
 
-  const rawPattern = pattern ?? emphasis;
-  if (rawPattern === 'high' || rawPattern === 'high-contrast-mixed') {
+  const rawPattern = pattern ?? variant ?? emphasis;
+  if (rawPattern === 'high' || rawPattern === 'high-contrast-mixed' || rawPattern === 'filled') {
     resolvedPattern = 'high-contrast-mixed';
-  } else if (rawPattern === 'low' || rawPattern === 'neutral-fill-accent-text' || rawPattern === 'soft-wash') {
+  } else if (rawPattern === 'low' || rawPattern === 'neutral-fill-accent-text' || rawPattern === 'soft-wash' || rawPattern === 'neutral') {
     resolvedPattern = 'neutral-fill-accent-text';
   } else {
     resolvedPattern = 'outline-neutral-fill';
