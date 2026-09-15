@@ -24,7 +24,7 @@ export const ToggleGroupItem: React.FC<ToggleGroupItemProps> = ({
       aria-label={ariaLabel}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center gap-2 h-10 px-4 min-h-[44px] rounded-sm font-label text-sm font-semibold transition-all cursor-pointer select-none',
+        'inline-flex items-center justify-center gap-2 h-full px-4 rounded-[4px] font-label text-sm font-semibold transition-all cursor-pointer select-none min-h-[38px]',
         'text-on-surface-variant hover:text-on-surface hover:bg-surface/50',
         'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:shadow-sm',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
@@ -78,8 +78,8 @@ const ToggleGroupComponent: React.FC<ToggleGroupProps> = ({
       loopFocus={loopFocus}
       disabled={disabled}
       className={cn(
-        'inline-flex p-1 rounded-[0.5rem] border-[1px] border-outline-variant bg-surface-container gap-1',
-        orientation === 'vertical' && 'flex-col',
+        'inline-flex items-center h-12 p-1 rounded-[0.5rem] border-[1px] border-outline-variant bg-surface-container gap-1',
+        orientation === 'vertical' && 'flex-col h-auto',
         className
       )}
     >
