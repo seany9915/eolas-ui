@@ -6,7 +6,8 @@ export interface MeterProps {
   value: number;
   min?: number;
   max?: number;
-  label?: string;
+  label?: React.ReactNode;
+  description?: React.ReactNode;
   format?: Intl.NumberFormatOptions;
   locale?: Intl.LocalesArgument;
   'aria-valuetext'?: string;
@@ -15,20 +16,20 @@ export interface MeterProps {
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'warning' | 'error' | 'success';
 }
 
-const MeterComponent: React.FC<MeterProps> = ({
+const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
   value,
   min = 0,
   max = 100,
   label,
+  description,
   format,
   locale,
   'aria-valuetext': ariaValueText,
   getAriaValueText,
   className,
   colorRole = 'primary',
-}) => {
-  const percentage = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
-
+  ...props
+}, ref) => {
   const bgClasses = {
     primary: 'bg-primary',
     secondary: 'bg-secondary',
@@ -40,6 +41,7 @@ const MeterComponent: React.FC<MeterProps> = ({
 
   return (
     <BaseMeter.Root
+      ref={ref}
       value={value}
       min={min}
       max={max}
@@ -48,23 +50,34 @@ const MeterComponent: React.FC<MeterProps> = ({
       aria-valuetext={ariaValueText}
       getAriaValueText={getAriaValueText}
       className={cn('space-y-1.5 w-full', className)}
+      {...props}
     >
       {(label || value !== undefined) && (
-        <div className="flex items-center justify-between font-label text-xs font-semibold text-on-surface-variant">
+        <div className="flex items-center justify-between font-label text-sm font-semibold text-on-surface">
           {label && <BaseMeter.Label>{label}</BaseMeter.Label>}
-          <BaseMeter.Value className="font-mono text-xs font-bold text-on-surface">
+          <BaseMeter.Value className="font-mono text-sm font-bold text-on-surface">
             {(formattedValue, val) => formattedValue || `${val}%`}
           </BaseMeter.Value>
         </div>
       )}
-      <BaseMeter.Track className="w-full h-3 rounded-full bg-surface-variant overflow-hidden relative border border-outline-variant/30">
+      {description && (
+        <span className="font-sans text-sm text-on-surface-variant block">
+          {description}
+        </span>
+      )}
+      <BaseMeter.Track className="w-full h-3 rounded-full bg-surface-variant overflow-hidden relative border border-outline-variant">
         <BaseMeter.Indicator
-          className={cn('h-full transition-all duration-300', bgClasses)}
+          className={cn(
+            'h-full transition-all duration-[var(--duration-standard)] ease-[var(--ease-standard)]',
+            bgClasses
+          )}
         />
       </BaseMeter.Track>
     </BaseMeter.Root>
   );
-};
+});
+
+MeterComponent.displayName = 'Meter';
 
 // Compound export mapping Base UI primitives
 export const Meter = Object.assign(MeterComponent, {

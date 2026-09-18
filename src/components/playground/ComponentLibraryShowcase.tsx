@@ -61,6 +61,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
   const [toggleVal, setToggleVal] = React.useState(true);
   const [toggleGroupVal, setToggleGroupVal] = React.useState<string[]>(['grid']);
   const [sliderVal, setSliderVal] = React.useState(65);
+  const [rangeSliderVal, setRangeSliderVal] = React.useState<number[]>([25, 75]);
   const [numVal, setNumVal] = React.useState<number | null>(4);
   const [selectVal, setSelectVal] = React.useState<string | null>('daily');
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -407,9 +408,18 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   </div>
                   <Slider
                     label="Audio Pitch Threshold"
+                    description="44px touch targets with RTL auto-mirroring"
                     value={sliderVal}
                     onValueChange={setSliderVal}
                   />
+                  <div className="mt-4 pt-4 border-t border-outline-variant/40">
+                    <Slider
+                      label="Frequency Passband (Range)"
+                      description="Dual 44px thumbs with minimum/maximum values"
+                      value={rangeSliderVal}
+                      onValueChange={setRangeSliderVal}
+                    />
+                  </div>
                 </div>
                 <span className="font-label text-[11px] text-on-surface-variant/80 block pt-3 border-t border-outline-variant/40 mt-4">
                   Slider coordinate calculations invert automatically in RTL mode.
@@ -922,6 +932,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-[1rem] bg-surface border-none shadow-ambient">
           <Autocomplete
             label="Assigned Speech Drill Autocomplete"
+            description="Search with leading icon, clear button, and flush focus ring"
             placeholder="Type drill name (e.g. Vowel, Pitch)..."
             value={autocompleteVal}
             onValueChange={setAutocompleteVal}
@@ -1044,10 +1055,27 @@ export const ComponentLibraryShowcase: React.FC = () => {
             <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
               Meter (Scalar Gauge) & Separator
             </h4>
-            <div className="space-y-3">
-              <Meter label="Vocal Pitch Stability Meter" value={meterVal} colorRole="secondary" />
+            <div className="space-y-4">
+              <Meter
+                label="Vocal Pitch Stability Meter"
+                description="Real-time acoustic stability scoring"
+                value={meterVal}
+                colorRole="secondary"
+              />
               <Separator />
-              <Meter label="Storage Quota Utilization" value={45} colorRole="primary" />
+              <Meter
+                label="Storage Quota Utilization"
+                description="Encrypted clinical telemetry records"
+                value={45}
+                colorRole="primary"
+              />
+              <Separator />
+              <Meter
+                label="Therapy Latency Ceiling"
+                description="Threshold warning indicator"
+                value={88}
+                colorRole="warning"
+              />
             </div>
             <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
               <Button size="sm" variant="outlined" colorRole="secondary" onClick={() => setMeterVal((v) => (v >= 100 ? 20 : Math.min(100, v + 20)))}>

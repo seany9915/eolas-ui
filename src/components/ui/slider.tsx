@@ -3,10 +3,12 @@ import { Slider as BaseSlider } from '@base-ui/react/slider';
 import { cn } from '@/lib/utils';
 
 export interface SliderProps {
-  label: string;
+  label?: React.ReactNode;
+  description?: React.ReactNode;
   value?: number | number[];
   defaultValue?: number | number[];
   onValueChange?: (value: any) => void;
+  onValueCommitted?: (value: any) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -19,11 +21,13 @@ export interface SliderProps {
   className?: string;
 }
 
-const SliderComponent: React.FC<SliderProps> = ({
+const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   label,
+  description,
   value,
   defaultValue = 50,
   onValueChange,
+  onValueCommitted,
   min = 0,
   max = 100,
   step = 1,
@@ -34,14 +38,17 @@ const SliderComponent: React.FC<SliderProps> = ({
   name,
   disabled,
   className,
-}) => {
+  ...props
+}, ref) => {
   const isRange = Array.isArray(value ?? defaultValue);
 
   return (
     <BaseSlider.Root
+      ref={ref}
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
+      onValueCommitted={onValueCommitted}
       min={min}
       max={max}
       step={step}
@@ -52,44 +59,56 @@ const SliderComponent: React.FC<SliderProps> = ({
       name={name}
       disabled={disabled}
       className={cn('flex flex-col gap-2 w-full', className)}
+      {...props}
     >
-      <div className="flex justify-between items-center font-label text-sm font-semibold text-on-surface">
-        <BaseSlider.Label>{label}</BaseSlider.Label>
-        <BaseSlider.Value className="text-on-surface-variant font-mono text-xs">
-          {(formattedValues, values) =>
-            formattedValues.length > 0
-              ? formattedValues.join(' - ')
-              : values.join(' - ')
-          }
-        </BaseSlider.Value>
-      </div>
+      {(label || value !== undefined) && (
+        <div className="flex justify-between items-center font-label text-sm font-semibold text-on-surface">
+          {label && <BaseSlider.Label>{label}</BaseSlider.Label>}
+          <BaseSlider.Value className="text-on-surface-variant font-mono text-sm font-medium">
+            {(formattedValues, values) =>
+              formattedValues.length > 0
+                ? formattedValues.join(' - ')
+                : values.join(' - ')
+            }
+          </BaseSlider.Value>
+        </div>
+      )}
+
+      {description && (
+        <span className="font-sans text-sm text-on-surface-variant">
+          {description}
+        </span>
+      )}
+
       <BaseSlider.Control className="relative flex items-center w-full h-8 touch-none select-none cursor-pointer">
-        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-variant">
+        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-variant border border-outline-variant/60">
           <BaseSlider.Indicator className="h-full rounded-full bg-primary" />
           {isRange ? (
             <>
               <BaseSlider.Thumb
                 index={0}
                 aria-label="Minimum value"
-                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md relative before:absolute before:content-[''] before:w-11 before:h-11 before:-top-3 before:-left-3 before:pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
               />
               <BaseSlider.Thumb
                 index={1}
                 aria-label="Maximum value"
-                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md relative before:absolute before:content-[''] before:w-11 before:h-11 before:-top-3 before:-left-3 before:pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
               />
             </>
           ) : (
             <BaseSlider.Thumb
-              aria-label={label}
-              className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+              aria-label={typeof label === 'string' ? label : 'Slider value'}
+              className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md relative before:absolute before:content-[''] before:w-11 before:h-11 before:-top-3 before:-left-3 before:pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
             />
           )}
         </BaseSlider.Track>
       </BaseSlider.Control>
     </BaseSlider.Root>
   );
-};
+});
+
+SliderComponent.displayName = 'Slider';
 
 // Compound export mapping Base UI primitives
 export const Slider = Object.assign(SliderComponent, {
@@ -112,3 +131,4 @@ export const SliderTrack = BaseSlider.Track;
 export const SliderIndicator = BaseSlider.Indicator;
 export const SliderThumb = BaseSlider.Thumb;
 
+export default Slider;
