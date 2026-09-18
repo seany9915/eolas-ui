@@ -28,10 +28,10 @@ const viewportClasses: Record<string, string> = {
 };
 
 const popupClasses: Record<string, string> = {
-  right: 'w-screen max-w-md h-full rounded-l-lg rounded-r-none border-l-[2px] border-y-0 border-r-0 border-outline-variant data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full',
-  left: 'w-screen max-w-md h-full rounded-r-lg rounded-l-none border-r-[2px] border-y-0 border-l-0 border-outline-variant data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
-  down: 'h-auto max-h-[85vh] w-full rounded-t-lg rounded-b-none border-t-[2px] border-x-0 border-b-0 border-outline-variant data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full',
-  up: 'h-auto max-h-[85vh] w-full rounded-b-lg rounded-t-none border-b-[2px] border-x-0 border-t-0 border-outline-variant data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full',
+  right: 'w-screen max-w-md h-full rounded-none border-l-[2px] border-y-0 border-r-0 border-outline-variant data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full',
+  left: 'w-screen max-w-md h-full rounded-none border-r-[2px] border-y-0 border-l-0 border-outline-variant data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
+  down: 'h-auto max-h-[85vh] w-full rounded-none border-t-[2px] border-x-0 border-b-0 border-outline-variant data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full',
+  up: 'h-auto max-h-[85vh] w-full rounded-none border-b-[2px] border-x-0 border-t-0 border-outline-variant data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full',
 };
 
 const DrawerComponent: React.FC<DrawerProps> = ({
@@ -127,7 +127,7 @@ const DrawerComponent: React.FC<DrawerProps> = ({
                 <div className="pt-6 border-t border-outline-variant mt-6">{footer}</div>
               ) : (
                 <div className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6">
-                  <BaseDrawer.Close className="inline-flex items-center justify-center font-label text-sm font-semibold rounded-[0.5rem] h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
+                  <BaseDrawer.Close className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
                     Close panel
                   </BaseDrawer.Close>
                 </div>

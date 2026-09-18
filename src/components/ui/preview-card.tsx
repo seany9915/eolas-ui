@@ -38,34 +38,34 @@ const PreviewCardComponent: React.FC<PreviewCardProps> = ({
         delay={delay}
         closeDelay={closeDelay}
         render={React.isValidElement(trigger) ? trigger : undefined}
-        className="inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm"
+        className="inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
       >
         {React.isValidElement(trigger) ? undefined : trigger}
       </BasePreviewCard.Trigger>
       <BasePreviewCard.Portal>
         <BasePreviewCard.Positioner sideOffset={8}>
-          <BasePreviewCard.Popup className="w-72 p-4 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating z-50 space-y-2 transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
+          <BasePreviewCard.Popup className="w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient z-50 space-y-2 transition-[opacity,transform] duration-100 ease-out origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]">
             {children ? (
               children
             ) : (
               <>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
                     {icon && (
-                      <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">
+                      <span className="material-symbols-outlined text-primary text-xl shrink-0" aria-hidden="true">
                         {icon}
                       </span>
                     )}
-                    {title && <h4 className="font-heading text-sm font-bold text-on-surface">{title}</h4>}
+                    {title && <h4 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h4>}
                   </div>
                   {badgeText && (
-                    <span className="px-2 py-0.5 rounded-full bg-surface-container text-primary border border-outline-variant/60 font-label text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label text-xs font-semibold shrink-0">
                       {badgeText}
                     </span>
                   )}
                 </div>
                 {description && (
-                  <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                  <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
                     {description}
                   </p>
                 )}

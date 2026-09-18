@@ -1015,14 +1015,13 @@ export const ComponentLibraryShowcase: React.FC = () => {
               <Separator />
               <div>
                 <span className="font-label text-xs text-on-surface-variant block mb-1">Hover Preview Card</span>
-                <p className="font-sans text-xs text-on-surface-variant">
+                <p className="font-sans text-sm text-on-surface-variant">
                   Patient registered under{' '}
                   <PreviewCard
                     trigger="Protocol #74-Beta"
                     title="Protocol #74-Beta Guidance"
                     description="Standardized 12-week vocal resonance strengthening routine for pitch range expansion."
                     icon="clinical_notes"
-                    badgeText="Active Tier"
                   />
                   .
                 </p>
