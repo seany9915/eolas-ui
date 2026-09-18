@@ -9,8 +9,75 @@ export interface AccordionItemData {
   disabled?: boolean;
 }
 
-// Retain alias for backwards compatibility
-export type AccordionItem = AccordionItemData;
+export interface AccordionItemProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Item> {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(
+  ({ className, children, ...props }, ref) => (
+    <BaseAccordion.Item
+      ref={ref}
+      className={cn('w-full', className)}
+      {...props}
+    >
+      {children}
+    </BaseAccordion.Item>
+  )
+);
+AccordionItem.displayName = 'AccordionItem';
+
+export interface AccordionTriggerProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Trigger> {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
+  ({ children, className, ...props }, ref) => (
+    <BaseAccordion.Header className="flex">
+      <BaseAccordion.Trigger
+        ref={ref}
+        className={cn(
+          'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-left group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-md',
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <span
+          className="material-symbols-outlined text-2xl text-on-surface-variant group-data-[panel-open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-150 ease-out"
+          aria-hidden="true"
+        >
+          expand_more
+        </span>
+      </BaseAccordion.Trigger>
+    </BaseAccordion.Header>
+  )
+);
+AccordionTrigger.displayName = 'AccordionTrigger';
+
+export interface AccordionPanelProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Panel> {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelProps>(
+  ({ children, className, ...props }, ref) => (
+    <BaseAccordion.Panel
+      ref={ref}
+      className="overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-150 ease-out data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
+      {...props}
+    >
+      <div className={cn('px-2 pb-4 font-sans text-base text-on-surface-variant leading-relaxed', className)}>
+        {children}
+      </div>
+    </BaseAccordion.Panel>
+  )
+);
+AccordionPanel.displayName = 'AccordionPanel';
+
+export const AccordionContent = AccordionPanel;
+export type AccordionContentProps = AccordionPanelProps;
 
 export interface AccordionProps {
   items?: AccordionItemData[];
@@ -19,6 +86,8 @@ export interface AccordionProps {
   defaultValue?: string | string[];
   onValueChange?: (value: any) => void;
   multiple?: boolean;
+  type?: 'single' | 'multiple';
+  collapsible?: boolean;
   orientation?: 'horizontal' | 'vertical';
   loopFocus?: boolean;
   disabled?: boolean;
@@ -32,9 +101,11 @@ const AccordionComponent: React.FC<AccordionProps> = ({
   items,
   level = 1,
   value,
-  defaultValue = [],
+  defaultValue,
   onValueChange,
   multiple,
+  type,
+  collapsible: _collapsible,
   orientation,
   loopFocus,
   disabled,
@@ -43,12 +114,39 @@ const AccordionComponent: React.FC<AccordionProps> = ({
   children,
   className,
 }) => {
+  const isMultiple = type ? type === 'multiple' : !!multiple;
+
+  const normalizedValue = React.useMemo(() => {
+    if (value === undefined) return undefined;
+    if (value === null) return [];
+    return Array.isArray(value) ? value : [value];
+  }, [value]);
+
+  const normalizedDefaultValue = React.useMemo(() => {
+    if (defaultValue === undefined) return undefined;
+    if (defaultValue === null) return [];
+    return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+  }, [defaultValue]);
+
+  const handleValueChange = React.useCallback(
+    (val: any[], eventDetails: any) => {
+      if (onValueChange) {
+        if (!isMultiple && type === 'single') {
+          onValueChange(val[val.length - 1] ?? '');
+        } else {
+          onValueChange(val);
+        }
+      }
+    },
+    [onValueChange, isMultiple, type]
+  );
+
   return (
     <BaseAccordion.Root
-      value={value as any}
-      defaultValue={defaultValue as any}
-      onValueChange={onValueChange}
-      multiple={multiple}
+      value={normalizedValue}
+      defaultValue={normalizedDefaultValue}
+      onValueChange={handleValueChange}
+      multiple={isMultiple}
       orientation={orientation}
       loopFocus={loopFocus}
       disabled={disabled}
@@ -73,17 +171,8 @@ const AccordionComponent: React.FC<AccordionProps> = ({
                 level === 2 && idx < (items?.length ?? 0) - 1 && 'border-b border-outline-variant/60'
               )}
             >
-              <BaseAccordion.Header className="flex">
-                <BaseAccordion.Trigger className="flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-left group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-md">
-                  <span>{item.title}</span>
-                  <span className="material-symbols-outlined text-2xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)]" aria-hidden="true">
-                    expand_more
-                  </span>
-                </BaseAccordion.Trigger>
-              </BaseAccordion.Header>
-              <BaseAccordion.Panel className="px-2 pb-4 font-sans text-base text-on-surface-variant leading-relaxed overflow-hidden h-[var(--accordion-panel-height)] transition-[height,opacity] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:h-0 data-[ending-style]:h-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0">
-                {item.content}
-              </BaseAccordion.Panel>
+              <AccordionTrigger>{item.title}</AccordionTrigger>
+              <AccordionPanel>{item.content}</AccordionPanel>
             </BaseAccordion.Item>
           ))}
     </BaseAccordion.Root>
@@ -92,18 +181,19 @@ const AccordionComponent: React.FC<AccordionProps> = ({
 
 // Compound export mapping Base UI primitives
 export const Accordion = Object.assign(AccordionComponent, {
-  Root: BaseAccordion.Root,
-  Item: BaseAccordion.Item,
+  Root: AccordionComponent,
+  Item: AccordionItem,
   Header: BaseAccordion.Header,
-  Trigger: BaseAccordion.Trigger,
-  Panel: BaseAccordion.Panel,
+  Trigger: AccordionTrigger,
+  Panel: AccordionPanel,
+  Content: AccordionContent,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseAccordion };
-export const AccordionRoot = BaseAccordion.Root;
+export const AccordionRoot = AccordionComponent;
 export const AccordionItemPrimitive = BaseAccordion.Item;
 export const AccordionHeader = BaseAccordion.Header;
-export const AccordionTrigger = BaseAccordion.Trigger;
-export const AccordionPanel = BaseAccordion.Panel;
-
+export const AccordionTriggerPrimitive = BaseAccordion.Trigger;
+export const AccordionPanelPrimitive = BaseAccordion.Panel;
+export default Accordion;

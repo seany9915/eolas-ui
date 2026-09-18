@@ -76,7 +76,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               : isSegmented
                 ? 'p-1 rounded-[0.5rem] bg-surface-container border border-outline-variant w-max gap-1'
                 : cn(
-                    'gap-2 border-outline-variant overflow-x-auto',
+                    'gap-2 border-outline-variant overflow-x-auto overflow-y-hidden scrollbar-none',
                     'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
                     'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                   ),
@@ -88,7 +88,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
           {showIndicator && !isSegmented && effectiveVariant !== 'unstyled' && (
             <BaseTabs.Indicator
               className={cn(
-                'absolute bg-primary rounded-full z-10 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
+                'absolute bg-primary rounded-none z-10 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
                 'data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2.5px]',
                 'data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2.5px]'
               )}
@@ -139,7 +139,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                 'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-xs aria-selected:font-bold'
               )
             : cn(
-                'py-3 px-4 min-h-[48px] rounded-[0.375rem] text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-2 border-transparent',
+                'py-3 px-4 min-h-[48px] rounded-t-[0.375rem] rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
                 'data-[active]:text-primary data-[active]:font-bold data-[active]:border-primary -mb-px',
                 'data-[selected]:text-primary data-[selected]:font-bold data-[selected]:border-primary',
                 'data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:border-primary',
