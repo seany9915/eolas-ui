@@ -13,6 +13,7 @@ export interface SliderProps {
   max?: number;
   step?: number;
   minStepsBetweenValues?: number;
+  thumbCollisionBehavior?: 'push' | 'swap' | 'none';
   format?: Intl.NumberFormatOptions;
   locale?: Intl.LocalesArgument;
   orientation?: 'horizontal' | 'vertical';
@@ -32,6 +33,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   max = 100,
   step = 1,
   minStepsBetweenValues,
+  thumbCollisionBehavior,
   format,
   locale,
   orientation = 'horizontal',
@@ -41,6 +43,8 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   ...props
 }, ref) => {
   const isRange = Array.isArray(value ?? defaultValue);
+  const effectiveMinSteps = minStepsBetweenValues ?? (isRange ? 1 : 0);
+  const effectiveCollision = thumbCollisionBehavior ?? (isRange ? 'none' : 'push');
 
   return (
     <BaseSlider.Root
@@ -52,7 +56,8 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
       min={min}
       max={max}
       step={step}
-      minStepsBetweenValues={minStepsBetweenValues}
+      minStepsBetweenValues={effectiveMinSteps}
+      thumbCollisionBehavior={effectiveCollision}
       format={format}
       locale={locale}
       orientation={orientation}
@@ -80,7 +85,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
         </span>
       )}
 
-      <BaseSlider.Control className="relative flex items-center w-full h-8 touch-none select-none cursor-pointer">
+      <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer">
         <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-variant border border-outline-variant/60">
           <BaseSlider.Indicator className="h-full rounded-full bg-primary" />
           {isRange ? (
@@ -88,18 +93,18 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
               <BaseSlider.Thumb
                 index={0}
                 aria-label="Minimum value"
-                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md relative before:absolute before:content-[''] before:w-11 before:h-11 before:-top-3 before:-left-3 before:pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
               />
               <BaseSlider.Thumb
                 index={1}
                 aria-label="Maximum value"
-                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md relative before:absolute before:content-[''] before:w-11 before:h-11 before:-top-3 before:-left-3 before:pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
               />
             </>
           ) : (
             <BaseSlider.Thumb
               aria-label={typeof label === 'string' ? label : 'Slider value'}
-              className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md relative before:absolute before:content-[''] before:w-11 before:h-11 before:-top-3 before:-left-3 before:pointer-events-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+              className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
             />
           )}
         </BaseSlider.Track>

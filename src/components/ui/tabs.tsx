@@ -5,7 +5,7 @@
  * - Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role="tablist", role="tab", role="tabpanel").
  * - Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).
  * - Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).
- * - Segmented container uses `rounded-md` (0.75rem / 12px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per DESIGN.md.
+ * - Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).
  * - Line tabs use `rounded-t-sm` (0.25rem / 4px).
  */
 import * as React from 'react';
@@ -84,7 +84,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             effectiveVariant === 'unstyled'
               ? ''
               : isSegmented
-                ? 'p-1 rounded-md bg-surface-container border border-outline-variant w-max gap-1'
+                ? 'p-1 rounded bg-surface-container border border-outline-variant w-max gap-1'
                 : cn(
                     'gap-2 border-outline-variant overflow-x-auto overflow-y-hidden scrollbar-none',
                     'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',

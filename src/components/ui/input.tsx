@@ -8,6 +8,8 @@ export interface InputProps extends React.ComponentPropsWithoutRef<typeof BaseIn
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   trailingAction?: React.ReactNode;
+  clearable?: boolean;
+  onClear?: () => void;
   error?: boolean | string;
 }
 
@@ -16,15 +18,38 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   leadingIcon,
   trailingIcon,
   trailingAction,
+  clearable,
+  onClear,
   error,
+  value,
   ...props
 }, ref) => {
   const hasLeading = Boolean(leadingIcon);
-  const hasTrailing = Boolean(trailingIcon || trailingAction);
+  const showClear = clearable && (value === undefined || Boolean(value));
+  
+  const clearButton = showClear ? (
+    <button
+      type="button"
+      aria-label="Clear input"
+      onClick={(e) => {
+        e.preventDefault();
+        onClear?.();
+      }}
+      className="p-1 rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer flex items-center justify-center"
+    >
+      <span className="material-symbols-outlined text-base leading-none select-none" aria-hidden="true">
+        close
+      </span>
+    </button>
+  ) : null;
+
+  const effectiveTrailing = trailingAction ?? (showClear ? clearButton : trailingIcon);
+  const hasTrailing = Boolean(effectiveTrailing);
 
   const inputElement = (
     <BaseInput
       ref={ref}
+      value={value}
       className={cn(
         'w-full h-12 rounded bg-surface text-on-surface font-sans text-base transition-colors',
         'border-[1px] border-outline focus:border-primary focus:outline-2 focus:outline-offset-0 focus:outline-primary',
@@ -53,14 +78,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
         </span>
       )}
       {inputElement}
-      {(trailingIcon || trailingAction) && (
+      {effectiveTrailing && (
         <span
           className={cn(
             'absolute right-3.5 flex items-center text-xl',
-            trailingAction ? 'text-on-surface' : 'text-on-surface-variant pointer-events-none select-none'
+            (trailingAction || showClear) ? 'text-on-surface' : 'text-on-surface-variant pointer-events-none select-none'
           )}
         >
-          {trailingAction ?? trailingIcon}
+          {effectiveTrailing}
         </span>
       )}
     </div>
@@ -79,6 +104,8 @@ export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInput
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   trailingAction?: React.ReactNode;
+  clearable?: boolean;
+  onClear?: () => void;
   children?: React.ReactNode;
 }
 
@@ -94,6 +121,8 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
   leadingIcon,
   trailingIcon,
   trailingAction,
+  clearable,
+  onClear,
   children,
   ...props
 }, ref) => {
@@ -114,6 +143,8 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
           id={id}
           disabled={disabled}
           error={Boolean(error)}
+          clearable={clearable}
+          onClear={onClear}
           leadingIcon={
             error ? (
               <span className="material-symbols-outlined text-error text-xl" aria-hidden="true">

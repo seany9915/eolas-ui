@@ -55,7 +55,7 @@ const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(({
       loopFocus={loopFocus}
       orientation={orientation}
       className={cn(
-        'inline-flex items-center gap-1 p-1.5 rounded-md bg-surface border-[1px] border-outline-variant w-full shadow-sm',
+        'inline-flex items-center gap-1 p-1 rounded bg-surface border-[1px] border-outline-variant w-full shadow-sm',
         className
       )}
       {...props}

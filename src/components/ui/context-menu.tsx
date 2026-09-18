@@ -42,8 +42,8 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
         {children}
       </BaseContextMenu.Trigger>
       <BaseContextMenu.Portal>
-        <BaseContextMenu.Positioner sideOffset={4}>
-          <BaseContextMenu.Popup className="min-w-[200px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-floating z-50 space-y-1 transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
+        <BaseContextMenu.Positioner sideOffset={4} collisionPadding={8} className="z-50 outline-none">
+          <BaseContextMenu.Popup className="min-w-[200px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-floating space-y-1 transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
             {items.map((item) => (
               <BaseContextMenu.Item
                 key={item.id}

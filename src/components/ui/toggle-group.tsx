@@ -6,7 +6,7 @@
  *   where selection updates state/data in-place without switching or hiding full views or panels.
  * - Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role="tablist").
  * - Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role="toolbar").
- * - Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded-md` (0.75rem / 12px) per DESIGN.md.
+ * - Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).
  * - Focus ring uses `focus-visible:outline-offset-1 focus-visible:z-10` to avoid clipping against adjacent buttons.
  */
 import * as React from 'react';
@@ -130,7 +130,7 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
         loopFocus={loopFocus}
         disabled={disabled}
         className={cn(
-          'inline-flex items-center h-12 p-1 rounded-md border-[1px] border-outline-variant bg-surface-container gap-1',
+          'inline-flex items-center h-12 p-1 rounded border-[1px] border-outline-variant bg-surface-container gap-1',
           orientation === 'vertical' && 'flex-col h-auto',
           className
         )}

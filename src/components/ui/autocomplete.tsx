@@ -42,7 +42,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
   keepHighlight,
   openOnInputClick,
   leadingIcon = (
-    <span className="material-symbols-rounded text-xl select-none" aria-hidden="true">
+    <span className="material-symbols-outlined text-xl select-none" aria-hidden="true">
       search
     </span>
   ),
@@ -111,7 +111,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
               aria-label="Clear input"
               className="absolute right-3.5 p-1 rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer flex items-center justify-center"
             >
-              <span className="material-symbols-rounded text-lg leading-none select-none" aria-hidden="true">
+              <span className="material-symbols-outlined text-lg leading-none select-none" aria-hidden="true">
                 close
               </span>
             </BaseAutocomplete.Clear>
@@ -140,7 +140,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       </BaseAutocomplete.Root>
       {typeof error === 'string' && (
         <div className="flex items-center gap-1.5 font-sans text-sm text-error" role="alert">
-          <span className="material-symbols-rounded text-base select-none shrink-0" aria-hidden="true">
+          <span className="material-symbols-outlined text-base select-none shrink-0" aria-hidden="true">
             error
           </span>
           <span>{error}</span>

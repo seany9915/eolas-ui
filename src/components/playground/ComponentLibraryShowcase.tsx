@@ -74,6 +74,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
   const [meterVal, setMeterVal] = React.useState(82);
   const [toolbarActive, setToolbarActive] = React.useState('bold');
   const [showcaseDirection, setShowcaseDirection] = React.useState<TextDirection>('ltr');
+  const [searchVal, setSearchVal] = React.useState('Eleanor Vance');
 
   // Sample Table Data
   interface PatientSession {
@@ -200,16 +201,11 @@ export const ComponentLibraryShowcase: React.FC = () => {
               label="Clinical Record Search"
               description="Search by NHS number, diagnosis, or patient identifier"
               placeholder="Search caseload..."
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
               leadingIcon={<span className="material-symbols-outlined text-lg" aria-hidden="true">search</span>}
-              trailingAction={
-                <button
-                  type="button"
-                  aria-label="Clear search"
-                  className="p-1 rounded hover:bg-surface-variant/40 text-on-surface-variant transition-colors flex items-center justify-center cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-base">close</span>
-                </button>
-              }
+              clearable
+              onClear={() => setSearchVal('')}
             />
           </div>
           <div className="space-y-4">

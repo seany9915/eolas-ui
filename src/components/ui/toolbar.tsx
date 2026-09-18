@@ -47,7 +47,7 @@ const ToolbarComponent = React.forwardRef<HTMLDivElement, ToolbarProps>(({
       orientation={orientation}
       loopFocus={loopFocus}
       className={cn(
-        'flex items-center gap-1.5 p-1.5 rounded-md bg-surface border border-outline-variant shadow-ambient w-max',
+        'flex items-center gap-1 p-1 rounded bg-surface border border-outline-variant shadow-ambient w-max',
         orientation === 'vertical' && 'flex-col',
         className
       )}
