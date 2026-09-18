@@ -459,6 +459,7 @@
     "registryDependencies": [
       "utils",
       "checkbox",
+      "checkbox-group",
       "radio",
       "switch"
     ]

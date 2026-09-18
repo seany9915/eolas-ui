@@ -3,7 +3,7 @@ import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import { cn } from '@/lib/utils';
 
 export interface CheckboxProps {
-  label?: string;
+  label?: React.ReactNode;
   value?: string;
   name?: string;
   required?: boolean;
@@ -15,12 +15,14 @@ export interface CheckboxProps {
   onCheckedChange?: (checked: boolean) => void;
   disabled?: boolean;
   id?: string;
-  description?: string;
+  description?: React.ReactNode;
+  error?: boolean | string;
   compact?: boolean;
   className?: string;
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
-const CheckboxComponent: React.FC<CheckboxProps> = ({
+const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(({
   label,
   value,
   name,
@@ -34,14 +36,18 @@ const CheckboxComponent: React.FC<CheckboxProps> = ({
   disabled,
   id,
   description,
+  error,
   compact,
   className,
-}) => {
+  inputRef,
+  ...props
+}, ref) => {
   const generatedId = React.useId();
   const checkboxId = id || generatedId;
 
   const checkboxNode = (
     <BaseCheckbox.Root
+      ref={ref}
       id={checkboxId}
       value={value}
       name={name}
@@ -53,14 +59,17 @@ const CheckboxComponent: React.FC<CheckboxProps> = ({
       parent={parent}
       onCheckedChange={onCheckedChange}
       disabled={disabled}
+      inputRef={inputRef}
       className={cn(
-        'w-5 h-5 rounded-sm border-[1px] border-outline bg-surface transition-all flex items-center justify-center shrink-0 cursor-pointer',
+        'w-5 h-5 rounded border-[1px] bg-surface transition-all flex items-center justify-center shrink-0 cursor-pointer',
         'data-[checked]:bg-primary data-[checked]:border-primary text-on-primary',
         'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'disabled:bg-surface-variant/40 disabled:border-outline-variant disabled:cursor-not-allowed',
+        error ? 'border-error focus-visible:outline-error' : 'border-outline',
         !label && className
       )}
+      {...props}
     >
       <BaseCheckbox.Indicator
         render={(indicatorProps, state) => (
@@ -68,7 +77,7 @@ const CheckboxComponent: React.FC<CheckboxProps> = ({
             {...indicatorProps}
             className="flex items-center justify-center transition-[transform,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:scale-75 data-[starting-style]:opacity-0"
           >
-            <span className="material-symbols-outlined text-xs font-bold text-on-primary select-none" aria-hidden="true">
+            <span className="material-symbols-outlined text-sm font-bold text-on-primary select-none" aria-hidden="true">
               {state.indeterminate ? 'remove' : 'check'}
             </span>
           </span>
@@ -99,14 +108,24 @@ const CheckboxComponent: React.FC<CheckboxProps> = ({
           {label}
         </span>
         {description && (
-          <span className="font-sans text-xs text-on-surface-variant select-none">
+          <span className="font-sans text-sm text-on-surface-variant select-none mt-0.5">
             {description}
+          </span>
+        )}
+        {typeof error === 'string' && error && (
+          <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
+            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+              error
+            </span>
+            <span>{error}</span>
           </span>
         )}
       </div>
     </label>
   );
-};
+});
+
+CheckboxComponent.displayName = 'Checkbox';
 
 // Compound export mapping Base UI primitives
 export const Checkbox = Object.assign(CheckboxComponent, {
@@ -117,3 +136,5 @@ export const Checkbox = Object.assign(CheckboxComponent, {
 export { BaseCheckbox };
 export const CheckboxRoot = BaseCheckbox.Root;
 export const CheckboxIndicator = BaseCheckbox.Indicator;
+
+export default Checkbox;

@@ -9,13 +9,14 @@
   "registryDependencies": [
     "utils",
     "checkbox",
+    "checkbox-group",
     "radio",
     "switch"
   ],
   "files": [
     {
       "path": "ui/selection-controls.tsx",
-      "content": "/**\n * Re-exports selection control primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/checkbox\n * - @/components/ui/radio\n * - @/components/ui/switch\n */\nexport * from './checkbox';\nexport * from './radio';\nexport * from './switch';\n",
+      "content": "/**\n * Re-exports selection control primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/checkbox\n * - @/components/ui/checkbox-group\n * - @/components/ui/radio\n * - @/components/ui/switch\n */\nexport * from './checkbox';\nexport * from './checkbox-group';\nexport * from './radio';\nexport * from './switch';\n",
       "type": "registry:ui",
       "target": "components/ui/selection-controls.tsx"
     }
