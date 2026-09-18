@@ -498,8 +498,7 @@
     ],
     "registryDependencies": [
       "utils",
-      "number-field",
-      "otp-field"
+      "number-field"
     ]
   },
   {

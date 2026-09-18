@@ -4,7 +4,7 @@ import { FormField } from '@/components/ui/input';
 import { Checkbox, Radio, RadioGroup, Switch } from '@/components/ui/selection-controls';
 import { Toggle, ToggleGroup } from '@/components/ui/toggles';
 import { Slider } from '@/components/ui/slider';
-import { NumberField } from '@/components/ui/steppers';
+import { NumberField } from '@/components/ui/number-field';
 import { OTPField } from '@/components/ui/otp-field';
 import { Select } from '@/components/ui/select';
 import { Menu } from '@/components/ui/menu';
@@ -362,7 +362,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
         <div className="border-b border-outline-variant pb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h3 className="font-heading text-xl font-bold text-on-surface">4. Sliders & Stepped Inputs (Base UI `Slider`, `NumberField`)</h3>
-            <p className="font-sans text-xs text-on-surface-variant">
+            <p className="font-sans text-sm text-on-surface-variant">
               Standardized label headers, numeric controls, and bidirectional RTL support via Base UI `DirectionProvider`.
             </p>
           </div>
@@ -421,10 +421,12 @@ export const ComponentLibraryShowcase: React.FC = () => {
           <Card variant="default" className="p-6 h-full flex flex-col justify-between">
             <NumberField
               label="Repetition Count"
+              description="Clinical trials target range: 1–20 reps"
               value={numVal ?? 4}
               onValueChange={setNumVal}
               min={1}
               max={20}
+              step={1}
             />
           </Card>
 
