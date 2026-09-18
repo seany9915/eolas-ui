@@ -3,13 +3,8 @@ import { Form as BaseForm } from '@base-ui/react/form';
 import { cn } from '@/lib/utils';
 
 export interface FormProps<FormValues extends Record<string, any> = Record<string, any>>
-  extends Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
-  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
-  onFormSubmit?: (formValues: FormValues, eventDetails: BaseForm.SubmitEventDetails) => void;
-  validationMode?: BaseForm.ValidationMode;
-  errors?: Record<string, string | string[]>;
-  actionsRef?: React.RefObject<BaseForm.Actions | null>;
-  children: React.ReactNode;
+  extends BaseForm.Props<FormValues> {
+  children?: React.ReactNode;
   className?: string;
 }
 
@@ -45,3 +40,4 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps<any>>(({
 export { BaseForm };
 export const FormRoot = BaseForm;
 
+export default Form;

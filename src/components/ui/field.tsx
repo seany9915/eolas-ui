@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Field as BaseField } from '@base-ui/react/field';
 import { cn } from '@/lib/utils';
+import { Input, type InputProps } from './input';
+import { Textarea, TextareaField, FormTextarea, type TextareaProps, type TextareaFieldProps } from './textarea';
 
 export interface FieldProps extends React.ComponentPropsWithoutRef<typeof BaseField.Root> {
   label?: React.ReactNode;
@@ -28,6 +30,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
   return (
     <BaseField.Root
       ref={ref}
+      invalid={Boolean(error)}
       className={cn('flex flex-col gap-1.5 w-full', className)}
       {...props}
     >
@@ -35,13 +38,13 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
         <BaseField.Label className="font-label text-sm font-semibold text-on-surface flex items-center justify-between">
           <span>{label}</span>
           {required && (
-            <span className="text-xs text-on-surface-variant font-normal">(required)</span>
+            <span className="text-sm text-on-surface-variant font-normal">(required)</span>
           )}
         </BaseField.Label>
       )}
 
       {helperText && (
-        <BaseField.Description className="text-xs text-on-surface-variant font-sans">
+        <BaseField.Description className="text-sm text-on-surface-variant font-sans">
           {helperText}
         </BaseField.Description>
       )}
@@ -51,16 +54,30 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
       {error ? (
         <BaseField.Error
           match
-          className="flex items-center gap-1 text-xs font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
+          className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
         >
-          <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
+          <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
             error
           </span>
           <span>{error}</span>
         </BaseField.Error>
       ) : (
         <BaseField.Error
-          className="flex items-center gap-1 text-xs font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
+          className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
+          render={(elementProps) => (
+            <div
+              {...elementProps}
+              className={cn(
+                'flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]',
+                elementProps.className
+              )}
+            >
+              <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+                error
+              </span>
+              <span>{elementProps.children}</span>
+            </div>
+          )}
         />
       )}
     </BaseField.Root>
@@ -104,7 +121,7 @@ export const FieldDescription = React.forwardRef<HTMLParagraphElement, React.Com
   ({ className, ...props }, ref) => (
     <BaseField.Description
       ref={ref}
-      className={cn('text-xs text-on-surface-variant font-sans', className)}
+      className={cn('text-sm text-on-surface-variant font-sans', className)}
       {...props}
     />
   )
@@ -112,15 +129,34 @@ export const FieldDescription = React.forwardRef<HTMLParagraphElement, React.Com
 FieldDescription.displayName = 'FieldDescription';
 
 export const FieldError = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof BaseField.Error>>(
-  ({ className, ...props }, ref) => (
+  ({ className, children, render, ...props }, ref) => (
     <BaseField.Error
       ref={ref}
       className={cn(
-        'flex items-center gap-1 text-xs font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]',
+        'flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]',
         className
       )}
+      render={
+        render ??
+        ((elementProps) => (
+          <div
+            {...elementProps}
+            className={cn(
+              'flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]',
+              elementProps.className
+            )}
+          >
+            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+              error
+            </span>
+            <span>{elementProps.children}</span>
+          </div>
+        ))
+      }
       {...props}
-    />
+    >
+      {children}
+    </BaseField.Error>
   )
 );
 FieldError.displayName = 'FieldError';
@@ -130,19 +166,12 @@ export const FieldItem = BaseField.Item;
 export { BaseField };
 
 // Cross-export Input and Textarea for backward compatibility with apps importing from Field
-export { Input } from './input';
-
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => (
-  <textarea
-    ref={ref}
-    className={cn(
-      'w-full min-h-[80px] p-3 rounded-[0.5rem] bg-surface text-on-surface font-sans text-base transition-colors',
-      'border-[1px] border-outline focus:border-primary focus:outline-2 focus:outline-offset-2 focus:outline-primary',
-      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant disabled:cursor-not-allowed',
-      className
-    )}
-    {...props}
-  />
-));
-Textarea.displayName = 'Textarea';
+export {
+  Input,
+  type InputProps,
+  Textarea,
+  TextareaField,
+  FormTextarea,
+  type TextareaProps,
+  type TextareaFieldProps,
+};

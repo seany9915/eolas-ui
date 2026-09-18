@@ -182,26 +182,84 @@ export const ComponentLibraryShowcase: React.FC = () => {
       {/* 2. Inputs & Form Fields */}
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
-          <h3 className="font-heading text-xl font-bold text-on-surface">2. Input Fields (Base UI `Field` & `Input`)</h3>
-          <p className="font-sans text-xs text-on-surface-variant">
-            Horizontal baseline alignment across normal and error field states with explicit accessibility bindings.
+          <h3 className="font-heading text-xl font-bold text-on-surface">2. Input Fields & Form Controls (Base UI `Field`, `Input`, `Fieldset`, `OTPField`)</h3>
+          <p className="font-sans text-sm text-on-surface-variant">
+            Flush inset focus rings (<code>outline-offset: 0</code>), 14px typography floor for helper/error text, leading error icons, and borderless fieldsets.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-[1rem] bg-surface border-none shadow-ambient">
-          <div className="space-y-1.5 flex flex-col justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-lg bg-surface border-none shadow-ambient">
+          <div className="space-y-4">
             <FormField
               label="Patient Full Name"
               description="Enter patient name as registered on clinical portal"
               placeholder="e.g. Eleanor Vance"
               required
             />
+            <FormField
+              label="Clinical Record Search"
+              description="Search by NHS number, diagnosis, or patient identifier"
+              placeholder="Search caseload..."
+              leadingIcon={<span className="material-symbols-outlined text-lg" aria-hidden="true">search</span>}
+              trailingAction={
+                <button
+                  type="button"
+                  aria-label="Clear search"
+                  className="p-1 rounded hover:bg-surface-variant/40 text-on-surface-variant transition-colors flex items-center justify-center cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base">close</span>
+                </button>
+              }
+            />
           </div>
-          <div className="space-y-1.5 flex flex-col justify-between">
+          <div className="space-y-4">
             <FormField
               label="Therapy Session Passcode"
               description="Format: 6-digit clinical security passcode"
               error="Passcode must contain at least 6 characters"
               defaultValue="123"
+            />
+            <Fieldset legend="Contact Preferences" description="Select preferred communication methods" variant="default">
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <FormField
+                  label="Secure Email"
+                  placeholder="name@nhs.net"
+                  type="email"
+                />
+                <FormField
+                  label="Direct Extension"
+                  placeholder="+44 20 7946 0192"
+                  type="tel"
+                />
+              </div>
+            </Fieldset>
+          </div>
+        </div>
+
+        {/* OTP Field Showcase */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-lg bg-surface border-none shadow-ambient">
+          <div>
+            <h4 className="font-label text-sm font-bold text-on-surface-variant mb-2">
+              Clinical MFA / 6-Digit Code (with 3-3 grouping separator)
+            </h4>
+            <OTPField
+              label="One-Time Clinical Authorization Code"
+              description="Enter the 6-digit verification code sent to your authenticated device"
+              length={6}
+              showSeparator
+              required
+            />
+          </div>
+          <div>
+            <h4 className="font-label text-sm font-bold text-on-surface-variant mb-2">
+              Invalid OTP Passcode (Error State with Icon)
+            </h4>
+            <OTPField
+              label="Session Re-Authentication"
+              description="Verification code expired after 5 minutes"
+              error="The verification code entered is invalid or expired. Please try again."
+              length={6}
+              showSeparator
+              defaultValue="849201"
             />
           </div>
         </div>

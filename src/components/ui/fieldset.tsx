@@ -2,42 +2,50 @@ import * as React from 'react';
 import { Fieldset as BaseFieldset } from '@base-ui/react/fieldset';
 import { cn } from '@/lib/utils';
 
-export interface FieldsetProps {
-  legend: string;
-  description?: string;
+export interface FieldsetProps extends React.ComponentPropsWithoutRef<typeof BaseFieldset.Root> {
+  legend?: React.ReactNode;
+  description?: React.ReactNode;
   children: React.ReactNode;
-  variant?: 'card' | 'flat';
+  variant?: 'default' | 'card' | 'flat';
   className?: string;
 }
 
-const FieldsetComponent: React.FC<FieldsetProps> = ({
+const FieldsetComponent = React.forwardRef<HTMLFieldSetElement, FieldsetProps>(({
   legend,
   description,
   children,
-  variant = 'card',
+  variant = 'default',
   className,
-}) => {
+  ...props
+}, ref) => {
   return (
     <BaseFieldset.Root
+      ref={ref}
       className={cn(
-        'p-5 rounded-lg space-y-4 w-full',
-        variant === 'card' && 'bg-surface border border-outline-variant shadow-ambient',
-        variant === 'flat' && 'bg-surface-container/60 border-none',
+        'w-full',
+        variant === 'default' && 'border-none p-0 space-y-3',
+        variant === 'card' && 'p-5 rounded bg-surface border border-outline-variant shadow-ambient space-y-4',
+        variant === 'flat' && 'p-5 rounded bg-surface-container/60 border-none space-y-4',
         className
       )}
+      {...props}
     >
-      <BaseFieldset.Legend className="px-1">
-        <span className="font-heading text-sm font-bold text-on-surface block">{legend}</span>
-        {description && (
-          <span className="font-sans text-xs text-on-surface-variant block mt-0.5">{description}</span>
-        )}
-      </BaseFieldset.Legend>
-      <div className="space-y-4">
+      {legend && (
+        <BaseFieldset.Legend className="px-0.5">
+          <span className="font-heading text-base font-bold text-on-surface block">{legend}</span>
+          {description && (
+            <span className="font-sans text-sm text-on-surface-variant block mt-0.5">{description}</span>
+          )}
+        </BaseFieldset.Legend>
+      )}
+      <div className={variant === 'default' ? 'space-y-3' : 'space-y-4'}>
         {children}
       </div>
     </BaseFieldset.Root>
   );
-};
+});
+
+FieldsetComponent.displayName = 'Fieldset';
 
 // Compound export mapping Base UI primitives
 export const Fieldset = Object.assign(FieldsetComponent, {
@@ -50,3 +58,4 @@ export { BaseFieldset };
 export const FieldsetRoot = BaseFieldset.Root;
 export const FieldsetLegend = BaseFieldset.Legend;
 
+export default Fieldset;

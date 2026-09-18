@@ -238,7 +238,8 @@
     ],
     "registryDependencies": [
       "utils",
-      "input"
+      "input",
+      "textarea"
     ]
   },
   {
