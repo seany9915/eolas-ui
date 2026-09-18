@@ -1040,12 +1040,13 @@ export const ComponentLibraryShowcase: React.FC = () => {
               <Collapsible title="View Clinical Guidelines">
                 Keep room noise level under 35dB. Maintain 12-inch distance from unidirectional condenser microphone.
               </Collapsible>
-              <ScrollArea maxHeight="100px">
-                <div className="space-y-2 text-xs font-sans text-on-surface-variant">
-                  <p><strong>Log Entry 1:</strong> Telemetry audio calibrated at 48kHz.</p>
-                  <p><strong>Log Entry 2:</strong> Vowel duration test passed (14.2s sustain).</p>
-                  <p><strong>Log Entry 3:</strong> Pitch stability variance &lt; 2.1 Hz.</p>
-                  <p><strong>Log Entry 4:</strong> Session metrics archived to Firestore.</p>
+              <ScrollArea maxHeight="120px" className="rounded-md bg-surface-container/40 p-3">
+                <div className="space-y-2 text-sm font-sans text-on-surface-variant">
+                  <p><strong className="text-on-surface">Log 1:</strong> Audio calibrated at 48kHz.</p>
+                  <p><strong className="text-on-surface">Log 2:</strong> Vowel duration test passed (14.2s sustain).</p>
+                  <p><strong className="text-on-surface">Log 3:</strong> Pitch stability variance &lt; 2.1 Hz.</p>
+                  <p><strong className="text-on-surface">Log 4:</strong> Session metrics saved to storage.</p>
+                  <p><strong className="text-on-surface">Log 5:</strong> Articulation accuracy evaluated at 96%.</p>
                 </div>
               </ScrollArea>
             </div>
