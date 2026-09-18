@@ -10,13 +10,14 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   /** Legacy alias for `colorRole`. If matching a color role name, mapped safely to avoid polluting DOM ARIA role. */
   role?: string;
   size?: 'sm' | 'md' | 'lg' | 'icon';
+  loading?: boolean;
   focusableWhenDisabled?: boolean;
   nativeButton?: boolean;
   render?: BaseButton.Props['render'];
   children?: React.ReactNode;
 }
 
-const baseStyles = 'inline-flex items-center justify-center font-label text-sm font-semibold rounded-[0.5rem] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
+const baseStyles = 'inline-flex items-center justify-center gap-2 font-label text-sm font-semibold rounded-[0.5rem] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.96] motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:active:scale-100 cursor-pointer select-none';
 
 const sizeStyles = {
   sm: 'h-9 px-3 min-h-[44px]', // min touch target
@@ -120,6 +121,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   focusableWhenDisabled,
   nativeButton,
   render,
+  loading = false,
   ...props
 }, ref) => {
   const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success', 'neutral'];
@@ -129,18 +131,27 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     domRole = role; // valid ARIA role like 'tab', 'switch', etc.
   }
 
+  const isActuallyDisabled = disabled || loading;
+  const isFocusableWhenDisabled = focusableWhenDisabled ?? (loading ? true : undefined);
+
   return (
     <BaseButton
       ref={ref}
-      disabled={disabled}
-      focusableWhenDisabled={focusableWhenDisabled}
+      disabled={isActuallyDisabled}
+      focusableWhenDisabled={isFocusableWhenDisabled}
       nativeButton={nativeButton}
       render={render}
       role={domRole}
+      aria-busy={loading ? true : undefined}
       className={buttonVariants({ variant, emphasis, colorRole, role, size, className })}
       {...props}
     >
-      {children}
+      {loading && (
+        <span className="material-symbols-outlined animate-spin text-base shrink-0" aria-hidden="true">
+          progress_activity
+        </span>
+      )}
+      {size === 'icon' && loading ? null : children}
     </BaseButton>
   );
 });
