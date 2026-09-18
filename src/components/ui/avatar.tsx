@@ -2,23 +2,26 @@ import * as React from 'react';
 import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import { cn } from '@/lib/utils';
 
-export interface AvatarProps {
+export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
   src?: string;
   alt?: string;
   fallback: React.ReactNode;
   delay?: number;
   size?: 'sm' | 'md' | 'lg';
+  keepMounted?: boolean;
   className?: string;
 }
 
-const AvatarComponent: React.FC<AvatarProps> = ({
+const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
   src,
   alt = 'User Avatar',
   fallback,
   delay,
   size = 'md',
+  keepMounted,
   className,
-}) => {
+  ...props
+}, ref) => {
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
     md: 'w-10 h-10 text-sm', // 2.5rem minimum floor
@@ -27,18 +30,21 @@ const AvatarComponent: React.FC<AvatarProps> = ({
 
   return (
     <BaseAvatar.Root
+      ref={ref}
       className={cn(
         'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
         'bg-surface-variant text-on-surface-variant font-label font-bold border border-outline-variant',
         sizeClasses[size],
         className
       )}
+      {...props}
     >
       {src && (
         <BaseAvatar.Image
           src={src}
           alt={alt}
-          className="w-full h-full object-cover"
+          keepMounted={keepMounted}
+          className="w-full h-full object-cover transition-opacity duration-quick data-[loading]:opacity-0"
         />
       )}
       <BaseAvatar.Fallback
@@ -49,7 +55,9 @@ const AvatarComponent: React.FC<AvatarProps> = ({
       </BaseAvatar.Fallback>
     </BaseAvatar.Root>
   );
-};
+});
+
+AvatarComponent.displayName = 'Avatar';
 
 export interface AvatarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   avatar: AvatarProps;

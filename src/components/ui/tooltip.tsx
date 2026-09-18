@@ -17,6 +17,7 @@ export interface TooltipProps {
   closeDelay?: number;
   trackCursorAxis?: 'none' | 'x' | 'y' | 'both';
   disabled?: boolean;
+  showArrow?: boolean;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ const TooltipComponent: React.FC<TooltipProps> = ({
   closeDelay,
   trackCursorAxis,
   disabled,
+  showArrow = true,
   className,
 }) => {
   return (
@@ -45,7 +47,13 @@ const TooltipComponent: React.FC<TooltipProps> = ({
     >
       <BaseTooltip.Trigger render={children} delay={delay} closeDelay={closeDelay} />
       <BaseTooltip.Portal>
-        <BaseTooltip.Positioner side={side} align={align} sideOffset={sideOffset}>
+        <BaseTooltip.Positioner
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          collisionPadding={8}
+          className="z-50 outline-none"
+        >
           <BaseTooltip.Popup
             className={cn(
               'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-md outline-none select-none',
@@ -55,7 +63,13 @@ const TooltipComponent: React.FC<TooltipProps> = ({
               className
             )}
           >
-            <BaseTooltip.Arrow className="fill-on-surface" />
+            {showArrow && (
+              <BaseTooltip.Arrow className="data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90">
+                <svg width="10" height="5" viewBox="0 0 10 5" className="fill-on-surface block">
+                  <path d="M0 5 L5 0 L10 5 Z" />
+                </svg>
+              </BaseTooltip.Arrow>
+            )}
             {content}
           </BaseTooltip.Popup>
         </BaseTooltip.Positioner>
