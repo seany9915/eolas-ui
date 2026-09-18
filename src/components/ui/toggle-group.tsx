@@ -1,3 +1,14 @@
+/**
+ * ToggleGroup primitive (@base-ui/react/toggle-group).
+ *
+ * TAXONOMY & USAGE:
+ * - Use ToggleGroup for mutually exclusive or multi-select option switches (e.g. text align, view mode grid/list, filter tags)
+ *   where selection updates state/data in-place without switching or hiding full views or panels.
+ * - Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role="tablist").
+ * - Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role="toolbar").
+ * - Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded-md` (0.75rem / 12px) per DESIGN.md.
+ * - Focus ring uses `focus-visible:outline-offset-1 focus-visible:z-10` to avoid clipping against adjacent buttons.
+ */
 import * as React from 'react';
 import { ToggleGroup as BaseToggleGroup } from '@base-ui/react/toggle-group';
 import { Toggle as BaseToggle } from '@base-ui/react/toggle';
@@ -28,12 +39,12 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
           />
         )}
         className={cn(
-          'inline-flex items-center justify-center gap-2 h-full px-4 rounded-[4px] font-label text-sm font-semibold transition-all cursor-pointer select-none min-h-[38px]',
+          'inline-flex items-center justify-center gap-2 h-full px-4 rounded-sm font-label text-sm font-semibold transition-all cursor-pointer select-none min-h-[38px]',
           'text-on-surface-variant hover:text-on-surface hover:bg-surface/50',
           'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:shadow-sm',
           'data-[state=on]:bg-primary data-[state=on]:text-on-primary data-[state=on]:shadow-sm',
           'aria-pressed:bg-primary aria-pressed:text-on-primary aria-pressed:shadow-sm',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className
         )}
@@ -119,7 +130,7 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
         loopFocus={loopFocus}
         disabled={disabled}
         className={cn(
-          'inline-flex items-center h-12 p-1 rounded-[0.5rem] border-[1px] border-outline-variant bg-surface-container gap-1',
+          'inline-flex items-center h-12 p-1 rounded-md border-[1px] border-outline-variant bg-surface-container gap-1',
           orientation === 'vertical' && 'flex-col h-auto',
           className
         )}

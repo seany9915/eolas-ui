@@ -352,7 +352,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
               </div>
             </div>
             <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Segmented Control State
+              Toggle: 2-state button (aria-pressed). ToggleGroup: In-place mode switch.
             </span>
           </Card>
         </div>
@@ -454,11 +454,11 @@ export const ComponentLibraryShowcase: React.FC = () => {
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
           <h3 className="font-heading text-xl font-bold text-on-surface">5. Menus, Selects & Popovers (Base UI Primitives)</h3>
-          <p className="font-sans text-xs text-on-surface-variant">
-            Tier B floating surfaces (1px border, 10% ambient shadow) with aligned trigger controls.
+          <p className="font-sans text-sm text-on-surface-variant">
+            Menu: Single-button action dropdown (role="menu"). Select: Form value picker (role="combobox"). Popover: Rich floating non-modal content.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-[1rem] bg-surface border-none shadow-ambient items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-lg bg-surface border-none shadow-ambient items-end">
           <Select
             label="Cadence Frequency Select"
             value={selectVal ?? ''}
@@ -743,9 +743,9 @@ export const ComponentLibraryShowcase: React.FC = () => {
       {/* 9. Accordion & Tabs */}
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
-          <h3 className="font-heading text-xl font-bold text-on-surface">9. Accordions & Tabs (Base UI `Accordion`, `Tabs`)</h3>
-          <p className="font-sans text-xs text-on-surface-variant">
-            Collapsible hierarchy vs multi-view panel layout comparison.
+          <h3 className="font-heading text-xl font-bold text-on-surface">9. Accordions & Tabs (Base UI Primitives)</h3>
+          <p className="font-sans text-sm text-on-surface-variant">
+            Tabs: Mutually exclusive in-page views/panels (role="tablist"). Accordion: Vertically stacked expandable disclosure panels.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -963,8 +963,8 @@ export const ComponentLibraryShowcase: React.FC = () => {
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
           <h3 className="font-heading text-xl font-bold text-on-surface">14. Menubar, Context Menu & Navigation (Base UI Primitives)</h3>
-          <p className="font-sans text-xs text-on-surface-variant">
-            Desktop application header menubars, contextual right-click popups, and site navigation headers.
+          <p className="font-sans text-sm text-on-surface-variant">
+            Menubar: Desktop app command bar. ContextMenu: Secondary right-click contextual menu. NavigationMenu: Site/app routing hierarchy (&lt;nav&gt;).
           </p>
         </div>
         <div className="space-y-6">
@@ -1005,12 +1005,12 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 { id: 'c3', label: 'Archive Record', icon: 'archive', destructive: true, action: () => showToast('Record Archived', 'Patient record moved to archive storage.', 'warning') },
               ]}
             >
-              <div className="p-6 rounded-[0.75rem] bg-surface-container border border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-context-menu hover:bg-surface-variant/50 transition-colors h-36">
+              <div className="p-6 rounded-md bg-surface-container border border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-context-menu hover:bg-surface-variant/50 transition-colors h-36">
                 <span className="material-symbols-outlined text-primary text-3xl mb-2" aria-hidden="true">
                   mouse
                 </span>
                 <span className="font-label text-sm font-bold text-on-surface">Right-Click Anywhere Here</span>
-                <span className="font-sans text-xs text-on-surface-variant mt-1">Triggers Base UI `ContextMenu` popup</span>
+                <span className="font-sans text-sm text-on-surface-variant mt-1">Triggers Base UI `ContextMenu` popup</span>
               </div>
             </ContextMenu>
 
@@ -1045,9 +1045,9 @@ export const ComponentLibraryShowcase: React.FC = () => {
       {/* 15. Utility & Gauge Primitives */}
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
-          <h3 className="font-heading text-xl font-bold text-on-surface">15. Utility, Scalar Gauge & Layout Primitives (Meter, Toolbar, PreviewCard, Collapsible, ScrollArea, Separator)</h3>
-          <p className="font-sans text-xs text-on-surface-variant">
-            Quantitative meters, action toolbars, rich preview cards, collapsible disclosures, and custom scroll areas.
+          <h3 className="font-heading text-xl font-bold text-on-surface">15. Utility, Scalar Gauge & Layout Primitives (Toolbar, Meter, PreviewCard, Collapsible, ScrollArea, Separator)</h3>
+          <p className="font-sans text-sm text-on-surface-variant">
+            Toolbar: Persistent action strip with single tab-stop arrow navigation (role="toolbar"). Meter: Scalar measurement gauge.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

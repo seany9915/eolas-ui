@@ -2,6 +2,20 @@ import * as React from 'react';
 import { ContextMenu as BaseContextMenu } from '@base-ui/react/context-menu';
 import { cn } from '@/lib/utils';
 
+/**
+ * ContextMenu Component (Secondary Pointer-Anchored Actions)
+ *
+ * WAI-ARIA Role: role="menu"
+ * Primary Purpose: Secondary action menu triggered by right-click, long-press, or Shift+F10 on a target surface.
+ *
+ * TAXONOMY & USAGE GUIDELINES:
+ * - USE THIS: For power-user shortcuts anchored directly to an item or canvas node.
+ * - DO NOT USE:
+ *   - As the ONLY way to perform an action. Touch/mobile users cannot right-click reliably; ALWAYS provide a visible primary action button or <Menu>.
+ *   - For persistent desktop menus -> Use <Menubar>.
+ *   - For primary action dropdowns -> Use <Menu>.
+ */
+
 export interface ContextMenuItem {
   id: string;
   label: string;
@@ -13,30 +27,36 @@ export interface ContextMenuItem {
 export interface ContextMenuProps {
   children: React.ReactNode;
   items: ContextMenuItem[];
+  className?: string;
 }
 
-const ContextMenuComponent: React.FC<ContextMenuProps> = ({ children, items }) => {
+const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(({
+  children,
+  items,
+  className,
+  ...props
+}, ref) => {
   return (
     <BaseContextMenu.Root>
-      <BaseContextMenu.Trigger className="w-full">
+      <BaseContextMenu.Trigger ref={ref} className={cn('w-full', className)} {...props}>
         {children}
       </BaseContextMenu.Trigger>
       <BaseContextMenu.Portal>
         <BaseContextMenu.Positioner sideOffset={4}>
-          <BaseContextMenu.Popup className="min-w-[200px] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating z-50 space-y-1 transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
+          <BaseContextMenu.Popup className="min-w-[200px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-floating z-50 space-y-1 transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
             {items.map((item) => (
               <BaseContextMenu.Item
                 key={item.id}
                 onClick={item.action}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-[0.375rem] font-sans text-xs font-medium cursor-pointer transition-colors select-none outline-none',
+                  'flex items-center gap-2 px-3 py-2 rounded-sm font-sans text-sm font-medium cursor-pointer transition-colors select-none outline-none',
                   item.destructive
-                    ? 'text-error hover:bg-error/10 data-[highlighted]:bg-error/10'
-                    : 'text-on-surface hover:bg-primary/10 hover:text-primary data-[highlighted]:bg-primary/10 data-[highlighted]:text-primary'
+                    ? 'text-error hover:bg-error-container/30 focus:bg-error-container/30 data-[highlighted]:bg-error-container/30'
+                    : 'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface'
                 )}
               >
                 {item.icon && (
-                  <span className="material-symbols-outlined text-base" aria-hidden="true">
+                  <span className="material-symbols-outlined text-lg" aria-hidden="true">
                     {item.icon}
                   </span>
                 )}
@@ -48,7 +68,9 @@ const ContextMenuComponent: React.FC<ContextMenuProps> = ({ children, items }) =
       </BaseContextMenu.Portal>
     </BaseContextMenu.Root>
   );
-};
+});
+
+ContextMenuComponent.displayName = 'ContextMenu';
 
 // Compound export mapping Base UI primitives
 export const ContextMenu = Object.assign(ContextMenuComponent, {

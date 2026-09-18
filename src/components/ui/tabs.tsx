@@ -1,3 +1,13 @@
+/**
+ * Tabs primitive (@base-ui/react/tabs).
+ *
+ * TAXONOMY & USAGE:
+ * - Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role="tablist", role="tab", role="tabpanel").
+ * - Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).
+ * - Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).
+ * - Segmented container uses `rounded-md` (0.75rem / 12px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per DESIGN.md.
+ * - Line tabs use `rounded-t-sm` (0.25rem / 4px).
+ */
 import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { cn } from '@/lib/utils';
@@ -74,7 +84,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             effectiveVariant === 'unstyled'
               ? ''
               : isSegmented
-                ? 'p-1 rounded-[0.5rem] bg-surface-container border border-outline-variant w-max gap-1'
+                ? 'p-1 rounded-md bg-surface-container border border-outline-variant w-max gap-1'
                 : cn(
                     'gap-2 border-outline-variant overflow-x-auto overflow-y-hidden scrollbar-none',
                     'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
@@ -132,20 +142,20 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
           'inline-flex items-center gap-2 font-label text-sm font-semibold transition-all duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
           isSegmented
             ? cn(
-                'py-2 px-3.5 min-h-[40px] rounded-[0.375rem] text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 z-10',
+                'py-2 px-3.5 min-h-[40px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 z-10',
                 'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-xs data-[active]:font-bold',
                 'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-xs data-[selected]:font-bold',
                 'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-xs data-[state=active]:font-bold',
                 'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-xs aria-selected:font-bold'
               )
             : cn(
-                'py-3 px-4 min-h-[48px] rounded-t-[0.375rem] rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
+                'py-3 px-4 min-h-[48px] rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
                 'data-[active]:text-primary data-[active]:font-bold data-[active]:border-primary -mb-px',
                 'data-[selected]:text-primary data-[selected]:font-bold data-[selected]:border-primary',
                 'data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:border-primary',
                 'aria-selected:text-primary aria-selected:font-bold aria-selected:border-primary'
               ),
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className
         )}
@@ -205,66 +215,75 @@ export interface TabsProps {
   className?: string;
 }
 
-const TabsComponent: React.FC<TabsProps> = ({
-  items,
-  tabs,
-  value,
-  defaultValue,
-  onValueChange,
-  orientation = 'horizontal',
-  activateOnFocus,
-  loopFocus,
-  variant = 'line',
-  inline = false,
-  children,
-  className,
-}) => {
-  const tabList = items || tabs;
-  const initialValue = defaultValue ?? (value === undefined && tabList ? (tabList[0]?.value ?? tabList[0]?.id) : undefined);
-  const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
-  const isSegmented = variant === 'segmented' || variant === 'segment' || variant === 'pills' || variant === 'pill';
+const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps>(
+  (
+    {
+      items,
+      tabs,
+      value,
+      defaultValue,
+      onValueChange,
+      orientation = 'horizontal',
+      activateOnFocus,
+      loopFocus,
+      variant = 'line',
+      inline = false,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const tabList = items || tabs;
+    const initialValue = defaultValue ?? (value === undefined && tabList ? (tabList[0]?.value ?? tabList[0]?.id) : undefined);
+    const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
+    const isSegmented = variant === 'segmented' || variant === 'segment' || variant === 'pills' || variant === 'pill';
 
-  return (
-    <TabsRoot
-      value={value}
-      defaultValue={initialValue}
-      onValueChange={onValueChange}
-      orientation={orientation}
-      variant={variant}
-      className={cn(
-        inline || isSegmented ? 'w-max items-start' : 'w-full',
-        className
-      )}
-    >
-      {children ? (
-        children
-      ) : (
-        <>
-          <TabsList activateOnFocus={activateOnFocus} loopFocus={loopFocus} variant={variant}>
-            {tabList?.map((tab) => {
-              const tabKey = (tab.value ?? tab.id) as string;
-              return (
-                <Tab key={tabKey} value={tabKey} icon={tab.icon} disabled={tab.disabled} variant={variant}>
-                  {tab.label}
-                </Tab>
-              );
-            })}
-          </TabsList>
-          {hasContent &&
-            tabList?.map((tab) => {
-              const tabKey = (tab.value ?? tab.id) as string;
-              if (!tab.content) return null;
-              return (
-                <TabsPanel key={tabKey} value={tabKey}>
-                  {tab.content}
-                </TabsPanel>
-              );
-            })}
-        </>
-      )}
-    </TabsRoot>
-  );
-};
+    return (
+      <TabsRoot
+        ref={ref}
+        value={value}
+        defaultValue={initialValue}
+        onValueChange={onValueChange}
+        orientation={orientation}
+        variant={variant}
+        className={cn(
+          inline || isSegmented ? 'w-max items-start' : 'w-full',
+          className
+        )}
+        {...props}
+      >
+        {children ? (
+          children
+        ) : (
+          <>
+            <TabsList activateOnFocus={activateOnFocus} loopFocus={loopFocus} variant={variant}>
+              {tabList?.map((tab) => {
+                const tabKey = (tab.value ?? tab.id) as string;
+                return (
+                  <Tab key={tabKey} value={tabKey} icon={tab.icon} disabled={tab.disabled} variant={variant}>
+                    {tab.label}
+                  </Tab>
+                );
+              })}
+            </TabsList>
+            {hasContent &&
+              tabList?.map((tab) => {
+                const tabKey = (tab.value ?? tab.id) as string;
+                if (!tab.content) return null;
+                return (
+                  <TabsPanel key={tabKey} value={tabKey}>
+                    {tab.content}
+                  </TabsPanel>
+                );
+              })}
+          </>
+        )}
+      </TabsRoot>
+    );
+  }
+);
+TabsComponent.displayName = 'Tabs';
 
 // Compound export mapping Base UI primitives & wrappers
 export const Tabs = Object.assign(TabsComponent, {

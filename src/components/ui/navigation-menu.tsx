@@ -2,6 +2,20 @@ import * as React from 'react';
 import { NavigationMenu as BaseNavigationMenu } from '@base-ui/react/navigation-menu';
 import { cn } from '@/lib/utils';
 
+/**
+ * NavigationMenu Component (Site & Application Routing)
+ *
+ * WAI-ARIA Role: <nav> landmark with list of navigation links
+ * Primary Purpose: Global site or application routing (URL navigation, pages, external links, docs).
+ *
+ * TAXONOMY & USAGE GUIDELINES:
+ * - USE THIS: In application top headers for navigating between pages, sections, or views with sub-navigation panels.
+ * - DO NOT USE:
+ *   - For executing actions/commands (e.g. Save, Delete, Export) -> Use <Menu> or <Menubar>.
+ *   - For switching tab panels on the same page -> Use <Tabs>.
+ *   - For form controls or active tools -> Use <Toolbar> or <ToggleGroup>.
+ */
+
 export interface NavigationSubItem {
   id: string;
   label: string;
@@ -33,7 +47,7 @@ export interface NavigationMenuProps {
   className?: string;
 }
 
-const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
+const NavigationMenuComponent = React.forwardRef<HTMLElement, NavigationMenuProps>(({
   items,
   activeId,
   value,
@@ -44,9 +58,11 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
   orientation = 'horizontal',
   children,
   className,
-}) => {
+  ...props
+}, ref) => {
   return (
     <BaseNavigationMenu.Root
+      ref={ref}
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
@@ -54,6 +70,7 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
       closeDelay={closeDelay}
       orientation={orientation}
       className={cn('relative z-10 flex w-full items-center', className)}
+      {...props}
     >
       {children ? (
         children
@@ -93,7 +110,7 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
                     <BaseNavigationMenu.Content
                       className={cn(
                         'h-full w-[calc(100vw-40px)] p-2 min-[500px]:w-max min-[500px]:min-w-[260px] min-[500px]:max-w-[420px]',
-                        'transition-[opacity,transform,translate] duration-[0.25s] ease-[var(--ease-standard)]',
+                        'transition-[opacity,transform,translate] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
                         'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
                         'data-[starting-style]:data-[activation-direction=left]:translate-x-[-20%]',
                         'data-[starting-style]:data-[activation-direction=right]:translate-x-[20%]',
@@ -107,8 +124,8 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
                             key={sub.id}
                             href={sub.href || '#'}
                             className={cn(
-                              'flex flex-col gap-0.5 px-3 py-2.5 min-h-[44px] rounded-md transition-colors cursor-pointer outline-none select-none',
-                              'text-on-surface hover:bg-surface-variant hover:text-primary focus:bg-surface-variant focus:text-primary',
+                              'flex flex-col gap-0.5 px-3 py-2.5 min-h-[44px] rounded-sm transition-colors cursor-pointer outline-none select-none',
+                              'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface',
                               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-primary'
                             )}
                           >
@@ -121,7 +138,7 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
                               <span>{sub.label}</span>
                             </div>
                             {sub.description && (
-                              <span className="font-sans text-xs text-on-surface-variant">
+                              <span className="font-sans text-sm text-on-surface-variant">
                                 {sub.description}
                               </span>
                             )}
@@ -161,13 +178,13 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
           <BaseNavigationMenu.Portal>
             <BaseNavigationMenu.Positioner
               sideOffset={8}
-              className="h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[0.25s] ease-[var(--ease-standard)] data-instant:transition-none"
+              className="h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-instant:transition-none"
             >
               <BaseNavigationMenu.Popup
                 className={cn(
                   'relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)]',
-                  'rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating outline-none',
-                  'transition-[opacity,transform,width,height] duration-[0.25s] ease-[var(--ease-standard)]',
+                  'rounded bg-surface border-[1px] border-outline-variant shadow-floating outline-none',
+                  'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
                   'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
                   'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)]'
                 )}
@@ -181,7 +198,9 @@ const NavigationMenuComponent: React.FC<NavigationMenuProps> = ({
       )}
     </BaseNavigationMenu.Root>
   );
-};
+});
+
+NavigationMenuComponent.displayName = 'NavigationMenu';
 
 // Compound export mapping Base UI primitives
 export const NavigationMenu = Object.assign(NavigationMenuComponent, {

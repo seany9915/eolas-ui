@@ -104,6 +104,7 @@ typography:
     lineHeight: 1.5
 rounded:
   none: 0px
+  sm: 0.25rem
   DEFAULT: 0.5rem
   md: 0.75rem
   lg: 1rem
@@ -345,15 +346,30 @@ The shape language uses two primary corner radii — compact controls stay squar
 
 Radius and border-width are defined once as scales in the frontmatter (`rounded`/`borderWidth`) — components reference the scale name below rather than each restating its own raw value, so a future change only happens in one place.
 
-- **`rounded.DEFAULT` (0.5rem):** Buttons, Input Fields, Menus/Selects/Dropdowns, Popovers, and Combobox panels (standardizing all Tier B floating anchored chrome to 0.5rem).
-- **`rounded.md` (0.75rem):** Intermediate utility containers, segmented controls, or compact cards where 1rem is too large.
-- **`rounded.lg` (1rem):** Standard Cards and Dialogs. (Full-height Drawers docking against viewport bezels use `rounded-none` to prevent corner-miter distortion and backdrop crescent gaps).
+- **`rounded.sm` (0.25rem / 4px):** Concentric inner interactive items: Menu rows, Context Menu rows, Toggle buttons inside a container, Tab buttons inside segmented lists, and dense action items ($R_{\text{inner}} = R_{\text{outer}} - \text{padding} = 8\text{px} - 4\text{px} = 4\text{px}$).
+- **`rounded.DEFAULT` (0.5rem / 8px):** Buttons, Input Fields, Menus/Selects/Dropdowns, Popovers, and Combobox panels (standardizing all Tier B floating anchored chrome to 0.5rem).
+- **`rounded.md` (0.75rem / 12px):** Intermediate utility containers, segmented controls, or compact cards where 1rem is too large (Toolbar shells, Menubar container, Toggle Group shells, Segmented Tab lists).
+- **`rounded.lg` (1rem / 16px):** Standard Cards and Dialogs. (Full-height Drawers docking against viewport bezels use `rounded-none` to prevent corner-miter distortion and backdrop crescent gaps).
 - **`rounded-none` (0px, flat rectangular):** Toasts & Inline Alerts — sharing the clean, unrounded silhouette and vertical 4px accent bar.
 - **`rounded.full` (9999px, fully rounded):** Chips & Tags, Avatars, and Radio controls — three circular exceptions to the rectangular radii above, two stylistic (Chips, Avatars) and one functional (Radio, where circular-vs-square is the actual affordance distinguishing "choose one" from "choose any" — see Selection Controls). Grouping the container-scale pair together is what keeps that silhouette distinct: every *rectangular* container in the system (Buttons, Cards, Dialogs, Menus) stays on `DEFAULT`/`lg`, while Toasts and Inline Alerts use `rounded-none`.
 - **`borderWidth.default` (1px):** Menu/Select/Dropdown and Popover structural borders, the Colored Outline chip pattern (Chips & Tags), and resting form-control borders (Input Fields, Checkbox/Radio, Toggle, Toggle Group container). Standard content cards are borderless.
 - **`borderWidth.emphasis` (2px):** Dialog/Drawer borders, the Active Selection state and Accent Card variant (Components > Cards), Outlined buttons, and Radio's checked-state ring (Selection Controls).
 - **`borderWidth.accent` (4px):** Inline Alert vertical left accent bar, and the matching vertical left accent bar on state-flavored Toasts (error/warning/success) — the only two components that use this accent-bar treatment; every other component sticks to `default`/`emphasis` border widths or no border at all.
 - **This list highlights the primary uses of each width, not an exhaustive registry** — as new components are added, default to `borderWidth.default` for any resting structural/form-control border and `borderWidth.emphasis` for any 2px selected/active/outlined treatment, rather than inventing a new width value.
+
+## Navigation, Command & Selection Architecture
+
+To ensure agents and engineers select the correct primitive and maintain strict WAI-ARIA and cognitive accessibility boundaries, use the following taxonomy:
+
+| Primitive | Base UI Package | WAI-ARIA Role | Primary Purpose | Interaction & Triggers | When to Use | When NOT to Use |
+|---|---|---|---|---|---|---|
+| **`NavigationMenu`** | `@base-ui/react/navigation-menu` | `<nav>` / `navigation` | Site & application routing | Hover/click delay; morphing viewport/positioner across content panels | Top-level application header with page routes and sub-navigation links | **Not** for executing commands/actions (e.g. Save, Delete), form controls, or desktop toolbars |
+| **`Menu`** | `@base-ui/react/menu` | `role="menu"` / `menuitem` | Single-button action dropdown | Click/press trigger button; opens popup list of commands | Isolated action menus, "..." overflow menus, record action buttons | **Not** for multi-menu desktop bars (use `Menubar`), global site nav (use `NavigationMenu`), or right-click (use `ContextMenu`) |
+| **`Menubar`** | `@base-ui/react/menubar` + `menu` | `role="menubar"` / `menu` | Desktop application command system | Persistent horizontal bar; arrow-key hopping between menus; keyboard shortcuts (`⌘N`, `Ctrl+Z`) | Desktop-class workspaces, clinical editor suites, IDEs with File/Edit/View/Tools | **Not** for website page routing links (use `NavigationMenu`) or a standalone dropdown button (use `Menu`) |
+| **`ContextMenu`** | `@base-ui/react/context-menu` | `role="menu"` | Secondary pointer-anchored actions | Right-click, long-press, or `Shift+F10`; opens at pointer coordinates | Power-user shortcuts on table rows, canvas nodes, card surfaces | **Never** as the sole way to trigger an action (mobile/touch users cannot right-click reliably; always provide a visible `Menu` or button) |
+| **`Toolbar`** | `@base-ui/react/toolbar` | `role="toolbar"` | Persistent action strip / formatting tools | Arrow key navigation with **single tab stop**; buttons stay visible and don't dismiss on click | Rich text formatting bars, media audio/playback controls, canvas tool palettes | **Not** for hierarchical dropdown menus (use `Menubar`) or page navigation (use `NavigationMenu`) |
+| **`Tabs`** | `@base-ui/react/tabs` | `role="tablist"` / `tab` / `tabpanel` | Mutually exclusive content views on same page | Tab click unhides paired `tabpanel`; 1 active panel at a time | Switching between views/sections of a card, dashboard, or patient record | **Not** for executing commands (e.g. "Export" is not a tab) or multi-select filters (use `ToggleGroup`) |
+| **`ToggleGroup`** | `@base-ui/react/toggle-group` | `role="group"` with `aria-pressed` | Mode/filter selection without view panels | Toggles boolean states (single 1-of-N or multi N-of-M) | Segmented controls, filter bars, layout toggles (Grid/List), text formatting buttons inside a Toolbar | **Not** for switching entire DOM content panels (use `Tabs`) or routing to new URLs (use `NavigationMenu`) |
 
 ## Components
 

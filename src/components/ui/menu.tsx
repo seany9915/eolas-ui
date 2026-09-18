@@ -2,6 +2,21 @@ import * as React from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { cn } from '@/lib/utils';
 
+/**
+ * Menu Component (Single-Button Action Dropdown)
+ *
+ * WAI-ARIA Role: role="menu" / role="menuitem"
+ * Primary Purpose: Command execution triggered from a single button (e.g., "..." overflow actions, export menus).
+ *
+ * TAXONOMY & USAGE GUIDELINES:
+ * - USE THIS: For standalone dropdown action buttons or overflow menus triggering immediate callbacks (onClick).
+ * - DO NOT USE:
+ *   - For desktop multi-menu command bars (File, Edit, View) -> Use <Menubar>.
+ *   - For global site or application URL routing links -> Use <NavigationMenu>.
+ *   - For secondary pointer/right-click actions -> Use <ContextMenu>.
+ *   - For switching content views/panels on the same page -> Use <Tabs>.
+ */
+
 export interface MenuItem {
   id: string;
   label: string;
@@ -12,7 +27,8 @@ export interface MenuItem {
 }
 
 export interface MenuProps {
-  label?: string;
+  label?: React.ReactNode;
+  description?: React.ReactNode;
   triggerLabel?: string;
   trigger?: React.ReactElement;
   items?: MenuItem[];
@@ -25,8 +41,9 @@ export interface MenuProps {
   children?: React.ReactNode;
 }
 
-const MenuComponent: React.FC<MenuProps> = ({
+const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
   label,
+  description,
   triggerLabel = 'Menu',
   trigger,
   items,
@@ -37,16 +54,22 @@ const MenuComponent: React.FC<MenuProps> = ({
   className,
   fullWidth = true,
   children,
-}) => {
+  ...props
+}, ref) => {
   const generatedId = React.useId();
   const menuId = `menu-${generatedId}`;
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
+    <div ref={ref} className="flex flex-col gap-1.5 w-full" {...props}>
       {label && (
-        <label htmlFor={menuId} className="font-label text-xs font-semibold text-on-surface-variant cursor-pointer">
+        <label htmlFor={menuId} className="font-label text-sm font-semibold text-on-surface cursor-pointer">
           {label}
         </label>
+      )}
+      {description && (
+        <span className="font-sans text-sm text-on-surface-variant">
+          {description}
+        </span>
       )}
       <BaseMenu.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} modal={modal}>
         {trigger ? (
@@ -55,7 +78,7 @@ const MenuComponent: React.FC<MenuProps> = ({
           <BaseMenu.Trigger
             id={menuId}
             className={cn(
-              'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded-md border-[1px] border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
+              'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border-[1px] border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
               fullWidth ? 'w-full' : 'w-max',
               className
             )}
@@ -69,7 +92,7 @@ const MenuComponent: React.FC<MenuProps> = ({
         <BaseMenu.Portal>
           <BaseMenu.Positioner sideOffset={6}>
             <BaseMenu.Popup
-              className="z-50 min-w-[220px] p-1.5 rounded-md bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]"
+              className="z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]"
             >
               {children
                 ? children
@@ -82,7 +105,7 @@ const MenuComponent: React.FC<MenuProps> = ({
                         'flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
                         item.destructive
                           ? 'text-error hover:bg-error-container/30 focus:bg-error-container/30 data-[highlighted]:bg-error-container/30'
-                          : 'text-on-surface hover:bg-surface-variant hover:text-primary focus:bg-surface-variant focus:text-primary data-[highlighted]:bg-surface-variant data-[highlighted]:text-primary',
+                          : 'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
                         'disabled:opacity-50 disabled:cursor-not-allowed'
                       )}
                     >
@@ -100,7 +123,9 @@ const MenuComponent: React.FC<MenuProps> = ({
       </BaseMenu.Root>
     </div>
   );
-};
+});
+
+MenuComponent.displayName = 'Menu';
 
 // Compound export mapping Base UI primitives
 export const Menu = Object.assign(MenuComponent, {
