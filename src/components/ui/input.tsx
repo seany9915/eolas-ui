@@ -30,9 +30,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
         'border-[1px] border-outline focus:border-primary focus:outline-2 focus:outline-offset-0 focus:outline-primary',
         'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant disabled:cursor-not-allowed',
         error && 'border-error focus:border-error focus:outline-error',
-        hasLeading ? 'pl-11' : 'px-4',
-        hasTrailing ? 'pr-11' : 'px-4',
-        hasLeading && hasTrailing && 'pl-11 pr-11',
+        hasLeading ? 'pl-11' : 'pl-4',
+        hasTrailing ? 'pr-11' : 'pr-4',
         className
       )}
       {...props}
