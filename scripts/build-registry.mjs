@@ -47,7 +47,7 @@ for (const file of files) {
 
   // Detect internal component dependencies
   const internalDeps = [];
-  const regex = /from\s+['"]\.\/([^'"]+)['"]/g;
+  const regex = /from\s+['"](?:\.\/|@\/components\/ui\/)([^'"]+)['"]/g;
   let m;
   while ((m = regex.exec(content)) !== null) {
     if (m[1] && m[1] !== name) {

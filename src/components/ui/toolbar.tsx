@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Toolbar as BaseToolbar } from '@base-ui/react/toolbar';
+import { Tooltip } from './tooltip';
 import { cn } from '@/lib/utils';
 
 /**
@@ -23,6 +24,7 @@ export interface ToolbarAction {
   action?: () => void;
   active?: boolean;
   disabled?: boolean;
+  tooltip?: React.ReactNode;
 }
 
 export interface ToolbarProps {
@@ -56,26 +58,31 @@ const ToolbarComponent = React.forwardRef<HTMLDivElement, ToolbarProps>(({
       {children
         ? children
         : actions?.map((act) => (
-            <BaseToolbar.Button
+            <Tooltip
               key={act.id}
-              onClick={act.action}
+              content={act.tooltip ?? act.label}
               disabled={act.disabled}
-              aria-label={act.label}
-              aria-pressed={act.active !== undefined ? act.active : undefined}
-              title={act.label}
-              className={cn(
-                'w-11 h-11 min-w-[44px] min-h-[44px] rounded-sm flex items-center justify-center transition-colors cursor-pointer select-none',
-                'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
-                act.active
-                  ? 'bg-primary text-on-primary shadow-xs'
-                  : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
-                'disabled:opacity-50 disabled:cursor-not-allowed'
-              )}
+              side={orientation === 'vertical' ? 'right' : 'top'}
             >
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                {act.icon}
-              </span>
-            </BaseToolbar.Button>
+              <BaseToolbar.Button
+                onClick={act.action}
+                disabled={act.disabled}
+                aria-label={act.label}
+                aria-pressed={act.active !== undefined ? act.active : undefined}
+                className={cn(
+                  'w-11 h-11 min-w-[44px] min-h-[44px] rounded-sm flex items-center justify-center transition-colors cursor-pointer select-none',
+                  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
+                  act.active
+                    ? 'bg-primary text-on-primary shadow-xs'
+                    : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
+                  'disabled:opacity-50 disabled:cursor-not-allowed'
+                )}
+              >
+                <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                  {act.icon}
+                </span>
+              </BaseToolbar.Button>
+            </Tooltip>
           ))}
     </BaseToolbar.Root>
   );
