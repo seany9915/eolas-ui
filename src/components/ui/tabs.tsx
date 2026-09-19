@@ -140,21 +140,23 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         )}
         className={cn(
           'inline-flex items-center gap-2 font-label text-sm font-semibold transition-all duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
-          isSegmented
-            ? cn(
-                'py-2 px-3.5 min-h-[40px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 z-10',
-                'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-xs data-[active]:font-bold',
-                'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-xs data-[selected]:font-bold',
-                'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-xs data-[state=active]:font-bold',
-                'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-xs aria-selected:font-bold'
-              )
-            : cn(
-                'py-3 px-4 min-h-[48px] rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
-                'data-[active]:text-primary data-[active]:font-bold data-[active]:border-primary -mb-px',
-                'data-[selected]:text-primary data-[selected]:font-bold data-[selected]:border-primary',
-                'data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:border-primary',
-                'aria-selected:text-primary aria-selected:font-bold aria-selected:border-primary'
-              ),
+          effectiveVariant === 'unstyled'
+            ? ''
+            : isSegmented
+              ? cn(
+                  'py-2 px-3.5 min-h-[40px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 z-10',
+                  'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-xs data-[active]:font-bold',
+                  'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-xs data-[selected]:font-bold',
+                  'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-xs data-[state=active]:font-bold',
+                  'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-xs aria-selected:font-bold'
+                )
+              : cn(
+                  'py-3 px-4 min-h-[48px] rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
+                  'data-[active]:text-primary data-[active]:font-bold data-[active]:border-primary -mb-px',
+                  'data-[selected]:text-primary data-[selected]:font-bold data-[selected]:border-primary',
+                  'data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:border-primary',
+                  'aria-selected:text-primary aria-selected:font-bold aria-selected:border-primary'
+                ),
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className
