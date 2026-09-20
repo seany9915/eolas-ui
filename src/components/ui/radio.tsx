@@ -173,5 +173,7 @@ export { BaseRadio, BaseRadioGroup };
 export const RadioGroupRoot = BaseRadioGroup;
 export const RadioRoot = BaseRadio.Root;
 export const RadioIndicator = BaseRadio.Indicator;
+export const RadioGroupItem = RadioComponent; // Alias for Radix compatibility
+export const RadioItem = RadioComponent; // Alias for Radix compatibility
 
 export default Radio;

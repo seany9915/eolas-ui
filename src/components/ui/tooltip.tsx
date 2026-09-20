@@ -99,6 +99,7 @@ export const TooltipTrigger = BaseTooltip.Trigger;
 export const TooltipPortal = BaseTooltip.Portal;
 export const TooltipPositioner = BaseTooltip.Positioner;
 export const TooltipPopup = BaseTooltip.Popup;
+export const TooltipContent = BaseTooltip.Popup; // Alias for Radix compatibility
 export const TooltipArrow = BaseTooltip.Arrow;
 export const TooltipViewport = BaseTooltip.Viewport;
 export const TooltipHandle = BaseTooltip.Handle;

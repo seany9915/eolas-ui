@@ -57,25 +57,38 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
 );
 ToggleGroupItem.displayName = 'ToggleGroupItem';
 
-export interface ToggleGroupProps {
-  type?: 'single' | 'multiple';
-  value?: string | string[];
-  defaultValue?: string | string[];
-  onValueChange?: (value: any, eventDetails?: any) => void;
-  ariaLabel?: string;
-  'aria-label'?: string;
-  items?: { value: string; label: string; icon?: string; disabled?: boolean }[];
-  multiple?: boolean;
+interface BaseToggleGroupCommonProps extends Omit<React.ComponentPropsWithoutRef<'div'>, 'defaultValue' | 'value' | 'onChange'> {
   orientation?: 'horizontal' | 'vertical';
   loopFocus?: boolean;
   disabled?: boolean;
+  ariaLabel?: string;
+  'aria-label'?: string;
+  items?: { value: string; label: string; icon?: string; disabled?: boolean }[];
   children?: React.ReactNode;
   className?: string;
 }
 
+export interface ToggleGroupSingleProps extends BaseToggleGroupCommonProps {
+  type: 'single';
+  multiple?: false;
+  value?: string | readonly string[];
+  defaultValue?: string | readonly string[];
+  onValueChange?: (value: string, eventDetails?: any) => void;
+}
+
+export interface ToggleGroupMultipleProps extends BaseToggleGroupCommonProps {
+  type?: 'multiple';
+  multiple?: boolean;
+  value?: readonly string[];
+  defaultValue?: readonly string[];
+  onValueChange?: (value: string[], eventDetails?: any) => void;
+}
+
+export type ToggleGroupProps = ToggleGroupSingleProps | ToggleGroupMultipleProps;
+
 const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
-  (
-    {
+  (props, ref) => {
+    const {
       type,
       value,
       defaultValue,
@@ -89,32 +102,34 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
       disabled,
       children,
       className,
-      ...props
-    },
-    ref
-  ) => {
+      ...domProps
+    } = props;
+
+    const isSingleMode = type === 'single';
     const isMultiple = multiple ?? (type === 'multiple');
     const label = ariaLabel ?? ariaLabelProp ?? 'Toggle selection group';
 
     const normalizedValue = React.useMemo(() => {
       if (value === undefined) return undefined;
       if (Array.isArray(value)) return value;
-      return value ? [value] : [];
+      return typeof value === 'string' && value ? [value] : [];
     }, [value]);
 
     const normalizedDefaultValue = React.useMemo(() => {
       if (defaultValue === undefined) return undefined;
       if (Array.isArray(defaultValue)) return defaultValue;
-      return defaultValue ? [defaultValue] : [];
+      return typeof defaultValue === 'string' && defaultValue ? [defaultValue] : [];
     }, [defaultValue]);
 
     const handleValueChange = (val: string[], eventDetails: any) => {
       if (!onValueChange) return;
-      if (isMultiple) {
-        onValueChange(val, eventDetails);
-      } else {
+      if (isSingleMode) {
+        // Legacy Radix single-mode compatibility: unpack array to single string value
         const singleVal = val.length > 0 ? val[val.length - 1] : '';
-        onValueChange(singleVal, eventDetails);
+        (onValueChange as (value: string, details: any) => void)(singleVal, eventDetails);
+      } else {
+        // Native Base UI contract: always array of strings
+        (onValueChange as (value: string[], details: any) => void)(val, eventDetails);
       }
     };
 
@@ -134,7 +149,7 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
           orientation === 'vertical' && 'flex-col h-auto',
           className
         )}
-        {...props}
+        {...domProps}
       >
         {children
           ? children
