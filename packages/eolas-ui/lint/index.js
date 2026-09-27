@@ -62,6 +62,7 @@ export const eolasLintPreset = [
                 "border-*",
                 "uppercase",
                 "outline-offset-0",
+                "transition-all",
               ],
               message: {
                 spacing:
@@ -72,6 +73,8 @@ export const eolasLintPreset = [
                   "Button enforces standard design-system border radius. Do not override rounded-*.",
                 typography:
                   "All-caps styling (uppercase) is strictly banned on buttons per DESIGN.md.",
+                motion:
+                  "Blanket transition-all is banned. Button manages its own targeted transitions.",
               },
             },
             {
@@ -88,9 +91,9 @@ export const eolasLintPreset = [
             {
               pattern: "^Card$",
               allow: ["layout", "w-*", "max-w-*"],
-              deny: ["bg-*", "rounded-*", "border-*", "shadow-*"],
+              deny: ["bg-*", "rounded-*", "border-*", "shadow-*", "transition-all"],
               message:
-                "Card defines clinical elevation and containment. Use CardHeader, CardContent, and CardFooter. Never nest cards inside cards.",
+                "Card defines clinical elevation and containment. Use CardHeader, CardContent, and CardFooter. Never nest cards inside cards, and never use transition-all (use explicit targeted transitions).",
             },
             {
               pattern: "^InlineAlert$",
@@ -98,6 +101,13 @@ export const eolasLintPreset = [
               deny: ["rounded-*"],
               message:
                 "InlineAlert must maintain standard rectangular shape with solid 4px accent bar. Do not apply rounded-*.",
+            },
+            {
+              pattern: "^Toast$",
+              allow: ["layout", "w-*"],
+              deny: ["rounded-*"],
+              message:
+                "Toast must maintain standard flat rectangular shape (rounded-none) and 44x44px dismiss button. Do not apply rounded-*.",
             },
             {
               pattern: "^(Tabs|TabsList|TabsTrigger)$",
@@ -121,10 +131,16 @@ export const eolasLintPreset = [
                 "Modal overlays must maintain standard surface styling, focus traps, and backdrop filters defined by Eolas UI.",
             },
             {
-              pattern: "^Skeleton$",
+              pattern: "^(Skeleton|SkeletonReveal)$",
               allow: ["layout", "shape"],
               message:
                 "Skeleton loaders support layout dimensions (w-*, h-*) and shapes (rounded, rounded-full) to mirror target components.",
+            },
+            {
+              pattern: "^(TextSwap|NotificationBadge|TextsReveal|NumberRoll|ShimmerText|ErrorShake|SuccessCheck)$",
+              allow: ["layout"],
+              message:
+                "Shared motion primitives manage their own transitions and reduced-motion fallbacks per DESIGN.md.",
             },
             {
               pattern: "^CardContent$",
