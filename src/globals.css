@@ -142,9 +142,10 @@
   --neutral-container: #DCE6FA;
   --on-neutral-container: #1a1c1e;
 
-  --shadow-ambient: 0 4px 12px rgba(26, 28, 30, 0.08);
-  --shadow-ambient-hover: 0 8px 24px rgba(26, 28, 30, 0.12);
-  --shadow-modal: 0 12px 32px rgba(26, 28, 30, 0.18);
+  /* Layered Ambient & Modal Shadows (Umbra + Penumbra) */
+  --shadow-ambient: 0 1px 3px rgba(26, 28, 30, 0.04), 0 4px 12px rgba(26, 28, 30, 0.06);
+  --shadow-ambient-hover: 0 2px 4px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.08);
+  --shadow-modal: 0 2px 6px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.06), 0 20px 48px rgba(26, 28, 30, 0.12);
 
   /* Motion Tokens */
   --duration-stagger: 40ms;
@@ -243,6 +244,7 @@ button:focus-visible {
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .text-headline-lg {
@@ -250,6 +252,7 @@ button:focus-visible {
   font-size: 2rem;
   font-weight: 600;
   line-height: 1.25;
+  text-wrap: balance;
 }
 
 .text-headline-md {
@@ -257,6 +260,7 @@ button:focus-visible {
   font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.35;
+  text-wrap: balance;
 }
 
 .text-headline-sm {
@@ -264,6 +268,7 @@ button:focus-visible {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
+  text-wrap: balance;
 }
 
 .text-body-lg {
@@ -271,6 +276,7 @@ button:focus-visible {
   font-size: 1.125rem;
   font-weight: 400;
   line-height: 1.55;
+  text-wrap: pretty;
 }
 
 .text-body-md {
@@ -278,6 +284,7 @@ button:focus-visible {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .text-label-lg {
@@ -304,6 +311,15 @@ button:focus-visible {
   letter-spacing: 0.03em;
 }
 
+/* Global Heading & Body Text-Wrap Defaults */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
 /* Long-Form Content Rhythm (shadcn Typeset container system) */
 .typeset {
   --typeset-font-body: var(--font-sans);
@@ -326,6 +342,7 @@ button:focus-visible {
   margin-top: calc(var(--typeset-flow) * 1.2);
   margin-bottom: calc(var(--typeset-flow) * 0.5);
   color: var(--on-surface);
+  text-wrap: balance;
 }
 
 .typeset h1 {
@@ -348,6 +365,21 @@ button:focus-visible {
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
   color: var(--on-surface-variant);
+  text-wrap: pretty;
+}
+
+/* Typeset opt-out isolation for embedded cards & interactive primitives */
+.typeset .not-typeset,
+.typeset [data-not-typeset] {
+  margin-top: var(--typeset-flow);
+  margin-bottom: var(--typeset-flow);
+  font-size: 1rem;
+  line-height: normal;
+}
+
+.typeset .not-typeset p,
+.typeset [data-not-typeset] p {
+  margin-bottom: 0;
 }
 
 .typeset-chat {

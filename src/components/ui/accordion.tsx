@@ -45,7 +45,7 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
       >
         {children}
         <span
-          className="material-symbols-outlined text-2xl text-on-surface-variant group-data-[panel-open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-150 ease-out"
+          className="material-symbols-outlined text-2xl text-on-surface-variant group-data-[panel-open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none"
           aria-hidden="true"
         >
           expand_more
@@ -65,7 +65,7 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
   ({ children, className, ...props }, ref) => (
     <BaseAccordion.Panel
       ref={ref}
-      className="overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-150 ease-out data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
+      className="overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
       {...props}
     >
       <div className={cn('px-2 pb-4 font-sans text-base text-on-surface-variant leading-relaxed', className)}>

@@ -1,0 +1,20 @@
+{
+  "name": "success-check",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/success-check.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface SuccessCheckProps extends React.SVGAttributes<SVGSVGElement> {\n  size?: 'sm' | 'md' | 'lg' | number;\n  trigger?: boolean | number | string;\n  onAnimationEnd?: () => void;\n  className?: string;\n}\n\nconst SIZE_MAP = {\n  sm: 24,\n  md: 40,\n  lg: 56,\n};\n\n/**\n * SuccessCheck\n *\n * Celebratory checkmark stroke-draw animation based on transitions.dev.\n * Provides instant positive feedback when a patient completes a drill,\n * an audio recording succeeds, or a clinical form is submitted.\n *\n * Complies strictly with WCAG 2.2 and prefers-reduced-motion.\n */\nexport const SuccessCheck = React.forwardRef<SVGSVGElement, SuccessCheckProps>(\n  (\n    {\n      size = 'md',\n      trigger = true,\n      onAnimationEnd,\n      className,\n      ...props\n    },\n    ref\n  ) => {\n    const pixelSize = typeof size === 'number' ? size : SIZE_MAP[size];\n\n    return (\n      <div\n        className={cn('inline-flex items-center justify-center shrink-0 select-none', className)}\n        role=\"status\"\n        aria-live=\"polite\"\n      >\n        <svg\n          ref={ref}\n          key={String(trigger)}\n          width={pixelSize}\n          height={pixelSize}\n          viewBox=\"0 0 40 40\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n          className=\"overflow-visible\"\n          onAnimationEnd={onAnimationEnd}\n          {...props}\n        >\n          {/* Background Circle */}\n          <circle\n            cx=\"20\"\n            cy=\"20\"\n            r=\"18\"\n            className=\"fill-success transition-transform duration-[var(--duration-quick)] motion-reduce:transition-none\"\n            style={{\n              animation: 't-check-circle-pop var(--duration-fast) var(--ease-smooth-out) forwards',\n            }}\n          />\n\n          {/* Stroke-Drawn Checkmark */}\n          <path\n            d=\"M12 20.5L17.5 26L28 15\"\n            stroke=\"var(--color-on-success)\"\n            strokeWidth=\"3.2\"\n            strokeLinecap=\"round\"\n            strokeLinejoin=\"round\"\n            style={{\n              strokeDasharray: 26,\n              strokeDashoffset: 26,\n              animation:\n                't-check-draw var(--duration-fast) var(--ease-smooth-out) 80ms forwards',\n            }}\n            className=\"motion-reduce:!stroke-dashoffset-0 motion-reduce:!animation-none\"\n          />\n        </svg>\n\n        <span className=\"sr-only\">Success</span>\n\n        <style\n          dangerouslySetInnerHTML={{\n            __html: `\n@keyframes t-check-circle-pop {\n  0% {\n    transform: scale(0.85);\n    opacity: 0;\n  }\n  50% {\n    transform: scale(1.05);\n  }\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n\n@keyframes t-check-draw {\n  to {\n    stroke-dashoffset: 0;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .t-check-circle-pop,\n  circle {\n    animation: none !important;\n    transform: none !important;\n    opacity: 1 !important;\n  }\n}\n`,\n          }}\n        />\n      </div>\n    );\n  }\n);\n\nSuccessCheck.displayName = 'SuccessCheck';\n",
+      "type": "registry:ui",
+      "target": "components/ui/success-check.tsx"
+    }
+  ]
+}

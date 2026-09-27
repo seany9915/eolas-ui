@@ -1,0 +1,20 @@
+{
+  "name": "error-shake",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/error-shake.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface ErrorShakeProps extends React.HTMLAttributes<HTMLDivElement> {\n  shake?: boolean | number | string;\n  onShakeEnd?: () => void;\n  children: React.ReactNode;\n}\n\n/**\n * ErrorShake\n *\n * Horizontal form micro-shake wrapper based on transitions.dev.\n * Subtly shakes invalid form fields or blocked actions using --distance-small (6px)\n * to draw optical attention without jarring the page or relying on color alone.\n *\n * Complies with WCAG 2.2 and automatically suppresses motion if prefers-reduced-motion is active.\n */\nexport const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(\n  ({ shake, onShakeEnd, className, children, ...props }, ref) => {\n    const [isShaking, setIsShaking] = React.useState(false);\n    const prevShakeRef = React.useRef(shake);\n\n    React.useEffect(() => {\n      if (shake && shake !== prevShakeRef.current) {\n        setIsShaking(true);\n        prevShakeRef.current = shake;\n\n        const timer = setTimeout(() => {\n          setIsShaking(false);\n          onShakeEnd?.();\n        }, 300);\n\n        return () => clearTimeout(timer);\n      }\n      prevShakeRef.current = shake;\n    }, [shake, onShakeEnd]);\n\n    return (\n      <div\n        ref={ref}\n        className={cn(\n          'w-full transition-transform motion-reduce:!transform-none motion-reduce:!animation-none',\n          isShaking && 'animate-error-shake',\n          className\n        )}\n        {...props}\n      >\n        {children}\n\n        <style\n          dangerouslySetInnerHTML={{\n            __html: `\n@keyframes error-shake {\n  0%, 100% {\n    transform: translateX(0);\n  }\n  20%, 60% {\n    transform: translateX(-6px);\n  }\n  40%, 80% {\n    transform: translateX(6px);\n  }\n}\n\n.animate-error-shake {\n  animation: error-shake 250ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .animate-error-shake {\n    animation: none !important;\n    transform: none !important;\n  }\n}\n`,\n          }}\n        />\n      </div>\n    );\n  }\n);\n\nErrorShake.displayName = 'ErrorShake';\n",
+      "type": "registry:ui",
+      "target": "components/ui/error-shake.tsx"
+    }
+  ]
+}

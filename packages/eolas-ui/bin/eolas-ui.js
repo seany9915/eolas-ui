@@ -17,11 +17,14 @@ eolas-ui - Private Base UI Component Registry CLI
 
 USAGE:
   npx @seany9915/eolas-ui add <component-name...> [--overwrite]
+  npx @seany9915/eolas-ui add --all [--overwrite]
+  npx @seany9915/eolas-ui sync
   npx @seany9915/eolas-ui list
 
 EXAMPLES:
   npx @seany9915/eolas-ui add button dialog select
   npx @seany9915/eolas-ui add tabs --overwrite
+  npx @seany9915/eolas-ui sync
   npx @seany9915/eolas-ui list
 `);
 }
@@ -75,7 +78,8 @@ function addComponents(componentNames, overwrite = false) {
 
     // Write component files
     for (const file of data.files) {
-      const destPath = path.resolve(cwd, 'src', file.target);
+      const baseDir = fs.existsSync(path.resolve(cwd, 'src')) ? path.resolve(cwd, 'src') : cwd;
+      const destPath = path.resolve(baseDir, file.target);
       const destDir = path.dirname(destPath);
       if (!fs.existsSync(destDir)) {
         fs.mkdirSync(destDir, { recursive: true });
@@ -100,11 +104,33 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
   printHelp();
 } else if (command === 'list') {
   listComponents();
+} else if (command === 'sync') {
+  const indexPath = path.join(REGISTRY_DIR, 'index.json');
+  if (!fs.existsSync(indexPath)) {
+    console.error('Error: Registry index not found.');
+    process.exit(1);
+  }
+  const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+  const allUiNames = items.filter(i => i.type === 'registry:ui').map(i => i.name);
+  console.log('Syncing all ' + allUiNames.length + ' Eolas UI components...\n');
+  addComponents(allUiNames, true);
 } else if (command === 'add') {
   const flags = args.filter(a => a.startsWith('-'));
   const names = args.slice(1).filter(a => !a.startsWith('-'));
   const overwrite = flags.includes('--overwrite') || flags.includes('-o');
-  addComponents(names, overwrite);
+
+  if (flags.includes('--all') || flags.includes('-a') || names.includes('all')) {
+    const indexPath = path.join(REGISTRY_DIR, 'index.json');
+    if (!fs.existsSync(indexPath)) {
+      console.error('Error: Registry index not found.');
+      process.exit(1);
+    }
+    const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+    const allUiNames = items.filter(i => i.type === 'registry:ui').map(i => i.name);
+    addComponents(allUiNames, overwrite);
+  } else {
+    addComponents(names, overwrite);
+  }
 } else {
   console.error('Unknown command: ' + command + '\n');
   printHelp();

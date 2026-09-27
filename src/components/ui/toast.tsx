@@ -71,7 +71,7 @@ const ToastComponent: React.FC<ToastProps> = ({
           {onClose && (
             <BaseToast.Close
               onClick={onClose}
-              className="w-7 h-7 min-w-[28px] min-h-[28px] shrink-0 -mr-1 -mt-0.5 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 active:bg-surface-variant transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 active:bg-surface-variant transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               aria-label="Dismiss toast"
             >
               <span className="material-symbols-outlined text-[18px] leading-none select-none" aria-hidden="true">
@@ -135,7 +135,7 @@ const ActiveToastItem: React.FC<{ toast: any }> = ({ toast: t }) => {
   return (
     <BaseToast.Root
       toast={t}
-      className="pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-[0.5rem] bg-surface border border-outline-variant shadow-floating max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)]"
+      className="pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-[0.5rem] bg-surface border border-outline-variant shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
     >
       <BaseToast.Content className="flex items-start gap-3 w-full">
         <div className={cn('absolute left-0 top-0 bottom-0 w-1', accentBg[toastType] || accentBg.info)} aria-hidden="true" />
@@ -153,7 +153,7 @@ const ActiveToastItem: React.FC<{ toast: any }> = ({ toast: t }) => {
           )}
         </div>
         <BaseToast.Close
-          className="w-7 h-7 min-w-[28px] min-h-[28px] shrink-0 -mr-1 -mt-0.5 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 active:bg-surface-variant transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 active:bg-surface-variant transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-label="Dismiss toast"
         >
           <span className="material-symbols-outlined text-[18px] leading-none select-none" aria-hidden="true">

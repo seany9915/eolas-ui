@@ -110,9 +110,9 @@ rounded:
   lg: 1rem
   full: 9999px
 shadows:
-  ambient: 0 4px 12px rgba(26, 28, 30, 0.08)
-  ambient-hover: 0 6px 16px rgba(26, 28, 30, 0.12)
-  modal: 0 12px 32px rgba(26, 28, 30, 0.18)
+  ambient: 0 1px 3px rgba(26, 28, 30, 0.04), 0 4px 12px rgba(26, 28, 30, 0.06)
+  ambient-hover: 0 2px 4px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.08)
+  modal: 0 2px 6px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.06), 0 20px 48px rgba(26, 28, 30, 0.12)
 motion:
   durations:
     stagger: 40ms
@@ -248,6 +248,10 @@ The typography strategy focuses on maximum legibility and clear information hier
 - **Casing Restrictions:** All-caps text styling (`text-transform: uppercase`) is strictly prohibited. This applies to eyebrow labels, category tags, utility badges, table headers, and button labels. Visual hierarchy must be achieved through relative size, font weight (semibold/bold), and letter spacing adjustments instead. Sentence case is the default for body copy; Title Case is permitted for headings, buttons, and nav labels. Standard acronyms (WCAG, UI, SLT, ADHD, FAB) stay fully capitalized — the uppercase ban is about styling whole labels/phrases, not established acronyms.
 - **Emphasis (no decorative italics):** Bold weight is the only sanctioned emphasis mechanism. Italic styling degrades legibility for dyslexic and low-vision readers and is prohibited for emphasis in UI copy and long-form content alike — this includes rendered markdown (`*em*`/`<em>`), not just component styling.
 - **Alignment (never justify):** Body and prose text is always ragged-right (left-aligned, natural line breaks). Justified text creates uneven word-spacing "rivers" that are a known dyslexia readability failure — never apply `text-align: justify` to paragraph or long-form content, even where the anchor-left rule in Layout & Spacing is already followed for block-level alignment.
+- **Text Wrap Balancing (`text-wrap: balance` & `text-wrap: pretty`):**
+  * **Headings (`h1`–`h6`, `.text-display-*`, `.text-headline-*`):** Enforce `text-wrap: balance`. Balanced wrapping distributes word counts evenly across lines, preventing single-word typographic orphans and awkward rag lines on titles.
+  * **Prose, Body, and Descriptions (`p`, `li`, `.text-body-*`, card descriptions, alerts):** Enforce `text-wrap: pretty`. Pretty wrapping prevents trailing single-word orphans on the final line of paragraphs without incurring the performance penalty of calculating balance across long multi-line text blocks.
+  * **Integration with shadcn Typeset:** In `.typeset` containers, `text-wrap: balance` automatically applies to `.typeset h1-h4`, while `text-wrap: pretty` applies to `.typeset p, ul, ol, li`. Embedded interactive components (Cards, Forms, Callouts) opt out using `.not-typeset` or `[data-not-typeset]` to retain their component-specific margins and typography.
 - **Underline (links only):** Underline styling is reserved exclusively for hyperlinks. Never use underline for emphasis, headings, or decorative styling — it creates ambiguity with actual links and adds visual noise without aiding legibility.
 - **Heading hierarchy:** Never skip heading levels (e.g. an `h1` followed directly by an `h3`) to achieve a smaller visual size — pick the correct semantic level for document structure and use the type scale tokens (`headline-lg`/`headline-md`/`headline-sm`) to control its visual size independently. This matters for screen-reader users, who navigate long-form content by heading level.
 - **Measure (line length):** Paragraph text must never be allowed to stretch to a container's full width. Long-form/prose copy is capped at the `measure` token (`40rem`, ~65-75 characters at `body-md` size) — apply it as a `max-width` on the prose wrapper, not by shortening the container itself. Lines that run wider than this are a genuine low-vision/dyslexia readability failure, not just an aesthetic preference.
@@ -292,6 +296,7 @@ The scale above governs discrete UI elements (a button label, a card headline). 
     - **`lg` (24px / `text-xl`):** Inline alert headers, toast indicators, section titles.
     - **`xl` (32px / `text-2xl`):** Hero cards, milestone achievements, victory dialog headers.
   * Accessibility: Use `aria-hidden="true"` on decorative icons. For standalone/interactive icons, provide descriptive text inside a `.sr-only` element or an `aria-label`. Use the `<Icon />` component primitive (`src/components/ui/icon.tsx`). Never mix icon libraries.
+  * **Dual-State Icon Transitions (`<Icon.Toggle />` & `<Icon.CrossFade />`):** When swapping action icons (e.g. Copy $\rightarrow$ Check, Mute $\rightarrow$ Unmute, Pin $\rightarrow$ Unpin), do not perform an instantaneous DOM unmount/mount. Use `<Icon.Toggle onName="..." offName="..." active={...} />` or `<Icon.CrossFade name={...} />`. These stack both icons in an identical 1×1 grid cell to prevent 1px layout jitter, morphing opacity and scale (`scale-75 opacity-0` $\leftrightarrow$ `scale-100 opacity-100`) over 150ms (`--duration-quick`) with `--ease-standard`. Screen readers receive dynamic announcements via `onLabel` / `offLabel` or `srLabel`. In `prefers-reduced-motion: reduce`, the transition resolves instantaneously (0.01ms).
 
 ## Layout & Spacing
 
@@ -304,6 +309,10 @@ The design system utilizes a **Fluid Grid** with a strict 0.5rem (8px) baseline 
 Content is organized into clear vertical stacks. Vertical spacing between logical sections should be generous (typically 4rem/64px or 5rem/80px) to prevent cognitive overload and maintain an uncluttered, calm feeling.
 
 - **Anchor left:** Don't center everything — F-pattern scanning means left-alignment is the anchor for body content, forms, and lists. Reserve centering for short, celebratory, or standalone confirmation messages (e.g. an empty state, a completion screen).
+- **Responsive Architecture (Components vs. Viewport):**
+  - **Core Contract:** *Components adapt to their container, pages adapt to the viewport.*
+  - **Component-Level Internals (`@container`):** Reusable UI primitives and modular blocks (`Card`, `Drawer` panels, `Dialog` layouts, `Table`, list rows, `ThinkingOrb` status blocks) must rely on Tailwind v4 native container queries (`@container` on the container wrapper, paired with `@sm:`, `@md:`, `@lg:` variants on child elements) rather than viewport media queries (`sm:`, `md:`, `lg:`). A card or metric summary must ask "How wide is my container?" so that when placed in a narrow off-canvas drawer (e.g. 380px) or a 3-column dashboard grid on a 4K display, it stays cleanly stacked rather than exploding into horizontal multi-column layouts.
+  - **Page-Level Shells (Viewport Breakpoints):** Viewport breakpoints (`sm:`, `md:`, `lg:`, `xl:`) are reserved strictly for page-level frame chrome: the top navigation header collapse, global page grid margins (`margin-desktop`, `margin-tablet`, `margin-mobile`), and root dashboard column splits.
 - **Touch targets:** Minimum 2.75rem × 2.75rem (44×44px) for any interactive element, as a general floor (WCAG 2.2 SC 2.5.8). Individual components in this file set stricter minimums where warranted (standalone action Buttons: 3rem/48px; Lists: 3.5rem/56px row height; compact controls like Steppers/Accordion triggers: 2.75rem/44px). Where the visual control is inherently smaller than 44px (e.g. 20px Checkboxes/Radios, or 32px/40px Avatars acting as buttons), the clickable/tappable hit area must still be expanded to at least the 2.75rem floor via padding or wrapper containers. *(Exception: On small mobile screens $\le 320\text{px}$, OTP digit boxes scale down to 40px width with 48px height to satisfy 320px reflow without horizontal scrolling under WCAG 1.4.10, comfortably surpassing the official WCAG 2.2 AA SC 2.5.8 24×24px target floor).*
 
 ## Elevation & Depth
@@ -311,6 +320,16 @@ Content is organized into clear vertical stacks. Vertical spacing between logica
 To maintain high contrast and visual clarity while avoiding heavy visual clutter, this design system uses **Borderless Cards**, **Ambient Elevation**, and **High-Visibility Focus Indicators**.
 
 - **Borderless Cards:** Standard content cards are **borderless by default** (`border-none`), using flat white `surface` (`#ffffff`) on a light `background` canvas (`#F6F7FB`) paired with crisp ambient elevation (`shadows.ambient` / `shadow-ambient`). This provides natural 3D layer separation without heavy outline ink.
+- **Layered Multi-Stop Ambient Shadows (Umbra + Penumbra):** Shadows in this system are strictly multi-stop compositions rather than muddy single-layer drop shadows. 
+  - Standard single-layer CSS shadows (`0 4px 12px rgba(...)`) create a blurry linear smear characteristic of generic AI UI.
+  - Our tokens combine a tight, low-opacity contact shadow (the umbra) to ground the container against the canvas, with a diffused, high-radius dispersion layer (the penumbra) to mimic natural light falloff.
+  - All shadows are strictly tinted with our neutral ink token (`rgba(26, 28, 30, ...)`) rather than pure carbon black (`#000000`), preserving color harmony with the `#F6F7FB` clinical canvas.
+- **Elevation Prominence Budget (Strict 3-Tier Rule):** Avoid sprawling multi-step shadow scales (`shadow-xs` through `shadow-2xl`). All elevation in the application is strictly budgeted into three semantic roles:
+  - `shadow-ambient`: Standard modular content cards and Tier B anchored overlays.
+  - `shadow-ambient-hover`: Interactive card lift on pointer hover.
+  - `shadow-modal`: Tier A blocking dialogs and full-height drawers over backdrop scrims.
+  - *Zero-Shadow Baseline:* Page-frame chrome (Header, Navigation Bar), Toolbars, Buttons, Text Inputs, Chips, and Inline Alerts maintain **zero box-shadow**. Never give shadows to flat controls.
+- **Physical Borders Over Faux Shadow-Rings:** We reject simulated border tricks like `smooth-shadow-ring` (`box-shadow: 0 0 0 1px ...`). In Windows High Contrast Mode (`forced-colors: active`), browsers completely strip all `box-shadow` properties, causing faux-bordered elements to melt invisibly into the canvas. All floating overlays must maintain real physical CSS borders (`border-outline-variant` 1px or 2px) so container perimeters remain fully legible across all assistive technologies.
 - **Structural Controls (Forms):** Form fields (inputs, selects, textareas) retain crisp 1px `outline` borders (`#737688`) to guarantee WCAG 2.2 SC 1.4.11 3:1 non-text contrast for interactive affordances (`outline-variant` `#C4D5F8` is reserved for passive structural dividers and disabled states).
 - **Interaction Elevation & Selection (Cards):** On hover/interaction, cards lift with enhanced ambient elevation (`hover:shadow-ambient-hover`). For **Selectable Cards**, active selection transitions from borderless to a 2px `primary` border (`borderWidth.emphasis`) paired with a subtle background wash (`bg-primary-container/15`) and an active indicator.
 - **Floating Containers:** Dialog, Drawer, Popover, Menu/Select/Dropdown, and Toast are elevated above page content with dedicated permanent shadows and consistent tier-based geometry:
@@ -545,6 +564,18 @@ Built on Base UI's `Avatar` primitive (see `component-library.md`). Avatars are 
 
 ### Progress & Loading States
 Built on Base UI's `Progress` primitive (see `component-library.md`) for determinate bars/rings; skeleton pulses are plain elements, not a Base UI primitive. Use the `primary` color for determinate progress bars/rings on a `surface-variant` track. For loading skeletons, use a subtle `surface-variant`-toned pulse — never a generic grey unrelated to the palette. Every component that can load asynchronously must define its loading and empty states, not just its populated state (see "Design for the Zero-State" in `anti-patterns.md`).
+
+### AI Activity Indicators (Thinking Orbs)
+Built on `thinking-orbs` via the `<ThinkingOrb />` design system wrapper (`src/components/ui/thinking-orb.tsx`). Used to communicate multi-step agentic latency (searching guidelines, synthesizing notes, formulating recommendations) rather than displaying a static, indeterminate spinner.
+- **Color & Motion Are Never the Only Cue:** A standalone canvas orb communicates nothing to screen readers and violates WCAG 1.4.1. An orb must **always** be accompanied by a visible status label in `font-sans text-on-surface` or an accessible `.sr-only` fallback inside a `role="status"` and `aria-live="polite"` live region.
+- **Standard Scale:** `sm` (20px) for inline text/badges, `md` (32px) for card headers, and `lg` (64px) for prominent hero-scale agent states.
+- **Mandatory Reduced Motion:** Wrappers automatically query `(prefers-reduced-motion: reduce)` to set `paused={true}` or dampen animation speed.
+
+### Paediatric AI Characters (Bot Avatars)
+Built on `bot-avatars` via the `<BotAvatar />` design system wrapper (`src/components/ui/bot-avatar.tsx`). Designed to provide friendly, approachable interaction for children, adolescents, and supportive healthcare education workflows.
+- **Affect & Clinical Tone Gating (`tone="calm"` vs `tone="friendly"`):** High-energy bouncing or smiling avatars during moments of acute patient distress, red-flag triage, or pain evaluation cause jarring tone mismatch. In any clinical assessment or triage pathway, `tone="calm"` is **mandatory**; this disables spontaneous flips/hops (`jumpEvery={0}`), restricts gaze turns, and reduces speed by 50%.
+- **Non-Clinical Identity Safeguard:** Automated tools must never mislead patients into believing they are speaking directly with a human paediatrician. Avatars must carry descriptive `role="img"` and `aria-label` tags identifying them as a "Digital Helper", and offer an optional visual `showDisclaimerBadge`.
+- **Sensory Sensitivity & Reduced Motion:** Continuous micro-movement can overstimulate neurodivergent patients (ADHD, sensory processing differences). The component automatically suppresses jumping and rapid rotation when `prefers-reduced-motion` is active.
 
 ### Toasts & Notifications
 Tier C floating container (see Elevation & Depth) — deliberately distinct from Card rather than matching it: `surface` background, borderless on top/right/bottom (`border-t-0 border-r-0 border-b-0`), flat rectangular shape (`rounded-none`), relying on a permanent ambient shadow as its perimeter edge. Always paired with a leading functional icon and, for error/success/warning states, an `error`/`success`/`warning` colored icon plus a matching `4px` (`borderWidth.accent`, `border-l-4`) left accent bar — the exact flat rectangle and accent-bar treatment as Inline Alerts — never a full-bleed colored background, which reduces text contrast. Auto-dismiss non-critical toasts; keep error toasts until manually dismissed.

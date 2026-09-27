@@ -92,7 +92,7 @@ const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
         <BaseMenu.Portal>
           <BaseMenu.Positioner sideOffset={6}>
             <BaseMenu.Popup
-              className="z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]"
+              className="z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
             >
               {children
                 ? children

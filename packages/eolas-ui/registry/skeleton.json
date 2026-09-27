@@ -1,0 +1,20 @@
+{
+  "name": "skeleton",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/skeleton.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface SkeletonProps extends React.HTMLAttributes<HTMLElement> {\n  /** HTML element to render. Use 'span' for inline text placeholders. Defaults to 'div'. */\n  as?: 'div' | 'span';\n  className?: string;\n}\n\n/**\n * Skeleton\n *\n * Accessible loading placeholder styled with the design system's surface-variant token.\n * Uses a calm, subtle opacity pulse to communicate asynchronous state without jarring flicker.\n *\n * Complies with DESIGN.md line 566 (surface-variant toned pulse, never generic gray).\n */\nexport const Skeleton = React.forwardRef<HTMLElement, SkeletonProps>(\n  ({ as: Component = 'div', className, ...props }, ref) => {\n    return (\n      <Component\n        ref={ref as never}\n        data-slot=\"skeleton\"\n        aria-hidden=\"true\"\n        className={cn(\n          'animate-pulse rounded bg-surface-variant/70 motion-reduce:animate-none',\n          Component === 'span' && 'inline-block align-middle',\n          className\n        )}\n        {...props}\n      />\n    );\n  }\n);\n\nSkeleton.displayName = 'Skeleton';\n\nexport interface SkeletonRevealProps extends React.HTMLAttributes<HTMLDivElement> {\n  /** Whether data is still loading. When true, skeleton is shown. When false, content is revealed. */\n  loading: boolean;\n  /** The skeleton placeholder node to show while loading */\n  skeleton: React.ReactNode;\n  /** Real loaded content to reveal */\n  children: React.ReactNode;\n  /** Duration of the cross-blur reveal in milliseconds. Defaults to 400ms (--duration-slow). */\n  duration?: number;\n  className?: string;\n}\n\n/**\n * SkeletonReveal\n *\n * Dual-layer cross-fade container based on transitions.dev.\n * Stacks placeholder skeleton and loaded content in the same slot.\n * When loading completes, smoothly cross-fades the skeleton to content with a 2px\n * micro-blur to eliminate layout snap.\n */\nexport const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealProps>(\n  (\n    {\n      loading,\n      skeleton,\n      children,\n      duration = 400,\n      className,\n      ...props\n    },\n    ref\n  ) => {\n    const id = React.useId().replace(/:/g, '');\n    const containerClass = `skel-reveal-${id}`;\n\n    return (\n      <div\n        ref={ref}\n        data-slot=\"skeleton-reveal\"\n        className={cn('relative w-full', containerClass, className)}\n        {...props}\n      >\n        {/* Skeleton Layer */}\n        <div\n          aria-hidden={!loading}\n          className={cn(\n            'w-full transition-[opacity,filter] duration-[var(--duration-slow)] ease-[var(--ease-in-out)] motion-reduce:transition-none',\n            loading\n              ? 'opacity-100 filter-none pointer-events-auto'\n              : 'absolute inset-0 opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'\n          )}\n        >\n          {skeleton}\n        </div>\n\n        {/* Content Layer */}\n        <div\n          aria-hidden={loading}\n          className={cn(\n            'w-full transition-[opacity,filter] duration-[var(--duration-slow)] ease-[var(--ease-in-out)] motion-reduce:transition-none',\n            loading\n              ? 'absolute inset-0 opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'\n              : 'opacity-100 filter-none pointer-events-auto'\n          )}\n        >\n          {children}\n        </div>\n      </div>\n    );\n  }\n);\n\nSkeletonReveal.displayName = 'SkeletonReveal';\n\nexport default Object.assign(Skeleton, {\n  Reveal: SkeletonReveal,\n});\n",
+      "type": "registry:ui",
+      "target": "components/ui/skeleton.tsx"
+    }
+  ]
+}

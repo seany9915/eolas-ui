@@ -34,6 +34,35 @@
     ]
   },
   {
+    "name": "approval-card",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "radio"
+    ]
+  },
+  {
+    "name": "attachment",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon",
+      "progress"
+    ]
+  },
+  {
     "name": "autocomplete",
     "type": "registry:ui",
     "dependencies": [
@@ -58,6 +87,32 @@
     ]
   },
   {
+    "name": "bot-avatar",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "bot-avatars"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
+    "name": "breadcrumb",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon"
+    ]
+  },
+  {
     "name": "button",
     "type": "registry:ui",
     "dependencies": [
@@ -79,6 +134,20 @@
     ],
     "registryDependencies": [
       "utils"
+    ]
+  },
+  {
+    "name": "carousel",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon"
     ]
   },
   {
@@ -229,6 +298,44 @@
     ]
   },
   {
+    "name": "empty-state",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon"
+    ]
+  },
+  {
+    "name": "empty",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "empty-state"
+    ]
+  },
+  {
+    "name": "error-shake",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
     "name": "field",
     "type": "registry:ui",
     "dependencies": [
@@ -354,7 +461,31 @@
     ]
   },
   {
+    "name": "notification-badge",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
     "name": "number-field",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
+    "name": "number-roll",
     "type": "registry:ui",
     "dependencies": [
       "@base-ui/react",
@@ -375,6 +506,20 @@
     ],
     "registryDependencies": [
       "utils"
+    ]
+  },
+  {
+    "name": "pagination",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon"
     ]
   },
   {
@@ -423,6 +568,19 @@
     ],
     "registryDependencies": [
       "utils"
+    ]
+  },
+  {
+    "name": "resizable",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon"
     ]
   },
   {
@@ -478,6 +636,30 @@
     ]
   },
   {
+    "name": "shimmer-text",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
+    "name": "skeleton",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
     "name": "slider",
     "type": "registry:ui",
     "dependencies": [
@@ -487,6 +669,20 @@
     ],
     "registryDependencies": [
       "utils"
+    ]
+  },
+  {
+    "name": "step-wizard",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon"
     ]
   },
   {
@@ -500,6 +696,18 @@
     "registryDependencies": [
       "utils",
       "number-field"
+    ]
+  },
+  {
+    "name": "success-check",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
     ]
   },
   {
@@ -539,6 +747,18 @@
     ]
   },
   {
+    "name": "text-swap",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
     "name": "textarea",
     "type": "registry:ui",
     "dependencies": [
@@ -549,6 +769,45 @@
     "registryDependencies": [
       "utils",
       "field"
+    ]
+  },
+  {
+    "name": "texts-reveal",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
+    "name": "thinking-orb",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "thinking-orbs"
+    ],
+    "registryDependencies": [
+      "utils"
+    ]
+  },
+  {
+    "name": "thinking-trace",
+    "type": "registry:ui",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "collapsible",
+      "icon"
     ]
   },
   {

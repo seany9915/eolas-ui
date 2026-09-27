@@ -38,6 +38,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Toolbar } from '@/components/ui/toolbar';
 import { DirectionProvider, type TextDirection } from '@/components/ui/direction-provider';
+import { ThinkingOrb, type OrbState } from '@/components/ui/thinking-orb';
+import { BotAvatar, type BotAvatarType, type BotAvatarState } from '@/components/ui/bot-avatar';
 
 export const ComponentLibraryShowcase: React.FC = () => {
   const [toastState, setToastState] = React.useState<{
@@ -75,6 +77,14 @@ export const ComponentLibraryShowcase: React.FC = () => {
   const [toolbarActive, setToolbarActive] = React.useState('bold');
   const [showcaseDirection, setShowcaseDirection] = React.useState<TextDirection>('ltr');
   const [searchVal, setSearchVal] = React.useState('Eleanor Vance');
+
+  // AI Components Interactive State
+  const [orbState, setOrbState] = React.useState<OrbState>('searching');
+  const [orbSize, setOrbSize] = React.useState<'sm' | 'md' | 'lg'>('md');
+  const [botType, setBotType] = React.useState<BotAvatarType>('clover');
+  const [botState, setBotState] = React.useState<BotAvatarState>('default');
+  const [botTone, setBotTone] = React.useState<'friendly' | 'calm'>('calm');
+  const [showBotDisclaimer, setShowBotDisclaimer] = React.useState(true);
 
   // Sample Table Data
   interface PatientSession {
@@ -1169,6 +1179,174 @@ export const ComponentLibraryShowcase: React.FC = () => {
             onConfirm={() => showToast('Telemetry Records Purged', 'All 48kHz audio recordings and pitch glide logs were permanently removed from Cloud Firestore.', 'error')}
           />
         </Card>
+      </section>
+
+      {/* 17. AI Activity Indicators & Paediatric Characters */}
+      <section className="space-y-4">
+        <div className="border-b border-outline-variant pb-2">
+          <h3 className="font-heading text-xl font-bold text-on-surface">17. AI Activity Indicators & Paediatric Avatars</h3>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Lightweight 2D canvas primitives for managing perceived latency in clinical AI workflows and delivering approachable, tone-safe paediatric interactions.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Thinking Orbs Panel */}
+          <div className="rounded-lg bg-surface border border-outline-variant p-6 space-y-5">
+            <div>
+              <h4 className="font-heading text-base font-bold text-on-surface">Thinking Orb (AI Agent State)</h4>
+              <p className="font-sans text-xs text-on-surface-variant mt-1">
+                Visualizes distinct agentic phases with zero runtime dependencies. Paired with visible text and a live region to comply with WCAG 1.4.1 (color is never the only cue).
+              </p>
+            </div>
+
+            {/* Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <label className="flex flex-col gap-1 font-label text-on-surface">
+                <span>State</span>
+                <select
+                  value={orbState}
+                  onChange={(e) => setOrbState(e.target.value as OrbState)}
+                  className="rounded-md border border-outline-variant bg-surface px-2.5 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <option value="working">working</option>
+                  <option value="searching">searching</option>
+                  <option value="solving">solving</option>
+                  <option value="listening">listening</option>
+                  <option value="connecting">connecting</option>
+                  <option value="weaving">weaving</option>
+                  <option value="composing">composing</option>
+                  <option value="breathing">breathing</option>
+                  <option value="shaping">shaping</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-1 font-label text-on-surface">
+                <span>Size</span>
+                <select
+                  value={orbSize}
+                  onChange={(e) => setOrbSize(e.target.value as 'sm' | 'md' | 'lg')}
+                  className="rounded-md border border-outline-variant bg-surface px-2.5 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <option value="sm">sm (20px inline)</option>
+                  <option value="md">md (32px badge)</option>
+                  <option value="lg">lg (64px hero)</option>
+                </select>
+              </label>
+            </div>
+
+            {/* Interactive Preview Canvas */}
+            <div className="rounded-lg bg-surface-container p-6 flex flex-col items-center justify-center min-h-[140px] border border-outline-variant/60">
+              <ThinkingOrb
+                state={orbState}
+                size={orbSize}
+                label={
+                  <span className="font-sans text-sm font-medium text-on-surface">
+                    {orbState === 'searching' && 'Searching national clinical guidelines...'}
+                    {orbState === 'solving' && 'Calculating paediatric dosage recommendation...'}
+                    {orbState === 'working' && 'Processing clinical telemetry data...'}
+                    {orbState === 'listening' && 'Listening for speech articulation...'}
+                    {orbState === 'connecting' && 'Connecting to electronic health record...'}
+                    {orbState === 'weaving' && 'Synthesising consultation notes...'}
+                    {orbState === 'composing' && 'Drafting care summary letter...'}
+                    {orbState === 'breathing' && 'System standby — ready for prompt'}
+                    {orbState === 'shaping' && 'Formatting output tables...'}
+                  </span>
+                }
+              />
+            </div>
+
+            <div className="text-[11px] font-sans text-on-surface-variant bg-surface-variant/40 p-2.5 rounded-md border border-outline-variant/50">
+              <strong className="text-on-surface font-semibold">Accessibility Guarantee:</strong> An <code className="font-mono text-primary">aria-live="polite"</code> announcement updates automatically when state transitions occur.
+            </div>
+          </div>
+
+          {/* Paediatric Bot Avatar Panel */}
+          <div className="rounded-lg bg-surface border border-outline-variant p-6 space-y-5">
+            <div>
+              <h4 className="font-heading text-base font-bold text-on-surface">Paediatric Bot Avatar</h4>
+              <p className="font-sans text-xs text-on-surface-variant mt-1">
+                Animated character companion for child-facing consultations. Enforces mandatory calm mode safeguards during acute clinical triage.
+              </p>
+            </div>
+
+            {/* Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <label className="flex flex-col gap-1 font-label text-on-surface">
+                <span>Character</span>
+                <select
+                  value={botType}
+                  onChange={(e) => setBotType(e.target.value as BotAvatarType)}
+                  className="rounded-md border border-outline-variant bg-surface px-2 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <option value="clover">Clover</option>
+                  <option value="cat">Cat</option>
+                  <option value="cloud">Cloud</option>
+                  <option value="blob">Blob</option>
+                  <option value="droid">Droid</option>
+                  <option value="star">Star</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-1 font-label text-on-surface">
+                <span>Activity</span>
+                <select
+                  value={botState}
+                  onChange={(e) => setBotState(e.target.value as BotAvatarState)}
+                  className="rounded-md border border-outline-variant bg-surface px-2 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <option value="default">Default (Idle)</option>
+                  <option value="working">Working (Active)</option>
+                  <option value="sleeping">Sleeping</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-1 font-label text-on-surface">
+                <span>Tone Mode</span>
+                <select
+                  value={botTone}
+                  onChange={(e) => setBotTone(e.target.value as 'friendly' | 'calm')}
+                  className="rounded-md border border-outline-variant bg-surface px-2 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <option value="calm">Calm (Clinical safe)</option>
+                  <option value="friendly">Friendly (Playful)</option>
+                </select>
+              </label>
+            </div>
+
+            {/* Interactive Preview Canvas */}
+            <div className="rounded-lg bg-surface-container p-6 flex flex-col items-center justify-center min-h-[140px] border border-outline-variant/60">
+              <BotAvatar
+                type={botType}
+                state={botState}
+                tone={botTone}
+                size="lg"
+                showDisclaimerBadge={showBotDisclaimer}
+                disclaimerText="Paediatric AI Assistant"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] font-sans text-on-surface-variant bg-surface-variant/40 p-2.5 rounded-md border border-outline-variant/50">
+              <span>
+                <strong className="text-on-surface font-semibold">
+                  {botTone === 'calm' ? 'Calm Mode Active:' : 'Friendly Mode Active:'}
+                </strong>{' '}
+                {botTone === 'calm'
+                  ? 'Spontaneous flips/hops disabled, speed halved to prevent affect mismatch during distress.'
+                  : 'Full playful animations enabled for positive reinforcement and casual check-ins.'}
+              </span>
+              <label className="inline-flex items-center gap-1.5 cursor-pointer ml-2 shrink-0">
+                <input
+                  type="checkbox"
+                  checked={showBotDisclaimer}
+                  onChange={(e) => setShowBotDisclaimer(e.target.checked)}
+                  className="rounded border-outline-variant text-primary focus:ring-primary"
+                />
+                <span className="font-label text-[10px]">Disclaimer badge</span>
+              </label>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Floating Design System Toast Notification Layer */}

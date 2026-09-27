@@ -1,0 +1,21 @@
+{
+  "name": "empty",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "empty-state"
+  ],
+  "files": [
+    {
+      "path": "ui/empty.tsx",
+      "content": "import { EmptyState } from './empty-state';\n\nexport * from './empty-state';\nexport { EmptyState as Empty } from './empty-state';\nexport default EmptyState;\n",
+      "type": "registry:ui",
+      "target": "components/ui/empty.tsx"
+    }
+  ]
+}

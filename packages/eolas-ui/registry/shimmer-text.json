@@ -1,0 +1,20 @@
+{
+  "name": "shimmer-text",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/shimmer-text.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface ShimmerTextProps extends React.HTMLAttributes<HTMLElement> {\n  children: React.ReactNode;\n  /** Component HTML tag to render. Defaults to 'span'. */\n  as?: 'span' | 'p' | 'div' | 'h1' | 'h2' | 'h3' | 'h4';\n  /** Whether the shimmer animation is active. Defaults to true. */\n  active?: boolean;\n  /** Color theme for the sweeping highlight band. Defaults to 'primary'. */\n  variant?: 'primary' | 'neutral' | 'secondary';\n  /** Cycle duration in milliseconds. Defaults to 2200. */\n  duration?: number;\n  className?: string;\n}\n\n/**\n * ShimmerText\n *\n * Ambient streaming text shimmer based on transitions.dev.\n * Sweeps a subtle brand highlight across muted text on a continuous loop\n * to communicate live AI reasoning, clinical transcription, or background sync.\n *\n * Automatically suppresses animation and settles into high-contrast text when\n * prefers-reduced-motion is active.\n */\nexport const ShimmerText = React.forwardRef<HTMLElement, ShimmerTextProps>(\n  (\n    {\n      children,\n      as: Component = 'span',\n      active = true,\n      variant = 'primary',\n      duration = 2200,\n      className,\n      ...props\n    },\n    ref\n  ) => {\n    // Unique ID for instance-specific scoped styles if custom duration is supplied\n    const id = React.useId().replace(/:/g, '');\n    const classNameId = `shimmer-text-${id}`;\n\n    const highlightColor =\n      variant === 'secondary'\n        ? 'var(--color-secondary)'\n        : variant === 'neutral'\n          ? 'var(--color-on-surface)'\n          : 'var(--color-primary)';\n\n    return (\n      <Component\n        ref={ref as never}\n        className={cn(\n          'inline-block font-sans text-on-surface-variant',\n          active && classNameId,\n          className\n        )}\n        {...props}\n      >\n        {children}\n\n        {active && (\n          <style\n            dangerouslySetInnerHTML={{\n              __html: `\n.${classNameId} {\n  background: linear-gradient(\n    90deg,\n    var(--color-on-surface-variant) 0%,\n    var(--color-on-surface-variant) 35%,\n    ${highlightColor} 50%,\n    var(--color-on-surface-variant) 65%,\n    var(--color-on-surface-variant) 100%\n  );\n  background-size: 250% 100%;\n  -webkit-background-clip: text;\n  background-clip: text;\n  color: transparent;\n  -webkit-text-fill-color: transparent;\n  animation: shimmer-sweep-${id} ${duration}ms linear infinite;\n}\n\n@keyframes shimmer-sweep-${id} {\n  0% {\n    background-position: 100% 0;\n  }\n  100% {\n    background-position: 0% 0;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .${classNameId} {\n    animation: none !important;\n    background: none !important;\n    color: var(--color-on-surface-variant) !important;\n    -webkit-text-fill-color: var(--color-on-surface-variant) !important;\n  }\n}\n`,\n            }}\n          />\n        )}\n      </Component>\n    );\n  }\n);\n\nShimmerText.displayName = 'ShimmerText';\n",
+      "type": "registry:ui",
+      "target": "components/ui/shimmer-text.tsx"
+    }
+  ]
+}

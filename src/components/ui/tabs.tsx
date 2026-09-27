@@ -28,6 +28,7 @@ export type TabsVariant = 'line' | 'underline' | 'segmented' | 'segment' | 'pill
 interface TabsContextValue {
   variant: TabsVariant;
   orientation?: 'horizontal' | 'vertical';
+  showIndicator?: boolean;
 }
 
 const TabsContext = React.createContext<TabsContextValue>({ variant: 'line' });
@@ -64,17 +65,18 @@ export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
   loopFocus?: boolean;
   variant?: TabsVariant;
   showIndicator?: boolean;
+  indicatorClassName?: string;
   className?: string;
 }
 
 export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
-  ({ children, activateOnFocus, loopFocus, variant, showIndicator = false, className, ...props }, ref) => {
+  ({ children, activateOnFocus, loopFocus, variant, showIndicator = false, indicatorClassName, className, ...props }, ref) => {
     const parentContext = React.useContext(TabsContext);
     const effectiveVariant = variant ?? parentContext.variant ?? 'line';
     const isSegmented = effectiveVariant === 'segmented' || effectiveVariant === 'segment' || effectiveVariant === 'pills' || effectiveVariant === 'pill';
 
     return (
-      <TabsContext.Provider value={{ variant: effectiveVariant, orientation: parentContext.orientation }}>
+      <TabsContext.Provider value={{ variant: effectiveVariant, orientation: parentContext.orientation, showIndicator }}>
         <BaseTabs.List
           ref={ref}
           activateOnFocus={activateOnFocus}
@@ -95,14 +97,26 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
           {...props}
         >
           {children}
-          {showIndicator && !isSegmented && effectiveVariant !== 'unstyled' && (
-            <BaseTabs.Indicator
-              className={cn(
-                'absolute bg-primary rounded-none z-10 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
-                'data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2.5px]',
-                'data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2.5px]'
-              )}
-            />
+          {showIndicator && effectiveVariant !== 'unstyled' && (
+            isSegmented ? (
+              <BaseTabs.Indicator
+                className={cn(
+                  'absolute rounded-sm bg-primary z-0 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'data-[orientation=horizontal]:inset-y-1',
+                  'data-[orientation=vertical]:inset-x-1',
+                  indicatorClassName
+                )}
+              />
+            ) : (
+              <BaseTabs.Indicator
+                className={cn(
+                  'absolute bg-primary rounded-none z-10 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2.5px]',
+                  'data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2.5px]',
+                  indicatorClassName
+                )}
+              />
+            )
           )}
         </BaseTabs.List>
       </TabsContext.Provider>
@@ -125,6 +139,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
     const context = React.useContext(TabsContext);
     const effectiveVariant = variant ?? context.variant ?? 'line';
     const isSegmented = effectiveVariant === 'segmented' || effectiveVariant === 'segment' || effectiveVariant === 'pills' || effectiveVariant === 'pill';
+    const hasSlidingIndicator = isSegmented && context.showIndicator;
 
     return (
       <BaseTabs.Tab
@@ -144,11 +159,22 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
             ? ''
             : isSegmented
               ? cn(
-                  'py-2 px-3.5 min-h-[40px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 z-10',
-                  'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-xs data-[active]:font-bold',
-                  'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-xs data-[selected]:font-bold',
-                  'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-xs data-[state=active]:font-bold',
-                  'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-xs aria-selected:font-bold'
+                  'py-2 px-3.5 min-h-[40px] rounded-sm text-on-surface-variant hover:text-on-surface z-10',
+                  hasSlidingIndicator
+                    ? cn(
+                        'bg-transparent',
+                        'data-[active]:text-on-primary data-[active]:font-bold',
+                        'data-[selected]:text-on-primary data-[selected]:font-bold',
+                        'data-[state=active]:text-on-primary data-[state=active]:font-bold',
+                        'aria-selected:text-on-primary aria-selected:font-bold'
+                      )
+                    : cn(
+                        'hover:bg-surface-variant/30',
+                        'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-xs data-[active]:font-bold',
+                        'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-xs data-[selected]:font-bold',
+                        'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-xs data-[state=active]:font-bold',
+                        'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-xs aria-selected:font-bold'
+                      )
                 )
               : cn(
                   'py-3 px-4 min-h-[48px] rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
@@ -157,7 +183,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                   'data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:border-primary',
                   'aria-selected:text-primary aria-selected:font-bold aria-selected:border-primary'
                 ),
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className
         )}

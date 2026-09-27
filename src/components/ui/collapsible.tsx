@@ -40,10 +40,11 @@ export type CollapsibleContentProps = CollapsiblePanelProps;
 export interface CollapsibleTriggerProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Trigger> {
   children: React.ReactNode;
   className?: string;
+  hideChevron?: boolean;
 }
 
 export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, CollapsibleTriggerProps>(
-  ({ children, className, ...props }, ref) => (
+  ({ children, className, hideChevron = false, ...props }, ref) => (
     <BaseCollapsible.Trigger
       ref={ref}
       className={cn(
@@ -53,9 +54,11 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
       {...props}
     >
       {children}
-      <span className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-150 ease-out" aria-hidden="true">
-        keyboard_arrow_down
-      </span>
+      {!hideChevron && (
+        <span className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-150 ease-out" aria-hidden="true">
+          keyboard_arrow_down
+        </span>
+      )}
     </BaseCollapsible.Trigger>
   )
 );

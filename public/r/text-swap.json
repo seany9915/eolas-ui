@@ -1,0 +1,20 @@
+{
+  "name": "text-swap",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/text-swap.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface TextSwapProps extends React.HTMLAttributes<HTMLSpanElement> {\n  /** The current text or string value to display */\n  children: React.ReactNode;\n  /** Custom duration in milliseconds. Defaults to 150ms (--duration-quick). */\n  duration?: number;\n  className?: string;\n}\n\n/**\n * TextSwap\n *\n * Micro-transition for in-place text state changes based on transitions.dev.\n * When children/text changes (e.g. \"Save\" -> \"Saved\", \"Syncing...\" -> \"Synced\"),\n * the departing text slides upward 4px with a 2px micro-blur and fades,\n * while incoming text rises seamlessly into place.\n *\n * Prevents layout-width thrash inside buttons, chips, and status badges.\n * Automatically falls back to an instant swap when prefers-reduced-motion is active.\n */\nexport const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(\n  ({ children, duration = 150, className, ...props }, ref) => {\n    const [currentText, setCurrentText] = React.useState(children);\n    const [prevText, setPrevText] = React.useState<React.ReactNode | null>(null);\n    const [phase, setPhase] = React.useState<'idle' | 'exit' | 'enter'>('idle');\n\n    React.useEffect(() => {\n      if (children !== currentText) {\n        setPrevText(currentText);\n        setCurrentText(children);\n        setPhase('exit');\n\n        const exitTimer = window.setTimeout(() => {\n          setPhase('enter');\n          const enterTimer = window.setTimeout(() => {\n            setPhase('idle');\n            setPrevText(null);\n          }, duration);\n          return () => window.clearTimeout(enterTimer);\n        }, duration);\n\n        return () => window.clearTimeout(exitTimer);\n      }\n    }, [children, currentText, duration]);\n\n    return (\n      <span\n        ref={ref}\n        className={cn(\n          'inline-grid grid-cols-1 grid-rows-1 place-items-center align-middle overflow-hidden select-none',\n          className\n        )}\n        {...props}\n      >\n        {prevText !== null && phase === 'exit' && (\n          <span\n            aria-hidden=\"true\"\n            className=\"col-start-1 row-start-1 opacity-0 -translate-y-1 blur-[var(--blur-small,2px)] transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-in-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none pointer-events-none\"\n          >\n            {prevText}\n          </span>\n        )}\n        <span\n          className={cn(\n            'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-in-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',\n            phase === 'exit'\n              ? 'opacity-0 translate-y-1 blur-[var(--blur-small,2px)]'\n              : 'opacity-100 translate-y-0 blur-0'\n          )}\n        >\n          {currentText}\n        </span>\n      </span>\n    );\n  }\n);\n\nTextSwap.displayName = 'TextSwap';\n\nexport default TextSwap;\n",
+      "type": "registry:ui",
+      "target": "components/ui/text-swap.tsx"
+    }
+  ]
+}

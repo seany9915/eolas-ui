@@ -1,0 +1,20 @@
+{
+  "name": "texts-reveal",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/texts-reveal.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface TextsRevealProps extends React.HTMLAttributes<HTMLDivElement> {\n  children: React.ReactNode;\n  /** Whether the reveal is visible. Defaults to true. */\n  show?: boolean;\n  className?: string;\n}\n\nexport interface TextsRevealLineProps extends React.HTMLAttributes<HTMLDivElement> {\n  children: React.ReactNode;\n  /** 0-based stagger index. Stagger delays cap at index 4 (5 items / 200ms max). */\n  index?: number;\n  className?: string;\n}\n\n/**\n * TextsRevealLine\n *\n * Individual line in a staggered text reveal sequence.\n * Rises 12px with a 3px micro-blur over 500ms.\n */\nexport const TextsRevealLine = React.forwardRef<HTMLDivElement, TextsRevealLineProps>(\n  ({ children, index = 0, className, style, ...props }, ref) => {\n    // Stagger Cap Rule: cap index at 4 (5th item) to ensure total delay <= 200ms\n    const cappedIndex = Math.min(index, 4);\n    const delayMs = cappedIndex * 40; // 40ms per item (--duration-stagger)\n\n    return (\n      <div\n        ref={ref}\n        style={{\n          animationDelay: `${delayMs}ms`,\n          ...style,\n        }}\n        className={cn(\n          'w-full animate-text-reveal motion-reduce:animate-none',\n          className\n        )}\n        {...props}\n      >\n        {children}\n      </div>\n    );\n  }\n);\n\nTextsRevealLine.displayName = 'TextsRevealLine';\n\n/**\n * TextsReveal\n *\n * Staggered text entrance container based on transitions.dev.\n * Staggers stacked headline and body copy into view with 3px micro-blur\n * and upward rise for empty states, onboarding steps, and hero summaries.\n *\n * Enforces the Stagger Cap Rule (max 5 items / 200ms max delay) to prevent UI lag.\n * Automatically strips motion under prefers-reduced-motion.\n */\nexport const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsRevealProps>(\n  ({ children, show = true, className, ...props }, ref) => {\n    return (\n      <div\n        ref={ref}\n        className={cn(\n          'flex flex-col gap-1 w-full',\n          !show && 'opacity-0 transition-opacity duration-200 ease-out',\n          className\n        )}\n        {...props}\n      >\n        {children}\n\n        <style\n          dangerouslySetInnerHTML={{\n            __html: `\n@keyframes text-reveal-rise {\n  from {\n    opacity: 0;\n    transform: translateY(var(--distance-medium, 12px));\n    filter: blur(var(--blur-medium, 3px));\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n    filter: blur(0);\n  }\n}\n\n.animate-text-reveal {\n  animation: text-reveal-rise var(--duration-very-slow, 500ms) var(--ease-standard, cubic-bezier(0.22, 1, 0.36, 1)) both;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .animate-text-reveal {\n    animation: none !important;\n    transform: none !important;\n    filter: none !important;\n  }\n}\n`,\n          }}\n        />\n      </div>\n    );\n  }\n);\n\nTextsRevealComponent.displayName = 'TextsReveal';\n\nexport const TextsReveal = Object.assign(TextsRevealComponent, {\n  Line: TextsRevealLine,\n});\n\nexport default TextsReveal;\n",
+      "type": "registry:ui",
+      "target": "components/ui/texts-reveal.tsx"
+    }
+  ]
+}

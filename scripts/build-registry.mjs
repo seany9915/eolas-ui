@@ -57,6 +57,12 @@ for (const file of files) {
 
   // Detect npm packages needed
   const npmDeps = ['@base-ui/react', 'clsx', 'tailwind-merge'];
+  if (content.includes("from 'thinking-orbs'")) {
+    npmDeps.push('thinking-orbs');
+  }
+  if (content.includes("from 'bot-avatars'")) {
+    npmDeps.push('bot-avatars');
+  }
 
   const item = {
     name,

@@ -1,0 +1,21 @@
+{
+  "name": "breadcrumb",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "icon"
+  ],
+  "files": [
+    {
+      "path": "ui/breadcrumb.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport { Icon } from './icon';\n\nexport interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {\n  separator?: React.ReactNode;\n}\n\nexport const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(\n  ({ className, ...props }, ref) => (\n    <nav\n      ref={ref}\n      aria-label=\"Breadcrumb\"\n      className={cn('@container relative w-full', className)}\n      {...props}\n    />\n  )\n);\nBreadcrumb.displayName = 'Breadcrumb';\n\nexport const BreadcrumbList = React.forwardRef<\n  HTMLOListElement,\n  React.ComponentPropsWithoutRef<'ol'>\n>(({ className, ...props }, ref) => (\n  <ol\n    ref={ref}\n    className={cn(\n      'flex flex-wrap items-center gap-1.5 font-sans text-sm text-on-surface-variant break-words',\n      className\n    )}\n    {...props}\n  />\n));\nBreadcrumbList.displayName = 'BreadcrumbList';\n\nexport const BreadcrumbItem = React.forwardRef<\n  HTMLLIElement,\n  React.ComponentPropsWithoutRef<'li'>\n>(({ className, ...props }, ref) => (\n  <li\n    ref={ref}\n    className={cn('inline-flex items-center gap-1.5 min-w-0', className)}\n    {...props}\n  />\n));\nBreadcrumbItem.displayName = 'BreadcrumbItem';\n\nexport interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<'a'> {}\n\nexport const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(\n  ({ className, ...props }, ref) => (\n    <a\n      ref={ref}\n      className={cn(\n        'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none',\n        className\n      )}\n      {...props}\n    />\n  )\n);\nBreadcrumbLink.displayName = 'BreadcrumbLink';\n\nexport const BreadcrumbPage = React.forwardRef<\n  HTMLSpanElement,\n  React.ComponentPropsWithoutRef<'span'>\n>(({ className, ...props }, ref) => (\n  <span\n    ref={ref}\n    role=\"link\"\n    aria-disabled=\"true\"\n    aria-current=\"page\"\n    className={cn('font-medium text-on-surface truncate max-w-[200px] @sm:max-w-none', className)}\n    {...props}\n  />\n));\nBreadcrumbPage.displayName = 'BreadcrumbPage';\n\nexport const BreadcrumbSeparator = ({\n  children,\n  className,\n  ...props\n}: React.ComponentPropsWithoutRef<'li'>) => (\n  <li\n    role=\"presentation\"\n    aria-hidden=\"true\"\n    className={cn('text-outline opacity-60 flex items-center select-none', className)}\n    {...props}\n  >\n    {children ?? <Icon name=\"chevron_right\" size=\"sm\" className=\"text-base\" />}\n  </li>\n);\nBreadcrumbSeparator.displayName = 'BreadcrumbSeparator';\n\nexport const BreadcrumbEllipsis = ({\n  className,\n  ...props\n}: React.ComponentPropsWithoutRef<'span'>) => (\n  <span\n    role=\"presentation\"\n    className={cn('flex size-6 items-center justify-center text-outline select-none', className)}\n    {...props}\n  >\n    <Icon name=\"more_horiz\" size=\"sm\" className=\"text-base\" aria-hidden=\"true\" />\n    <span className=\"sr-only\">More links</span>\n  </span>\n);\nBreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis';\n",
+      "type": "registry:ui",
+      "target": "components/ui/breadcrumb.tsx"
+    }
+  ]
+}

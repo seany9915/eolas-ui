@@ -58,7 +58,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
   // Resolve accent: invertedAccent takes priority, fallback to deprecated spotlightAccent, default to 'tertiary'
   const resolvedAccent = invertedAccent ?? (spotlightAccent === 'neutral' ? 'neutral' : 'tertiary');
 
-  const baseStyles = 'p-6 rounded-[1rem] transition-all relative';
+  const baseStyles = 'p-6 rounded-[1rem] transition-[box-shadow,border-color,background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] relative motion-reduce:transition-none';
 
   // Body copy remains pure white (text-surface) to avoid chromatic glare/fatigue; tertiary accents apply to headlines/icons
   const invertedStyles = 'bg-on-surface text-surface border-none shadow-ambient';

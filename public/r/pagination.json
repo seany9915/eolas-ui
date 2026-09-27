@@ -1,0 +1,22 @@
+{
+  "name": "pagination",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "button",
+    "icon"
+  ],
+  "files": [
+    {
+      "path": "ui/pagination.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\nimport { Button, type ButtonProps } from './button';\nimport { Icon } from './icon';\n\nexport interface PaginationProps extends React.ComponentPropsWithoutRef<'nav'> {}\n\nexport const Pagination = ({ className, ...props }: PaginationProps) => (\n  <nav\n    role=\"navigation\"\n    aria-label=\"Pagination\"\n    className={cn('@container mx-auto flex w-full justify-center', className)}\n    {...props}\n  />\n);\nPagination.displayName = 'Pagination';\n\nexport const PaginationContent = React.forwardRef<\n  HTMLUListElement,\n  React.ComponentPropsWithoutRef<'ul'>\n>(({ className, ...props }, ref) => (\n  <ul\n    ref={ref}\n    className={cn('flex flex-row items-center gap-1 @sm:gap-2', className)}\n    {...props}\n  />\n));\nPaginationContent.displayName = 'PaginationContent';\n\nexport const PaginationItem = React.forwardRef<\n  HTMLLIElement,\n  React.ComponentPropsWithoutRef<'li'>\n>(({ className, ...props }, ref) => (\n  <li ref={ref} className={cn('list-none', className)} {...props} />\n));\nPaginationItem.displayName = 'PaginationItem';\n\nexport type PaginationLinkProps = {\n  isActive?: boolean;\n} & Pick<ButtonProps, 'size'> &\n  React.ComponentPropsWithoutRef<'a'>;\n\nexport const PaginationLink = ({\n  className,\n  isActive,\n  size = 'md',\n  children,\n  ...props\n}: PaginationLinkProps) => (\n  <Button\n    render={<a aria-current={isActive ? 'page' : undefined} {...props} />}\n    variant={isActive ? 'filled' : 'outlined'}\n    size={size}\n    className={cn(\n      'min-w-[44px] min-h-[44px] tabular-nums font-sans text-sm',\n      isActive && 'pointer-events-none font-semibold border-primary',\n      className\n    )}\n  >\n    {children}\n  </Button>\n);\nPaginationLink.displayName = 'PaginationLink';\n\nexport const PaginationPrevious = ({\n  className,\n  children = 'Previous',\n  ...props\n}: React.ComponentPropsWithoutRef<typeof PaginationLink>) => (\n  <PaginationLink\n    aria-label=\"Go to previous page\"\n    className={cn('gap-1 pl-2.5 pr-3.5', className)}\n    {...props}\n  >\n    <Icon name=\"chevron_left\" size=\"sm\" className=\"text-base\" />\n    <span className=\"hidden @sm:inline\">{children}</span>\n  </PaginationLink>\n);\nPaginationPrevious.displayName = 'PaginationPrevious';\n\nexport const PaginationNext = ({\n  className,\n  children = 'Next',\n  ...props\n}: React.ComponentPropsWithoutRef<typeof PaginationLink>) => (\n  <PaginationLink\n    aria-label=\"Go to next page\"\n    className={cn('gap-1 pl-3.5 pr-2.5', className)}\n    {...props}\n  >\n    <span className=\"hidden @sm:inline\">{children}</span>\n    <Icon name=\"chevron_right\" size=\"sm\" className=\"text-base\" />\n  </PaginationLink>\n);\nPaginationNext.displayName = 'PaginationNext';\n\nexport const PaginationEllipsis = ({\n  className,\n  ...props\n}: React.ComponentPropsWithoutRef<'span'>) => (\n  <span\n    className={cn(\n      'flex size-11 items-center justify-center font-sans text-on-surface-variant select-none',\n      className\n    )}\n    {...props}\n  >\n    <Icon name=\"more_horiz\" size=\"md\" aria-hidden=\"true\" />\n    <span className=\"sr-only\">More pages</span>\n  </span>\n);\nPaginationEllipsis.displayName = 'PaginationEllipsis';\n",
+      "type": "registry:ui",
+      "target": "components/ui/pagination.tsx"
+    }
+  ]
+}
