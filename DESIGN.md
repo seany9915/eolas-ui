@@ -116,6 +116,7 @@ shadows:
 motion:
   durations:
     stagger: 40ms
+    micro: 80ms
     quick: 150ms
     fast: 250ms
     medium: 350ms
@@ -124,6 +125,25 @@ motion:
     very-slow: 500ms
   easing:
     standard: cubic-bezier(0.22, 1, 0.36, 1)
+    smooth-out: cubic-bezier(0.22, 1, 0.36, 1)
+    exit: cubic-bezier(0.4, 0, 1, 1)
+    in-out: ease-in-out
+    bounce: cubic-bezier(0.34, 1.36, 0.64, 1)
+    bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1)
+  scales:
+    large: 0.96
+    medium: 0.97
+    small: 0.98
+    tiny: 0.99
+  distances:
+    micro: 4px
+    small: 6px
+    base: 8px
+    medium: 12px
+    roomy: 16px
+  blurs:
+    small: 2px
+    medium: 3px
 spacing:
   base: 0.5rem
   gutter: 1.5rem
@@ -291,12 +311,13 @@ The scale above governs discrete UI elements (a button label, a card headline). 
   * Icon font family class: `material-symbols-outlined`
   * Example: `<span className="material-symbols-outlined" aria-hidden="true">home</span>`
   * Standard Size Scale Matrix:
-    - **`sm` (16px / `text-sm`):** Compact chips, dense metadata badges, inline close triggers.
-    - **`md` (20px / `text-base`):** Form field leading icons, standard button icons, menu row icons.
+    - **`xs` (14px / `text-xs`):** Micro action triggers, inline metadata tags, table row actions.
+    - **`sm` (16px / `text-base`):** Compact chips, dense metadata badges, inline close triggers.
+    - **`md` (20px / `text-lg`):** Form field leading icons, standard button icons, menu row icons.
     - **`lg` (24px / `text-xl`):** Inline alert headers, toast indicators, section titles.
     - **`xl` (32px / `text-2xl`):** Hero cards, milestone achievements, victory dialog headers.
   * Accessibility: Use `aria-hidden="true"` on decorative icons. For standalone/interactive icons, provide descriptive text inside a `.sr-only` element or an `aria-label`. Use the `<Icon />` component primitive (`src/components/ui/icon.tsx`). Never mix icon libraries.
-  * **Dual-State Icon Transitions (`<Icon.Toggle />` & `<Icon.CrossFade />`):** When swapping action icons (e.g. Copy $\rightarrow$ Check, Mute $\rightarrow$ Unmute, Pin $\rightarrow$ Unpin), do not perform an instantaneous DOM unmount/mount. Use `<Icon.Toggle onName="..." offName="..." active={...} />` or `<Icon.CrossFade name={...} />`. These stack both icons in an identical 1×1 grid cell to prevent 1px layout jitter, morphing opacity and scale (`scale-75 opacity-0` $\leftrightarrow$ `scale-100 opacity-100`) over 150ms (`--duration-quick`) with `--ease-standard`. Screen readers receive dynamic announcements via `onLabel` / `offLabel` or `srLabel`. In `prefers-reduced-motion: reduce`, the transition resolves instantaneously (0.01ms).
+  * **Dual-State Icon Transitions (`<Icon.Toggle />` & `<Icon.CrossFade />`):** When swapping action icons (e.g. Copy $\rightarrow$ Check, Mute $\rightarrow$ Unmute, Pin $\rightarrow$ Unpin), do not perform an instantaneous DOM unmount/mount. Use `<Icon.Toggle onName="..." offName="..." active={...} />` or `<Icon.CrossFade name={...} />`. These stack both icons in an identical 1×1 grid cell to prevent 1px layout jitter, morphing opacity, scale (`scale-[0.25] opacity-0 blur-[var(--blur-small)]` $\leftrightarrow$ `scale-100 opacity-100 blur-0`) over 150ms (`--duration-quick`) with `--ease-standard`. Screen readers receive dynamic announcements via `onLabel` / `offLabel` or `srLabel`. In `prefers-reduced-motion: reduce`, the transition resolves instantaneously without transform or blur.
 
 ## Layout & Spacing
 
@@ -347,17 +368,47 @@ To maintain high contrast and visual clarity while avoiding heavy visual clutter
 
 Motion is quick, purposeful, and understated — never bouncy or decorative. It exists to clarify a state change (something opened, failed, or loaded), not to entertain. This section anchors the *values*; full implementation snippets live in the `transitions-dev` skill (new motion) and `transitions-polish` skill (tuning existing motion) — reference the same scale rather than hand-rolling new numbers.
 
-- **Per-component open/close durations** (matching `transitions-dev`'s `_root.css` scale exactly, so both stay in sync):
-  - **Dialog:** open `250ms` ("fast"), close `150ms` ("quick") — the scale-in/out "modal" pairing.
-  - **Popover, Menu/Select/Dropdown:** open `250ms` ("fast"), close `150ms` ("quick") — the same "dropdown" pairing as Dialog; visual weight (border/shadow/scrim, see Elevation & Depth) is what separates Tier A from Tier B here, not speed.
-  - **Drawer:** open `400ms` ("slow"), close `350ms` ("medium") — the slower "panel reveal" pairing, since a Drawer physically slides in from an edge rather than scaling in place.
-  - **Toast:** open `400ms` ("slow"), close `350ms` ("medium") — the same pairing as Drawer; a toast rising from below is a comparable physical motion, per `transitions-dev`'s own toast reference (`22-toast.md`).
-  - **Emphasis-only moments** (success check, milestone badge appear): `500ms` ("emphasis" / "very slow", `--duration-emphasis`) — never use this for routine open/close chrome.
-  - **Close is never slower than open.** Every pairing above closes at the same speed as or faster than it opens, so dismissing something always feels at least as light as summoning it.
-- **Stagger Cap Rule:** Multi-item stagger animations must use `--duration-stagger: 40ms` and cap at **5 items maximum** ($\text{max cumulative delay} = 5 \times 40\text{ms} = 200\text{ms}$). Items beyond index 5 animate concurrently with item 5 to ensure list renders never produce perceived UI lag.
-- **Easing:** a single smooth-out cubic-bezier (`cubic-bezier(0.22, 1, 0.36, 1)`) for anything that opens, closes, or changes position — Dialog, Drawer, Popover, Menu, Toast, page transitions. Reserve bounce/spring easing only for celebratory, non-structural moments (a success check, a milestone badge) — never on overlay/container chrome, which would read as playful rather than calm and focused.
-- **`prefers-reduced-motion` is mandatory, not optional**, for every component in this file. Every transition/animation must ship a `@media (prefers-reduced-motion: reduce)` fallback that strips translation/scale/blur movement and keeps only an instant or opacity-only state change — never drop the state change itself, only the motion.
-- **Wiring into Base UI:** prefer Base UI's `[data-starting-style]`/`[data-ending-style]` attributes (CSS transitions — these cancel smoothly mid-way if a user closes something before it finishes opening) over `[data-open]`/`[data-closed]` keyframe animations, per Base UI's own animation guidance — see `component-library.md`.
+### The 5 Rules for Motion Polish
+1. **Open / Close Timing Asymmetry (Close $\le$ Open):** Every dismiss or exit transition must be at least as fast as or faster than its entrance. Dismissing a surface should always feel lighter and quicker than summoning it.
+2. **Intent Delays on Hover / Tooltips:** Use a calibrated delay (100–150ms, `--duration-quick`) before opening hover cards or tooltips to avoid phantom flashes when a cursor sweeps across a screen.
+3. **Calibrated Physical Travel Distances:** Never use large arbitrary 32px or 48px jumps. Motion distances reflect physical scale:
+   - `--distance-micro` (4px): In-place text swaps, icon nudges, micro-elevation.
+   - `--distance-small` (6px): Compact menus, badges, chip transitions.
+   - `--distance-base` (8px): Dropdowns, popovers, step-wizard horizontal panel slides.
+   - `--distance-medium` (12px): Dialog scale-float offsets.
+   - `--distance-roomy` (16px): Full drawer entry offsets and toast vertical slide-ins.
+4. **Blur-Coupled Micro-Motion:** Small transforms must be paired with subtle optical blur (`--blur-small: 2px` or `--blur-medium: 3px`) during entry/exit. This eliminates subpixel snapping, softens text rasterization jitter, and provides an organic fluid feel.
+5. **The Stagger Cap:** Multi-item stagger animations must use `--duration-stagger: 40ms` and strictly cap at **5 items maximum** ($\text{max cumulative delay} = 5 \times 40\text{ms} = 200\text{ms}$). Items beyond index 5 animate concurrently with item 5 to ensure list renders never introduce perceived UI latency.
+
+### Explicit Property Targeting (Never `transition-all`)
+Never use `transition-all` on cards, layout containers, or dialogs. Blanket transitions force the browser style engine to recompute layout geometry on unrelated style changes, producing paint thrashing and visible frame drops. Always target explicit CSS properties:
+- Cards: `transition-[box-shadow,border-color,background-color,transform]`
+- Dropdowns / Popovers / Dialogs: `transition-[opacity,transform,filter]`
+- Accordions / Expandables: `transition-[height]`
+- Icons / Toggles: `transition-[opacity,transform,filter]`
+
+### Per-Component Durations & Motion Pairings
+- **Dialog:** open `250ms` ("fast"), close `150ms` ("quick") — scale-in/out modal pairing (`scale-[0.98]` $\leftrightarrow$ `scale-100`).
+- **Popover, Menu, Select, Dropdown:** open `250ms` ("fast"), close `150ms` ("quick") — slide-down pairing (`--distance-base: 8px`).
+- **Drawer:** open `400ms` ("slow"), close `350ms` ("medium") — physical side-panel slide pairing (`--distance-roomy: 16px`).
+- **Toast:** open `400ms` ("slow"), close `350ms` ("medium") — bottom-up rise pairing. Dismiss action buttons must maintain a minimum 44×44px hit-target (`min-w-[44px] min-h-[44px]`) to satisfy WCAG 2.2 SC 2.5.8.
+- **Accordion:** open/close `250ms` ("fast", `--duration-fast`) with `--ease-standard` on both the panel height reveal and chevron rotation.
+- **Emphasis-only moments:** `500ms` ("emphasis" / "very slow", `--duration-emphasis`) — reserved strictly for celebratory milestones (`SuccessCheck`, badge unlock); never on standard UI chrome.
+- **Motion Restraint on High-Frequency Controls:** Checkboxes and switches do not use 350ms stroke-draws or double-bounce springs. Standard chrome uses crisp 150ms micro-transitions.
+
+### Essential Motion Primitives
+The design system ships 8 reusable motion primitives in `@/components/ui/` that implement these polish standards:
+- **`Skeleton` & `Skeleton.Reveal` (`skeleton.tsx`):** Subtle pulse track on `bg-surface-variant/70` (never generic grey). The companion `Skeleton.Reveal` provides a seamless dual-layer cross-blur transition (`--blur-medium: 3px` over `--duration-fast: 250ms`) from skeleton to real content without layout pop. Supports polymorphic `as="div" | "span"` and `data-slot="skeleton"`.
+- **`TextSwap` (`text-swap.tsx`):** In-place vertical slip for status, tab, or metric label swaps (4px travel + 2px blur over 150ms).
+- **`NotificationBadge` (`notification-badge.tsx`):** Diagonal slide + scale-pop badge entrance (150ms) that renders isolated from parent layout flow.
+- **`TextsReveal` (`texts-reveal.tsx`):** Staggered multi-line text entrance enforcing the 40ms stagger cap ($\le 5$ lines / 200ms max).
+- **`NumberRoll` (`number-roll.tsx`):** Tabular vertical digit odometer with `tabular-nums` ensuring fixed character widths.
+- **`ShimmerText` (`shimmer-text.tsx`):** Directional highlight shimmer across active or processing text labels.
+- **`ErrorShake` (`error-shake.tsx`):** 3-cycle horizontal error pulse (300ms) on invalid form actions or blocked requests.
+- **`SuccessCheck` (`success-check.tsx`):** Calibrated SVG stroke-draw checkmark over 500ms for confirmation dialogs.
+
+### Mandatory Accessibility Fallback
+**`prefers-reduced-motion` is mandatory, not optional**, for every component in this system. Every transition must ship a `@media (prefers-reduced-motion: reduce)` / `motion-reduce:transition-none` fallback that strips translation, scale, and blur, preserving instant or opacity-only state changes. Never drop the state change itself, only the motion. Base UI components must use `[data-starting-style]` and `[data-ending-style]` CSS transitions rather than CSS keyframes.
 
 ## Shapes
 
@@ -578,7 +629,7 @@ Built on `bot-avatars` via the `<BotAvatar />` design system wrapper (`src/compo
 - **Sensory Sensitivity & Reduced Motion:** Continuous micro-movement can overstimulate neurodivergent patients (ADHD, sensory processing differences). The component automatically suppresses jumping and rapid rotation when `prefers-reduced-motion` is active.
 
 ### Toasts & Notifications
-Tier C floating container (see Elevation & Depth) — deliberately distinct from Card rather than matching it: `surface` background, borderless on top/right/bottom (`border-t-0 border-r-0 border-b-0`), flat rectangular shape (`rounded-none`), relying on a permanent ambient shadow as its perimeter edge. Always paired with a leading functional icon and, for error/success/warning states, an `error`/`success`/`warning` colored icon plus a matching `4px` (`borderWidth.accent`, `border-l-4`) left accent bar — the exact flat rectangle and accent-bar treatment as Inline Alerts — never a full-bleed colored background, which reduces text contrast. Auto-dismiss non-critical toasts; keep error toasts until manually dismissed.
+Tier C floating container (see Elevation & Depth) — deliberately distinct from Card rather than matching it: `surface` background, borderless on top/right/bottom (`border-t-0 border-r-0 border-b-0`), flat rectangular shape (`rounded-none`), relying on a permanent ambient shadow (`shadow-ambient`) as its perimeter edge. Always paired with a leading functional icon and, for error/success/warning states, an `error`/`success`/`warning` colored icon plus a matching `4px` (`borderWidth.accent`, `border-l-4`) left accent bar — the exact flat rectangle and accent-bar treatment as Inline Alerts — never a full-bleed colored background, which reduces text contrast. Auto-dismiss non-critical toasts; keep error toasts until manually dismissed. **Dismiss action buttons must strictly maintain a minimum 44×44px touch target (`w-11 h-11 min-w-[44px] min-h-[44px]`) to comply with WCAG 2.2 SC 2.5.8.**
 
 ## Brand Architecture & Usage Guidelines
 
