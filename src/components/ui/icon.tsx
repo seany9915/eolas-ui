@@ -3,12 +3,13 @@ import { cn } from '@/lib/utils';
 
 export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   srLabel?: string;
   className?: string;
 }
 
 const sizeClasses = {
+  xs: 'text-xs text-[14px]',
   sm: 'text-base text-[16px]',
   md: 'text-lg text-[20px]',
   lg: 'text-xl text-[24px]',
@@ -46,7 +47,7 @@ export interface ToggleIconProps extends Omit<React.HTMLAttributes<HTMLSpanEleme
   active: boolean;
   onName: string;
   offName: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   srLabel?: string;
   onLabel?: string;
   offLabel?: string;
@@ -108,7 +109,7 @@ ToggleIcon.displayName = 'ToggleIcon';
 
 export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   name: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   srLabel?: string;
   className?: string;
 }

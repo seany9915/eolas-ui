@@ -23,7 +23,7 @@ export type CardAffordance = 'static' | 'actionable' | 'selectable' | 'interacti
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   prominence?: CardProminence;
   affordance?: CardAffordance;
-  variant?: 'default' | 'selectable' | 'filled' | 'spotlight' | 'inverted' | 'accent';
+  variant?: 'default' | 'standard' | 'selectable' | 'filled' | 'spotlight' | 'inverted' | 'accent';
   selected?: boolean;
   colorRole?: 'primary' | 'secondary' | 'tertiary';
   /** Accent configuration for Inverted Cards ('tertiary' Sunny Amber headline/badge or 'neutral' pure white) */
@@ -47,7 +47,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
 }, ref) => {
   // Resolve resolvedProminence: prominence prop takes priority, else infer from variant, default to 'default'
   const resolvedProminence: CardProminence = prominence ?? (
-    variant === 'selectable' ? 'default' : (variant ?? 'default')
+    variant === 'selectable' || variant === 'standard' ? 'default' : (variant ?? 'default')
   );
 
   // Resolve resolvedAffordance: affordance prop takes priority, else infer from variant or selectable
