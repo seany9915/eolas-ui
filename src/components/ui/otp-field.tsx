@@ -58,9 +58,9 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
 
   return (
     <BaseField.Root
-      ref={ref}
-      invalid={Boolean(error)}
-      className={cn('flex flex-col gap-1.5 w-full', className)}
+    ref={ref}
+    invalid={Boolean(error)}
+    className={cn('@container flex flex-col gap-1.5 w-full', className)}
     >
       {label && (
         <BaseField.Label className={cn('font-label text-sm font-semibold text-on-surface flex items-center', center ? 'justify-center' : 'justify-between')}>
@@ -94,7 +94,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         validationType={validationType}
         inputMode={inputMode}
         aria-label={!label ? 'One-time passcode' : undefined}
-        className={cn('flex gap-1.5 sm:gap-2 items-center', center ? 'justify-center' : 'justify-start')}
+        className={cn('flex gap-1.5 @sm:gap-2 items-center', center ? 'justify-center' : 'justify-start')}
       >
         {Array.from({ length }, (_, idx) => (
           <React.Fragment key={idx}>
@@ -109,7 +109,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
             <BaseOTPField.Input
               pattern={pattern}
               className={cn(
-                'w-10 sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg sm:text-xl font-bold rounded',
+                'w-10 @sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg @sm:text-xl font-bold rounded',
                 'border-[1px] bg-surface text-on-surface transition-colors shrink-0',
                 'focus:border-primary focus:outline-2 focus:outline-offset-0 focus:outline-primary',
                 'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant disabled:cursor-not-allowed',

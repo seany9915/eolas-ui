@@ -82,7 +82,7 @@ const AlertDialogComponent: React.FC<AlertDialogProps> = ({
             initialFocus={initialFocus}
             finalFocus={finalFocus}
             className={cn(
-              'w-full max-w-md p-6 rounded-[1rem] bg-surface border-[2px] border-outline-variant shadow-modal space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)]',
+              '@container w-full max-w-md p-6 rounded-[1rem] bg-surface border-[2px] border-outline-variant shadow-modal space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)]',
               className
             )}
           >
@@ -154,7 +154,7 @@ export const AlertDialogContent = React.forwardRef<
       <BaseAlertDialog.Popup
         ref={ref}
         className={cn(
-          'w-full max-w-md p-6 rounded-[1rem] bg-surface border-[2px] border-outline-variant shadow-modal space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)]',
+          '@container w-full max-w-md p-6 rounded-[1rem] bg-surface border-[2px] border-outline-variant shadow-modal space-y-4 max-h-[calc(100vh-2rem)] overflow-y-auto will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)]',
           className
         )}
         {...props}
@@ -167,12 +167,12 @@ export const AlertDialogContent = React.forwardRef<
 AlertDialogContent.displayName = 'AlertDialogContent';
 
 export const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />
+  <div className={cn('flex flex-col space-y-2 text-center @sm:text-left', className)} {...props} />
 );
 AlertDialogHeader.displayName = 'AlertDialogHeader';
 
 export const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-2 border-t border-outline-variant', className)} {...props} />
+  <div className={cn('flex flex-col-reverse @sm:flex-row @sm:justify-end @sm:space-x-2 pt-2 border-t border-outline-variant', className)} {...props} />
 );
 AlertDialogFooter.displayName = 'AlertDialogFooter';
 

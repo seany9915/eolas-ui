@@ -101,7 +101,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   <label
                     key={opt.id}
                     className={cn(
-                      'flex items-start gap-3 p-3 rounded-md border text-left transition-all duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-pointer select-none',
+                      'flex items-start gap-3 p-3 rounded-md border text-left transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-pointer select-none',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       isSelected
                         ? 'border-primary bg-primary-container/20 text-on-surface'
@@ -126,7 +126,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               {allowCustomInput && (
                 <div
                   className={cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-md border transition-all duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+                    'flex items-center gap-2 px-3 py-2 rounded-md border transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
                     selectedOptionId === '__custom__'
                       ? 'border-primary bg-primary-container/20'
                       : 'border-outline-variant hover:bg-surface-container'

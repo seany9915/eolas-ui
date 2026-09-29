@@ -71,37 +71,6 @@ export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsReveal
         {...props}
       >
         {children}
-
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-@keyframes text-reveal-rise {
-  from {
-    opacity: 0;
-    transform: translateY(var(--distance-medium, 12px));
-    filter: blur(var(--blur-medium, 3px));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-.animate-text-reveal {
-  animation: text-reveal-rise var(--duration-very-slow, 500ms) var(--ease-standard, cubic-bezier(0.22, 1, 0.36, 1)) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-text-reveal {
-    animation: none !important;
-    transform: none !important;
-    filter: none !important;
-  }
-}
-`,
-          }}
-        />
       </div>
     );
   }

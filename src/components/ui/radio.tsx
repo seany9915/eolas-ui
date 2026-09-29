@@ -103,7 +103,7 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps>(({
       readOnly={readOnly}
       required={required}
       className={cn(
-        'w-5 h-5 rounded-full border-[1px] bg-surface transition-all flex items-center justify-center shrink-0 cursor-pointer',
+        'w-5 h-5 rounded-full border-[1px] bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer',
         'data-[checked]:border-[2px] data-[checked]:border-primary',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-primary',
         'disabled:border-outline-variant disabled:bg-surface-variant/30 disabled:cursor-not-allowed',

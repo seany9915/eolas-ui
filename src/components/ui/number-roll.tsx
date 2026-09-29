@@ -67,9 +67,9 @@ export const NumberRoll: React.FC<NumberRollProps> = ({
 
       <span
         className={cn(
-          'inline-block transition-all duration-[var(--duration-fast)] ease-[var(--ease-smooth-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
-          animating && direction === 'up' && 'animate-in fade-in slide-in-from-bottom-2 blur-[1px]',
-          animating && direction === 'down' && 'animate-in fade-in slide-in-from-top-2 blur-[1px]'
+          'inline-block transition-[transform,opacity,filter] duration-[var(--duration-fast)] ease-[var(--ease-smooth-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
+          animating && direction === 'up' && 'animate-roll-up',
+          animating && direction === 'down' && 'animate-roll-down'
         )}
       >
         {formattedText}

@@ -14,7 +14,7 @@
   "files": [
     {
       "path": "ui/toggles.tsx",
-      "content": "/**\n * Re-exports toggle primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/toggle\n * - @/components/ui/toggle-group\n */\nexport * from './toggle';\nexport * from './toggle-group';\n",
+      "content": "/**\r\n * Re-exports toggle primitives for backward compatibility.\r\n * Dedicated modular files exist at:\r\n * - @/components/ui/toggle\r\n * - @/components/ui/toggle-group\r\n */\r\nexport * from './toggle';\r\nexport * from './toggle-group';\r\n",
       "type": "registry:ui",
       "target": "components/ui/toggles.tsx"
     }

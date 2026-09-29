@@ -53,8 +53,8 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
         className={cn(
           'absolute -top-1 -right-1 z-20 pointer-events-none select-none flex items-center justify-center font-mono font-bold leading-none',
           isCounted
-            ? 'min-w-[18px] h-[18px] px-1 text-[11px] rounded-full tabular-nums shadow-xs'
-            : 'w-2.5 h-2.5 rounded-full shadow-xs',
+            ? 'min-w-[18px] h-[18px] px-1 text-[11px] rounded-full tabular-nums shadow-ambient'
+            : 'w-2.5 h-2.5 rounded-full shadow-ambient',
           variantStyles,
           'transition-[transform,opacity,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
           visible
@@ -66,42 +66,6 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
       >
         {isCounted ? count : null}
         {srLabel && <span className="sr-only">{srLabel}</span>}
-
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-@keyframes badge-pop-in {
-  0% {
-    transform: translate(-4px, 4px) scale(0);
-    filter: blur(var(--blur-small, 2px));
-    opacity: 0;
-  }
-  60% {
-    transform: translate(0, 0) scale(1.15);
-    filter: blur(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-    filter: blur(0);
-    opacity: 1;
-  }
-}
-
-.animate-badge-pop {
-  animation: badge-pop-in var(--duration-very-slow, 500ms) cubic-bezier(0.34, 1.36, 0.64, 1) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-badge-pop {
-    animation: none !important;
-    transform: none !important;
-    filter: none !important;
-  }
-}
-`,
-          }}
-        />
       </span>
     );
   }

@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "ui/direction-provider.tsx",
-      "content": "﻿'use client';\n\nexport {\n  DirectionProvider,\n  useDirection,\n  type DirectionProviderProps,\n  type TextDirection,\n} from '@base-ui/react/direction-provider';\r\n",
+      "content": "﻿'use client';\r\n\r\nexport {\r\n  DirectionProvider,\r\n  useDirection,\r\n  type DirectionProviderProps,\r\n  type TextDirection,\r\n} from '@base-ui/react/direction-provider';\r\n",
       "type": "registry:ui",
       "target": "components/ui/direction-provider.tsx"
     }

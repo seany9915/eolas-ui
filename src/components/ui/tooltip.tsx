@@ -78,7 +78,7 @@ const TooltipComponent: React.FC<TooltipProps> = ({
         >
           <BaseTooltip.Popup
             className={cn(
-              'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-md outline-none select-none',
+              'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
               'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
               'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
               'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',
@@ -133,7 +133,7 @@ export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentPro
         <BaseTooltip.Popup
           ref={ref}
           className={cn(
-            'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-md outline-none select-none',
+            'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
             'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',

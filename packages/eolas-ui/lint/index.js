@@ -168,6 +168,7 @@ export const eolasLintPreset = [
       "shadcn/no-arbitrary-values": "off",
       "shadcn/no-inline-styles": "off",
       "shadcn/require-static-classes": "off",
+      "shadcn/no-raw-colors": ["error", { scanAllStrings: false }],
     },
   },
 ];
