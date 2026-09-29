@@ -4,6 +4,8 @@ import { Field as BaseField } from '@base-ui/react/field';
 import { cn } from '@/lib/utils';
 
 export interface OTPFieldProps {
+  id?: string;
+  center?: boolean;
   label?: React.ReactNode;
   description?: React.ReactNode;
   error?: string;
@@ -28,6 +30,8 @@ export interface OTPFieldProps {
 }
 
 const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
+  id,
+  center = false,
   label,
   description,
   error,
@@ -59,7 +63,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       className={cn('flex flex-col gap-1.5 w-full', className)}
     >
       {label && (
-        <BaseField.Label className="font-label text-sm font-semibold text-on-surface flex items-center justify-between">
+        <BaseField.Label className={cn('font-label text-sm font-semibold text-on-surface flex items-center', center ? 'justify-center' : 'justify-between')}>
           <span>{label}</span>
           {required && (
             <span className="text-sm text-on-surface-variant font-normal">(required)</span>
@@ -68,12 +72,13 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       )}
 
       {description && (
-        <BaseField.Description className="text-sm text-on-surface-variant font-sans">
+        <BaseField.Description className={cn('text-sm text-on-surface-variant font-sans', center && 'text-center')}>
           {description}
         </BaseField.Description>
       )}
 
       <BaseOTPField.Root
+        id={id}
         length={length}
         value={value}
         defaultValue={defaultValue}
@@ -89,7 +94,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         validationType={validationType}
         inputMode={inputMode}
         aria-label={!label ? 'One-time passcode' : undefined}
-        className="flex gap-1.5 sm:gap-2 justify-start items-center"
+        className={cn('flex gap-1.5 sm:gap-2 items-center', center ? 'justify-center' : 'justify-start')}
       >
         {Array.from({ length }, (_, idx) => (
           <React.Fragment key={idx}>

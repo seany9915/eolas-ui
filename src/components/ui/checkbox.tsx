@@ -8,7 +8,7 @@ export interface CheckboxProps {
   name?: string;
   required?: boolean;
   readOnly?: boolean;
-  checked?: boolean;
+  checked?: boolean | 'indeterminate';
   defaultChecked?: boolean;
   indeterminate?: boolean;
   parent?: boolean;
@@ -45,6 +45,9 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(({
   const generatedId = React.useId();
   const checkboxId = id || generatedId;
 
+  const isIndeterminate = indeterminate ?? (checked === 'indeterminate');
+  const isChecked = checked === 'indeterminate' ? false : checked;
+
   const checkboxNode = (
     <BaseCheckbox.Root
       ref={ref}
@@ -53,9 +56,9 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(({
       name={name}
       required={required}
       readOnly={readOnly}
-      checked={checked}
+      checked={isChecked}
       defaultChecked={defaultChecked}
-      indeterminate={indeterminate}
+      indeterminate={isIndeterminate}
       parent={parent}
       onCheckedChange={onCheckedChange}
       disabled={disabled}
