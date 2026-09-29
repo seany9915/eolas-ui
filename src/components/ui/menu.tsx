@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
  *   - For switching content views/panels on the same page -> Use <Tabs>.
  */
 
-export interface MenuItem {
+export interface MenuItemData {
   id: string;
   label: string;
   icon?: string;
@@ -26,12 +26,84 @@ export interface MenuItem {
   onClick?: () => void;
 }
 
+// Declaration merging: MenuItem acts both as an interface for declarative items and as a styled component
+export interface MenuItem extends MenuItemData {}
+
+export interface MenuItemProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Item> {
+  destructive?: boolean;
+  icon?: string;
+}
+
+export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
+  ({ className, destructive, icon, children, ...props }, ref) => (
+    <BaseMenu.Item
+      ref={ref}
+      className={cn(
+        'flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+        destructive
+          ? 'text-error hover:bg-error-container/30 focus:bg-error-container/30 data-[highlighted]:bg-error-container/30'
+          : 'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        className
+      )}
+      {...props}
+    >
+      {icon && (
+        <span className="material-symbols-outlined text-lg" aria-hidden="true">
+          {icon}
+        </span>
+      )}
+      {children}
+    </BaseMenu.Item>
+  )
+);
+MenuItem.displayName = 'MenuItem';
+
+export interface MenuContentProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Popup> {
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  align?: 'start' | 'center' | 'end';
+  sideOffset?: number;
+  alignOffset?: number;
+}
+
+export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
+  ({ className, children, side, align, sideOffset = 6, alignOffset, ...props }, ref) => (
+    <BaseMenu.Portal>
+      <BaseMenu.Positioner side={side} align={align} sideOffset={sideOffset} alignOffset={alignOffset}>
+        <BaseMenu.Popup
+          ref={ref}
+          className={cn(
+            'z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </BaseMenu.Popup>
+      </BaseMenu.Positioner>
+    </BaseMenu.Portal>
+  )
+);
+MenuContent.displayName = 'MenuContent';
+
+export const MenuSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Separator>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.Separator
+    ref={ref}
+    className={cn('h-[1px] bg-outline-variant my-1 -mx-1', className)}
+    {...props}
+  />
+));
+MenuSeparator.displayName = 'MenuSeparator';
+
 export interface MenuProps {
   label?: React.ReactNode;
   description?: React.ReactNode;
   triggerLabel?: string;
   trigger?: React.ReactElement;
-  items?: MenuItem[];
+  items?: MenuItemData[];
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -97,25 +169,15 @@ const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
               {children
                 ? children
                 : items?.map((item) => (
-                    <BaseMenu.Item
+                    <MenuItem
                       key={item.id}
                       onClick={item.onClick}
                       disabled={item.disabled}
-                      className={cn(
-                        'flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
-                        item.destructive
-                          ? 'text-error hover:bg-error-container/30 focus:bg-error-container/30 data-[highlighted]:bg-error-container/30'
-                          : 'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-                        'disabled:opacity-50 disabled:cursor-not-allowed'
-                      )}
+                      destructive={item.destructive}
+                      icon={item.icon}
                     >
-                      {item.icon && (
-                        <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                          {item.icon}
-                        </span>
-                      )}
                       <span>{item.label}</span>
-                    </BaseMenu.Item>
+                    </MenuItem>
                   ))}
             </BaseMenu.Popup>
           </BaseMenu.Positioner>
@@ -127,16 +189,17 @@ const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
 
 MenuComponent.displayName = 'Menu';
 
-// Compound export mapping Base UI primitives
+// Compound export mapping Base UI primitives and styled composites
 export const Menu = Object.assign(MenuComponent, {
   Root: BaseMenu.Root,
   Trigger: BaseMenu.Trigger,
   Portal: BaseMenu.Portal,
   Positioner: BaseMenu.Positioner,
   Popup: BaseMenu.Popup,
-  Item: BaseMenu.Item,
+  Content: MenuContent,
+  Item: MenuItem,
   LinkItem: BaseMenu.LinkItem,
-  Separator: BaseMenu.Separator,
+  Separator: MenuSeparator,
   Group: BaseMenu.Group,
   GroupLabel: BaseMenu.GroupLabel,
   SubmenuRoot: BaseMenu.SubmenuRoot,
@@ -153,7 +216,7 @@ export const Menu = Object.assign(MenuComponent, {
   Handle: BaseMenu.Handle,
 });
 
-// Re-export Base UI primitives for compound composition
+// Re-export Base UI primitives and styled components for composition
 export { BaseMenu };
 export const MenuRoot = BaseMenu.Root;
 export const MenuTrigger = BaseMenu.Trigger;
@@ -162,7 +225,6 @@ export const MenuPositioner = BaseMenu.Positioner;
 export const MenuPopup = BaseMenu.Popup;
 export const MenuItemPrimitive = BaseMenu.Item;
 export const MenuLinkItem = BaseMenu.LinkItem;
-export const MenuSeparator = BaseMenu.Separator;
 export const MenuGroup = BaseMenu.Group;
 export const MenuGroupLabel = BaseMenu.GroupLabel;
 export const MenuSubmenuRoot = BaseMenu.SubmenuRoot;
@@ -177,4 +239,6 @@ export const MenuBackdrop = BaseMenu.Backdrop;
 export const MenuViewport = BaseMenu.Viewport;
 export const createMenuHandle = BaseMenu.createHandle;
 export const MenuHandle = BaseMenu.Handle;
+
+export default Menu;
 
