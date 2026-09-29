@@ -87,7 +87,7 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
           'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           active
             ? 'opacity-0 scale-[0.25] blur-[var(--blur-small)] pointer-events-none'
-            : 'opacity-100 scale-100 blur-0'
+            : 'opacity-100 scale-100 blur-none'
         )}
       />
       <BaseIcon
@@ -96,7 +96,7 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
         className={cn(
           'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           active
-            ? 'opacity-100 scale-100 blur-0'
+            ? 'opacity-100 scale-100 blur-none'
             : 'opacity-0 scale-[0.25] blur-[var(--blur-small)] pointer-events-none'
         )}
       />
@@ -164,7 +164,7 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
         size={size}
         className={cn(
           'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-          isTransitioning ? 'opacity-100 scale-100 blur-0' : 'opacity-100 scale-100 blur-0'
+          isTransitioning ? 'opacity-100 scale-100 blur-none' : 'opacity-100 scale-100 blur-none'
         )}
       />
       {srLabel && <span className="sr-only">{srLabel}</span>}

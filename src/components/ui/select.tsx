@@ -243,7 +243,7 @@ const SelectComponent: React.FC<SelectProps> = ({
             collisionPadding={collisionPadding}
             className="z-50 outline-none"
           >
-            <BaseSelect.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
+            <BaseSelect.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
               <BaseSelect.List className="relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none">
                 {normalizedGroups ? (
                   normalizedGroups.map((group) => (
@@ -387,7 +387,7 @@ export const SelectContent = React.forwardRef<
       <BaseSelect.Popup
         ref={ref}
         className={cn(
-          'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
+          'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
           className
         )}
         {...props}
@@ -423,7 +423,7 @@ export const SelectItem = React.forwardRef<
       ref={ref}
       value={value}
       className={cn(
-        'relative flex items-center justify-between px-3 py-2 text-sm text-on-surface rounded-md cursor-pointer select-none outline-none transition-colors hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container-high data-[selected]:font-semibold data-[selected]:text-primary data-[disabled]:text-on-surface-variant/40 data-[disabled]:pointer-events-none',
+        'relative flex items-center justify-between px-3 py-2 text-sm text-on-surface rounded-md cursor-pointer select-none outline-none transition-colors hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[selected]:font-semibold data-[selected]:text-primary data-[disabled]:text-on-surface-variant/40 data-[disabled]:pointer-events-none',
         className
       )}
       {...props}

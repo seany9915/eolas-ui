@@ -125,17 +125,23 @@ toast.error = (title: React.ReactNode, description?: React.ReactNode, timeout?: 
 
 toast.close = (id?: string) => globalToastManager.close(id);
 
+type ActiveToast = React.ComponentProps<typeof BaseToast.Root>['toast'] & {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  type?: 'info' | 'success' | 'warning' | 'error' | string;
+};
+
 /**
  * Toast item inside global Toaster
  */
-const ActiveToastItem: React.FC<{ toast: any }> = ({ toast: t }) => {
+const ActiveToastItem: React.FC<{ toast: ActiveToast }> = ({ toast: t }) => {
   const toastType = t.type || 'info';
   const currentIcon = iconMap[toastType] || iconMap.info;
 
   return (
     <BaseToast.Root
       toast={t}
-      className="pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-[0.5rem] bg-surface border border-outline-variant shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
+      className="pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-none bg-surface border border-outline-variant shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
     >
       <BaseToast.Content className="flex items-start gap-3 w-full">
         <div className={cn('absolute left-0 top-0 bottom-0 w-1', accentBg[toastType] || accentBg.info)} aria-hidden="true" />

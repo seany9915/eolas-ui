@@ -13,7 +13,7 @@
   "files": [
     {
       "path": "ui/steppers.tsx",
-      "content": "/**\n * Backward-compatibility alias for NumberField.\n * Canonical primitive resides at @/components/ui/number-field.\n * For OTP Passcode input, import directly from @/components/ui/otp-field.\n */\nexport { NumberField, BaseNumberField, NumberFieldRoot, NumberFieldGroup, NumberFieldInput, NumberFieldIncrement, NumberFieldDecrement } from './number-field';\nexport type { NumberFieldProps } from './number-field';\n\n// Legacy alias\nexport { NumberField as Stepper } from './number-field';\nexport type { NumberFieldProps as StepperProps } from './number-field';\n",
+      "content": "/**\r\n * Backward-compatibility alias for NumberField.\r\n * Canonical primitive resides at @/components/ui/number-field.\r\n * For OTP Passcode input, import directly from @/components/ui/otp-field.\r\n */\r\nexport { NumberField, BaseNumberField, NumberFieldRoot, NumberFieldGroup, NumberFieldInput, NumberFieldIncrement, NumberFieldDecrement } from './number-field';\r\nexport type { NumberFieldProps } from './number-field';\r\n\r\n// Legacy alias\r\nexport { NumberField as Stepper } from './number-field';\r\nexport type { NumberFieldProps as StepperProps } from './number-field';\r\n",
       "type": "registry:ui",
       "target": "components/ui/steppers.tsx"
     }

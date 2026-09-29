@@ -118,7 +118,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
           )}
           <BaseAutocomplete.Portal>
             <BaseAutocomplete.Positioner sideOffset={6} className="z-50 outline-none">
-              <BaseAutocomplete.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
+              <BaseAutocomplete.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
                 <BaseAutocomplete.Empty className="px-3 py-2 font-sans text-sm text-on-surface-variant">
                   No matching options found
                 </BaseAutocomplete.Empty>

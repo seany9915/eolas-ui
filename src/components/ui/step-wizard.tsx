@@ -100,7 +100,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 >
                   <span
                     className={cn(
-                      'size-2.5 rounded-full transition-all duration-[var(--duration-quick)]',
+                      'size-2.5 rounded-full transition-[width,background-color] duration-[var(--duration-quick)]',
                       idx === currentStepIndex
                         ? 'w-6 bg-primary'
                         : idx < currentStepIndex
@@ -136,55 +136,6 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
           >
             {currentStep?.content}
           </div>
-
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `
-@keyframes step-slide-forward {
-  from {
-    opacity: 0;
-    transform: translateX(var(--distance-base, 8px));
-    filter: blur(var(--blur-medium, 3px));
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-    filter: blur(0);
-  }
-}
-
-@keyframes step-slide-backward {
-  from {
-    opacity: 0;
-    transform: translateX(calc(var(--distance-base, 8px) * -1));
-    filter: blur(var(--blur-medium, 3px));
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-    filter: blur(0);
-  }
-}
-
-.animate-step-forward {
-  animation: step-slide-forward var(--duration-fast, 250ms) var(--ease-standard, cubic-bezier(0.22, 1, 0.36, 1)) both;
-}
-
-.animate-step-backward {
-  animation: step-slide-backward var(--duration-fast, 250ms) var(--ease-standard, cubic-bezier(0.22, 1, 0.36, 1)) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-step-forward,
-  .animate-step-backward {
-    animation: none !important;
-    transform: none !important;
-    filter: none !important;
-  }
-}
-`,
-            }}
-          />
         </div>
 
         {/* Footer Navigation Controls */}

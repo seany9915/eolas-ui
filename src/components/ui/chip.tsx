@@ -34,10 +34,10 @@ export const Chip: React.FC<ChipProps> = ({
   className,
 }) => {
   // Backward compatibility resolution
-  const validColorRoles = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success', 'neutral'];
-  const resolvedRole = (role && validColorRoles.includes(role)) ? role : undefined;
-  const resolvedColorRole: 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' | 'neutral' =
-    (colorRole as any) ?? (resolvedRole as any) ?? 'primary';
+  type ColorRoleType = 'primary' | 'secondary' | 'tertiary' | 'error' | 'warning' | 'success' | 'neutral';
+  const validColorRoles: ColorRoleType[] = ['primary', 'secondary', 'tertiary', 'error', 'warning', 'success', 'neutral'];
+  const resolvedRole = (role && (validColorRoles as string[]).includes(role)) ? (role as ColorRoleType) : undefined;
+  const resolvedColorRole: ColorRoleType = colorRole ?? resolvedRole ?? 'primary';
 
   let resolvedPattern: 'high-contrast-mixed' | 'outline-neutral-fill' | 'neutral-fill-accent-text' = 'outline-neutral-fill';
 

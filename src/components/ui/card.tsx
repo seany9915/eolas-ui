@@ -96,7 +96,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (isSelectable && (e.key === ' ' || e.key === 'Enter')) {
       e.preventDefault();
-      props.onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+      e.currentTarget.click();
     }
     props.onKeyDown?.(e);
   };

@@ -167,7 +167,7 @@ const ComboboxComponent: React.FC<ComboboxProps> = ({
             aria-invalid={!!error}
             aria-describedby={describedBy}
             className={cn(
-              'w-full h-12 pl-4 pr-16 rounded-md bg-surface border-[1px] border-outline text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-2 focus:outline-offset-2 focus:outline-primary transition-all min-h-[48px]',
+              'w-full h-12 pl-4 pr-16 rounded-md bg-surface border-[1px] border-outline text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-2 focus:outline-offset-2 focus:outline-primary transition-[border-color,box-shadow] min-h-[48px]',
               'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
               error && 'border-error'
             )}
@@ -198,7 +198,7 @@ const ComboboxComponent: React.FC<ComboboxProps> = ({
               collisionPadding={collisionPadding}
               className="z-50 outline-none"
             >
-              <BaseCombobox.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-floating transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
+              <BaseCombobox.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]">
                 <BaseCombobox.Empty className="px-3 py-2 text-xs font-sans text-on-surface-variant">
                   No matching options
                 </BaseCombobox.Empty>

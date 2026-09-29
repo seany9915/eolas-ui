@@ -13,7 +13,7 @@
   "files": [
     {
       "path": "ui/empty.tsx",
-      "content": "import { EmptyState } from './empty-state';\n\nexport * from './empty-state';\nexport { EmptyState as Empty } from './empty-state';\nexport default EmptyState;\n",
+      "content": "import { EmptyState } from './empty-state';\r\n\r\nexport * from './empty-state';\r\nexport { EmptyState as Empty } from './empty-state';\r\nexport default EmptyState;\r\n",
       "type": "registry:ui",
       "target": "components/ui/empty.tsx"
     }

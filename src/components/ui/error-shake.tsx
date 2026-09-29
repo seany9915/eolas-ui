@@ -40,42 +40,13 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
       <div
         ref={ref}
         className={cn(
-          'w-full transition-transform motion-reduce:!transform-none motion-reduce:!animation-none',
+          'w-full transition-transform motion-reduce:transform-none motion-reduce:animate-none',
           isShaking && 'animate-error-shake',
           className
         )}
         {...props}
       >
         {children}
-
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-@keyframes error-shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  20%, 60% {
-    transform: translateX(-6px);
-  }
-  40%, 80% {
-    transform: translateX(6px);
-  }
-}
-
-.animate-error-shake {
-  animation: error-shake 250ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-error-shake {
-    animation: none !important;
-    transform: none !important;
-  }
-}
-`,
-          }}
-        />
       </div>
     );
   }

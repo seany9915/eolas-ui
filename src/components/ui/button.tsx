@@ -93,7 +93,7 @@ export function buttonVariants({
   }
 
   if (role && validColorRoles.includes(role)) {
-    resolvedColorRole = role as any;
+    resolvedColorRole = role as typeof resolvedColorRole;
   }
 
   const safeVariant = (resolvedColorRole === 'tertiary' && normalizedVariant !== 'filled') ? 'filled' : normalizedVariant;
