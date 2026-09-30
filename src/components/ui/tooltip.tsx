@@ -69,16 +69,17 @@ const TooltipComponent: React.FC<TooltipProps> = ({
         {!React.isValidElement(children) ? children : undefined}
       </BaseTooltip.Trigger>
       <BaseTooltip.Portal>
+        {/* Layering: Tooltips use z-[70] so hover hints float above modal dialogs (z-50) and toasts (z-[60]). */}
         <BaseTooltip.Positioner
           side={side}
           align={align}
           sideOffset={sideOffset}
           collisionPadding={8}
-          className="z-50 outline-none"
+          className="z-[70] outline-none"
         >
           <BaseTooltip.Popup
             className={cn(
-              'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
+              'px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
               'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
               'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
               'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',
@@ -123,17 +124,18 @@ export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentPro
     ref
   ) => (
     <BaseTooltip.Portal>
+      {/* Layering: Tooltips use z-[70] so hover hints float above modal dialogs (z-50) and toasts (z-[60]). */}
       <BaseTooltip.Positioner
         side={side}
         align={align}
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
-        className="z-50 outline-none"
+        className="z-[70] outline-none"
       >
         <BaseTooltip.Popup
           ref={ref}
           className={cn(
-            'z-50 px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
+            'px-3 py-1.5 rounded-[0.5rem] bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
             'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',

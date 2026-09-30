@@ -43,8 +43,9 @@ const PreviewCardComponent: React.FC<PreviewCardProps> = ({
         {React.isValidElement(trigger) ? undefined : trigger}
       </BasePreviewCard.Trigger>
       <BasePreviewCard.Portal>
-        <BasePreviewCard.Positioner sideOffset={8}>
-          <BasePreviewCard.Popup className="w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient z-50 space-y-2 transition-[opacity,transform] duration-100 ease-out origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]">
+        {/* Layering: Hover preview cards use z-50 to float above standard canvas content */}
+        <BasePreviewCard.Positioner sideOffset={8} className="z-50 outline-none">
+          <BasePreviewCard.Popup className="w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient space-y-2 transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]">
             {children ? (
               children
             ) : (

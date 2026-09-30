@@ -98,7 +98,42 @@ ${colorConfig
   );
 };
 
-export const ChartTooltip = RechartsPrimitive.Tooltip;
+/**
+ * Refined Recharts Tooltip with smooth tracking, jitter-free cursor following,
+ * and mouse-collision prevention (pointerEvents: none).
+ */
+export const ChartTooltip = ({
+  animationDuration = 150,
+  animationEasing = 'ease-out',
+  isAnimationActive = true,
+  allowEscapeViewBox = { x: true, y: true },
+  offset = 12,
+  wrapperStyle,
+  cursor = {
+    stroke: 'var(--color-outline-variant, #cac5be)',
+    strokeWidth: 1,
+    strokeDasharray: '4 4',
+  },
+  ...props
+}: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) => {
+  return (
+    <RechartsPrimitive.Tooltip
+      animationDuration={animationDuration}
+      animationEasing={animationEasing}
+      isAnimationActive={isAnimationActive}
+      allowEscapeViewBox={allowEscapeViewBox}
+      offset={offset}
+      cursor={cursor}
+      wrapperStyle={{
+        outline: 'none',
+        pointerEvents: 'none', // Prevents hover collisions and tracking flutter
+        zIndex: 50,
+        ...wrapperStyle,
+      }}
+      {...props}
+    />
+  );
+};
 
 export type ChartTooltipPayloadItem = {
   name?: string | number;
@@ -202,7 +237,7 @@ export const ChartTooltipContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-md border border-outline-variant bg-surface px-3 py-2 text-xs shadow-ambient text-on-surface',
+          'pointer-events-none select-none grid min-w-[8rem] items-start gap-1.5 rounded-[0.75rem] border border-outline-variant/60 bg-surface/95 backdrop-blur-sm px-3 py-2 text-xs shadow-ambient text-on-surface',
           className
         )}
       >

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
+import { assetUrl } from '@/lib/utils';
 
 export const IconStylingShowcase: React.FC = () => {
   const [accordionOpen, setAccordionOpen] = React.useState(false);
@@ -521,7 +522,7 @@ export const IconStylingShowcase: React.FC = () => {
 
         <div className="rounded-[1rem] bg-surface border border-outline-variant p-6 flex flex-wrap items-center gap-8">
           <div className="flex items-center gap-3">
-            <img src="/logos/pictorial-mark.svg" alt="Eolas Symbol 32px" className="h-8 w-8 object-contain" />
+            <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol 32px" className="h-8 w-8 object-contain" />
             <div>
               <p className="font-label text-xs font-bold text-on-surface">32px Favicon / Header Grid</p>
               <p className="font-sans text-xs text-on-surface-variant">2rem x 2rem compact size</p>
@@ -529,7 +530,7 @@ export const IconStylingShowcase: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <img src="/logos/pictorial-mark.svg" alt="Eolas Symbol 40px" className="h-10 w-10 object-contain" />
+            <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol 40px" className="h-10 w-10 object-contain" />
             <div>
               <p className="font-label text-xs font-bold text-on-surface">40px General UI Grid</p>
               <p className="font-sans text-xs text-on-surface-variant">2.5rem x 2.5rem standard size</p>

@@ -5,6 +5,7 @@ import { ComponentLibraryShowcase } from '@/components/playground/ComponentLibra
 import { BrandAssetsShowcase } from '@/components/playground/BrandAssetsShowcase';
 import { AntiPatternAuditBench } from '@/components/playground/AntiPatternAuditBench';
 import { IconStylingShowcase } from '@/components/playground/IconStylingShowcase';
+import { assetUrl } from '@/lib/utils';
 
 export function App() {
   const [activeTab, setActiveTab] = React.useState('tokens');
@@ -19,18 +20,20 @@ export function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-[80rem] w-full mx-auto px-4 sm:px-8 py-8">
-        {activeTab === 'tokens' && <ColorTokensExplorer />}
-        {activeTab === 'components' && <ComponentLibraryShowcase />}
-        {activeTab === 'icons' && <IconStylingShowcase />}
-        {activeTab === 'brand' && <BrandAssetsShowcase />}
-        {activeTab === 'audit' && <AntiPatternAuditBench />}
+        <div key={activeTab}>
+          {activeTab === 'tokens' && <ColorTokensExplorer />}
+          {activeTab === 'components' && <ComponentLibraryShowcase />}
+          {activeTab === 'icons' && <IconStylingShowcase />}
+          {activeTab === 'brand' && <BrandAssetsShowcase />}
+          {activeTab === 'audit' && <AntiPatternAuditBench />}
+        </div>
       </main>
 
       {/* Clinical Playground Footer */}
       <footer className="bg-surface border-t border-outline-variant py-8 mt-12">
         <div className="max-w-[80rem] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/logos/pictorial-mark.svg" alt="Eolas Symbol" className="h-7 w-7 object-contain" />
+            <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol" className="h-7 w-7 object-contain" />
             <span className="font-label text-sm font-bold text-on-surface">Eolas Design System & Playground</span>
           </div>
           <p className="font-sans text-xs text-on-surface-variant text-center sm:text-right">
