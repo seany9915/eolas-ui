@@ -13,7 +13,7 @@ export interface AutocompleteProps {
   placeholder?: string;
   options: AutocompleteOption[];
   value?: string | null;
-  defaultValue?: string;
+  defaultValue?: string | null;
   onValueChange?: (val: string | null) => void;
   mode?: 'list' | 'both' | 'inline' | 'none';
   autoHighlight?: boolean | 'always';
@@ -57,6 +57,57 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
 }, ref) => {
   const hasLeading = Boolean(leadingIcon);
 
+  // Resolve value to option label if an option's value was supplied
+  const resolvedValue = React.useMemo(() => {
+    if (value === undefined) return undefined;
+    if (value === null) return '';
+    const match = options.find((opt) => opt.value === value || opt.label === value);
+    return match ? match.label : value;
+  }, [value, options]);
+
+  const resolvedDefaultValue = React.useMemo(() => {
+    if (defaultValue === undefined) return undefined;
+    if (defaultValue === null) return '';
+    const match = options.find((opt) => opt.value === defaultValue || opt.label === defaultValue);
+    return match ? match.label : defaultValue;
+  }, [defaultValue, options]);
+
+  // Handle value change when user types or selects
+  const handleValueChange = (val: string) => {
+    const trimmed = (val ?? '').trim();
+    if (!trimmed) {
+      onValueChange?.(null);
+      return;
+    }
+    const matched = options.find(
+      (opt) => opt.label.toLowerCase() === trimmed.toLowerCase() || opt.value.toLowerCase() === trimmed.toLowerCase()
+    );
+    onValueChange?.(matched ? matched.value : val);
+  };
+
+  // Custom filter: when opening an autocomplete with a default/selected item,
+  // do not restrict out all other options so the user can easily see and switch choices
+  const filterFn = React.useCallback(
+    (item: AutocompleteOption, query: string) => {
+      if (!query) return true;
+      const normalizedQuery = query.trim().toLowerCase();
+      if (!normalizedQuery) return true;
+
+      // If query matches the current selection/default exactly, bypass filtering to show all options
+      if (resolvedValue && normalizedQuery === resolvedValue.trim().toLowerCase()) {
+        return true;
+      }
+      if (resolvedDefaultValue && normalizedQuery === resolvedDefaultValue.trim().toLowerCase()) {
+        return true;
+      }
+
+      const itemLabel = (item?.label ?? '').toLowerCase();
+      const itemVal = (item?.value ?? '').toLowerCase();
+      return itemLabel.includes(normalizedQuery) || itemVal.includes(normalizedQuery);
+    },
+    [resolvedValue, resolvedDefaultValue]
+  );
+
   return (
     <div ref={ref} className={cn('space-y-1.5 w-full', className)} {...props}>
       {label && (
@@ -72,9 +123,10 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       <BaseAutocomplete.Root
         items={options}
         itemToStringValue={(item) => (typeof item === 'string' ? item : item?.label ?? '')}
-        value={value ?? undefined}
-        defaultValue={defaultValue}
-        onValueChange={(val) => onValueChange?.(val || null)}
+        value={resolvedValue}
+        defaultValue={resolvedDefaultValue}
+        onValueChange={handleValueChange}
+        filter={filterFn}
         mode={mode}
         autoHighlight={autoHighlight}
         keepHighlight={keepHighlight}

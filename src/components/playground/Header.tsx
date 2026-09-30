@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Icon } from '@/components/ui/icon';
+import { assetUrl } from '@/lib/utils';
 
 export interface HeaderProps {
   activeTab: string;
@@ -24,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand Horizontal Lockup Integration */}
         <div className="flex items-center gap-3 shrink-0">
           <img
-            src="/logos/horizontal-lockup.svg"
+            src={assetUrl('/logos/horizontal-lockup.svg')}
             alt="Eolas Brand Logo"
             className="h-8 sm:h-9 w-auto object-contain max-h-[40px]"
           />
@@ -44,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
                   title={tab.label}
-                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 min-h-[40px] rounded-[0.5rem] font-label text-xs sm:text-sm font-semibold transition-all cursor-pointer select-none shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 min-h-[40px] rounded-[0.5rem] font-label text-xs sm:text-sm font-semibold transition-[color,background-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none cursor-pointer select-none shrink-0 ${
                     isActive
                       ? 'bg-primary text-on-primary shadow-sm'
                       : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'

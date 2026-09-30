@@ -70,7 +70,7 @@ export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
-  ({ children, activateOnFocus, loopFocus, variant, showIndicator = false, indicatorClassName, className, ...props }, ref) => {
+  ({ children, activateOnFocus, loopFocus, variant, showIndicator = true, indicatorClassName, className, ...props }, ref) => {
     const parentContext = React.useContext(TabsContext);
     const effectiveVariant = variant ?? parentContext.variant ?? 'line';
     const isSegmented = effectiveVariant === 'segmented' || effectiveVariant === 'segment' || effectiveVariant === 'pills' || effectiveVariant === 'pill';
@@ -101,18 +101,18 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             isSegmented ? (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute rounded-sm bg-primary z-0 transition-[left,width,top,height,transform,opacity,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-                  'data-[orientation=horizontal]:inset-y-1',
-                  'data-[orientation=vertical]:inset-x-1',
+                  'absolute rounded-sm bg-primary z-0 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-1',
+                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-1',
                   indicatorClassName
                 )}
               />
             ) : (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute bg-primary rounded-none z-10 transition-[left,width,top,height,transform,opacity,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-                  'data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2.5px]',
-                  'data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2.5px]',
+                  'absolute bg-primary rounded-none z-10 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2.5px]',
+                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2.5px]',
                   indicatorClassName
                 )}
               />
@@ -139,7 +139,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
     const context = React.useContext(TabsContext);
     const effectiveVariant = variant ?? context.variant ?? 'line';
     const isSegmented = effectiveVariant === 'segmented' || effectiveVariant === 'segment' || effectiveVariant === 'pills' || effectiveVariant === 'pill';
-    const hasSlidingIndicator = isSegmented && context.showIndicator;
+    const hasSlidingIndicator = context.showIndicator;
 
     return (
       <BaseTabs.Tab
@@ -154,6 +154,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
           />
         )}
         className={cn(
+          // Retain font-semibold across both active and inactive to prevent horizontal layout shift / text jumping
           'inline-flex items-center gap-2 font-label text-sm font-semibold transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
           effectiveVariant === 'unstyled'
             ? ''
@@ -163,25 +164,34 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                   hasSlidingIndicator
                     ? cn(
                         'bg-transparent',
-                        'data-[active]:text-on-primary data-[active]:font-bold',
-                        'data-[selected]:text-on-primary data-[selected]:font-bold',
-                        'data-[state=active]:text-on-primary data-[state=active]:font-bold',
-                        'aria-selected:text-on-primary aria-selected:font-bold'
+                        'data-[active]:text-on-primary',
+                        'data-[selected]:text-on-primary',
+                        'data-[state=active]:text-on-primary',
+                        'aria-selected:text-on-primary'
                       )
                     : cn(
                         'hover:bg-surface-variant/30',
-                        'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-ambient data-[active]:font-bold',
-                        'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-ambient data-[selected]:font-bold',
-                        'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-ambient data-[state=active]:font-bold',
-                        'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-ambient aria-selected:font-bold'
+                        'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-ambient',
+                        'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-ambient',
+                        'data-[state=active]:bg-primary data-[state=active]:text-on-primary data-[state=active]:shadow-ambient',
+                        'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-ambient'
                       )
                 )
               : cn(
                   'py-3 px-4 min-h-[48px] rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border-b-[2.5px] border-transparent',
-                  'data-[active]:text-primary data-[active]:font-bold data-[active]:border-primary -mb-px',
-                  'data-[selected]:text-primary data-[selected]:font-bold data-[selected]:border-primary',
-                  'data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:border-primary',
-                  'aria-selected:text-primary aria-selected:font-bold aria-selected:border-primary'
+                  hasSlidingIndicator
+                    ? cn(
+                        'data-[active]:text-primary',
+                        'data-[selected]:text-primary',
+                        'data-[state=active]:text-primary',
+                        'aria-selected:text-primary'
+                      )
+                    : cn(
+                        'data-[active]:text-primary data-[active]:border-primary -mb-px',
+                        'data-[selected]:text-primary data-[selected]:border-primary',
+                        'data-[state=active]:text-primary data-[state=active]:border-primary',
+                        'aria-selected:text-primary aria-selected:border-primary'
+                      )
                 ),
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
           'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -215,7 +225,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
       value={value}
       keepMounted={keepMounted}
       className={cn(
-        'py-6 font-sans transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
+        'py-6 font-sans outline-none transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
         className
       )}
       {...props}

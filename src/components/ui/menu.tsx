@@ -69,11 +69,12 @@ export interface MenuContentProps extends React.ComponentPropsWithoutRef<typeof 
 export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
   ({ className, children, side, align, sideOffset = 6, alignOffset, ...props }, ref) => (
     <BaseMenu.Portal>
-      <BaseMenu.Positioner side={side} align={align} sideOffset={sideOffset} alignOffset={alignOffset}>
+      {/* Layering: Menu positioner creates z-50 stacking context to float over page canvas */}
+      <BaseMenu.Positioner side={side} align={align} sideOffset={sideOffset} alignOffset={alignOffset} className="z-50 outline-none">
         <BaseMenu.Popup
           ref={ref}
           className={cn(
-            'z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+            'min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
             className
           )}
           {...props}
@@ -162,9 +163,10 @@ const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
           </BaseMenu.Trigger>
         )}
         <BaseMenu.Portal>
-          <BaseMenu.Positioner sideOffset={6}>
+          {/* Layering: Menu positioner creates z-50 stacking context to float over page canvas */}
+          <BaseMenu.Positioner sideOffset={6} className="z-50 outline-none">
             <BaseMenu.Popup
-              className="z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
+              className="min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
             >
               {children
                 ? children

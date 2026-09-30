@@ -20,7 +20,11 @@ export interface ComboboxProps {
   items?: ComboboxItem[];
   groups?: ComboboxGroupItem[];
   value?: string | null;
+  defaultValue?: string | null;
+  inputValue?: string;
+  defaultInputValue?: string;
   onValueChange?: (val: string | null) => void;
+  onInputValueChange?: (input: string) => void;
   onChange?: (val: string | null) => void;
   error?: string;
   description?: string;
@@ -44,7 +48,11 @@ const ComboboxComponent: React.FC<ComboboxProps> = ({
   items,
   groups,
   value,
+  defaultValue,
+  inputValue,
+  defaultInputValue,
   onValueChange,
+  onInputValueChange,
   onChange,
   error,
   description,
@@ -65,6 +73,8 @@ const ComboboxComponent: React.FC<ComboboxProps> = ({
   const descriptionId = description ? `${comboboxId}-desc` : undefined;
   const errorId = error ? `${comboboxId}-error` : undefined;
   const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+
+  const isControlled = value !== undefined;
 
   const normalizedOptions = React.useMemo(() => {
     const list = options ?? items;
@@ -120,18 +130,43 @@ const ComboboxComponent: React.FC<ComboboxProps> = ({
     return (normalizedOptions || []).find((opt) => opt.value === value) ?? null;
   }, [normalizedOptions, value]);
 
+  const defaultSelectedItem = React.useMemo(() => {
+    if (!defaultValue) return undefined;
+    return (normalizedOptions || []).find((opt) => opt.value === defaultValue) ?? undefined;
+  }, [normalizedOptions, defaultValue]);
+
   const handleValueChange = (selected: ComboboxItem | null) => {
     const val = selected ? selected.value : null;
     onValueChange?.(val);
     onChange?.(val);
   };
 
+  const handleInputValueChange = (text: string, eventDetails?: any) => {
+    onInputValueChange?.(text);
+    // When the user writes custom text into the input or clears it,
+    // clear the previously selected / default state so typing your own text clears the default state
+    if (eventDetails?.reason === 'input-change' || eventDetails?.reason === 'input-clear') {
+      const currentLabel = selectedItem?.label ?? '';
+      if (text.trim() === '' || text !== currentLabel) {
+        if (value || selectedItem) {
+          onValueChange?.(null);
+          onChange?.(null);
+        }
+      }
+    }
+  };
+
   if (children) {
     return (
       <BaseCombobox.Root
         items={normalizedOptions}
-        value={selectedItem}
+        value={isControlled ? selectedItem : undefined}
+        defaultValue={defaultSelectedItem}
         onValueChange={handleValueChange}
+        onInputValueChange={handleInputValueChange}
+        itemToStringLabel={(opt: ComboboxItem | null) => opt?.label ?? ''}
+        itemToStringValue={(opt: ComboboxItem | null) => opt?.value ?? ''}
+        isItemEqualToValue={(opt: ComboboxItem, val: ComboboxItem) => opt?.value === val?.value}
         disabled={disabled}
       >
         {children}
@@ -143,8 +178,15 @@ const ComboboxComponent: React.FC<ComboboxProps> = ({
     <div className={cn('space-y-1.5 w-full', className)}>
       <BaseCombobox.Root
         items={normalizedOptions}
-        value={selectedItem}
+        value={isControlled ? selectedItem : undefined}
+        defaultValue={defaultSelectedItem}
+        inputValue={inputValue}
+        defaultInputValue={defaultInputValue}
         onValueChange={handleValueChange}
+        onInputValueChange={handleInputValueChange}
+        itemToStringLabel={(opt: ComboboxItem | null) => opt?.label ?? ''}
+        itemToStringValue={(opt: ComboboxItem | null) => opt?.value ?? ''}
+        isItemEqualToValue={(opt: ComboboxItem, val: ComboboxItem) => opt?.value === val?.value}
         disabled={disabled}
       >
         <BaseCombobox.Status className="sr-only" />

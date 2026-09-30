@@ -69,12 +69,13 @@ const PopoverComponent: React.FC<PopoverProps> = ({
     >
       <BasePopover.Trigger id={popoverId} render={trigger} />
       <BasePopover.Portal>
-        <BasePopover.Positioner side={side} align={align} sideOffset={sideOffset}>
+        {/* Layering: Popover positioner creates z-50 stacking context to float over page canvas */}
+        <BasePopover.Positioner side={side} align={align} sideOffset={sideOffset} className="z-50 outline-none">
           <BasePopover.Popup
             initialFocus={initialFocus}
             finalFocus={finalFocus}
             className={cn(
-              'z-50 w-80 p-5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
+              'w-80 p-5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
               className
             )}
           >
@@ -129,11 +130,12 @@ export interface PopoverContentProps extends React.ComponentPropsWithoutRef<type
 export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
   ({ className, children, side, align, sideOffset = 8, showArrow = true, ...props }, ref) => (
     <BasePopover.Portal>
-      <BasePopover.Positioner side={side} align={align} sideOffset={sideOffset}>
+      {/* Layering: Popover positioner creates z-50 stacking context to float over page canvas */}
+      <BasePopover.Positioner side={side} align={align} sideOffset={sideOffset} className="z-50 outline-none">
         <BasePopover.Popup
           ref={ref}
           className={cn(
-            'z-50 w-80 p-5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
+            'w-80 p-5 rounded-[0.5rem] bg-surface border-[1px] border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
             className
           )}
           {...props}

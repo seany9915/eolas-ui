@@ -96,10 +96,11 @@ export const MenubarMenu = React.forwardRef<HTMLButtonElement, MenubarMenuProps>
         <span>{triggerLabel}</span>
       </BaseMenu.Trigger>
       <BaseMenu.Portal>
-        <BaseMenu.Positioner sideOffset={6} align="start">
+        {/* Layering: Menubar menu positioner creates z-50 stacking context to float over page canvas */}
+        <BaseMenu.Positioner sideOffset={6} align="start" className="z-50 outline-none">
           <BaseMenu.Popup
             className={cn(
-              'z-50 min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-modal outline-none',
+              'min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-modal outline-none',
               'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
               'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
               'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)]'

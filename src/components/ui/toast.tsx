@@ -176,7 +176,8 @@ const ToasterViewportContent: React.FC = () => {
 
   return (
     <BaseToast.Portal>
-      <BaseToast.Viewport className="fixed bottom-4 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none p-4 focus:outline-none">
+      {/* Layering: Toasts use z-[60] so notifications float above modal dialogs and drawers (z-50) */}
+      <BaseToast.Viewport className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none p-4 focus:outline-none">
         {toasts.map((t) => (
           <ActiveToastItem key={t.id} toast={t} />
         ))}
