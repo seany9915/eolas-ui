@@ -1,12 +1,14 @@
 import * as React from 'react';
 import {
   BotAvatar as RawBotAvatar,
+  botAvatarTypes,
   type BotAvatarType,
   type BotAvatarState,
   type BotAvatarFace,
 } from 'bot-avatars';
 import { cn } from '@/lib/utils';
 
+export { botAvatarTypes };
 export type { BotAvatarType, BotAvatarState, BotAvatarFace };
 
 export type BotAvatarSize = 'sm' | 'md' | 'lg' | 'xl' | number;

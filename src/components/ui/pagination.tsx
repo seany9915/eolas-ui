@@ -21,7 +21,7 @@ export const PaginationContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ul
     ref={ref}
-    className={cn('flex flex-row items-center gap-1 @sm:gap-2', className)}
+    className={cn('flex flex-row flex-wrap items-center justify-center gap-1.5 @sm:gap-2', className)}
     {...props}
   />
 ));
@@ -43,17 +43,20 @@ export type PaginationLinkProps = {
 export const PaginationLink = ({
   className,
   isActive,
-  size = 'md',
+  size = 'sm',
   children,
   ...props
 }: PaginationLinkProps) => (
   <Button
     render={<a aria-current={isActive ? 'page' : undefined} {...props} />}
     variant={isActive ? 'filled' : 'outlined'}
+    colorRole={isActive ? 'primary' : 'neutral'}
     size={size}
     className={cn(
-      'min-w-[44px] min-h-[44px] tabular-nums font-sans text-sm',
-      isActive && 'pointer-events-none font-semibold border-primary',
+      'min-w-[44px] min-h-[44px] h-11 px-3.5 tabular-nums font-sans text-sm rounded-md transition-colors',
+      isActive
+        ? 'pointer-events-none font-semibold shadow-ambient'
+        : 'text-on-surface hover:bg-surface-container border-outline-variant hover:border-outline',
       className
     )}
   >

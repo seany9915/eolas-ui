@@ -238,10 +238,10 @@ export const CarouselPrevious = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'absolute z-10 rounded-full border-2 border-outline-variant bg-surface text-on-surface hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100',
+        'absolute z-10 rounded-full border-2 border-outline-variant bg-surface text-on-surface shadow-sm hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100',
         orientation === 'horizontal'
-          ? '-left-5 top-1/2 -translate-y-1/2'
-          : '-top-5 left-1/2 -translate-x-1/2',
+          ? 'left-2 top-1/2 -translate-y-1/2'
+          : 'top-2 left-1/2 -translate-x-1/2',
         className
       )}
       disabled={!canScrollPrev}
@@ -272,10 +272,10 @@ export const CarouselNext = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'absolute z-10 rounded-full border-2 border-outline-variant bg-surface text-on-surface hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100',
+        'absolute z-10 rounded-full border-2 border-outline-variant bg-surface text-on-surface shadow-sm hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100',
         orientation === 'horizontal'
-          ? '-right-5 top-1/2 -translate-y-1/2'
-          : '-bottom-5 left-1/2 -translate-x-1/2',
+          ? 'right-2 top-1/2 -translate-y-1/2'
+          : 'bottom-2 left-1/2 -translate-x-1/2',
         className
       )}
       disabled={!canScrollNext}
