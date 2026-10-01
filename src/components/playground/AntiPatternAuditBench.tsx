@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { Icon } from '@/components/ui/icon';
 
 export const AntiPatternAuditBench: React.FC = () => {
   const auditChecks = [
@@ -12,9 +13,9 @@ export const AntiPatternAuditBench: React.FC = () => {
       status: 'Passed',
       demonstration: (
         <div className="flex flex-wrap items-center gap-2">
-          <Chip label="Pattern 1: Outline + Surface" pattern="outline-neutral-fill" colorRole="primary" />
-          <Chip label="Pattern 2: Saturated Mixed" pattern="high-contrast-mixed" colorRole="tertiary" />
-          <Chip label="Pattern 3: Neutral Fill + Text" pattern="neutral-fill-accent-text" colorRole="primary" />
+          <Chip label="Pattern 1: Outline + Surface" pattern="outlined" colorRole="primary" />
+          <Chip label="Pattern 2: Saturated Mixed" pattern="filled" colorRole="tertiary" />
+          <Chip label="Pattern 3: Neutral Fill + Text" pattern="neutral" colorRole="primary" />
         </div>
       ),
     },
@@ -24,11 +25,11 @@ export const AntiPatternAuditBench: React.FC = () => {
       status: 'Passed',
       demonstration: (
         <div className="flex flex-wrap items-center gap-4">
-          <div className="h-[44px] min-w-[44px] px-3 bg-surface-container border border-outline flex items-center justify-center font-label text-xs font-semibold rounded-[0.5rem]">
+          <div className="h-11 min-w-11 px-3 bg-surface-container border border-outline flex items-center justify-center font-label text-xs font-semibold rounded">
             44px Control Floor
           </div>
           <Button colorRole="primary" size="md">48px Button Floor</Button>
-          <div className="h-[56px] px-4 bg-surface border border-outline-variant flex items-center font-sans text-sm rounded-[0.5rem]">
+          <div className="h-14 px-4 bg-surface border border-outline-variant flex items-center font-sans text-sm rounded">
             56px List/Table Row Height
           </div>
         </div>
@@ -39,9 +40,9 @@ export const AntiPatternAuditBench: React.FC = () => {
       rule: 'Focus rings must use real outline / border properties (not box-shadow tricks) so they render in Windows High Contrast mode.',
       status: 'Passed',
       demonstration: (
-        <button className="h-12 px-5 rounded-[0.5rem] bg-surface border-[1px] border-outline font-label text-sm font-semibold focus:outline-2 focus:outline-offset-2 focus:outline-primary cursor-pointer">
+        <Button variant="outlined" colorRole="primary">
           Focus Me (Tab to Test Real Outline)
-        </button>
+        </Button>
       ),
     },
     {
@@ -61,7 +62,7 @@ export const AntiPatternAuditBench: React.FC = () => {
       status: 'Passed',
       demonstration: (
         <div className="flex items-center gap-2 text-success font-label text-sm font-bold">
-          <span className="material-symbols-outlined text-xl" aria-hidden="true">check_circle</span>
+          <Icon name="check_circle" size="md" />
           <span>Exercise attempt verified and recorded</span>
         </div>
       ),
@@ -78,22 +79,23 @@ export const AntiPatternAuditBench: React.FC = () => {
       {/* Audit List */}
       <div className="space-y-4">
         {auditChecks.map((check) => (
-          <Card key={check.title} variant="default" className="p-6 flex flex-col justify-between space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between border-b border-outline-variant pb-2">
-                <h4 className="font-heading text-base font-bold text-on-surface">{check.title}</h4>
-                <span className="inline-flex items-center gap-1 text-xs font-label font-bold text-success bg-success-container px-3 py-1 rounded-full shrink-0">
-                  <span className="material-symbols-outlined text-sm" aria-hidden="true">check_circle</span>
-                  {check.status}
-                </span>
+          <Card key={check.title} variant="default">
+            <div className="flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-outline-variant pb-2">
+                  <h4 className="font-heading text-base font-bold text-on-surface">{check.title}</h4>
+                  <Chip icon="check_circle" pattern="neutral" colorRole="success" size="sm">
+                    {check.status}
+                  </Chip>
+                </div>
+                <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                  {check.rule}
+                </p>
               </div>
-              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                {check.rule}
-              </p>
-            </div>
-            <div className="pt-3 border-t border-outline-variant/40 space-y-2">
-              <span className="font-label text-[11px] font-bold text-on-surface-variant block">Live component verification</span>
-              {check.demonstration}
+              <div className="pt-3 border-t border-outline-variant/40 space-y-2">
+                <span className="font-label text-xs font-bold text-on-surface-variant block">Live component verification</span>
+                {check.demonstration}
+              </div>
             </div>
           </Card>
         ))}

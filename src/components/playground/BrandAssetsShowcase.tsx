@@ -35,26 +35,28 @@ export const BrandAssetsShowcase: React.FC = () => {
       {/* Asset Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {brandAssets.map((asset) => (
-          <Card key={asset.name} variant="default" className="h-full flex flex-col justify-between p-6 space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-outline-variant pb-2">
-                <h4 className="font-heading text-sm font-bold text-on-surface truncate pr-2">{asset.name}</h4>
-                <span className="font-mono text-[10px] text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded shrink-0">SVG</span>
+          <Card key={asset.name} variant="default" className="h-full">
+            <div className="h-full flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-outline-variant pb-2">
+                  <h4 className="font-heading text-sm font-bold text-on-surface truncate pr-2">{asset.name}</h4>
+                  <span className="font-mono text-xs text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded shrink-0">SVG</span>
+                </div>
+                <div className={`p-4 rounded-md ${asset.bg} border border-outline-variant flex items-center justify-center h-32`}>
+                  <img
+                    src={asset.file}
+                    alt={asset.name}
+                    className="max-h-20 max-w-full object-contain"
+                  />
+                </div>
+                <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                  {asset.text}
+                </p>
               </div>
-              <div className={`p-4 rounded-[0.75rem] ${asset.bg} border border-outline-variant flex items-center justify-center h-32`}>
-                <img
-                  src={asset.file}
-                  alt={asset.name}
-                  className="max-h-[80px] max-w-full object-contain"
-                />
+              <div className="pt-2 border-t border-outline-variant/40 flex items-center justify-between text-xs font-label text-on-surface-variant shrink-0">
+                <span>Vector Scalable</span>
+                <span className="text-primary font-semibold">1:1 Vector Standard</span>
               </div>
-              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                {asset.text}
-              </p>
-            </div>
-            <div className="pt-2 border-t border-outline-variant/40 flex items-center justify-between text-[11px] font-label text-on-surface-variant shrink-0">
-              <span>Vector Scalable</span>
-              <span className="text-primary font-semibold">1:1 Vector Standard</span>
             </div>
           </Card>
         ))}
@@ -66,31 +68,35 @@ export const BrandAssetsShowcase: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {/* Hero Portal Block */}
-          <Card variant="default" className="h-full p-8 flex flex-col items-center justify-between text-center space-y-4 bg-gradient-to-b from-surface to-surface-container">
-            <div className="space-y-4 flex flex-col items-center">
-              <img src={assetUrl('/logos/primary-mark.svg')} alt="Stacked Mark" className="h-28 w-auto object-contain" />
-              <h4 className="font-heading text-2xl font-bold text-on-surface">Welcome to Eolas Speech Therapy</h4>
-              <p className="font-sans text-sm text-on-surface-variant max-w-md">
-                An accessible clinical speech therapy platform engineered for cognitive ease and WCAG 2.2 AA compliance.
-              </p>
+          <Card variant="default" className="h-full">
+            <div className="h-full flex flex-col items-center justify-between text-center space-y-4">
+              <div className="space-y-4 flex flex-col items-center">
+                <img src={assetUrl('/logos/primary-mark.svg')} alt="Stacked Mark" className="h-28 w-auto object-contain" />
+                <h4 className="font-heading text-2xl font-bold text-on-surface">Welcome to Eolas Speech Therapy</h4>
+                <p className="font-sans text-sm text-on-surface-variant max-w-md">
+                  An accessible clinical speech therapy platform engineered for cognitive ease and WCAG 2.2 AA compliance.
+                </p>
+              </div>
+              <Button colorRole="primary" size="md" className="mt-4">Start Daily Exercises</Button>
             </div>
-            <Button colorRole="primary" size="md" className="mt-4">Start Daily Exercises</Button>
           </Card>
 
-          {/* Dark Charcoal Footer Lockup */}
-          <div className="h-full p-8 rounded-[1rem] bg-on-surface text-surface flex flex-col justify-between space-y-6">
-            <div className="flex items-center justify-between border-b border-surface/20 pb-4">
-              <img src={assetUrl('/logos/horizontal-lockup-white.svg')} alt="White Lockup" className="h-8 w-auto object-contain" />
-              <img src={assetUrl('/logos/wordmark-amber.svg')} alt="Amber Wordmark" className="h-5 w-auto object-contain" />
+          {/* Dark Charcoal Footer Lockup via Inverted Card Primitive */}
+          <Card variant="inverted" className="h-full">
+            <div className="flex flex-col justify-between space-y-6">
+              <div className="flex items-center justify-between border-b border-surface/20 pb-4">
+                <img src={assetUrl('/logos/horizontal-lockup-white.svg')} alt="White Lockup" className="h-8 w-auto object-contain" />
+                <img src={assetUrl('/logos/wordmark-amber.svg')} alt="Amber Wordmark" className="h-5 w-auto object-contain" />
+              </div>
+              <p className="font-sans text-xs text-surface/80 leading-relaxed">
+                Eolas Clinical Platform. Certified accessible healthcare technology built with Base UI primitives and Material Symbols.
+              </p>
+              <div className="border-t border-surface/20 pt-4 flex items-center justify-between text-xs text-surface/60 font-label">
+                <span>© 2026 Eolas Healthcare Ltd.</span>
+                <span>WCAG 2.2 AA Compliant</span>
+              </div>
             </div>
-            <p className="font-sans text-xs text-surface/80 leading-relaxed">
-              Eolas Clinical Platform. Certified accessible healthcare technology built with Base UI primitives and Material Symbols.
-            </p>
-            <div className="border-t border-surface/20 pt-4 flex items-center justify-between text-[11px] text-surface/60 font-label">
-              <span>© 2026 Eolas Healthcare Ltd.</span>
-              <span>WCAG 2.2 AA Compliant</span>
-            </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

@@ -40,6 +40,25 @@ import { Toolbar } from '@/components/ui/toolbar';
 import { DirectionProvider, type TextDirection } from '@/components/ui/direction-provider';
 import { ThinkingOrb, type OrbState } from '@/components/ui/thinking-orb';
 import { BotAvatar, type BotAvatarType, type BotAvatarState } from '@/components/ui/bot-avatar';
+import { Icon } from '@/components/ui/icon';
+import { ThinkingTrace } from '@/components/ui/thinking-trace';
+import { ApprovalCard } from '@/components/ui/approval-card';
+import { ClinicianTip } from '@/components/ui/clinician-tip';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis } from '@/components/ui/breadcrumb';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { Textarea, TextareaField } from '@/components/ui/textarea';
+import { Attachment } from '@/components/ui/attachment';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselDots } from '@/components/ui/carousel';
+import { StepWizard } from '@/components/ui/step-wizard';
+import { NumberRoll } from '@/components/ui/number-roll';
+import { SuccessCheck } from '@/components/ui/success-check';
+import { TextSwap } from '@/components/ui/text-swap';
+import { ErrorShake } from '@/components/ui/error-shake';
+import { ShimmerText } from '@/components/ui/shimmer-text';
+import { TextsReveal, TextsRevealLine } from '@/components/ui/texts-reveal';
+import { NotificationBadge } from '@/components/ui/notification-badge';
 
 export const ComponentLibraryShowcase: React.FC = () => {
   const [toastState, setToastState] = React.useState<{
@@ -86,6 +105,19 @@ export const ComponentLibraryShowcase: React.FC = () => {
   const [botTone, setBotTone] = React.useState<'friendly' | 'calm'>('calm');
   const [showBotDisclaimer, setShowBotDisclaimer] = React.useState(true);
 
+  // New Primitives Interactive State
+  const [approvalOption, setApprovalOption] = React.useState('opt-1');
+  const [approvalCustomInput, setApprovalCustomInput] = React.useState('');
+  const [approvalStepCurrent, setApprovalStepCurrent] = React.useState(2);
+  const [currentPage, setCurrentPage] = React.useState(2);
+  const [wizardStep, setWizardStep] = React.useState(0);
+  const [liveAccuracy, setLiveAccuracy] = React.useState(92.4);
+  const [successTrigger, setSuccessTrigger] = React.useState(1);
+  const [swapState, setSwapState] = React.useState(false);
+  const [shakeTrigger, setShakeTrigger] = React.useState(0);
+  const [badgeCount, setBadgeCount] = React.useState(3);
+  const [clinicalNotes, setClinicalNotes] = React.useState('Patient demonstrates clear vocal onset with reduced glottal attack across all sustained vowel repetitions.');
+
   // Sample Table Data
   interface PatientSession {
     id: string;
@@ -113,7 +145,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
         </div>
 
         {/* Matrix Grid */}
-        <div className="rounded-[1rem] bg-surface border-none shadow-ambient overflow-x-auto p-6 space-y-6">
+        <div className="rounded-lg bg-surface border-none shadow-ambient overflow-x-auto p-6 space-y-6">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant font-label text-xs font-bold text-on-surface-variant">
@@ -142,13 +174,13 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <td className="py-4 px-4">
                   <div className="flex items-center gap-2">
                     <Button colorRole="tertiary">Milestone Highlight</Button>
-                    <span className="text-[10px] text-on-surface-variant italic">(Filled Only for Contrast)</span>
+                    <span className="text-xs text-on-surface-variant italic">(Filled Only for Contrast)</span>
                   </div>
                 </td>
                 <td className="py-4 pl-4">
                   <div className="flex items-center gap-2">
                     <Button colorRole="tertiary">Milestone Highlight</Button>
-                    <span className="text-[10px] text-on-surface-variant italic">(Filled Only for Contrast)</span>
+                    <span className="text-xs text-on-surface-variant italic">(Filled Only for Contrast)</span>
                   </div>
                 </td>
               </tr>
@@ -281,85 +313,91 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Binary controls (Checkbox & Switch)
-            </h4>
-            <div className="space-y-4">
-              <Checkbox
-                label="Enable audio recording"
-                checked={checkboxVal}
-                onCheckedChange={setCheckboxVal}
-              />
-              <Switch
-                label="Real-time visual feedback"
-                checked={switchVal}
-                onCheckedChange={setSwitchVal}
-              />
-            </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              44px Hit Target Verified
-            </span>
-          </Card>
-
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Radio options (Single Select)
-            </h4>
-            <RadioGroup value={radioVal} onValueChange={setRadioVal}>
-              <Radio
-                label="Daily therapy cadence"
-                description="20 minutes guided daily practice"
-                value="daily"
-                id="r1"
-              />
-              <Radio
-                label="Weekly therapy cadence"
-                description="60 minutes weekly clinician review"
-                value="weekly"
-                id="r2"
-              />
-              <Radio
-                label="Monthly milestone review (Disabled)"
-                description="Available after 4 active weeks"
-                value="monthly"
-                id="r3"
-                disabled
-              />
-            </RadioGroup>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Base UI RadioGroup & Radio (Active: <code className="text-primary font-bold">{radioVal}</code>)
-            </span>
-          </Card>
-
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Action toggles (Toggle & ToggleGroup)
-            </h4>
-            <div className="space-y-4">
-              <Toggle
-                pressed={toggleVal}
-                onPressedChange={setToggleVal}
-                ariaLabel="High contrast view toggle"
-              >
-                High Contrast Mode
-              </Toggle>
-              <div>
-                <span className="font-label text-xs text-on-surface-variant block mb-1">Layout Mode</span>
-                <ToggleGroup
-                  value={toggleGroupVal}
-                  onValueChange={setToggleGroupVal}
-                  ariaLabel="View mode"
-                  items={[
-                    { value: 'grid', label: 'Grid', icon: 'grid_view' },
-                    { value: 'list', label: 'List', icon: 'format_list_bulleted' },
-                  ]}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Binary controls (Checkbox & Switch)
+              </h4>
+              <div className="space-y-4">
+                <Checkbox
+                  label="Enable audio recording"
+                  checked={checkboxVal}
+                  onCheckedChange={setCheckboxVal}
+                />
+                <Switch
+                  label="Real-time visual feedback"
+                  checked={switchVal}
+                  onCheckedChange={setSwitchVal}
                 />
               </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                44px Hit Target Verified
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Toggle: 2-state button (aria-pressed). ToggleGroup: In-place mode switch.
-            </span>
+          </Card>
+
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Radio options (Single Select)
+              </h4>
+              <RadioGroup value={radioVal} onValueChange={setRadioVal}>
+                <Radio
+                  label="Daily therapy cadence"
+                  description="20 minutes guided daily practice"
+                  value="daily"
+                  id="r1"
+                />
+                <Radio
+                  label="Weekly therapy cadence"
+                  description="60 minutes weekly clinician review"
+                  value="weekly"
+                  id="r2"
+                />
+                <Radio
+                  label="Monthly milestone review (Disabled)"
+                  description="Available after 4 active weeks"
+                  value="monthly"
+                  id="r3"
+                  disabled
+                />
+              </RadioGroup>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Base UI RadioGroup & Radio (Active: <code className="text-primary font-bold">{radioVal}</code>)
+              </span>
+            </div>
+          </Card>
+
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Action toggles (Toggle & ToggleGroup)
+              </h4>
+              <div className="space-y-4">
+                <Toggle
+                  pressed={toggleVal}
+                  onPressedChange={setToggleVal}
+                  ariaLabel="High contrast view toggle"
+                >
+                  High Contrast Mode
+                </Toggle>
+                <div>
+                  <span className="font-label text-xs text-on-surface-variant block mb-1">Layout Mode</span>
+                  <ToggleGroup
+                    value={toggleGroupVal}
+                    onValueChange={setToggleGroupVal}
+                    ariaLabel="View mode"
+                    items={[
+                      { value: 'grid', label: 'Grid', icon: 'grid_view' },
+                      { value: 'list', label: 'List', icon: 'format_list_bulleted' },
+                    ]}
+                  />
+                </div>
+              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Toggle: 2-state button (aria-pressed). ToggleGroup: In-place mode switch.
+              </span>
+            </div>
           </Card>
         </div>
       </section>
@@ -373,7 +411,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
               Standardized label headers, numeric controls, and bidirectional RTL support via Base UI `DirectionProvider`.
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant shrink-0">
+          <div className="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant shrink-0">
             <span className="font-label text-xs font-semibold text-on-surface-variant">Direction:</span>
             <button
               type="button"
@@ -402,56 +440,62 @@ export const ComponentLibraryShowcase: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <DirectionProvider direction={showcaseDirection}>
             <div dir={showcaseDirection} className="h-full">
-              <Card variant="default" className="p-6 h-full flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-label text-[10px] uppercase font-bold text-secondary tracking-wider">
-                      DirectionProvider ({showcaseDirection.toUpperCase()})
-                    </span>
-                    <span className="font-label text-xs text-on-surface-variant">
-                      Track auto-mirrors
-                    </span>
-                  </div>
-                  <Slider
-                    label="Audio Pitch Threshold"
-                    description="44px touch targets with RTL auto-mirroring"
-                    value={sliderVal}
-                    onValueChange={setSliderVal}
-                  />
-                  <div className="mt-4 pt-4 border-t border-outline-variant/40">
+              <Card variant="default" className="h-full">
+                <div className="p-6 h-full flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-label text-xs uppercase font-bold text-secondary tracking-wider">
+                        DirectionProvider ({showcaseDirection.toUpperCase()})
+                      </span>
+                      <span className="font-label text-xs text-on-surface-variant">
+                        Track auto-mirrors
+                      </span>
+                    </div>
                     <Slider
-                      label="Frequency Passband (Range)"
-                      description="Dual 44px thumbs with minimum/maximum values"
-                      value={rangeSliderVal}
-                      onValueChange={setRangeSliderVal}
+                      label="Audio Pitch Threshold"
+                      description="44px touch targets with RTL auto-mirroring"
+                      value={sliderVal}
+                      onValueChange={setSliderVal}
                     />
+                    <div className="mt-4 pt-4 border-t border-outline-variant/40">
+                      <Slider
+                        label="Frequency Passband (Range)"
+                        description="Dual 44px thumbs with minimum/maximum values"
+                        value={rangeSliderVal}
+                        onValueChange={setRangeSliderVal}
+                      />
+                    </div>
                   </div>
+                  <span className="font-label text-xs text-on-surface-variant/80 block pt-3 border-t border-outline-variant/40 mt-4">
+                    Slider coordinate calculations invert automatically in RTL mode.
+                  </span>
                 </div>
-                <span className="font-label text-[11px] text-on-surface-variant/80 block pt-3 border-t border-outline-variant/40 mt-4">
-                  Slider coordinate calculations invert automatically in RTL mode.
-                </span>
               </Card>
             </div>
           </DirectionProvider>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between">
-            <NumberField
-              label="Repetition Count"
-              description="Clinical trials target range: 1–20 reps"
-              value={numVal ?? 4}
-              onValueChange={setNumVal}
-              min={1}
-              max={20}
-              step={1}
-            />
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between">
+              <NumberField
+                label="Repetition Count"
+                description="Clinical trials target range: 1–20 reps"
+                value={numVal ?? 4}
+                onValueChange={setNumVal}
+                min={1}
+                max={20}
+                step={1}
+              />
+            </div>
           </Card>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between">
-            <OTPField
-              label="Security Verification Code"
-              length={4}
-              onComplete={(code) => showToast('Passcode Verified', `Verified security passcode: ${code}`, 'success')}
-            />
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between">
+              <OTPField
+                label="Security Verification Code"
+                length={4}
+                onComplete={(code) => showToast('Passcode Verified', `Verified security passcode: ${code}`, 'success')}
+              />
+            </div>
           </Card>
         </div>
       </section>
@@ -509,30 +553,34 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <div>
-              <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Modal confirmation tier</span>
-              <h4 className="font-heading text-base font-bold text-on-surface">Modal Action Dialog</h4>
-              <p className="font-sans text-xs text-on-surface-variant mt-1">
-                Centred focus-trap overlay with backdrop scrim for destructive or critical confirmations.
-              </p>
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Modal confirmation tier</span>
+                <h4 className="font-heading text-base font-bold text-on-surface">Modal Action Dialog</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-1">
+                  Centred focus-trap overlay with backdrop scrim for destructive or critical confirmations.
+                </p>
+              </div>
+              <Button colorRole="primary" onClick={() => setDialogOpen(true)}>
+                Open Confirmation Dialog
+              </Button>
             </div>
-            <Button colorRole="primary" onClick={() => setDialogOpen(true)}>
-              Open Confirmation Dialog
-            </Button>
           </Card>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <div>
-              <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Side drawer tier</span>
-              <h4 className="font-heading text-base font-bold text-on-surface">Patient History Drawer</h4>
-              <p className="font-sans text-xs text-on-surface-variant mt-1">
-                Full-height side panel slide-in for deep clinical inspection without losing page context.
-              </p>
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Side drawer tier</span>
+                <h4 className="font-heading text-base font-bold text-on-surface">Patient History Drawer</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-1">
+                  Full-height side panel slide-in for deep clinical inspection without losing page context.
+                </p>
+              </div>
+              <Button variant="outlined" colorRole="tertiary" onClick={() => setDrawerOpen(true)}>
+                Open Side Drawer Panel
+              </Button>
             </div>
-            <Button variant="outlined" colorRole="tertiary" onClick={() => setDrawerOpen(true)}>
-              Open Side Drawer Panel
-            </Button>
           </Card>
 
           <Dialog
@@ -554,7 +602,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
               <InlineAlert title="Recent Progress Milestone" role="success" icon="emoji_events">
                 Patient completed 5 consecutive days of vowel prolongation drills.
               </InlineAlert>
-              <div className="p-4 rounded-[0.5rem] bg-surface-container border border-outline-variant">
+              <div className="p-4 rounded bg-surface-container border border-outline-variant">
                 <h5 className="font-bold text-on-surface mb-1">Therapist Notes</h5>
                 <p className="text-on-surface-variant">
                   Exhibited strong pitch stability during vocal warmups. Ready to advance to consonant cluster exercises.
@@ -580,31 +628,35 @@ export const ComponentLibraryShowcase: React.FC = () => {
             variant="selectable"
             selected={selectedCard === 'card-1'}
             onClick={() => setSelectedCard('card-1')}
-            className="cursor-pointer h-full flex flex-col justify-between p-5 space-y-4"
+            className="h-full cursor-pointer"
           >
-            <div>
-              <span className="font-label text-[10px] font-bold text-primary block mb-1">Selectable (Tab to Focus)</span>
-              <h4 className="font-heading text-base font-bold mb-1">Active Selection Card</h4>
-              <p className="font-sans text-xs text-on-surface-variant">
-                Displays a 2px offset focus ring when focused, and a flush 2px border with soft wash when selected.
-              </p>
-            </div>
-            <div className="border-t border-outline-variant/60 pt-2 text-[11px] font-label text-primary font-semibold flex items-center justify-between">
-              <span>{selectedCard === 'card-1' ? 'Selected' : 'Press Space to Select'}</span>
-              {selectedCard === 'card-1' && (
-                <span className="material-symbols-outlined text-base text-primary" aria-hidden="true">check_circle</span>
-              )}
+            <div className="p-5 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-primary block mb-1">Selectable (Tab to Focus)</span>
+                <h4 className="font-heading text-base font-bold mb-1">Active Selection Card</h4>
+                <p className="font-sans text-xs text-on-surface-variant">
+                  Displays a 2px offset focus ring when focused, and a flush 2px border with soft wash when selected.
+                </p>
+              </div>
+              <div className="border-t border-outline-variant/60 pt-2 text-xs font-label text-primary font-semibold flex items-center justify-between">
+                <span>{selectedCard === 'card-1' ? 'Selected' : 'Press Space to Select'}</span>
+                {selectedCard === 'card-1' && (
+                  <span className="material-symbols-outlined text-base text-primary" aria-hidden="true">check_circle</span>
+                )}
+              </div>
             </div>
           </Card>
 
-          <Card variant="accent" colorRole="secondary" className="h-full flex flex-col justify-between p-5 space-y-4">
-            <div>
-              <span className="font-label text-[10px] font-bold text-secondary block mb-1">Accent Border (Secondary Emerald)</span>
-              <h4 className="font-heading text-base font-bold text-secondary mb-1">Accent Card</h4>
-              <p className="font-sans text-xs text-on-surface-variant">2px solid Rich Emerald border for therapy guide categories.</p>
-            </div>
-            <div className="border-t border-outline-variant/60 pt-2 text-[11px] font-label text-secondary font-semibold">
-              Category Highlight
+          <Card variant="accent" colorRole="secondary" className="h-full">
+            <div className="p-5 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-secondary block mb-1">Accent Border (Secondary Emerald)</span>
+                <h4 className="font-heading text-base font-bold text-secondary mb-1">Accent Card</h4>
+                <p className="font-sans text-xs text-on-surface-variant">2px solid Rich Emerald border for therapy guide categories.</p>
+              </div>
+              <div className="border-t border-outline-variant/60 pt-2 text-xs font-label text-secondary font-semibold">
+                Category Highlight
+              </div>
             </div>
           </Card>
         </div>
@@ -615,25 +667,29 @@ export const ComponentLibraryShowcase: React.FC = () => {
             Inverted Card (<code className="text-primary font-bold">variant="inverted"</code>) — Charcoal Inverted Fill Accent Matrix
           </span>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card variant="inverted" invertedAccent="tertiary" className="h-full flex flex-col justify-between p-5 space-y-4">
-              <div>
-                <span className="font-label text-[10px] font-bold text-tertiary block mb-1">Inverted (Amber Title + White Body)</span>
-                <h4 className="font-heading text-base font-bold text-tertiary mb-1">Strategy Tip Callout</h4>
-                <p className="font-sans text-xs font-medium text-surface">Sunny Amber title (8.55:1 AAA) with pure white body copy (15.3:1 AAA) to prevent chromatic glare.</p>
-              </div>
-              <div className="border-t border-surface/20 pt-2 text-[11px] font-label text-tertiary font-semibold">
-                Strategy & Guidance Callout
+            <Card variant="inverted" invertedAccent="tertiary" className="h-full">
+              <div className="p-5 h-full flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="font-label text-xs font-bold text-tertiary block mb-1">Inverted (Amber Title + White Body)</span>
+                  <h4 className="font-heading text-base font-bold text-tertiary mb-1">Strategy Tip Callout</h4>
+                  <p className="font-sans text-xs font-medium text-surface">Sunny Amber title (8.55:1 AAA) with pure white body copy (15.3:1 AAA) to prevent chromatic glare.</p>
+                </div>
+                <div className="border-t border-surface/20 pt-2 text-xs font-label text-tertiary font-semibold">
+                  Strategy & Guidance Callout
+                </div>
               </div>
             </Card>
 
-            <Card variant="inverted" invertedAccent="neutral" className="h-full flex flex-col justify-between p-5 space-y-4">
-              <div>
-                <span className="font-label text-[10px] font-bold text-surface block mb-1">Inverted (Pure White Neutral)</span>
-                <h4 className="font-heading text-base font-bold text-surface mb-1">Monochrome Inverted Card</h4>
-                <p className="font-sans text-xs font-medium text-surface">Pure white title and body copy on charcoal for high-contrast announcements (15.3:1 AAA).</p>
-              </div>
-              <div className="border-t border-surface/20 pt-2 text-[11px] font-label text-surface font-semibold">
-                High-Contrast Announcement
+            <Card variant="inverted" invertedAccent="neutral" className="h-full">
+              <div className="p-5 h-full flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="font-label text-xs font-bold text-surface block mb-1">Inverted (Pure White Neutral)</span>
+                  <h4 className="font-heading text-base font-bold text-surface mb-1">Monochrome Inverted Card</h4>
+                  <p className="font-sans text-xs font-medium text-surface">Pure white title and body copy on charcoal for high-contrast announcements (15.3:1 AAA).</p>
+                </div>
+                <div className="border-t border-surface/20 pt-2 text-xs font-label text-surface font-semibold">
+                  High-Contrast Announcement
+                </div>
               </div>
             </Card>
           </div>
@@ -645,36 +701,42 @@ export const ComponentLibraryShowcase: React.FC = () => {
             Highlight Card (<code className="text-primary font-bold">variant="filled"</code>) — Color Roles & High-Contrast Text Pairings
           </span>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card variant="filled" colorRole="primary" className="h-full flex flex-col justify-between p-5 space-y-4">
-              <div>
-                <span className="font-label text-[10px] font-bold text-on-primary block mb-1">Highlight (Primary Blue)</span>
-                <h4 className="font-heading text-base font-bold text-on-primary mb-1">Primary Highlight Card</h4>
-                <p className="font-sans text-xs font-medium text-on-primary">Solid Electric Blue fill paired with 100% pure white text (<code>on-primary</code>, 4.6:1 AA pass).</p>
-              </div>
-              <div className="border-t border-on-primary/30 pt-2 text-[11px] font-label text-on-primary font-semibold">
-                Brand Core Fill
-              </div>
-            </Card>
-
-            <Card variant="filled" colorRole="secondary" className="h-full flex flex-col justify-between p-5 space-y-4">
-              <div>
-                <span className="font-label text-[10px] font-bold text-on-secondary block mb-1">Highlight (Secondary Emerald)</span>
-                <h4 className="font-heading text-base font-bold text-on-secondary mb-1">Secondary Highlight Card</h4>
-                <p className="font-sans text-xs font-medium text-on-secondary">Solid Rich Emerald fill paired with 100% pure white text (<code>on-secondary</code>, 4.6:1 AA pass).</p>
-              </div>
-              <div className="border-t border-on-secondary/30 pt-2 text-[11px] font-label text-on-secondary font-semibold">
-                Knowledge & Guidance Fill
+            <Card variant="filled" colorRole="primary" className="h-full">
+              <div className="p-5 h-full flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="font-label text-xs font-bold text-on-primary block mb-1">Highlight (Primary Blue)</span>
+                  <h4 className="font-heading text-base font-bold text-on-primary mb-1">Primary Highlight Card</h4>
+                  <p className="font-sans text-xs font-medium text-on-primary">Solid Electric Blue fill paired with 100% pure white text (<code>on-primary</code>, 4.6:1 AA pass).</p>
+                </div>
+                <div className="border-t border-on-primary/30 pt-2 text-xs font-label text-on-primary font-semibold">
+                  Brand Core Fill
+                </div>
               </div>
             </Card>
 
-            <Card variant="filled" colorRole="tertiary" className="h-full flex flex-col justify-between p-5 space-y-4">
-              <div>
-                <span className="font-label text-[10px] font-bold text-on-tertiary block mb-1">Highlight (Tertiary Amber)</span>
-                <h4 className="font-heading text-base font-bold text-on-tertiary mb-1">Tertiary Highlight Card</h4>
-                <p className="font-sans text-xs font-medium text-on-tertiary">Solid Sunny Amber fill paired with 100% dark charcoal text (<code>on-tertiary</code>, 10.7:1 AAA pass).</p>
+            <Card variant="filled" colorRole="secondary" className="h-full">
+              <div className="p-5 h-full flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="font-label text-xs font-bold text-on-secondary block mb-1">Highlight (Secondary Emerald)</span>
+                  <h4 className="font-heading text-base font-bold text-on-secondary mb-1">Secondary Highlight Card</h4>
+                  <p className="font-sans text-xs font-medium text-on-secondary">Solid Rich Emerald fill paired with 100% pure white text (<code>on-secondary</code>, 4.6:1 AA pass).</p>
+                </div>
+                <div className="border-t border-on-secondary/30 pt-2 text-xs font-label text-on-secondary font-semibold">
+                  Knowledge & Guidance Fill
+                </div>
               </div>
-              <div className="border-t border-on-tertiary/30 pt-2 text-[11px] font-label text-on-tertiary font-semibold">
-                Celebratory Highlight Fill
+            </Card>
+
+            <Card variant="filled" colorRole="tertiary" className="h-full">
+              <div className="p-5 h-full flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="font-label text-xs font-bold text-on-tertiary block mb-1">Highlight (Tertiary Amber)</span>
+                  <h4 className="font-heading text-base font-bold text-on-tertiary mb-1">Tertiary Highlight Card</h4>
+                  <p className="font-sans text-xs font-medium text-on-tertiary">Solid Sunny Amber fill paired with 100% dark charcoal text (<code>on-tertiary</code>, 10.7:1 AAA pass).</p>
+                </div>
+                <div className="border-t border-on-tertiary/30 pt-2 text-xs font-label text-on-tertiary font-semibold">
+                  Celebratory Highlight Fill
+                </div>
               </div>
             </Card>
           </div>
@@ -694,7 +756,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </p>
         </div>
 
-        <div className="rounded-[1rem] bg-surface border border-outline-variant overflow-x-auto p-6">
+        <div className="rounded-lg bg-surface border border-outline-variant overflow-x-auto p-6">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant font-label text-xs font-bold text-on-surface-variant">
@@ -708,13 +770,13 @@ export const ComponentLibraryShowcase: React.FC = () => {
               <tr>
                 <td className="py-4 pr-4 font-label text-xs font-bold text-primary">Primary</td>
                 <td className="py-4 px-4"><Chip label="Primary Solid" pattern="high-contrast-mixed" colorRole="primary" icon="record_voice_over" /></td>
-                <td className="py-4 px-4"><Chip label="Phonetics" pattern="outline-neutral-fill" colorRole="primary" icon="record_voice_over" /></td>
+                <td className="py-4 px-4"><Chip label="Phonetics" pattern="outline" colorRole="primary" icon="record_voice_over" /></td>
                 <td className="py-4 pl-4"><Chip label="Metadata Tag" pattern="neutral-fill-accent-text" colorRole="primary" /></td>
               </tr>
               <tr>
                 <td className="py-4 pr-4 font-label text-xs font-bold text-secondary">Secondary</td>
                 <td className="py-4 px-4"><Chip label="Guide Solid" pattern="high-contrast-mixed" colorRole="secondary" icon="lightbulb" /></td>
-                <td className="py-4 px-4"><Chip label="Guide Tip" pattern="outline-neutral-fill" colorRole="secondary" icon="lightbulb" /></td>
+                <td className="py-4 px-4"><Chip label="Guide Tip" pattern="outline" colorRole="secondary" icon="lightbulb" /></td>
                 <td className="py-4 pl-4"><Chip label="Informational" pattern="neutral-fill-accent-text" colorRole="secondary" /></td>
               </tr>
               <tr>
@@ -726,19 +788,19 @@ export const ComponentLibraryShowcase: React.FC = () => {
               <tr>
                 <td className="py-4 pr-4 font-label text-xs font-bold text-success">Success</td>
                 <td className="py-4 px-4"><Chip label="Completed" pattern="high-contrast-mixed" colorRole="success" icon="check" /></td>
-                <td className="py-4 px-4"><Chip label="Verified Outline" pattern="outline-neutral-fill" colorRole="success" icon="check" /></td>
+                <td className="py-4 px-4"><Chip label="Verified Outline" pattern="outline" colorRole="success" icon="check" /></td>
                 <td className="py-4 pl-4"><Chip label="Success Tag" pattern="neutral-fill-accent-text" colorRole="success" /></td>
               </tr>
               <tr>
                 <td className="py-4 pr-4 font-label text-xs font-bold text-error">Error</td>
                 <td className="py-4 px-4"><Chip label="Session Failed" pattern="high-contrast-mixed" colorRole="error" icon="error" /></td>
-                <td className="py-4 px-4"><Chip label="Failed Outline" pattern="outline-neutral-fill" colorRole="error" icon="error" /></td>
+                <td className="py-4 px-4"><Chip label="Failed Outline" pattern="outline" colorRole="error" icon="error" /></td>
                 <td className="py-4 pl-4"><Chip label="Error Tag" pattern="neutral-fill-accent-text" colorRole="error" /></td>
               </tr>
               <tr>
                 <td className="py-4 pr-4 font-label text-xs font-bold text-warning">Warning</td>
                 <td className="py-4 px-4"><Chip label="Caution" pattern="high-contrast-mixed" colorRole="warning" icon="warning" /></td>
-                <td className="py-4 px-4"><Chip label="Caution Outline" pattern="outline-neutral-fill" colorRole="warning" icon="warning" /></td>
+                <td className="py-4 px-4"><Chip label="Caution Outline" pattern="outline" colorRole="warning" icon="warning" /></td>
                 <td className="py-4 pl-4"><Chip label="Warning Tag" pattern="neutral-fill-accent-text" colorRole="warning" /></td>
               </tr>
             </tbody>
@@ -755,34 +817,38 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <div>
-              <h4 className="font-heading text-base font-bold mb-4">Accordion (Level 1 Layout)</h4>
-              <Accordion
-                items={[
-                  { id: '1', title: 'What is the 3-level containment model?', content: 'Every screen uses Level 1 (Canvas), Level 2 (Grouped Fill), and Level 3 (Surface/Card) in strict decision order to reduce visual noise.' },
-                  { id: '2', title: 'Why is Base UI the primitive foundation?', content: 'Base UI ships as unstyled, accessible primitives with superior maintenance velocity and tree-shakable architecture.' },
-                ]}
-              />
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <h4 className="font-heading text-base font-bold mb-4">Accordion (Level 1 Layout)</h4>
+                <Accordion
+                  items={[
+                    { id: '1', title: 'What is the 3-level containment model?', content: 'Every screen uses Level 1 (Canvas), Level 2 (Grouped Fill), and Level 3 (Surface/Card) in strict decision order to reduce visual noise.' },
+                    { id: '2', title: 'Why is Base UI the primitive foundation?', content: 'Base UI ships as unstyled, accessible primitives with superior maintenance velocity and tree-shakable architecture.' },
+                  ]}
+                />
+              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Accessible WAI-ARIA Accordion
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Accessible WAI-ARIA Accordion
-            </span>
           </Card>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <div>
-              <h4 className="font-heading text-base font-bold mb-2">Tabs Component</h4>
-              <Tabs
-                items={[
-                  { id: 't1', label: 'Vocal Warmups', icon: 'graphic_eq', content: <p className="text-xs text-on-surface-variant">Sustained vowel exercises designed to stabilize vocal fold vibration.</p> },
-                  { id: 't2', label: 'Fluency Drills', icon: 'speed', content: <p className="text-xs text-on-surface-variant">Rhythmic syllable pacing exercises to improve articulation smooth flow.</p> },
-                ]}
-              />
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <h4 className="font-heading text-base font-bold mb-2">Tabs Component</h4>
+                <Tabs
+                  items={[
+                    { id: 't1', label: 'Vocal Warmups', icon: 'graphic_eq', content: <p className="text-xs text-on-surface-variant">Sustained vowel exercises designed to stabilize vocal fold vibration.</p> },
+                    { id: 't2', label: 'Fluency Drills', icon: 'speed', content: <p className="text-xs text-on-surface-variant">Rhythmic syllable pacing exercises to improve articulation smooth flow.</p> },
+                  ]}
+                />
+              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Keyboard Tablist Navigation
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Keyboard Tablist Navigation
-            </span>
           </Card>
         </div>
       </section>
@@ -796,58 +862,64 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Progress & Skeletons
-            </h4>
-            <div className="space-y-4">
-              <Progress value={78} label="Session Mastery Goal" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Progress & Skeletons
+              </h4>
+              <div className="space-y-4">
+                <Progress value={78} label="Session Mastery Goal" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
               </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Animated Shimmer Loading
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Animated Shimmer Loading
-            </span>
           </Card>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Avatars (surface-variant fallback)
-            </h4>
-            <div className="flex items-center justify-center gap-4 py-2">
-              <div className="flex flex-col items-center gap-1">
-                <Avatar fallback="ED" size="sm" />
-                <span className="text-[10px] font-mono text-on-surface-variant">SM (32px)</span>
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Avatars (surface-variant fallback)
+              </h4>
+              <div className="flex items-center justify-center gap-4 py-2">
+                <div className="flex flex-col items-center gap-1">
+                  <Avatar fallback="ED" size="sm" />
+                  <span className="text-xs font-mono text-on-surface-variant">SM (32px)</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Avatar fallback="TA" size="md" />
+                  <span className="text-xs font-mono text-on-surface-variant">MD (40px)</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Avatar fallback="FP" size="lg" />
+                  <span className="text-xs font-mono text-on-surface-variant">LG (48px)</span>
+                </div>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <Avatar fallback="TA" size="md" />
-                <span className="text-[10px] font-mono text-on-surface-variant">MD (40px)</span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <Avatar fallback="FP" size="lg" />
-                <span className="text-[10px] font-mono text-on-surface-variant">LG (48px)</span>
-              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                High Contrast Initials
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              High Contrast Initials
-            </span>
           </Card>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Tooltip & Toast
-            </h4>
-            <div className="flex flex-col gap-3">
-              <Tooltip content="Provides instant clinical assessment feedback">
-                <Button variant="outlined" colorRole="primary" size="sm" className="w-full">Hover for Tooltip</Button>
-              </Tooltip>
-              <Toast title="Session Saved" description="Therapy drill results persisted to Cloud Firestore." type="success" />
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Tooltip & Toast
+              </h4>
+              <div className="flex flex-col gap-3">
+                <Tooltip content="Provides instant clinical assessment feedback">
+                  <Button variant="outlined" colorRole="primary" size="sm" className="w-full">Hover for Tooltip</Button>
+                </Tooltip>
+                <Toast title="Session Saved" description="Therapy drill results persisted to Cloud Firestore." type="success" />
+              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Non-Disruptive Notifications
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Non-Disruptive Notifications
-            </span>
           </Card>
         </div>
       </section>
@@ -871,7 +943,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 accessor: (row) => (
                   <Chip
                     label={row.status}
-                    pattern={row.status === 'Completed' ? 'high-contrast-mixed' : 'outline-neutral-fill'}
+                    pattern={row.status === 'Completed' ? 'high-contrast-mixed' : 'outline'}
                     colorRole={row.status === 'Completed' ? 'success' : 'primary'}
                   />
                 ),
@@ -912,16 +984,18 @@ export const ComponentLibraryShowcase: React.FC = () => {
             </Form>
           </Fieldset>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <div>
-              <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Semantic Form Section</span>
-              <h4 className="font-heading text-base font-bold text-on-surface">Fieldset & Legend Architecture</h4>
-              <p className="font-sans text-xs text-on-surface-variant mt-2 leading-relaxed">
-                Base UI <code className="text-primary font-mono">Fieldset</code> provides standard WAI-ARIA group binding, associating legend titles and description text directly with enclosed input controls.
-              </p>
-            </div>
-            <div className="p-3 rounded-[0.5rem] bg-surface-container border border-outline-variant/60 font-mono text-xs text-on-surface-variant">
-              Selected: {JSON.stringify(checkboxGroupVal)}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Semantic Form Section</span>
+                <h4 className="font-heading text-base font-bold text-on-surface">Fieldset & Legend Architecture</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-2 leading-relaxed">
+                  Base UI <code className="text-primary font-mono">Fieldset</code> provides standard WAI-ARIA group binding, associating legend titles and description text directly with enclosed input controls.
+                </p>
+              </div>
+              <div className="p-3 rounded bg-surface-container border border-outline-variant/60 font-mono text-xs text-on-surface-variant">
+                Selected: {JSON.stringify(checkboxGroupVal)}
+              </div>
             </div>
           </Card>
         </div>
@@ -935,7 +1009,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
             Filtered search suggestions and dropdown selection primitives.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-[1rem] bg-surface border-none shadow-ambient">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-lg bg-surface border-none shadow-ambient">
           <Autocomplete
             label="Assigned Speech Drill Autocomplete"
             description="Search with leading icon, clear button, and flush focus ring"
@@ -1012,37 +1086,39 @@ export const ComponentLibraryShowcase: React.FC = () => {
               ]}
             >
               <div className="p-6 rounded-md bg-surface-container border border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-context-menu hover:bg-surface-variant/50 transition-colors h-36">
-                <span className="material-symbols-outlined text-primary text-3xl mb-2" aria-hidden="true">
-                  mouse
+                <span className="text-primary mb-2">
+                  <Icon name="mouse" size="xl" />
                 </span>
                 <span className="font-label text-sm font-bold text-on-surface">Right-Click Anywhere Here</span>
                 <span className="font-sans text-sm text-on-surface-variant mt-1">Triggers Base UI `ContextMenu` popup</span>
               </div>
             </ContextMenu>
 
-            <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-              <div>
-                <span className="font-label text-xs font-bold text-on-surface-variant block mb-2">Base UI `NavigationMenu`</span>
-                <NavigationMenu
-                  activeId="n1"
-                  items={[
-                    { id: 'n1', label: 'Dashboard', icon: 'dashboard', href: '#dashboard' },
-                    {
-                      id: 'n2',
-                      label: 'Analytics',
-                      icon: 'analytics',
-                      children: [
-                        { id: 'n2-1', label: 'Progress Reports', icon: 'bar_chart', description: 'Patient accuracy rates & pitch telemetry logs' },
-                        { id: 'n2-2', label: 'Resonance Metrics', icon: 'graphic_eq', description: 'Spectrogram harmonics density analysis' },
-                      ],
-                    },
-                    { id: 'n3', label: 'Settings', icon: 'settings', href: '#settings' },
-                  ]}
-                />
+            <Card variant="default" className="h-full">
+              <div className="p-6 h-full flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="font-label text-xs font-bold text-on-surface-variant block mb-2">Base UI `NavigationMenu`</span>
+                  <NavigationMenu
+                    activeId="n1"
+                    items={[
+                      { id: 'n1', label: 'Dashboard', icon: 'dashboard', href: '#dashboard' },
+                      {
+                        id: 'n2',
+                        label: 'Analytics',
+                        icon: 'analytics',
+                        children: [
+                          { id: 'n2-1', label: 'Progress Reports', icon: 'bar_chart', description: 'Patient accuracy rates & pitch telemetry logs' },
+                          { id: 'n2-2', label: 'Resonance Metrics', icon: 'graphic_eq', description: 'Spectrogram harmonics density analysis' },
+                        ],
+                      },
+                      { id: 'n3', label: 'Settings', icon: 'settings', href: '#settings' },
+                    ]}
+                  />
+                </div>
+                <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                  Accessible Header Navigation Bar with 2px Primary Active Underline & Submenus
+                </span>
               </div>
-              <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-                Accessible Header Navigation Bar with 2px Primary Active Underline & Submenus
-              </span>
             </Card>
           </div>
         </div>
@@ -1057,96 +1133,104 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Meter (Scalar Gauge) & Separator
-            </h4>
-            <div className="space-y-4">
-              <Meter
-                label="Vocal Pitch Stability Meter"
-                description="Real-time acoustic stability scoring"
-                value={meterVal}
-                colorRole="secondary"
-              />
-              <Separator />
-              <Meter
-                label="Storage Quota Utilization"
-                description="Encrypted clinical telemetry records"
-                value={45}
-                colorRole="primary"
-              />
-              <Separator />
-              <Meter
-                label="Therapy Latency Ceiling"
-                description="Threshold warning indicator"
-                value={88}
-                colorRole="warning"
-              />
-            </div>
-            <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
-              <Button size="sm" variant="outlined" colorRole="secondary" onClick={() => setMeterVal((v) => (v >= 100 ? 20 : Math.min(100, v + 20)))}>
-                Bump Pitch Stability ({meterVal}%)
-              </Button>
-            </div>
-          </Card>
-
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Action Toolbar & PreviewCard
-            </h4>
-            <div className="space-y-4">
-              <div>
-                <span className="font-label text-xs text-on-surface-variant block mb-1">Editor Action Toolbar</span>
-                <Toolbar
-                  actions={[
-                    { id: 'bold', label: 'Bold Text', icon: 'format_bold', active: toolbarActive === 'bold', action: () => setToolbarActive('bold') },
-                    { id: 'italic', label: 'Italic Text', icon: 'format_italic', active: toolbarActive === 'italic', action: () => setToolbarActive('italic') },
-                    { id: 'underline', label: 'Underline Text', icon: 'format_underlined', active: toolbarActive === 'underline', action: () => setToolbarActive('underline') },
-                    { id: 'mic', label: 'Record Audio', icon: 'mic', active: toolbarActive === 'mic', action: () => setToolbarActive('mic') },
-                  ]}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Meter (Scalar Gauge) & Separator
+              </h4>
+              <div className="space-y-4">
+                <Meter
+                  label="Vocal Pitch Stability Meter"
+                  description="Real-time acoustic stability scoring"
+                  value={meterVal}
+                  colorRole="secondary"
+                />
+                <Separator />
+                <Meter
+                  label="Storage Quota Utilization"
+                  description="Encrypted clinical telemetry records"
+                  value={45}
+                  colorRole="primary"
+                />
+                <Separator />
+                <Meter
+                  label="Therapy Latency Ceiling"
+                  description="Threshold warning indicator"
+                  value={88}
+                  colorRole="warning"
                 />
               </div>
-              <Separator />
-              <div>
-                <span className="font-label text-xs text-on-surface-variant block mb-1">Hover Preview Card</span>
-                <p className="font-sans text-sm text-on-surface-variant">
-                  Patient registered under{' '}
-                  <PreviewCard
-                    trigger="Protocol #74-Beta"
-                    title="Protocol #74-Beta Guidance"
-                    description="Standardized 12-week vocal resonance strengthening routine for pitch range expansion."
-                    icon="clinical_notes"
-                  />
-                  .
-                </p>
+              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
+                <Button size="sm" variant="outlined" colorRole="secondary" onClick={() => setMeterVal((v) => (v >= 100 ? 20 : Math.min(100, v + 20)))}>
+                  Bump Pitch Stability ({meterVal}%)
+                </Button>
               </div>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Rich Context Popovers
-            </span>
           </Card>
 
-          <Card variant="default" className="p-6 h-full flex flex-col justify-between space-y-4">
-            <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
-              Collapsible & Custom ScrollArea
-            </h4>
-            <div className="space-y-3">
-              <Collapsible title="View Clinical Guidelines">
-                Keep room noise level under 35dB. Maintain 12-inch distance from unidirectional condenser microphone.
-              </Collapsible>
-              <ScrollArea maxHeight="120px" className="rounded-md bg-surface-container/40 p-3">
-                <div className="space-y-2 text-sm font-sans text-on-surface-variant">
-                  <p><strong className="text-on-surface">Log 1:</strong> Audio calibrated at 48kHz.</p>
-                  <p><strong className="text-on-surface">Log 2:</strong> Vowel duration test passed (14.2s sustain).</p>
-                  <p><strong className="text-on-surface">Log 3:</strong> Pitch stability variance &lt; 2.1 Hz.</p>
-                  <p><strong className="text-on-surface">Log 4:</strong> Session metrics saved to storage.</p>
-                  <p><strong className="text-on-surface">Log 5:</strong> Articulation accuracy evaluated at 96%.</p>
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Action Toolbar & PreviewCard
+              </h4>
+              <div className="space-y-4">
+                <div>
+                  <span className="font-label text-xs text-on-surface-variant block mb-1">Editor Action Toolbar</span>
+                  <Toolbar
+                    actions={[
+                      { id: 'bold', label: 'Bold Text', icon: 'format_bold', active: toolbarActive === 'bold', action: () => setToolbarActive('bold') },
+                      { id: 'italic', label: 'Italic Text', icon: 'format_italic', active: toolbarActive === 'italic', action: () => setToolbarActive('italic') },
+                      { id: 'underline', label: 'Underline Text', icon: 'format_underlined', active: toolbarActive === 'underline', action: () => setToolbarActive('underline') },
+                      { id: 'mic', label: 'Record Audio', icon: 'mic', active: toolbarActive === 'mic', action: () => setToolbarActive('mic') },
+                    ]}
+                  />
                 </div>
-              </ScrollArea>
+                <Separator />
+                <div>
+                  <span className="font-label text-xs text-on-surface-variant block mb-1">Hover Preview Card</span>
+                  <p className="font-sans text-sm text-on-surface-variant">
+                    Patient registered under{' '}
+                    <PreviewCard
+                      trigger="Protocol #74-Beta"
+                      title="Protocol #74-Beta Guidance"
+                      description="Standardized 12-week vocal resonance strengthening routine for pitch range expansion."
+                      icon="clinical_notes"
+                    />
+                    .
+                  </p>
+                </div>
+              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Rich Context Popovers
+              </span>
             </div>
-            <span className="font-label text-[11px] text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
-              Custom Scrollbars & Panels
-            </span>
+          </Card>
+
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <h4 className="font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/60 pb-2">
+                Collapsible & Custom ScrollArea
+              </h4>
+              <div className="space-y-3">
+                <Collapsible title="View Clinical Guidelines">
+                  Keep room noise level under 35dB. Maintain 12-inch distance from unidirectional condenser microphone.
+                </Collapsible>
+                <div className="rounded-md bg-surface-container/40 p-3">
+                  <ScrollArea maxHeight="120px">
+                    <div className="space-y-2 text-sm font-sans text-on-surface-variant">
+                      <p><strong className="text-on-surface">Log 1:</strong> Audio calibrated at 48kHz.</p>
+                      <p><strong className="text-on-surface">Log 2:</strong> Vowel duration test passed (14.2s sustain).</p>
+                      <p><strong className="text-on-surface">Log 3:</strong> Pitch stability variance &lt; 2.1 Hz.</p>
+                      <p><strong className="text-on-surface">Log 4:</strong> Session metrics saved to storage.</p>
+                      <p><strong className="text-on-surface">Log 5:</strong> Articulation accuracy evaluated at 96%.</p>
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Custom Scrollbars & Panels
+              </span>
+            </div>
           </Card>
         </div>
       </section>
@@ -1159,25 +1243,27 @@ export const ComponentLibraryShowcase: React.FC = () => {
             Urgent modal dialog layer designed for high-consequence destructive actions with explicit accessibility alert roles.
           </p>
         </div>
-        <Card variant="default" className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h4 className="font-heading text-base font-bold text-on-surface">Purge Patient Telemetry Logs</h4>
-            <p className="font-sans text-xs text-on-surface-variant mt-1">
-              Triggers the Base UI <code className="text-error font-mono">AlertDialog</code> with warning icon and destructive primary trigger button.
-            </p>
-          </div>
-          <Button colorRole="error" onClick={() => setAlertDialogOptionsOpen(true)}>
-            Trigger Alert Dialog
-          </Button>
+        <Card variant="default" className="w-full">
+          <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-heading text-base font-bold text-on-surface">Purge Patient Telemetry Logs</h4>
+              <p className="font-sans text-xs text-on-surface-variant mt-1">
+                Triggers the Base UI <code className="text-error font-mono">AlertDialog</code> with warning icon and destructive primary trigger button.
+              </p>
+            </div>
+            <Button colorRole="error" onClick={() => setAlertDialogOptionsOpen(true)}>
+              Trigger Alert Dialog
+            </Button>
 
-          <AlertDialog
-            open={alertDialogOptionsOpen}
-            onOpenChange={setAlertDialogOptionsOpen}
-            title="Permanently Delete Patient Telemetry Logs?"
-            description="This action cannot be undone. All 48kHz audio recordings and pitch glide harmonic logs for this patient will be permanently removed from Cloud Firestore."
-            confirmLabel="Delete Telemetry Records"
-            onConfirm={() => showToast('Telemetry Records Purged', 'All 48kHz audio recordings and pitch glide logs were permanently removed from Cloud Firestore.', 'error')}
-          />
+            <AlertDialog
+              open={alertDialogOptionsOpen}
+              onOpenChange={setAlertDialogOptionsOpen}
+              title="Permanently Delete Patient Telemetry Logs?"
+              description="This action cannot be undone. All 48kHz audio recordings and pitch glide harmonic logs for this patient will be permanently removed from Cloud Firestore."
+              confirmLabel="Delete Telemetry Records"
+              onConfirm={() => showToast('Telemetry Records Purged', 'All 48kHz audio recordings and pitch glide logs were permanently removed from Cloud Firestore.', 'error')}
+            />
+          </div>
         </Card>
       </section>
 
@@ -1202,41 +1288,37 @@ export const ComponentLibraryShowcase: React.FC = () => {
 
             {/* Controls */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <label className="flex flex-col gap-1 font-label text-on-surface">
-                <span>State</span>
-                <select
-                  value={orbState}
-                  onChange={(e) => setOrbState(e.target.value as OrbState)}
-                  className="rounded-md border border-outline-variant bg-surface px-2.5 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <option value="working">working</option>
-                  <option value="searching">searching</option>
-                  <option value="solving">solving</option>
-                  <option value="listening">listening</option>
-                  <option value="connecting">connecting</option>
-                  <option value="weaving">weaving</option>
-                  <option value="composing">composing</option>
-                  <option value="breathing">breathing</option>
-                  <option value="shaping">shaping</option>
-                </select>
-              </label>
+              <Select
+                label="State"
+                value={orbState}
+                onValueChange={(val) => setOrbState(val as OrbState)}
+                options={[
+                  { value: 'working', label: 'working' },
+                  { value: 'searching', label: 'searching' },
+                  { value: 'solving', label: 'solving' },
+                  { value: 'listening', label: 'listening' },
+                  { value: 'connecting', label: 'connecting' },
+                  { value: 'weaving', label: 'weaving' },
+                  { value: 'composing', label: 'composing' },
+                  { value: 'breathing', label: 'breathing' },
+                  { value: 'shaping', label: 'shaping' },
+                ]}
+              />
 
-              <label className="flex flex-col gap-1 font-label text-on-surface">
-                <span>Size</span>
-                <select
-                  value={orbSize}
-                  onChange={(e) => setOrbSize(e.target.value as 'sm' | 'md' | 'lg')}
-                  className="rounded-md border border-outline-variant bg-surface px-2.5 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <option value="sm">sm (20px inline)</option>
-                  <option value="md">md (32px badge)</option>
-                  <option value="lg">lg (64px hero)</option>
-                </select>
-              </label>
+              <Select
+                label="Size"
+                value={orbSize}
+                onValueChange={(val) => setOrbSize(val as 'sm' | 'md' | 'lg')}
+                options={[
+                  { value: 'sm', label: 'sm (20px inline)' },
+                  { value: 'md', label: 'md (32px badge)' },
+                  { value: 'lg', label: 'lg (64px hero)' },
+                ]}
+              />
             </div>
 
             {/* Interactive Preview Canvas */}
-            <div className="rounded-lg bg-surface-container p-6 flex flex-col items-center justify-center min-h-[140px] border border-outline-variant/60">
+            <div className="rounded-lg bg-surface-container p-6 flex flex-col items-center justify-center min-h-35 border border-outline-variant/60">
               <ThinkingOrb
                 state={orbState}
                 size={orbSize}
@@ -1256,7 +1338,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
               />
             </div>
 
-            <div className="text-[11px] font-sans text-on-surface-variant bg-surface-variant/40 p-2.5 rounded-md border border-outline-variant/50">
+            <div className="text-xs font-sans text-on-surface-variant bg-surface-variant/40 p-2.5 rounded-md border border-outline-variant/50">
               <strong className="text-on-surface font-semibold">Accessibility Guarantee:</strong> An <code className="font-mono text-primary">aria-live="polite"</code> announcement updates automatically when state transitions occur.
             </div>
           </div>
@@ -1272,50 +1354,44 @@ export const ComponentLibraryShowcase: React.FC = () => {
 
             {/* Controls */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <label className="flex flex-col gap-1 font-label text-on-surface">
-                <span>Character</span>
-                <select
-                  value={botType}
-                  onChange={(e) => setBotType(e.target.value as BotAvatarType)}
-                  className="rounded-md border border-outline-variant bg-surface px-2 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <option value="clover">Clover</option>
-                  <option value="cat">Cat</option>
-                  <option value="cloud">Cloud</option>
-                  <option value="blob">Blob</option>
-                  <option value="droid">Droid</option>
-                  <option value="star">Star</option>
-                </select>
-              </label>
+              <Select
+                label="Character"
+                value={botType}
+                onValueChange={(val) => setBotType(val as BotAvatarType)}
+                options={[
+                  { value: 'clover', label: 'Clover' },
+                  { value: 'cat', label: 'Cat' },
+                  { value: 'cloud', label: 'Cloud' },
+                  { value: 'blob', label: 'Blob' },
+                  { value: 'droid', label: 'Droid' },
+                  { value: 'star', label: 'Star' },
+                ]}
+              />
 
-              <label className="flex flex-col gap-1 font-label text-on-surface">
-                <span>Activity</span>
-                <select
-                  value={botState}
-                  onChange={(e) => setBotState(e.target.value as BotAvatarState)}
-                  className="rounded-md border border-outline-variant bg-surface px-2 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <option value="default">Default (Idle)</option>
-                  <option value="working">Working (Active)</option>
-                  <option value="sleeping">Sleeping</option>
-                </select>
-              </label>
+              <Select
+                label="Activity"
+                value={botState}
+                onValueChange={(val) => setBotState(val as BotAvatarState)}
+                options={[
+                  { value: 'default', label: 'Default (Idle)' },
+                  { value: 'working', label: 'Working (Active)' },
+                  { value: 'sleeping', label: 'Sleeping' },
+                ]}
+              />
 
-              <label className="flex flex-col gap-1 font-label text-on-surface">
-                <span>Tone Mode</span>
-                <select
-                  value={botTone}
-                  onChange={(e) => setBotTone(e.target.value as 'friendly' | 'calm')}
-                  className="rounded-md border border-outline-variant bg-surface px-2 py-1.5 text-xs text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <option value="calm">Calm (Clinical safe)</option>
-                  <option value="friendly">Friendly (Playful)</option>
-                </select>
-              </label>
+              <Select
+                label="Tone Mode"
+                value={botTone}
+                onValueChange={(val) => setBotTone(val as 'friendly' | 'calm')}
+                options={[
+                  { value: 'calm', label: 'Calm (Clinical safe)' },
+                  { value: 'friendly', label: 'Friendly (Playful)' },
+                ]}
+              />
             </div>
 
             {/* Interactive Preview Canvas */}
-            <div className="rounded-lg bg-surface-container p-6 flex flex-col items-center justify-center min-h-[140px] border border-outline-variant/60">
+            <div className="rounded-lg bg-surface-container p-6 flex flex-col items-center justify-center min-h-35 border border-outline-variant/60">
               <BotAvatar
                 type={botType}
                 state={botState}
@@ -1326,7 +1402,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] font-sans text-on-surface-variant bg-surface-variant/40 p-2.5 rounded-md border border-outline-variant/50">
+            <div className="flex items-center justify-between text-xs font-sans text-on-surface-variant bg-surface-variant/40 p-2.5 rounded-md border border-outline-variant/50">
               <span>
                 <strong className="text-on-surface font-semibold">
                   {botTone === 'calm' ? 'Calm Mode Active:' : 'Friendly Mode Active:'}
@@ -1335,23 +1411,710 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   ? 'Spontaneous flips/hops disabled, speed halved to prevent affect mismatch during distress.'
                   : 'Full playful animations enabled for positive reinforcement and casual check-ins.'}
               </span>
-              <label className="inline-flex items-center gap-1.5 cursor-pointer ml-2 shrink-0">
-                <input
-                  type="checkbox"
+              <div className="ml-2 shrink-0">
+                <Checkbox
                   checked={showBotDisclaimer}
-                  onChange={(e) => setShowBotDisclaimer(e.target.checked)}
-                  className="rounded border-outline-variant text-primary focus:ring-primary"
+                  onCheckedChange={(c) => setShowBotDisclaimer(!!c)}
+                  label={<span className="font-label text-xs">Disclaimer badge</span>}
+                  compact
                 />
-                <span className="font-label text-[10px]">Disclaimer badge</span>
-              </label>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* 18. AI Agent Workflows & Clinical Decision Support */}
+      <section className="space-y-4">
+        <div className="border-b border-outline-variant pb-2">
+          <h3 className="font-heading text-xl font-bold text-on-surface">18. AI Agent Workflows & Clinical Guidance (ThinkingTrace, ApprovalCard, ClinicianTip)</h3>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Multi-step reasoning disclosure panels, human-in-the-loop decision approval cards, and dual-variant clinical tips (unboxed inside cards, inset with wash).
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* ThinkingTrace & ClinicianTip */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">ThinkingTrace (Reasoning Audit Trail)</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Collapsible agent reasoning disclosure with step-by-step progress duration and elapsed timing.
+                  </p>
+                </div>
+
+                <ThinkingTrace
+                  title="Clinical reasoning & EHR cross-reference"
+                  elapsedTime="1.8s"
+                  defaultOpen={true}
+                  steps={[
+                    { id: 's1', label: 'EHR baseline retrieved (NHS #948 201 4920)', duration: '0.4s', icon: 'check_circle', isComplete: true },
+                    { id: 's2', label: 'Acoustic pitch jitter evaluated against clinical normative bands', duration: '0.9s', icon: 'check_circle', isComplete: true },
+                    { id: 's3', label: 'Synthesising next-stage consonant cluster recommendation', duration: '0.5s', icon: 'pending', isComplete: false },
+                  ]}
+                >
+                  <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                    Patient completed 5 sustained vowel repetitions with 92% pitch stability. Harmonic jitter fell below the 1.8% pathology threshold. Model recommends advancing to plosive consonants /b/ and /p/.
+                  </p>
+                </ThinkingTrace>
+
+                {/* ClinicianTip Showcase (Dual Variants) */}
+                <div className="pt-4 border-t border-outline-variant/60 space-y-3">
+                  <span className="font-label text-xs font-bold text-on-surface-variant block">
+                    ClinicianTip Primitives (Dual Presentation Variants)
+                  </span>
+                  
+                  {/* Inset Variant */}
+                  <ClinicianTip variant="inset" icon="lightbulb" label="Acoustic cue">
+                    Verify background ambient noise remains below 35dB before initiating 48kHz frequency calibration.
+                  </ClinicianTip>
+
+                  {/* Unboxed Variant */}
+                  <div className="p-4 rounded bg-surface border border-outline-variant">
+                    <span className="font-label text-xs font-semibold text-primary block mb-1">Inside Exercise Drill:</span>
+                    <ClinicianTip variant="unboxed" icon="info" label="Diaphragmatic tip">
+                      Encourage slow diaphragmatic inhalation before beginning sustained vowel phonation.
+                    </ClinicianTip>
+                  </div>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                WCAG 2.2 compliant agentic reasoning trails and clinical cueing
+              </span>
+            </div>
+          </Card>
+
+          {/* ApprovalCard */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">
+                  Human-in-the-Loop Governance
+                </span>
+                <h4 className="font-heading text-base font-bold text-on-surface mb-4">
+                  ApprovalCard (Clinical Decision Checkpoint)
+                </h4>
+
+                <ApprovalCard
+                  title="Confirm Recommended Articulation Plan"
+                  description="The clinical AI evaluated Arthur's vocal stability at 92%. Review the automated recommendation before advancing."
+                  options={[
+                    {
+                      id: 'opt-1',
+                      label: 'Advance to Consonant Clusters (/st/, /br/)',
+                      description: 'Recommended next clinical tier based on acoustic stability',
+                    },
+                    {
+                      id: 'opt-2',
+                      label: 'Repeat Sustained Vowel Drills (Stabilization)',
+                      description: 'Consolidate baseline performance for 3 additional sessions',
+                    },
+                    {
+                      id: 'opt-3',
+                      label: 'Defer to Weekly Clinic Consultation',
+                      description: 'Hold current plan pending direct therapist consultation',
+                    },
+                  ]}
+                  selectedOptionId={approvalOption}
+                  onSelectOption={setApprovalOption}
+                  allowCustomInput={true}
+                  customInputValue={approvalCustomInput}
+                  onCustomInputChange={setApprovalCustomInput}
+                  stepCurrent={approvalStepCurrent}
+                  stepTotal={4}
+                  onPreviousStep={() => setApprovalStepCurrent((s) => Math.max(1, s - 1))}
+                  onNextStep={() => setApprovalStepCurrent((s) => Math.min(4, s + 1))}
+                  onConfirm={() => showToast('Plan Confirmed', 'Advancement to consonant clusters persisted to patient record.', 'success')}
+                  onSkip={() => showToast('Step Skipped', 'Patient maintained on current practice schedule.', 'info')}
+                />
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Radio selection, optional custom textarea override, and stepped navigation
+              </span>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* 19. Navigation, Pagination & Resizable Layouts */}
+      <section className="space-y-4">
+        <div className="border-b border-outline-variant pb-2">
+          <h3 className="font-heading text-xl font-bold text-on-surface">19. Navigation, Pagination & Resizable Panes (Breadcrumb, Pagination, Resizable)</h3>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Accessible site breadcrumbs, keyboard-navigable pagination bars, and smooth draggable split-pane layouts.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Breadcrumb & Pagination */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-6">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">Breadcrumb Navigation</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1 mb-3">
+                    Semantic <code className="font-mono text-primary">&lt;nav aria-label="Breadcrumb"&gt;</code> hierarchy with separators and active leaf page.
+                  </p>
+                  <div className="p-4 rounded bg-surface-container border border-outline-variant/60">
+                    <Breadcrumb>
+                      <BreadcrumbList>
+                        <BreadcrumbItem>
+                          <BreadcrumbLink href="#patients">Patients</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                          <BreadcrumbLink href="#vance">Arthur Dent</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                          <BreadcrumbEllipsis />
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                          <BreadcrumbLink href="#voice">Voice Drills</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                          <BreadcrumbPage>Session #14 (Vowel Prolongation)</BreadcrumbPage>
+                        </BreadcrumbItem>
+                      </BreadcrumbList>
+                    </Breadcrumb>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">Pagination Bar</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1 mb-3">
+                    Accessible pagination control with 44px min touch floors and keyboard navigation.
+                  </p>
+                  <div className="p-4 rounded bg-surface-container border border-outline-variant/60 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            aria-disabled={currentPage === 1}
+                            className={currentPage === 1 ? 'pointer-events-none' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationLink isActive={currentPage === 1} onClick={() => setCurrentPage(1)} className="cursor-pointer">
+                            1
+                          </PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationLink isActive={currentPage === 2} onClick={() => setCurrentPage(2)} className="cursor-pointer">
+                            2
+                          </PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationLink isActive={currentPage === 3} onClick={() => setCurrentPage(3)} className="cursor-pointer">
+                            3
+                          </PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationLink isActive={currentPage === 8} onClick={() => setCurrentPage(8)} className="cursor-pointer">
+                            8
+                          </PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() => setCurrentPage((p) => Math.min(8, p + 1))}
+                            aria-disabled={currentPage === 8}
+                            className={currentPage === 8 ? 'pointer-events-none' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                  <span className="font-label text-xs text-on-surface-variant text-center block mt-2">
+                    Active Page: <strong className="text-primary">{currentPage}</strong> of 8
+                  </span>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                WAI-ARIA Breadcrumb & Pagination specifications verified
+              </span>
+            </div>
+          </Card>
+
+          {/* Resizable Split Panes */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <h4 className="font-heading text-base font-bold text-on-surface">Resizable Split Panels</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-1 mb-4">
+                  Draggable split containers supporting multi-pane clinical inspection (e.g. waveform audio vs clinician notes).
+                </p>
+
+                <div className="h-64 rounded-lg overflow-hidden border border-outline-variant">
+                  <ResizablePanelGroup direction="horizontal">
+                    <ResizablePanel defaultSize={50} minSize={30}>
+                      <div className="h-full p-4 bg-surface-container flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-primary"><Icon name="graphic_eq" size="sm" /></span>
+                            <span className="font-label text-xs font-bold text-on-surface">Acoustic Waveform</span>
+                          </div>
+                          <p className="font-sans text-xs text-on-surface-variant">
+                            Live 48kHz audio stream capture. Sampling pitch variance across 14.2s sustained phonation.
+                          </p>
+                        </div>
+                        <div className="p-2 rounded bg-surface border border-outline-variant/60 font-mono text-xs text-primary">
+                          Peak: 224 Hz | Jitter: 0.8%
+                        </div>
+                      </div>
+                    </ResizablePanel>
+
+                    <ResizableHandle withHandle />
+
+                    <ResizablePanel defaultSize={50} minSize={30}>
+                      <div className="h-full p-4 bg-surface flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-secondary"><Icon name="clinical_notes" size="sm" /></span>
+                            <span className="font-label text-xs font-bold text-on-surface">Clinician Observations</span>
+                          </div>
+                          <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                            Patient maintains upright posture and steady diaphragmatic breathing during trial.
+                          </p>
+                        </div>
+                        <span className="text-xs text-on-surface-variant/70 italic">
+                          ← Drag the handle to resize
+                        </span>
+                      </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Smooth handle drag with min/max percentage boundary enforcement
+              </span>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* 20. Content Presentation, Uploads & States */}
+      <section className="space-y-4">
+        <div className="border-b border-outline-variant pb-2">
+          <h3 className="font-heading text-xl font-bold text-on-surface">20. Content Presentation, Uploads & States (Textarea, Attachment, EmptyState, Carousel)</h3>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Full-width clinical textareas, file attachment progress rows, empty milestone fallbacks, and multi-slide carousels.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Textarea & Attachment */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <TextareaField
+                  label="Consultation Clinical Notes (TextareaField)"
+                  description="Detailed qualitative notes recorded during speech practice session"
+                  placeholder="Record articulation cues, pitch stabilization observations, and patient feedback..."
+                  value={clinicalNotes}
+                  onChange={(e) => setClinicalNotes(e.target.value)}
+                  rows={3}
+                />
+
+                <div className="space-y-2 pt-2 border-t border-outline-variant/40">
+                  <span className="font-label text-xs font-bold text-on-surface-variant block">
+                    Clinical Media Attachments (Attachment Primitive)
+                  </span>
+                  <div className="space-y-2">
+                    <Attachment
+                      fileName="vocal_prolongation_48khz.wav"
+                      fileType="audio"
+                      fileSize="3.4 MB"
+                      status="completed"
+                      onDownload={() => showToast('Download Started', 'Downloading acoustic audio recording...', 'info')}
+                      onRemove={() => showToast('Attachment Removed', 'Audio recording removed from session draft.', 'warning')}
+                    />
+                    <Attachment
+                      fileName="milestone_assessment_report.pdf"
+                      fileType="pdf"
+                      fileSize="640 KB"
+                      status="completed"
+                      onDownload={() => showToast('Download Started', 'Downloading clinical PDF report...', 'info')}
+                      onRemove={() => showToast('Attachment Removed', 'PDF summary removed from session draft.', 'warning')}
+                    />
+                    <Attachment
+                      fileName="spectrogram_harmonics_scan.png"
+                      fileType="image"
+                      fileSize="1.9 MB"
+                      status="uploading"
+                      uploadProgress={68}
+                      onRemove={() => showToast('Upload Cancelled', 'Image upload cancelled.', 'warning')}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Semantic file type indicators, live progress bars, and touch-target action buttons
+              </span>
+            </div>
+          </Card>
+
+          {/* Carousel & EmptyState */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-6">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface mb-2">
+                    Clinical Drill Modules (Carousel)
+                  </h4>
+                  <div className="px-8 py-2 relative">
+                    <Carousel className="w-full">
+                      <CarouselContent>
+                        <CarouselItem>
+                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                            <div>
+                              <span className="font-label text-xs font-bold text-primary">Module 01</span>
+                              <h5 className="font-heading text-sm font-bold text-on-surface">Vowel Prolongation (/a/, /i/, /u/)</h5>
+                              <p className="font-sans text-xs text-on-surface-variant mt-1">Sustained steady phonation to evaluate vocal fold vibration stability.</p>
+                            </div>
+                            <span className="text-xs font-medium text-success">Target: 12.0s sustain</span>
+                          </div>
+                        </CarouselItem>
+                        <CarouselItem>
+                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                            <div>
+                              <span className="font-label text-xs font-bold text-secondary">Module 02</span>
+                              <h5 className="font-heading text-sm font-bold text-on-surface">Pitch Glide Dynamics</h5>
+                              <p className="font-sans text-xs text-on-surface-variant mt-1">Smooth low-to-high frequency transitions to expand dynamic vocal range.</p>
+                            </div>
+                            <span className="text-xs font-medium text-primary">Target: 130–260 Hz range</span>
+                          </div>
+                        </CarouselItem>
+                        <CarouselItem>
+                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                            <div>
+                              <span className="font-label text-xs font-bold text-tertiary">Module 03</span>
+                              <h5 className="font-heading text-sm font-bold text-on-surface">Plosive Consonant Articulation</h5>
+                              <p className="font-sans text-xs text-on-surface-variant mt-1">Rapid intraoral pressure release drills (/b/, /p/, /t/, /d/).</p>
+                            </div>
+                            <span className="text-xs font-medium text-secondary">Target: 90% acoustic accuracy</span>
+                          </div>
+                        </CarouselItem>
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                      <div className="mt-3 flex justify-center">
+                        <CarouselDots />
+                      </div>
+                    </Carousel>
+                  </div>
+                </div>
+
+                <div className="border-t border-outline-variant/40 pt-4">
+                  <h4 className="font-heading text-base font-bold text-on-surface mb-2">
+                    Empty State Fallback (EmptyState)
+                  </h4>
+                  <EmptyState
+                    icon="mic_off"
+                    title="No Recorded Voice Sessions"
+                    description="Arthur has not recorded any practice sessions for this milestone yet. Start the first drill to begin telemetry capture."
+                    action={
+                      <Button
+                        colorRole="primary"
+                        size="sm"
+                        onClick={() => showToast('Session Initialized', 'Microphone calibrated. Starting vowel drill...', 'info')}
+                      >
+                        Start First Drill
+                      </Button>
+                    }
+                  />
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Accessible carousel with slide indicators and balance-wrapped empty states
+              </span>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* 21. Interactive Polish & Motion Micro-Interactions */}
+      <section className="space-y-4">
+        <div className="border-b border-outline-variant pb-2">
+          <h3 className="font-heading text-xl font-bold text-on-surface">21. Interactive Polish & Motion Micro-Interactions (Motion Primitives Suite)</h3>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Transitions.dev inspired micro-motion: tabular number counters, celebratory success checks, in-place text swaps, validation shakes, ambient shimmers, staggered reveals, and notification badges.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* StepWizard */}
+          <Card variant="default" className="h-full md:col-span-2 lg:col-span-1">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Guided Flow</span>
+                <h4 className="font-heading text-base font-bold text-on-surface mb-3">StepWizard</h4>
+                
+                <StepWizard
+                  currentStepIndex={wizardStep}
+                  onStepChange={setWizardStep}
+                  onComplete={() => showToast('Onboarding Completed', 'Clinical baseline telemetry setup finished.', 'success')}
+                  steps={[
+                    {
+                      id: 'step-1',
+                      title: 'Microphone Check',
+                      description: 'Calibrate input level',
+                      content: (
+                        <div className="space-y-2 py-2">
+                          <p className="text-xs text-on-surface-variant">Testing ambient audio floor. Speak at normal conversation volume.</p>
+                          <div className="p-2 rounded bg-surface-container font-mono text-xs text-success">
+                            Calibrated: 48kHz / 24-bit PCM
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 'step-2',
+                      title: 'Pitch Baseline',
+                      description: 'Sustain comfortable tone',
+                      content: (
+                        <div className="space-y-2 py-2">
+                          <p className="text-xs text-on-surface-variant">Produce an uninterrupted /a/ sound for 5 seconds.</p>
+                          <div className="p-2 rounded bg-surface-container font-mono text-xs text-primary">
+                            Fundamental: 182.4 Hz
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: 'step-3',
+                      title: 'Confirmation',
+                      description: 'Review clinical setup',
+                      content: (
+                        <div className="space-y-2 py-2">
+                          <p className="text-xs text-on-surface-variant">Ready to launch patient exercise plan. Telemetry will sync automatically.</p>
+                          <div className="p-2 rounded bg-surface-container font-mono text-xs text-secondary">
+                            Profile: Ready for Clinical Use
+                          </div>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Directional slide transitions with keyboard controls
+              </span>
+            </div>
+          </Card>
+
+          {/* NumberRoll & SuccessCheck */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Metrics & Feedback</span>
+                <h4 className="font-heading text-base font-bold text-on-surface mb-3">NumberRoll & SuccessCheck</h4>
+                
+                <div className="p-6 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col items-center justify-center space-y-4 text-center">
+                  <div className="flex items-center gap-3">
+                    <SuccessCheck trigger={successTrigger} size="md" />
+                    <div className="font-heading text-3xl font-bold text-on-surface">
+                      <NumberRoll value={liveAccuracy} decimals={1} suffix="%" />
+                    </div>
+                  </div>
+                  <span className="font-sans text-xs text-on-surface-variant">
+                    Accuracy Score (Smooth tabular vertical roll with micro-blur)
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outlined"
+                    colorRole="primary"
+                    onClick={() => {
+                      setLiveAccuracy((prev) => (prev > 90 ? 84.6 : 95.8));
+                      setSuccessTrigger((s) => s + 1);
+                    }}
+                  >
+                    Simulate Score Update
+                  </Button>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Emil Kowalski style tabular number animation & celebratory stroke draw
+              </span>
+            </div>
+          </Card>
+
+          {/* TextSwap & ErrorShake */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Interactive Triggers</span>
+                <h4 className="font-heading text-base font-bold text-on-surface mb-3">TextSwap & ErrorShake</h4>
+                
+                <div className="space-y-4">
+                  {/* TextSwap button */}
+                  <div>
+                    <span className="font-label text-xs text-on-surface-variant block mb-1.5">In-Place TextSwap:</span>
+                    <Button
+                      colorRole="primary"
+                      className="w-full"
+                      onClick={() => setSwapState((s) => !s)}
+                    >
+                      <TextSwap>
+                        {swapState ? 'Saved to Patient Record ✓' : 'Save Session Changes'}
+                      </TextSwap>
+                    </Button>
+                  </div>
+
+                  {/* ErrorShake field */}
+                  <div className="pt-2 border-t border-outline-variant/40">
+                    <span className="font-label text-xs text-on-surface-variant block mb-1.5">Validation ErrorShake:</span>
+                    <ErrorShake shake={shakeTrigger}>
+                      <FormField
+                        label="Security Passcode"
+                        placeholder="6-digit code"
+                        error={shakeTrigger > 0 ? 'Invalid clinical passcode' : undefined}
+                      />
+                    </ErrorShake>
+                    <div className="mt-2">
+                      <Button
+                        size="sm"
+                        variant="outlined"
+                        colorRole="error"
+                        className="w-full"
+                        onClick={() => setShakeTrigger((s) => s + 1)}
+                      >
+                        Trigger Error Shake
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Layout-stable text rise and 6px non-jarring horizontal shake
+              </span>
+            </div>
+          </Card>
+
+          {/* ShimmerText & TextsReveal */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Streaming Indicators</span>
+                <h4 className="font-heading text-base font-bold text-on-surface mb-3">ShimmerText & TextsReveal</h4>
+                
+                <div className="space-y-4">
+                  <div className="p-4 rounded bg-surface-container border border-outline-variant/60">
+                    <span className="font-label text-xs font-semibold text-primary block mb-1">Live AI Phonation Stream:</span>
+                    <div className="text-xs leading-relaxed">
+                      <ShimmerText variant="primary">
+                        Streaming acoustic telemetry... evaluating vocal tract harmonic ratios in real-time.
+                      </ShimmerText>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded bg-surface-container border border-outline-variant/60">
+                    <span className="font-label text-xs font-semibold text-secondary block mb-1">Staggered Sequence Reveal:</span>
+                    <div className="space-y-1">
+                      <TextsReveal show={true}>
+                        <TextsRevealLine index={0}>
+                          <p className="text-xs font-bold text-on-surface">1. Phonation calibration confirmed</p>
+                        </TextsRevealLine>
+                        <TextsRevealLine index={1}>
+                          <p className="text-xs text-on-surface-variant">2. Patient posture stabilized</p>
+                        </TextsRevealLine>
+                        <TextsRevealLine index={2}>
+                          <p className="text-xs text-primary font-semibold">3. Ready for phonation target capture</p>
+                        </TextsRevealLine>
+                      </TextsReveal>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Ambient gradient sweeps and staggered 40ms line reveals
+              </span>
+            </div>
+          </Card>
+
+          {/* NotificationBadge */}
+          <Card variant="default" className="h-full md:col-span-2 lg:col-span-2">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Visual Salience</span>
+                <h4 className="font-heading text-base font-bold text-on-surface mb-3">NotificationBadge (Counted & Indicator Dots)</h4>
+                
+                <div className="p-6 rounded-lg bg-surface-container border border-outline-variant/60 space-y-6">
+                  <div className="flex flex-wrap items-center gap-6">
+                    {/* Primary Counted Badge */}
+                    <div className="relative inline-block">
+                      <Button colorRole="primary" variant="outlined">
+                        Clinical Reviews
+                      </Button>
+                      <NotificationBadge count={badgeCount} variant="error" srLabel={`${badgeCount} unread reviews`} />
+                    </div>
+
+                    {/* Secondary Counted Badge */}
+                    <div className="relative inline-block">
+                      <Button colorRole="secondary" variant="outlined">
+                        Milestone Drills
+                      </Button>
+                      <NotificationBadge count={2} variant="secondary" srLabel="2 pending drills" />
+                    </div>
+
+                    {/* Dot Badge */}
+                    <div className="relative inline-block">
+                      <Button colorRole="tertiary" variant="outlined">
+                        System Telemetry
+                      </Button>
+                      <NotificationBadge dot variant="primary" srLabel="Telemetry active" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-2 border-t border-outline-variant/40">
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      colorRole="primary"
+                      onClick={() => setBadgeCount((c) => c + 1)}
+                    >
+                      Increment Badge ({badgeCount})
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outlined"
+                      colorRole="neutral"
+                      onClick={() => setBadgeCount(0)}
+                    >
+                      Clear Count
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Diagonal slide-in and scale-pop badge without layout displacement
+              </span>
+            </div>
+          </Card>
+        </div>
+      </section>
+
       {/* Floating Design System Toast Notification Layer */}
       {toastState && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in-50 max-w-md">
+        <div className="fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out max-w-md">
           <Toast
             title={toastState.title}
             description={toastState.description}
