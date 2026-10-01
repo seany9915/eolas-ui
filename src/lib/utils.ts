@@ -4,6 +4,7 @@ import { extendTailwindMerge } from 'tailwind-merge';
 const customTwMerge = extendTailwindMerge({
   extend: {
     classGroups: {
+      // eslint-disable-next-line shadcn/no-raw-colors
       'border-w': ['border-default', 'border-emphasis', 'border-accent'],
     },
   },

@@ -140,14 +140,14 @@ export const ColorTokensExplorer: React.FC = () => {
       description: 'Precise linear separation without heavy skeuomorphic shadows.',
       tokens: [
         {
-          name: 'outline (Default Control Boundaries)',
+          name: 'Outline (Default Control Boundaries)',
           hex: '#737688',
           textHex: '#ffffff',
           bgClass: 'bg-outline text-surface',
           usage: '1px resting border for interactive form controls (Input, Checkbox, Radio).',
         },
         {
-          name: 'outline-variant (Subtle Card & Divider Borders)',
+          name: 'Outline-Variant (Subtle Card & Divider Borders)',
           hex: '#C4D5F8',
           textHex: '#1a1c1e',
           bgClass: 'bg-outline-variant text-on-surface',
@@ -180,21 +180,23 @@ export const ColorTokensExplorer: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {group.tokens.map((tok) => (
-              <Card key={tok.name} variant="default" className="h-full flex flex-col justify-between p-5 space-y-4">
-                <div className="space-y-3">
-                  <div className={`h-14 px-4 rounded-[0.5rem] ${tok.bgClass} flex items-center justify-between font-mono text-xs shadow-xs`}>
-                    <span className="font-bold truncate pr-2">{tok.name}</span>
-                    <span className="shrink-0">{tok.hex}</span>
+              <Card key={tok.name} variant="default" className="h-full">
+                <div className="h-full flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className={`h-14 px-4 rounded ${tok.bgClass} flex items-center justify-between font-mono text-xs shadow-xs`}>
+                      <span className="font-bold truncate pr-2">{tok.name}</span>
+                      <span className="shrink-0">{tok.hex}</span>
+                    </div>
+                    <p className="font-sans text-xs text-on-surface leading-relaxed">
+                      {tok.usage}
+                    </p>
                   </div>
-                  <p className="font-sans text-xs text-on-surface leading-relaxed">
-                    {tok.usage}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between text-[11px] font-label text-on-surface-variant border-t border-outline-variant/60 pt-2 shrink-0">
-                  <span>WCAG 2.2 AA Verified</span>
-                  <span className="text-success font-semibold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm" aria-hidden="true">check_circle</span> Pass
-                  </span>
+                  <div className="flex items-center justify-between text-xs font-label text-on-surface-variant border-t border-outline-variant/60 pt-2 shrink-0">
+                    <span>WCAG 2.2 AA Verified</span>
+                    <span className="text-success font-semibold flex items-center gap-1">
+                      <Icon name="check_circle" size="xs" /> Pass
+                    </span>
+                  </div>
                 </div>
               </Card>
             ))}

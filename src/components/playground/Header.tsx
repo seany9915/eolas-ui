@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Icon } from '@/components/ui/icon';
+import { TabsRoot, TabsList, Tab } from '@/components/ui/tabs';
 import { assetUrl } from '@/lib/utils';
 
 export interface HeaderProps {
@@ -21,43 +22,44 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-surface border-b border-outline-variant shadow-xs transition-colors">
-      <div className="w-full max-w-[88rem] mx-auto px-3 sm:px-5 lg:px-8 min-h-[4.5rem] py-2 sm:py-0 flex items-center justify-between gap-3 sm:gap-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 min-h-18 py-2 sm:py-0 flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Horizontal Lockup Integration */}
         <div className="flex items-center gap-3 shrink-0">
           <img
             src={assetUrl('/logos/horizontal-lockup.svg')}
             alt="Eolas Brand Logo"
-            className="h-8 sm:h-9 w-auto object-contain max-h-[40px]"
+            className="h-8 sm:h-9 w-auto object-contain max-h-10"
           />
-          <div className="hidden md:block h-5 w-[1px] bg-outline-variant" />
+          <div className="hidden md:block h-5 w-px bg-outline-variant" />
           <span className="hidden md:inline-block font-label text-xs font-bold text-on-surface-variant whitespace-nowrap">
             Playground & Component Library
           </span>
         </div>
 
-        {/* Global Navigation Tabs */}
+        {/* Global Navigation Tabs via Shared Base UI Tabs Primitive */}
         <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-end min-w-0">
-          <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto min-w-0 py-1 scrollbar-none" aria-label="Main Navigation">
-            {navTabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
+          <TabsRoot
+            value={activeTab}
+            onValueChange={onTabChange}
+            variant="segmented"
+            className="w-auto"
+          >
+            <TabsList variant="segmented" className="overflow-x-auto min-w-0" aria-label="Main Navigation">
+              {navTabs.map((tab) => (
+                <Tab
                   key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
-                  title={tab.label}
-                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 min-h-[40px] rounded-[0.5rem] font-label text-xs sm:text-sm font-semibold transition-[color,background-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none cursor-pointer select-none shrink-0 ${
-                    isActive
-                      ? 'bg-primary text-on-primary shadow-sm'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`}
+                  value={tab.id}
+                  className="shrink-0"
                 >
-                  <Icon name={tab.icon} size="sm" aria-hidden="true" />
-                  <span className="hidden xl:inline whitespace-nowrap">{tab.label}</span>
-                  <span className="inline xl:hidden whitespace-nowrap">{tab.shortLabel}</span>
-                </button>
-              );
-            })}
-          </nav>
+                  <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                    <Icon name={tab.icon} size="sm" aria-hidden="true" />
+                    <span className="hidden xl:inline whitespace-nowrap">{tab.label}</span>
+                    <span className="inline xl:hidden whitespace-nowrap">{tab.shortLabel}</span>
+                  </span>
+                </Tab>
+              ))}
+            </TabsList>
+          </TabsRoot>
         </div>
       </div>
     </header>

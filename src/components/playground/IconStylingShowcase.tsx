@@ -1,17 +1,24 @@
 import * as React from 'react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Chip } from '@/components/ui/chip';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
+import { Field } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Toggle } from '@/components/ui/toggle';
+import { Accordion } from '@/components/ui/accordion';
+import { InlineAlert } from '@/components/ui/inline-alert';
 import { assetUrl } from '@/lib/utils';
 
 export const IconStylingShowcase: React.FC = () => {
-  const [accordionOpen, setAccordionOpen] = React.useState(false);
   const [togglePressed, setTogglePressed] = React.useState(true);
 
   return (
     <div className="space-y-12">
       {/* Overview Header */}
-      <div className="rounded-[1rem] bg-surface border border-outline-variant p-6 space-y-3">
+      <Card>
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center text-primary">
             <Icon name="category" size="lg" aria-hidden="true" />
@@ -23,7 +30,7 @@ export const IconStylingShowcase: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* 0. Accessible <Icon /> Primitive Component & Size Matrix */}
       <section className="space-y-4">
@@ -35,37 +42,45 @@ export const IconStylingShowcase: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-4 space-y-2 text-center">
-            <div className="h-12 flex items-center justify-center text-primary">
-              <Icon name="verified" size="sm" />
+          <Card>
+            <div className="space-y-2 text-center">
+              <div className="h-12 flex items-center justify-center text-primary">
+                <Icon name="verified" size="sm" />
+              </div>
+              <span className="font-label text-xs font-bold text-on-surface block">sm (16px)</span>
+              <span className="font-sans text-xs text-on-surface-variant block">Compact chips, metadata badges</span>
             </div>
-            <span className="font-label text-xs font-bold text-on-surface block">sm (16px)</span>
-            <span className="font-sans text-[11px] text-on-surface-variant block">Compact chips, metadata badges</span>
-          </div>
+          </Card>
 
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-4 space-y-2 text-center">
-            <div className="h-12 flex items-center justify-center text-primary">
-              <Icon name="verified" size="md" />
+          <Card>
+            <div className="space-y-2 text-center">
+              <div className="h-12 flex items-center justify-center text-primary">
+                <Icon name="verified" size="md" />
+              </div>
+              <span className="font-label text-xs font-bold text-on-surface block">md (20px)</span>
+              <span className="font-sans text-xs text-on-surface-variant block">Buttons, input leading icons</span>
             </div>
-            <span className="font-label text-xs font-bold text-on-surface block">md (20px)</span>
-            <span className="font-sans text-[11px] text-on-surface-variant block">Buttons, input leading icons</span>
-          </div>
+          </Card>
 
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-4 space-y-2 text-center">
-            <div className="h-12 flex items-center justify-center text-primary">
-              <Icon name="verified" size="lg" />
+          <Card>
+            <div className="space-y-2 text-center">
+              <div className="h-12 flex items-center justify-center text-primary">
+                <Icon name="verified" size="lg" />
+              </div>
+              <span className="font-label text-xs font-bold text-on-surface block">lg (24px)</span>
+              <span className="font-sans text-xs text-on-surface-variant block">Default callout headers, toasts</span>
             </div>
-            <span className="font-label text-xs font-bold text-on-surface block">lg (24px)</span>
-            <span className="font-sans text-[11px] text-on-surface-variant block">Default callout headers, toasts</span>
-          </div>
+          </Card>
 
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-4 space-y-2 text-center">
-            <div className="h-12 flex items-center justify-center text-primary">
-              <Icon name="verified" size="xl" />
+          <Card>
+            <div className="space-y-2 text-center">
+              <div className="h-12 flex items-center justify-center text-primary">
+                <Icon name="verified" size="xl" />
+              </div>
+              <span className="font-label text-xs font-bold text-on-surface block">xl (32px)</span>
+              <span className="font-sans text-xs text-on-surface-variant block">Hero milestones, victory cards</span>
             </div>
-            <span className="font-label text-xs font-bold text-on-surface block">xl (32px)</span>
-            <span className="font-sans text-[11px] text-on-surface-variant block">Hero milestones, victory cards</span>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -79,48 +94,52 @@ export const IconStylingShowcase: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2">
-              <span className="font-label text-xs font-bold text-on-surface">Decorative Icon Pattern</span>
-              <span className="bg-success-container text-on-success-container font-label text-[10px] font-bold px-2 py-0.5 rounded-full">
-                aria-hidden="true"
-              </span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-surface-container rounded-[0.5rem]">
-              <span className="material-symbols-outlined text-primary text-2xl" aria-hidden="true">
-                medical_services
-              </span>
-              <div>
-                <p className="font-sans text-sm font-semibold text-on-surface">Speech Therapy Guide</p>
-                <p className="font-sans text-xs text-on-surface-variant">Decorative icon paired with explicit text label.</p>
+          <Card>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2">
+                <span className="font-label text-xs font-bold text-on-surface">Decorative Icon Pattern</span>
+                <Chip variant="tonal" colorRole="secondary" size="sm">
+                  aria-hidden="true"
+                </Chip>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-surface-container rounded">
+                <span className="text-primary">
+                  <Icon name="medical_services" size="lg" />
+                </span>
+                <div>
+                  <p className="font-sans text-sm font-semibold text-on-surface">Speech Therapy Guide</p>
+                  <p className="font-sans text-xs text-on-surface-variant">Decorative icon paired with explicit text label.</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2">
-              <span className="font-label text-xs font-bold text-on-surface">Standalone Interactive Icon Pattern</span>
-              <span className="bg-primary-container text-on-primary-container font-label text-[10px] font-bold px-2 py-0.5 rounded-full">
-                aria-label / sr-only
-              </span>
-            </div>
-            <div className="flex items-center gap-4 p-3 bg-surface-container rounded-[0.5rem]">
-              <Tooltip content="Print therapy summary">
-                <button
-                  type="button"
-                  aria-label="Print summary"
-                  className="h-11 w-11 rounded-[0.5rem] bg-surface border border-outline hover:bg-surface-variant text-on-surface flex items-center justify-center cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-                >
-                  <span className="material-symbols-outlined text-xl" aria-hidden="true">print</span>
-                  <span className="sr-only">Print therapy summary</span>
-                </button>
-              </Tooltip>
-              <div>
-                <p className="font-sans text-sm font-semibold text-on-surface">Standalone Icon Control</p>
-                <p className="font-sans text-xs text-on-surface-variant">Min 44x44px touch target + Tooltip hint + Screen-reader text.</p>
+          <Card>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2">
+                <span className="font-label text-xs font-bold text-on-surface">Standalone Interactive Icon Pattern</span>
+                <Chip variant="tonal" colorRole="primary" size="sm">
+                  aria-label / sr-only
+                </Chip>
+              </div>
+              <div className="flex items-center gap-4 p-3 bg-surface-container rounded">
+                <Tooltip content="Print therapy summary">
+                  <Button
+                    variant="outlined"
+                    size="icon"
+                    aria-label="Print summary"
+                  >
+                    <Icon name="print" size="md" />
+                    <span className="sr-only">Print therapy summary</span>
+                  </Button>
+                </Tooltip>
+                <div>
+                  <p className="font-sans text-sm font-semibold text-on-surface">Standalone Icon Control</p>
+                  <p className="font-sans text-xs text-on-surface-variant">Min 44x44px touch target + Tooltip hint + Screen-reader text.</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -133,44 +152,50 @@ export const IconStylingShowcase: React.FC = () => {
               Icon glyphs inside soft role-container washes (<code className="font-mono text-primary">primary-container</code>, <code className="font-mono text-primary">surface-variant</code>) with charcoal (<code className="font-mono">#1a1c1e</code>) or brand blue glyphs. Delivers visual weight, clear structural framing, and 8.0:1+ contrast.
             </p>
           </div>
-          <span className="bg-primary-container text-on-primary-container font-label text-xs font-bold px-3 py-1 rounded-full">
+          <Chip variant="tonal" colorRole="primary" size="sm">
             Common Row/Card Pattern
-          </span>
+          </Chip>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Primary Soft Container Tile */}
-          <div className="p-4 bg-surface border border-outline-variant rounded-[1rem] flex items-center gap-3.5">
-            <div className="h-12 w-12 rounded-[0.75rem] bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-2xl" aria-hidden="true">graphic_eq</span>
+          <Card>
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-md bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+                <Icon name="graphic_eq" size="lg" />
+              </div>
+              <div>
+                <p className="font-sans text-sm font-bold text-on-surface">Audio Wave Analysis</p>
+                <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">primary-container</code> wash</p>
+              </div>
             </div>
-            <div>
-              <p className="font-sans text-sm font-bold text-on-surface">Audio Wave Analysis</p>
-              <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">primary-container</code> wash</p>
-            </div>
-          </div>
+          </Card>
 
           {/* Surface-Variant Soft Tile */}
-          <div className="p-4 bg-surface border border-outline-variant rounded-[1rem] flex items-center gap-3.5">
-            <div className="h-12 w-12 rounded-[0.75rem] bg-surface-variant text-on-surface-variant flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-2xl" aria-hidden="true">record_voice_over</span>
+          <Card>
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-md bg-surface-variant text-on-surface-variant flex items-center justify-center shrink-0">
+                <Icon name="record_voice_over" size="lg" />
+              </div>
+              <div>
+                <p className="font-sans text-sm font-bold text-on-surface">Phoneme Speech Drill</p>
+                <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">surface-variant</code> wash</p>
+              </div>
             </div>
-            <div>
-              <p className="font-sans text-sm font-bold text-on-surface">Phoneme Speech Drill</p>
-              <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">surface-variant</code> wash</p>
-            </div>
-          </div>
+          </Card>
 
           {/* Tertiary Soft Tile */}
-          <div className="p-4 bg-surface border border-outline-variant rounded-[1rem] flex items-center gap-3.5">
-            <div className="h-12 w-12 rounded-[0.75rem] bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-2xl" aria-hidden="true">tune</span>
+          <Card>
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-md bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+                <Icon name="tune" size="lg" />
+              </div>
+              <div>
+                <p className="font-sans text-sm font-bold text-on-surface">Pitch Calibration</p>
+                <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">tertiary-container</code> wash</p>
+              </div>
             </div>
-            <div>
-              <p className="font-sans text-sm font-bold text-on-surface">Pitch Calibration</p>
-              <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">tertiary-container</code> wash</p>
-            </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -183,25 +208,25 @@ export const IconStylingShowcase: React.FC = () => {
               Bare Sunny Amber (<code className="font-mono font-bold text-tertiary">#F9A825</code>) icon glyphs fail contrast (1.99:1) on white. <code className="font-mono font-bold">DESIGN.md</code> requires a solid amber badge with charcoal (<code className="font-mono">#1a1c1e</code>) icon inside.
             </p>
           </div>
-          <span className="bg-tertiary-container text-on-tertiary-container font-label text-xs font-bold px-3 py-1 rounded-full">
+          <Chip variant="tonal" colorRole="tertiary" size="sm">
             8.66:1 AA Compliant
-          </span>
+          </Chip>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Compliant Pattern */}
-          <div className="rounded-[1rem] bg-surface border-2 border-success p-5 space-y-3">
+          <div className="rounded-lg bg-surface border-2 border-success p-5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-label text-xs font-bold text-success flex items-center gap-1">
-                <span className="material-symbols-outlined text-base">check_circle</span>
+                <Icon name="check_circle" size="xs" />
                 DESIGN.md Compliant: Solid Tertiary Badge
               </span>
               <span className="font-mono text-xs font-bold text-success">8.66:1 Contrast</span>
             </div>
-            <div className="p-4 bg-surface-container rounded-[0.5rem] flex items-center gap-4">
+            <div className="p-4 bg-surface-container rounded flex items-center gap-4">
               {/* Solid Amber Badge */}
-              <div className="h-10 w-10 rounded-[0.5rem] bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-xs font-bold">
-                <span className="material-symbols-outlined text-xl" aria-hidden="true">emoji_events</span>
+              <div className="h-10 w-10 rounded bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-xs font-bold">
+                <Icon name="emoji_events" size="md" />
               </div>
               <div>
                 <p className="font-sans text-sm font-bold text-on-surface">Milestone Unlocked Badge</p>
@@ -211,18 +236,18 @@ export const IconStylingShowcase: React.FC = () => {
           </div>
 
           {/* Banned Anti-Pattern */}
-          <div className="rounded-[1rem] bg-surface border-2 border-error p-5 space-y-3">
+          <div className="rounded-lg bg-surface border-2 border-error p-5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-label text-xs font-bold text-error flex items-center gap-1">
-                <span className="material-symbols-outlined text-base">cancel</span>
+                <Icon name="cancel" size="xs" />
                 Banned Anti-Pattern: Bare Amber Glyph on White
               </span>
               <span className="font-mono text-xs font-bold text-error">1.99:1 FAIL</span>
             </div>
-            <div className="p-4 bg-surface-container rounded-[0.5rem] flex items-center gap-4">
+            <div className="p-4 bg-surface-container rounded flex items-center gap-4">
               {/* Bare Amber Icon (FAILS CONTRAST) */}
-              <div className="h-10 w-10 rounded-[0.5rem] bg-surface border border-outline-variant flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-xl text-[#F9A825]" aria-hidden="true">emoji_events</span>
+              <div className="h-10 w-10 rounded bg-surface border border-outline-variant flex items-center justify-center shrink-0 text-secondary">
+                <Icon name="emoji_events" size="md" />
               </div>
               <div>
                 <p className="font-sans text-sm font-bold text-on-surface">Bare Amber Glyph (Banned)</p>
@@ -244,64 +269,70 @@ export const IconStylingShowcase: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Spotlight Tertiary Amber Icon */}
-          <div className="rounded-[1rem] bg-on-surface p-5 text-surface space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-label text-xs font-bold text-tertiary flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">stars</span>
-                Amber Accent Icon
-              </span>
-              <span className="font-mono text-[10px] bg-tertiary/20 text-tertiary px-2 py-0.5 rounded font-bold">8.66:1 AA</span>
-            </div>
-            <div className="flex items-center gap-3 pt-2">
-              <div className="h-10 w-10 rounded-[0.5rem] bg-white/10 flex items-center justify-center text-tertiary">
-                <span className="material-symbols-outlined text-2xl" aria-hidden="true">workspace_premium</span>
+          <Card variant="inverted" invertedAccent="tertiary">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-label text-xs font-bold text-tertiary flex items-center gap-1">
+                  <Icon name="stars" size="xs" />
+                  Amber Accent Icon
+                </span>
+                <span className="font-mono text-xs bg-tertiary/20 text-tertiary px-2 py-0.5 rounded font-bold">8.66:1 AA</span>
               </div>
-              <div>
-                <p className="font-sans text-sm font-bold text-white">Milestone Highlight</p>
-                <p className="font-sans text-xs text-white/70">Tertiary amber icon glyph on charcoal card.</p>
+              <div className="flex items-center gap-3 pt-2">
+                <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center text-tertiary">
+                  <Icon name="workspace_premium" size="lg" />
+                </div>
+                <div>
+                  <p className="font-sans text-sm font-bold text-white">Milestone Highlight</p>
+                  <p className="font-sans text-xs text-white/70">Tertiary amber icon glyph on charcoal card.</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Spotlight Secondary Emerald Icon */}
-          <div className="rounded-[1rem] bg-on-surface p-5 text-surface space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-label text-xs font-bold text-secondary-container flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">nature</span>
-                Emerald Accent Icon
-              </span>
-              <span className="font-mono text-[10px] bg-secondary/30 text-secondary-container px-2 py-0.5 rounded font-bold">3.2:1+ AA</span>
-            </div>
-            <div className="flex items-center gap-3 pt-2">
-              <div className="h-10 w-10 rounded-[0.5rem] bg-white/10 flex items-center justify-center text-[#26a69a]">
-                <span className="material-symbols-outlined text-2xl" aria-hidden="true">psychology</span>
+          <Card variant="inverted">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-label text-xs font-bold text-secondary-container flex items-center gap-1">
+                  <Icon name="nature" size="xs" />
+                  Emerald Accent Icon
+                </span>
+                <span className="font-mono text-xs bg-secondary/30 text-secondary-container px-2 py-0.5 rounded font-bold">3.2:1+ AA</span>
               </div>
-              <div>
-                <p className="font-sans text-sm font-bold text-white">Clinical Guidance</p>
-                <p className="font-sans text-xs text-white/70">High-contrast emerald icon glyph on charcoal card.</p>
+              <div className="flex items-center gap-3 pt-2">
+                <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center text-secondary-container">
+                  <Icon name="psychology" size="lg" />
+                </div>
+                <div>
+                  <p className="font-sans text-sm font-bold text-white">Clinical Guidance</p>
+                  <p className="font-sans text-xs text-white/70">High-contrast emerald icon glyph on charcoal card.</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Excluded Electric Blue Icon */}
-          <div className="rounded-[1rem] bg-on-surface p-5 text-surface space-y-3 opacity-80 border border-error/40">
-            <div className="flex items-center justify-between">
-              <span className="font-label text-xs font-bold text-error flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">block</span>
-                Primary Blue (Excluded)
-              </span>
-              <span className="font-mono text-[10px] bg-error/30 text-error px-2 py-0.5 rounded font-bold">2.97:1 FAIL</span>
-            </div>
-            <div className="flex items-center gap-3 pt-2">
-              <div className="h-10 w-10 rounded-[0.5rem] bg-white/10 flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-2xl" aria-hidden="true">local_hospital</span>
+          <Card variant="inverted">
+            <div className="opacity-80 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-label text-xs font-bold text-error flex items-center gap-1">
+                  <Icon name="block" size="xs" />
+                  Primary Blue (Excluded)
+                </span>
+                <span className="font-mono text-xs bg-error/30 text-error px-2 py-0.5 rounded font-bold">2.97:1 FAIL</span>
               </div>
-              <div>
-                <p className="font-sans text-sm font-bold text-white">Electric Blue (Banned)</p>
-                <p className="font-sans text-xs text-error font-medium">Excluded from Spotlight cards due to contrast failure on charcoal.</p>
+              <div className="flex items-center gap-3 pt-2">
+                <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center text-primary">
+                  <Icon name="local_hospital" size="lg" />
+                </div>
+                <div>
+                  <p className="font-sans text-sm font-bold text-white">Electric Blue (Banned)</p>
+                  <p className="font-sans text-xs text-error font-medium">Excluded from Spotlight cards due to contrast failure on charcoal.</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -310,37 +341,22 @@ export const IconStylingShowcase: React.FC = () => {
         <div className="border-b border-outline-variant pb-2">
           <h3 className="font-heading text-xl font-bold text-on-surface">4. Role-Colored Leading Icons (Flat Callout Banners)</h3>
           <p className="font-sans text-xs text-on-surface-variant">
-            Flat white <code className="font-mono text-on-surface">surface</code> background with a 4px left accent bar paired with a role-colored leading icon glyph for instant dual-coded visual recognition.
+            Flat white <code className="font-mono text-on-surface">surface</code> background with an accent bar paired with a role-colored leading icon glyph for instant dual-coded visual recognition.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Primary Callout Icon */}
-          <div className="rounded-[0.5rem] bg-surface border border-outline-variant border-l-[4px] border-l-primary p-4 flex items-start gap-3">
-            <span className="material-symbols-outlined text-primary text-xl shrink-0 mt-0.5" aria-hidden="true">info</span>
-            <div>
-              <p className="font-label text-xs font-bold text-on-surface">Primary Brand Tip</p>
-              <p className="font-sans text-xs text-on-surface-variant">Leading icon colored in Electric Blue (<code className="font-mono">#0052FF</code>).</p>
-            </div>
-          </div>
+          <InlineAlert title="Primary Brand Tip" role="neutral" icon="info">
+            Leading icon colored in Electric Blue (<code className="font-mono">#0052FF</code>).
+          </InlineAlert>
 
-          {/* Secondary Emerald Callout Icon */}
-          <div className="rounded-[0.5rem] bg-surface border border-outline-variant border-l-[4px] border-l-secondary p-4 flex items-start gap-3">
-            <span className="material-symbols-outlined text-secondary text-xl shrink-0 mt-0.5" aria-hidden="true">lightbulb</span>
-            <div>
-              <p className="font-label text-xs font-bold text-on-surface">Clinical Strategy Guide</p>
-              <p className="font-sans text-xs text-on-surface-variant">Leading icon colored in Rich Emerald (<code className="font-mono">#00796B</code>).</p>
-            </div>
-          </div>
+          <InlineAlert title="Clinical Strategy Guide" role="success" icon="lightbulb">
+            Leading icon colored in Rich Emerald (<code className="font-mono">#00796B</code>).
+          </InlineAlert>
 
-          {/* Error Callout Icon */}
-          <div className="rounded-[0.5rem] bg-surface border border-outline-variant border-l-[4px] border-l-error p-4 flex items-start gap-3">
-            <span className="material-symbols-outlined text-error text-xl shrink-0 mt-0.5" aria-hidden="true">error</span>
-            <div>
-              <p className="font-label text-xs font-bold text-on-surface">Critical Notice</p>
-              <p className="font-sans text-xs text-on-surface-variant">Leading icon colored in Destructive Red (<code className="font-mono">#ba1a1a</code>).</p>
-            </div>
-          </div>
+          <InlineAlert title="Critical Notice" role="error" icon="error">
+            Leading icon colored in Destructive Red (<code className="font-mono">#ba1a1a</code>).
+          </InlineAlert>
         </div>
       </section>
 
@@ -349,40 +365,42 @@ export const IconStylingShowcase: React.FC = () => {
         <div className="border-b border-outline-variant pb-2">
           <h3 className="font-heading text-xl font-bold text-on-surface">5. Functional State Toast Notification Icons</h3>
           <p className="font-sans text-xs text-on-surface-variant">
-            Tier C floating container (<code className="font-mono">rounded-[0.75rem]</code>, ambient shadow, borderless) with 4px left accent bar and matching state leading icon.
+            Tier C floating container (<code className="font-mono">rounded-md</code>, ambient shadow, borderless) with left accent bar and matching state leading icon.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Success Toast */}
-          <div className="rounded-[0.75rem] bg-surface shadow-ambient border-l-[4px] border-l-success p-4 flex items-center gap-3">
-            <span className="material-symbols-outlined text-success text-xl shrink-0" aria-hidden="true">check_circle</span>
+          <div className="rounded-md bg-surface shadow-ambient border-l-4 border-l-success p-4 flex items-center gap-3">
+            <span className="text-success shrink-0">
+              <Icon name="check_circle" size="md" />
+            </span>
             <div className="flex-1">
               <p className="font-label text-xs font-bold text-on-surface">Exercise Saved</p>
-              <p className="font-sans text-[11px] text-on-surface-variant">Patient score recorded successfully.</p>
+              <p className="font-sans text-xs text-on-surface-variant">Patient score recorded successfully.</p>
             </div>
           </div>
 
-          {/* Warning Toast */}
-          <div className="rounded-[0.75rem] bg-surface shadow-ambient border-l-[4px] border-l-warning p-4 flex items-center gap-3">
-            <span className="material-symbols-outlined text-warning text-xl shrink-0" aria-hidden="true">warning</span>
+          <div className="rounded-md bg-surface shadow-ambient border-l-4 border-l-warning p-4 flex items-center gap-3">
+            <span className="text-warning shrink-0">
+              <Icon name="warning" size="md" />
+            </span>
             <div className="flex-1">
               <p className="font-label text-xs font-bold text-on-surface">Session Expiring</p>
-              <p className="font-sans text-[11px] text-on-surface-variant">Inactivity timeout in 2 minutes.</p>
+              <p className="font-sans text-xs text-on-surface-variant">Inactivity timeout in 2 minutes.</p>
             </div>
           </div>
 
-          {/* Error Toast */}
-          <div className="rounded-[0.75rem] bg-surface shadow-ambient border-l-[4px] border-l-error p-4 flex items-center gap-3">
-            <span className="material-symbols-outlined text-error text-xl shrink-0" aria-hidden="true">report</span>
+          <div className="rounded-md bg-surface shadow-ambient border-l-4 border-l-error p-4 flex items-center gap-3">
+            <span className="text-error shrink-0">
+              <Icon name="report" size="md" />
+            </span>
             <div className="flex-1">
               <p className="font-label text-xs font-bold text-on-surface">Connection Interrupted</p>
-              <p className="font-sans text-[11px] text-on-surface-variant">Failed to sync audio recording.</p>
+              <p className="font-sans text-xs text-on-surface-variant">Failed to sync audio recording.</p>
             </div>
           </div>
         </div>
       </section>
-
       {/* 6. Form Validation & Interactive State Icons */}
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
@@ -393,77 +411,52 @@ export const IconStylingShowcase: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Error Input Validation Icon */}
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-5 space-y-3">
-            <span className="font-label text-xs font-bold text-on-surface">Leading Error Validation Icon</span>
-            <div className="space-y-1.5">
-              <label className="block font-label text-xs font-bold text-on-surface">Patient ID (required)</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-error text-lg pointer-events-none" aria-hidden="true">
-                  error
-                </span>
-                <input
-                  type="text"
+          <Card>
+            <div className="space-y-3">
+              <span className="font-label text-xs font-bold text-on-surface">Leading Error Validation Icon</span>
+              <Field label="Patient ID (required)" error="Format must be SLT-XXXXX.">
+                <Input
                   readOnly
-                  value="INVALID-ID-99"
-                  className="w-full pl-9 pr-3 py-2.5 rounded-[0.5rem] border-2 border-error bg-surface font-sans text-sm text-on-surface focus:outline-none"
+                  defaultValue="INVALID-ID-99"
+                  leadingIcon={<Icon name="error" size="sm" />}
+                  error
                 />
-              </div>
-              <p className="font-sans text-xs text-error font-medium flex items-center gap-1">
-                Format must be SLT-XXXXX.
-              </p>
+              </Field>
             </div>
-          </div>
+          </Card>
 
-          {/* Solid Checked & Pressed Controls */}
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-5 space-y-3">
-            <span className="font-label text-xs font-bold text-on-surface">Solid Brand Control Icons</span>
-            <div className="space-y-3 pt-1">
-              <div className="flex items-center gap-3">
-                <div className="h-6 w-6 rounded-[0.5rem] bg-primary text-on-primary flex items-center justify-center">
-                  <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">check</span>
+          <Card>
+            <div className="space-y-3">
+              <span className="font-label text-xs font-bold text-on-surface">Solid Brand Control Icons</span>
+              <div className="space-y-3 pt-1">
+                <Checkbox checked readOnly label={<span className="font-sans text-xs font-semibold text-on-surface">Checked Checkbox Icon</span>} />
+                <div>
+                  <Toggle
+                    pressed={togglePressed}
+                    onPressedChange={setTogglePressed}
+                  >
+                    <Icon name="format_bold" size="sm" />
+                    <span>{togglePressed ? 'Pressed Solid Icon' : 'Unpressed Icon'}</span>
+                  </Toggle>
                 </div>
-                <span className="font-sans text-xs font-semibold text-on-surface">Checked Checkbox Icon (<code className="font-mono text-primary">on-primary</code>)</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setTogglePressed(!togglePressed)}
-                  className={`px-3 py-1.5 rounded-[0.5rem] font-label text-xs font-bold inline-flex items-center gap-2 cursor-pointer transition-colors ${
-                    togglePressed ? 'bg-primary text-on-primary' : 'bg-surface border border-outline text-on-surface'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-base" aria-hidden="true">format_bold</span>
-                  <span>{togglePressed ? 'Pressed Solid Icon' : 'Unpressed Icon'}</span>
-                </button>
               </div>
             </div>
-          </div>
+          </Card>
 
-          {/* Smoothly Rotating Accordion Chevron */}
-          <div className="rounded-[1rem] bg-surface border border-outline-variant p-5 space-y-3">
-            <span className="font-label text-xs font-bold text-on-surface">Rotating Interactive Chevron Icon</span>
-            <button
-              type="button"
-              onClick={() => setAccordionOpen(!accordionOpen)}
-              className="w-full p-3 rounded-[0.5rem] bg-surface-container flex items-center justify-between font-label text-xs font-bold text-on-surface cursor-pointer hover:bg-surface-variant transition-colors"
-            >
-              <span>{accordionOpen ? 'Collapse Section' : 'Expand Section'}</span>
-              <span
-                className={`material-symbols-outlined text-on-surface-variant transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                  accordionOpen ? 'rotate-180' : 'rotate-0'
-                }`}
-                aria-hidden="true"
-              >
-                expand_more
-              </span>
-            </button>
-            {accordionOpen && (
-              <p className="font-sans text-xs text-on-surface-variant p-2 bg-surface rounded border border-outline-variant">
-                Accordion panel content smoothly revealed using Popover/Menu motion tokens (250ms / 150ms).
-              </p>
-            )}
-          </div>
+          <Card>
+            <div className="space-y-3">
+              <span className="font-label text-xs font-bold text-on-surface">Rotating Interactive Chevron Icon</span>
+              <Accordion
+                items={[
+                  {
+                    id: 'accordion-sample',
+                    title: 'Expandable Clinical Details',
+                    content: 'Accordion panel content smoothly revealed using Popover/Menu motion tokens (250ms / 150ms).',
+                  },
+                ]}
+              />
+            </div>
+          </Card>
         </div>
       </section>
 
@@ -476,39 +469,36 @@ export const IconStylingShowcase: React.FC = () => {
           </p>
         </div>
 
-        <div className="rounded-[1rem] bg-surface border border-outline-variant p-6 space-y-4">
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Primary Filled Button with Icon */}
-            <Button colorRole="primary">
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">play_arrow</span>
-              <span>Start Exercise</span>
-            </Button>
+        <Card>
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <Button colorRole="primary">
+                <Icon name="play_arrow" size="md" />
+                <span>Start Exercise</span>
+              </Button>
 
-            {/* Outlined Button with Icon */}
-            <Button variant="outlined" colorRole="primary">
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">download</span>
-              <span>Export Report</span>
-            </Button>
+              <Button variant="outlined" colorRole="primary">
+                <Icon name="download" size="md" />
+                <span>Export Report</span>
+              </Button>
 
-            {/* Text Button with Icon */}
-            <Button variant="text" colorRole="tertiary">
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">menu_book</span>
-              <span>View Guide</span>
-            </Button>
+              <Button variant="text" colorRole="tertiary">
+                <Icon name="menu_book" size="md" />
+                <span>View Guide</span>
+              </Button>
 
-            {/* Secondary Amber Filled Button with Icon */}
-            <Button colorRole="secondary">
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">emoji_events</span>
-              <span>Claim Milestone</span>
-            </Button>
+              <Button colorRole="secondary">
+                <Icon name="emoji_events" size="md" />
+                <span>Claim Milestone</span>
+              </Button>
 
-            {/* Error Destructive Button with Icon */}
-            <Button colorRole="error">
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">delete</span>
-              <span>Delete Session</span>
-            </Button>
+              <Button colorRole="error">
+                <Icon name="delete" size="md" />
+                <span>Delete Session</span>
+              </Button>
+            </div>
           </div>
-        </div>
+        </Card>
       </section>
 
       {/* 8. Brand Mark Pictorial Icon */}
@@ -520,36 +510,42 @@ export const IconStylingShowcase: React.FC = () => {
           </p>
         </div>
 
-        <div className="rounded-[1rem] bg-surface border border-outline-variant p-6 flex flex-wrap items-center gap-8">
-          <div className="flex items-center gap-3">
-            <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol 32px" className="h-8 w-8 object-contain" />
-            <div>
-              <p className="font-label text-xs font-bold text-on-surface">32px Favicon / Header Grid</p>
-              <p className="font-sans text-xs text-on-surface-variant">2rem x 2rem compact size</p>
+        <Card>
+          <div className="flex flex-wrap items-center gap-8">
+            <div className="flex items-center gap-3">
+              <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol 32px" className="h-8 w-8 object-contain" />
+              <div>
+                <p className="font-label text-xs font-bold text-on-surface">32px Favicon / Header Grid</p>
+                <p className="font-sans text-xs text-on-surface-variant">2rem x 2rem compact size</p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol 40px" className="h-10 w-10 object-contain" />
-            <div>
-              <p className="font-label text-xs font-bold text-on-surface">40px General UI Grid</p>
-              <p className="font-sans text-xs text-on-surface-variant">2.5rem x 2.5rem standard size</p>
+            <div className="flex items-center gap-3">
+              <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol 40px" className="h-10 w-10 object-contain" />
+              <div>
+                <p className="font-label text-xs font-bold text-on-surface">40px General UI Grid</p>
+                <p className="font-sans text-xs text-on-surface-variant">2.5rem x 2.5rem standard size</p>
+              </div>
             </div>
           </div>
-        </div>
+        </Card>
       </section>
 
       {/* 9. Comprehensive Design System Icon Audit & Gaps Analysis */}
-      <section className="rounded-[1rem] bg-surface-container border border-outline-variant p-6 space-y-4">
+      <section className="rounded-lg bg-surface-container border border-outline-variant p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">verified</span>
+          <span className="text-primary">
+            <Icon name="verified" size="md" />
+          </span>
           <h3 className="font-heading text-lg font-bold text-on-surface">Design System Icon Rules & Gaps Audit</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans text-on-surface-variant">
-          <div className="p-4 rounded-[0.5rem] bg-surface border border-outline-variant space-y-2">
+          <div className="p-4 rounded bg-surface border border-outline-variant space-y-2">
             <p className="font-label font-bold text-on-surface flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-success text-base">check_circle</span>
+              <span className="text-success">
+                <Icon name="check_circle" size="xs" />
+              </span>
               Explicitly Sanctioned Icon Rules in DESIGN.md
             </p>
             <ul className="list-disc pl-5 space-y-1">
@@ -561,9 +557,11 @@ export const IconStylingShowcase: React.FC = () => {
             </ul>
           </div>
 
-          <div className="p-4 rounded-[0.5rem] bg-surface border border-outline-variant space-y-2">
+          <div className="p-4 rounded bg-surface border border-outline-variant space-y-2">
             <p className="font-label font-bold text-on-surface flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-warning text-base">warning</span>
+              <span className="text-warning">
+                <Icon name="warning" size="xs" />
+              </span>
               Icon Styling Gaps & Banned Fallbacks
             </p>
             <ul className="list-disc pl-5 space-y-1">
