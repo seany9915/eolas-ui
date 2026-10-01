@@ -9,6 +9,7 @@ interface ResizableContextType {
   registerPanel: (index: number, defaultSize: number) => void;
   isDragging: boolean;
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
+  groupRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const ResizableContext = React.createContext<ResizableContextType | null>(null);
@@ -22,6 +23,7 @@ export const ResizablePanelGroup = React.forwardRef<HTMLDivElement, ResizablePan
   ({ className, direction = 'horizontal', children, ...props }, ref) => {
     const [panelSizes, setPanelSizes] = React.useState<number[]>([]);
     const [isDragging, setIsDragging] = React.useState(false);
+    const internalGroupRef = React.useRef<HTMLDivElement | null>(null);
 
     const registerPanel = React.useCallback((index: number, defaultSize: number) => {
       setPanelSizes((prev) => {
@@ -32,6 +34,18 @@ export const ResizablePanelGroup = React.forwardRef<HTMLDivElement, ResizablePan
       });
     }, []);
 
+    const setMergedRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        internalGroupRef.current = node;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }
+      },
+      [ref]
+    );
+
     return (
       <ResizableContext.Provider
         value={{
@@ -41,10 +55,11 @@ export const ResizablePanelGroup = React.forwardRef<HTMLDivElement, ResizablePan
           registerPanel,
           isDragging,
           setIsDragging,
+          groupRef: internalGroupRef,
         }}
       >
         <div
-          ref={ref}
+          ref={setMergedRef}
           className={cn(
             '@container flex h-full w-full overflow-hidden rounded-lg border border-outline-variant bg-surface',
             direction === 'horizontal' ? 'flex-row' : 'flex-col',
@@ -141,20 +156,18 @@ export const ResizableHandle = React.forwardRef<HTMLDivElement, ResizableHandleP
       const startX = e.clientX;
       const startY = e.clientY;
       const initialSizes = [...ctx.panelSizes];
+      const container = ctx.groupRef.current;
+      const rect = container?.getBoundingClientRect();
 
       const onMouseMove = (moveEvent: MouseEvent) => {
         const delta = isHorizontal ? moveEvent.clientX - startX : moveEvent.clientY - startY;
-        const container = (e.target as HTMLElement).closest('.flex');
-        if (!container) return;
-
-        const totalPx = isHorizontal ? container.clientWidth : container.clientHeight;
+        const totalPx = rect ? (isHorizontal ? rect.width : rect.height) : (isHorizontal ? 500 : 300);
+        if (!totalPx) return;
         const deltaPercent = (delta / totalPx) * 100;
 
-        ctx.setPanelSizes(([left = 50]) => {
-          const initialLeft = initialSizes[0] ?? 50;
-          const newLeft = Math.min(85, Math.max(15, initialLeft + deltaPercent));
-          return [newLeft, 100 - newLeft];
-        });
+        const initialLeft = initialSizes[0] ?? 50;
+        const newLeft = Math.min(85, Math.max(15, initialLeft + deltaPercent));
+        ctx.setPanelSizes([newLeft, 100 - newLeft]);
       };
 
       const onMouseUp = () => {
@@ -175,22 +188,20 @@ export const ResizableHandle = React.forwardRef<HTMLDivElement, ResizableHandleP
       const startX = touch.clientX;
       const startY = touch.clientY;
       const initialSizes = [...ctx.panelSizes];
+      const container = ctx.groupRef.current;
+      const rect = container?.getBoundingClientRect();
 
       const onTouchMove = (moveEvent: TouchEvent) => {
         if (moveEvent.touches.length === 0) return;
         const moveTouch = moveEvent.touches[0];
         const delta = isHorizontal ? moveTouch.clientX - startX : moveTouch.clientY - startY;
-        const container = (e.target as HTMLElement).closest('.flex');
-        if (!container) return;
-
-        const totalPx = isHorizontal ? container.clientWidth : container.clientHeight;
+        const totalPx = rect ? (isHorizontal ? rect.width : rect.height) : (isHorizontal ? 500 : 300);
+        if (!totalPx) return;
         const deltaPercent = (delta / totalPx) * 100;
 
-        ctx.setPanelSizes(([left = 50]) => {
-          const initialLeft = initialSizes[0] ?? 50;
-          const newLeft = Math.min(85, Math.max(15, initialLeft + deltaPercent));
-          return [newLeft, 100 - newLeft];
-        });
+        const initialLeft = initialSizes[0] ?? 50;
+        const newLeft = Math.min(85, Math.max(15, initialLeft + deltaPercent));
+        ctx.setPanelSizes([newLeft, 100 - newLeft]);
       };
 
       const onTouchEnd = () => {

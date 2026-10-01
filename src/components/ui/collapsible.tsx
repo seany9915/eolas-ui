@@ -17,16 +17,17 @@ export interface CollapsibleProps {
 export interface CollapsiblePanelProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Panel> {
   children?: React.ReactNode;
   className?: string;
+  unstyled?: boolean;
 }
 
 export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePanelProps>(
-  ({ children, className, ...props }, ref) => (
+  ({ children, className, unstyled = false, ...props }, ref) => (
     <BaseCollapsible.Panel
       ref={ref}
       className="flex flex-col justify-end overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-150 ease-out data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
       {...props}
     >
-      <div className={cn('pt-3 border-t border-outline-variant/40 font-sans text-xs text-on-surface-variant leading-relaxed', className)}>
+      <div className={cn(unstyled ? '' : 'pt-3 border-t border-outline-variant/40 font-sans text-xs text-on-surface-variant leading-relaxed', className)}>
         {children}
       </div>
     </BaseCollapsible.Panel>

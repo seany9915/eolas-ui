@@ -24,26 +24,24 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
   ({ children, duration = 150, className, ...props }, ref) => {
     const [currentText, setCurrentText] = React.useState(children);
     const [prevText, setPrevText] = React.useState<React.ReactNode | null>(null);
-    const [phase, setPhase] = React.useState<'idle' | 'exit' | 'enter'>('idle');
+    const [isExiting, setIsExiting] = React.useState(false);
+    const currentRef = React.useRef(children);
 
     React.useEffect(() => {
-      if (children !== currentText) {
-        setPrevText(currentText);
+      if (children !== currentRef.current) {
+        setPrevText(currentRef.current);
         setCurrentText(children);
-        setPhase('exit');
+        currentRef.current = children;
+        setIsExiting(true);
 
-        const exitTimer = window.setTimeout(() => {
-          setPhase('enter');
-          const enterTimer = window.setTimeout(() => {
-            setPhase('idle');
-            setPrevText(null);
-          }, duration);
-          return () => window.clearTimeout(enterTimer);
+        const timer = window.setTimeout(() => {
+          setIsExiting(false);
+          setPrevText(null);
         }, duration);
 
-        return () => window.clearTimeout(exitTimer);
+        return () => window.clearTimeout(timer);
       }
-    }, [children, currentText, duration]);
+    }, [children, duration]);
 
     return (
       <span
@@ -54,21 +52,23 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
         )}
         {...props}
       >
-        {prevText !== null && phase === 'exit' && (
+        {isExiting && prevText !== null && (
           <span
             aria-hidden="true"
-            className="col-start-1 row-start-1 opacity-0 -translate-y-1 blur-[var(--blur-small,2px)] transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-in-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none pointer-events-none"
+            className="col-start-1 row-start-1 opacity-0 -translate-y-2 blur-[var(--blur-small,2px)] transition-[opacity,transform,filter] ease-[var(--ease-standard)] motion-reduce:transition-none pointer-events-none"
+            style={{ transitionDuration: `${duration}ms` }}
           >
             {prevText}
           </span>
         )}
         <span
           className={cn(
-            'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-in-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
-            phase === 'exit'
-              ? 'opacity-0 translate-y-1 blur-[var(--blur-small,2px)]'
-              : 'opacity-100 translate-y-0 blur-none'
+            'col-start-1 row-start-1 transition-[opacity,transform] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            isExiting
+              ? 'opacity-0 translate-y-1'
+              : 'opacity-100 translate-y-0'
           )}
+          style={{ transitionDuration: `${duration}ms` }}
         >
           {currentText}
         </span>

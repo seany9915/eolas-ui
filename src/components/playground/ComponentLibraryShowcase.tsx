@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/input';
 import { Checkbox, Radio, RadioGroup, Switch } from '@/components/ui/selection-controls';
@@ -39,7 +40,7 @@ import { Separator } from '@/components/ui/separator';
 import { Toolbar } from '@/components/ui/toolbar';
 import { DirectionProvider, type TextDirection } from '@/components/ui/direction-provider';
 import { ThinkingOrb, type OrbState } from '@/components/ui/thinking-orb';
-import { BotAvatar, type BotAvatarType, type BotAvatarState } from '@/components/ui/bot-avatar';
+import { BotAvatar, botAvatarTypes, type BotAvatarType, type BotAvatarState } from '@/components/ui/bot-avatar';
 import { Icon } from '@/components/ui/icon';
 import { ThinkingTrace } from '@/components/ui/thinking-trace';
 import { ApprovalCard } from '@/components/ui/approval-card';
@@ -1358,14 +1359,10 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 label="Character"
                 value={botType}
                 onValueChange={(val) => setBotType(val as BotAvatarType)}
-                options={[
-                  { value: 'clover', label: 'Clover' },
-                  { value: 'cat', label: 'Cat' },
-                  { value: 'cloud', label: 'Cloud' },
-                  { value: 'blob', label: 'Blob' },
-                  { value: 'droid', label: 'Droid' },
-                  { value: 'star', label: 'Star' },
-                ]}
+                options={botAvatarTypes.map((type) => ({
+                  value: type,
+                  label: type.charAt(0).toUpperCase() + type.slice(1),
+                }))}
               />
 
               <Select
@@ -1419,6 +1416,112 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   compact
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Complete Bot Archetypes & Thinking Orb States Showcase */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* All 18 Bot Avatars Gallery */}
+          <div className="rounded-lg bg-surface border border-outline-variant p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-heading text-base font-bold text-on-surface">All 18 Bot Avatar Archetypes</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-1">
+                  Complete catalogue of 18 3D geometric shapes with living eyes and interactive hover glances.
+                </p>
+              </div>
+              <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-surface-container text-primary">
+                18 archetypes
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 pt-2">
+              {botAvatarTypes.map((arch) => (
+                <button
+                  key={arch}
+                  type="button"
+                  onClick={() => setBotType(arch)}
+                  className={cn(
+                    'flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all cursor-pointer text-center group min-h-24',
+                    botType === arch
+                      ? 'border-primary bg-primary/5 shadow-ambient ring-2 ring-primary/20'
+                      : 'border-outline-variant/60 bg-surface hover:bg-surface-container/60 hover:border-outline-variant'
+                  )}
+                  aria-label={`Select ${arch} avatar archetype`}
+                >
+                  <BotAvatar
+                    type={arch}
+                    state={botType === arch ? botState : 'default'}
+                    tone={botTone}
+                    size="sm"
+                    interactive={false}
+                  />
+                  <span className={cn(
+                    'font-mono text-xs mt-1.5 capitalize transition-colors',
+                    botType === arch ? 'font-bold text-primary' : 'text-on-surface-variant group-hover:text-on-surface'
+                  )}>
+                    {arch}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* All Thinking Orb States Gallery */}
+          <div className="rounded-lg bg-surface border border-outline-variant p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-heading text-base font-bold text-on-surface">All Thinking Orb States & Phases</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-1">
+                  Agentic activity states with distinct motion signatures, visible text labels, and ARIA live regions.
+                </p>
+              </div>
+              <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-surface-container text-primary">
+                9 states
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              {(
+                [
+                  { state: 'working', label: 'Working' },
+                  { state: 'searching', label: 'Searching' },
+                  { state: 'solving', label: 'Solving' },
+                  { state: 'listening', label: 'Listening' },
+                  { state: 'connecting', label: 'Connecting' },
+                  { state: 'weaving', label: 'Weaving' },
+                  { state: 'composing', label: 'Composing' },
+                  { state: 'breathing', label: 'Breathing' },
+                  { state: 'shaping', label: 'Shaping' },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.state}
+                  type="button"
+                  onClick={() => setOrbState(item.state)}
+                  className={cn(
+                    'flex items-center gap-2.5 p-3 rounded-lg border text-left transition-all cursor-pointer min-h-13',
+                    orbState === item.state
+                      ? 'border-primary bg-primary/5 shadow-ambient ring-2 ring-primary/20'
+                      : 'border-outline-variant/60 bg-surface hover:bg-surface-container/60 hover:border-outline-variant'
+                  )}
+                  aria-label={`Select ${item.label} orb state`}
+                >
+                  <ThinkingOrb state={item.state} size="sm" className="shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className={cn(
+                      'font-sans text-xs capitalize',
+                      orbState === item.state ? 'font-bold text-primary' : 'font-medium text-on-surface'
+                    )}>
+                      {item.label}
+                    </span>
+                    <span className="font-mono text-xs text-on-surface-variant/70 truncate">
+                      {item.state}
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -1774,11 +1877,11 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   <h4 className="font-heading text-base font-bold text-on-surface mb-2">
                     Clinical Drill Modules (Carousel)
                   </h4>
-                  <div className="px-8 py-2 relative">
+                  <div className="py-2 relative">
                     <Carousel className="w-full">
                       <CarouselContent>
                         <CarouselItem>
-                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                          <div className="p-5 px-12 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
                             <div>
                               <span className="font-label text-xs font-bold text-primary">Module 01</span>
                               <h5 className="font-heading text-sm font-bold text-on-surface">Vowel Prolongation (/a/, /i/, /u/)</h5>
@@ -1788,7 +1891,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                           </div>
                         </CarouselItem>
                         <CarouselItem>
-                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                          <div className="p-5 px-12 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
                             <div>
                               <span className="font-label text-xs font-bold text-secondary">Module 02</span>
                               <h5 className="font-heading text-sm font-bold text-on-surface">Pitch Glide Dynamics</h5>
@@ -1798,7 +1901,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                           </div>
                         </CarouselItem>
                         <CarouselItem>
-                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                          <div className="p-5 px-12 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
                             <div>
                               <span className="font-label text-xs font-bold text-tertiary">Module 03</span>
                               <h5 className="font-heading text-sm font-bold text-on-surface">Plosive Consonant Articulation</h5>

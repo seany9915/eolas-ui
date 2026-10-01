@@ -35,9 +35,9 @@ export const ThinkingTrace: React.FC<ThinkingTraceProps> = ({
   children,
 }) => {
   return (
-    <div className={cn('@container my-2 w-full max-w-xl', className)}>
-      <Collapsible defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
-        <CollapsibleTrigger hideChevron className="min-h-[44px] px-3.5 py-2 rounded-md border border-outline-variant bg-surface-container/40 hover:bg-surface-container font-sans text-xs font-medium text-on-surface-variant transition-colors flex items-center justify-between w-full">
+    <div className={cn('@container my-2 w-full max-w-xl rounded-lg border border-outline-variant bg-surface overflow-hidden shadow-ambient', className)}>
+      <Collapsible.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange} className="w-full">
+        <CollapsibleTrigger hideChevron className="min-h-[44px] px-3.5 py-2.5 bg-surface-container/30 hover:bg-surface-container/60 font-sans text-xs font-medium text-on-surface-variant transition-colors flex items-center justify-between w-full rounded-none">
           <div className="flex items-center gap-2">
             <Icon name={icon} size="sm" className="text-primary text-base" />
             <span className="font-sans text-xs font-semibold text-on-surface">{title}</span>
@@ -54,18 +54,18 @@ export const ThinkingTrace: React.FC<ThinkingTraceProps> = ({
           />
         </CollapsibleTrigger>
 
-        <CollapsiblePanel className="pt-2">
-          <div className="relative pl-6 py-2">
+        <CollapsiblePanel unstyled className="p-4 pt-2 border-t border-outline-variant/50">
+          <div className="relative pl-7 py-1">
             {/* Vertical Timeline Track */}
-            <div className="absolute left-2.5 top-3 bottom-3 w-px bg-outline-variant" aria-hidden="true" />
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-outline-variant" aria-hidden="true" />
 
             {/* Steps Sequence */}
-            <div className="flex flex-col gap-3 font-sans text-xs text-on-surface-variant">
+            <div className="flex flex-col gap-3.5 font-sans text-xs text-on-surface-variant">
               {steps.map((step) => (
-                <div key={step.id} className="relative flex items-start gap-2.5">
+                <div key={step.id} className="relative flex items-start gap-3">
                   <div
                     className={cn(
-                      'absolute -left-6 mt-0.5 flex size-4 items-center justify-center rounded-full bg-surface border',
+                      'absolute -left-7 mt-0.5 flex size-4 items-center justify-center rounded-full bg-surface border z-10',
                       step.isComplete
                         ? 'border-primary text-primary'
                         : 'border-outline text-outline'
@@ -87,11 +87,15 @@ export const ThinkingTrace: React.FC<ThinkingTraceProps> = ({
                   </div>
                 </div>
               ))}
-              {children}
+              {children && (
+                <div className="pt-2 text-xs text-on-surface-variant border-t border-outline-variant/30">
+                  {children}
+                </div>
+              )}
             </div>
           </div>
         </CollapsiblePanel>
-      </Collapsible>
+      </Collapsible.Root>
     </div>
   );
 };
