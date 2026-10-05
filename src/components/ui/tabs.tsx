@@ -216,7 +216,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         disabled={disabled}
         className={cn(
           // Retain font-semibold across both active and inactive to prevent layout shift
-          'inline-flex items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
+          'inline-flex items-center justify-center gap-2 sm:gap-2.5 font-label font-semibold transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
           sizeClasses,
           effectiveVariant === 'unstyled'
             ? ''
@@ -262,7 +262,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
             {icon}
           </span>
         )}
-        <span>{children}</span>
+        {children}
       </BaseTabs.Tab>
     );
   }

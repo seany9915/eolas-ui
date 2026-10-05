@@ -50,9 +50,9 @@ const variantStyles: Record<ToggleVariant, string> = {
 };
 
 const sizeStyles: Record<ToggleSize, string> = {
-  sm: 'h-9 px-3 min-w-[36px] text-xs gap-1.5 rounded-sm',
-  md: 'h-11 px-4 min-w-[44px] min-h-[44px] text-sm gap-2 rounded',
-  lg: 'h-12 px-5 min-w-[48px] min-h-[48px] text-base gap-2.5 rounded-md',
+  sm: 'h-9 px-3 min-w-[36px] text-xs gap-2 rounded-sm',
+  md: 'h-11 px-4 min-w-[44px] min-h-[44px] text-sm gap-2.5 rounded',
+  lg: 'h-12 px-5 min-w-[48px] min-h-[48px] text-base gap-3 rounded-md',
 };
 
 const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<any>>(
