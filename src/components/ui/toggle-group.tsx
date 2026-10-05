@@ -1,55 +1,105 @@
 /**
  * ToggleGroup primitive (@base-ui/react/toggle-group).
  *
+ * Base UI Documentation: https://base-ui.com/react/components/toggle-group
+ *
  * TAXONOMY & USAGE:
  * - Use ToggleGroup for mutually exclusive or multi-select option switches (e.g. text align, view mode grid/list, filter tags)
  *   where selection updates state/data in-place without switching or hiding full views or panels.
  * - Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role="tablist").
  * - Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role="toolbar").
  * - Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).
- * - Focus ring uses `focus-visible:outline-offset-1 focus-visible:z-10` to avoid clipping against adjacent buttons.
+ * - Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items.
  */
 import * as React from 'react';
 import { ToggleGroup as BaseToggleGroup } from '@base-ui/react/toggle-group';
 import { Toggle as BaseToggle } from '@base-ui/react/toggle';
 import { cn } from '@/lib/utils';
 
-export interface ToggleGroupItemProps extends Omit<React.ComponentPropsWithoutRef<typeof BaseToggle>, 'children'> {
+export type ToggleGroupVariant = 'default' | 'outline' | 'segmented';
+export type ToggleGroupSize = 'sm' | 'md' | 'lg';
+
+interface ToggleGroupContextValue {
+  variant: ToggleGroupVariant;
+  size: ToggleGroupSize;
+  orientation: 'horizontal' | 'vertical';
+}
+
+const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
+  variant: 'default',
+  size: 'md',
+  orientation: 'horizontal',
+});
+
+export interface ToggleGroupItemProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseToggle>, 'children'> {
   value: string;
   ariaLabel?: string;
   'aria-label'?: string;
   children: React.ReactNode;
-  disabled?: boolean;
-  className?: string;
+  icon?: string;
+  variant?: ToggleGroupVariant;
+  size?: ToggleGroupSize;
 }
 
 export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
-  ({ value, ariaLabel, 'aria-label': ariaLabelProp, children, disabled, className, ...props }, ref) => {
+  (
+    {
+      value,
+      ariaLabel,
+      'aria-label': ariaLabelProp,
+      children,
+      icon,
+      disabled,
+      variant,
+      size,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const groupContext = React.useContext(ToggleGroupContext);
+    const effectiveVariant = variant ?? groupContext.variant;
+    const effectiveSize = size ?? groupContext.size;
     const label = ariaLabel ?? ariaLabelProp;
+
+    const sizeClasses = {
+      sm: 'h-9 px-2.5 min-w-[36px] text-xs gap-1.5',
+      md: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-sm gap-2',
+      lg: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-base gap-2.5',
+    }[effectiveSize];
+
     return (
       <BaseToggle
         ref={ref}
         value={value}
         aria-label={label}
         disabled={disabled}
-        render={(renderProps, state) => (
-          <button
-            {...renderProps}
-            data-state={state.pressed ? 'on' : 'off'}
-          />
-        )}
         className={cn(
-          'inline-flex items-center justify-center gap-2 h-full px-4 rounded-sm font-label text-sm font-semibold transition-all cursor-pointer select-none min-h-[38px]',
-          'text-on-surface-variant hover:text-on-surface hover:bg-surface/50',
-          'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:shadow-sm',
-          'data-[state=on]:bg-primary data-[state=on]:text-on-primary data-[state=on]:shadow-sm',
-          'aria-pressed:bg-primary aria-pressed:text-on-primary aria-pressed:shadow-sm',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center rounded-sm font-label font-semibold cursor-pointer select-none',
+          'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+          'active:scale-[var(--scale-tiny)] motion-reduce:transform-none motion-reduce:transition-none',
+          sizeClasses,
+          effectiveVariant === 'outline'
+            ? cn(
+                'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 border border-transparent',
+                'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:shadow-ambient'
+              )
+            : cn(
+                'text-on-surface-variant hover:text-on-surface hover:bg-surface/50',
+                'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:shadow-ambient'
+              ),
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
           className
         )}
         {...props}
       >
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
         {children}
       </BaseToggle>
     );
@@ -57,13 +107,28 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
 );
 ToggleGroupItem.displayName = 'ToggleGroupItem';
 
-interface BaseToggleGroupCommonProps extends Omit<React.ComponentPropsWithoutRef<'div'>, 'defaultValue' | 'value' | 'onChange'> {
+export interface ToggleGroupItemData {
+  value: string;
+  label: React.ReactNode;
+  icon?: string;
+  disabled?: boolean;
+  ariaLabel?: string;
+}
+
+interface BaseToggleGroupCommonProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<'div'>,
+    'defaultValue' | 'value' | 'onChange'
+  > {
   orientation?: 'horizontal' | 'vertical';
   loopFocus?: boolean;
   disabled?: boolean;
+  mandatory?: boolean;
+  variant?: ToggleGroupVariant;
+  size?: ToggleGroupSize;
   ariaLabel?: string;
   'aria-label'?: string;
-  items?: { value: string; label: string; icon?: string; disabled?: boolean }[];
+  items?: ToggleGroupItemData[];
   children?: React.ReactNode;
   className?: string;
 }
@@ -71,9 +136,9 @@ interface BaseToggleGroupCommonProps extends Omit<React.ComponentPropsWithoutRef
 export interface ToggleGroupSingleProps extends BaseToggleGroupCommonProps {
   type: 'single';
   multiple?: false;
-  value?: string | readonly string[];
-  defaultValue?: string | readonly string[];
-  onValueChange?: (value: string, eventDetails?: any) => void;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string, eventDetails: BaseToggleGroup.ChangeEventDetails) => void;
 }
 
 export interface ToggleGroupMultipleProps extends BaseToggleGroupCommonProps {
@@ -81,7 +146,7 @@ export interface ToggleGroupMultipleProps extends BaseToggleGroupCommonProps {
   multiple?: boolean;
   value?: readonly string[];
   defaultValue?: readonly string[];
-  onValueChange?: (value: string[], eventDetails?: any) => void;
+  onValueChange?: (value: string[], eventDetails: BaseToggleGroup.ChangeEventDetails) => void;
 }
 
 export type ToggleGroupProps = ToggleGroupSingleProps | ToggleGroupMultipleProps;
@@ -97,18 +162,22 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
       'aria-label': ariaLabelProp,
       items,
       multiple,
+      mandatory = type === 'single' || multiple === false,
       orientation = 'horizontal',
       loopFocus = true,
-      disabled,
+      disabled = false,
+      variant = 'default',
+      size = 'md',
       children,
       className,
       ...domProps
     } = props;
 
-    const isSingleMode = type === 'single';
-    const isMultiple = multiple ?? (type === 'multiple');
+    const isSingleStringMode = type === 'single';
+    const isMultipleMode = multiple === true || type === 'multiple';
     const label = ariaLabel ?? ariaLabelProp ?? 'Toggle selection group';
 
+    // Normalize value into Base UI array contract
     const normalizedValue = React.useMemo(() => {
       if (value === undefined) return undefined;
       if (Array.isArray(value)) return value;
@@ -121,66 +190,97 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
       return typeof defaultValue === 'string' && defaultValue ? [defaultValue] : [];
     }, [defaultValue]);
 
-    const handleValueChange = (val: string[], eventDetails: any) => {
+    // Track active selection internally for uncontrolled / value retention fallback
+    const [internalValue, setInternalValue] = React.useState<string[]>(
+      normalizedValue ?? normalizedDefaultValue ?? []
+    );
+
+    // Keep internal tracking synchronized with controlled value when present
+    React.useEffect(() => {
+      if (normalizedValue !== undefined) {
+        setInternalValue(normalizedValue);
+      }
+    }, [normalizedValue]);
+
+    const effectiveValue = normalizedValue !== undefined ? normalizedValue : internalValue;
+
+    const handleValueChange = (
+      val: string[],
+      eventDetails: BaseToggleGroup.ChangeEventDetails
+    ) => {
+      // If mandatory is true and user tries to deselect the last item, retain previous selection
+      if (mandatory && val.length === 0 && effectiveValue.length > 0) {
+        return;
+      }
+
+      if (normalizedValue === undefined) {
+        setInternalValue(val);
+      }
+
       if (!onValueChange) return;
-      if (isSingleMode) {
-        // Legacy Radix single-mode compatibility: unpack array to single string value
+
+      if (isSingleStringMode) {
+        // Unpack array to single string value for single-mode listeners
         const singleVal = val.length > 0 ? val[val.length - 1] : '';
-        (onValueChange as (value: string, details: any) => void)(singleVal, eventDetails);
+        (onValueChange as (v: string, d: BaseToggleGroup.ChangeEventDetails) => void)(
+          singleVal,
+          eventDetails
+        );
       } else {
-        // Native Base UI contract: always array of strings
-        (onValueChange as (value: string[], details: any) => void)(val, eventDetails);
+        // Multiple mode listeners receive array of strings
+        (onValueChange as (v: string[], d: BaseToggleGroup.ChangeEventDetails) => void)(
+          val,
+          eventDetails
+        );
       }
     };
 
     return (
-      <BaseToggleGroup
-        ref={ref}
-        value={normalizedValue}
-        defaultValue={normalizedDefaultValue}
-        onValueChange={handleValueChange}
-        aria-label={label}
-        multiple={isMultiple}
-        orientation={orientation}
-        loopFocus={loopFocus}
-        disabled={disabled}
-        className={cn(
-          'inline-flex items-center h-12 p-1 rounded border-[1px] border-outline-variant bg-surface-container gap-1',
-          orientation === 'vertical' && 'flex-col h-auto',
-          className
-        )}
-        {...domProps}
-      >
-        {children
-          ? children
-          : items?.map((item) => (
-              <ToggleGroupItem
-                key={item.value}
-                value={item.value}
-                ariaLabel={item.label}
-                disabled={item.disabled}
-              >
-                {item.icon && (
-                  <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                    {item.icon}
-                  </span>
-                )}
-                <span>{item.label}</span>
-              </ToggleGroupItem>
-            ))}
-      </BaseToggleGroup>
+      <ToggleGroupContext.Provider value={{ variant, size, orientation }}>
+        <BaseToggleGroup
+          ref={ref}
+          value={effectiveValue}
+          onValueChange={handleValueChange}
+          multiple={isMultipleMode}
+          orientation={orientation}
+          loopFocus={loopFocus}
+          disabled={disabled}
+          aria-label={label}
+          className={cn(
+            'inline-flex p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none',
+            orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
+            className
+          )}
+          {...domProps}
+        >
+          {children
+            ? children
+            : items?.map((item) => (
+                <ToggleGroupItem
+                  key={item.value}
+                  value={item.value}
+                  icon={item.icon}
+                  disabled={item.disabled}
+                  aria-label={item.ariaLabel}
+                  variant={variant}
+                  size={size}
+                >
+                  {item.label}
+                </ToggleGroupItem>
+              ))}
+        </BaseToggleGroup>
+      </ToggleGroupContext.Provider>
     );
   }
 );
 ToggleGroupComponent.displayName = 'ToggleGroup';
 
-// Compound export mapping Base UI primitives & wrappers
+// Compound export mapping Base UI primitives
 export const ToggleGroup = Object.assign(ToggleGroupComponent, {
-  Root: ToggleGroupComponent,
+  Root: BaseToggleGroup,
   Item: ToggleGroupItem,
 });
 
 export { BaseToggleGroup };
-export const ToggleGroupRoot = ToggleGroupComponent;
-export const ToggleGroupRootPrimitive = BaseToggleGroup;
+export const ToggleGroupRoot = BaseToggleGroup;
 export default ToggleGroup;

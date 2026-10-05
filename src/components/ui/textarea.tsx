@@ -1,3 +1,13 @@
+/**
+ * Textarea primitive.
+ *
+ * Base UI Integration: Works seamlessly with Base UI Field via Field.Control.
+ *
+ * TAXONOMY & USAGE:
+ * - Use Textarea for multi-line freeform text input.
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
+ *   and WCAG 2.2 SC 2.5.8 touch target compliance.
+ */
 import * as React from 'react';
 import { Field } from './field';
 import { cn } from '@/lib/utils';
@@ -6,20 +16,20 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   error?: boolean | string;
 }
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, ...props }, ref) => (
+const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, ...props }, ref) => (
   <textarea
     ref={ref}
     className={cn(
-      'w-full min-h-[80px] p-3 rounded bg-surface text-on-surface font-sans text-base transition-colors',
-      'border-[1px] border-outline focus:border-primary focus:outline-2 focus:outline-offset-0 focus:outline-primary',
-      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant disabled:cursor-not-allowed',
-      error && 'border-error focus:border-error focus:outline-error',
+      'w-full min-h-[80px] p-3 rounded-md bg-surface text-on-surface font-sans text-base transition-[border-color,box-shadow]',
+      'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+      error && 'border-error focus-visible:border-error focus-visible:outline-error',
       className
     )}
     {...props}
   />
 ));
-Textarea.displayName = 'Textarea';
+TextareaComponent.displayName = 'Textarea';
 
 export interface TextareaFieldProps extends TextareaProps {
   label?: string;
@@ -49,17 +59,27 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
       disabled={disabled}
       className={className}
     >
-      <Textarea
-        ref={ref}
-        id={id}
-        disabled={disabled}
-        error={Boolean(error)}
-        {...props}
+      <Field.Control
+        render={(controlProps) => (
+          <TextareaComponent
+            ref={ref}
+            id={id}
+            disabled={disabled}
+            error={Boolean(error)}
+            {...controlProps}
+            {...props}
+          />
+        )}
       />
     </Field>
   );
 });
 TextareaField.displayName = 'TextareaField';
+
+/** Compound export */
+export const Textarea = Object.assign(TextareaComponent, {
+  Field: TextareaField,
+});
 
 /** Backward-compatibility alias for TextareaField */
 export const FormTextarea = TextareaField;

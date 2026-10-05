@@ -238,10 +238,16 @@ export const CarouselPrevious = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'absolute z-10 rounded-full border-2 border-outline-variant bg-surface text-on-surface shadow-sm hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100',
-        orientation === 'horizontal'
-          ? 'left-2 top-1/2 -translate-y-1/2'
-          : 'top-2 left-1/2 -translate-x-1/2',
+        'rounded-full min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-40 disabled:pointer-events-none',
+        // If not styled with static/relative positioning (e.g. In header controls bar), use floating absolute positioning
+        !className?.includes('relative') &&
+          !className?.includes('static') &&
+          cn(
+            'absolute z-10',
+            orientation === 'horizontal'
+              ? '-left-4 md:-left-6 top-1/2 -translate-y-1/2'
+              : '-top-4 md:-top-6 left-1/2 -translate-x-1/2'
+          ),
         className
       )}
       disabled={!canScrollPrev}
@@ -272,10 +278,16 @@ export const CarouselNext = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'absolute z-10 rounded-full border-2 border-outline-variant bg-surface text-on-surface shadow-sm hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100',
-        orientation === 'horizontal'
-          ? 'right-2 top-1/2 -translate-y-1/2'
-          : 'bottom-2 left-1/2 -translate-x-1/2',
+        'rounded-full min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-40 disabled:pointer-events-none',
+        // If not styled with static/relative positioning (e.g. In header controls bar), use floating absolute positioning
+        !className?.includes('relative') &&
+          !className?.includes('static') &&
+          cn(
+            'absolute z-10',
+            orientation === 'horizontal'
+              ? '-right-4 md:-right-6 top-1/2 -translate-y-1/2'
+              : '-bottom-4 md:-bottom-6 left-1/2 -translate-x-1/2'
+          ),
         className
       )}
       disabled={!canScrollNext}

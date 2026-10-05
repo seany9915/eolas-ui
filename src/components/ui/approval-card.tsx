@@ -104,13 +104,13 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                       'flex items-start gap-3 p-3 rounded-md border text-left transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-pointer select-none',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       isSelected
-                        ? 'border-primary bg-primary-container/20 text-on-surface'
-                        : 'border-outline-variant hover:bg-surface-container text-on-surface'
+                        ? 'border-primary bg-primary-container text-on-surface'
+                        : 'border-outline-variant bg-surface hover:bg-surface-container text-on-surface'
                     )}
                   >
                     <Radio value={opt.id} className="mt-0.5" />
                     <div className="flex flex-col min-w-0">
-                      <span className="font-sans text-sm font-medium leading-tight">
+                      <span className="font-sans text-sm font-medium leading-tight text-on-surface">
                         {opt.label}
                       </span>
                       {opt.description && (
@@ -124,28 +124,33 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               })}
 
               {allowCustomInput && (
-                <div
+                <label
+                  onClick={() => onSelectOption?.('__custom__')}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-md border transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+                    'flex items-center gap-3 p-3 rounded-md border transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-pointer',
+                    'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                     selectedOptionId === '__custom__'
-                      ? 'border-primary bg-primary-container/20'
-                      : 'border-outline-variant hover:bg-surface-container'
+                      ? 'border-primary bg-primary-container text-on-surface'
+                      : 'border-outline-variant bg-surface hover:bg-surface-container text-on-surface'
                   )}
                 >
-                  <Icon name="edit" size="sm" className="text-on-surface-variant shrink-0" />
-                  <input
-                    type="text"
-                    value={customInputValue}
-                    onChange={(e) => {
-                      onSelectOption?.('__custom__');
-                      onCustomInputChange?.(e.target.value);
-                    }}
-                    onFocus={() => onSelectOption?.('__custom__')}
-                    placeholder={customInputPlaceholder}
-                    aria-label="Custom answer"
-                    className="w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-outline focus:outline-none"
-                  />
-                </div>
+                  <Radio value="__custom__" className="shrink-0" />
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <Icon name="edit" size="sm" className="text-on-surface-variant shrink-0" />
+                    <input
+                      type="text"
+                      value={customInputValue}
+                      onChange={(e) => {
+                        onSelectOption?.('__custom__');
+                        onCustomInputChange?.(e.target.value);
+                      }}
+                      onFocus={() => onSelectOption?.('__custom__')}
+                      placeholder={customInputPlaceholder}
+                      aria-label="Custom answer"
+                      className="w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-outline focus:outline-none"
+                    />
+                  </div>
+                </label>
               )}
             </RadioGroup>
           )}

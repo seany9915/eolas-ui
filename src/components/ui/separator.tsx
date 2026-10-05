@@ -1,8 +1,18 @@
+/**
+ * Separator primitive (@base-ui/react/separator).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/separator
+ *
+ * TAXONOMY & USAGE:
+ * - A visual or semantic separator between sections of content.
+ * - Supports horizontal and vertical orientations with accessible role/aria-hidden attributes.
+ * - Follows DESIGN.md Tier B tokens: border-outline-variant.
+ */
 import * as React from 'react';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
 import { cn } from '@/lib/utils';
 
-export interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SeparatorProps extends React.ComponentPropsWithoutRef<typeof BaseSeparator> {
   orientation?: 'horizontal' | 'vertical';
   decorative?: boolean;
   className?: string;
@@ -40,3 +50,4 @@ export const Separator = Object.assign(SeparatorComponent, {
 export { BaseSeparator };
 export const SeparatorRoot = BaseSeparator;
 
+export default Separator;

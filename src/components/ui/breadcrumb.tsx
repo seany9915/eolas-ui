@@ -92,17 +92,27 @@ export const BreadcrumbSeparator = ({
 );
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 
-export const BreadcrumbEllipsis = ({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'span'>) => (
-  <span
-    role="presentation"
-    className={cn('flex size-6 items-center justify-center text-outline select-none', className)}
-    {...props}
-  >
-    <Icon name="more_horiz" size="sm" className="text-base" aria-hidden="true" />
-    <span className="sr-only">More links</span>
-  </span>
+export interface BreadcrumbEllipsisProps extends React.ComponentPropsWithoutRef<'button'> {}
+
+export const BreadcrumbEllipsis = React.forwardRef<HTMLButtonElement, BreadcrumbEllipsisProps>(
+  ({ className, children, ...props }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      aria-label="More links"
+      className={cn(
+        'inline-flex min-h-[44px] min-w-[44px] size-11 items-center justify-center rounded-sm text-outline hover:text-on-surface hover:bg-surface-container transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 select-none cursor-pointer',
+        className
+      )}
+      {...props}
+    >
+      {children ?? (
+        <>
+          <Icon name="more_horiz" size="sm" className="text-base" aria-hidden="true" />
+          <span className="sr-only">More links</span>
+        </>
+      )}
+    </button>
+  )
 );
 BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis';

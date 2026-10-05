@@ -137,7 +137,7 @@ export const eolasLintPreset = [
                 "Skeleton loaders support layout dimensions (w-*, h-*) and shapes (rounded, rounded-full) to mirror target components.",
             },
             {
-              pattern: "^(TextSwap|NotificationBadge|TextsReveal|NumberRoll|ShimmerText|ErrorShake|SuccessCheck)$",
+              pattern: "^(TextSwap|NotificationBadge|TextsReveal|NumberRoll|NumberPopIn|SpinningCounter|ShimmerText|ErrorShake|SuccessCheck)$",
               allow: ["layout"],
               message:
                 "Shared motion primitives manage their own transitions and reduced-motion fallbacks per DESIGN.md.",

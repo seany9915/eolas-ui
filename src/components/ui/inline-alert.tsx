@@ -90,7 +90,7 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
           type="button"
           onClick={onClose}
           aria-label="Dismiss alert"
-          className="shrink-0 p-1 -mr-1 -mt-1 text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded"
+          className="shrink-0 min-h-[44px] min-w-[44px] size-11 -mr-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer"
         >
           <Icon name="close" size="md" aria-hidden="true" />
         </button>

@@ -397,12 +397,14 @@ Never use `transition-all` on cards, layout containers, or dialogs. Blanket tran
 - **Motion Restraint on High-Frequency Controls:** Checkboxes and switches do not use 350ms stroke-draws or double-bounce springs. Standard chrome uses crisp 150ms micro-transitions.
 
 ### Essential Motion Primitives
-The design system ships 8 reusable motion primitives in `@/components/ui/` that implement these polish standards:
+The design system ships 10 reusable motion primitives in `@/components/ui/` that implement these polish standards:
 - **`Skeleton` & `Skeleton.Reveal` (`skeleton.tsx`):** Subtle pulse track on `bg-surface-variant/70` (never generic grey). The companion `Skeleton.Reveal` provides a seamless dual-layer cross-blur transition (`--blur-medium: 3px` over `--duration-fast: 250ms`) from skeleton to real content without layout pop. Supports polymorphic `as="div" | "span"` and `data-slot="skeleton"`.
 - **`TextSwap` (`text-swap.tsx`):** In-place vertical slip for status, tab, or metric label swaps (4px travel + 2px blur over 150ms).
 - **`NotificationBadge` (`notification-badge.tsx`):** Diagonal slide + scale-pop badge entrance (150ms) that renders isolated from parent layout flow.
 - **`TextsReveal` (`texts-reveal.tsx`):** Staggered multi-line text entrance enforcing the 40ms stagger cap ($\le 5$ lines / 200ms max).
 - **`NumberRoll` (`number-roll.tsx`):** Tabular vertical digit odometer with `tabular-nums` ensuring fixed character widths.
+- **`NumberPopIn` (`number-pop-in.tsx`):** Spring digit pop-in entrance with 70ms stagger on trailing decimals.
+- **`SpinningCounter` (`spinning-counter.tsx`):** Vertical clipped reel odometer with 90ms column stagger and gradient edge masks.
 - **`ShimmerText` (`shimmer-text.tsx`):** Directional highlight shimmer across active or processing text labels.
 - **`ErrorShake` (`error-shake.tsx`):** 3-cycle horizontal error pulse (300ms) on invalid form actions or blocked requests.
 - **`SuccessCheck` (`success-check.tsx`):** Calibrated SVG stroke-draw checkmark over 500ms for confirmation dialogs.

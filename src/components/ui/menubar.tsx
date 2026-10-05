@@ -3,21 +3,6 @@ import { Menubar as BaseMenubar } from '@base-ui/react/menubar';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { cn } from '@/lib/utils';
 
-/**
- * Menubar Component (Desktop Application Command System)
- *
- * WAI-ARIA Role: role="menubar" / role="menuitem"
- * Primary Purpose: Persistent horizontal menu bar providing application-wide commands (File, Edit, View, Window).
- *
- * TAXONOMY & USAGE GUIDELINES:
- * - USE THIS: In desktop-class workspaces, clinical analysis suites, or IDE layouts organizing hierarchical commands across the top of a window.
- * - DO NOT USE:
- *   - For general website or application URL routing links -> Use <NavigationMenu>.
- *   - For a single dropdown button -> Use <Menu>.
- *   - For contextual right-click actions -> Use <ContextMenu>.
- *   - For formatting strips / active tool palettes -> Use <Toolbar>.
- */
-
 export interface MenubarMenuItem {
   id: string;
   label: string;
@@ -33,29 +18,302 @@ export interface MenubarMenuData {
   items: MenubarMenuItem[];
 }
 
-export interface MenubarProps {
+export interface MenubarProps extends React.ComponentPropsWithoutRef<typeof BaseMenubar> {
   menus?: MenubarMenuData[];
-  loopFocus?: boolean;
-  orientation?: 'horizontal' | 'vertical';
-  children?: React.ReactNode;
-  className?: string;
 }
 
-const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(({
-  menus,
-  loopFocus,
-  orientation = 'horizontal',
-  children,
+export const MenubarTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <BaseMenu.Trigger
+    ref={ref}
+    className={cn(
+      'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-md font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none',
+      'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
+      'data-[popup-open]:bg-surface-container data-[popup-open]:text-primary',
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </BaseMenu.Trigger>
+));
+MenubarTrigger.displayName = 'MenubarTrigger';
+
+export interface MenubarContentProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Popup> {
+  sideOffset?: number;
+  align?: 'start' | 'center' | 'end';
+  alignOffset?: number;
+  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  containerClassName?: string;
+}
+
+export const MenubarContent = React.forwardRef<HTMLDivElement, MenubarContentProps>(
+  (
+    {
+      className,
+      children,
+      sideOffset = 4,
+      align = 'start',
+      alignOffset,
+      collisionPadding = 8,
+      containerClassName,
+      ...props
+    },
+    ref
+  ) => (
+    <BaseMenu.Portal>
+      <BaseMenu.Positioner
+        sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
+        collisionPadding={collisionPadding}
+        className={cn('z-50 outline-none', containerClassName)}
+      >
+        <BaseMenu.Popup
+          ref={ref}
+          className={cn(
+            'min-w-[220px] p-1 rounded-lg bg-surface border border-outline-variant shadow-modal outline-none',
+            'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
+            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
+            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)]',
+            'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </BaseMenu.Popup>
+      </BaseMenu.Positioner>
+    </BaseMenu.Portal>
+  )
+);
+MenubarContent.displayName = 'MenubarContent';
+
+export interface MenubarItemProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Item> {
+  destructive?: boolean;
+  icon?: string;
+  shortcut?: string;
+}
+
+export const MenubarItem = React.forwardRef<HTMLDivElement, MenubarItemProps>(
+  ({ className, destructive, icon, shortcut, children, ...props }, ref) => (
+    <BaseMenu.Item
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-3 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+        'data-[disabled]:opacity-40 data-[disabled]:pointer-events-none',
+        destructive
+          ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
+          : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      {shortcut && (
+        <span className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ml-auto">
+          {shortcut}
+        </span>
+      )}
+    </BaseMenu.Item>
+  )
+);
+MenubarItem.displayName = 'MenubarItem';
+
+export interface MenubarCheckboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.CheckboxItem> {
+  icon?: string;
+}
+
+export const MenubarCheckboxItem = React.forwardRef<HTMLDivElement, MenubarCheckboxItemProps>(
+  ({ className, children, icon, ...props }, ref) => (
+    <BaseMenu.CheckboxItem
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      <BaseMenu.CheckboxItemIndicator className="shrink-0 text-primary flex items-center justify-center">
+        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
+          check
+        </span>
+      </BaseMenu.CheckboxItemIndicator>
+    </BaseMenu.CheckboxItem>
+  )
+);
+MenubarCheckboxItem.displayName = 'MenubarCheckboxItem';
+
+export interface MenubarRadioItemProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.RadioItem> {
+  icon?: string;
+}
+
+export const MenubarRadioItem = React.forwardRef<HTMLDivElement, MenubarRadioItemProps>(
+  ({ className, children, icon, ...props }, ref) => (
+    <BaseMenu.RadioItem
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      <BaseMenu.RadioItemIndicator className="shrink-0 text-primary flex items-center justify-center">
+        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
+          radio_button_checked
+        </span>
+      </BaseMenu.RadioItemIndicator>
+    </BaseMenu.RadioItem>
+  )
+);
+MenubarRadioItem.displayName = 'MenubarRadioItem';
+
+export interface MenubarSubmenuTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.SubmenuTrigger> {
+  icon?: string;
+}
+
+export const MenubarSubmenuTrigger = React.forwardRef<HTMLDivElement, MenubarSubmenuTriggerProps>(
+  ({ className, children, icon, ...props }, ref) => (
+    <BaseMenu.SubmenuTrigger
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      <span className="material-symbols-outlined text-base text-on-surface-variant shrink-0" aria-hidden="true">
+        chevron_right
+      </span>
+    </BaseMenu.SubmenuTrigger>
+  )
+);
+MenubarSubmenuTrigger.displayName = 'MenubarSubmenuTrigger';
+
+export const MenubarSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Separator>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.Separator
+    ref={ref}
+    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
+    {...props}
+  />
+));
+MenubarSeparator.displayName = 'MenubarSeparator';
+
+export const MenubarGroup = BaseMenu.Group;
+export const MenubarGroupLabel = BaseMenu.GroupLabel;
+export const MenubarRadioGroup = BaseMenu.RadioGroup;
+export const MenubarSubmenu = BaseMenu.SubmenuRoot;
+
+export interface MenubarMenuProps {
+  triggerLabel: string;
+  items?: MenubarMenuItem[];
+  children?: React.ReactNode;
+}
+
+export const MenubarMenu = React.forwardRef<HTMLButtonElement, MenubarMenuProps>(
+  ({ triggerLabel, items, children }, ref) => (
+    <BaseMenu.Root>
+      <MenubarTrigger ref={ref}>
+        <span>{triggerLabel}</span>
+      </MenubarTrigger>
+      <MenubarContent>
+        {children
+          ? children
+          : items?.map((item) => (
+              <MenubarItem
+                key={item.id}
+                disabled={item.disabled}
+                destructive={item.destructive}
+                icon={item.icon}
+                shortcut={item.shortcut}
+                onClick={item.onClick}
+              >
+                {item.label}
+              </MenubarItem>
+            ))}
+      </MenubarContent>
+    </BaseMenu.Root>
+  )
+);
+MenubarMenu.displayName = 'MenubarMenu';
+
+export const MenubarShortcut: React.FC<React.HTMLAttributes<HTMLSpanElement>> = ({
   className,
   ...props
-}, ref) => {
-  return (
+}) => (
+  <span
+    className={cn('font-mono text-xs text-on-surface-variant font-medium tracking-wider ml-auto', className)}
+    {...props}
+  />
+);
+MenubarShortcut.displayName = 'MenubarShortcut';
+
+const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(
+  (
+    {
+      menus,
+      loopFocus = true,
+      orientation = 'horizontal',
+      modal = true,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => (
     <BaseMenubar
       ref={ref}
       loopFocus={loopFocus}
       orientation={orientation}
+      modal={modal}
       className={cn(
-        'inline-flex items-center gap-1 p-1 rounded bg-surface border-[1px] border-outline-variant w-full shadow-sm',
+        'inline-flex items-center gap-1 p-1 rounded-lg bg-surface border border-outline-variant w-full shadow-ambient',
         className
       )}
       {...props}
@@ -66,96 +324,26 @@ const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(({
             <MenubarMenu key={i} triggerLabel={menu.triggerLabel} items={menu.items} />
           ))}
     </BaseMenubar>
-  );
-});
+  )
+);
 
 MenubarComponent.displayName = 'Menubar';
 
-export interface MenubarMenuProps {
-  triggerLabel: string;
-  items?: MenubarMenuItem[];
-  children?: React.ReactNode;
-}
-
-export const MenubarMenu = React.forwardRef<HTMLButtonElement, MenubarMenuProps>(({
-  triggerLabel,
-  items,
-  children,
-}, ref) => {
-  return (
-    <BaseMenu.Root>
-      <BaseMenu.Trigger
-        ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-sm font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none',
-          'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
-          'data-[popup-open]:bg-surface-container data-[popup-open]:text-primary',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-primary'
-        )}
-      >
-        <span>{triggerLabel}</span>
-      </BaseMenu.Trigger>
-      <BaseMenu.Portal>
-        {/* Layering: Menubar menu positioner creates z-50 stacking context to float over page canvas */}
-        <BaseMenu.Positioner sideOffset={6} align="start" className="z-50 outline-none">
-          <BaseMenu.Popup
-            className={cn(
-              'min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-modal outline-none',
-              'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-              'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-              'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)]'
-            )}
-          >
-            {children
-              ? children
-              : items?.map((item) => (
-                  <BaseMenu.Item
-                    key={item.id}
-                    disabled={item.disabled}
-                    onClick={item.onClick}
-                    className={cn(
-                      'flex items-center justify-between gap-3 px-3 py-2.5 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
-                      'data-[disabled]:opacity-50 data-[disabled]:pointer-events-none',
-                      item.destructive
-                        ? 'text-error hover:bg-error-container/30 focus:bg-error-container/30 data-[highlighted]:bg-error-container/30'
-                        : 'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface'
-                    )}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      {item.icon && (
-                        <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                          {item.icon}
-                        </span>
-                      )}
-                      <span>{item.label}</span>
-                    </div>
-                    {item.shortcut && (
-                      <span className="font-mono text-sm text-on-surface-variant font-medium tracking-wider">
-                        {item.shortcut}
-                      </span>
-                    )}
-                  </BaseMenu.Item>
-                ))}
-          </BaseMenu.Popup>
-        </BaseMenu.Positioner>
-      </BaseMenu.Portal>
-    </BaseMenu.Root>
-  );
-});
-
-MenubarMenu.displayName = 'MenubarMenu';
-
-export const MenubarSeparator: React.FC<{ className?: string }> = ({ className }) => (
-  <BaseMenu.Separator className={cn('h-[1px] bg-outline-variant my-1 -mx-1', className)} />
-);
-
-// Compound export mapping Base UI primitives & wrappers
 export const Menubar = Object.assign(MenubarComponent, {
-  Root: BaseMenubar,
   Menu: MenubarMenu,
+  Trigger: MenubarTrigger,
+  Content: MenubarContent,
+  Item: MenubarItem,
+  CheckboxItem: MenubarCheckboxItem,
+  RadioGroup: MenubarRadioGroup,
+  RadioItem: MenubarRadioItem,
+  Submenu: MenubarSubmenu,
+  SubmenuTrigger: MenubarSubmenuTrigger,
   Separator: MenubarSeparator,
+  Group: MenubarGroup,
+  GroupLabel: MenubarGroupLabel,
+  Shortcut: MenubarShortcut,
 });
 
 export { BaseMenubar };
-export const MenubarRoot = BaseMenubar;
-
+export default Menubar;

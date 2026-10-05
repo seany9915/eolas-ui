@@ -1,3 +1,15 @@
+/**
+ * Field primitive (@base-ui/react/field).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/field
+ *
+ * TAXONOMY & USAGE:
+ * - Use Field to group a form control with its label, description, and error message.
+ * - Supports automatic validation (onSubmit, onBlur, onChange), validation debouncing,
+ *   and accessibility attribute wiring (id, aria-labelledby, aria-describedby, aria-invalid).
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
+ *   and WCAG 2.2 SC 2.5.8 touch target compliance.
+ */
 import * as React from 'react';
 import { Field as BaseField } from '@base-ui/react/field';
 import { cn } from '@/lib/utils';
@@ -23,6 +35,11 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
   required,
   children,
   className,
+  name,
+  disabled,
+  validate,
+  validationMode,
+  validationDebounceTime,
   ...props
 }, ref) => {
   const helperText = description ?? hint;
@@ -30,6 +47,11 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
   return (
     <BaseField.Root
       ref={ref}
+      name={name}
+      disabled={disabled}
+      validate={validate}
+      validationMode={validationMode}
+      validationDebounceTime={validationDebounceTime}
       invalid={Boolean(error)}
       className={cn('flex flex-col gap-1.5 w-full', className)}
       {...props}
@@ -56,7 +78,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
           match
           className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
         >
-          <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+          <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
             error
           </span>
           <span>{error}</span>
@@ -72,7 +94,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
                 elementProps.className
               )}
             >
-              <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+              <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
                 error
               </span>
               <span>{elementProps.children}</span>
@@ -146,7 +168,7 @@ export const FieldError = React.forwardRef<HTMLDivElement, React.ComponentPropsW
               elementProps.className
             )}
           >
-            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+            <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
               error
             </span>
             <span>{elementProps.children}</span>
@@ -175,3 +197,5 @@ export {
   type TextareaProps,
   type TextareaFieldProps,
 };
+
+export default Field;

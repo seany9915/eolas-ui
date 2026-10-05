@@ -1,3 +1,14 @@
+/**
+ * OTPField primitive (@base-ui/react/otp-field).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/otp-field
+ *
+ * TAXONOMY & USAGE:
+ * - Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.
+ * - Supports automatic focus advancement, paste distribution, character masking, and validation types.
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
+ *   WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint.
+ */
 import * as React from 'react';
 import { OTPField as BaseOTPField } from '@base-ui/react/otp-field';
 import { Field as BaseField } from '@base-ui/react/field';
@@ -12,9 +23,10 @@ export interface OTPFieldProps {
   length?: number;
   value?: string;
   defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  onComplete?: (code: string) => void;
+  onValueChange?: (value: string, eventDetails?: BaseOTPField.Root.ChangeEventDetails) => void;
+  onComplete?: (code: string, eventDetails?: BaseOTPField.Root.CompleteEventDetails) => void;
   name?: string;
+  form?: string;
   required?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
@@ -23,9 +35,11 @@ export interface OTPFieldProps {
   mask?: boolean;
   validationType?: 'numeric' | 'alpha' | 'alphanumeric' | 'none';
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  autoComplete?: string;
   pattern?: string;
   showSeparator?: boolean;
   separatorIndex?: number;
+  children?: React.ReactNode;
   className?: string;
 }
 
@@ -41,6 +55,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   onValueChange,
   onComplete,
   name,
+  form,
   required,
   readOnly,
   autoFocus,
@@ -49,18 +64,20 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   mask,
   validationType = 'numeric',
   inputMode,
+  autoComplete = 'one-time-code',
   pattern,
   showSeparator = false,
   separatorIndex,
+  children,
   className,
 }, ref) => {
   const sepIndex = separatorIndex ?? Math.floor(length / 2);
 
   return (
     <BaseField.Root
-    ref={ref}
-    invalid={Boolean(error)}
-    className={cn('@container flex flex-col gap-1.5 w-full', className)}
+      ref={ref}
+      invalid={Boolean(error)}
+      className={cn('@container flex flex-col gap-1.5 w-full', className)}
     >
       {label && (
         <BaseField.Label className={cn('font-label text-sm font-semibold text-on-surface flex items-center', center ? 'justify-center' : 'justify-between')}>
@@ -82,9 +99,10 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         length={length}
         value={value}
         defaultValue={defaultValue}
-        onValueChange={(val) => onValueChange?.(val)}
-        onValueComplete={(val) => onComplete?.(val)}
+        onValueChange={onValueChange}
+        onValueComplete={onComplete}
         name={name}
+        form={form}
         required={required}
         readOnly={readOnly}
         autoFocus={autoFocus}
@@ -93,31 +111,36 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         mask={mask}
         validationType={validationType}
         inputMode={inputMode}
+        autoComplete={autoComplete}
         aria-label={!label ? 'One-time passcode' : undefined}
         className={cn('flex gap-1.5 @sm:gap-2 items-center', center ? 'justify-center' : 'justify-start')}
       >
-        {Array.from({ length }, (_, idx) => (
-          <React.Fragment key={idx}>
-            {showSeparator && idx === sepIndex && (
-              <BaseOTPField.Separator
-                className="text-outline flex items-center justify-center font-bold px-0.5 select-none"
-                aria-hidden="true"
-              >
-                –
-              </BaseOTPField.Separator>
-            )}
-            <BaseOTPField.Input
-              pattern={pattern}
-              className={cn(
-                'w-10 @sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg @sm:text-xl font-bold rounded',
-                'border-[1px] bg-surface text-on-surface transition-colors shrink-0',
-                'focus:border-primary focus:outline-2 focus:outline-offset-0 focus:outline-primary',
-                'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant disabled:cursor-not-allowed',
-                error ? 'border-error focus:border-error focus:outline-error' : 'border-outline'
+        {children ? (
+          children
+        ) : (
+          Array.from({ length }, (_, idx) => (
+            <React.Fragment key={idx}>
+              {showSeparator && idx === sepIndex && (
+                <BaseOTPField.Separator
+                  className="text-outline flex items-center justify-center font-bold px-0.5 select-none"
+                  aria-hidden="true"
+                >
+                  –
+                </BaseOTPField.Separator>
               )}
-            />
-          </React.Fragment>
-        ))}
+              <BaseOTPField.Input
+                pattern={pattern}
+                className={cn(
+                  'w-10 @sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg @sm:text-xl font-bold rounded',
+                  'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
+                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+                  error ? 'border-error focus-visible:border-error focus-visible:outline-error' : 'border-outline'
+                )}
+              />
+            </React.Fragment>
+          ))
+        )}
       </BaseOTPField.Root>
 
       {error ? (
@@ -125,7 +148,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
           match
           className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
         >
-          <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+          <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
             error
           </span>
           <span>{error}</span>
@@ -141,7 +164,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
                 elementProps.className
               )}
             >
-              <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+              <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
                 error
               </span>
               <span>{elementProps.children}</span>

@@ -387,6 +387,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   <ToggleGroup
                     value={toggleGroupVal}
                     onValueChange={setToggleGroupVal}
+                    mandatory
                     ariaLabel="View mode"
                     items={[
                       { value: 'grid', label: 'Grid', icon: 'grid_view' },
@@ -514,10 +515,23 @@ export const ComponentLibraryShowcase: React.FC = () => {
             label="Cadence Frequency Select"
             value={selectVal ?? ''}
             onValueChange={setSelectVal}
-            options={[
-              { value: 'daily', label: 'Daily Session' },
-              { value: 'weekly', label: 'Weekly Review' },
-              { value: 'monthly', label: 'Monthly Milestone' },
+            groups={[
+              {
+                label: 'Active Rehabilitation',
+                options: [
+                  { value: 'daily', label: 'Daily Session (Intensive)' },
+                  { value: 'triweekly', label: '3x Weekly Protocol' },
+                  { value: 'weekly', label: 'Weekly Clinical Review' },
+                ],
+              },
+              {
+                label: 'Long-term Monitoring',
+                options: [
+                  { value: 'biweekly', label: 'Bi-Weekly Follow-up' },
+                  { value: 'monthly', label: 'Monthly Milestone' },
+                  { value: 'quarterly', label: 'Quarterly Evaluation' },
+                ],
+              },
             ]}
           />
 
@@ -1553,8 +1567,8 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   elapsedTime="1.8s"
                   defaultOpen={true}
                   steps={[
-                    { id: 's1', label: 'EHR baseline retrieved (NHS #948 201 4920)', duration: '0.4s', icon: 'check_circle', isComplete: true },
-                    { id: 's2', label: 'Acoustic pitch jitter evaluated against clinical normative bands', duration: '0.9s', icon: 'check_circle', isComplete: true },
+                    { id: 's1', label: 'EHR baseline retrieved (NHS No. 948 201 4920)', duration: '0.4s', isComplete: true },
+                    { id: 's2', label: 'Acoustic pitch jitter evaluated against clinical normative bands', duration: '0.9s', isComplete: true },
                     { id: 's3', label: 'Synthesising next-stage consonant cluster recommendation', duration: '0.5s', icon: 'pending', isComplete: false },
                   ]}
                 >
@@ -1660,9 +1674,9 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <div>
                   <h4 className="font-heading text-base font-bold text-on-surface">Breadcrumb Navigation</h4>
                   <p className="font-sans text-xs text-on-surface-variant mt-1 mb-3">
-                    Semantic <code className="font-mono text-primary">&lt;nav aria-label="Breadcrumb"&gt;</code> hierarchy with separators and active leaf page.
+                    Semantic <code className="font-mono text-primary">&lt;nav aria-label="Breadcrumb"&gt;</code> hierarchy with separators, interactive ellipsis dropdown, and active leaf page.
                   </p>
-                  <div className="p-4 rounded bg-surface-container border border-outline-variant/60">
+                  <div className="py-2">
                     <Breadcrumb>
                       <BreadcrumbList>
                         <BreadcrumbItem>
@@ -1670,11 +1684,32 @@ export const ComponentLibraryShowcase: React.FC = () => {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                          <BreadcrumbLink href="#vance">Arthur Dent</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                          <BreadcrumbEllipsis />
+                          <Menu
+                            fullWidth={false}
+                            trigger={
+                              <BreadcrumbEllipsis />
+                            }
+                            items={[
+                              {
+                                id: 'p-dent',
+                                label: 'Arthur Dent (Profile)',
+                                icon: 'person',
+                                onClick: () => showToast('Navigated', 'Opening Arthur Dent profile', 'info'),
+                              },
+                              {
+                                id: 'p-charts',
+                                label: 'Clinical Telemetry Charts',
+                                icon: 'analytics',
+                                onClick: () => showToast('Navigated', 'Opening Telemetry Charts', 'info'),
+                              },
+                              {
+                                id: 'p-history',
+                                label: 'Historical Assessment Log',
+                                icon: 'history',
+                                onClick: () => showToast('Navigated', 'Opening Assessment Log', 'info'),
+                              },
+                            ]}
+                          />
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
@@ -1694,7 +1729,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   <p className="font-sans text-xs text-on-surface-variant mt-1 mb-3">
                     Accessible pagination control with 44px min touch floors and keyboard navigation.
                   </p>
-                  <div className="p-4 rounded bg-surface-container border border-outline-variant/60 flex justify-center">
+                  <div className="py-2 flex justify-center">
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
@@ -1874,14 +1909,17 @@ export const ComponentLibraryShowcase: React.FC = () => {
             <div className="p-6 h-full flex flex-col justify-between space-y-6">
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-heading text-base font-bold text-on-surface mb-2">
-                    Clinical Drill Modules (Carousel)
-                  </h4>
-                  <div className="py-2 relative">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-heading text-base font-bold text-on-surface">
+                      Clinical Drill Modules (Carousel)
+                    </h4>
+                    <span className="font-label text-xs text-on-surface-variant">3 Modules</span>
+                  </div>
+                  <div className="px-5 py-2 relative">
                     <Carousel className="w-full">
                       <CarouselContent>
                         <CarouselItem>
-                          <div className="p-5 px-12 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
                             <div>
                               <span className="font-label text-xs font-bold text-primary">Module 01</span>
                               <h5 className="font-heading text-sm font-bold text-on-surface">Vowel Prolongation (/a/, /i/, /u/)</h5>
@@ -1891,7 +1929,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                           </div>
                         </CarouselItem>
                         <CarouselItem>
-                          <div className="p-5 px-12 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
                             <div>
                               <span className="font-label text-xs font-bold text-secondary">Module 02</span>
                               <h5 className="font-heading text-sm font-bold text-on-surface">Pitch Glide Dynamics</h5>
@@ -1901,10 +1939,10 @@ export const ComponentLibraryShowcase: React.FC = () => {
                           </div>
                         </CarouselItem>
                         <CarouselItem>
-                          <div className="p-5 px-12 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
+                          <div className="p-5 rounded-lg bg-surface-container border border-outline-variant/60 flex flex-col justify-between h-36">
                             <div>
-                              <span className="font-label text-xs font-bold text-tertiary">Module 03</span>
-                              <h5 className="font-heading text-sm font-bold text-on-surface">Plosive Consonant Articulation</h5>
+                              <span className="inline-block px-1.5 py-0.5 rounded text-xs font-bold bg-tertiary text-on-tertiary">Module 03</span>
+                              <h5 className="font-heading text-sm font-bold text-on-surface mt-0.5">Plosive Consonant Articulation</h5>
                               <p className="font-sans text-xs text-on-surface-variant mt-1">Rapid intraoral pressure release drills (/b/, /p/, /t/, /d/).</p>
                             </div>
                             <span className="text-xs font-medium text-secondary">Target: 90% acoustic accuracy</span>
@@ -1967,6 +2005,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <h4 className="font-heading text-base font-bold text-on-surface mb-3">StepWizard</h4>
                 
                 <StepWizard
+                  variant="embedded"
                   currentStepIndex={wizardStep}
                   onStepChange={setWizardStep}
                   onComplete={() => showToast('Onboarding Completed', 'Clinical baseline telemetry setup finished.', 'success')}

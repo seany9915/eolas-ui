@@ -110,7 +110,7 @@ export const ChartTooltip = ({
   offset = 12,
   wrapperStyle,
   cursor = {
-    stroke: 'var(--color-outline-variant, #cac5be)',
+    stroke: 'var(--color-outline-variant)',
     strokeWidth: 1,
     strokeDasharray: '4 4',
   },

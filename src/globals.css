@@ -301,8 +301,20 @@ button:focus-visible {
   animation: t-check-circle-pop var(--duration-fast) var(--ease-smooth-out) forwards;
 }
 
+@utility animate-success-check {
+  animation:
+    t-check-fade var(--check-opacity-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    t-check-rotate var(--check-rotate-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    t-check-blur var(--check-blur-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    t-check-bob var(--check-bob-dur, 500ms) cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+}
+
 @utility animate-check-draw {
-  animation: t-check-draw var(--duration-fast) var(--ease-smooth-out) 80ms forwards;
+  animation: t-check-draw var(--check-path-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) var(--check-path-delay, 80ms) forwards;
+}
+
+@utility animate-digit-pop {
+  animation: digit-pop-in var(--digit-dur, 500ms) cubic-bezier(0.34, 1.45, 0.64, 1) both;
 }
 
 @keyframes badge-pop-in {
@@ -324,14 +336,27 @@ button:focus-visible {
 }
 
 @keyframes error-shake {
-  0%, 100% {
+  0% {
     transform: translateX(0);
   }
-  20%, 60% {
-    transform: translateX(-6px);
+  20% {
+    transform: translateX(calc(var(--shake-distance, 6px) * -1));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  40%, 80% {
-    transform: translateX(6px);
+  40% {
+    transform: translateX(var(--shake-overshoot, 4px));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  60% {
+    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.5));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  80% {
+    transform: translateX(calc(var(--shake-overshoot, 4px) * 0.25));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 
@@ -414,9 +439,64 @@ button:focus-visible {
   }
 }
 
+@keyframes t-check-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes t-check-rotate {
+  from {
+    transform: rotate(var(--check-rotate-from, 80deg));
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes t-check-blur {
+  from {
+    filter: blur(var(--check-blur-from, 10px));
+  }
+  to {
+    filter: blur(0px);
+  }
+}
+
+@keyframes t-check-bob {
+  from {
+    transform: translateY(var(--check-y-amount, 40px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 @keyframes t-check-draw {
+  from {
+    stroke-dashoffset: 26;
+  }
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+@keyframes digit-pop-in {
+  0% {
+    transform: translate(
+      calc(var(--digit-distance, 8px) * var(--digit-dir-x, 0)),
+      calc(var(--digit-distance, 8px) * var(--digit-dir-y, 1))
+    );
+    opacity: 0;
+    filter: blur(var(--digit-blur, 2px));
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+    filter: blur(0);
   }
 }
 

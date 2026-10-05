@@ -63,6 +63,15 @@ for (const file of files) {
   if (content.includes("from 'bot-avatars'")) {
     npmDeps.push('bot-avatars');
   }
+  if (content.includes("from 'embla-carousel-react'") || content.includes('from "embla-carousel-react"')) {
+    npmDeps.push('embla-carousel-react');
+  }
+  if (content.includes("from 'recharts'") || content.includes('from "recharts"')) {
+    npmDeps.push('recharts');
+  }
+  if (content.includes("from 'react-resizable-panels'") || content.includes('from "react-resizable-panels"')) {
+    npmDeps.push('react-resizable-panels');
+  }
 
   const item = {
     name,

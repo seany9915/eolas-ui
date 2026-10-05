@@ -1,3 +1,13 @@
+/**
+ * Meter primitive (@base-ui/react/meter).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/meter
+ *
+ * TAXONOMY & USAGE:
+ * - Displays a graphical meter representing a scalar value within a known range (e.g. disk space, battery level, audio volume).
+ * - For task progress towards completion, use Progress instead.
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint.
+ */
 import * as React from 'react';
 import { Meter as BaseMeter } from '@base-ui/react/meter';
 import { cn } from '@/lib/utils';
@@ -12,9 +22,19 @@ export interface MeterProps {
   locale?: Intl.LocalesArgument;
   'aria-valuetext'?: string;
   getAriaValueText?: (formattedValue: string, value: number) => string;
+  children?: React.ReactNode;
   className?: string;
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'warning' | 'error' | 'success';
 }
+
+const colorRoleClasses: Record<'primary' | 'secondary' | 'tertiary' | 'warning' | 'error' | 'success', string> = {
+  primary: 'bg-primary',
+  secondary: 'bg-secondary',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  warning: 'bg-warning',
+  error: 'bg-error',
+  success: 'bg-success',
+};
 
 const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
   value,
@@ -26,18 +46,30 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
   locale,
   'aria-valuetext': ariaValueText,
   getAriaValueText,
+  children,
   className,
   colorRole = 'primary',
   ...props
 }, ref) => {
-  const bgClasses = {
-    primary: 'bg-primary',
-    secondary: 'bg-secondary',
-    tertiary: 'bg-tertiary',
-    warning: 'bg-warning',
-    error: 'bg-error',
-    success: 'bg-success',
-  }[colorRole];
+  // Composable compound usage
+  if (children) {
+    return (
+      <BaseMeter.Root
+        ref={ref}
+        value={value}
+        min={min}
+        max={max}
+        format={format}
+        locale={locale}
+        aria-valuetext={ariaValueText}
+        getAriaValueText={getAriaValueText}
+        className={cn('space-y-1.5 w-full', className)}
+        {...props}
+      >
+        {children}
+      </BaseMeter.Root>
+    );
+  }
 
   return (
     <BaseMeter.Root
@@ -55,7 +87,7 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
       {(label || value !== undefined) && (
         <div className="flex items-center justify-between font-label text-sm font-semibold text-on-surface">
           {label && <BaseMeter.Label>{label}</BaseMeter.Label>}
-          <BaseMeter.Value className="font-mono text-sm font-bold text-on-surface">
+          <BaseMeter.Value className="font-mono text-sm font-bold text-on-surface tabular-nums">
             {(formattedValue, val) => formattedValue || `${val}%`}
           </BaseMeter.Value>
         </div>
@@ -68,8 +100,8 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
       <BaseMeter.Track className="w-full h-3 rounded-full bg-surface-variant overflow-hidden relative border border-outline-variant">
         <BaseMeter.Indicator
           className={cn(
-            'h-full transition-all duration-[var(--duration-standard)] ease-[var(--ease-standard)]',
-            bgClasses
+            'h-full transition-[width] duration-[var(--duration-standard)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            colorRoleClasses[colorRole]
           )}
         />
       </BaseMeter.Track>
@@ -96,3 +128,4 @@ export const MeterValue = BaseMeter.Value;
 export const MeterTrack = BaseMeter.Track;
 export const MeterIndicator = BaseMeter.Indicator;
 
+export default Meter;

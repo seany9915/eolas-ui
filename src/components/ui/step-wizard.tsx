@@ -19,6 +19,8 @@ export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   nextLabel?: string;
   previousLabel?: string;
   showNavigationButtons?: boolean;
+  variant?: 'card' | 'embedded';
+  allowStepClick?: boolean;
 }
 
 export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
@@ -33,6 +35,8 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
       nextLabel = 'Next step',
       previousLabel = 'Back',
       showNavigationButtons = true,
+      variant = 'card',
+      allowStepClick = false,
       ...props
     },
     ref
@@ -68,13 +72,21 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
         role="region"
         aria-label={`Step ${currentStepIndex + 1} of ${steps.length}: ${currentStep?.title}`}
         className={cn(
-          '@container flex flex-col rounded-lg bg-surface border border-outline-variant shadow-ambient overflow-hidden w-full max-w-2xl mx-auto',
+          '@container flex flex-col w-full max-w-2xl mx-auto',
+          variant === 'card'
+            ? 'rounded-lg bg-surface border border-outline-variant shadow-ambient overflow-hidden'
+            : 'bg-transparent overflow-hidden',
           className
         )}
         {...props}
       >
         {/* Step Wizard Header / Navigation Indicator */}
-        <div className="flex flex-col gap-3 p-5 @sm:p-6 border-b border-outline-variant bg-surface-container/50">
+        <div
+          className={cn(
+            'flex flex-col gap-3 p-5 @sm:p-6 border-b border-outline-variant',
+            variant === 'card' ? 'bg-surface-container/50' : 'bg-surface-container/20 rounded-t-lg'
+          )}
+        >
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col min-w-0">
               <span className="font-mono text-xs font-semibold text-primary tabular-nums">
@@ -88,28 +100,34 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
               </h3>
             </div>
             <div className="flex items-center -mr-2 font-mono text-xs text-on-surface-variant tabular-nums shrink-0">
-              {steps.map((s, idx) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => onStepChange?.(idx)}
-                  disabled={idx > currentStepIndex}
-                  aria-label={`Jump to step ${idx + 1}: ${s.title}`}
-                  aria-current={idx === currentStepIndex ? 'step' : undefined}
-                  className="flex min-w-[44px] min-h-[44px] items-center justify-center focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer disabled:cursor-not-allowed"
-                >
-                  <span
-                    className={cn(
-                      'size-2.5 rounded-full transition-[width,background-color] duration-[var(--duration-quick)]',
-                      idx === currentStepIndex
-                        ? 'w-6 bg-primary'
-                        : idx < currentStepIndex
-                        ? 'bg-outline hover:bg-on-surface'
-                        : 'bg-outline-variant opacity-60'
-                    )}
-                  />
-                </button>
-              ))}
+              {steps.map((s, idx) => {
+                const isSelected = idx === currentStepIndex;
+                const isPast = idx < currentStepIndex;
+                const canNavigate = allowStepClick || isPast;
+
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => canNavigate && onStepChange?.(idx)}
+                    disabled={!canNavigate && !isSelected}
+                    aria-label={`Jump to step ${idx + 1}: ${s.title}`}
+                    aria-current={isSelected ? 'step' : undefined}
+                    className="flex min-w-[44px] min-h-[44px] items-center justify-center focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:pointer-events-none"
+                  >
+                    <span
+                      className={cn(
+                        'size-2.5 rounded-full transition-[width,background-color] duration-[var(--duration-quick)] motion-reduce:transition-none',
+                        isSelected
+                          ? 'w-6 bg-primary'
+                          : isPast
+                          ? 'bg-outline hover:bg-on-surface'
+                          : 'bg-outline-variant opacity-60'
+                      )}
+                    />
+                  </button>
+                );
+              })}
             </div>
           </div>
           {currentStep?.description && (
@@ -140,7 +158,12 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
 
         {/* Footer Navigation Controls */}
         {showNavigationButtons && (
-          <div className="flex items-center justify-between gap-4 px-5 py-4 bg-surface-container border-t border-outline-variant">
+          <div
+            className={cn(
+              'flex items-center justify-between gap-4 px-5 py-4 border-t border-outline-variant',
+              variant === 'card' ? 'bg-surface-container' : 'bg-surface-container/20 rounded-b-lg'
+            )}
+          >
             <Button
               type="button"
               variant="outlined"

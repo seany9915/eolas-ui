@@ -1,0 +1,20 @@
+{
+  "name": "number-pop-in",
+  "type": "registry:ui",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/number-pop-in.tsx",
+      "content": "import * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface NumberPopInProps extends React.HTMLAttributes<HTMLSpanElement> {\n  value: number;\n  prefix?: string;\n  suffix?: string;\n  decimals?: number;\n  format?: (value: number) => string;\n  className?: string;\n}\n\n/**\n * NumberPopIn\n *\n * Digit pop-in animation primitive based strictly on transitions.dev\n * (https://transitions.dev/detail.html?t=number-pop-in / 02-number-pop-in.md).\n *\n * Decomposes numeric strings into individual character spans. When updated,\n * each digit pops into place with 8px vertical travel, 2px micro-blur, and spring overshoot\n * (cubic-bezier(0.34, 1.45, 0.64, 1)). Trailing decimal digits stagger by 70ms so updates feel\n * alive without looking chaotic.\n *\n * Tabular numerals prevent layout jitter.\n * Complies with WCAG 2.2 and motion-reduce:animate-none.\n */\nexport const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(\n  (\n    {\n      value,\n      prefix = '',\n      suffix = '',\n      decimals = 0,\n      format,\n      className,\n      ...props\n    },\n    ref\n  ) => {\n    const formattedText = React.useMemo(() => {\n      if (format) return format(value);\n      if (decimals > 0) return value.toFixed(decimals);\n      return Math.round(value).toLocaleString();\n    }, [value, format, decimals]);\n\n    // Decompose into characters\n    const chars = formattedText.split('');\n    const totalChars = chars.length;\n\n    return (\n      <span\n        ref={ref}\n        key={formattedText}\n        className={cn(\n          'inline-flex items-baseline font-mono text-inherit tabular-nums select-none overflow-hidden',\n          className\n        )}\n        role=\"status\"\n        aria-live=\"polite\"\n        {...props}\n      >\n        {prefix && <span className=\"mr-0.5\">{prefix}</span>}\n\n        <span className=\"inline-flex items-baseline\">\n          {chars.map((char, idx) => {\n            // Transitions.dev rule: The last two characters stagger (stagger=1, stagger=2)\n            // so decimals feel alive.\n            let staggerIndex = 0;\n            if (idx === totalChars - 2) staggerIndex = 1;\n            if (idx === totalChars - 1) staggerIndex = 2;\n\n            const delayMs = staggerIndex * 70; // 70ms per digit (--digit-stagger)\n\n            return (\n              <span\n                key={`${idx}-${char}`}\n                style={{\n                  animationDelay: `${delayMs}ms`,\n                }}\n                className={cn(\n                  'inline-block animate-digit-pop will-change-[transform,opacity,filter]',\n                  'motion-reduce:animate-none motion-reduce:transform-none motion-reduce:filter-none'\n                )}\n              >\n                {char}\n              </span>\n            );\n          })}\n        </span>\n\n        {suffix && <span className=\"ml-0.5\">{suffix}</span>}\n      </span>\n    );\n  }\n);\n\nNumberPopIn.displayName = 'NumberPopIn';\n\nexport default NumberPopIn;\n",
+      "type": "registry:ui",
+      "target": "components/ui/number-pop-in.tsx"
+    }
+  ]
+}

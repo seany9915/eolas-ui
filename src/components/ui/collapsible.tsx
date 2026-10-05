@@ -1,3 +1,14 @@
+/**
+ * Collapsible primitive (@base-ui/react/collapsible).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/collapsible
+ *
+ * TAXONOMY & USAGE:
+ * - Use Collapsible for an interactive disclosure element that shows or hides a single panel.
+ * - Supports browser in-page search (hiddenUntilFound / hidden="until-found").
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
+ *   WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint.
+ */
 import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
 import { cn } from '@/lib/utils';
@@ -7,10 +18,11 @@ export interface CollapsibleProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
   open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: (open: boolean, eventDetails?: BaseCollapsible.Root.ChangeEventDetails) => void;
   disabled?: boolean;
   hiddenUntilFound?: boolean;
   keepMounted?: boolean;
+  variant?: 'card' | 'unstyled';
   className?: string;
 }
 
@@ -24,10 +36,17 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
   ({ children, className, unstyled = false, ...props }, ref) => (
     <BaseCollapsible.Panel
       ref={ref}
-      className="flex flex-col justify-end overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-150 ease-out data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
+      className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
       {...props}
     >
-      <div className={cn(unstyled ? '' : 'pt-3 border-t border-outline-variant/40 font-sans text-xs text-on-surface-variant leading-relaxed', className)}>
+      <div
+        className={cn(
+          unstyled
+            ? ''
+            : 'pt-3 border-t border-outline-variant/40 font-sans text-sm text-on-surface-variant leading-relaxed',
+          className
+        )}
+      >
         {children}
       </div>
     </BaseCollapsible.Panel>
@@ -49,14 +68,19 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
     <BaseCollapsible.Trigger
       ref={ref}
       className={cn(
-        'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-left group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-md',
+        'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-left group rounded-md',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        'disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
       {...props}
     >
       {children}
       {!hideChevron && (
-        <span className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-150 ease-out" aria-hidden="true">
+        <span
+          className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none shrink-0"
+          aria-hidden="true"
+        >
           keyboard_arrow_down
         </span>
       )}
@@ -74,15 +98,22 @@ const CollapsibleComponent: React.FC<CollapsibleProps> = ({
   disabled,
   hiddenUntilFound,
   keepMounted,
+  variant,
   className,
 }) => {
+  const isCard = variant === 'card' || (variant === undefined && Boolean(title));
+
   return (
     <BaseCollapsible.Root
       defaultOpen={defaultOpen}
       open={open}
       onOpenChange={onOpenChange}
       disabled={disabled}
-      className={cn('w-full rounded-[0.75rem] bg-surface border border-outline-variant p-4', className)}
+      className={cn(
+        'w-full',
+        isCard && 'rounded-xl bg-surface border border-outline-variant p-4 shadow-ambient',
+        className
+      )}
     >
       {title ? (
         <>

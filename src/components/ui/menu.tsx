@@ -2,21 +2,6 @@ import * as React from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { cn } from '@/lib/utils';
 
-/**
- * Menu Component (Single-Button Action Dropdown)
- *
- * WAI-ARIA Role: role="menu" / role="menuitem"
- * Primary Purpose: Command execution triggered from a single button (e.g., "..." overflow actions, export menus).
- *
- * TAXONOMY & USAGE GUIDELINES:
- * - USE THIS: For standalone dropdown action buttons or overflow menus triggering immediate callbacks (onClick).
- * - DO NOT USE:
- *   - For desktop multi-menu command bars (File, Edit, View) -> Use <Menubar>.
- *   - For global site or application URL routing links -> Use <NavigationMenu>.
- *   - For secondary pointer/right-click actions -> Use <ContextMenu>.
- *   - For switching content views/panels on the same page -> Use <Tabs>.
- */
-
 export interface MenuItemData {
   id: string;
   label: string;
@@ -25,9 +10,6 @@ export interface MenuItemData {
   disabled?: boolean;
   onClick?: () => void;
 }
-
-// Declaration merging: MenuItem acts both as an interface for declarative items and as a styled component
-export interface MenuItem extends MenuItemData {}
 
 export interface MenuItemProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Item> {
   destructive?: boolean;
@@ -39,21 +21,21 @@ export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
     <BaseMenu.Item
       ref={ref}
       className={cn(
-        'flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+        'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
         destructive
-          ? 'text-error hover:bg-error-container/30 focus:bg-error-container/30 data-[highlighted]:bg-error-container/30'
-          : 'text-on-surface hover:bg-surface-container hover:text-on-surface focus:bg-surface-container focus:text-on-surface data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
+          ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
+          : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
       {icon && (
-        <span className="material-symbols-outlined text-lg" aria-hidden="true">
+        <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
           {icon}
         </span>
       )}
-      {children}
+      <span className="truncate flex-1">{children}</span>
     </BaseMenu.Item>
   )
 );
@@ -64,17 +46,42 @@ export interface MenuContentProps extends React.ComponentPropsWithoutRef<typeof 
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
+  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  containerClassName?: string;
 }
 
 export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
-  ({ className, children, side, align, sideOffset = 6, alignOffset, ...props }, ref) => (
+  (
+    {
+      className,
+      children,
+      side,
+      align,
+      sideOffset = 4,
+      alignOffset,
+      collisionPadding = 8,
+      containerClassName,
+      ...props
+    },
+    ref
+  ) => (
     <BaseMenu.Portal>
-      {/* Layering: Menu positioner creates z-50 stacking context to float over page canvas */}
-      <BaseMenu.Positioner side={side} align={align} sideOffset={sideOffset} alignOffset={alignOffset} className="z-50 outline-none">
+      <BaseMenu.Positioner
+        side={side}
+        align={align}
+        sideOffset={sideOffset}
+        alignOffset={alignOffset}
+        collisionPadding={collisionPadding}
+        className={cn('z-50 outline-none', containerClassName)}
+      >
         <BaseMenu.Popup
           ref={ref}
           className={cn(
-            'min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+            'min-w-[200px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
+            'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
+            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
+            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
+            'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -93,28 +100,208 @@ export const MenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseMenu.Separator
     ref={ref}
-    className={cn('h-[1px] bg-outline-variant my-1 -mx-1', className)}
+    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
     {...props}
   />
 ));
 MenuSeparator.displayName = 'MenuSeparator';
 
-export interface MenuProps {
+export interface MenuTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger> {}
+
+export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
+  ({ className, children, ...props }, ref) => (
+    <BaseMenu.Trigger
+      ref={ref}
+      className={cn(
+        'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </BaseMenu.Trigger>
+  )
+);
+MenuTrigger.displayName = 'MenuTrigger';
+
+export interface MenuCheckboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.CheckboxItem> {
+  icon?: string;
+}
+
+export const MenuCheckboxItem = React.forwardRef<HTMLDivElement, MenuCheckboxItemProps>(
+  ({ className, children, icon, ...props }, ref) => (
+    <BaseMenu.CheckboxItem
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      <BaseMenu.CheckboxItemIndicator className="shrink-0 text-primary flex items-center justify-center">
+        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
+          check
+        </span>
+      </BaseMenu.CheckboxItemIndicator>
+    </BaseMenu.CheckboxItem>
+  )
+);
+MenuCheckboxItem.displayName = 'MenuCheckboxItem';
+
+export interface MenuRadioItemProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.RadioItem> {
+  icon?: string;
+}
+
+export const MenuRadioItem = React.forwardRef<HTMLDivElement, MenuRadioItemProps>(
+  ({ className, children, icon, ...props }, ref) => (
+    <BaseMenu.RadioItem
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      <BaseMenu.RadioItemIndicator className="shrink-0 text-primary flex items-center justify-center">
+        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
+          radio_button_checked
+        </span>
+      </BaseMenu.RadioItemIndicator>
+    </BaseMenu.RadioItem>
+  )
+);
+MenuRadioItem.displayName = 'MenuRadioItem';
+
+export interface MenuSubmenuTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.SubmenuTrigger> {
+  icon?: string;
+}
+
+export const MenuSubmenuTrigger = React.forwardRef<HTMLDivElement, MenuSubmenuTriggerProps>(
+  ({ className, children, icon, ...props }, ref) => (
+    <BaseMenu.SubmenuTrigger
+      ref={ref}
+      className={cn(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2.5 truncate">
+        {icon && (
+          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <span className="truncate">{children}</span>
+      </div>
+      <span className="material-symbols-outlined text-base text-on-surface-variant shrink-0" aria-hidden="true">
+        chevron_right
+      </span>
+    </BaseMenu.SubmenuTrigger>
+  )
+);
+MenuSubmenuTrigger.displayName = 'MenuSubmenuTrigger';
+
+export const MenuGroupLabel = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.GroupLabel>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.GroupLabel
+    ref={ref}
+    className={cn('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
+    {...props}
+  />
+));
+MenuGroupLabel.displayName = 'MenuGroupLabel';
+
+export const MenuGroup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Group>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.Group ref={ref} className={cn('py-1', className)} {...props} />
+));
+MenuGroup.displayName = 'MenuGroup';
+
+export const MenuRadioGroup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.RadioGroup>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.RadioGroup ref={ref} className={cn('py-1', className)} {...props} />
+));
+MenuRadioGroup.displayName = 'MenuRadioGroup';
+
+export const MenuLinkItem = React.forwardRef<
+  HTMLAnchorElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.LinkItem>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.LinkItem
+    ref={ref}
+    className={cn(
+      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+      className
+    )}
+    {...props}
+  />
+));
+MenuLinkItem.displayName = 'MenuLinkItem';
+
+export interface MenuProps<Payload = unknown> {
   label?: React.ReactNode;
   description?: React.ReactNode;
   triggerLabel?: string;
-  trigger?: React.ReactElement;
+  trigger?: React.ReactNode;
   items?: MenuItemData[];
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: (open: boolean, eventDetails: BaseMenu.Root.ChangeEventDetails) => void;
+  onOpenChangeComplete?: (open: boolean) => void;
   modal?: boolean;
-  className?: string;
+  loopFocus?: boolean;
+  highlightItemOnHover?: boolean;
+  orientation?: 'horizontal' | 'vertical';
+  disabled?: boolean;
+  closeParentOnEsc?: boolean;
+  actionsRef?: React.RefObject<BaseMenu.Root.Actions | null>;
+  handle?: BaseMenu.Handle<Payload>;
+  triggerId?: string | null;
+  defaultTriggerId?: string | null;
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  align?: 'start' | 'center' | 'end';
+  sideOffset?: number;
+  alignOffset?: number;
+  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   fullWidth?: boolean;
-  children?: React.ReactNode;
+  className?: string;
+  children?: BaseMenu.Root.Props<Payload>['children'];
 }
 
-const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
+function MenuComponent<Payload = unknown>({
   label,
   description,
   triggerLabel = 'Menu',
@@ -123,93 +310,181 @@ const MenuComponent = React.forwardRef<HTMLDivElement, MenuProps>(({
   open,
   defaultOpen,
   onOpenChange,
-  modal,
-  className,
+  onOpenChangeComplete,
+  modal = true,
+  loopFocus = true,
+  highlightItemOnHover = true,
+  orientation = 'vertical',
+  disabled = false,
+  closeParentOnEsc = false,
+  actionsRef,
+  handle,
+  triggerId,
+  defaultTriggerId,
+  side,
+  align,
+  sideOffset = 4,
+  alignOffset,
+  collisionPadding = 8,
   fullWidth = true,
+  className,
   children,
-  ...props
-}, ref) => {
+}: MenuProps<Payload>): React.JSX.Element {
   const generatedId = React.useId();
   const menuId = `menu-${generatedId}`;
 
-  return (
-    <div ref={ref} className="flex flex-col gap-1.5 w-full" {...props}>
-      {label && (
-        <label htmlFor={menuId} className="font-label text-sm font-semibold text-on-surface cursor-pointer">
-          {label}
-        </label>
-      )}
-      {description && (
-        <span className="font-sans text-sm text-on-surface-variant">
-          {description}
-        </span>
-      )}
-      <BaseMenu.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} modal={modal}>
-        {trigger ? (
-          <BaseMenu.Trigger id={menuId} render={trigger} />
-        ) : (
-          <BaseMenu.Trigger
-            id={menuId}
-            className={cn(
-              'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border-[1px] border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
-              fullWidth ? 'w-full' : 'w-max',
-              className
-            )}
-          >
-            <span>{triggerLabel}</span>
-            <span className="material-symbols-outlined text-lg text-on-surface-variant" aria-hidden="true">
-              arrow_drop_down
-            </span>
-          </BaseMenu.Trigger>
-        )}
-        <BaseMenu.Portal>
-          {/* Layering: Menu positioner creates z-50 stacking context to float over page canvas */}
-          <BaseMenu.Positioner sideOffset={6} className="z-50 outline-none">
-            <BaseMenu.Popup
-              className="min-w-[220px] p-1.5 rounded bg-surface border-[1px] border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none"
-            >
-              {children
-                ? children
-                : items?.map((item) => (
-                    <MenuItem
-                      key={item.id}
-                      onClick={item.onClick}
-                      disabled={item.disabled}
-                      destructive={item.destructive}
-                      icon={item.icon}
-                    >
-                      <span>{item.label}</span>
-                    </MenuItem>
-                  ))}
-            </BaseMenu.Popup>
-          </BaseMenu.Positioner>
-        </BaseMenu.Portal>
+  // If used as composable compound root (<Menu open={...}><MenuTrigger /><MenuContent /></Menu>)
+  if (!trigger && !items && !label && !description) {
+    return (
+      <BaseMenu.Root<Payload>
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        onOpenChangeComplete={onOpenChangeComplete}
+        modal={modal}
+        loopFocus={loopFocus}
+        highlightItemOnHover={highlightItemOnHover}
+        orientation={orientation}
+        disabled={disabled}
+        closeParentOnEsc={closeParentOnEsc}
+        actionsRef={actionsRef}
+        handle={handle}
+        triggerId={triggerId}
+        defaultTriggerId={defaultTriggerId}
+      >
+        {children}
       </BaseMenu.Root>
-    </div>
-  );
-});
+    );
+  }
 
-MenuComponent.displayName = 'Menu';
+  const renderChildren = (renderProps: { payload: Payload | undefined }) => {
+    if (typeof children === 'function') {
+      return children(renderProps);
+    }
+    return children;
+  };
+
+  const menuTree = (
+    <BaseMenu.Root<Payload>
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={onOpenChangeComplete}
+      modal={modal}
+      loopFocus={loopFocus}
+      highlightItemOnHover={highlightItemOnHover}
+      orientation={orientation}
+      disabled={disabled}
+      closeParentOnEsc={closeParentOnEsc}
+      actionsRef={actionsRef}
+      handle={handle}
+      triggerId={triggerId}
+      defaultTriggerId={defaultTriggerId}
+    >
+      {(renderProps) => (
+        <>
+          {trigger ? (
+            <BaseMenu.Trigger
+              id={menuId}
+              render={React.isValidElement(trigger) ? trigger : undefined}
+            >
+              {!React.isValidElement(trigger) ? trigger : undefined}
+            </BaseMenu.Trigger>
+          ) : (
+            <BaseMenu.Trigger
+              id={menuId}
+              className={cn(
+                'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+                fullWidth ? 'w-full' : 'w-max',
+                className
+              )}
+            >
+              <span>{triggerLabel}</span>
+              <span className="material-symbols-outlined text-lg text-on-surface-variant" aria-hidden="true">
+                arrow_drop_down
+              </span>
+            </BaseMenu.Trigger>
+          )}
+          <BaseMenu.Portal>
+            <BaseMenu.Positioner
+              side={side}
+              align={align}
+              sideOffset={sideOffset}
+              alignOffset={alignOffset}
+              collisionPadding={collisionPadding}
+              className="z-50 outline-none"
+            >
+              <BaseMenu.Popup
+                className={cn(
+                  'min-w-[200px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
+                  'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
+                  'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
+                  'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
+                  'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+                  className
+                )}
+              >
+                {children
+                  ? renderChildren(renderProps)
+                  : items?.map((item) => (
+                      <MenuItem
+                        key={item.id}
+                        onClick={item.onClick}
+                        disabled={item.disabled}
+                        destructive={item.destructive}
+                        icon={item.icon}
+                      >
+                        {item.label}
+                      </MenuItem>
+                    ))}
+              </BaseMenu.Popup>
+            </BaseMenu.Positioner>
+          </BaseMenu.Portal>
+        </>
+      )}
+    </BaseMenu.Root>
+  );
+
+  if (label || description) {
+    return (
+      <div className="flex flex-col gap-1.5 w-full">
+        {label && (
+          <label htmlFor={menuId} className="font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none">
+            {label}
+          </label>
+        )}
+        {description && (
+          <span className="font-sans text-sm text-on-surface-variant">
+            {description}
+          </span>
+        )}
+        {menuTree}
+      </div>
+    );
+  }
+
+  return menuTree;
+}
 
 // Compound export mapping Base UI primitives and styled composites
 export const Menu = Object.assign(MenuComponent, {
   Root: BaseMenu.Root,
-  Trigger: BaseMenu.Trigger,
+  Trigger: MenuTrigger,
   Portal: BaseMenu.Portal,
   Positioner: BaseMenu.Positioner,
   Popup: BaseMenu.Popup,
   Content: MenuContent,
   Item: MenuItem,
-  LinkItem: BaseMenu.LinkItem,
+  LinkItem: MenuLinkItem,
   Separator: MenuSeparator,
-  Group: BaseMenu.Group,
-  GroupLabel: BaseMenu.GroupLabel,
+  Group: MenuGroup,
+  GroupLabel: MenuGroupLabel,
   SubmenuRoot: BaseMenu.SubmenuRoot,
-  SubmenuTrigger: BaseMenu.SubmenuTrigger,
-  CheckboxItem: BaseMenu.CheckboxItem,
+  SubmenuTrigger: MenuSubmenuTrigger,
+  CheckboxItem: MenuCheckboxItem,
   CheckboxItemIndicator: BaseMenu.CheckboxItemIndicator,
-  RadioGroup: BaseMenu.RadioGroup,
-  RadioItem: BaseMenu.RadioItem,
+  RadioGroup: MenuRadioGroup,
+  RadioItem: MenuRadioItem,
   RadioItemIndicator: BaseMenu.RadioItemIndicator,
   Arrow: BaseMenu.Arrow,
   Backdrop: BaseMenu.Backdrop,
@@ -221,20 +496,12 @@ export const Menu = Object.assign(MenuComponent, {
 // Re-export Base UI primitives and styled components for composition
 export { BaseMenu };
 export const MenuRoot = BaseMenu.Root;
-export const MenuTrigger = BaseMenu.Trigger;
 export const MenuPortal = BaseMenu.Portal;
 export const MenuPositioner = BaseMenu.Positioner;
 export const MenuPopup = BaseMenu.Popup;
 export const MenuItemPrimitive = BaseMenu.Item;
-export const MenuLinkItem = BaseMenu.LinkItem;
-export const MenuGroup = BaseMenu.Group;
-export const MenuGroupLabel = BaseMenu.GroupLabel;
 export const MenuSubmenuRoot = BaseMenu.SubmenuRoot;
-export const MenuSubmenuTrigger = BaseMenu.SubmenuTrigger;
-export const MenuCheckboxItem = BaseMenu.CheckboxItem;
 export const MenuCheckboxItemIndicator = BaseMenu.CheckboxItemIndicator;
-export const MenuRadioGroup = BaseMenu.RadioGroup;
-export const MenuRadioItem = BaseMenu.RadioItem;
 export const MenuRadioItemIndicator = BaseMenu.RadioItemIndicator;
 export const MenuArrow = BaseMenu.Arrow;
 export const MenuBackdrop = BaseMenu.Backdrop;
@@ -243,4 +510,3 @@ export const createMenuHandle = BaseMenu.createHandle;
 export const MenuHandle = BaseMenu.Handle;
 
 export default Menu;
-

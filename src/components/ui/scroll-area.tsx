@@ -1,3 +1,14 @@
+/**
+ * ScrollArea primitive (@base-ui/react/scroll-area).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/scroll-area
+ *
+ * TAXONOMY & USAGE:
+ * - Augments native browser scrolling with custom-styled, accessible scrollbars.
+ * - Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
+ *   and motion restraint.
+ */
 import * as React from 'react';
 import { ScrollArea as BaseScrollArea } from '@base-ui/react/scroll-area';
 import { cn } from '@/lib/utils';
@@ -32,7 +43,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
       ref={ref}
       className={cn(
         'relative overflow-hidden w-full',
-        variant === 'framed' && 'rounded-md border border-outline-variant bg-surface',
+        variant === 'framed' && 'rounded-xl border border-outline-variant bg-surface',
         className
       )}
       style={style}
@@ -41,7 +52,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
       <BaseScrollArea.Viewport
         style={maxHeight !== undefined ? { maxHeight } : undefined}
         className={cn(
-          'w-full h-full focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+          'w-full h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           fade && 'mask-linear-[to_bottom,transparent_0,black_min(24px,var(--scroll-area-overflow-y-start)),black_calc(100%_-_min(24px,var(--scroll-area-overflow-y-end,24px))),transparent_100%] mask-no-repeat',
           viewportClassName
         )}
@@ -54,7 +65,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
       {showVertical && (
         <BaseScrollArea.Scrollbar
           orientation="vertical"
-          className="flex select-none touch-none p-0.5 w-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-150 opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
+          className="flex select-none touch-none p-0.5 w-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
         >
           <BaseScrollArea.Thumb className="w-full bg-outline/60 hover:bg-outline rounded-full transition-colors" />
         </BaseScrollArea.Scrollbar>
@@ -63,7 +74,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
       {showHorizontal && (
         <BaseScrollArea.Scrollbar
           orientation="horizontal"
-          className="flex select-none touch-none p-0.5 h-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-150 opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
+          className="flex select-none touch-none p-0.5 h-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
         >
           <BaseScrollArea.Thumb className="h-full bg-outline/60 hover:bg-outline rounded-full transition-colors" />
         </BaseScrollArea.Scrollbar>

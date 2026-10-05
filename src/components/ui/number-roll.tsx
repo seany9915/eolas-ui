@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { NumberPopIn, NumberPopInProps } from '@/components/ui/number-pop-in';
+import { SpinningCounter, SpinningCounterProps } from '@/components/ui/spinning-counter';
 
 export interface NumberRollProps extends React.HTMLAttributes<HTMLSpanElement> {
   value: number;
@@ -7,77 +8,72 @@ export interface NumberRollProps extends React.HTMLAttributes<HTMLSpanElement> {
   suffix?: string;
   decimals?: number;
   format?: (value: number) => string;
+  /** Transition style: 'pop-in' (default from transitions.dev) or 'spinning' (slot-machine reels) */
+  variant?: 'pop-in' | 'spinning';
+  /** Cell height for spinning reel variant. Defaults to 28px. */
+  cellHeight?: number;
+  className?: string;
 }
 
 /**
  * NumberRoll
  *
- * Tabular number counter based on transitions.dev / Emil Kowalski polish rules.
- * Transitions updating numbers (accuracy percentages, decibel levels, therapy durations)
- * with a subtle vertical slide and 2px micro-blur rather than an abrupt visual snap.
+ * Tabular number transition primitive based strictly on transitions.dev.
+ * Supports:
+ * - 'pop-in' (default): Individual digit pop-in with spring overshoot and decimal stagger (02-number-pop-in.md).
+ * - 'spinning': Slot-machine vertical reel roll with soft edge masks (26-spinning-counter.md).
  *
- * Strictly adheres to Atkinson/Roboto Mono typography and prefers-reduced-motion.
+ * Tabular numerals prevent layout jitter across all variants.
+ * Strictly adheres to Roboto Mono typography and prefers-reduced-motion.
  */
-export const NumberRoll: React.FC<NumberRollProps> = ({
-  value,
-  prefix = '',
-  suffix = '',
-  decimals = 0,
-  format,
-  className,
-  ...props
-}) => {
-  const [displayValue, setDisplayValue] = React.useState(value);
-  const [animating, setAnimating] = React.useState(false);
-  const [direction, setDirection] = React.useState<'up' | 'down'>('up');
-  const prevValueRef = React.useRef(value);
-
-  React.useEffect(() => {
-    if (value !== prevValueRef.current) {
-      setDirection(value > prevValueRef.current ? 'up' : 'down');
-      prevValueRef.current = value;
-      setAnimating(true);
-      setDisplayValue(value);
-
-      const timer = setTimeout(() => {
-        setAnimating(false);
-      }, 250); // Matches --duration-fast
-
-      return () => clearTimeout(timer);
+export const NumberRoll = React.forwardRef<HTMLSpanElement, NumberRollProps>(
+  (
+    {
+      value,
+      prefix = '',
+      suffix = '',
+      decimals = 0,
+      format,
+      variant = 'pop-in',
+      cellHeight,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    if (variant === 'spinning') {
+      return (
+        <SpinningCounter
+          ref={ref}
+          value={value}
+          prefix={prefix}
+          suffix={suffix}
+          decimals={decimals}
+          format={format}
+          cellHeight={cellHeight}
+          className={className}
+          {...props}
+        />
+      );
     }
-  }, [value]);
 
-  const formattedText = format
-    ? format(displayValue)
-    : decimals > 0
-    ? displayValue.toFixed(decimals)
-    : Math.round(displayValue).toLocaleString();
-
-  return (
-    <span
-      className={cn(
-        'inline-flex items-baseline font-mono text-inherit tabular-nums select-none overflow-hidden',
-        className
-      )}
-      role="status"
-      aria-live="polite"
-      {...props}
-    >
-      {prefix && <span className="mr-0.5">{prefix}</span>}
-
-      <span
-        className={cn(
-          'inline-block transition-[transform,opacity,filter] duration-[var(--duration-fast)] ease-[var(--ease-smooth-out)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
-          animating && direction === 'up' && 'animate-roll-up',
-          animating && direction === 'down' && 'animate-roll-down'
-        )}
-      >
-        {formattedText}
-      </span>
-
-      {suffix && <span className="ml-0.5">{suffix}</span>}
-    </span>
-  );
-};
+    return (
+      <NumberPopIn
+        ref={ref}
+        value={value}
+        prefix={prefix}
+        suffix={suffix}
+        decimals={decimals}
+        format={format}
+        className={className}
+        {...props}
+      />
+    );
+  }
+);
 
 NumberRoll.displayName = 'NumberRoll';
+
+// Re-export underlying transitions.dev primitives
+export { NumberPopIn, SpinningCounter };
+export default NumberRoll;

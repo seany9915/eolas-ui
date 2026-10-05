@@ -1,3 +1,14 @@
+/**
+ * Slider primitive (@base-ui/react/slider).
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/slider
+ *
+ * TAXONOMY & USAGE:
+ * - Allows users to make selections from a range of values along a horizontal or vertical track.
+ * - Supports single-value or multi-thumb range selections with collision behaviors ('push', 'swap', 'none').
+ * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
+ *   WCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint.
+ */
 import * as React from 'react';
 import { Slider as BaseSlider } from '@base-ui/react/slider';
 import { cn } from '@/lib/utils';
@@ -7,8 +18,8 @@ export interface SliderProps {
   description?: React.ReactNode;
   value?: number | number[];
   defaultValue?: number | number[];
-  onValueChange?: (value: any) => void;
-  onValueCommitted?: (value: any) => void;
+  onValueChange?: (value: any, eventDetails?: BaseSlider.Root.ChangeEventDetails) => void;
+  onValueCommitted?: (value: any, eventDetails?: BaseSlider.Root.CommitEventDetails) => void;
   min?: number;
   max?: number;
   step?: number;
@@ -19,6 +30,7 @@ export interface SliderProps {
   orientation?: 'horizontal' | 'vertical';
   name?: string;
   disabled?: boolean;
+  children?: React.ReactNode;
   className?: string;
 }
 
@@ -39,12 +51,40 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   orientation = 'horizontal',
   name,
   disabled,
+  children,
   className,
   ...props
 }, ref) => {
   const isRange = Array.isArray(value ?? defaultValue);
   const effectiveMinSteps = minStepsBetweenValues ?? (isRange ? 1 : 0);
   const effectiveCollision = thumbCollisionBehavior ?? (isRange ? 'none' : 'push');
+
+  // Composable compound usage
+  if (children) {
+    return (
+      <BaseSlider.Root
+        ref={ref}
+        value={value}
+        defaultValue={defaultValue}
+        onValueChange={onValueChange}
+        onValueCommitted={onValueCommitted}
+        min={min}
+        max={max}
+        step={step}
+        minStepsBetweenValues={effectiveMinSteps}
+        thumbCollisionBehavior={effectiveCollision}
+        format={format}
+        locale={locale}
+        orientation={orientation}
+        name={name}
+        disabled={disabled}
+        className={cn('flex flex-col gap-2 w-full', className)}
+        {...props}
+      >
+        {children}
+      </BaseSlider.Root>
+    );
+  }
 
   return (
     <BaseSlider.Root
@@ -69,7 +109,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
       {(label || value !== undefined) && (
         <div className="flex justify-between items-center font-label text-sm font-semibold text-on-surface">
           {label && <BaseSlider.Label>{label}</BaseSlider.Label>}
-          <BaseSlider.Value className="text-on-surface-variant font-mono text-sm font-medium">
+          <BaseSlider.Value className="text-on-surface-variant font-mono text-sm font-medium tabular-nums">
             {(formattedValues, values) =>
               formattedValues.length > 0
                 ? formattedValues.join(' - ')
@@ -93,18 +133,18 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
               <BaseSlider.Thumb
                 index={0}
                 aria-label="Minimum value"
-                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+                className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
               <BaseSlider.Thumb
                 index={1}
                 aria-label="Maximum value"
-                className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+                className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
             </>
           ) : (
             <BaseSlider.Thumb
               aria-label={typeof label === 'string' ? label : 'Slider value'}
-              className="block w-5 h-5 rounded-full bg-primary border-2 border-surface shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary hover:scale-110 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-grab active:cursor-grabbing"
+              className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             />
           )}
         </BaseSlider.Track>

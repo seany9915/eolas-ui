@@ -76,7 +76,7 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
         role="group"
         aria-label={`File attachment: ${fileName}`}
         className={cn(
-          '@container relative flex flex-col rounded-md border bg-surface p-3 transition-colors duration-[var(--duration-quick)]',
+          '@container relative flex flex-col rounded-lg border bg-surface p-3 transition-[border-color,background-color] duration-[var(--duration-quick)]',
           isError ? 'border-error' : 'border-outline-variant hover:border-outline',
           className
         )}
@@ -138,9 +138,7 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
 
         {/* Upload Progress Track */}
         {isUploading && (
-          <div className="mt-2.5 w-full">
-            <Progress value={uploadProgress} className="h-1.5" />
-          </div>
+          <Progress value={uploadProgress} showValue={false} size="sm" className="w-full mt-2.5" />
         )}
       </div>
     );
