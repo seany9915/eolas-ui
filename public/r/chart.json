@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "chart",
   "type": "registry:ui",
+  "title": "Chart",
+  "description": "Eolas UI Chart component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

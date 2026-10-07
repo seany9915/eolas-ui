@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "clinician-tip",
   "type": "registry:ui",
+  "title": "Clinician Tip",
+  "description": "Eolas UI Clinician Tip component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "navigation-menu",
   "type": "registry:ui",
+  "title": "Navigation Menu",
+  "description": "Eolas UI Navigation Menu component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

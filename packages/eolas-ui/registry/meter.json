@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "meter",
   "type": "registry:ui",
+  "title": "Meter",
+  "description": "Meter primitive (@base-ui/react/meter).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/meter.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Displays a graphical meter representing a scalar value within a known range (e.g. disk space, battery level, audio volume).",
+      "For task progress towards completion, use Progress instead.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+    ]
+  },
+  "docs": "Meter primitive (@base-ui/react/meter).\nBase UI Documentation: https://base-ui.com/react/components/meter\nTAXONOMY & USAGE:\n- Displays a graphical meter representing a scalar value within a known range (e.g. disk space, battery level, audio volume).\n- For task progress towards completion, use Progress instead.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
 }

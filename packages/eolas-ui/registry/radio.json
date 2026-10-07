@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "radio",
   "type": "registry:ui",
+  "title": "Radio",
+  "description": "Radio & RadioGroup primitives (@base-ui/react/radio, @base-ui/react/radio-group).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/radio.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use RadioGroup for selecting a single option from a visible list of 2-7 mutually exclusive choices.",
+      "Supports roving tabindex arrow key navigation.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+    ]
+  },
+  "docs": "Radio & RadioGroup primitives (@base-ui/react/radio, @base-ui/react/radio-group).\nBase UI Documentation: https://base-ui.com/react/components/radio\nTAXONOMY & USAGE:\n- Use RadioGroup for selecting a single option from a visible list of 2-7 mutually exclusive choices.\n- Supports roving tabindex arrow key navigation.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nflush primary indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
 }

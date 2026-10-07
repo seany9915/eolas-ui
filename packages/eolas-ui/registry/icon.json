@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "icon",
   "type": "registry:ui",
+  "title": "Icon",
+  "description": "Eolas UI Icon component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

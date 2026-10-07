@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "alert-dialog",
   "type": "registry:ui",
+  "title": "Alert Dialog",
+  "description": "Eolas UI Alert Dialog component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

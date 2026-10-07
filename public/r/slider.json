@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "slider",
   "type": "registry:ui",
+  "title": "Slider",
+  "description": "Slider primitive (@base-ui/react/slider).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/slider.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Allows users to make selections from a range of values along a horizontal or vertical track.",
+      "Supports single-value or multi-thumb range selections with collision behaviors ('push', 'swap', 'none').",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint."
+    ]
+  },
+  "docs": "Slider primitive (@base-ui/react/slider).\nBase UI Documentation: https://base-ui.com/react/components/slider\nTAXONOMY & USAGE:\n- Allows users to make selections from a range of values along a horizontal or vertical track.\n- Supports single-value or multi-thumb range selections with collision behaviors ('push', 'swap', 'none').\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint."
 }

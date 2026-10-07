@@ -24,42 +24,76 @@ export type ComboboxItem = ComboboxOption;
 
 export interface ComboboxGroupOption {
   label: string;
-  options: ComboboxOption[];
+  items?: ComboboxOption[];
+  options?: ComboboxOption[];
 }
 
 export type ComboboxGroupItem = ComboboxGroupOption;
 
-export interface ComboboxProps<ItemValue = ComboboxOption> {
+type ComboboxValueType<Value, Multiple extends boolean | undefined> = Multiple extends true ? Value[] : Value;
+
+export interface ComboboxProps<Item = ComboboxOption, Value = string, Multiple extends boolean | undefined = false> {
   label?: React.ReactNode;
   placeholder?: string;
   options?: ComboboxOption[];
-  items?: readonly ItemValue[];
+  items?: readonly any[] | BaseCombobox.Root.Props<Value, Multiple, Item>['items'];
   groups?: ComboboxGroupOption[];
-  value?: string | string[] | null;
-  defaultValue?: string | string[] | null;
+  value?: ComboboxValueType<Value, Multiple> | null;
+  defaultValue?: ComboboxValueType<Value, Multiple> | null;
   inputValue?: string;
   defaultInputValue?: string;
-  onValueChange?: (val: string | null) => void;
-  onInputValueChange?: (input: string, eventDetails?: BaseCombobox.Root.ChangeEventDetails) => void;
-  onChange?: (val: string | null) => void;
-  multiple?: boolean;
+  onValueChange?: (value: ComboboxValueType<Value, Multiple> | (Multiple extends true ? never : null), eventDetails: BaseCombobox.Root.ChangeEventDetails) => void;
+  onChange?: (value: ComboboxValueType<Value, Multiple> | (Multiple extends true ? never : null)) => void;
+  onInputValueChange?: (inputValue: string, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void;
+  onOpenChangeComplete?: (open: boolean) => void;
+  multiple?: Multiple;
   clearable?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
+  required?: boolean;
   name?: string;
   id?: string;
+  form?: string;
+  autoComplete?: string;
+  autoHighlight?: boolean;
+  highlightItemOnHover?: boolean;
+  loopFocus?: boolean;
+  openOnInputClick?: boolean;
+  modal?: boolean;
+  actionsRef?: React.RefObject<BaseCombobox.Root.Actions | null>;
+  inputRef?: React.Ref<HTMLInputElement>;
+  itemToStringLabel?: (itemValue: any) => string;
+  itemToStringValue?: (itemValue: any) => string;
+  isItemEqualToValue?: (itemValue: any, value: any) => boolean;
+  filter?: BaseCombobox.Root.Props<Value, Multiple, Item>['filter'];
+  filteredItems?: BaseCombobox.Root.Props<Value, Multiple, Item>['filteredItems'];
+  limit?: number;
   error?: boolean | string;
   description?: React.ReactNode;
+  container?: BaseCombobox.Portal.Props['container'];
+  anchor?: BaseCombobox.Positioner.Props['anchor'];
   side?: 'top' | 'bottom' | 'left' | 'right';
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  collisionBoundary?: BaseCombobox.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BaseCombobox.Positioner.Props['collisionAvoidance'];
+  positionerClassName?: string;
+  popupClassName?: string;
+  listClassName?: string;
+  inputGroupClassName?: string;
+  inputClassName?: string;
+  emptyMessage?: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
   children?: React.ReactNode;
   className?: string;
-  inputClassName?: string;
 }
 
-const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any>>(
+const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, any, any>>(
   (
     {
       label,
@@ -72,38 +106,119 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any>>(
       inputValue,
       defaultInputValue,
       onValueChange,
-      onInputValueChange,
       onChange,
+      onInputValueChange,
+      open,
+      defaultOpen,
+      onOpenChange,
+      onOpenChangeComplete,
       multiple = false,
       clearable = true,
       disabled = false,
+      readOnly = false,
+      required = false,
       name,
       id,
+      form,
+      autoComplete,
+      autoHighlight,
+      highlightItemOnHover = true,
+      loopFocus = true,
+      openOnInputClick = true,
+      modal = false,
+      actionsRef,
+      inputRef,
+      itemToStringLabel,
+      itemToStringValue,
+      isItemEqualToValue,
+      filter,
+      filteredItems,
+      limit,
       error,
       description,
+      container,
+      anchor,
       side = 'bottom',
       align = 'start',
-      sideOffset = 6,
+      sideOffset = 4,
       alignOffset,
       collisionPadding = 8,
+      collisionBoundary,
+      collisionAvoidance,
+      positionerClassName,
+      popupClassName,
+      listClassName,
+      inputGroupClassName,
+      inputClassName,
+      emptyMessage = 'No matching options found',
+      size = 'md',
       children,
       className,
-      inputClassName,
       ...props
     },
     ref
   ) => {
+    // Unify onValueChange and onChange without suppressing eventDetails
+    const handleValueChange = (
+      val: any,
+      eventDetails: BaseCombobox.Root.ChangeEventDetails
+    ) => {
+      onValueChange?.(val, eventDetails);
+      onChange?.(val);
+    };
+
+    // If children are provided, this is a compositional/compound Combobox
+    if (children) {
+      return (
+        <BaseCombobox.Root
+          items={items}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={handleValueChange}
+          inputValue={inputValue}
+          defaultInputValue={defaultInputValue}
+          onInputValueChange={onInputValueChange}
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          onOpenChangeComplete={onOpenChangeComplete}
+          multiple={multiple}
+          disabled={disabled}
+          readOnly={readOnly}
+          required={required}
+          name={name}
+          id={id}
+          form={form}
+          autoComplete={autoComplete}
+          autoHighlight={autoHighlight}
+          highlightItemOnHover={highlightItemOnHover}
+          loopFocus={loopFocus}
+          openOnInputClick={openOnInputClick}
+          modal={modal}
+          actionsRef={actionsRef}
+          inputRef={inputRef}
+          itemToStringLabel={itemToStringLabel}
+          itemToStringValue={itemToStringValue}
+          isItemEqualToValue={isItemEqualToValue}
+          filter={filter}
+          filteredItems={filteredItems}
+          limit={limit}
+        >
+          {children}
+        </BaseCombobox.Root>
+      );
+    }
+
     const generatedId = React.useId();
     const comboboxId = id || `combobox-${generatedId}`;
     const descriptionId = description ? `${comboboxId}-desc` : undefined;
     const errorId = error ? `${comboboxId}-error` : undefined;
     const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
 
-    const isControlled = value !== undefined;
-
+    // Normalize flat options
     const normalizedOptions: ComboboxOption[] = React.useMemo(() => {
       const list = options ?? (items as ComboboxOption[] | undefined);
-      if (list && list.length > 0) {
+      if (list && Array.isArray(list) && list.length > 0) {
         return list.map((opt, index) => {
           if (typeof opt === 'string' || typeof opt === 'number') {
             return { value: String(opt), label: String(opt), disabled: false };
@@ -115,28 +230,15 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any>>(
           };
         });
       }
-      if (groups && groups.length > 0) {
-        return groups.flatMap((group) =>
-          (group.options || []).map((opt, index) => {
-            if (typeof opt === 'string' || typeof opt === 'number') {
-              return { value: String(opt), label: String(opt), disabled: false };
-            }
-            return {
-              value: String(opt?.value ?? opt?.label ?? index),
-              label: String(opt?.label ?? opt?.value ?? index),
-              disabled: !!opt?.disabled,
-            };
-          })
-        );
-      }
       return [];
-    }, [options, items, groups]);
+    }, [options, items]);
 
+    // Normalize grouped options (Base UI expects groups with an `items` array)
     const normalizedGroups = React.useMemo(() => {
-      if (!groups) return null;
+      if (!groups || groups.length === 0) return null;
       return groups.map((g) => ({
         label: String(g.label || ''),
-        options: (g.options || []).map((opt, index) => {
+        items: (g.items || g.options || []).map((opt, index) => {
           if (typeof opt === 'string' || typeof opt === 'number') {
             return { value: String(opt), label: String(opt), disabled: false };
           }
@@ -149,204 +251,160 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any>>(
       }));
     }, [groups]);
 
-    // Manage uncontrolled state internally so clear actions cleanly reset to null
-    const [internalValue, setInternalValue] = React.useState<string | null>(
-      typeof defaultValue === 'string' ? defaultValue : null
-    );
-    const effectiveValue = isControlled ? (typeof value === 'string' ? value : null) : internalValue;
-
-    // Find selected item object
-    const selectedItem = React.useMemo(() => {
-      if (!effectiveValue) return null;
-      return normalizedOptions.find((opt) => opt.value === effectiveValue) ?? null;
-    }, [normalizedOptions, effectiveValue]);
-
-    const handleValueChange = (selected: ComboboxOption | null) => {
-      const val = selected ? selected.value : null;
-      if (!isControlled) {
-        setInternalValue(val);
+    // Build memoized createItems collection so Base UI handles string IDs and labels seamlessly
+    const itemCollection = React.useMemo(() => {
+      if (normalizedGroups && normalizedGroups.length > 0) {
+        return BaseCombobox.createItems(normalizedGroups, {
+          getValue: (item: ComboboxOption) => item.value,
+          getLabel: (item: ComboboxOption) => item.label,
+        });
       }
-      onValueChange?.(val);
-      onChange?.(val);
-    };
-
-    const handleInputValueChange = (
-      text: string,
-      eventDetails?: BaseCombobox.Root.ChangeEventDetails
-    ) => {
-      onInputValueChange?.(text, eventDetails);
-      // When the user clears the input or writes custom text, clear the previous selected state
-      if (
-        eventDetails?.reason === 'input-change' ||
-        eventDetails?.reason === 'input-clear' ||
-        eventDetails?.reason === 'clear-press'
-      ) {
-        const currentLabel = selectedItem?.label ?? '';
-        if (text.trim() === '' || text !== currentLabel) {
-          if (effectiveValue || selectedItem) {
-            if (!isControlled) {
-              setInternalValue(null);
-            }
-            onValueChange?.(null);
-            onChange?.(null);
-          }
-        }
+      if (normalizedOptions && normalizedOptions.length > 0) {
+        return BaseCombobox.createItems(normalizedOptions, {
+          getValue: (item: ComboboxOption) => item.value,
+          getLabel: (item: ComboboxOption) => item.label,
+        });
       }
-    };
-
-    if (children) {
-      return (
-        <BaseCombobox.Root
-          items={normalizedOptions}
-          value={selectedItem}
-          onValueChange={handleValueChange}
-          onInputValueChange={handleInputValueChange}
-          itemToStringLabel={(opt: ComboboxOption | null) => opt?.label ?? ''}
-          itemToStringValue={(opt: ComboboxOption | null) => opt?.value ?? ''}
-          isItemEqualToValue={(opt: ComboboxOption, val: ComboboxOption) => opt?.value === val?.value}
-          disabled={disabled}
-        >
-          {children}
-        </BaseCombobox.Root>
-      );
-    }
+      return items;
+    }, [normalizedOptions, normalizedGroups, items]);
 
     return (
-      <div ref={ref} className={cn('space-y-1.5 w-full', className)} {...props}>
+      <div ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
         <BaseCombobox.Root
-          items={normalizedOptions}
-          value={selectedItem}
+          items={itemCollection}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={handleValueChange}
           inputValue={inputValue}
           defaultInputValue={defaultInputValue}
-          onValueChange={handleValueChange}
-          onInputValueChange={handleInputValueChange}
-          itemToStringLabel={(opt: ComboboxOption | null) => opt?.label ?? ''}
-          itemToStringValue={(opt: ComboboxOption | null) => opt?.value ?? ''}
-          isItemEqualToValue={(opt: ComboboxOption, val: ComboboxOption) => opt?.value === val?.value}
+          onInputValueChange={onInputValueChange}
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          onOpenChangeComplete={onOpenChangeComplete}
+          multiple={multiple}
           disabled={disabled}
+          readOnly={readOnly}
+          required={required}
+          name={name || comboboxId}
+          id={comboboxId}
+          form={form}
+          autoComplete={autoComplete}
+          autoHighlight={autoHighlight}
+          highlightItemOnHover={highlightItemOnHover}
+          loopFocus={loopFocus}
+          openOnInputClick={openOnInputClick}
+          modal={modal}
+          actionsRef={actionsRef}
+          inputRef={inputRef}
+          itemToStringLabel={itemToStringLabel}
+          itemToStringValue={itemToStringValue}
+          isItemEqualToValue={isItemEqualToValue}
+          filter={filter}
+          filteredItems={filteredItems}
+          limit={limit}
         >
-          <BaseCombobox.Status className="sr-only" />
+          <ComboboxStatus />
           {label && (
-            <BaseCombobox.Label className="block font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none">
+            <ComboboxLabel>
               {label}
-            </BaseCombobox.Label>
+            </ComboboxLabel>
           )}
           {description && (
             <p id={descriptionId} className="text-xs text-on-surface-variant font-sans">
               {description}
             </p>
           )}
-          <BaseCombobox.InputGroup className="relative w-full">
+
+          <ComboboxInputGroup
+            className={cn(
+              error && 'border-error focus-within:outline-error',
+              disabled && 'bg-surface-variant/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
+              inputGroupClassName
+            )}
+          >
             <BaseCombobox.Input
               id={comboboxId}
               name={name || comboboxId}
               placeholder={placeholder}
               disabled={disabled}
+              readOnly={readOnly}
               aria-invalid={!!error}
               aria-describedby={describedBy}
               className={cn(
-                'w-full h-12 pl-4 pr-16 rounded-md bg-surface border border-outline text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 min-h-[48px]',
-                'transition-[border-color,box-shadow]',
-                'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-                'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-                error && 'border-error focus-visible:border-error focus-visible:outline-error',
+                'w-full bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',
+                size === 'sm' && 'h-9 px-3 pr-16 min-h-[44px] text-xs',
+                size === 'md' && 'h-11 px-3.5 pr-16 min-h-[44px] text-sm',
+                size === 'lg' && 'h-14 px-5 pr-20 min-h-[56px] text-base',
+                'disabled:cursor-not-allowed',
                 inputClassName
               )}
             />
             <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
               {clearable && (
-                <BaseCombobox.Clear
-                  className="size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors cursor-pointer"
-                  aria-label="Clear selection"
-                >
-                  <span className="material-symbols-outlined text-base" aria-hidden="true">
-                    close
-                  </span>
-                </BaseCombobox.Clear>
+                <ComboboxClear disabled={disabled || readOnly} />
               )}
-              <BaseCombobox.Trigger
-                disabled={disabled}
-                className="size-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface cursor-pointer rounded disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label="Open options"
-              >
-                <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                  unfold_more
-                </span>
-              </BaseCombobox.Trigger>
+              <ComboboxTrigger disabled={disabled} />
             </div>
-            <BaseCombobox.Portal>
-              <BaseCombobox.Positioner
+
+            <BaseCombobox.Portal container={container}>
+              <ComboboxPositioner
+                anchor={anchor}
                 side={side}
                 align={align}
                 sideOffset={sideOffset}
                 alignOffset={alignOffset}
                 collisionPadding={collisionPadding}
-                className="z-50 outline-none"
+                collisionBoundary={collisionBoundary}
+                collisionAvoidance={collisionAvoidance}
+                className={positionerClassName}
               >
-                <BaseCombobox.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-lg bg-surface border border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none">
-                  <BaseCombobox.Empty className="px-3 py-2.5 text-xs font-sans text-on-surface-variant">
-                    No matching options found
-                  </BaseCombobox.Empty>
-                  <BaseCombobox.List className="max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none data-[empty]:p-0">
+                <ComboboxPopup className={popupClassName}>
+                  <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
+
+                  <ComboboxList className={listClassName}>
                     {normalizedGroups ? (
-                      normalizedGroups.map((group) => (
-                        <BaseCombobox.Group key={group.label} items={group.options} className="py-1">
+                      (group: { label: string; items: ComboboxOption[] }) => (
+                        <ComboboxGroup key={group.label} items={group.items}>
                           {group.label && (
-                            <BaseCombobox.GroupLabel className="sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none">
+                            <ComboboxGroupLabel>
                               {group.label}
-                            </BaseCombobox.GroupLabel>
+                            </ComboboxGroupLabel>
                           )}
                           <BaseCombobox.Collection>
                             {(opt: ComboboxOption) => (
-                              <BaseCombobox.Item
+                              <ComboboxItem
                                 key={opt.value}
-                                value={opt}
+                                value={opt.value}
                                 disabled={opt.disabled}
-                                className="flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm text-on-surface hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed cursor-pointer transition-colors select-none outline-none"
                               >
-                                <BaseCombobox.ItemIndicator
-                                  keepMounted
-                                  className="size-5 flex items-center justify-center text-on-primary-container shrink-0 opacity-0 data-[selected]:opacity-100 transition-opacity"
-                                >
-                                  <span className="material-symbols-outlined text-base font-bold">check</span>
-                                </BaseCombobox.ItemIndicator>
-                                <span className="flex-1 truncate">{opt.label}</span>
-                              </BaseCombobox.Item>
+                                {opt.label}
+                              </ComboboxItem>
                             )}
                           </BaseCombobox.Collection>
-                        </BaseCombobox.Group>
-                      ))
+                        </ComboboxGroup>
+                      )
                     ) : (
                       (opt: ComboboxOption) => (
-                        <BaseCombobox.Item
+                        <ComboboxItem
                           key={opt.value}
-                          value={opt}
+                          value={opt.value}
                           disabled={opt.disabled}
-                          className="flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm text-on-surface hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed cursor-pointer transition-colors select-none outline-none"
                         >
-                          <BaseCombobox.ItemIndicator
-                            keepMounted
-                            className="size-5 flex items-center justify-center text-on-primary-container shrink-0 opacity-0 data-[selected]:opacity-100 transition-opacity"
-                          >
-                            <span className="material-symbols-outlined text-base font-bold">check</span>
-                          </BaseCombobox.ItemIndicator>
-                          <span className="flex-1 truncate">{opt.label}</span>
-                        </BaseCombobox.Item>
+                          {opt.label}
+                        </ComboboxItem>
                       )
                     )}
-                  </BaseCombobox.List>
-                </BaseCombobox.Popup>
-              </BaseCombobox.Positioner>
+                  </ComboboxList>
+                </ComboboxPopup>
+              </ComboboxPositioner>
             </BaseCombobox.Portal>
-          </BaseCombobox.InputGroup>
+          </ComboboxInputGroup>
         </BaseCombobox.Root>
         {typeof error === 'string' && error && (
-          <div className="flex items-center gap-1.5 font-sans text-sm font-semibold text-error select-none mt-1" role="alert">
-            <span className="material-symbols-outlined text-base select-none shrink-0" aria-hidden="true">
-              error
-            </span>
-            <span>{error}</span>
-          </div>
+          <p id={errorId} className="text-xs text-error font-sans font-medium" role="alert">
+            {error}
+          </p>
         )}
       </div>
     );
@@ -355,34 +413,466 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any>>(
 
 ComboboxComponent.displayName = 'Combobox';
 
+// Compound Subcomponents for Compositional API
+
+export interface ComboboxInputProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseCombobox.Input>, 'size'> {
+  error?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export const ComboboxInput = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Input>,
+  ComboboxInputProps
+>(({ className, size = 'md', error, ...props }, ref) => (
+  <BaseCombobox.Input
+    ref={ref}
+    className={cn(
+      'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-colors',
+      size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
+      size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
+      size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+      error && 'border-error focus-visible:outline-error',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxInput.displayName = 'ComboboxInput';
+
+export interface ComboboxTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseCombobox.Trigger> {
+  showIcon?: boolean;
+  icon?: React.ReactNode;
+}
+
+export const ComboboxTrigger = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Trigger>,
+  ComboboxTriggerProps
+>(({ className, children, showIcon = true, icon, ...props }, ref) => (
+  <BaseCombobox.Trigger
+    ref={ref}
+    className={cn(
+      'inline-flex items-center justify-between rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container transition-colors cursor-pointer',
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+      className
+    )}
+    {...props}
+  >
+    {children}
+    {showIcon && (
+      <BaseCombobox.Icon className="ml-2 shrink-0 text-on-surface-variant">
+        {icon ?? (
+          <span className="material-symbols-outlined text-lg" aria-hidden="true">
+            unfold_more
+          </span>
+        )}
+      </BaseCombobox.Icon>
+    )}
+  </BaseCombobox.Trigger>
+));
+ComboboxTrigger.displayName = 'ComboboxTrigger';
+
+export interface ComboboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof BaseCombobox.Item> {
+  indicatorPosition?: 'start' | 'end';
+  showIndicator?: boolean;
+  indicator?: React.ReactNode;
+}
+
+export const ComboboxItem = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Item>,
+  ComboboxItemProps
+>(({ className, children, indicatorPosition = 'end', showIndicator, indicator, ...props }, ref) => {
+  const isSimpleChild = typeof children === 'string' || typeof children === 'number';
+  const shouldRenderIndicator = showIndicator ?? isSimpleChild;
+
+  return (
+    <BaseCombobox.Item
+      ref={ref}
+      className={cn(
+        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+        'hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:font-semibold',
+        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
+        className
+      )}
+      {...props}
+    >
+      {isSimpleChild ? (
+        <span className="truncate flex-1">{children}</span>
+      ) : (
+        children
+      )}
+      {shouldRenderIndicator && (
+        <ComboboxItemIndicator>
+          {indicator}
+        </ComboboxItemIndicator>
+      )}
+    </BaseCombobox.Item>
+  );
+});
+ComboboxItem.displayName = 'ComboboxItem';
+
+export interface ComboboxItemIndicatorProps
+  extends React.ComponentPropsWithoutRef<typeof BaseCombobox.ItemIndicator> {}
+
+export const ComboboxItemIndicator = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.ItemIndicator>,
+  ComboboxItemIndicatorProps
+>(({ className, children, ...props }, ref) => (
+  <BaseCombobox.ItemIndicator
+    ref={ref}
+    className={cn('shrink-0 text-on-primary-container flex items-center justify-center', className)}
+    {...props}
+  >
+    {children ?? (
+      <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
+        check
+      </span>
+    )}
+  </BaseCombobox.ItemIndicator>
+));
+ComboboxItemIndicator.displayName = 'ComboboxItemIndicator';
+
+export interface ComboboxContentProps
+  extends React.ComponentPropsWithoutRef<typeof BaseCombobox.Popup> {
+  container?: BaseCombobox.Portal.Props['container'];
+  anchor?: BaseCombobox.Positioner.Props['anchor'];
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  sideOffset?: number;
+  align?: 'start' | 'center' | 'end';
+  alignOffset?: number;
+  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  collisionBoundary?: BaseCombobox.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BaseCombobox.Positioner.Props['collisionAvoidance'];
+  positionerClassName?: string;
+  listClassName?: string;
+}
+
+export const ComboboxContent = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Popup>,
+  ComboboxContentProps
+>(
+  (
+    {
+      className,
+      container,
+      anchor,
+      side = 'bottom',
+      sideOffset = 4,
+      align = 'start',
+      alignOffset,
+      collisionPadding = 8,
+      collisionBoundary,
+      collisionAvoidance,
+      positionerClassName,
+      listClassName,
+      children,
+      ...props
+    },
+    ref
+  ) => (
+    <BaseCombobox.Portal container={container}>
+      <ComboboxPositioner
+        anchor={anchor}
+        side={side}
+        align={align}
+        sideOffset={sideOffset}
+        alignOffset={alignOffset}
+        collisionPadding={collisionPadding}
+        collisionBoundary={collisionBoundary}
+        collisionAvoidance={collisionAvoidance}
+        className={positionerClassName}
+      >
+        <ComboboxPopup className={className} ref={ref} {...props}>
+          {children}
+        </ComboboxPopup>
+      </ComboboxPositioner>
+    </BaseCombobox.Portal>
+  )
+);
+ComboboxContent.displayName = 'ComboboxContent';
+
+export const ComboboxClear = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Clear>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Clear>
+>(({ className, children, ...props }, ref) => (
+  <BaseCombobox.Clear
+    ref={ref}
+    className={cn(
+      'size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
+      className
+    )}
+    aria-label="Clear selection"
+    {...props}
+  >
+    {children ?? (
+      <span className="material-symbols-outlined text-base" aria-hidden="true">
+        close
+      </span>
+    )}
+  </BaseCombobox.Clear>
+));
+ComboboxClear.displayName = 'ComboboxClear';
+
+export const ComboboxEmpty = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Empty>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Empty>
+>(({ className, children, ...props }, ref) => (
+  <BaseCombobox.Empty
+    ref={ref}
+    className={cn('px-3 py-2.5 text-xs font-sans text-on-surface-variant text-center select-none', className)}
+    {...props}
+  >
+    {children ?? 'No matching options found'}
+  </BaseCombobox.Empty>
+));
+ComboboxEmpty.displayName = 'ComboboxEmpty';
+
+export const ComboboxList = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.List>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.List>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.List
+    ref={ref}
+    className={cn(
+      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none data-[empty]:p-0',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxList.displayName = 'ComboboxList';
+
+export const ComboboxPopup = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Popup>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Popup>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Popup
+    ref={ref}
+    className={cn(
+      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxPopup.displayName = 'ComboboxPopup';
+
+export const ComboboxPositioner = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Positioner>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Positioner>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Positioner ref={ref} className={cn('z-50 outline-none', className)} {...props} />
+));
+ComboboxPositioner.displayName = 'ComboboxPositioner';
+
+export const ComboboxInputGroup = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.InputGroup>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.InputGroup>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.InputGroup
+    ref={ref}
+    className={cn(
+      'relative w-full rounded-md border border-outline bg-surface text-on-surface focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary transition-[border-color,box-shadow]',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxInputGroup.displayName = 'ComboboxInputGroup';
+
+export const ComboboxLabel = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Label>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Label>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Label
+    ref={ref}
+    className={cn('block font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none', className)}
+    {...props}
+  />
+));
+ComboboxLabel.displayName = 'ComboboxLabel';
+
+export const ComboboxGroup = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Group>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Group>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Group ref={ref} className={cn('py-1', className)} {...props} />
+));
+ComboboxGroup.displayName = 'ComboboxGroup';
+
+export const ComboboxGroupLabel = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.GroupLabel>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.GroupLabel>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.GroupLabel
+    ref={ref}
+    className={cn(
+      'sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxGroupLabel.displayName = 'ComboboxGroupLabel';
+
+export const ComboboxSeparator = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Separator>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Separator>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Separator
+    ref={ref}
+    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
+    {...props}
+  />
+));
+ComboboxSeparator.displayName = 'ComboboxSeparator';
+
+export const ComboboxChips = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Chips>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Chips>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Chips
+    ref={ref}
+    className={cn('flex flex-wrap items-center gap-1.5 p-1', className)}
+    {...props}
+  />
+));
+ComboboxChips.displayName = 'ComboboxChips';
+
+export const ComboboxChip = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Chip>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Chip>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Chip
+    ref={ref}
+    className={cn(
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxChip.displayName = 'ComboboxChip';
+
+export const ComboboxChipRemove = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.ChipRemove>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.ChipRemove>
+>(({ className, children, ...props }, ref) => (
+  <BaseCombobox.ChipRemove
+    ref={ref}
+    className={cn(
+      'size-4 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-variant cursor-pointer transition-colors',
+      className
+    )}
+    aria-label="Remove"
+    {...props}
+  >
+    {children ?? (
+      <span className="material-symbols-outlined text-xs" aria-hidden="true">
+        close
+      </span>
+    )}
+  </BaseCombobox.ChipRemove>
+));
+ComboboxChipRemove.displayName = 'ComboboxChipRemove';
+
+export const ComboboxBackdrop = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Backdrop>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Backdrop>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Backdrop
+    ref={ref}
+    className={cn(
+      'fixed inset-0 z-40 bg-on-surface/40 backdrop-blur-[2px] transition-opacity duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
+      className
+    )}
+    {...props}
+  />
+));
+ComboboxBackdrop.displayName = 'ComboboxBackdrop';
+
+export const ComboboxArrow = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Arrow>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Arrow>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Arrow
+    ref={ref}
+    className={cn('fill-surface stroke-outline-variant', className)}
+    {...props}
+  />
+));
+ComboboxArrow.displayName = 'ComboboxArrow';
+
+export const ComboboxIcon = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Icon>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Icon>
+>(({ className, children, ...props }, ref) => (
+  <BaseCombobox.Icon
+    ref={ref}
+    className={cn('shrink-0 text-on-surface-variant', className)}
+    {...props}
+  >
+    {children ?? (
+      <span className="material-symbols-outlined text-lg" aria-hidden="true">
+        unfold_more
+      </span>
+    )}
+  </BaseCombobox.Icon>
+));
+ComboboxIcon.displayName = 'ComboboxIcon';
+
+export const ComboboxRow = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Row>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Row>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Row ref={ref} className={cn('flex items-center gap-1', className)} {...props} />
+));
+ComboboxRow.displayName = 'ComboboxRow';
+
+export const ComboboxStatus = React.forwardRef<
+  React.ComponentRef<typeof BaseCombobox.Status>,
+  React.ComponentPropsWithoutRef<typeof BaseCombobox.Status>
+>(({ className, ...props }, ref) => (
+  <BaseCombobox.Status ref={ref} className={cn('sr-only', className)} {...props} />
+));
+ComboboxStatus.displayName = 'ComboboxStatus';
+
 // Compound Base UI exports
 export const Combobox = Object.assign(ComboboxComponent, {
   Root: BaseCombobox.Root,
-  Label: BaseCombobox.Label,
-  Input: BaseCombobox.Input,
-  InputGroup: BaseCombobox.InputGroup,
-  Trigger: BaseCombobox.Trigger,
-  Clear: BaseCombobox.Clear,
-  Icon: BaseCombobox.Icon,
+  Label: ComboboxLabel,
+  Input: ComboboxInput,
+  InputGroup: ComboboxInputGroup,
+  Trigger: ComboboxTrigger,
+  Clear: ComboboxClear,
+  Icon: ComboboxIcon,
   Value: BaseCombobox.Value,
-  Status: BaseCombobox.Status,
-  Chips: BaseCombobox.Chips,
-  Chip: BaseCombobox.Chip,
-  ChipRemove: BaseCombobox.ChipRemove,
+  Status: ComboboxStatus,
+  Chips: ComboboxChips,
+  Chip: ComboboxChip,
+  ChipRemove: ComboboxChipRemove,
   Portal: BaseCombobox.Portal,
-  Backdrop: BaseCombobox.Backdrop,
-  Positioner: BaseCombobox.Positioner,
-  Popup: BaseCombobox.Popup,
-  Arrow: BaseCombobox.Arrow,
-  Empty: BaseCombobox.Empty,
-  List: BaseCombobox.List,
-  Row: BaseCombobox.Row,
-  Item: BaseCombobox.Item,
-  ItemIndicator: BaseCombobox.ItemIndicator,
-  Group: BaseCombobox.Group,
-  GroupLabel: BaseCombobox.GroupLabel,
-  Separator: BaseCombobox.Separator,
+  Backdrop: ComboboxBackdrop,
+  Positioner: ComboboxPositioner,
+  Popup: ComboboxPopup,
+  Arrow: ComboboxArrow,
+  Empty: ComboboxEmpty,
+  List: ComboboxList,
+  Row: ComboboxRow,
+  Item: ComboboxItem,
+  ItemIndicator: ComboboxItemIndicator,
+  Group: ComboboxGroup,
+  GroupLabel: ComboboxGroupLabel,
+  Separator: ComboboxSeparator,
   Collection: BaseCombobox.Collection,
+  Content: ComboboxContent,
   useFilter: BaseCombobox.useFilter,
   useFilteredItems: BaseCombobox.useFilteredItems,
   createItems: BaseCombobox.createItems,
@@ -390,30 +880,8 @@ export const Combobox = Object.assign(ComboboxComponent, {
 
 export { BaseCombobox };
 export const ComboboxRoot = BaseCombobox.Root;
-export const ComboboxLabel = BaseCombobox.Label;
-export const ComboboxInput = BaseCombobox.Input;
-export const ComboboxInputGroup = BaseCombobox.InputGroup;
-export const ComboboxTrigger = BaseCombobox.Trigger;
-export const ComboboxClear = BaseCombobox.Clear;
-export const ComboboxIcon = BaseCombobox.Icon;
-export const ComboboxValue = BaseCombobox.Value;
-export const ComboboxStatus = BaseCombobox.Status;
-export const ComboboxChips = BaseCombobox.Chips;
-export const ComboboxChip = BaseCombobox.Chip;
-export const ComboboxChipRemove = BaseCombobox.ChipRemove;
 export const ComboboxPortal = BaseCombobox.Portal;
-export const ComboboxBackdrop = BaseCombobox.Backdrop;
-export const ComboboxPositioner = BaseCombobox.Positioner;
-export const ComboboxPopup = BaseCombobox.Popup;
-export const ComboboxArrow = BaseCombobox.Arrow;
-export const ComboboxEmpty = BaseCombobox.Empty;
-export const ComboboxList = BaseCombobox.List;
-export const ComboboxRow = BaseCombobox.Row;
-export const ComboboxItem = BaseCombobox.Item;
-export const ComboboxItemIndicator = BaseCombobox.ItemIndicator;
-export const ComboboxGroup = BaseCombobox.Group;
-export const ComboboxGroupLabel = BaseCombobox.GroupLabel;
-export const ComboboxSeparator = BaseCombobox.Separator;
+export const ComboboxValue = BaseCombobox.Value;
 export const ComboboxCollection = BaseCombobox.Collection;
 export const useComboboxFilter = BaseCombobox.useFilter;
 export const useComboboxFilteredItems = BaseCombobox.useFilteredItems;

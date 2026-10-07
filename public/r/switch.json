@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "switch",
   "type": "registry:ui",
+  "title": "Switch",
+  "description": "Switch primitive (@base-ui/react/switch).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/switch.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Switch for standalone binary settings that take effect immediately (e.g. Dark Mode, Notifications).",
+      "Do NOT use Switch for in-group option selections (use Checkbox or ToggleGroup instead).",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary track fill, smooth thumb sliding, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+    ]
+  },
+  "docs": "Switch primitive (@base-ui/react/switch).\nBase UI Documentation: https://base-ui.com/react/components/switch\nTAXONOMY & USAGE:\n- Use Switch for standalone binary settings that take effect immediately (e.g. Dark Mode, Notifications).\n- Do NOT use Switch for in-group option selections (use Checkbox or ToggleGroup instead).\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nflush primary track fill, smooth thumb sliding, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
 }

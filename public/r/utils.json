@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "utils",
   "type": "registry:lib",
+  "title": "Eolas UI Utilities",
+  "description": "Utility functions including cn() class merger for Tailwind CSS and Base UI",
   "dependencies": [
     "clsx",
     "tailwind-merge",

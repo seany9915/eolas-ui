@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toggle-group",
   "type": "registry:ui",
+  "title": "Toggle Group",
+  "description": "ToggleGroup primitive (@base-ui/react/toggle-group).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,15 @@
       "type": "registry:ui",
       "target": "components/ui/toggle-group.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use ToggleGroup for mutually exclusive or multi-select option switches (e.g. text align, view mode grid/list, filter tags) where selection updates state/data in-place without switching or hiding full views or panels.",
+      "Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").",
+      "Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").",
+      "Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+      "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
+    ]
+  },
+  "docs": "ToggleGroup primitive (@base-ui/react/toggle-group).\nBase UI Documentation: https://base-ui.com/react/components/toggle-group\nTAXONOMY & USAGE:\n- Use ToggleGroup for mutually exclusive or multi-select option switches (e.g. text align, view mode grid/list, filter tags)\nwhere selection updates state/data in-place without switching or hiding full views or panels.\n- Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").\n- Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").\n- Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).\n- Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
 }

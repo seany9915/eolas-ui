@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "thinking-trace",
   "type": "registry:ui",
+  "title": "Thinking Trace",
+  "description": "Eolas UI Thinking Trace component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

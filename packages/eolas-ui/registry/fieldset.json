@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "fieldset",
   "type": "registry:ui",
+  "title": "Fieldset",
+  "description": "Fieldset primitive (@base-ui/react/fieldset).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,12 @@
       "type": "registry:ui",
       "target": "components/ui/fieldset.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Fieldset to group related form controls with a shared legend.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+    ]
+  },
+  "docs": "Fieldset primitive (@base-ui/react/fieldset).\nBase UI Documentation: https://base-ui.com/react/components/fieldset\nTAXONOMY & USAGE:\n- Use Fieldset to group related form controls with a shared legend.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nand WCAG 2.2 SC 2.5.8 touch target compliance."
 }

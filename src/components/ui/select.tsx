@@ -46,14 +46,27 @@ export interface SelectProps<Value = string, Multiple extends boolean | undefine
   name?: string;
   id?: string;
   required?: boolean;
+  container?: BaseSelect.Portal.Props['container'];
   position?: 'popper' | 'item-aligned';
   alignItemWithTrigger?: boolean;
+  anchor?: BaseSelect.Positioner.Props['anchor'];
   side?: 'top' | 'bottom' | 'left' | 'right';
   align?: 'start' | 'center' | 'end';
-  sideOffset?: number;
-  alignOffset?: number;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  sideOffset?: number | BaseSelect.Positioner.Props['sideOffset'];
+  alignOffset?: number | BaseSelect.Positioner.Props['alignOffset'];
+  collisionPadding?: BaseSelect.Positioner.Props['collisionPadding'];
+  collisionBoundary?: BaseSelect.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BaseSelect.Positioner.Props['collisionAvoidance'];
+  arrowPadding?: number;
+  sticky?: boolean;
+  positionMethod?: 'absolute' | 'fixed';
+  disableAnchorTracking?: boolean;
+  finalFocus?: BaseSelect.Popup.Props['finalFocus'];
+  positionerClassName?: string;
+  popupClassName?: string;
+  listClassName?: string;
   withScrollArrows?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   children?: React.ReactNode;
   className?: string;
 }
@@ -72,7 +85,7 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
   onOpenChange,
   onOpenChangeComplete,
   multiple,
-  modal = true,
+  modal = false,
   actionsRef,
   inputRef,
   form,
@@ -89,24 +102,47 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
   name,
   id,
   required,
-  position = 'item-aligned',
+  container,
+  position = 'popper',
   alignItemWithTrigger,
-  side,
+  anchor,
+  side = 'bottom',
   align = 'start',
   sideOffset = 4,
   alignOffset,
   collisionPadding = 8,
-  withScrollArrows = true,
+  collisionBoundary,
+  collisionAvoidance,
+  arrowPadding,
+  sticky,
+  positionMethod,
+  disableAnchorTracking,
+  finalFocus,
+  positionerClassName,
+  popupClassName,
+  listClassName,
+  withScrollArrows,
+  size = 'md',
   children,
   className,
 }: SelectProps<Value, Multiple>): React.JSX.Element {
+  const handleValueChange = (
+    newVal: SelectValueType<Value, Multiple> | (Multiple extends true ? never : null),
+    details: BaseSelect.Root.ChangeEventDetails
+  ) => {
+    onValueChange?.(newVal, details);
+    if (newVal !== undefined && newVal !== null) {
+      onChange?.(newVal as SelectValueType<Value, Multiple>);
+    }
+  };
+
   // If children are provided, this is a compound Select (e.g. <Select><SelectTrigger/><SelectContent/></Select>)
   if (children) {
     return (
       <BaseSelect.Root<Value, Multiple>
         value={value}
         defaultValue={defaultValue}
-        onValueChange={onValueChange}
+        onValueChange={handleValueChange}
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
@@ -149,17 +185,8 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
     return items;
   }, [options, items]);
 
-  const handleValueChange = (
-    newVal: SelectValueType<Value, Multiple> | (Multiple extends true ? never : null),
-    details: BaseSelect.Root.ChangeEventDetails
-  ) => {
-    onValueChange?.(newVal, details);
-    if (newVal !== undefined && newVal !== null) {
-      onChange?.(newVal as SelectValueType<Value, Multiple>);
-    }
-  };
-
-  const isItemAligned = alignItemWithTrigger ?? (position !== 'popper');
+  const isItemAligned = alignItemWithTrigger ?? (position === 'item-aligned');
+  const showScrollArrows = withScrollArrows ?? isItemAligned;
 
   return (
     <BaseSelect.Root<Value, Multiple>
@@ -202,7 +229,10 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between w-full h-11 px-3.5 rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer min-h-[44px]',
+            'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
+            size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
+            size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
+            size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
             'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
             error && 'border-error focus-visible:outline-error'
           )}
@@ -219,19 +249,38 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
             {error}
           </p>
         )}
-        <BaseSelect.Portal>
+        <BaseSelect.Portal container={container}>
           <BaseSelect.Positioner
+            anchor={anchor}
             side={side}
             align={align}
             sideOffset={sideOffset}
             alignOffset={alignOffset}
             collisionPadding={collisionPadding}
+            collisionBoundary={collisionBoundary}
+            collisionAvoidance={collisionAvoidance}
+            arrowPadding={arrowPadding}
+            sticky={sticky}
+            positionMethod={positionMethod}
+            disableAnchorTracking={disableAnchorTracking}
             alignItemWithTrigger={isItemAligned}
-            className="z-50 outline-none"
+            className={cn('z-50 outline-none', positionerClassName)}
           >
-            <BaseSelect.Popup className="min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col">
-              {withScrollArrows && <SelectScrollUpArrow />}
-              <BaseSelect.List className="relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none">
+            <BaseSelect.Popup
+              finalFocus={finalFocus}
+              className={cn(
+                'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+                popupClassName
+              )}
+            >
+              {showScrollArrows && <SelectScrollUpArrow />}
+              <BaseSelect.List
+                className={cn(
+                  'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 space-y-0.5 outline-none',
+                  showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
+                  listClassName
+                )}
+              >
                 {groups ? (
                   groups.map((group) => (
                     <BaseSelect.Group key={group.label} className="py-1">
@@ -263,7 +312,7 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
                   ))
                 ) : null}
               </BaseSelect.List>
-              {withScrollArrows && <SelectScrollDownArrow />}
+              {showScrollArrows && <SelectScrollDownArrow />}
             </BaseSelect.Popup>
           </BaseSelect.Positioner>
         </BaseSelect.Portal>
@@ -276,16 +325,22 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
 export interface SelectTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BaseSelect.Trigger> {
   error?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  showIcon?: boolean;
+  icon?: React.ReactNode;
 }
 
 export const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Trigger>,
   SelectTriggerProps
->(({ className, children, error, ...props }, ref) => (
+>(({ className, children, error, size = 'md', showIcon = true, icon, ...props }, ref) => (
   <BaseSelect.Trigger
     ref={ref}
     className={cn(
-      'inline-flex items-center justify-between w-full h-11 px-3.5 rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container transition-colors cursor-pointer min-h-[44px]',
+      'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container transition-colors cursor-pointer',
+      size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
+      size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
+      size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
       'data-[popup-open]:border-primary data-[open]:border-primary',
       'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
@@ -295,11 +350,15 @@ export const SelectTrigger = React.forwardRef<
     {...props}
   >
     {children}
-    <BaseSelect.Icon className="ml-2 shrink-0 text-on-surface-variant">
-      <span className="material-symbols-outlined text-lg" aria-hidden="true">
-        unfold_more
-      </span>
-    </BaseSelect.Icon>
+    {showIcon && (
+      <BaseSelect.Icon className="ml-2 shrink-0 text-on-surface-variant">
+        {icon ?? (
+          <span className="material-symbols-outlined text-lg" aria-hidden="true">
+            unfold_more
+          </span>
+        )}
+      </BaseSelect.Icon>
+    )}
   </BaseSelect.Trigger>
 ));
 SelectTrigger.displayName = 'SelectTrigger';
@@ -327,14 +386,24 @@ SelectValue.displayName = 'SelectValue';
 
 export interface SelectContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseSelect.Popup> {
+  container?: BaseSelect.Portal.Props['container'];
+  anchor?: BaseSelect.Positioner.Props['anchor'];
   side?: 'top' | 'right' | 'bottom' | 'left';
-  sideOffset?: number;
+  sideOffset?: number | BaseSelect.Positioner.Props['sideOffset'];
   align?: 'start' | 'center' | 'end';
-  alignOffset?: number;
+  alignOffset?: number | BaseSelect.Positioner.Props['alignOffset'];
   position?: 'popper' | 'item-aligned';
   alignItemWithTrigger?: boolean;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  collisionPadding?: BaseSelect.Positioner.Props['collisionPadding'];
+  collisionBoundary?: BaseSelect.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BaseSelect.Positioner.Props['collisionAvoidance'];
+  arrowPadding?: number;
+  sticky?: boolean;
+  positionMethod?: 'absolute' | 'fixed';
+  disableAnchorTracking?: boolean;
+  positionerClassName?: string;
   containerClassName?: string;
+  listClassName?: string;
   withScrollArrows?: boolean;
 }
 
@@ -345,46 +414,70 @@ export const SelectContent = React.forwardRef<
   (
     {
       className,
-      side,
+      container,
+      anchor,
+      side = 'bottom',
       sideOffset = 4,
       align = 'start',
       alignOffset,
-      position = 'item-aligned',
+      position = 'popper',
       alignItemWithTrigger,
       collisionPadding = 8,
+      collisionBoundary,
+      collisionAvoidance,
+      arrowPadding,
+      sticky,
+      positionMethod,
+      disableAnchorTracking,
+      positionerClassName,
       containerClassName,
-      withScrollArrows = true,
+      listClassName,
+      withScrollArrows,
       children,
       ...props
     },
     ref
   ) => {
-    const isItemAligned = alignItemWithTrigger ?? (position !== 'popper');
+    const isItemAligned = alignItemWithTrigger ?? (position === 'item-aligned');
+    const showScrollArrows = withScrollArrows ?? isItemAligned;
 
     return (
-      <BaseSelect.Portal>
+      <BaseSelect.Portal container={container}>
         <BaseSelect.Positioner
+          anchor={anchor}
           side={side}
           sideOffset={sideOffset}
           align={align}
           alignOffset={alignOffset}
           collisionPadding={collisionPadding}
+          collisionBoundary={collisionBoundary}
+          collisionAvoidance={collisionAvoidance}
+          arrowPadding={arrowPadding}
+          sticky={sticky}
+          positionMethod={positionMethod}
+          disableAnchorTracking={disableAnchorTracking}
           alignItemWithTrigger={isItemAligned}
-          className={cn('z-50 outline-none', containerClassName)}
+          className={cn('z-50 outline-none', positionerClassName, containerClassName)}
         >
           <BaseSelect.Popup
             ref={ref}
             className={cn(
-              'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-modal transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+              'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
               className
             )}
             {...props}
           >
-            {withScrollArrows && <SelectScrollUpArrow />}
-            <BaseSelect.List className="relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none">
+            {showScrollArrows && <SelectScrollUpArrow />}
+            <BaseSelect.List
+              className={cn(
+                'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 space-y-0.5 outline-none',
+                showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
+                listClassName
+              )}
+            >
               {children}
             </BaseSelect.List>
-            {withScrollArrows && <SelectScrollDownArrow />}
+            {showScrollArrows && <SelectScrollDownArrow />}
           </BaseSelect.Popup>
         </BaseSelect.Positioner>
       </BaseSelect.Portal>
@@ -397,12 +490,13 @@ export interface SelectItemProps
   extends React.ComponentPropsWithoutRef<typeof BaseSelect.Item> {
   indicatorPosition?: 'start' | 'end';
   showIndicator?: boolean;
+  indicator?: React.ReactNode;
 }
 
 export const SelectItem = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Item>,
   SelectItemProps
->(({ className, children, indicatorPosition = 'end', showIndicator = true, ...props }, ref) => (
+>(({ className, children, indicatorPosition = 'end', showIndicator = true, indicator, ...props }, ref) => (
   <BaseSelect.Item
     ref={ref}
     className={cn(
@@ -418,9 +512,11 @@ export const SelectItem = React.forwardRef<
     <BaseSelect.ItemText className="truncate">{children}</BaseSelect.ItemText>
     {showIndicator && (
       <BaseSelect.ItemIndicator className="shrink-0 text-on-primary-container flex items-center justify-center">
-        <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
-          check
-        </span>
+        {indicator ?? (
+          <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
+            check
+          </span>
+        )}
       </BaseSelect.ItemIndicator>
     )}
   </BaseSelect.Item>
@@ -428,7 +524,7 @@ export const SelectItem = React.forwardRef<
 SelectItem.displayName = 'SelectItem';
 
 export const SelectBackdrop = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.Backdrop>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Backdrop>
 >(({ className, ...props }, ref) => (
   <BaseSelect.Backdrop
@@ -443,7 +539,7 @@ export const SelectBackdrop = React.forwardRef<
 SelectBackdrop.displayName = 'SelectBackdrop';
 
 export const SelectLabel = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.Label>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Label>
 >(({ className, ...props }, ref) => (
   <BaseSelect.Label
@@ -455,7 +551,7 @@ export const SelectLabel = React.forwardRef<
 SelectLabel.displayName = 'SelectLabel';
 
 export const SelectGroup = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.Group>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Group>
 >(({ className, ...props }, ref) => (
   <BaseSelect.Group ref={ref} className={cn('py-1', className)} {...props} />
@@ -463,7 +559,7 @@ export const SelectGroup = React.forwardRef<
 SelectGroup.displayName = 'SelectGroup';
 
 export const SelectGroupLabel = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.GroupLabel>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.GroupLabel>
 >(({ className, ...props }, ref) => (
   <BaseSelect.GroupLabel
@@ -478,7 +574,7 @@ export const SelectGroupLabel = React.forwardRef<
 SelectGroupLabel.displayName = 'SelectGroupLabel';
 
 export const SelectSeparator = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.Separator>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Separator>
 >(({ className, ...props }, ref) => (
   <BaseSelect.Separator
@@ -490,7 +586,7 @@ export const SelectSeparator = React.forwardRef<
 SelectSeparator.displayName = 'SelectSeparator';
 
 export const SelectArrow = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.Arrow>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Arrow>
 >(({ className, ...props }, ref) => (
   <BaseSelect.Arrow
@@ -502,13 +598,13 @@ export const SelectArrow = React.forwardRef<
 SelectArrow.displayName = 'SelectArrow';
 
 export const SelectScrollUpArrow = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.ScrollUpArrow>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.ScrollUpArrow>
 >(({ className, children, ...props }, ref) => (
   <BaseSelect.ScrollUpArrow
     ref={ref}
     className={cn(
-      'flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface select-none z-10 shrink-0 border-b border-outline-variant/30',
+      'top-0 left-0 right-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-b border-outline-variant/30',
       className
     )}
     {...props}
@@ -519,13 +615,13 @@ export const SelectScrollUpArrow = React.forwardRef<
 SelectScrollUpArrow.displayName = 'SelectScrollUpArrow';
 
 export const SelectScrollDownArrow = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.ScrollDownArrow>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.ScrollDownArrow>
 >(({ className, children, ...props }, ref) => (
   <BaseSelect.ScrollDownArrow
     ref={ref}
     className={cn(
-      'flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface select-none z-10 shrink-0 border-t border-outline-variant/30',
+      'bottom-0 left-0 right-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-t border-outline-variant/30',
       className
     )}
     {...props}
@@ -536,7 +632,7 @@ export const SelectScrollDownArrow = React.forwardRef<
 SelectScrollDownArrow.displayName = 'SelectScrollDownArrow';
 
 export const SelectIcon = React.forwardRef<
-  HTMLDivElement,
+  React.ComponentRef<typeof BaseSelect.Icon>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Icon>
 >(({ className, children, ...props }, ref) => (
   <BaseSelect.Icon

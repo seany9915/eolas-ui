@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toggles",
   "type": "registry:ui",
+  "title": "Toggles",
+  "description": "Re-exports toggle primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/toggle - @/components/ui/toggle-group",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -18,5 +21,6 @@
       "type": "registry:ui",
       "target": "components/ui/toggles.tsx"
     }
-  ]
+  ],
+  "docs": "Re-exports toggle primitives for backward compatibility.\nDedicated modular files exist at:\n- @/components/ui/toggle\n- @/components/ui/toggle-group"
 }

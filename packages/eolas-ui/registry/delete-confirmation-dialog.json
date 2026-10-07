@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "delete-confirmation-dialog",
+  "type": "registry:block",
+  "title": "Delete Confirmation Dialog",
+  "description": "DeleteConfirmationDialog block. Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "dialog",
+    "button",
+    "icon"
+  ],
+  "files": [
+    {
+      "path": "blocks/delete-confirmation-dialog.tsx",
+      "content": "/**\n * DeleteConfirmationDialog block.\n *\n * Presentational composite modal for destructive confirmation workflows.\n * Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping,\n * 44px minimum touch targets, and high-contrast error styling.\n */\nimport * as React from 'react';\nimport { Dialog } from '@/components/ui/dialog';\nimport { Button } from '@/components/ui/button';\nimport { Icon } from '@/components/ui/icon';\n\nexport interface DeleteConfirmationDialogProps {\n  open: boolean;\n  onOpenChange: (open: boolean) => void;\n  title?: React.ReactNode;\n  description?: React.ReactNode;\n  itemName?: string;\n  confirmLabel?: string;\n  cancelLabel?: string;\n  onConfirm: () => void | Promise<void>;\n  isLoading?: boolean;\n}\n\nexport function DeleteConfirmationDialog({\n  open,\n  onOpenChange,\n  title = 'Delete item',\n  description,\n  itemName,\n  confirmLabel = 'Delete',\n  cancelLabel = 'Cancel',\n  onConfirm,\n  isLoading = false,\n}: DeleteConfirmationDialogProps) {\n  const defaultDescription = itemName\n    ? `Are you sure you want to delete \"${itemName}\"? This action cannot be undone.`\n    : 'Are you sure you want to delete this item? This action cannot be undone.';\n\n  return (\n    <Dialog.Root open={open} onOpenChange={onOpenChange}>\n      <Dialog.Portal>\n        <Dialog.Backdrop />\n        <Dialog.Popup className=\"max-w-md\">\n          <div className=\"flex items-start gap-3.5\">\n            <div className=\"flex items-center justify-center w-11 h-11 min-w-11 min-h-11 rounded-full bg-error-container text-on-error-container shrink-0\">\n              <Icon name=\"delete\" size=\"lg\" aria-hidden=\"true\" />\n            </div>\n            <div className=\"space-y-1 pt-1\">\n              <Dialog.Title>\n                {title}\n              </Dialog.Title>\n              <Dialog.Description>\n                {description ?? defaultDescription}\n              </Dialog.Description>\n            </div>\n          </div>\n\n          <Dialog.Footer className=\"mt-6\">\n            <div className=\"flex items-center justify-end gap-3 w-full\">\n              <Dialog.Close\n                render={\n                  <Button\n                    variant=\"outlined\"\n                    colorRole=\"neutral\"\n                    disabled={isLoading}\n                    onClick={() => onOpenChange(false)}\n                  >\n                    {cancelLabel}\n                  </Button>\n                }\n              />\n              <Button\n                variant=\"filled\"\n                colorRole=\"error\"\n                loading={isLoading}\n                onClick={async () => {\n                  await onConfirm();\n                }}\n              >\n                {confirmLabel}\n              </Button>\n            </div>\n          </Dialog.Footer>\n        </Dialog.Popup>\n      </Dialog.Portal>\n    </Dialog.Root>\n  );\n}\n\nexport default DeleteConfirmationDialog;\n",
+      "type": "registry:block",
+      "target": "components/blocks/delete-confirmation-dialog.tsx"
+    }
+  ],
+  "docs": "DeleteConfirmationDialog block.\nPresentational composite modal for destructive confirmation workflows.\nComposes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping,\n44px minimum touch targets, and high-contrast error styling."
+}

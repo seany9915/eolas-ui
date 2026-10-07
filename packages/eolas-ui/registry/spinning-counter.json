@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "spinning-counter",
   "type": "registry:ui",
+  "title": "Spinning Counter",
+  "description": "Eolas UI Spinning Counter component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toolbar",
   "type": "registry:ui",
+  "title": "Toolbar",
+  "description": "Toolbar primitive (@base-ui/react/toolbar). WAI-ARIA Role: role=\"toolbar\" Primary Purpose: Group of controls navigable with arrow keys under a SINGLE tab stop.",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -17,5 +20,16 @@
       "type": "registry:ui",
       "target": "components/ui/toolbar.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "USE THIS: In rich-text formatting strips, media audio/playback bars, or canvas editing palettes where controls remain permanently visible and interactive under roving keyboard focus.",
+      "DO NOT USE:",
+      "For hierarchical application command menus (File, Edit, View) -> Use <Menubar>.",
+      "For site navigation links -> Use <NavigationMenu>.",
+      "For standalone action dropdowns -> Use <Menu>.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "Toolbar primitive (@base-ui/react/toolbar).\nBase UI Documentation: https://base-ui.com/react/components/toolbar\nWAI-ARIA Role: role=\"toolbar\"\nPrimary Purpose: Group of controls navigable with arrow keys under a SINGLE tab stop.\nTAXONOMY & USAGE GUIDELINES:\n- USE THIS: In rich-text formatting strips, media audio/playback bars, or canvas editing palettes\nwhere controls remain permanently visible and interactive under roving keyboard focus.\n- DO NOT USE:\n- For hierarchical application command menus (File, Edit, View) -> Use <Menubar>.\n- For site navigation links -> Use <NavigationMenu>.\n- For standalone action dropdowns -> Use <Menu>.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
 }

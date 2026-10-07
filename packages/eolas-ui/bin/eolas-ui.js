@@ -16,13 +16,14 @@ function printHelp() {
 eolas-ui - Private Base UI Component Registry CLI
 
 USAGE:
-  npx @seany9915/eolas-ui add <component-name...> [--overwrite]
+  npx @seany9915/eolas-ui add <item-name...> [--overwrite]
   npx @seany9915/eolas-ui add --all [--overwrite]
   npx @seany9915/eolas-ui sync
   npx @seany9915/eolas-ui list
 
 EXAMPLES:
   npx @seany9915/eolas-ui add button dialog select
+  npx @seany9915/eolas-ui add agent-rules lint theme
   npx @seany9915/eolas-ui add tabs --overwrite
   npx @seany9915/eolas-ui sync
   npx @seany9915/eolas-ui list
@@ -36,16 +37,29 @@ function listComponents() {
     process.exit(1);
   }
   const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-  console.log('\nAvailable Eolas UI Components (Total: ' + items.length + '):\n');
-  const uiItems = items.filter(i => i.type === 'registry:ui').map(i => i.name);
+  const uiItems = items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
+  const blockItems = items.filter((i) => i.type === 'registry:block').map((i) => i.name);
+  const otherItems = items.filter((i) => i.type !== 'registry:ui' && i.type !== 'registry:block').map((i) => i.name);
+
+  console.log(`\nAvailable Eolas UI Primitives (Total: ${uiItems.length}):\n`);
   console.log(uiItems.join(', '));
+
+  if (blockItems.length > 0) {
+    console.log(`\nComposite Blocks (Total: ${blockItems.length}):\n`);
+    console.log(blockItems.join(', '));
+  }
+
+  if (otherItems.length > 0) {
+    console.log(`\nPresets, Rules & Utilities (Total: ${otherItems.length}):\n`);
+    console.log(otherItems.join(', '));
+  }
   console.log('');
 }
 
 function addComponents(componentNames, overwrite = false) {
   if (componentNames.length === 0) {
-    console.error('Error: Please specify one or more components to add.');
-    console.log('Run `npx @seany9915/eolas-ui list` to see available components.');
+    console.error('Error: Please specify one or more components or items to add.');
+    console.log('Run `npx @seany9915/eolas-ui list` to see available items.');
     process.exit(1);
   }
 
@@ -59,9 +73,9 @@ function addComponents(componentNames, overwrite = false) {
     if (processed.has(name)) continue;
     processed.add(name);
 
-    const compFile = path.join(REGISTRY_DIR, name + '.json');
+    const compFile = path.join(REGISTRY_DIR, `${name}.json`);
     if (!fs.existsSync(compFile)) {
-      console.warn('Warning: Component ' + name + ' not found in Eolas UI registry. Skipping.');
+      console.warn(`Warning: Item ${name} not found in Eolas UI registry. Skipping.`);
       continue;
     }
 
@@ -76,26 +90,48 @@ function addComponents(componentNames, overwrite = false) {
       }
     }
 
-    // Write component files
+    // Write item files
     for (const file of data.files) {
-      const baseDir = fs.existsSync(path.resolve(cwd, 'src')) ? path.resolve(cwd, 'src') : cwd;
-      const destPath = path.resolve(baseDir, file.target);
+      const isRootFile =
+        file.target.startsWith('eslint.') ||
+        file.target.startsWith('lint/') ||
+        file.target.startsWith('.');
+
+      const baseDir = isRootFile
+        ? cwd
+        : fs.existsSync(path.resolve(cwd, 'src'))
+          ? path.resolve(cwd, 'src')
+          : cwd;
+
+      let destPath = path.resolve(baseDir, file.target);
+
+      // Smart resolution for theme file when target is styles/globals.css
+      if (file.target === 'styles/globals.css') {
+        if (fs.existsSync(path.resolve(baseDir, 'styles/globals.css'))) {
+          destPath = path.resolve(baseDir, 'styles/globals.css');
+        } else if (fs.existsSync(path.resolve(baseDir, 'globals.css'))) {
+          destPath = path.resolve(baseDir, 'globals.css');
+        } else if (fs.existsSync(path.resolve(baseDir, 'index.css'))) {
+          destPath = path.resolve(baseDir, 'index.css');
+        }
+      }
+
       const destDir = path.dirname(destPath);
       if (!fs.existsSync(destDir)) {
         fs.mkdirSync(destDir, { recursive: true });
       }
 
       if (fs.existsSync(destPath) && !overwrite) {
-        console.log('  - Skipping ' + file.target + ' (already exists, pass --overwrite to replace)');
+        console.log(`  - Skipping ${file.target} (already exists, pass --overwrite to replace)`);
       } else {
         fs.writeFileSync(destPath, file.content, 'utf8');
-        console.log('  + Installed ' + file.target);
+        console.log(`  + Installed ${file.target}`);
         installedFiles.push(file.target);
       }
     }
   }
 
-  console.log('\nSuccessfully processed ' + processed.size + ' components/dependencies.');
+  console.log(`\nSuccessfully processed ${processed.size} items/dependencies.`);
   console.log('Ensure peer dependencies are installed: npm install @base-ui/react clsx tailwind-merge\n');
 }
 
@@ -111,12 +147,12 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
     process.exit(1);
   }
   const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-  const allUiNames = items.filter(i => i.type === 'registry:ui').map(i => i.name);
-  console.log('Syncing all ' + allUiNames.length + ' Eolas UI components...\n');
+  const allUiNames = items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
+  console.log(`Syncing all ${allUiNames.length} Eolas UI components...\n`);
   addComponents(allUiNames, true);
 } else if (command === 'add') {
-  const flags = args.filter(a => a.startsWith('-'));
-  const names = args.slice(1).filter(a => !a.startsWith('-'));
+  const flags = args.filter((a) => a.startsWith('-'));
+  const names = args.slice(1).filter((a) => !a.startsWith('-'));
   const overwrite = flags.includes('--overwrite') || flags.includes('-o');
 
   if (flags.includes('--all') || flags.includes('-a') || names.includes('all')) {
@@ -126,13 +162,13 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
       process.exit(1);
     }
     const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-    const allUiNames = items.filter(i => i.type === 'registry:ui').map(i => i.name);
+    const allUiNames = items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
     addComponents(allUiNames, overwrite);
   } else {
     addComponents(names, overwrite);
   }
 } else {
-  console.error('Unknown command: ' + command + '\n');
+  console.error(`Unknown command: ${command}\n`);
   printHelp();
   process.exit(1);
 }

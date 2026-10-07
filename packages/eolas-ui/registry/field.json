@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "field",
   "type": "registry:ui",
+  "title": "Field",
+  "description": "Field primitive (@base-ui/react/field).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -18,5 +21,13 @@
       "type": "registry:ui",
       "target": "components/ui/field.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Field to group a form control with its label, description, and error message.",
+      "Supports automatic validation (onSubmit, onBlur, onChange), validation debouncing, and accessibility attribute wiring (id, aria-labelledby, aria-describedby, aria-invalid).",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+    ]
+  },
+  "docs": "Field primitive (@base-ui/react/field).\nBase UI Documentation: https://base-ui.com/react/components/field\nTAXONOMY & USAGE:\n- Use Field to group a form control with its label, description, and error message.\n- Supports automatic validation (onSubmit, onBlur, onChange), validation debouncing,\nand accessibility attribute wiring (id, aria-labelledby, aria-describedby, aria-invalid).\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nand WCAG 2.2 SC 2.5.8 touch target compliance."
 }

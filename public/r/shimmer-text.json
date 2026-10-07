@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "shimmer-text",
   "type": "registry:ui",
+  "title": "Shimmer Text",
+  "description": "Eolas UI Shimmer Text component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "preview-card",
   "type": "registry:ui",
+  "title": "Preview Card",
+  "description": "Eolas UI Preview Card component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "checkbox-group",
   "type": "registry:ui",
+  "title": "Checkbox Group",
+  "description": "CheckboxGroup primitive (@base-ui/react/checkbox-group).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -17,5 +20,14 @@
       "type": "registry:ui",
       "target": "components/ui/checkbox-group.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Provides shared state and keyboard management for a list of related checkboxes.",
+      "Supports `allValues` for parent indeterminate checkbox synchronization.",
+      "Supports both declarative `options` array and composable `children`.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+    ]
+  },
+  "docs": "CheckboxGroup primitive (@base-ui/react/checkbox-group).\nBase UI Documentation: https://base-ui.com/react/components/checkbox-group\nTAXONOMY & USAGE:\n- Provides shared state and keyboard management for a list of related checkboxes.\n- Supports `allValues` for parent indeterminate checkbox synchronization.\n- Supports both declarative `options` array and composable `children`.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nand WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
 }

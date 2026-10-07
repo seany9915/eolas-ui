@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "attachment",
   "type": "registry:ui",
+  "title": "Attachment",
+  "description": "Eolas UI Attachment component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "drawer",
   "type": "registry:ui",
+  "title": "Drawer",
+  "description": "Drawer primitive (@base-ui/react/drawer).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/drawer.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures, snap points, and background indent effects.",
+      "For focused modal dialogs without swipe gestures, use Dialog instead.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "Drawer primitive (@base-ui/react/drawer).\nBase UI Documentation: https://base-ui.com/react/components/drawer\nTAXONOMY & USAGE:\n- Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures,\nsnap points, and background indent effects.\n- For focused modal dialogs without swipe gestures, use Dialog instead.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
 }

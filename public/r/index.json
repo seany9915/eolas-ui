@@ -2,6 +2,8 @@
   {
     "name": "utils",
     "type": "registry:lib",
+    "title": "Eolas UI Utilities",
+    "description": "Utility functions including cn() class merger for Tailwind CSS and Base UI",
     "dependencies": [
       "clsx",
       "tailwind-merge",
@@ -9,8 +11,33 @@
     ]
   },
   {
+    "name": "theme",
+    "type": "registry:file",
+    "title": "Eolas UI Clinical Theme",
+    "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, and motion tokens conforming to DESIGN.md"
+  },
+  {
+    "name": "agent-rules",
+    "type": "registry:file",
+    "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
+    "description": "Strict architectural contracts, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers"
+  },
+  {
+    "name": "lint",
+    "type": "registry:file",
+    "title": "Eolas UI Lint",
+    "description": "@shadcn/lint preset and ESLint config for Eolas UI Base UI design contracts",
+    "devDependencies": [
+      "@shadcn/lint",
+      "eslint",
+      "@typescript-eslint/parser"
+    ]
+  },
+  {
     "name": "accordion",
     "type": "registry:ui",
+    "title": "Accordion",
+    "description": "Accordion primitive (@base-ui/react/accordion).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -18,11 +45,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Accordion for vertically stacked disclosure panels where one or more sections can be expanded at a time.",
+        "Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "alert-dialog",
     "type": "registry:ui",
+    "title": "Alert Dialog",
+    "description": "Eolas UI Alert Dialog component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -37,6 +73,8 @@
   {
     "name": "approval-card",
     "type": "registry:ui",
+    "title": "Approval Card",
+    "description": "Eolas UI Approval Card component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -52,6 +90,8 @@
   {
     "name": "attachment",
     "type": "registry:ui",
+    "title": "Attachment",
+    "description": "Eolas UI Attachment component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -66,6 +106,8 @@
   {
     "name": "autocomplete",
     "type": "registry:ui",
+    "title": "Autocomplete",
+    "description": "Autocomplete primitive (@base-ui/react/autocomplete).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -73,11 +115,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Autocomplete for freeform text search inputs with dynamic completion suggestions where the user can either select a suggestion or type their own custom query.",
+        "For selecting one or more values from a closed set where selections submit explicit item keys, use Combobox or Select instead.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "avatar",
     "type": "registry:ui",
+    "title": "Avatar",
+    "description": "Avatar primitive (@base-ui/react/avatar).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -85,11 +136,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays a user's profile picture, initials, or fallback icon.",
+        "Supports image loading states (idle, loading, loaded, error) and delayed fallback rendering to prevent visual flashes during fast network loads.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
+      ]
+    }
   },
   {
     "name": "bot-avatar",
     "type": "registry:ui",
+    "title": "Bot Avatar",
+    "description": "Eolas UI Bot Avatar component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -103,6 +163,8 @@
   {
     "name": "breadcrumb",
     "type": "registry:ui",
+    "title": "Breadcrumb",
+    "description": "Eolas UI Breadcrumb component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -116,6 +178,8 @@
   {
     "name": "button",
     "type": "registry:ui",
+    "title": "Button",
+    "description": "Button primitive (@base-ui/react/button).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -123,11 +187,22 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Button for triggering immediate page/dialog actions, form submits, or opening popups.",
+        "Do NOT use Button for on/off toggles with persistent state (use Toggle instead).",
+        "Do NOT use Button for in-page panel navigation (use Tabs instead).",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded 8px / 0.5rem), floating 2px focus ring, active micro-motion scaling, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+        "Never uses Sunny Amber (tertiary) text on light surfaces without dark container background."
+      ]
+    }
   },
   {
     "name": "card",
     "type": "registry:ui",
+    "title": "Card",
+    "description": "Eolas UI Card component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -140,6 +215,8 @@
   {
     "name": "carousel",
     "type": "registry:ui",
+    "title": "Carousel",
+    "description": "Eolas UI Carousel component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -155,6 +232,8 @@
   {
     "name": "chart",
     "type": "registry:ui",
+    "title": "Chart",
+    "description": "Eolas UI Chart component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -168,6 +247,8 @@
   {
     "name": "checkbox-group",
     "type": "registry:ui",
+    "title": "Checkbox Group",
+    "description": "CheckboxGroup primitive (@base-ui/react/checkbox-group).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -176,11 +257,21 @@
     "registryDependencies": [
       "utils",
       "checkbox"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Provides shared state and keyboard management for a list of related checkboxes.",
+        "Supports `allValues` for parent indeterminate checkbox synchronization.",
+        "Supports both declarative `options` array and composable `children`.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "checkbox",
     "type": "registry:ui",
+    "title": "Checkbox",
+    "description": "Checkbox primitive (@base-ui/react/checkbox).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -188,11 +279,21 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Checkbox for multi-selection or binary on/off options within forms or lists.",
+        "Supports three states: unchecked, checked, and indeterminate (mixed).",
+        "Supports parent-child tree checkboxes via the `parent` prop.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded-xs / 4px on box, rounded 8px on row), floating 2px focus ring, flush primary fill on check, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "chip",
     "type": "registry:ui",
+    "title": "Chip",
+    "description": "Eolas UI Chip component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -205,6 +306,8 @@
   {
     "name": "clinician-tip",
     "type": "registry:ui",
+    "title": "Clinician Tip",
+    "description": "Eolas UI Clinician Tip component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -218,6 +321,8 @@
   {
     "name": "collapsible",
     "type": "registry:ui",
+    "title": "Collapsible",
+    "description": "Collapsible primitive (@base-ui/react/collapsible).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -225,11 +330,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Collapsible for an interactive disclosure element that shows or hides a single panel.",
+        "Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "combobox",
     "type": "registry:ui",
+    "title": "Combobox",
+    "description": "Combobox primitive (@base-ui/react/combobox).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -237,11 +351,21 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Combobox for selecting one or multiple values from a list of options with text filtering.",
+        "Supports multi-selection with inline chips (Combobox.Chips, Combobox.Chip, Combobox.ChipRemove).",
+        "For freeform text searches where custom unlisted queries are valid, use Autocomplete instead.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "context-menu",
     "type": "registry:ui",
+    "title": "Context Menu",
+    "description": "Eolas UI Context Menu component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -254,6 +378,8 @@
   {
     "name": "csp-provider",
     "type": "registry:ui",
+    "title": "Csp Provider",
+    "description": "Eolas UI Csp Provider component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -266,6 +392,8 @@
   {
     "name": "dialog",
     "type": "registry:ui",
+    "title": "Dialog",
+    "description": "Eolas UI Dialog component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -279,6 +407,8 @@
   {
     "name": "direction-provider",
     "type": "registry:ui",
+    "title": "Direction Provider",
+    "description": "Eolas UI Direction Provider component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -291,6 +421,8 @@
   {
     "name": "drawer",
     "type": "registry:ui",
+    "title": "Drawer",
+    "description": "Drawer primitive (@base-ui/react/drawer).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -298,11 +430,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures, snap points, and background indent effects.",
+        "For focused modal dialogs without swipe gestures, use Dialog instead.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "empty-state",
     "type": "registry:ui",
+    "title": "Empty State",
+    "description": "Eolas UI Empty State component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -316,6 +457,8 @@
   {
     "name": "empty",
     "type": "registry:ui",
+    "title": "Empty",
+    "description": "Eolas UI Empty component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -329,6 +472,8 @@
   {
     "name": "error-shake",
     "type": "registry:ui",
+    "title": "Error Shake",
+    "description": "Eolas UI Error Shake component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -341,6 +486,8 @@
   {
     "name": "field",
     "type": "registry:ui",
+    "title": "Field",
+    "description": "Field primitive (@base-ui/react/field).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -350,11 +497,20 @@
       "utils",
       "input",
       "textarea"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Field to group a form control with its label, description, and error message.",
+        "Supports automatic validation (onSubmit, onBlur, onChange), validation debouncing, and accessibility attribute wiring (id, aria-labelledby, aria-describedby, aria-invalid).",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+      ]
+    }
   },
   {
     "name": "fieldset",
     "type": "registry:ui",
+    "title": "Fieldset",
+    "description": "Fieldset primitive (@base-ui/react/fieldset).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -362,11 +518,19 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Fieldset to group related form controls with a shared legend.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+      ]
+    }
   },
   {
     "name": "form",
     "type": "registry:ui",
+    "title": "Form",
+    "description": "Form primitive (@base-ui/react/form).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -374,11 +538,19 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "A native form element with consolidated error handling, field registration, imperative validate actions, and external error state integration.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+      ]
+    }
   },
   {
     "name": "icon",
     "type": "registry:ui",
+    "title": "Icon",
+    "description": "Eolas UI Icon component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -391,6 +563,8 @@
   {
     "name": "inline-alert",
     "type": "registry:ui",
+    "title": "Inline Alert",
+    "description": "Eolas UI Inline Alert component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -404,6 +578,8 @@
   {
     "name": "input",
     "type": "registry:ui",
+    "title": "Input",
+    "description": "Input primitive (@base-ui/react/input).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -413,11 +589,20 @@
       "utils",
       "field",
       "textarea"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "A native input element that automatically works with Base UI Field context.",
+        "Supports leading/trailing icons, clear button, and accessible error styling.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "menu",
     "type": "registry:ui",
+    "title": "Menu",
+    "description": "Eolas UI Menu component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -430,6 +615,8 @@
   {
     "name": "menubar",
     "type": "registry:ui",
+    "title": "Menubar",
+    "description": "Eolas UI Menubar component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -442,6 +629,8 @@
   {
     "name": "meter",
     "type": "registry:ui",
+    "title": "Meter",
+    "description": "Meter primitive (@base-ui/react/meter).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -449,11 +638,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays a graphical meter representing a scalar value within a known range (e.g. disk space, battery level, audio volume).",
+        "For task progress towards completion, use Progress instead.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+      ]
+    }
   },
   {
     "name": "navigation-menu",
     "type": "registry:ui",
+    "title": "Navigation Menu",
+    "description": "Eolas UI Navigation Menu component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -466,6 +664,8 @@
   {
     "name": "notification-badge",
     "type": "registry:ui",
+    "title": "Notification Badge",
+    "description": "Eolas UI Notification Badge component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -478,6 +678,8 @@
   {
     "name": "number-field",
     "type": "registry:ui",
+    "title": "Number Field",
+    "description": "NumberField primitive (@base-ui/react/number-field).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -485,11 +687,19 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use NumberField for numerical inputs with step buttons, keyboard scrubbing, wheel scrubbing, and localized formatting.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "number-pop-in",
     "type": "registry:ui",
+    "title": "Number Pop In",
+    "description": "Eolas UI Number Pop In component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -502,6 +712,8 @@
   {
     "name": "number-roll",
     "type": "registry:ui",
+    "title": "Number Roll",
+    "description": "Eolas UI Number Roll component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -516,6 +728,8 @@
   {
     "name": "otp-field",
     "type": "registry:ui",
+    "title": "Otp Field",
+    "description": "OTPField primitive (@base-ui/react/otp-field).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -523,11 +737,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.",
+        "Supports automatic focus advancement, paste distribution, character masking, and validation types.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "pagination",
     "type": "registry:ui",
+    "title": "Pagination",
+    "description": "Eolas UI Pagination component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -542,6 +765,8 @@
   {
     "name": "popover",
     "type": "registry:ui",
+    "title": "Popover",
+    "description": "Eolas UI Popover component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -554,6 +779,8 @@
   {
     "name": "preview-card",
     "type": "registry:ui",
+    "title": "Preview Card",
+    "description": "Eolas UI Preview Card component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -566,6 +793,8 @@
   {
     "name": "progress",
     "type": "registry:ui",
+    "title": "Progress",
+    "description": "Progress primitive (@base-ui/react/progress).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -574,11 +803,20 @@
     "registryDependencies": [
       "utils",
       "skeleton"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays the completion status of a task or process.",
+        "Supports determinate values as well as indeterminate loading state (value=null/undefined).",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+      ]
+    }
   },
   {
     "name": "radio",
     "type": "registry:ui",
+    "title": "Radio",
+    "description": "Radio & RadioGroup primitives (@base-ui/react/radio, @base-ui/react/radio-group).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -586,11 +824,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use RadioGroup for selecting a single option from a visible list of 2-7 mutually exclusive choices.",
+        "Supports roving tabindex arrow key navigation.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "resizable",
     "type": "registry:ui",
+    "title": "Resizable",
+    "description": "Eolas UI Resizable component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -605,6 +852,8 @@
   {
     "name": "scroll-area",
     "type": "registry:ui",
+    "title": "Scroll Area",
+    "description": "ScrollArea primitive (@base-ui/react/scroll-area).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -612,11 +861,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Augments native browser scrolling with custom-styled, accessible scrollbars.",
+        "Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
+      ]
+    }
   },
   {
     "name": "select",
     "type": "registry:ui",
+    "title": "Select",
+    "description": "Eolas UI Select component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -629,6 +887,8 @@
   {
     "name": "selection-controls",
     "type": "registry:ui",
+    "title": "Selection Controls",
+    "description": "Re-exports selection control primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/checkbox - @/components/ui/checkbox-group - @/components/ui/radio - @/components/ui/switch",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -645,6 +905,8 @@
   {
     "name": "separator",
     "type": "registry:ui",
+    "title": "Separator",
+    "description": "Separator primitive (@base-ui/react/separator).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -652,11 +914,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "A visual or semantic separator between sections of content.",
+        "Supports horizontal and vertical orientations with accessible role/aria-hidden attributes.",
+        "Follows DESIGN.md Tier B tokens: border-outline-variant."
+      ]
+    }
   },
   {
     "name": "shimmer-text",
     "type": "registry:ui",
+    "title": "Shimmer Text",
+    "description": "Eolas UI Shimmer Text component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -669,6 +940,8 @@
   {
     "name": "skeleton",
     "type": "registry:ui",
+    "title": "Skeleton",
+    "description": "Eolas UI Skeleton component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -681,6 +954,8 @@
   {
     "name": "slider",
     "type": "registry:ui",
+    "title": "Slider",
+    "description": "Slider primitive (@base-ui/react/slider).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -688,11 +963,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Allows users to make selections from a range of values along a horizontal or vertical track.",
+        "Supports single-value or multi-thumb range selections with collision behaviors ('push', 'swap', 'none').",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "spinning-counter",
     "type": "registry:ui",
+    "title": "Spinning Counter",
+    "description": "Eolas UI Spinning Counter component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -705,6 +989,8 @@
   {
     "name": "step-wizard",
     "type": "registry:ui",
+    "title": "Step Wizard",
+    "description": "Eolas UI Step Wizard component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -719,6 +1005,8 @@
   {
     "name": "steppers",
     "type": "registry:ui",
+    "title": "Steppers",
+    "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -732,6 +1020,8 @@
   {
     "name": "success-check",
     "type": "registry:ui",
+    "title": "Success Check",
+    "description": "Eolas UI Success Check component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -744,6 +1034,8 @@
   {
     "name": "switch",
     "type": "registry:ui",
+    "title": "Switch",
+    "description": "Switch primitive (@base-ui/react/switch).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -751,11 +1043,20 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Switch for standalone binary settings that take effect immediately (e.g. Dark Mode, Notifications).",
+        "Do NOT use Switch for in-group option selections (use Checkbox or ToggleGroup instead).",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary track fill, smooth thumb sliding, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "table",
     "type": "registry:ui",
+    "title": "Table",
+    "description": "Eolas UI Table component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -768,6 +1069,8 @@
   {
     "name": "tabs",
     "type": "registry:ui",
+    "title": "Tabs",
+    "description": "Tabs primitive (@base-ui/react/tabs).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -775,11 +1078,23 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role=\"tablist\", role=\"tab\", role=\"tabpanel\").",
+        "Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).",
+        "Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).",
+        "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+        "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
+        "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
+      ]
+    }
   },
   {
     "name": "text-swap",
     "type": "registry:ui",
+    "title": "Text Swap",
+    "description": "Eolas UI Text Swap component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -792,6 +1107,8 @@
   {
     "name": "textarea",
     "type": "registry:ui",
+    "title": "Textarea",
+    "description": "Textarea primitive. Base UI Integration: Works seamlessly with Base UI Field via Field.Control.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -800,11 +1117,19 @@
     "registryDependencies": [
       "utils",
       "field"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Textarea for multi-line freeform text input.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+      ]
+    }
   },
   {
     "name": "texts-reveal",
     "type": "registry:ui",
+    "title": "Texts Reveal",
+    "description": "Eolas UI Texts Reveal component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -817,6 +1142,8 @@
   {
     "name": "thinking-orb",
     "type": "registry:ui",
+    "title": "Thinking Orb",
+    "description": "Eolas UI Thinking Orb component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -830,6 +1157,8 @@
   {
     "name": "thinking-trace",
     "type": "registry:ui",
+    "title": "Thinking Trace",
+    "description": "Eolas UI Thinking Trace component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -844,6 +1173,8 @@
   {
     "name": "toast",
     "type": "registry:ui",
+    "title": "Toast",
+    "description": "Eolas UI Toast component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -857,6 +1188,8 @@
   {
     "name": "toggle-group",
     "type": "registry:ui",
+    "title": "Toggle Group",
+    "description": "ToggleGroup primitive (@base-ui/react/toggle-group).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -864,11 +1197,22 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use ToggleGroup for mutually exclusive or multi-select option switches (e.g. text align, view mode grid/list, filter tags) where selection updates state/data in-place without switching or hiding full views or panels.",
+        "Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").",
+        "Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").",
+        "Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+        "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
+      ]
+    }
   },
   {
     "name": "toggle",
     "type": "registry:ui",
+    "title": "Toggle",
+    "description": "Toggle primitive (@base-ui/react/toggle).",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -876,11 +1220,21 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.",
+        "For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.",
+        "For form on/off switches that submit form values, use Switch instead.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
   },
   {
     "name": "toggles",
     "type": "registry:ui",
+    "title": "Toggles",
+    "description": "Re-exports toggle primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/toggle - @/components/ui/toggle-group",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -895,6 +1249,8 @@
   {
     "name": "toolbar",
     "type": "registry:ui",
+    "title": "Toolbar",
+    "description": "Toolbar primitive (@base-ui/react/toolbar). WAI-ARIA Role: role=\"toolbar\" Primary Purpose: Group of controls navigable with arrow keys under a SINGLE tab stop.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -903,11 +1259,23 @@
     "registryDependencies": [
       "utils",
       "tooltip"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "USE THIS: In rich-text formatting strips, media audio/playback bars, or canvas editing palettes where controls remain permanently visible and interactive under roving keyboard focus.",
+        "DO NOT USE:",
+        "For hierarchical application command menus (File, Edit, View) -> Use <Menubar>.",
+        "For site navigation links -> Use <NavigationMenu>.",
+        "For standalone action dropdowns -> Use <Menu>.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+      ]
+    }
   },
   {
     "name": "tooltip",
     "type": "registry:ui",
+    "title": "Tooltip",
+    "description": "Eolas UI Tooltip component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -915,6 +1283,59 @@
     ],
     "registryDependencies": [
       "utils"
+    ]
+  },
+  {
+    "name": "delete-confirmation-dialog",
+    "type": "registry:block",
+    "title": "Delete Confirmation Dialog",
+    "description": "DeleteConfirmationDialog block. Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "dialog",
+      "button",
+      "icon"
+    ]
+  },
+  {
+    "name": "filter-toolbar",
+    "type": "registry:block",
+    "title": "Filter Toolbar",
+    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "input",
+      "select",
+      "button",
+      "chip",
+      "icon"
+    ]
+  },
+  {
+    "name": "metric-card",
+    "type": "registry:block",
+    "title": "Metric Card",
+    "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Chip, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "card",
+      "chip",
+      "icon"
     ]
   }
 ]

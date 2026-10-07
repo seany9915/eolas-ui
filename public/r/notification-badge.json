@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "notification-badge",
   "type": "registry:ui",
+  "title": "Notification Badge",
+  "description": "Eolas UI Notification Badge component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

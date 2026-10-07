@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "avatar",
   "type": "registry:ui",
+  "title": "Avatar",
+  "description": "Avatar primitive (@base-ui/react/avatar).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/avatar.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Displays a user's profile picture, initials, or fallback icon.",
+      "Supports image loading states (idle, loading, loaded, error) and delayed fallback rendering to prevent visual flashes during fast network loads.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
+    ]
+  },
+  "docs": "Avatar primitive (@base-ui/react/avatar).\nBase UI Documentation: https://base-ui.com/react/components/avatar\nTAXONOMY & USAGE:\n- Displays a user's profile picture, initials, or fallback icon.\n- Supports image loading states (idle, loading, loaded, error) and delayed fallback rendering\nto prevent visual flashes during fast network loads.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
 }

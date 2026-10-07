@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "collapsible",
   "type": "registry:ui",
+  "title": "Collapsible",
+  "description": "Collapsible primitive (@base-ui/react/collapsible).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/collapsible.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Collapsible for an interactive disclosure element that shows or hides a single panel.",
+      "Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "Collapsible primitive (@base-ui/react/collapsible).\nBase UI Documentation: https://base-ui.com/react/components/collapsible\nTAXONOMY & USAGE:\n- Use Collapsible for an interactive disclosure element that shows or hides a single panel.\n- Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
 }

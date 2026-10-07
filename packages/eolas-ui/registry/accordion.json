@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "accordion",
   "type": "registry:ui",
+  "title": "Accordion",
+  "description": "Accordion primitive (@base-ui/react/accordion).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/accordion.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Accordion for vertically stacked disclosure panels where one or more sections can be expanded at a time.",
+      "Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "Accordion primitive (@base-ui/react/accordion).\nBase UI Documentation: https://base-ui.com/react/components/accordion\nTAXONOMY & USAGE:\n- Use Accordion for vertically stacked disclosure panels where one or more\nsections can be expanded at a time.\n- Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
 }

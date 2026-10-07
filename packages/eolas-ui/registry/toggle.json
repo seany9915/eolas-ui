@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toggle",
   "type": "registry:ui",
+  "title": "Toggle",
+  "description": "Toggle primitive (@base-ui/react/toggle).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,14 @@
       "type": "registry:ui",
       "target": "components/ui/toggle.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.",
+      "For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.",
+      "For form on/off switches that submit form values, use Switch instead.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+    ]
+  },
+  "docs": "Toggle primitive (@base-ui/react/toggle).\nBase UI Documentation: https://base-ui.com/react/components/toggle\nTAXONOMY & USAGE:\n- Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.\n- For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.\n- For form on/off switches that submit form values, use Switch instead.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nflush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
 }

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "texts-reveal",
   "type": "registry:ui",
+  "title": "Texts Reveal",
+  "description": "Eolas UI Texts Reveal component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

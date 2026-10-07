@@ -41,7 +41,27 @@ export const eolasLintPreset = [
       // 5. Require statically analyzable classes
       "shadcn/require-static-classes": "error",
 
-      // 6. Restyle contracts tailored to Eolas UI Base UI primitives
+      // 6. Forbid direct HTML interactive elements outside primitive libraries
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXOpeningElement[name.name='button']",
+          message:
+            "Direct <button> usage is prohibited outside primitives. Use <Button> from @/components/ui/button.",
+        },
+        {
+          selector: "JSXOpeningElement[name.name='input']",
+          message:
+            "Direct <input> usage is prohibited outside primitives. Use <Input> from @/components/ui/input.",
+        },
+        {
+          selector: "JSXOpeningElement[name.name='select']",
+          message:
+            "Direct <select> usage is prohibited outside primitives. Use <Select> from @/components/ui/select.",
+        },
+      ],
+
+      // 7. Restyle contracts tailored to Eolas UI Base UI primitives
       "shadcn/no-restyle": [
         "error",
         {
@@ -160,15 +180,23 @@ export const eolasLintPreset = [
       ],
     },
   },
-  // Allow internal primitive files inside ui/ to define their own styles, floors, and spacing
+  // Allow internal primitive files inside ui/ and showcase/playground testbeds to define their own styles, floors, spacing, and native elements
   {
-    files: ["**/components/ui/**", "**/src/components/ui/**"],
+    files: [
+      "**/components/ui/**",
+      "**/src/components/ui/**",
+      "**/playground/**",
+      "**/showcase/**",
+      "**/*Showcase*/**",
+      "**/*Showcase.tsx",
+    ],
     rules: {
       "shadcn/no-restyle": "off",
       "shadcn/no-arbitrary-values": "off",
       "shadcn/no-inline-styles": "off",
       "shadcn/require-static-classes": "off",
       "shadcn/no-raw-colors": ["error", { scanAllStrings: false }],
+      "no-restricted-syntax": "off",
     },
   },
 ];

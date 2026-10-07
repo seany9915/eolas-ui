@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "tabs",
   "type": "registry:ui",
+  "title": "Tabs",
+  "description": "Tabs primitive (@base-ui/react/tabs).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,16 @@
       "type": "registry:ui",
       "target": "components/ui/tabs.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role=\"tablist\", role=\"tab\", role=\"tabpanel\").",
+      "Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).",
+      "Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).",
+      "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+      "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
+      "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
+    ]
+  },
+  "docs": "Tabs primitive (@base-ui/react/tabs).\nBase UI Documentation: https://base-ui.com/react/components/tabs\nTAXONOMY & USAGE:\n- Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role=\"tablist\", role=\"tab\", role=\"tabpanel\").\n- Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).\n- Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).\n- Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).\n- Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.\n- Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
 }

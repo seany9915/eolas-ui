@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "progress",
   "type": "registry:ui",
+  "title": "Progress",
+  "description": "Progress primitive (@base-ui/react/progress).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -17,5 +20,13 @@
       "type": "registry:ui",
       "target": "components/ui/progress.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Displays the completion status of a task or process.",
+      "Supports determinate values as well as indeterminate loading state (value=null/undefined).",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+    ]
+  },
+  "docs": "Progress primitive (@base-ui/react/progress).\nBase UI Documentation: https://base-ui.com/react/components/progress\nTAXONOMY & USAGE:\n- Displays the completion status of a task or process.\n- Supports determinate values as well as indeterminate loading state (value=null/undefined).\n- Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
 }

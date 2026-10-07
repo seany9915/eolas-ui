@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "button",
   "type": "registry:ui",
+  "title": "Button",
+  "description": "Button primitive (@base-ui/react/button).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,15 @@
       "type": "registry:ui",
       "target": "components/ui/button.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Button for triggering immediate page/dialog actions, form submits, or opening popups.",
+      "Do NOT use Button for on/off toggles with persistent state (use Toggle instead).",
+      "Do NOT use Button for in-page panel navigation (use Tabs instead).",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded 8px / 0.5rem), floating 2px focus ring, active micro-motion scaling, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+      "Never uses Sunny Amber (tertiary) text on light surfaces without dark container background."
+    ]
+  },
+  "docs": "Button primitive (@base-ui/react/button).\nBase UI Documentation: https://base-ui.com/react/components/button\nTAXONOMY & USAGE:\n- Use Button for triggering immediate page/dialog actions, form submits, or opening popups.\n- Do NOT use Button for on/off toggles with persistent state (use Toggle instead).\n- Do NOT use Button for in-page panel navigation (use Tabs instead).\n- Follows DESIGN.md Tier B interactive controls: concentric radius (rounded 8px / 0.5rem),\nfloating 2px focus ring, active micro-motion scaling, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.\n- Never uses Sunny Amber (tertiary) text on light surfaces without dark container background."
 }

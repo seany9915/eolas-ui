@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "otp-field",
   "type": "registry:ui",
+  "title": "Otp Field",
+  "description": "OTPField primitive (@base-ui/react/otp-field).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/otp-field.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.",
+      "Supports automatic focus advancement, paste distribution, character masking, and validation types.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "OTPField primitive (@base-ui/react/otp-field).\nBase UI Documentation: https://base-ui.com/react/components/otp-field\nTAXONOMY & USAGE:\n- Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.\n- Supports automatic focus advancement, paste distribution, character masking, and validation types.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
 }

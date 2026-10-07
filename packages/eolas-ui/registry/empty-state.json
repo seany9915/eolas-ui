@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "empty-state",
   "type": "registry:ui",
+  "title": "Empty State",
+  "description": "Eolas UI Empty State component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "input",
   "type": "registry:ui",
+  "title": "Input",
+  "description": "Input primitive (@base-ui/react/input).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -18,5 +21,13 @@
       "type": "registry:ui",
       "target": "components/ui/input.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "A native input element that automatically works with Base UI Field context.",
+      "Supports leading/trailing icons, clear button, and accessible error styling.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "Input primitive (@base-ui/react/input).\nBase UI Documentation: https://base-ui.com/react/components/input\nTAXONOMY & USAGE:\n- A native input element that automatically works with Base UI Field context.\n- Supports leading/trailing icons, clear button, and accessible error styling.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
 }

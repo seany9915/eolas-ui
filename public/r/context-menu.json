@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "context-menu",
   "type": "registry:ui",
+  "title": "Context Menu",
+  "description": "Eolas UI Context Menu component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "approval-card",
   "type": "registry:ui",
+  "title": "Approval Card",
+  "description": "Eolas UI Approval Card component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "filter-toolbar",
+  "type": "registry:block",
+  "title": "Filter Toolbar",
+  "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils",
+    "input",
+    "select",
+    "button",
+    "chip",
+    "icon"
+  ],
+  "files": [
+    {
+      "path": "blocks/filter-toolbar.tsx",
+      "content": "/**\n * FilterToolbar block.\n *\n * Controlled composite toolbar for data tables, caseload lists, and exercise libraries.\n * Composes Input, Select, Button, and Chip primitives with responsive container queries (@container),\n * 44px minimum touch targets, and accessible filter clearing.\n */\nimport * as React from 'react';\nimport { Input } from '@/components/ui/input';\nimport { Select, type SelectOption } from '@/components/ui/select';\nimport { Button } from '@/components/ui/button';\nimport { Chip } from '@/components/ui/chip';\nimport { Icon } from '@/components/ui/icon';\nimport { cn } from '@/lib/utils';\n\nexport interface FilterOptionGroup {\n  id: string;\n  label: string;\n  value: string;\n  options: SelectOption[];\n}\n\nexport interface ActiveFilterTag {\n  id: string;\n  label: string;\n  valueLabel: string;\n}\n\nexport interface FilterToolbarProps {\n  searchQuery: string;\n  onSearchChange: (query: string) => void;\n  searchPlaceholder?: string;\n  filterGroups?: FilterOptionGroup[];\n  onFilterChange?: (groupId: string, value: string) => void;\n  activeFilters?: ActiveFilterTag[];\n  onRemoveFilter?: (filterId: string) => void;\n  onReset?: () => void;\n  actions?: React.ReactNode;\n  className?: string;\n}\n\nexport function FilterToolbar({\n  searchQuery,\n  onSearchChange,\n  searchPlaceholder = 'Search...',\n  filterGroups = [],\n  onFilterChange,\n  activeFilters = [],\n  onRemoveFilter,\n  onReset,\n  actions,\n  className,\n}: FilterToolbarProps) {\n  const hasActiveFilters = searchQuery.trim().length > 0 || activeFilters.length > 0;\n\n  return (\n    <div className={cn('@container w-full space-y-3', className)}>\n      <div className=\"flex flex-col @md:flex-row items-stretch @md:items-center justify-between gap-3\">\n        {/* Search input with functional icon */}\n        <div className=\"flex-1 min-w-50\">\n          <Input\n            value={searchQuery}\n            onChange={(e) => onSearchChange(e.target.value)}\n            placeholder={searchPlaceholder}\n            leadingIcon={<Icon name=\"search\" size=\"md\" aria-hidden=\"true\" />}\n            className=\"w-full\"\n            aria-label={searchPlaceholder}\n          />\n        </div>\n\n        {/* Filter dropdowns and actions */}\n        <div className=\"flex flex-wrap items-center gap-2.5 shrink-0\">\n          {filterGroups.map((group) => (\n            <div key={group.id} className=\"min-w-36\">\n              <Select\n                value={group.value}\n                onValueChange={(val) => {\n                  if (val && onFilterChange) {\n                    onFilterChange(group.id, val);\n                  }\n                }}\n                options={group.options}\n                placeholder={group.label}\n              />\n            </div>\n          ))}\n\n          {hasActiveFilters && onReset && (\n            <Button\n              variant=\"outlined\"\n              colorRole=\"neutral\"\n              size=\"sm\"\n              onClick={onReset}\n            >\n              <Icon name=\"restart_alt\" size=\"sm\" aria-hidden=\"true\" />\n              Reset\n            </Button>\n          )}\n\n          {actions}\n        </div>\n      </div>\n\n      {/* Active Filter Chips */}\n      {activeFilters.length > 0 && (\n        <div className=\"flex flex-wrap items-center gap-2 pt-1\">\n          <span className=\"font-label text-xs font-semibold text-on-surface-variant mr-1\">\n            Active filters:\n          </span>\n          {activeFilters.map((filter) => (\n            <Chip\n              key={filter.id}\n              variant=\"outline\"\n              colorRole=\"primary\"\n              onRemove={onRemoveFilter ? () => onRemoveFilter(filter.id) : undefined}\n            >\n              <span className=\"font-medium opacity-80\">{filter.label}:</span>{' '}\n              <span className=\"font-semibold\">{filter.valueLabel}</span>\n            </Chip>\n          ))}\n        </div>\n      )}\n    </div>\n  );\n}\n\nexport default FilterToolbar;\n",
+      "type": "registry:block",
+      "target": "components/blocks/filter-toolbar.tsx"
+    }
+  ],
+  "docs": "FilterToolbar block.\nControlled composite toolbar for data tables, caseload lists, and exercise libraries.\nComposes Input, Select, Button, and Chip primitives with responsive container queries (@container),\n44px minimum touch targets, and accessible filter clearing."
+}

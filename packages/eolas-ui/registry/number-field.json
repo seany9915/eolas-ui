@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "number-field",
   "type": "registry:ui",
+  "title": "Number Field",
+  "description": "NumberField primitive (@base-ui/react/number-field).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,12 @@
       "type": "registry:ui",
       "target": "components/ui/number-field.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use NumberField for numerical inputs with step buttons, keyboard scrubbing, wheel scrubbing, and localized formatting.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+    ]
+  },
+  "docs": "NumberField primitive (@base-ui/react/number-field).\nBase UI Documentation: https://base-ui.com/react/components/number-field\nTAXONOMY & USAGE:\n- Use NumberField for numerical inputs with step buttons, keyboard scrubbing,\nwheel scrubbing, and localized formatting.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nWCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
 }

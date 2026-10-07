@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "checkbox",
   "type": "registry:ui",
+  "title": "Checkbox",
+  "description": "Checkbox primitive (@base-ui/react/checkbox).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,14 @@
       "type": "registry:ui",
       "target": "components/ui/checkbox.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "Use Checkbox for multi-selection or binary on/off options within forms or lists.",
+      "Supports three states: unchecked, checked, and indeterminate (mixed).",
+      "Supports parent-child tree checkboxes via the `parent` prop.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded-xs / 4px on box, rounded 8px on row), floating 2px focus ring, flush primary fill on check, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+    ]
+  },
+  "docs": "Checkbox primitive (@base-ui/react/checkbox).\nBase UI Documentation: https://base-ui.com/react/components/checkbox\nTAXONOMY & USAGE:\n- Use Checkbox for multi-selection or binary on/off options within forms or lists.\n- Supports three states: unchecked, checked, and indeterminate (mixed).\n- Supports parent-child tree checkboxes via the `parent` prop.\n- Follows DESIGN.md Tier B interactive controls: concentric radius (rounded-xs / 4px on box, rounded 8px on row),\nfloating 2px focus ring, flush primary fill on check, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
 }

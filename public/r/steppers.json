@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "steppers",
   "type": "registry:ui",
+  "title": "Steppers",
+  "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -17,5 +20,6 @@
       "type": "registry:ui",
       "target": "components/ui/steppers.tsx"
     }
-  ]
+  ],
+  "docs": "Backward-compatibility alias for NumberField.\nCanonical primitive resides at @/components/ui/number-field.\nFor OTP Passcode input, import directly from @/components/ui/otp-field."
 }

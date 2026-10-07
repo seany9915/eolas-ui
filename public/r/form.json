@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "form",
   "type": "registry:ui",
+  "title": "Form",
+  "description": "Form primitive (@base-ui/react/form).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,12 @@
       "type": "registry:ui",
       "target": "components/ui/form.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "A native form element with consolidated error handling, field registration, imperative validate actions, and external error state integration.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+    ]
+  },
+  "docs": "Form primitive (@base-ui/react/form).\nBase UI Documentation: https://base-ui.com/react/components/form\nTAXONOMY & USAGE:\n- A native form element with consolidated error handling, field registration,\nimperative validate actions, and external error state integration.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,\nand WCAG 2.2 SC 2.5.8 touch target compliance."
 }

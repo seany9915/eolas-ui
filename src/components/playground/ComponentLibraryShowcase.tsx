@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button, BaseButton } from '@/components/ui/button';
 import { FormField } from '@/components/ui/input';
 import { Checkbox, Radio, RadioGroup, Switch } from '@/components/ui/selection-controls';
 import { Toggle, ToggleGroup } from '@/components/ui/toggles';
@@ -415,28 +415,20 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </div>
           <div className="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant shrink-0">
             <span className="font-label text-xs font-semibold text-on-surface-variant">Direction:</span>
-            <button
-              type="button"
+            <Button
+              size="sm"
+              variant={showcaseDirection === 'ltr' ? 'filled' : 'ghost'}
               onClick={() => setShowcaseDirection('ltr')}
-              className={`text-xs px-2.5 py-1 rounded font-medium transition-colors ${
-                showcaseDirection === 'ltr'
-                  ? 'bg-primary text-on-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
             >
               LTR
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              size="sm"
+              variant={showcaseDirection === 'rtl' ? 'filled' : 'ghost'}
               onClick={() => setShowcaseDirection('rtl')}
-              className={`text-xs px-2.5 py-1 rounded font-medium transition-colors ${
-                showcaseDirection === 'rtl'
-                  ? 'bg-primary text-on-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
             >
               RTL
-            </button>
+            </Button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1452,12 +1444,13 @@ export const ComponentLibraryShowcase: React.FC = () => {
 
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 pt-2">
               {botAvatarTypes.map((arch) => (
-                <button
+                <BaseButton
                   key={arch}
                   type="button"
                   onClick={() => setBotType(arch)}
                   className={cn(
-                    'flex flex-col items-center justify-center p-2.5 rounded-lg border transition-all cursor-pointer text-center group min-h-24',
+                    'flex flex-col items-center justify-center p-2.5 rounded-lg border transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] cursor-pointer text-center group min-h-24',
+                    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     botType === arch
                       ? 'border-primary bg-primary/5 shadow-ambient ring-2 ring-primary/20'
                       : 'border-outline-variant/60 bg-surface hover:bg-surface-container/60 hover:border-outline-variant'
@@ -1477,7 +1470,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   )}>
                     {arch}
                   </span>
-                </button>
+                </BaseButton>
               ))}
             </div>
           </div>
@@ -1510,12 +1503,13 @@ export const ComponentLibraryShowcase: React.FC = () => {
                   { state: 'shaping', label: 'Shaping' },
                 ] as const
               ).map((item) => (
-                <button
+                <BaseButton
                   key={item.state}
                   type="button"
                   onClick={() => setOrbState(item.state)}
                   className={cn(
-                    'flex items-center gap-2.5 p-3 rounded-lg border text-left transition-all cursor-pointer min-h-13',
+                    'flex items-center gap-2.5 p-3 rounded-lg border text-left transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] cursor-pointer min-h-13',
+                    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                     orbState === item.state
                       ? 'border-primary bg-primary/5 shadow-ambient ring-2 ring-primary/20'
                       : 'border-outline-variant/60 bg-surface hover:bg-surface-container/60 hover:border-outline-variant'
@@ -1534,7 +1528,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                       {item.state}
                     </span>
                   </div>
-                </button>
+                </BaseButton>
               ))}
             </div>
           </div>

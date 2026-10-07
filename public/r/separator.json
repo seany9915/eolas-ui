@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "separator",
   "type": "registry:ui",
+  "title": "Separator",
+  "description": "Separator primitive (@base-ui/react/separator).",
   "dependencies": [
     "@base-ui/react",
     "clsx",
@@ -16,5 +19,13 @@
       "type": "registry:ui",
       "target": "components/ui/separator.tsx"
     }
-  ]
+  ],
+  "meta": {
+    "taxonomy": [
+      "A visual or semantic separator between sections of content.",
+      "Supports horizontal and vertical orientations with accessible role/aria-hidden attributes.",
+      "Follows DESIGN.md Tier B tokens: border-outline-variant."
+    ]
+  },
+  "docs": "Separator primitive (@base-ui/react/separator).\nBase UI Documentation: https://base-ui.com/react/components/separator\nTAXONOMY & USAGE:\n- A visual or semantic separator between sections of content.\n- Supports horizontal and vertical orientations with accessible role/aria-hidden attributes.\n- Follows DESIGN.md Tier B tokens: border-outline-variant."
 }

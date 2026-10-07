@@ -1,6 +1,9 @@
 {
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "error-shake",
   "type": "registry:ui",
+  "title": "Error Shake",
+  "description": "Eolas UI Error Shake component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
     "@base-ui/react",
     "clsx",
