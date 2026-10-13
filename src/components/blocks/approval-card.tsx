@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from './button';
-import { Icon } from './icon';
-import { RadioGroup, Radio } from './radio';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { RadioGroup, Radio } from '@/components/ui/radio';
+import { Input } from '@/components/ui/input';
 
 export interface ApprovalCardOption {
   id: string;
@@ -71,17 +72,11 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
         {/* Card Header & Body */}
         <div className="p-5 @sm:p-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5 pr-2">
-            <h4
-              className="font-heading text-headline-sm font-semibold text-on-surface"
-              style={{ textWrap: 'balance' }}
-            >
+            <h4 className="font-heading text-headline-sm font-semibold text-on-surface text-balance">
               {title}
             </h4>
             {description && (
-              <p
-                className="font-sans text-body-md text-on-surface-variant"
-                style={{ textWrap: 'pretty' }}
-              >
+              <p className="font-sans text-body-md text-on-surface-variant text-pretty">
                 {description}
               </p>
             )}
@@ -93,7 +88,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               value={selectedOptionId}
               onValueChange={(val) => onSelectOption?.(val)}
               ariaLabel={title}
-              className="gap-2 mt-1"
+              className="mt-1"
             >
               {options.map((opt) => {
                 const isSelected = selectedOptionId === opt.id;
@@ -101,7 +96,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   <label
                     key={opt.id}
                     className={cn(
-                      'flex items-start gap-3 p-3 rounded-md border text-left transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-pointer select-none',
+                      'flex items-start gap-3 p-3 rounded-md border text-left transition-colors duration-150 cursor-pointer select-none',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       isSelected
                         ? 'border-primary bg-primary-container text-on-surface'
@@ -124,33 +119,35 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               })}
 
               {allowCustomInput && (
-                <label
-                  onClick={() => onSelectOption?.('__custom__')}
-                  className={cn(
-                    'flex items-center gap-3 p-3 rounded-md border transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] cursor-pointer',
-                    'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
-                    selectedOptionId === '__custom__'
-                      ? 'border-primary bg-primary-container text-on-surface'
-                      : 'border-outline-variant bg-surface hover:bg-surface-container text-on-surface'
+                <div className="flex flex-col gap-2">
+                  <label
+                    onClick={() => onSelectOption?.('__custom__')}
+                    className={cn(
+                      'flex items-center gap-3 p-3 rounded-md border transition-colors duration-150 cursor-pointer',
+                      'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
+                      selectedOptionId === '__custom__'
+                        ? 'border-primary bg-primary-container text-on-surface'
+                        : 'border-outline-variant bg-surface hover:bg-surface-container text-on-surface'
+                    )}
+                  >
+                    <Radio value="__custom__" className="shrink-0" />
+                    <span className="font-sans text-sm font-medium leading-tight text-on-surface">
+                      {customInputPlaceholder || 'Other (specify)'}
+                    </span>
+                  </label>
+                  {selectedOptionId === '__custom__' && (
+                    <div className="pl-7">
+                      <Input
+                        type="text"
+                        value={customInputValue}
+                        onChange={(e) => onCustomInputChange?.(e.target.value)}
+                        placeholder={customInputPlaceholder}
+                        aria-label="Custom answer"
+                        className="w-full"
+                      />
+                    </div>
                   )}
-                >
-                  <Radio value="__custom__" className="shrink-0" />
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <Icon name="edit" size="sm" className="text-on-surface-variant shrink-0" />
-                    <input
-                      type="text"
-                      value={customInputValue}
-                      onChange={(e) => {
-                        onSelectOption?.('__custom__');
-                        onCustomInputChange?.(e.target.value);
-                      }}
-                      onFocus={() => onSelectOption?.('__custom__')}
-                      placeholder={customInputPlaceholder}
-                      aria-label="Custom answer"
-                      className="w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-outline focus:outline-none"
-                    />
-                  </div>
-                </label>
+                </div>
               )}
             </RadioGroup>
           )}
@@ -161,29 +158,31 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
           {stepCurrent && stepTotal ? (
             <div className="flex items-center gap-1.5 text-on-surface-variant font-mono text-xs tabular-nums select-none">
               {onPreviousStep && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={onPreviousStep}
                   disabled={stepCurrent <= 1}
                   aria-label="Previous question"
-                  className="flex size-11 items-center justify-center rounded-sm hover:bg-surface disabled:opacity-30 disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer"
                 >
                   <Icon name="chevron_left" size="sm" />
-                </button>
+                </Button>
               )}
               <span>
                 {stepCurrent} / {stepTotal}
               </span>
               {onNextStep && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={onNextStep}
                   disabled={stepCurrent >= stepTotal}
                   aria-label="Next question"
-                  className="flex size-11 items-center justify-center rounded-sm hover:bg-surface disabled:opacity-30 disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer"
                 >
                   <Icon name="chevron_right" size="sm" />
-                </button>
+                </Button>
               )}
             </div>
           ) : (
@@ -215,3 +214,4 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
 );
 
 ApprovalCard.displayName = 'ApprovalCard';
+export default ApprovalCard;

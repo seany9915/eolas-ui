@@ -116,7 +116,7 @@ function DialogComponent<Payload = unknown>({
             </BaseDialog.Trigger>
           )}
           <BaseDialog.Portal>
-            <BaseDialog.Backdrop className="fixed inset-0 bg-on-surface/40 z-50 transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
+            <BaseDialog.Backdrop className="fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
             <BaseDialog.Viewport
               className={cn(
                 'fixed inset-0 z-50 p-4',
@@ -129,14 +129,14 @@ function DialogComponent<Payload = unknown>({
                 initialFocus={initialFocus}
                 finalFocus={finalFocus}
                 className={cn(
-                  'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+                  'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
                   isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
                   sizeClasses[size] || sizeClasses.md,
                   className
                 )}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <BaseDialog.Title className="font-heading text-xl font-bold text-on-surface">
+                  <BaseDialog.Title className="font-heading text-xl font-bold text-on-surface text-balance">
                     {title}
                   </BaseDialog.Title>
                   <BaseDialog.Close
@@ -147,7 +147,7 @@ function DialogComponent<Payload = unknown>({
                   </BaseDialog.Close>
                 </div>
                 {description && (
-                  <BaseDialog.Description className="font-sans text-sm text-on-surface-variant mb-6 leading-relaxed">
+                  <BaseDialog.Description className="font-sans text-sm text-on-surface-variant mb-6 leading-relaxed text-pretty">
                     {description}
                   </BaseDialog.Description>
                 )}
@@ -213,7 +213,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
       <BaseDialog.Portal>
         <BaseDialog.Backdrop
           className={cn(
-            'fixed inset-0 bg-on-surface/40 z-50 transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
+            'fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
             backdropClassName
           )}
         />
@@ -229,7 +229,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
           <BaseDialog.Popup
             ref={ref}
             className={cn(
-              'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+              'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
               sizeClasses[size] || sizeClasses.md,
               className
@@ -266,7 +266,7 @@ export const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseDialog.Title
     ref={ref}
-    className={cn('font-heading text-xl font-bold text-on-surface', className)}
+    className={cn('font-heading text-xl font-bold text-on-surface text-balance', className)}
     {...props}
   />
 ));
@@ -278,7 +278,7 @@ export const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseDialog.Description
     ref={ref}
-    className={cn('font-sans text-sm text-on-surface-variant leading-relaxed', className)}
+    className={cn('font-sans text-sm text-on-surface-variant leading-relaxed text-pretty', className)}
     {...props}
   />
 ));

@@ -216,7 +216,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         disabled={disabled}
         className={cn(
           // Retain font-semibold across both active and inactive to prevent layout shift
-          'inline-flex items-center justify-center gap-2 sm:gap-2.5 font-label font-semibold transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
+          'inline-flex items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
           sizeClasses,
           effectiveVariant === 'unstyled'
             ? ''
@@ -269,23 +269,86 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
 );
 Tab.displayName = 'Tab';
 
-export interface TabsPanelProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Panel> {}
+export interface TabsPanelProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Panel> {
+  /**
+   * Allows the browser's built-in page search (Ctrl+F / Cmd+F) to find and reveal the panel contents.
+   *
+   * Overrides `keepMounted` and uses `hidden="until-found"` to keep the inactive panel in the DOM.
+   * When matched by browser search, triggers a `beforematch` event to switch the active tab.
+   *
+   * @default false
+   */
+  hiddenUntilFound?: boolean;
+}
 
 export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
-  ({ value, keepMounted = false, children, className, ...props }, ref) => (
-    <BaseTabs.Panel
-      ref={ref}
-      value={value}
-      keepMounted={keepMounted}
-      className={cn(
-        'py-4 font-sans outline-none transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </BaseTabs.Panel>
-  )
+  ({ value, keepMounted = false, hiddenUntilFound = false, children, className, ...props }, forwardedRef) => {
+    const internalRef = React.useRef<HTMLDivElement>(null);
+    const resolvedKeepMounted = hiddenUntilFound || keepMounted;
+
+    React.useEffect(() => {
+      const panel = internalRef.current;
+      if (!panel || !hiddenUntilFound) return;
+
+      const syncHidden = () => {
+        if (panel.hasAttribute('hidden') && panel.getAttribute('hidden') !== 'until-found') {
+          panel.setAttribute('hidden', 'until-found');
+        }
+      };
+
+      syncHidden();
+
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'hidden') {
+            syncHidden();
+          }
+        }
+      });
+
+      observer.observe(panel, { attributes: true, attributeFilter: ['hidden'] });
+
+      const handleBeforeMatch = () => {
+        const tabId = panel.getAttribute('aria-labelledby');
+        if (tabId) {
+          const tabButton = document.getElementById(tabId);
+          if (tabButton) {
+            tabButton.click();
+          }
+        }
+      };
+
+      panel.addEventListener('beforematch', handleBeforeMatch);
+
+      return () => {
+        observer.disconnect();
+        panel.removeEventListener('beforematch', handleBeforeMatch);
+      };
+    }, [hiddenUntilFound]);
+
+    return (
+      <BaseTabs.Panel
+        ref={(node) => {
+          (internalRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          if (typeof forwardedRef === 'function') {
+            forwardedRef(node);
+          } else if (forwardedRef) {
+            forwardedRef.current = node;
+          }
+        }}
+        value={value}
+        keepMounted={resolvedKeepMounted}
+        className={cn(
+          'py-4 font-sans outline-none transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+          '[&[hidden]:not([hidden="until-found"])]:hidden',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </BaseTabs.Panel>
+    );
+  }
 );
 TabsPanel.displayName = 'TabsPanel';
 
@@ -305,6 +368,8 @@ export interface TabsProps<Value extends TabValue = string> {
   indicatorClassName?: string;
   /** When true, shrink-wraps the tabs container rather than stretching across full width */
   inline?: boolean;
+  /** When true, configures tab panels with hidden="until-found" so browser Ctrl+F can find inactive tab content */
+  hiddenUntilFound?: boolean;
   children?: React.ReactNode;
   className?: string;
   listClassName?: string;
@@ -327,6 +392,7 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<any>>(
       showIndicator = true,
       indicatorClassName,
       inline = false,
+      hiddenUntilFound = false,
       children,
       className,
       listClassName,
@@ -398,7 +464,12 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<any>>(
                 const tabKey = (tab.value ?? tab.id) as string;
                 if (!tab.content) return null;
                 return (
-                  <TabsPanel key={tabKey} value={tabKey} className={panelClassName}>
+                  <TabsPanel
+                    key={tabKey}
+                    value={tabKey}
+                    hiddenUntilFound={hiddenUntilFound}
+                    className={panelClassName}
+                  >
                     {tab.content}
                   </TabsPanel>
                 );

@@ -92,28 +92,59 @@ function addComponents(componentNames, overwrite = false) {
 
     // Write item files
     for (const file of data.files) {
-      const isRootFile =
-        file.target.startsWith('eslint.') ||
-        file.target.startsWith('lint/') ||
-        file.target.startsWith('.');
+      // Resolve target path (supporting shadcn @ui/, @components/, @lib/, @hooks/, ~/ placeholders)
+      let destPath;
+      let componentsConfig = null;
+      const componentsJsonPath = path.resolve(cwd, 'components.json');
+      if (fs.existsSync(componentsJsonPath)) {
+        try {
+          componentsConfig = JSON.parse(fs.readFileSync(componentsJsonPath, 'utf8'));
+        } catch (_) {}
+      }
 
-      const baseDir = isRootFile
-        ? cwd
-        : fs.existsSync(path.resolve(cwd, 'src'))
-          ? path.resolve(cwd, 'src')
-          : cwd;
+      const hasSrc = fs.existsSync(path.resolve(cwd, 'src'));
+      const defaultSrc = hasSrc ? 'src' : '';
 
-      let destPath = path.resolve(baseDir, file.target);
+      if (file.target.startsWith('~/')) {
+        destPath = path.resolve(cwd, file.target.slice(2));
+      } else if (file.target.startsWith('@ui/')) {
+        const alias = componentsConfig?.aliases?.ui?.replace(/^@\//, '') || path.join(defaultSrc, 'components/ui');
+        destPath = path.resolve(cwd, alias, file.target.slice(4));
+      } else if (file.target.startsWith('@components/')) {
+        const alias = componentsConfig?.aliases?.components?.replace(/^@\//, '') || path.join(defaultSrc, 'components');
+        destPath = path.resolve(cwd, alias, file.target.slice(12));
+      } else if (file.target.startsWith('@lib/')) {
+        const alias = componentsConfig?.aliases?.lib?.replace(/^@\//, '') || path.join(defaultSrc, 'lib');
+        destPath = path.resolve(cwd, alias, file.target.slice(5));
+      } else if (file.target.startsWith('@hooks/')) {
+        const alias = componentsConfig?.aliases?.hooks?.replace(/^@\//, '') || path.join(defaultSrc, 'hooks');
+        destPath = path.resolve(cwd, alias, file.target.slice(7));
+      } else {
+        const isRootFile =
+          file.target.startsWith('eslint.') ||
+          file.target.startsWith('lint/') ||
+          file.target.startsWith('.');
+
+        const baseDir = isRootFile
+          ? cwd
+          : hasSrc
+            ? path.resolve(cwd, 'src')
+            : cwd;
+
+        destPath = path.resolve(baseDir, file.target);
+      }
 
       // Smart resolution for theme file when target is styles/globals.css
-      if (file.target === 'styles/globals.css') {
-        if (fs.existsSync(path.resolve(baseDir, 'styles/globals.css'))) {
-          destPath = path.resolve(baseDir, 'styles/globals.css');
-        } else if (fs.existsSync(path.resolve(baseDir, 'globals.css'))) {
-          destPath = path.resolve(baseDir, 'globals.css');
-        } else if (fs.existsSync(path.resolve(baseDir, 'index.css'))) {
-          destPath = path.resolve(baseDir, 'index.css');
-        }
+      if (file.target === 'styles/globals.css' || file.target === 'globals.css') {
+        const candidates = [
+          path.resolve(cwd, 'src/globals.css'),
+          path.resolve(cwd, 'src/styles/globals.css'),
+          path.resolve(cwd, 'styles/globals.css'),
+          path.resolve(cwd, 'src/index.css'),
+          path.resolve(cwd, 'globals.css'),
+        ];
+        const existing = candidates.find((p) => fs.existsSync(p));
+        if (existing) destPath = existing;
       }
 
       const destDir = path.dirname(destPath);

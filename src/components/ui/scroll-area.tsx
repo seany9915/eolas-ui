@@ -67,7 +67,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
           orientation="vertical"
           className="flex select-none touch-none p-0.5 w-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
         >
-          <BaseScrollArea.Thumb className="w-full bg-outline/60 hover:bg-outline rounded-full transition-colors" />
+          <BaseScrollArea.Thumb className="w-full bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline rounded-full transition-colors" />
         </BaseScrollArea.Scrollbar>
       )}
 
@@ -76,7 +76,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
           orientation="horizontal"
           className="flex select-none touch-none p-0.5 h-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
         >
-          <BaseScrollArea.Thumb className="h-full bg-outline/60 hover:bg-outline rounded-full transition-colors" />
+          <BaseScrollArea.Thumb className="h-full bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline rounded-full transition-colors" />
         </BaseScrollArea.Scrollbar>
       )}
 

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sticky-container",
+  "type": "registry:ui",
+  "title": "Sticky Container",
+  "description": "StickyContainer primitive. Platform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/sticky-container.tsx",
+      "content": "/**\n * StickyContainer primitive.\n *\n * Platform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)\n *\n * TAXONOMY & USAGE:\n * - A state-aware sticky header and toolbar container.\n * - Dynamically elevates (gains ambient box-shadow, surface wash, and border) when stuck to the viewport edge.\n * - Uses compositor-driven CSS Container Scroll-State queries (`container-type: scroll-state`)\n *   with zero main-thread scroll listeners in Chrome 133+ and Edge 133+.\n * - Features an accessible zero-height sentinel and IntersectionObserver fallback for Safari and Firefox.\n * - Prevents layout-shift oscillations by strictly constraining state transitions to non-layout-shifting properties\n *   (background-color, border-color, box-shadow, and backdrop-blur).\n */\nimport * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport interface StickyContainerProps extends React.ComponentPropsWithoutRef<'div'> {\n  /** Top offset distance when stuck in pixels. Defaults to 0 */\n  topOffset?: number;\n  /** Z-index layer value. Defaults to 20 */\n  zIndex?: number;\n  /** Additional classes applied to the inner wrapper when actively stuck */\n  stuckClassName?: string;\n  /** Additional classes applied to the inner wrapper in both stuck and unstuck states */\n  innerClassName?: string;\n  /** Callback fired when the stuck state toggles */\n  onStuckChange?: (isStuck: boolean) => void;\n  children: React.ReactNode;\n}\n\nexport const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerProps>(\n  (\n    {\n      topOffset = 0,\n      zIndex = 20,\n      stuckClassName,\n      innerClassName,\n      onStuckChange,\n      className,\n      children,\n      style,\n      ...props\n    },\n    ref\n  ) => {\n    const sentinelRef = React.useRef<HTMLDivElement>(null);\n    const [isStuckFallback, setIsStuckFallback] = React.useState<boolean>(false);\n\n    React.useEffect(() => {\n      const sentinel = sentinelRef.current;\n      if (!sentinel) return;\n\n      // Provide observer-based fallback for browsers lacking native scroll-state support\n      const supportsScrollState =\n        typeof CSS !== 'undefined' &&\n        typeof CSS.supports === 'function' &&\n        CSS.supports('container-type: scroll-state');\n\n      const observer = new IntersectionObserver(\n        ([entry]) => {\n          // When the sentinel is no longer intersecting the top edge, the header is stuck\n          const stuck = !entry.isIntersecting;\n          setIsStuckFallback(stuck);\n          onStuckChange?.(stuck);\n        },\n        {\n          rootMargin: `-${topOffset + 1}px 0px 0px 0px`,\n          threshold: [0, 1],\n        }\n      );\n\n      observer.observe(sentinel);\n\n      return () => {\n        observer.disconnect();\n      };\n    }, [topOffset, onStuckChange]);\n\n    return (\n      <div className=\"w-full\">\n        {/* Invisible 0px sentinel placed immediately before the sticky container */}\n        <div\n          ref={sentinelRef}\n          aria-hidden=\"true\"\n          className=\"h-0 w-0 p-0 m-0 opacity-0 pointer-events-none\"\n        />\n\n        {/* Outer scroll-state container */}\n        <div\n          ref={ref}\n          className={cn('sticky-scroll-container w-full', className)}\n          style={{\n            top: `${topOffset}px`,\n            zIndex,\n            ...style,\n          }}\n          {...props}\n        >\n          {/* Inner presentation wrapper queried by @container sticky-nav scroll-state(stuck: top) */}\n          <div\n            className={cn(\n              'sticky-nav-inner w-full transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',\n              isStuckFallback && cn('is-stuck', stuckClassName),\n              innerClassName\n            )}\n          >\n            {children}\n          </div>\n        </div>\n      </div>\n    );\n  }\n);\nStickyContainer.displayName = 'StickyContainer';\n",
+      "type": "registry:ui",
+      "target": "@ui/sticky-container.tsx"
+    }
+  ],
+  "meta": {
+    "taxonomy": [
+      "A state-aware sticky header and toolbar container.",
+      "Dynamically elevates (gains ambient box-shadow, surface wash, and border) when stuck to the viewport edge.",
+      "Uses compositor-driven CSS Container Scroll-State queries (`container-type: scroll-state`) with zero main-thread scroll listeners in Chrome 133+ and Edge 133+.",
+      "Features an accessible zero-height sentinel and IntersectionObserver fallback for Safari and Firefox.",
+      "Prevents layout-shift oscillations by strictly constraining state transitions to non-layout-shifting properties (background-color, border-color, box-shadow, and backdrop-blur)."
+    ]
+  },
+  "docs": "StickyContainer primitive.\nPlatform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)\nTAXONOMY & USAGE:\n- A state-aware sticky header and toolbar container.\n- Dynamically elevates (gains ambient box-shadow, surface wash, and border) when stuck to the viewport edge.\n- Uses compositor-driven CSS Container Scroll-State queries (`container-type: scroll-state`)\nwith zero main-thread scroll listeners in Chrome 133+ and Edge 133+.\n- Features an accessible zero-height sentinel and IntersectionObserver fallback for Safari and Firefox.\n- Prevents layout-shift oscillations by strictly constraining state transitions to non-layout-shifting properties\n(background-color, border-color, box-shadow, and backdrop-blur)."
+}

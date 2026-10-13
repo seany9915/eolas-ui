@@ -29,12 +29,12 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
           </div>
         )}
         {title && (
-          <h3 className="font-heading text-headline-sm font-semibold text-on-surface mb-2" style={{ textWrap: 'balance' }}>
+          <h3 className="font-heading text-headline-sm font-semibold text-on-surface mb-2 text-balance">
             {title}
           </h3>
         )}
         {description && (
-          <p className="font-sans text-body-md text-on-surface-variant max-w-md mb-6" style={{ textWrap: 'pretty' }}>
+          <p className="font-sans text-body-md text-on-surface-variant max-w-md mb-6 text-pretty">
             {description}
           </p>
         )}
@@ -61,8 +61,7 @@ EmptyStateIcon.displayName = 'EmptyStateIcon';
 
 export const EmptyStateTitle = ({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3
-    className={cn('font-heading text-headline-sm font-semibold text-on-surface mb-2', className)}
-    style={{ textWrap: 'balance' }}
+    className={cn('font-heading text-headline-sm font-semibold text-on-surface mb-2 text-balance', className)}
     {...props}
   >
     {children}
@@ -72,8 +71,7 @@ EmptyStateTitle.displayName = 'EmptyStateTitle';
 
 export const EmptyStateDescription = ({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p
-    className={cn('font-sans text-body-md text-on-surface-variant max-w-md mb-6', className)}
-    style={{ textWrap: 'pretty' }}
+    className={cn('font-sans text-body-md text-on-surface-variant max-w-md mb-6 text-pretty', className)}
     {...props}
   >
     {children}

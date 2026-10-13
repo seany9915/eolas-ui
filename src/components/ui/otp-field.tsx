@@ -13,6 +13,7 @@ import * as React from 'react';
 import { OTPField as BaseOTPField } from '@base-ui/react/otp-field';
 import { Field as BaseField } from '@base-ui/react/field';
 import { cn } from '@/lib/utils';
+import { useWebOtp } from '@/lib/use-web-otp';
 
 export interface OTPFieldProps {
   id?: string;
@@ -39,6 +40,8 @@ export interface OTPFieldProps {
   pattern?: string;
   showSeparator?: boolean;
   separatorIndex?: number;
+  /** Whether to listen for and auto-fill incoming SMS OTPs via the WebOTP API on supported mobile browsers */
+  autoExtractSmsOtp?: boolean;
   children?: React.ReactNode;
   className?: string;
 }
@@ -68,10 +71,19 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   pattern,
   showSeparator = false,
   separatorIndex,
+  autoExtractSmsOtp,
   children,
   className,
 }, ref) => {
   const sepIndex = separatorIndex ?? Math.floor(length / 2);
+
+  useWebOtp({
+    enabled: Boolean(autoExtractSmsOtp && !disabled && !readOnly),
+    onCodeReceived: (receivedCode) => {
+      onValueChange?.(receivedCode);
+      onComplete?.(receivedCode);
+    },
+  });
 
   return (
     <BaseField.Root
@@ -186,7 +198,7 @@ export const OTPField = Object.assign(OTPFieldComponent, {
 });
 
 // Re-export Base UI primitives for compound composition
-export { BaseOTPField };
+export { BaseOTPField, useWebOtp };
 export const OTPFieldRoot = BaseOTPField.Root;
 export const OTPFieldInput = BaseOTPField.Input;
 export const OTPFieldSeparator = BaseOTPField.Separator;

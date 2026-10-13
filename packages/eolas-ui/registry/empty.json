@@ -18,7 +18,7 @@
       "path": "ui/empty.tsx",
       "content": "import { EmptyState } from './empty-state';\n\nexport * from './empty-state';\nexport { EmptyState as Empty } from './empty-state';\nexport default EmptyState;\n",
       "type": "registry:ui",
-      "target": "components/ui/empty.tsx"
+      "target": "@ui/empty.tsx"
     }
   ]
 }

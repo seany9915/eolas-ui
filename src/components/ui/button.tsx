@@ -47,11 +47,15 @@ export interface ButtonProps
   role?: string;
   size?: ButtonSize;
   loading?: boolean;
+  /** ID of the target element to invoke declaratively via the HTML Invoker Commands API */
+  commandfor?: string;
+  /** Command to dispatch to the target element (built-in like 'show-modal' or custom '--action') */
+  command?: string;
   children?: React.ReactNode;
 }
 
 const baseStyles = cn(
-  'inline-flex items-center justify-center gap-2 font-label text-sm font-semibold rounded cursor-pointer select-none',
+  'inline-flex items-center justify-center gap-2 font-label text-sm font-semibold rounded cursor-pointer select-none touch-manipulation',
   'transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
   'active:scale-[var(--scale-large)] motion-reduce:active:scale-100 motion-reduce:transition-none',
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',

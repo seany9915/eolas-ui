@@ -17,7 +17,7 @@
       "path": "ui/csp-provider.tsx",
       "content": "﻿'use client';\n\nexport {\n  CSPProvider,\n  type CSPProviderProps,\n} from '@base-ui/react/csp-provider';\r\n",
       "type": "registry:ui",
-      "target": "components/ui/csp-provider.tsx"
+      "target": "@ui/csp-provider.tsx"
     }
   ]
 }

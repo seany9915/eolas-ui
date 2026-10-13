@@ -14,15 +14,24 @@ import { cn } from '@/lib/utils';
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   error?: boolean | string;
+  /**
+   * When true, automatically adjusts the height of the textarea to fit its content
+   * using modern CSS `field-sizing: content` without JavaScript recalculations.
+   * @default false
+   */
+  autoGrow?: boolean;
 }
 
-const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, ...props }, ref) => (
+const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, autoGrow = false, ...props }, ref) => (
   <textarea
     ref={ref}
     className={cn(
-      'w-full min-h-[80px] p-3 rounded-md bg-surface text-on-surface font-sans text-base transition-[border-color,box-shadow]',
+      'w-full min-h-[80px] p-3 rounded bg-surface text-on-surface font-sans text-base transition-[border-color,box-shadow]',
       'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
       'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+      'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
+      'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
+      autoGrow && '[field-sizing:content] min-h-[3lh] max-h-[12lh] h-auto resize-none',
       error && 'border-error focus-visible:border-error focus-visible:outline-error',
       className
     )}
@@ -45,6 +54,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
   hint,
   error,
   required,
+  autoGrow,
   className,
   id,
   disabled,
@@ -66,6 +76,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
             id={id}
             disabled={disabled}
             error={Boolean(error)}
+            autoGrow={autoGrow}
             {...controlProps}
             {...props}
           />

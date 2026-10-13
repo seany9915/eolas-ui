@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "view-transition",
+  "type": "registry:ui",
+  "title": "View Transition",
+  "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/view-transition.tsx",
+      "content": "/**\n * ViewTransition primitive (@base-ui/react/button).\n *\n * Platform Reference: Modern Web Guidance (MWG: same-document-transitions)\n *\n * TAXONOMY & USAGE:\n * - Declarative container and trigger components for the View Transitions API (document.startViewTransition).\n * - Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).\n * - Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.\n * - Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.\n * - Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring.\n */\nimport * as React from 'react';\nimport { Button as BaseButton } from '@base-ui/react/button';\nimport { useViewTransition, type TransitionOptions } from '@/lib/view-transitions';\nimport { cn } from '@/lib/utils';\n\nexport interface ViewTransitionProps extends React.HTMLAttributes<HTMLDivElement> {\n  /** Unique view-transition-name CSS identifier for morphing pair */\n  name?: string;\n  children: React.ReactNode;\n  className?: string;\n}\n\n/**\n * Container marking an element for shared View Transition morphing.\n */\nexport const ViewTransition = React.forwardRef<HTMLDivElement, ViewTransitionProps>(\n  ({ name, className, style, children, ...props }, ref) => {\n    const dynamicStyle: React.CSSProperties = {\n      ...style,\n      ...(name ? { viewTransitionName: name } : {}),\n    };\n\n    return (\n      <div\n        ref={ref}\n        style={dynamicStyle}\n        className={cn('inline-block', className)}\n        {...props}\n      >\n        {children}\n      </div>\n    );\n  }\n);\nViewTransition.displayName = 'ViewTransition';\n\nexport interface ViewTransitionTriggerProps\n  extends React.ComponentPropsWithoutRef<typeof BaseButton> {\n  /** The state update callback to execute within document.startViewTransition */\n  onTransition?: () => void | Promise<void>;\n  /** Optional focus routing options once the transition completes */\n  transitionOptions?: TransitionOptions;\n  children: React.ReactNode;\n  className?: string;\n}\n\n/**\n * Interactive trigger button/anchor wrapper executing updates inside a View Transition.\n */\nexport const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTransitionTriggerProps>(\n  (\n    {\n      onTransition,\n      transitionOptions,\n      onClick,\n      className,\n      children,\n      ...props\n    },\n    ref\n  ) => {\n    const { startTransition, isTransitioning } = useViewTransition();\n\n    const handleClick: React.ComponentPropsWithoutRef<typeof BaseButton>['onClick'] = (e) => {\n      onClick?.(e);\n      if (onTransition && !e.defaultPrevented) {\n        startTransition(onTransition, transitionOptions);\n      }\n    };\n\n    return (\n      <BaseButton\n        ref={ref}\n        onClick={handleClick}\n        disabled={isTransitioning || props.disabled}\n        className={cn(\n          'inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md font-label text-sm font-semibold transition-colors cursor-pointer select-none',\n          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',\n          className\n        )}\n        {...props}\n      >\n        {children}\n      </BaseButton>\n    );\n  }\n);\nViewTransitionTrigger.displayName = 'ViewTransitionTrigger';\n\nexport { useViewTransition };\n\nexport default ViewTransition;\n",
+      "type": "registry:ui",
+      "target": "@ui/view-transition.tsx"
+    }
+  ],
+  "meta": {
+    "taxonomy": [
+      "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
+      "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
+      "Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.",
+      "Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
+    ]
+  },
+  "docs": "ViewTransition primitive (@base-ui/react/button).\nPlatform Reference: Modern Web Guidance (MWG: same-document-transitions)\nTAXONOMY & USAGE:\n- Declarative container and trigger components for the View Transitions API (document.startViewTransition).\n- Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).\n- Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.\n- Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.\n- Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
+}

@@ -17,6 +17,12 @@ export interface FormProps<FormValues extends Record<string, any> = Record<strin
   extends BaseForm.Props<FormValues> {
   children?: React.ReactNode;
   className?: string;
+  /** WebMCP: Unique tool identifier for client-side AI agent discovery */
+  toolname?: string;
+  /** WebMCP: Natural language description synthesized into the AI tool schema */
+  tooldescription?: string;
+  /** WebMCP: Allows the agent to automatically submit read-only or low-risk queries without modal confirmation */
+  toolautosubmit?: boolean;
 }
 
 const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(({
@@ -27,8 +33,16 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(({
   actionsRef,
   children,
   className,
+  toolname,
+  tooldescription,
+  toolautosubmit,
   ...props
 }, ref) => {
+  const webMcpProps: Record<string, any> = {};
+  if (toolname) webMcpProps.toolname = toolname;
+  if (tooldescription) webMcpProps.tooldescription = tooldescription;
+  if (toolautosubmit) webMcpProps.toolautosubmit = '';
+
   return (
     <BaseForm
       ref={ref}
@@ -37,7 +51,11 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(({
       actionsRef={actionsRef}
       onFormSubmit={onFormSubmit}
       onSubmit={onSubmit}
-      className={cn('space-y-4 w-full', className)}
+      {...webMcpProps}
+      className={cn(
+        'space-y-4 w-full transition-colors duration-150',
+        className
+      )}
       {...props}
     >
       {children}

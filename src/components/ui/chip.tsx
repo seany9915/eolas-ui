@@ -105,7 +105,7 @@ export const Chip: React.FC<ChipProps> = ({
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full font-label font-semibold select-none transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.97]',
+        'inline-flex items-center gap-1.5 rounded-full font-label font-semibold select-none touch-manipulation transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] active:scale-[0.97]',
         sizeStyles[size],
         touchTargetClass,
         patternClass,
@@ -117,11 +117,11 @@ export const Chip: React.FC<ChipProps> = ({
           {icon}
         </span>
       )}
-      <span>{children ?? label}</span>
+      <span className="box-trim">{children ?? label}</span>
       {onRemove && (
         <BaseButton
           onClick={onRemove}
-          className="ml-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer inline-flex items-center justify-center p-0.5 rounded-full"
+          className="ml-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full"
           aria-label={labelText ? `Remove ${labelText}` : 'Remove'}
         >
           <span className="material-symbols-outlined text-sm" aria-hidden="true">close</span>

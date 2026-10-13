@@ -1,0 +1,32 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "deferred-view",
+  "type": "registry:ui",
+  "title": "Deferred View",
+  "description": "DeferredView primitive. Platform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/deferred-view.tsx",
+      "content": "/**\n * DeferredView primitive.\n *\n * Platform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)\n *\n * TAXONOMY & USAGE:\n * - Defers layout and paint computations for offscreen or below-the-fold content using CSS `content-visibility: auto`.\n * - Pairs with `contain-intrinsic-size` to prevent layout shifts and scrollbar jumping.\n * - Supports 'hidden' mode for instantaneous view toggling without destroying component DOM state.\n * - Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint.\n */\nimport * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport type DeferredViewMode = 'auto' | 'hidden' | 'visible';\n\nexport interface DeferredViewProps extends React.HTMLAttributes<HTMLDivElement> {\n  /**\n   * Optimization mode.\n   * - 'auto': Skips layout and paint when scrolled offscreen.\n   * - 'hidden': Keeps component in DOM with zero rendering cost (instant switching).\n   * - 'visible': Standard layout rendering without deferral.\n   */\n  mode?: DeferredViewMode;\n  /** Estimated element height for layout placeholder calculations (e.g. 200, '300px', '20rem'). Default: 200px */\n  estimatedHeight?: number | string;\n  /** Estimated element width for horizontal scroll calculations (optional) */\n  estimatedWidth?: number | string;\n  children: React.ReactNode;\n  className?: string;\n}\n\nexport const DeferredView = React.forwardRef<HTMLDivElement, DeferredViewProps>(\n  (\n    {\n      mode = 'auto',\n      estimatedHeight,\n      estimatedWidth,\n      children,\n      className,\n      style,\n      ...props\n    },\n    ref\n  ) => {\n    const intrinsicHeight = typeof estimatedHeight === 'number' ? `${estimatedHeight}px` : estimatedHeight;\n    const intrinsicWidth = typeof estimatedWidth === 'number' ? `${estimatedWidth}px` : estimatedWidth;\n\n    const dynamicStyle: React.CSSProperties = {\n      ...style,\n      ...(intrinsicHeight\n        ? { containIntrinsicSize: `auto ${intrinsicWidth ?? 'none'} auto ${intrinsicHeight}` }\n        : {}),\n    };\n\n    return (\n      <div\n        ref={ref}\n        style={dynamicStyle}\n        className={cn(\n          mode === 'auto' && 'content-visibility-auto',\n          mode === 'hidden' && 'content-visibility-hidden',\n          className\n        )}\n        {...props}\n      >\n        {children}\n      </div>\n    );\n  }\n);\n\nDeferredView.displayName = 'DeferredView';\n\nexport default DeferredView;\n",
+      "type": "registry:ui",
+      "target": "@ui/deferred-view.tsx"
+    }
+  ],
+  "meta": {
+    "taxonomy": [
+      "Defers layout and paint computations for offscreen or below-the-fold content using CSS `content-visibility: auto`.",
+      "Pairs with `contain-intrinsic-size` to prevent layout shifts and scrollbar jumping.",
+      "Supports 'hidden' mode for instantaneous view toggling without destroying component DOM state.",
+      "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+    ]
+  },
+  "docs": "DeferredView primitive.\nPlatform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)\nTAXONOMY & USAGE:\n- Defers layout and paint computations for offscreen or below-the-fold content using CSS `content-visibility: auto`.\n- Pairs with `contain-intrinsic-size` to prevent layout shifts and scrollbar jumping.\n- Supports 'hidden' mode for instantaneous view toggling without destroying component DOM state.\n- Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+}

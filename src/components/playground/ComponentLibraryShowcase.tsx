@@ -16,6 +16,8 @@ import { Accordion } from '@/components/ui/accordion';
 import { Tabs } from '@/components/ui/tabs';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Progress, Skeleton } from '@/components/ui/progress';
+import { ProgressRing } from '@/components/ui/progress-ring';
+import { SwipeReveal } from '@/components/ui/swipe-reveal';
 import { Avatar } from '@/components/ui/avatar';
 import { Toast } from '@/components/ui/toast';
 import { Card } from '@/components/ui/card';
@@ -43,7 +45,7 @@ import { ThinkingOrb, type OrbState } from '@/components/ui/thinking-orb';
 import { BotAvatar, botAvatarTypes, type BotAvatarType, type BotAvatarState } from '@/components/ui/bot-avatar';
 import { Icon } from '@/components/ui/icon';
 import { ThinkingTrace } from '@/components/ui/thinking-trace';
-import { ApprovalCard } from '@/components/ui/approval-card';
+import { ApprovalCard } from '@/components/blocks/approval-card';
 import { ClinicianTip } from '@/components/ui/clinician-tip';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis } from '@/components/ui/breadcrumb';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from '@/components/ui/pagination';
@@ -876,6 +878,20 @@ export const ComponentLibraryShowcase: React.FC = () => {
               </h4>
               <div className="space-y-4">
                 <Progress value={78} label="Session Mastery Goal" />
+                <div className="flex items-center justify-around py-2 border-y border-outline-variant/30">
+                  <div className="flex flex-col items-center gap-1">
+                    <ProgressRing value={45} size="sm" color="primary" />
+                    <span className="font-mono text-[10px] text-on-surface-variant">45%</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <ProgressRing value={85} size="md" color="secondary" />
+                    <span className="font-mono text-[10px] text-on-surface-variant">85%</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <ProgressRing value={100} size="sm" color="success" />
+                    <span className="font-mono text-[10px] text-on-surface-variant">Done</span>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
@@ -1889,6 +1905,42 @@ export const ComponentLibraryShowcase: React.FC = () => {
                       onRemove={() => showToast('Upload Cancelled', 'Image upload cancelled.', 'warning')}
                     />
                   </div>
+
+                  <div className="space-y-2 pt-2 border-t border-outline-variant/40">
+                    <span className="font-label text-xs font-bold text-on-surface-variant block">
+                      Swipe Action Row (SwipeReveal Primitive)
+                    </span>
+                    <SwipeReveal
+                      actions={
+                        <>
+                          <SwipeReveal.Action
+                            variant="primary"
+                            onClick={() => showToast('Session Queued', 'Session added to caseload triage queue.', 'info')}
+                          >
+                            <Icon name="archive" size="sm" />
+                          </SwipeReveal.Action>
+                          <SwipeReveal.Action
+                            variant="error"
+                            onClick={() => showToast('Record Deleted', 'Clinical practice trial removed.', 'warning')}
+                          >
+                            <Icon name="delete" size="sm" />
+                          </SwipeReveal.Action>
+                        </>
+                      }
+                    >
+                      <div className="p-3 flex items-center justify-between">
+                        <div>
+                          <span className="font-heading text-sm font-bold text-on-surface block">
+                            Dr. Sarah Connor — Pitch Glide Trial
+                          </span>
+                          <span className="font-sans text-xs text-on-surface-variant">
+                            Swipe left to reveal actions (CSS scroll snap)
+                          </span>
+                        </div>
+                        <Icon name="chevron_left" size="sm" className="text-on-surface-variant" />
+                      </div>
+                    </SwipeReveal>
+                  </div>
                 </div>
               </div>
 
@@ -2250,7 +2302,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
 
       {/* Floating Design System Toast Notification Layer */}
       {toastState && (
-        <div className="fixed bottom-6 right-6 z-50 transition-all duration-300 ease-out max-w-md">
+        <div className="fixed bottom-6 right-6 z-50 transition-[opacity,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] max-w-md">
           <Toast
             title={toastState.title}
             description={toastState.description}

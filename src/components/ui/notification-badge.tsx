@@ -53,7 +53,7 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
         className={cn(
           'absolute -top-1 -right-1 z-20 pointer-events-none select-none flex items-center justify-center font-mono font-bold leading-none',
           isCounted
-            ? 'min-w-[18px] h-[18px] px-1 text-[11px] rounded-full tabular-nums shadow-ambient'
+            ? 'min-w-[18px] h-[18px] px-1 text-[11px] rounded-full tabular-nums shadow-ambient box-trim'
             : 'w-2.5 h-2.5 rounded-full shadow-ambient',
           variantStyles,
           'transition-[transform,opacity,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',

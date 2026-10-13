@@ -6,11 +6,22 @@
  * TAXONOMY & USAGE:
  * - A native input element that automatically works with Base UI Field context.
  * - Supports leading/trailing icons, clear button, and accessible error styling.
+ * - Follows Modern Web Guidance (MWG: html) tri-token contract:
+ *   - Match `type` (browser validation), `inputMode` (virtual keyboard layout), and `autoComplete` (autofill heuristic):
+ *     - Email: `type="email"` + `inputMode="email"` + `autoComplete="email"`
+ *     - Phone: `type="tel"` + `inputMode="tel"` + `autoComplete="tel"`
+ *     - Sign-in Password: `type="password"` + `autoComplete="current-password"`
+ *     - New Password / Reset: `type="password"` + `autoComplete="new-password"`
+ *     - Passkey / WebAuthn: `type="text"` + `autoComplete="username webauthn"`
+ *     - Search: `type="search"` + `enterKeyHint="search"`
+ *     - Clinical Code / NHS ID / Dosage: `autoCorrect="off"` + `spellCheck={false}`
+ *     - OTP / PIN: `type="text"` + `inputMode="numeric"` + `autoComplete="one-time-code"`
  * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
  *   WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint.
  */
 import * as React from 'react';
 import { Input as BaseInput } from '@base-ui/react/input';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { Field, BaseField, FieldRoot, FieldLabel, FieldControl, FieldDescription, FieldError, FieldValidity, FieldItem } from './field';
 import { Textarea, TextareaField, FormTextarea, type TextareaProps, type TextareaFieldProps } from './textarea';
 import { cn } from '@/lib/utils';
@@ -22,6 +33,26 @@ export interface InputProps extends React.ComponentPropsWithoutRef<typeof BaseIn
   clearable?: boolean;
   onClear?: () => void;
   error?: boolean | string;
+  /**
+   * Autofill token for password managers and passkeys.
+   * Prefer explicit tokens: 'email', 'current-password', 'new-password', 'one-time-code', 'username webauthn', 'address-level2'.
+   */
+  autoComplete?: string;
+  /**
+   * Virtual keyboard hint for mobile devices: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'.
+   */
+  inputMode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
+  /**
+   * Mobile virtual keyboard action button label.
+   * Options: 'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send'.
+   */
+  enterKeyHint?: 'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send';
+  /**
+   * Mobile autocorrect behavior.
+   * In clinical code fields (NHS IDs, dosages, medication names), set to 'off'
+   * to prevent mobile OS spellcheck from mangling clinical entries.
+   */
+  autoCorrect?: 'on' | 'off' | string;
 }
 
 const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
@@ -39,19 +70,19 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
   const showClear = clearable && (value === undefined || Boolean(value));
 
   const clearButton = showClear ? (
-    <button
+    <BaseButton
       type="button"
       aria-label="Clear input"
       onClick={(e) => {
         e.preventDefault();
         onClear?.();
       }}
-      className="p-1 rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer flex items-center justify-center min-w-[28px] min-h-[28px]"
+      className="size-11 min-w-[44px] min-h-[44px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none"
     >
       <span className="material-symbols-outlined text-base leading-none select-none" aria-hidden="true">
         close
       </span>
-    </button>
+    </BaseButton>
   ) : null;
 
   const effectiveTrailing = trailingAction ?? (showClear ? clearButton : trailingIcon);
@@ -65,9 +96,11 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
         'w-full h-12 rounded bg-surface text-on-surface font-sans text-base transition-[border-color,box-shadow] min-h-[48px]',
         'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+        'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
+        'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
         error && 'border-error focus-visible:border-error focus-visible:outline-error',
         hasLeading ? 'pl-11' : 'pl-4',
-        hasTrailing ? 'pr-11' : 'pr-4',
+        hasTrailing ? (showClear || trailingAction ? 'pr-14' : 'pr-11') : 'pr-4',
         className
       )}
       {...props}
@@ -92,8 +125,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
       {effectiveTrailing && (
         <span
           className={cn(
-            'absolute right-3.5 flex items-center text-xl z-10',
-            (trailingAction || showClear) ? 'text-on-surface' : 'text-on-surface-variant pointer-events-none select-none'
+            'absolute flex items-center text-xl z-10',
+            (trailingAction || showClear) ? 'right-1 text-on-surface' : 'right-3.5 text-on-surface-variant pointer-events-none select-none'
           )}
         >
           {effectiveTrailing}

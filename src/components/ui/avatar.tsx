@@ -12,6 +12,7 @@
  */
 import * as React from 'react';
 import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 
 export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Root> {
@@ -21,6 +22,9 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseA
   delay?: number;
   size?: 'sm' | 'md' | 'lg';
   keepMounted?: boolean;
+  /** Browser fetch priority hint for Largest Contentful Paint (LCP) optimization */
+  fetchPriority?: 'high' | 'low' | 'auto';
+  loading?: 'eager' | 'lazy';
   onLoadingStatusChange?: (status: BaseAvatar.Root.State['imageLoadingStatus']) => void;
   children?: React.ReactNode;
   className?: string;
@@ -39,6 +43,8 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
   delay = 300,
   size = 'md',
   keepMounted,
+  fetchPriority,
+  loading,
   onLoadingStatusChange,
   children,
   className,
@@ -78,6 +84,8 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
           src={src}
           alt={alt}
           keepMounted={keepMounted}
+          fetchPriority={fetchPriority}
+          loading={loading}
           onLoadingStatusChange={onLoadingStatusChange}
           className="w-full h-full object-cover transition-opacity duration-[var(--duration-quick)] data-[loading]:opacity-0 motion-reduce:transition-none"
         />
@@ -106,7 +114,7 @@ export const AvatarButton = React.forwardRef<HTMLButtonElement, AvatarButtonProp
   ...props
 }, ref) => {
   return (
-    <button
+    <BaseButton
       ref={ref}
       type="button"
       aria-label={label}
@@ -119,7 +127,7 @@ export const AvatarButton = React.forwardRef<HTMLButtonElement, AvatarButtonProp
       {...props}
     >
       <AvatarComponent {...avatar} />
-    </button>
+    </BaseButton>
   );
 });
 

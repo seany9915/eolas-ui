@@ -103,6 +103,10 @@
 }
 
 :root {
+  color-scheme: light;
+  accent-color: var(--primary);
+  interpolate-size: allow-keywords;
+  scrollbar-gutter: stable;
   --font-mono: "Roboto Mono", monospace;
   --background: #F6F7FB;
   --on-background: #1a1c1e;
@@ -227,6 +231,29 @@ textarea:focus-visible {
 button:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Autofill Credential Highlighting: maintains calibrated surface tokens and typography on browser autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface) inset !important;
+  -webkit-text-fill-color: var(--on-surface) !important;
+  caret-color: var(--primary);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input:autofill,
+textarea:autofill,
+select:autofill {
+  box-shadow: 0 0 0px 1000px var(--surface) inset !important;
+  filter: none;
 }
 
 /* Reduced motion preference */
@@ -660,5 +687,121 @@ p, li {
   --typeset-size: 1.25em;
   --typeset-leading: 1.8;
   --typeset-flow: 1.75em;
+}
+
+/* WebMCP Agent Form interaction indicators */
+form[data-tool-active] {
+  outline: 2px dashed var(--primary);
+  background-color: color-mix(in srgb, var(--primary-container) 10%, transparent);
+}
+
+/* Offscreen rendering optimization (MWG: defer-rendering-heavy-content) */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 200px;
+}
+
+.content-visibility-hidden {
+  content-visibility: hidden;
+}
+
+/* Scroll-Driven Reading Progress Indicator (MWG: scrollytelling / scroll-driven animations) */
+@keyframes reading-progress-scale {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  .reading-progress-root-driven {
+    transform-origin: left center;
+    animation: reading-progress-scale linear;
+    animation-timeline: scroll(root block);
+    animation-range: 0% 100%;
+    will-change: transform;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress-root-driven {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* View Transitions API (MWG: same-document-transitions) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Precise Text Alignment: trims font leading/ghost whitespace for optical centering (MWG: precise-text-alignment) */
+.box-trim {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+/* CSS Custom Highlight API: GPU-accelerated in-page search highlighting (MWG: highlight-text-ranges) */
+::highlight(search-results) {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+/* State-Aware Sticky Header: compositor-driven stuck elevation (MWG: state-aware-sticky-headers) */
+.sticky-scroll-container {
+  position: sticky;
+  top: 0;
+  container-type: scroll-state;
+  container-name: sticky-nav;
+}
+
+@container sticky-nav scroll-state(stuck: top) {
+  .sticky-nav-inner {
+    background-color: var(--surface);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+    border-bottom-color: var(--outline-variant);
+  }
+}
+
+.sticky-nav-inner.is-stuck {
+  background-color: var(--surface);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  border-bottom-color: var(--outline-variant);
+}
+
+/* Scrollspy Navigation: active target tracking (MWG: scrollspy) */
+.scrollspy-nav {
+  scroll-target-group: auto;
+}
+
+.scrollspy-link[aria-current="true"],
+.scrollspy-link.\:target-current {
+  color: var(--primary);
+  font-weight: 600;
+  border-left-color: var(--primary);
+}
+
+/* Container clipping boundary offset allowing floating focus rings and ambient drop-shadows to bleed unclipped (MWG: overflow-clipping-control) */
+.clip-safe-shadow {
+  overflow: clip;
+  overflow-clip-margin: 8px;
+}
+
+/* Layout Containment Boundary: isolates reflow & recalculations in data-dense tables/grids (MWG: interactions-in-complex-layouts) */
+.contain-layout {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
+
+@supports not (content-visibility: auto) {
+  .contain-layout {
+    contain: layout style;
+  }
 }
 

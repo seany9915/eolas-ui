@@ -83,7 +83,7 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
         path: 'lib/utils.ts',
         content: utilsContent,
         type: 'registry:lib',
-        target: 'lib/utils.ts',
+        target: '@lib/utils.ts',
       },
     ],
   };
@@ -144,13 +144,13 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
         path: 'rules/00-core-contract.md',
         content: fs.readFileSync(CORE_CONTRACT, 'utf8'),
         type: 'registry:file',
-        target: '.agents/rules/00-core-contract.md',
+        target: '~/.agents/rules/00-core-contract.md',
       },
       {
         path: 'rules/anti-patterns.md',
         content: fs.readFileSync(ANTI_PATTERNS, 'utf8'),
         type: 'registry:file',
-        target: '.agents/rules/anti-patterns.md',
+        target: '~/.agents/rules/anti-patterns.md',
       },
       ...(fs.existsSync(COMPONENT_LIB)
         ? [
@@ -158,7 +158,7 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
               path: 'rules/component-library.md',
               content: fs.readFileSync(COMPONENT_LIB, 'utf8'),
               type: 'registry:file',
-              target: '.agents/rules/component-library.md',
+              target: '~/.agents/rules/component-library.md',
             },
           ]
         : []),
@@ -168,7 +168,7 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
               path: 'rules/design-system.md',
               content: fs.readFileSync(DESIGN_SYSTEM, 'utf8'),
               type: 'registry:file',
-              target: '.agents/rules/design-system.md',
+              target: '~/.agents/rules/design-system.md',
             },
           ]
         : []),
@@ -176,7 +176,7 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
         path: 'scripts/check-anti-patterns.mjs',
         content: fs.readFileSync(CHECK_SCRIPT, 'utf8'),
         type: 'registry:file',
-        target: '.agents/scripts/check-anti-patterns.mjs',
+        target: '~/.agents/scripts/check-anti-patterns.mjs',
       },
     ],
   };
@@ -238,13 +238,13 @@ export default [
         path: 'lint/index.js',
         content: lintContent,
         type: 'registry:file',
-        target: 'lint/index.js',
+        target: '~/lint/index.js',
       },
       {
         path: 'eslint.config.mjs',
         content: eslintConfigContent,
         type: 'registry:file',
-        target: 'eslint.config.mjs',
+        target: '~/eslint.config.mjs',
       },
     ],
   };
@@ -304,7 +304,7 @@ for (const file of files) {
         path: `ui/${file}`,
         content,
         type: 'registry:ui',
-        target: `components/ui/${file}`,
+        target: `@ui/${file}`,
       },
     ],
     ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
@@ -360,7 +360,7 @@ if (fs.existsSync(BLOCKS_DIR)) {
           path: `blocks/${file}`,
           content,
           type: 'registry:block',
-          target: `components/blocks/${file}`,
+          target: `@components/blocks/${file}`,
         },
       ],
       ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
@@ -392,6 +392,52 @@ const registryCatalog = {
 };
 fs.writeFileSync(REGISTRY_CATALOG, JSON.stringify(registryCatalog, null, 2));
 
+// Generate root registry.json for GitHub direct repository installation
+// (e.g. npx shadcn add username/repo/item)
+const ROOT_REGISTRY = path.resolve('registry.json');
+const rootItems = registryItems.map((item) => {
+  const itemFile = path.join(OUT_DIR, `${item.name}.json`);
+  if (!fs.existsSync(itemFile)) return item;
+  const fullItem = JSON.parse(fs.readFileSync(itemFile, 'utf8'));
+  return {
+    name: fullItem.name,
+    type: fullItem.type,
+    title: fullItem.title,
+    description: fullItem.description,
+    dependencies: fullItem.dependencies,
+    devDependencies: fullItem.devDependencies,
+    registryDependencies: fullItem.registryDependencies,
+    files: (fullItem.files || []).map((f) => ({
+      path: f.path.startsWith('ui/')
+        ? `src/components/${f.path}`
+        : f.path.startsWith('blocks/')
+          ? `src/components/${f.path}`
+          : f.path.startsWith('lib/')
+            ? `src/${f.path}`
+            : f.path.startsWith('styles/')
+              ? `src/globals.css`
+              : f.path.startsWith('rules/')
+                ? `.agents/${f.path}`
+                : f.path.startsWith('scripts/')
+                  ? `.agents/${f.path}`
+                  : f.path.startsWith('lint/')
+                    ? `packages/eolas-ui/${f.path}`
+                    : f.path,
+      type: f.type,
+      target: f.target,
+    })),
+    ...(fullItem.meta ? { meta: fullItem.meta } : {}),
+  };
+});
+
+const rootCatalog = {
+  $schema: 'https://ui.shadcn.com/schema/registry.json',
+  name: '@seany9915/eolas-ui',
+  homepage: 'https://github.com/seany9915/eolas-ui',
+  items: rootItems,
+};
+fs.writeFileSync(ROOT_REGISTRY, JSON.stringify(rootCatalog, null, 2));
+
 // Mirror all to packages/eolas-ui/registry for zero-dependency CLI bundling
 if (!fs.existsSync(PKG_REGISTRY)) {
   fs.mkdirSync(PKG_REGISTRY, { recursive: true });
@@ -403,4 +449,4 @@ for (const item of registryItems) {
 fs.writeFileSync(path.join(PKG_REGISTRY, 'index.json'), JSON.stringify(registryItems, null, 2));
 fs.writeFileSync(path.join(PKG_REGISTRY, 'registry.json'), JSON.stringify(registryCatalog, null, 2));
 
-console.log(`Successfully generated registry at public/r/ and packages/eolas-ui/registry/ with ${registryItems.length} items.`);
+console.log(`Successfully generated registry at public/r/, packages/eolas-ui/registry/, and root registry.json with ${registryItems.length} items.`);

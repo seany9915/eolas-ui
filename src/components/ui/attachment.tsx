@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from './button';
 import { Icon } from './icon';
 import { Progress } from './progress';
 
@@ -114,24 +115,28 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
           {/* Action Triggers with Minimum 44px Touch Targets */}
           <div className="flex items-center">
             {onDownload && !isUploading && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={onDownload}
                 aria-label={`Download ${fileName}`}
-                className="flex size-11 items-center justify-center rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer"
+                className="rounded-sm text-on-surface-variant hover:text-on-surface"
               >
                 <Icon name="download" size="sm" />
-              </button>
+              </Button>
             )}
             {onRemove && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={onRemove}
                 aria-label={`Remove ${fileName}`}
-                className="flex size-11 items-center justify-center rounded-sm text-on-surface-variant hover:bg-surface-container hover:text-error focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer"
+                className="rounded-sm text-on-surface-variant hover:text-error"
               >
                 <Icon name="close" size="sm" />
-              </button>
+              </Button>
             )}
           </div>
         </div>

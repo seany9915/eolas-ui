@@ -3,6 +3,7 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { Button } from './button';
 import { Icon } from './icon';
 
@@ -327,7 +328,7 @@ export const CarouselDots = React.forwardRef<
       {scrollSnaps.map((_, index) => {
         const isSelected = index === selectedIndex;
         return (
-          <button
+          <BaseButton
             key={index}
             type="button"
             aria-current={isSelected ? 'true' : undefined}
@@ -337,13 +338,13 @@ export const CarouselDots = React.forwardRef<
           >
             <span
               className={cn(
-                'size-2.5 rounded-full transition-all duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                'size-2.5 rounded-full transition-[width,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
                 isSelected
                   ? 'w-6 bg-primary'
                   : 'bg-outline-variant hover:bg-outline'
               )}
             />
-          </button>
+          </BaseButton>
         );
       })}
     </div>

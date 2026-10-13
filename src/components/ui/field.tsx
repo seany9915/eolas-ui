@@ -53,11 +53,11 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(({
       validationMode={validationMode}
       validationDebounceTime={validationDebounceTime}
       invalid={Boolean(error)}
-      className={cn('flex flex-col gap-1.5 w-full', className)}
+      className={cn('flex flex-col gap-1.5 w-full group/field', className)}
       {...props}
     >
       {label && (
-        <BaseField.Label className="font-label text-sm font-semibold text-on-surface flex items-center justify-between">
+        <BaseField.Label className="font-label text-sm font-semibold text-on-surface group-has-[:user-invalid]/field:text-error data-[invalid]:text-error flex items-center justify-between">
           <span>{label}</span>
           {required && (
             <span className="text-sm text-on-surface-variant font-normal">(required)</span>
@@ -121,7 +121,7 @@ export const Field = Object.assign(FieldComponent, {
 // Styled Compound Components for advanced composition
 export const FieldRoot = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof BaseField.Root>>(
   ({ className, ...props }, ref) => (
-    <BaseField.Root ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props} />
+    <BaseField.Root ref={ref} className={cn('flex flex-col gap-1.5 w-full group/field', className)} {...props} />
   )
 );
 FieldRoot.displayName = 'FieldRoot';
@@ -130,7 +130,7 @@ export const FieldLabel = React.forwardRef<HTMLLabelElement, React.ComponentProp
   ({ className, ...props }, ref) => (
     <BaseField.Label
       ref={ref}
-      className={cn('font-label text-sm font-semibold text-on-surface flex items-center justify-between', className)}
+      className={cn('font-label text-sm font-semibold text-on-surface group-has-[:user-invalid]/field:text-error data-[invalid]:text-error flex items-center justify-between', className)}
       {...props}
     />
   )

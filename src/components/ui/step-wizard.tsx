@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { Icon } from './icon';
@@ -21,7 +22,57 @@ export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   showNavigationButtons?: boolean;
   variant?: 'card' | 'embedded';
   allowStepClick?: boolean;
+  /** When true, keeps all wizard steps in the DOM with hidden="until-found" so browser search (Ctrl+F) can find inactive step content */
+  hiddenUntilFound?: boolean;
 }
+
+interface StepPanelProps {
+  step: StepWizardStep;
+  isSelected: boolean;
+  direction: 'forward' | 'backward';
+  onSelect: () => void;
+}
+
+const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, direction, onSelect }) => {
+  const panelRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+
+    if (!isSelected) {
+      el.setAttribute('hidden', 'until-found');
+    } else {
+      el.removeAttribute('hidden');
+    }
+
+    const handleBeforeMatch = () => {
+      onSelect();
+    };
+
+    el.addEventListener('beforematch', handleBeforeMatch);
+    return () => {
+      el.removeEventListener('beforematch', handleBeforeMatch);
+    };
+  }, [isSelected, onSelect]);
+
+  return (
+    <div
+      ref={panelRef}
+      className={cn(
+        'w-full [&[hidden]:not([hidden="until-found"])]:hidden',
+        isSelected
+          ? direction === 'forward'
+            ? 'animate-step-forward'
+            : 'animate-step-backward'
+          : '',
+        'motion-reduce:animate-none'
+      )}
+    >
+      {step.content}
+    </div>
+  );
+};
 
 export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
   (
@@ -37,6 +88,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
       showNavigationButtons = true,
       variant = 'card',
       allowStepClick = false,
+      hiddenUntilFound = false,
       ...props
     },
     ref
@@ -106,7 +158,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 const canNavigate = allowStepClick || isPast;
 
                 return (
-                  <button
+                  <BaseButton
                     key={s.id}
                     type="button"
                     onClick={() => canNavigate && onStepChange?.(idx)}
@@ -125,7 +177,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                           : 'bg-outline-variant opacity-60'
                       )}
                     />
-                  </button>
+                  </BaseButton>
                 );
               })}
             </div>
@@ -142,18 +194,30 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
           className="relative min-h-[200px] overflow-hidden p-5 @sm:p-6"
           aria-live="polite"
         >
-          <div
-            key={currentStep?.id || currentStepIndex}
-            className={cn(
-              'w-full',
-              direction === 'forward'
-                ? 'animate-step-forward'
-                : 'animate-step-backward',
-              'motion-reduce:animate-none'
-            )}
-          >
-            {currentStep?.content}
-          </div>
+          {hiddenUntilFound ? (
+            steps.map((s, idx) => (
+              <StepPanel
+                key={s.id}
+                step={s}
+                isSelected={idx === currentStepIndex}
+                direction={direction}
+                onSelect={() => onStepChange?.(idx)}
+              />
+            ))
+          ) : (
+            <div
+              key={currentStep?.id || currentStepIndex}
+              className={cn(
+                'w-full',
+                direction === 'forward'
+                  ? 'animate-step-forward'
+                  : 'animate-step-backward',
+                'motion-reduce:animate-none'
+              )}
+            >
+              {currentStep?.content}
+            </div>
+          )}
         </div>
 
         {/* Footer Navigation Controls */}

@@ -71,23 +71,6 @@
     ]
   },
   {
-    "name": "approval-card",
-    "type": "registry:ui",
-    "title": "Approval Card",
-    "description": "Eolas UI Approval Card component built on Base UI and DESIGN.md design tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "registryDependencies": [
-      "utils",
-      "button",
-      "icon",
-      "radio"
-    ]
-  },
-  {
     "name": "attachment",
     "type": "registry:ui",
     "title": "Attachment",
@@ -99,6 +82,7 @@
     ],
     "registryDependencies": [
       "utils",
+      "button",
       "icon",
       "progress"
     ]
@@ -390,6 +374,28 @@
     ]
   },
   {
+    "name": "deferred-view",
+    "type": "registry:ui",
+    "title": "Deferred View",
+    "description": "DeferredView primitive. Platform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Defers layout and paint computations for offscreen or below-the-fold content using CSS `content-visibility: auto`.",
+        "Pairs with `contain-intrinsic-size` to prevent layout shifts and scrollbar jumping.",
+        "Supports 'hidden' mode for instantaneous view toggling without destroying component DOM state.",
+        "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+      ]
+    }
+  },
+  {
     "name": "dialog",
     "type": "registry:ui",
     "title": "Dialog",
@@ -594,6 +600,16 @@
       "taxonomy": [
         "A native input element that automatically works with Base UI Field context.",
         "Supports leading/trailing icons, clear button, and accessible error styling.",
+        "Follows Modern Web Guidance (MWG: html) tri-token contract:",
+        "Match `type` (browser validation), `inputMode` (virtual keyboard layout), and `autoComplete` (autofill heuristic):",
+        "Email: `type=\"email\"` + `inputMode=\"email\"` + `autoComplete=\"email\"`",
+        "Phone: `type=\"tel\"` + `inputMode=\"tel\"` + `autoComplete=\"tel\"`",
+        "Sign-in Password: `type=\"password\"` + `autoComplete=\"current-password\"`",
+        "New Password / Reset: `type=\"password\"` + `autoComplete=\"new-password\"`",
+        "Passkey / WebAuthn: `type=\"text\"` + `autoComplete=\"username webauthn\"`",
+        "Search: `type=\"search\"` + `enterKeyHint=\"search\"`",
+        "Clinical Code / NHS ID / Dosage: `autoCorrect=\"off\"` + `spellCheck={false}`",
+        "OTP / PIN: `type=\"text\"` + `inputMode=\"numeric\"` + `autoComplete=\"one-time-code\"`",
         "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
       ]
     }
@@ -791,6 +807,28 @@
     ]
   },
   {
+    "name": "progress-ring",
+    "type": "registry:ui",
+    "title": "Progress Ring",
+    "description": "ProgressRing primitive (@base-ui/react/progress).",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "A circular progress indicator built on Base UI's headless Progress state machine.",
+        "Manages accessibility roles (role=\"progressbar\", aria-valuenow, aria-valuemin, aria-valuemax) and internationalized number formatting headlessly.",
+        "Renders a hardware-accelerated SVG conic ring with concentric stroke geometry.",
+        "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+      ]
+    }
+  },
+  {
     "name": "progress",
     "type": "registry:ui",
     "title": "Progress",
@@ -834,6 +872,28 @@
     }
   },
   {
+    "name": "reading-progress",
+    "type": "registry:ui",
+    "title": "Reading Progress",
+    "description": "ReadingProgress primitive (@base-ui/react/progress). Platform Reference: Modern Web Guidance (MWG: scrollytelling / scroll-driven animations)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Pinned reading/scroll progress indicator built on Base UI's headless Progress state machine.",
+        "Manages accessibility roles (role=\"progressbar\", aria-valuenow, aria-valuemin, aria-valuemax) headlessly.",
+        "Uses compositor-driven CSS scroll-driven animations (animation-timeline: scroll()) on supported browsers with an automatic, lightweight requestAnimationFrame scroll listener fallback for Safari and Firefox.",
+        "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+      ]
+    }
+  },
+  {
     "name": "resizable",
     "type": "registry:ui",
     "title": "Resizable",
@@ -867,6 +927,29 @@
         "Augments native browser scrolling with custom-styled, accessible scrollbars.",
         "Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.",
         "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
+      ]
+    }
+  },
+  {
+    "name": "scrollspy",
+    "type": "registry:ui",
+    "title": "Scrollspy",
+    "description": "Scrollspy primitive. Platform Reference: Modern Web Guidance (MWG: scrollspy)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "In-page table of contents and section navigation primitive.",
+        "Synchronizes active reading position in navigation links with visible page sections.",
+        "Uses compositor-driven `scroll-target-group: auto` (Chrome/Edge 140+) with an accessible `IntersectionObserver` fallback for Safari and Firefox.",
+        "Sets explicit `aria-current=\"true\"` on the active link for screen reader synchronicity.",
+        "Adheres to WCAG 2.2 SC 2.5.8 (44x44px minimum touch targets) and WCAG 1.4.1 (non-color active cues)."
       ]
     }
   },
@@ -1018,6 +1101,29 @@
     ]
   },
   {
+    "name": "sticky-container",
+    "type": "registry:ui",
+    "title": "Sticky Container",
+    "description": "StickyContainer primitive. Platform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "A state-aware sticky header and toolbar container.",
+        "Dynamically elevates (gains ambient box-shadow, surface wash, and border) when stuck to the viewport edge.",
+        "Uses compositor-driven CSS Container Scroll-State queries (`container-type: scroll-state`) with zero main-thread scroll listeners in Chrome 133+ and Edge 133+.",
+        "Features an accessible zero-height sentinel and IntersectionObserver fallback for Safari and Firefox.",
+        "Prevents layout-shift oscillations by strictly constraining state transitions to non-layout-shifting properties (background-color, border-color, box-shadow, and backdrop-blur)."
+      ]
+    }
+  },
+  {
     "name": "success-check",
     "type": "registry:ui",
     "title": "Success Check",
@@ -1030,6 +1136,28 @@
     "registryDependencies": [
       "utils"
     ]
+  },
+  {
+    "name": "swipe-reveal",
+    "type": "registry:ui",
+    "title": "Swipe Reveal",
+    "description": "SwipeReveal primitive. Platform Reference: Modern Web Guidance (MWG: swipe-to-reveal)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "A compositor-driven swipe-to-reveal action row built on CSS scroll-snap and `overscroll-behavior: chain`.",
+        "Avoids main-thread pointermove/touchmove JS listener bottlenecks for sub-50ms INP responsiveness.",
+        "Handles keyboard focus gracefully by snapping content back when tabbing with :focus-visible.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit-targets, and floating 2px focus rings."
+      ]
+    }
   },
   {
     "name": "switch",
@@ -1056,7 +1184,7 @@
     "name": "table",
     "type": "registry:ui",
     "title": "Table",
-    "description": "Eolas UI Table component built on Base UI and DESIGN.md design tokens.",
+    "description": "Table primitive. Platform Reference: Modern Web Guidance (MWG: responsive-table)",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -1064,7 +1192,15 @@
     ],
     "registryDependencies": [
       "utils"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "A data table primitive supporting standard horizontal scroll or responsive container-query card stacking.",
+        "When responsive=\"stack\", transforms rows into accessible stacked cards on narrow container widths (@container width < 600px).",
+        "Implements explicit column header semantics (scope=\"col\") and 56px minimum row heights for OS text zoom adaptability.",
+        "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+      ]
+    }
   },
   {
     "name": "tabs",
@@ -1087,6 +1223,28 @@
         "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
         "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
         "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
+      ]
+    }
+  },
+  {
+    "name": "text-highlight",
+    "type": "registry:ui",
+    "title": "Text Highlight",
+    "description": "TextHighlight primitive. Platform Reference: Modern Web Guidance (MWG: highlight-text-ranges)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "A declarative text-search and keyword highlight container powered by the CSS Custom Highlight API (`::highlight()`).",
+        "Highlights search matches on the GPU compositor without mutating the DOM tree, splitting strings, or fragmenting screen reader announcements.",
+        "Adheres to WCAG 4.1.3 (Status Messages) by synchronizing visual highlights with an `aria-live=\"polite\"` screen reader match announcer.",
+        "Styles matches using tokenized secondary container palette in globals.css: `::highlight(search-results) { background-color: var(--secondary-container); color: var(--on-secondary-container); }`"
       ]
     }
   },
@@ -1283,6 +1441,47 @@
     ],
     "registryDependencies": [
       "utils"
+    ]
+  },
+  {
+    "name": "view-transition",
+    "type": "registry:ui",
+    "title": "View Transition",
+    "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
+        "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
+        "Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.",
+        "Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
+      ]
+    }
+  },
+  {
+    "name": "approval-card",
+    "type": "registry:block",
+    "title": "Approval Card",
+    "description": "Eolas UI Approval Card component built on Base UI and DESIGN.md design tokens.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "radio",
+      "input"
     ]
   },
   {

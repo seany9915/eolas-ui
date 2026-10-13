@@ -21,7 +21,7 @@
       "path": "ui/selection-controls.tsx",
       "content": "/**\n * Re-exports selection control primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/checkbox\n * - @/components/ui/checkbox-group\n * - @/components/ui/radio\n * - @/components/ui/switch\n */\nexport * from './checkbox';\nexport * from './checkbox-group';\nexport * from './radio';\nexport * from './switch';\n",
       "type": "registry:ui",
-      "target": "components/ui/selection-controls.tsx"
+      "target": "@ui/selection-controls.tsx"
     }
   ],
   "docs": "Re-exports selection control primitives for backward compatibility.\nDedicated modular files exist at:\n- @/components/ui/checkbox\n- @/components/ui/checkbox-group\n- @/components/ui/radio\n- @/components/ui/switch"

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 
@@ -73,10 +74,10 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
         aria-hidden="true"
       />
       <div className="flex-1 min-w-0">
-        <h4 className="font-heading text-base font-bold text-on-surface mb-1">
+        <h4 className="font-heading text-base font-bold text-on-surface mb-1 text-balance">
           {title}
         </h4>
-        <div className="font-sans text-sm text-on-surface-variant leading-relaxed">
+        <div className="font-sans text-sm text-on-surface-variant leading-relaxed text-pretty">
           {children}
         </div>
         {action && (
@@ -86,14 +87,14 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
         )}
       </div>
       {onClose && (
-        <button
+        <BaseButton
           type="button"
           onClick={onClose}
           aria-label="Dismiss alert"
-          className="shrink-0 min-h-[44px] min-w-[44px] size-11 -mr-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer"
+          className="shrink-0 min-h-[44px] min-w-[44px] size-11 -mr-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none"
         >
           <Icon name="close" size="md" aria-hidden="true" />
-        </button>
+        </BaseButton>
       )}
     </div>
   );
