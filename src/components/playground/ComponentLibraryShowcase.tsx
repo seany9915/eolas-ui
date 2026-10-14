@@ -138,6 +138,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
 
   return (
     <div className="space-y-12">
+      <h2 className="sr-only">Base UI Component Library Showcase</h2>
       {/* 1. Buttons Comparative Matrix */}
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
@@ -380,7 +381,6 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <Toggle
                   pressed={toggleVal}
                   onPressedChange={setToggleVal}
-                  ariaLabel="High contrast view toggle"
                 >
                   High Contrast Mode
                 </Toggle>
@@ -880,15 +880,15 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <Progress value={78} label="Session Mastery Goal" />
                 <div className="flex items-center justify-around py-2 border-y border-outline-variant/30">
                   <div className="flex flex-col items-center gap-1">
-                    <ProgressRing value={45} size="sm" color="primary" />
+                    <ProgressRing value={45} size="sm" color="primary" aria-label="Session trial progress" />
                     <span className="font-mono text-[10px] text-on-surface-variant">45%</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
-                    <ProgressRing value={85} size="md" color="secondary" />
+                    <ProgressRing value={85} size="md" color="secondary" aria-label="Daily cadence completion" />
                     <span className="font-mono text-[10px] text-on-surface-variant">85%</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
-                    <ProgressRing value={100} size="sm" color="success" />
+                    <ProgressRing value={100} size="sm" color="success" aria-label="Milestone goal completion" />
                     <span className="font-mono text-[10px] text-on-surface-variant">Done</span>
                   </div>
                 </div>
@@ -1530,9 +1530,8 @@ export const ComponentLibraryShowcase: React.FC = () => {
                       ? 'border-primary bg-primary/5 shadow-ambient ring-2 ring-primary/20'
                       : 'border-outline-variant/60 bg-surface hover:bg-surface-container/60 hover:border-outline-variant'
                   )}
-                  aria-label={`Select ${item.label} orb state`}
                 >
-                  <ThinkingOrb state={item.state} size="sm" className="shrink-0" />
+                  <ThinkingOrb state={item.state} size="sm" className="shrink-0" aria-hidden="true" />
                   <div className="flex flex-col min-w-0">
                     <span className={cn(
                       'font-sans text-xs capitalize',
@@ -1540,7 +1539,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                     )}>
                       {item.label}
                     </span>
-                    <span className="font-mono text-xs text-on-surface-variant/70 truncate">
+                    <span className="font-mono text-xs text-on-surface-variant truncate">
                       {item.state}
                     </span>
                   </div>
@@ -1835,7 +1834,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                             Patient maintains upright posture and steady diaphragmatic breathing during trial.
                           </p>
                         </div>
-                        <span className="text-xs text-on-surface-variant/70 italic">
+                        <span className="text-xs text-on-surface-variant italic">
                           ← Drag the handle to resize
                         </span>
                       </div>
@@ -1915,15 +1914,17 @@ export const ComponentLibraryShowcase: React.FC = () => {
                         <>
                           <SwipeReveal.Action
                             variant="primary"
+                            aria-label="Queue session for triage"
                             onClick={() => showToast('Session Queued', 'Session added to caseload triage queue.', 'info')}
                           >
-                            <Icon name="archive" size="sm" />
+                            <Icon name="archive" size="sm" aria-hidden="true" />
                           </SwipeReveal.Action>
                           <SwipeReveal.Action
                             variant="error"
+                            aria-label="Delete clinical trial"
                             onClick={() => showToast('Record Deleted', 'Clinical practice trial removed.', 'warning')}
                           >
-                            <Icon name="delete" size="sm" />
+                            <Icon name="delete" size="sm" aria-hidden="true" />
                           </SwipeReveal.Action>
                         </>
                       }

@@ -77,17 +77,17 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
         disabled={disabled}
         className={cn(
           'inline-flex items-center justify-center rounded-sm font-label font-semibold cursor-pointer select-none',
-          'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+          'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
           'active:scale-[var(--scale-tiny)] motion-reduce:transform-none motion-reduce:transition-none',
           sizeClasses,
           effectiveVariant === 'outline'
             ? cn(
                 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 border border-transparent',
-                'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:shadow-ambient'
+                'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
               )
             : cn(
                 'text-on-surface-variant hover:text-on-surface hover:bg-surface/50',
-                'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:shadow-ambient'
+                'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container'
               ),
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
           'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
@@ -247,7 +247,7 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
           disabled={disabled}
           aria-label={label}
           className={cn(
-            'inline-flex p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none',
+            'inline-flex p-1 rounded bg-surface-container border border-outline gap-1 select-none',
             orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
             className
           )}

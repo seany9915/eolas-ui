@@ -9,7 +9,7 @@
    - **Primitives (`src/components/ui/`):** Pure Base UI wrappers and design tokens. Zero business logic. Never import from blocks or features.
    - **Composite Blocks (`src/components/blocks/`):** Reusable, controlled UI compositions built strictly from primitives and design tokens. Pure UI assemblies (receive props, emit callbacks, zero network or auth coupling). Never import from features.
    - **Feature Views (`src/features/` or `src/views/`):** Domain-specific screens & workflows. Owns state, queries, and auth. Decoupled from the shared component registry.
-   - **Direct Tag Ban:** Direct `<button>`, `<input>`, and `<select>` tags outside `components/ui/` are strictly banned (enforced via ESLint AST selectors). Always use `<Button>`, `<Input>`, `<Select>` from `@/components/ui/`.
+   - **Direct Tag Ban:** Direct `<button>`, `<input>`, `<select>`, `<textarea>`, and native `<dialog>` tags outside `components/ui/` are strictly banned (enforced via ESLint AST selectors). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, and `<Dialog>` from `@/components/ui/` (for unstyled triggers like card stretched-links or table sort headers, use `<UnstyledButton>` or `<Button variant="unstyled">`).
 3. **API preservation:** Visual styling, bug fixes, or token updates must NEVER erode component API surface, strip Base UI polymorphic `render` / slot props, drop compound subcomponents, or downgrade primitives to plain HTML `<div>`s or `<button>`s.
 4. **Anti-pattern gate:** Re-check `.agents/rules/anti-patterns.md` before finishing any UI task. Highest priority: no triple-tint monochrome chips, no focus vs. selection ambiguity, no raw interactive HTML tags, and no registry bloat.
 5. **Design law:** Full structural/color/typography/a11y rules live in `.agents/rules/design-system.md` and the project root `DESIGN.md` — treat `DESIGN.md` as the single source of truth for tokens, never invent hex codes.
@@ -17,8 +17,5 @@
 
 ---
 
-<!-- BEGIN:nextjs-agent-rules -->
-# Next.js Framework Customizations (Breaking Changes)
-
-This version of Next.js has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+## Framework Architecture: Vite + React SPA
+This project is a high-performance Single Page Application built on **Vite + React 18**. Do not import or generate Next.js server components, App Router files (`page.tsx`, `layout.tsx`, `route.ts`), or `next/*` modules. Application routes and state follow client-side SPA conventions with Tailwind CSS v4 and Base UI primitives.

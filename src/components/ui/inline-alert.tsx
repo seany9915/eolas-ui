@@ -57,7 +57,7 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
       aria-live={ariaLive}
       aria-atomic="true"
       className={cn(
-        'relative flex items-start gap-4 p-5 pl-6 rounded-none bg-surface border-none shadow-ambient overflow-hidden text-left',
+        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default bg-surface border-none shadow-ambient overflow-hidden text-left',
         className
       )}
       {...props}

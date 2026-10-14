@@ -12,6 +12,14 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-background text-on-background flex flex-col font-sans transition-colors duration-200">
+      {/* Skip Navigation Bypass Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-surface focus:text-primary focus:border-2 focus:border-primary focus:rounded-md focus:shadow-ambient focus:font-label focus:text-sm focus:font-semibold"
+      >
+        Skip to main content
+      </a>
+
       {/* Playground Header Navigation */}
       <Header
         activeTab={activeTab}
@@ -19,7 +27,8 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8">
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8">
+        <h1 className="sr-only">Eolas Clinical Design System & Component Library</h1>
         <div key={activeTab}>
           {activeTab === 'tokens' && <ColorTokensExplorer />}
           {activeTab === 'components' && <ComponentLibraryShowcase />}

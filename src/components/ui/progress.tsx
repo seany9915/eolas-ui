@@ -12,7 +12,8 @@ import * as React from 'react';
 import { Progress as BaseProgress } from '@base-ui/react/progress';
 import { cn } from '@/lib/utils';
 
-export interface ProgressProps {
+export interface ProgressProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseProgress.Root>, 'value'> {
   value?: number | null;
   max?: number;
   min?: number;
@@ -66,6 +67,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
           locale={locale}
           aria-valuetext={ariaValueText}
           getAriaValueText={getAriaValueText}
+          aria-label={props['aria-label'] || label || (children ? undefined : 'Progress')}
           className={cn('flex flex-col gap-1.5 w-full', className)}
           {...props}
         >
@@ -89,6 +91,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
         locale={locale}
         aria-valuetext={ariaValueText}
         getAriaValueText={getAriaValueText}
+        aria-label={props['aria-label'] || label || 'Progress'}
         className={cn('flex flex-col gap-1.5 w-full', className)}
         {...props}
       >

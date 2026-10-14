@@ -81,13 +81,13 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
   let affordanceStyles = '';
   if (isSelectable) {
     affordanceStyles = cn(
-      'cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      'cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
       selected
-        ? 'bg-primary-container/15 border-[2px] border-primary text-on-surface shadow-ambient'
+        ? 'bg-primary-container border-[2px] border-primary text-on-surface shadow-ambient'
         : 'bg-surface border-[2px] border-transparent text-on-surface shadow-ambient hover:shadow-ambient-hover hover:border-outline-variant/50'
     );
   } else if (isActionable) {
-    affordanceStyles = 'cursor-pointer hover:shadow-ambient-hover active:scale-[0.99] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+    affordanceStyles = 'cursor-pointer hover:shadow-ambient-hover active:scale-[0.99] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary';
   } else {
     // Static: retains standard ambient hover if default, but no pointer cursor or focus ring
     affordanceStyles = resolvedProminence === 'default' ? 'hover:shadow-ambient-hover' : '';
@@ -101,12 +101,19 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
     props.onKeyDown?.(e);
   };
 
+  const isRadio = props.role === 'radio';
+  const role = isSelectable ? (props.role ?? 'button') : props.role;
+  const ariaPressed = isSelectable && !isRadio ? (props['aria-pressed'] ?? selected) : props['aria-pressed'];
+  const ariaChecked = isRadio ? (props['aria-checked'] ?? selected) : props['aria-checked'];
+  const tabIndex = props.tabIndex !== undefined ? props.tabIndex : (isSelectable || isActionable ? 0 : undefined);
+
   return (
     <div
       ref={ref}
-      role={isSelectable ? (props.role ?? 'button') : props.role}
-      tabIndex={isSelectable || isActionable ? (props.tabIndex ?? 0) : props.tabIndex}
-      aria-pressed={isSelectable ? selected : undefined}
+      role={role}
+      tabIndex={tabIndex}
+      aria-pressed={ariaPressed}
+      aria-checked={ariaChecked}
       onKeyDown={handleKeyDown}
       className={cn(baseStyles, prominenceStyles[resolvedProminence], affordanceStyles, className)}
       {...props}

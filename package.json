@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && npm run build:registry",
+    "build": "npm run build:registry && tsc && vite build",
     "build:registry": "node scripts/build-registry.mjs",
     "registry:validate": "node scripts/validate-registry.mjs && npx --yes shadcn@latest registry validate",
     "lint": "eslint .",

@@ -13,13 +13,14 @@ import { Icon } from '@/components/ui/icon';
 export interface ToastProps {
   title: string;
   description?: string;
-  type?: 'info' | 'success' | 'warning' | 'error';
+  type?: 'neutral' | 'info' | 'success' | 'warning' | 'error';
   onClose?: () => void;
   className?: string;
 }
 
 const accentBorder: Record<string, string> = {
-  info: 'border-l-primary',
+  neutral: 'border-l-neutral',
+  info: 'border-l-neutral', // alias to neutral to preserve primary blue strictly for interactive controls
   success: 'border-l-success',
   warning: 'border-l-warning',
   error: 'border-l-error',
@@ -27,14 +28,16 @@ const accentBorder: Record<string, string> = {
 };
 
 const accentBg: Record<string, string> = {
-  info: 'bg-primary',
+  neutral: 'bg-neutral',
+  info: 'bg-neutral',
   success: 'bg-success',
   warning: 'bg-warning',
   error: 'bg-error',
 };
 
 const iconMap: Record<string, { name: string; color: string }> = {
-  info: { name: 'info', color: 'text-primary' },
+  neutral: { name: 'info', color: 'text-on-surface' },
+  info: { name: 'info', color: 'text-on-surface' },
   success: { name: 'check_circle', color: 'text-success' },
   warning: { name: 'warning', color: 'text-warning' },
   error: { name: 'error', color: 'text-error' },
@@ -68,7 +71,7 @@ const ToastComponent: React.FC<ToastProps> = ({
       <BaseToast.Root
         toast={toastObj}
         className={cn(
-          'relative flex items-start gap-3 p-4 pl-5 rounded-none bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+          'relative flex items-start gap-3 p-4 pl-5 rounded-l-none rounded-r-default bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
           accentBorder[type] || accentBorder.info,
           className
         )}
@@ -141,13 +144,26 @@ function normalizeToastOptions(options: ToastOptions | string, defaultType = 'in
  * Dispatches a toast notification via the global toast manager.
  */
 export const toast = (options: ToastOptions | string) => {
-  const norm = normalizeToastOptions(options, 'info');
+  const norm = normalizeToastOptions(options, 'neutral');
   return globalToastManager.add(norm);
 };
 
 toast.add = (options: ToastOptions) => {
-  const norm = normalizeToastOptions(options, 'info');
+  const norm = normalizeToastOptions(options, 'neutral');
   return globalToastManager.add(norm);
+};
+
+toast.neutral = (
+  title: React.ReactNode,
+  description?: React.ReactNode,
+  options?: Omit<ToastOptions, 'title' | 'description' | 'type'>
+) => {
+  return toast.add({
+    ...options,
+    title,
+    description,
+    type: 'neutral',
+  });
 };
 
 toast.info = (
@@ -298,7 +314,7 @@ const ActiveToastItem: React.FC<{
       swipeDirection={['down', 'right', 'left']}
       style={t.positionerProps?.anchor ? undefined : stackStyle}
       className={cn(
-        'pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-none bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
+        'pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-l-none rounded-r-default bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
         accentBorder[toastType] || accentBorder.info,
         // Base transition for smooth stacking deck physics
         'transition-[opacity,transform,box-shadow] duration-[var(--duration-slow)] ease-[var(--ease-standard)]',

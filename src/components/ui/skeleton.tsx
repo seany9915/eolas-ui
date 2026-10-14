@@ -23,7 +23,8 @@ export const Skeleton = React.forwardRef<HTMLElement, SkeletonProps>(
         data-slot="skeleton"
         aria-hidden="true"
         className={cn(
-          'animate-pulse rounded bg-surface-variant/70 motion-reduce:animate-none',
+          'animate-pulse rounded bg-surface-variant',
+          'motion-reduce:animate-none motion-reduce:bg-surface-variant motion-reduce:border motion-reduce:border-outline-variant/60',
           Component === 'span' && 'inline-block align-middle',
           className
         )}

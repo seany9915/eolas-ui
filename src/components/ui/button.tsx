@@ -23,7 +23,8 @@ export type ButtonVariant =
   | 'ghost'
   | 'tonal'
   | 'secondary'
-  | 'default';
+  | 'default'
+  | 'unstyled';
 
 export type ButtonColorRole =
   | 'primary'
@@ -137,6 +138,13 @@ export function buttonVariants({
           ? 'filled'
           : rawVariant;
 
+  if (normalizedVariant === 'unstyled') {
+    return cn(
+      'cursor-pointer select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-50 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      className
+    );
+  }
+
   const validColorRoles: ButtonColorRole[] = [
     'primary',
     'secondary',
@@ -239,9 +247,27 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 ButtonComponent.displayName = 'Button';
 
+export interface UnstyledButtonProps extends ButtonProps {}
+
+/**
+ * UnstyledButton
+ *
+ * Lightweight semantic button primitive wrapping Base UI's BaseButton.
+ * Provides accessible keyboard focus ring and interaction states without
+ * enforcing height, padding, or background chrome.
+ * Ideal for stretched-link card triggers, table column headers, and custom row actions.
+ */
+export const UnstyledButton = React.forwardRef<HTMLButtonElement, UnstyledButtonProps>(
+  ({ variant = 'unstyled', ...props }, ref) => {
+    return <ButtonComponent ref={ref} variant={variant} {...props} />;
+  }
+);
+UnstyledButton.displayName = 'UnstyledButton';
+
 // Compound export mapping Base UI primitives
 export const Button = Object.assign(ButtonComponent, {
   Root: BaseButton,
+  Unstyled: UnstyledButton,
 });
 
 // Re-export Base UI primitives for compound composition

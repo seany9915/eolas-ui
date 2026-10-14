@@ -26,7 +26,10 @@ import { Field, BaseField, FieldRoot, FieldLabel, FieldControl, FieldDescription
 import { Textarea, TextareaField, FormTextarea, type TextareaProps, type TextareaFieldProps } from './textarea';
 import { cn } from '@/lib/utils';
 
-export interface InputProps extends React.ComponentPropsWithoutRef<typeof BaseInput> {
+export type InputSize = 'sm' | 'md' | 'lg';
+
+export interface InputProps extends Omit<React.ComponentPropsWithoutRef<typeof BaseInput>, 'size'> {
+  size?: InputSize;
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   trailingAction?: React.ReactNode;
@@ -57,6 +60,7 @@ export interface InputProps extends React.ComponentPropsWithoutRef<typeof BaseIn
 
 const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
   className,
+  size = 'md',
   leadingIcon,
   trailingIcon,
   trailingAction,
@@ -77,7 +81,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
         e.preventDefault();
         onClear?.();
       }}
-      className="size-11 min-w-[44px] min-h-[44px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none"
+      className={cn(
+        "rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none",
+        size === 'sm' ? "size-9 min-w-[36px] min-h-[36px]" : "size-11 min-w-[44px] min-h-[44px]"
+      )}
     >
       <span className="material-symbols-outlined text-base leading-none select-none" aria-hidden="true">
         close
@@ -88,19 +95,35 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
   const effectiveTrailing = trailingAction ?? (showClear ? clearButton : trailingIcon);
   const hasTrailing = Boolean(effectiveTrailing);
 
+  const sizeClasses = {
+    sm: 'h-11 min-h-[44px] text-sm',
+    md: 'h-12 min-h-[48px] text-base',
+    lg: 'h-14 min-h-[56px] text-base',
+  }[size];
+
+  const paddingClasses = size === 'sm'
+    ? cn(
+        hasLeading ? 'pl-10' : 'pl-3.5',
+        hasTrailing ? (showClear || trailingAction ? 'pr-12' : 'pr-10') : 'pr-3.5'
+      )
+    : cn(
+        hasLeading ? 'pl-11' : 'pl-4',
+        hasTrailing ? (showClear || trailingAction ? 'pr-14' : 'pr-11') : 'pr-4'
+      );
+
   const inputElement = (
     <BaseInput
       ref={ref}
       value={value}
       className={cn(
-        'w-full h-12 rounded bg-surface text-on-surface font-sans text-base transition-[border-color,box-shadow] min-h-[48px]',
+        'w-full rounded bg-surface text-on-surface font-sans transition-[border-color,box-shadow]',
+        sizeClasses,
+        paddingClasses,
         'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
         'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
         'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
         error && 'border-error focus-visible:border-error focus-visible:outline-error',
-        hasLeading ? 'pl-11' : 'pl-4',
-        hasTrailing ? (showClear || trailingAction ? 'pr-14' : 'pr-11') : 'pr-4',
         className
       )}
       {...props}
@@ -138,7 +161,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
 
 InputComponent.displayName = 'Input';
 
-export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'children'> {
+export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'children' | 'size'> {
+  size?: InputSize;
   label?: string;
   description?: string;
   /** Legacy alias for description */
@@ -154,6 +178,7 @@ export interface FormFieldProps extends Omit<React.InputHTMLAttributes<HTMLInput
 }
 
 export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
+  size = 'md',
   label,
   description,
   hint,
@@ -184,6 +209,7 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(({
       ) : (
         <InputComponent
           ref={ref}
+          size={size}
           id={id}
           disabled={disabled}
           error={Boolean(error)}

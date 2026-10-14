@@ -331,6 +331,7 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
               readOnly={readOnly}
               aria-invalid={!!error}
               aria-describedby={describedBy}
+              aria-labelledby={label ? `${comboboxId}-label` : undefined}
               className={cn(
                 'w-full bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',
                 size === 'sm' && 'h-9 px-3 pr-16 min-h-[44px] text-xs',

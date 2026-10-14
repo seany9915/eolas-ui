@@ -143,7 +143,13 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
 
         {/* Upload Progress Track */}
         {isUploading && (
-          <Progress value={uploadProgress} showValue={false} size="sm" className="w-full mt-2.5" />
+          <Progress
+            value={uploadProgress}
+            showValue={false}
+            size="sm"
+            aria-label={`Upload progress for ${fileName}`}
+            className="w-full mt-2.5"
+          />
         )}
       </div>
     );

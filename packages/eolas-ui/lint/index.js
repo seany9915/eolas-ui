@@ -59,6 +59,16 @@ export const eolasLintPreset = [
           message:
             "Direct <select> usage is prohibited outside primitives. Use <Select> from @/components/ui/select.",
         },
+        {
+          selector: "JSXOpeningElement[name.name='textarea']",
+          message:
+            "Direct <textarea> usage is prohibited outside primitives. Use <Textarea> from @/components/ui/textarea.",
+        },
+        {
+          selector: "JSXOpeningElement[name.name='dialog']",
+          message:
+            "Direct <dialog> usage is prohibited outside primitives. Use <Dialog> from @/components/ui/dialog.",
+        },
       ],
 
       // 7. Restyle contracts tailored to Eolas UI Base UI primitives

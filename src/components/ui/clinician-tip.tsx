@@ -41,7 +41,7 @@ export const ClinicianTip = React.forwardRef<HTMLDivElement, ClinicianTipProps>(
       ref={ref}
       className={cn(
         'flex items-start gap-2.5 text-left',
-        variant === 'inset' && 'rounded-md bg-surface-container px-3.5 py-2.5',
+        variant === 'inset' && 'rounded-md bg-surface-container border border-outline-variant px-3.5 py-2.5',
         variant === 'unboxed' && 'pt-2 bg-transparent',
         className
       )}

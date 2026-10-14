@@ -37,32 +37,38 @@ PaginationItem.displayName = 'PaginationItem';
 
 export type PaginationLinkProps = {
   isActive?: boolean;
-} & Pick<ButtonProps, 'size'> &
-  React.ComponentPropsWithoutRef<'a'>;
+  href?: string;
+} & ButtonProps;
 
 export const PaginationLink = ({
   className,
   isActive,
   size = 'sm',
   children,
+  href,
   ...props
-}: PaginationLinkProps) => (
-  <Button
-    render={<a aria-current={isActive ? 'page' : undefined} {...props} />}
-    variant={isActive ? 'filled' : 'outlined'}
-    colorRole={isActive ? 'primary' : 'neutral'}
-    size={size}
-    className={cn(
-      'min-w-[44px] min-h-[44px] h-11 px-3.5 tabular-nums font-sans text-sm rounded-md transition-colors',
-      isActive
-        ? 'pointer-events-none font-semibold shadow-ambient'
-        : 'text-on-surface hover:bg-surface-container border-outline-variant hover:border-outline',
-      className
-    )}
-  >
-    {children}
-  </Button>
-);
+}: PaginationLinkProps) => {
+  const isLink = Boolean(href);
+  return (
+    <Button
+      render={isLink ? <a href={href} aria-current={isActive ? 'page' : undefined} /> : undefined}
+      aria-current={!isLink && isActive ? 'page' : undefined}
+      variant={isActive ? 'filled' : 'outlined'}
+      colorRole={isActive ? 'primary' : 'neutral'}
+      size={size}
+      className={cn(
+        'min-w-[44px] min-h-[44px] h-11 px-3.5 tabular-nums font-sans text-sm rounded-md transition-colors',
+        isActive
+          ? 'pointer-events-none font-semibold shadow-ambient'
+          : 'text-on-surface hover:bg-surface-container border-outline-variant hover:border-outline',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+};
 PaginationLink.displayName = 'PaginationLink';
 
 export const PaginationPrevious = ({

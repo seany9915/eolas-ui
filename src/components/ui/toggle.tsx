@@ -32,8 +32,8 @@ export interface ToggleProps<Value extends string = string>
 
 const variantStyles: Record<ToggleVariant, string> = {
   default: cn(
-    'bg-surface border border-outline-variant text-on-surface hover:bg-surface-container',
-    'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:border-primary data-[pressed]:shadow-ambient'
+    'bg-surface border border-outline text-on-surface hover:bg-surface-container',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-2 data-[pressed]:border-primary data-[pressed]:shadow-ambient'
   ),
   outline: cn(
     'bg-transparent border border-outline text-on-surface hover:bg-surface-container/60',

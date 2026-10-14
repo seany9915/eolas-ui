@@ -46,7 +46,7 @@ export const ThinkingTrace: React.FC<ThinkingTraceProps> = ({
             <Icon name={icon} size="sm" className="text-primary text-base" />
             <span className="font-sans text-xs font-semibold text-on-surface">{title}</span>
             {elapsedTime && (
-              <span className="font-mono text-[11px] text-outline tabular-nums">
+              <span className="font-mono text-[11px] text-on-surface-variant tabular-nums">
                 ({elapsedTime})
               </span>
             )}
@@ -54,7 +54,7 @@ export const ThinkingTrace: React.FC<ThinkingTraceProps> = ({
           <Icon
             name="expand_more"
             size="sm"
-            className="text-outline group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)]"
+            className="text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)]"
           />
         </CollapsibleTrigger>
 
@@ -114,7 +114,7 @@ export const ThinkingTrace: React.FC<ThinkingTraceProps> = ({
                     <div className="flex items-baseline justify-between gap-4 w-full min-w-0 pt-0.5">
                       <span className="text-on-surface font-medium leading-tight">{step.label}</span>
                       {step.duration && (
-                        <span className="font-mono text-[11px] text-outline tabular-nums shrink-0">
+                        <span className="font-mono text-[11px] text-on-surface-variant tabular-nums shrink-0">
                           {step.duration}
                         </span>
                       )}

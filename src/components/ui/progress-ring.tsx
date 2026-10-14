@@ -84,6 +84,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
     return (
       <BaseProgress.Root
         ref={ref}
+        aria-label={props['aria-label'] || label || 'Progress'}
         value={value ?? null}
         max={max}
         min={min}

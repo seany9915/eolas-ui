@@ -85,7 +85,6 @@
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: ease-in-out;
   --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
-  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
 
   --scale-large: 0.96;
   --scale-medium: 0.97;
@@ -100,6 +99,15 @@
 
   --blur-small: 2px;
   --blur-medium: 3px;
+
+  /* Spacing & Layout Tokens (DESIGN.md) */
+  --spacing-gutter: var(--gutter);
+  --spacing-gutter-mobile: var(--gutter-mobile);
+  --spacing-margin-mobile: var(--margin-mobile);
+  --spacing-margin-tablet: var(--margin-tablet);
+  --spacing-margin-desktop: var(--margin-desktop);
+  --container-measure: var(--measure);
+  --spacing-container-max: var(--container-max);
 }
 
 :root {
@@ -113,10 +121,10 @@
   --surface: #ffffff;
   --on-surface: #1a1c1e;
   --on-surface-variant: #434656;
-  --surface-container: #EEF3FF;
-  --surface-variant: #DCE6FA;
+  --surface-container: #EEF1F8;
+  --surface-variant: #E1E6F0;
   --outline: #737688;
-  --outline-variant: #C4D5F8;
+  --outline-variant: #C8D0E0;
   --primary: #0052FF;
   --on-primary: #ffffff;
   --primary-container: #dce6ff;
@@ -144,7 +152,7 @@
 
   --neutral: #1a1c1e;
   --on-neutral: #ffffff;
-  --neutral-container: #DCE6FA;
+  --neutral-container: #D5DCEB;
   --on-neutral-container: #1a1c1e;
 
   /* Layered Ambient & Modal Shadows (Umbra + Penumbra) */
@@ -167,7 +175,6 @@
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: ease-in-out;
   --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
-  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
 
   --scale-large: 0.96;
   --scale-medium: 0.97;
@@ -182,6 +189,16 @@
 
   --blur-small: 2px;
   --blur-medium: 3px;
+
+  /* Spacing & Layout Tokens (DESIGN.md) */
+  --spacing-base: 0.5rem;
+  --gutter: 1.5rem;
+  --gutter-mobile: 1rem;
+  --margin-mobile: 1rem;
+  --margin-tablet: 2rem;
+  --margin-desktop: 4rem;
+  --container-max: 80rem;
+  --measure: 40rem;
 }
 
 /* Border Width Token Utility Classes */
@@ -219,13 +236,13 @@
   outline-offset: 2px;
 }
 
-/* Streamlined focus integration for form controls: merges border and focus ring to prevent double-box artifacts */
+/* Streamlined focus integration for form controls: pairs border-primary with standard floating focus ring */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   border-color: var(--primary);
   outline: 2px solid var(--primary);
-  outline-offset: 0px;
+  outline-offset: 2px;
 }
 
 button:focus-visible {
@@ -256,7 +273,7 @@ select:autofill {
   filter: none;
 }
 
-/* Reduced motion preference */
+/* Reduced motion preference: eliminates disruptive movement (transforms, translations, scale, bounce) while preserving accessible opacity fades */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
@@ -264,12 +281,29 @@ select:autofill {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Allow calm, non-vestibular opacity crossfades for dialogs, popovers, and status changes */
+  .transition-opacity,
+  [data-open],
+  [data-closed],
+  [data-starting-style],
+  [data-ending-style] {
+    transition-property: opacity !important;
+    transition-duration: var(--duration-quick, 150ms) !important;
+    transform: none !important;
+    filter: none !important;
+  }
 }
 
-/* Motion & Transition Utilities */
-@utility duration-instant {
-  transition-duration: var(--duration-instant);
-  animation-duration: var(--duration-instant);
+/* Canonical Motion & Transition Utilities */
+@utility duration-stagger {
+  transition-duration: var(--duration-stagger);
+  animation-duration: var(--duration-stagger);
+}
+
+@utility duration-micro {
+  transition-duration: var(--duration-micro);
+  animation-duration: var(--duration-micro);
 }
 
 @utility duration-quick {
@@ -277,19 +311,29 @@ select:autofill {
   animation-duration: var(--duration-quick);
 }
 
-@utility duration-moderate {
-  transition-duration: var(--duration-moderate);
-  animation-duration: var(--duration-moderate);
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+  animation-duration: var(--duration-fast);
 }
 
-@utility duration-deliberate {
-  transition-duration: var(--duration-deliberate);
-  animation-duration: var(--duration-deliberate);
+@utility duration-medium {
+  transition-duration: var(--duration-medium);
+  animation-duration: var(--duration-medium);
 }
 
-@utility duration-complex {
-  transition-duration: var(--duration-complex);
-  animation-duration: var(--duration-complex);
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
+  animation-duration: var(--duration-slow);
+}
+
+@utility duration-very-slow {
+  transition-duration: var(--duration-very-slow);
+  animation-duration: var(--duration-very-slow);
+}
+
+@utility duration-emphasis {
+  transition-duration: var(--duration-emphasis);
+  animation-duration: var(--duration-emphasis);
 }
 
 @utility stroke-dashoffset-0 {
@@ -297,11 +341,11 @@ select:autofill {
 }
 
 @utility animate-badge-pop {
-  animation: badge-pop-in var(--duration-very-slow, 500ms) cubic-bezier(0.34, 1.36, 0.64, 1) both;
+  animation: badge-pop-in var(--duration-quick, 150ms) cubic-bezier(0.34, 1.36, 0.64, 1) both;
 }
 
 @utility animate-error-shake {
-  animation: error-shake 250ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: error-shake 300ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @utility animate-text-reveal {
@@ -331,9 +375,8 @@ select:autofill {
 @utility animate-success-check {
   animation:
     t-check-fade var(--check-opacity-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    t-check-rotate var(--check-rotate-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    t-check-blur var(--check-blur-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    t-check-bob var(--check-bob-dur, 500ms) cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+    t-check-transform var(--check-transform-dur, 500ms) cubic-bezier(0.34, 1.35, 0.64, 1) forwards,
+    t-check-blur var(--check-blur-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @utility animate-check-draw {
@@ -366,20 +409,24 @@ select:autofill {
   0% {
     transform: translateX(0);
   }
-  20% {
+  16% {
     transform: translateX(calc(var(--shake-distance, 6px) * -1));
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  40% {
+  33% {
     transform: translateX(var(--shake-overshoot, 4px));
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  60% {
-    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.5));
+  50% {
+    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.75));
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  80% {
-    transform: translateX(calc(var(--shake-overshoot, 4px) * 0.25));
+  66% {
+    transform: translateX(calc(var(--shake-overshoot, 4px) * 0.5));
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  83% {
+    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.25));
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
   100% {
@@ -404,12 +451,10 @@ select:autofill {
   from {
     opacity: 0;
     transform: translateX(var(--distance-base, 8px));
-    filter: blur(var(--blur-medium, 3px));
   }
   to {
     opacity: 1;
     transform: translateX(0);
-    filter: blur(0);
   }
 }
 
@@ -417,12 +462,10 @@ select:autofill {
   from {
     opacity: 0;
     transform: translateX(calc(var(--distance-base, 8px) * -1));
-    filter: blur(var(--blur-medium, 3px));
   }
   to {
     opacity: 1;
     transform: translateX(0);
-    filter: blur(0);
   }
 }
 
@@ -475,6 +518,15 @@ select:autofill {
   }
 }
 
+@keyframes t-check-transform {
+  from {
+    transform: translateY(var(--check-y-amount, 40px)) rotate(var(--check-rotate-from, 80deg));
+  }
+  to {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
 @keyframes t-check-rotate {
   from {
     transform: rotate(var(--check-rotate-from, 80deg));
@@ -486,7 +538,7 @@ select:autofill {
 
 @keyframes t-check-blur {
   from {
-    filter: blur(var(--check-blur-from, 10px));
+    filter: blur(var(--check-blur-from, var(--blur-medium, 3px)));
   }
   to {
     filter: blur(0px);
@@ -537,6 +589,15 @@ select:autofill {
   text-wrap: balance;
 }
 
+@utility text-display-sm {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
 @utility text-headline-lg {
   font-family: var(--font-heading);
   font-size: 2rem;
@@ -577,6 +638,28 @@ select:autofill {
   text-wrap: pretty;
 }
 
+@utility text-body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+@utility text-caption {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+@utility text-code-md {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 @utility text-label-lg {
   font-family: var(--font-label);
   font-size: 0.875rem;
@@ -596,7 +679,7 @@ select:autofill {
 @utility text-label-sm {
   font-family: var(--font-label);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.35;
   letter-spacing: 0.03em;
 }
@@ -622,7 +705,6 @@ p, li {
   font-family: var(--typeset-font-body);
   font-size: var(--typeset-size);
   line-height: var(--typeset-leading);
-  max-width: 40rem;
 }
 
 .typeset h1, .typeset h2, .typeset h3, .typeset h4 {
@@ -654,7 +736,7 @@ p, li {
 .typeset p, .typeset ul, .typeset ol {
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
-  color: var(--on-surface-variant);
+  color: var(--on-surface);
   text-wrap: pretty;
 }
 
@@ -664,7 +746,7 @@ p, li {
   margin-top: var(--typeset-flow);
   margin-bottom: var(--typeset-flow);
   font-size: 1rem;
-  line-height: normal;
+  line-height: 1.5;
 }
 
 .typeset .not-typeset p,
@@ -764,14 +846,14 @@ form[data-tool-active] {
 @container sticky-nav scroll-state(stuck: top) {
   .sticky-nav-inner {
     background-color: var(--surface);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+    box-shadow: var(--shadow-ambient);
     border-bottom-color: var(--outline-variant);
   }
 }
 
 .sticky-nav-inner.is-stuck {
   background-color: var(--surface);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  box-shadow: var(--shadow-ambient);
   border-bottom-color: var(--outline-variant);
 }
 
@@ -803,5 +885,16 @@ form[data-tool-active] {
   .contain-layout {
     contain: layout style;
   }
+}
+
+/* Asymmetric corner utilities for InlineAlert and Toast */
+@utility rounded-r {
+  border-top-right-radius: var(--radius-default);
+  border-bottom-right-radius: var(--radius-default);
+}
+
+@utility rounded-r-default {
+  border-top-right-radius: var(--radius-default);
+  border-bottom-right-radius: var(--radius-default);
 }
 
