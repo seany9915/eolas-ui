@@ -84,7 +84,8 @@
       "utils",
       "button",
       "icon",
-      "progress"
+      "progress",
+      "tooltip"
     ]
   },
   {
@@ -156,7 +157,9 @@
     ],
     "registryDependencies": [
       "utils",
-      "icon"
+      "icon",
+      "button",
+      "tooltip"
     ]
   },
   {
@@ -200,7 +203,7 @@
     "name": "carousel",
     "type": "registry:ui",
     "title": "Carousel",
-    "description": "Eolas UI Carousel component built on Base UI and DESIGN.md design tokens.",
+    "description": "Carousel primitive built on embla-carousel-react and Base UI. Embla Carousel Documentation: https://www.embla-carousel.com/",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -211,7 +214,40 @@
       "utils",
       "button",
       "icon"
-    ]
+    ],
+    "meta": {
+      "taxonomy": [
+        "Provides horizontal and vertical cyclic or bounded content carousels and sliders.",
+        "Supports touch/drag gestures, physics-based momentum, and keyboard navigation (Arrow keys).",
+        "Follows DESIGN.md Tier B tokens: hairline borders (outline-variant), floating 2px focus rings, motion restraint (duration-quick, ease-standard), and accessible 44px touch targets.",
+        "Supports Google-style paired bottom controls with progress bars or floating side navigation."
+      ]
+    }
+  },
+  {
+    "name": "chain-of-thought",
+    "type": "registry:ui",
+    "title": "Chain Of Thought",
+    "description": "ChainOfThought primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite and `Chip` design tokens. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/chain-of-thought",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "trace",
+      "chip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays an AI agent's multi-step execution summary (e.g. \"Researched in 4 steps\") that smoothly expands to reveal historical reasoning, search, and tool steps.",
+        "Follows the shadcn AI Elements migration specification: Rebuilt natively using Trace and Chip/Badge primitives.",
+        "Exports: ChainOfThought, ChainOfThoughtHeader, ChainOfThoughtTrigger, ChainOfThoughtContent, ChainOfThoughtStep.",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on triggers.",
+        "Follows DESIGN.md tokens: floating 2px focus ring, semantic tokens, zero triple-tints."
+      ]
+    }
   },
   {
     "name": "chart",
@@ -227,6 +263,36 @@
     "registryDependencies": [
       "utils"
     ]
+  },
+  {
+    "name": "chat-message",
+    "type": "registry:ui",
+    "title": "Chat Message",
+    "description": "ChatMessage primitive. Base UI Integration: Works seamlessly with Base UI Button and Icon primitives.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "bot-avatar",
+      "trace",
+      "reasoning",
+      "tooltip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use ChatMessage to display conversational turns (user, assistant, system).",
+        "Follows DESIGN.md:",
+        "Assistant messages use neutral surface fill (`bg-surface`), outline-variant border, calibrated ambient elevation (`shadow-ambient`), and `rounded-2xl rounded-bl-xs`.",
+        "User messages use role container fill (`bg-primary-container text-on-primary-container`), `rounded-2xl rounded-br-xs`, and right alignment.",
+        "Actions (copy, bookmark, retry) maintain accessible 44x44px touch targets.",
+        "Numeric timestamps use `tabular-nums` and `font-mono`."
+      ]
+    }
   },
   {
     "name": "checkbox-group",
@@ -274,6 +340,33 @@
     }
   },
   {
+    "name": "checkpoint",
+    "type": "registry:ui",
+    "title": "Checkpoint",
+    "description": "Checkpoint primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "chip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Checkpoint to mark specific points or milestone states in a conversation thread that a user or clinical agent can return to (e.g. before modifying a clinical plan).",
+        "Conforms to shadcn AI Elements Checkpoint specification and DESIGN.md:",
+        "Balanced horizontal divider with neutral surface wash.",
+        "Accessible 44x44px touch target on the Restore trigger.",
+        "Monospace tabular-nums for turn numbering and timestamps.",
+        "Single-ring floating 2px focus indicator."
+      ]
+    }
+  },
+  {
     "name": "chip",
     "type": "registry:ui",
     "title": "Chip",
@@ -301,6 +394,30 @@
       "utils",
       "icon"
     ]
+  },
+  {
+    "name": "code-block",
+    "type": "registry:ui",
+    "title": "Code Block",
+    "description": "CodeBlock primitive. Base UI Integration: Consumes Base UI Tooltip and Button primitives. Specification & Reference: - https://ui.shadcn.com/docs/components/base/code-block - https://ui.shadcn.com/docs/ai-elements",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "tooltip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays source code, JSON telemetry parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
+        "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
+      ]
+    }
   },
   {
     "name": "collapsible",
@@ -342,6 +459,33 @@
         "Supports multi-selection with inline chips (Combobox.Chips, Combobox.Chip, Combobox.ChipRemove).",
         "For freeform text searches where custom unlisted queries are valid, use Autocomplete instead.",
         "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      ]
+    }
+  },
+  {
+    "name": "confirmation",
+    "type": "registry:ui",
+    "title": "Confirmation",
+    "description": "Confirmation primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "chip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Confirmation to present a human-in-the-loop consent or approval gate before an agentic tool executes a sensitive clinical or system action (e.g. updating a patient record, finalizing an assessment, or running an external write operation).",
+        "Conforms to shadcn AI Elements Confirmation specification and DESIGN.md:",
+        "High-contrast visual structure with calm clinical amber/neutral tokens.",
+        "Clear distinction between pending, approved, and denied states.",
+        "WCAG 2.2 compliant 44x44px touch targets on decision buttons.",
+        "Floating 2px focus rings (`outline-offset: 2px`)."
       ]
     }
   },
@@ -643,6 +787,34 @@
     ]
   },
   {
+    "name": "message-scroller",
+    "type": "registry:ui",
+    "title": "Message Scroller",
+    "description": "MessageScroller primitive suite. Base UI Integration: Consumes Base UI Button and Tooltip primitives. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/components/base/message-scroller",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "tooltip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "The foundational viewport engine for conversational AI interfaces, live transcripts, and clinical chat.",
+        "Handles smart auto-scrolling: follows incoming streamed tokens when the user is at the live edge, without hijacking the scroll position if the clinician scrolled up to review clinical history.",
+        "Turn Anchoring (`scrollAnchor`): Pins new prompt turns near the top with `scrollPreviousItemPeek` visible.",
+        "Jump-to-Latest Control: Smooth floating button to return to the live response edge with unread indicators.",
+        "Preserves scroll position on historical message prepends (`preserveScrollOnPrepend`).",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
+        "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic colors, zero triple-tints."
+      ]
+    }
+  },
+  {
     "name": "meter",
     "type": "registry:ui",
     "title": "Meter",
@@ -660,6 +832,32 @@
         "Displays a graphical meter representing a scalar value within a known range (e.g. disk space, battery level, audio volume).",
         "For task progress towards completion, use Progress instead.",
         "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+      ]
+    }
+  },
+  {
+    "name": "model-selector",
+    "type": "registry:ui",
+    "title": "Model Selector",
+    "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select primitive and Icon primitive.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "select",
+      "icon",
+      "tooltip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use ModelSelector in chat headers, sidebar toolbars, or prompt input footers to let users dynamically switch the active language model and adjust reasoning/thinking effort.",
+        "Conforms to shadcn AI Elements ModelSelector specification and DESIGN.md:",
+        "Compact, high-precision layout with 44x44px accessible touch bounds.",
+        "Clear distinction between model family (Gemini, Claude, GPT, Med-PaLM) and thinking depth.",
+        "Concentric radius, floating 2px focus ring (`outline-offset: 2px`)."
       ]
     }
   },
@@ -851,6 +1049,32 @@
     }
   },
   {
+    "name": "prompt-input",
+    "type": "registry:ui",
+    "title": "Prompt Input",
+    "description": "PromptInput primitive. Base UI Integration: Consumes Base UI Button, Textarea primitive, and Tooltip primitive.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon",
+      "textarea",
+      "tooltip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use PromptInput for conversational AI prompts, multi-turn clinical query inputs, and structured message composition.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+        "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
+        "Supports Enter to submit and Shift+Enter for newline insertion."
+      ]
+    }
+  },
+  {
     "name": "radio",
     "type": "registry:ui",
     "title": "Radio",
@@ -894,10 +1118,36 @@
     }
   },
   {
+    "name": "reasoning",
+    "type": "registry:ui",
+    "title": "Reasoning",
+    "description": "Reasoning primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/reasoning",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "trace"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays an AI agent's live or historical thinking process as it streams or settles.",
+        "Supports both declarative compound composition: <Reasoning isStreaming={isStreaming}> <ReasoningTrigger /> <ReasoningContent>{reasoningText}</ReasoningContent> </Reasoning> and shorthand invocation: <Reasoning duration=\"1.8s\">{reasoningText}</Reasoning>",
+        "Manages the dynamic transition:",
+        "While streaming: active spinning indicator, \"Thinking...\", auto-expanded to show thought stream.",
+        "When complete: psychology icon, \"Thought\", formatted elapsed duration badge, auto-collapsed.",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on disclosure triggers.",
+        "Follows DESIGN.md tokens: floating 2px focus ring, semantic colors, and zero triple-tints."
+      ]
+    }
+  },
+  {
     "name": "resizable",
     "type": "registry:ui",
     "title": "Resizable",
-    "description": "Eolas UI Resizable component built on Base UI and DESIGN.md design tokens.",
+    "description": "Resizable component primitive built on react-resizable-panels. React Resizable Panels Documentation: https://github.com/bvaughn/react-resizable-panels",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -905,9 +1155,15 @@
       "react-resizable-panels"
     ],
     "registryDependencies": [
-      "utils",
-      "icon"
-    ]
+      "utils"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Provides accessible, draggable multi-pane layouts (split views, sidebars, inspection panels).",
+        "Supports keyboard navigation (Arrow keys, Home, End), touch targets, and min/max constraints.",
+        "Follows DESIGN.md Tier B tokens: hairline 1px track (outline-variant), 12px touch-safe hit area, refined capsule pill drag handle (rounded-full, bg-surface, primary hover/active feedback), and floating 2px focus ring."
+      ]
+    }
   },
   {
     "name": "scroll-area",
@@ -1021,6 +1277,34 @@
     ]
   },
   {
+    "name": "sidebar",
+    "type": "registry:ui",
+    "title": "Sidebar",
+    "description": "Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture). Shadcn UI Reference: https://ui.shadcn.com/docs/components/base/sidebar",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "tooltip",
+      "button",
+      "input",
+      "separator",
+      "skeleton",
+      "icon"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Composable, mobile-responsive application navigation shell and collapsible rail.",
+        "On desktop viewports (>= md), renders a stationary or collapsible `<aside>` navigation bar (supporting icon-rail, off-canvas, floating, and inset variants).",
+        "On mobile/tablet viewports (< md), automatically delegates to a touch-friendly Base UI modal Drawer with swipe dismissal and backdrop blur.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets (min 44x44px), and calibrated motion restraint."
+      ]
+    }
+  },
+  {
     "name": "skeleton",
     "type": "registry:ui",
     "title": "Skeleton",
@@ -1052,6 +1336,33 @@
         "Allows users to make selections from a range of values along a horizontal or vertical track.",
         "Supports single-value or multi-thumb range selections with collision behaviors ('push', 'swap', 'none').",
         "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint."
+      ]
+    }
+  },
+  {
+    "name": "sources",
+    "type": "registry:ui",
+    "title": "Sources",
+    "description": "Sources primitive. Base UI Integration: Works with Base UI Collapsible and Tooltip primitives.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon",
+      "tooltip"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Sources to render grounded clinical citations, evidence base references, and trial literature.",
+        "Follows DESIGN.md:",
+        "Pattern 2 chip styling (neutral surface fill, outline-variant border, high-contrast text).",
+        "Never uses triple-tint monochrome styling.",
+        "Never uses hand-rolled native browser tooltips (`title` attribute); all citations and inline footnote markers consume the Base UI Tooltip primitive for full keyboard and touch accessibility.",
+        "All clickable citations maintain WCAG 2.2 SC 2.5.8 compliant 44px touch targets.",
+        "Floating focus rings on links and triggers."
       ]
     }
   },
@@ -1138,6 +1449,33 @@
     ]
   },
   {
+    "name": "suggestion-chips",
+    "type": "registry:ui",
+    "title": "Suggestion Chips",
+    "description": "SuggestionChips primitive. Base UI Integration: Uses Base UI Button foundation.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "button",
+      "icon"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use SuggestionChips to surface starter queries, recommended clinical questions, and protocol exploration prompts.",
+        "Follows DESIGN.md:",
+        "Pattern 2 chip styling (neutral surface fill, outline-variant border, hover secondary-container/40).",
+        "Never uses triple-tint monochrome styling.",
+        "WCAG 2.2 SC 2.5.8 compliant 44px minimum touch target.",
+        "Floating 2px focus ring with 2px offset.",
+        "Strictly adheres to the 5-item stagger cap if animated."
+      ]
+    }
+  },
+  {
     "name": "swipe-reveal",
     "type": "registry:ui",
     "title": "Swipe Reveal",
@@ -1198,6 +1536,8 @@
         "A data table primitive supporting standard horizontal scroll or responsive container-query card stacking.",
         "When responsive=\"stack\", transforms rows into accessible stacked cards on narrow container widths (@container width < 600px).",
         "Implements explicit column header semantics (scope=\"col\") and 56px minimum row heights for OS text zoom adaptability.",
+        "Supports column-level alignment ('left' | 'right' | 'center') and automatic tabular number formatting (numeric: true).",
+        "Numerical columns (percentages, scores, durations, metrics) right-align both headers and cells with tabular-nums.",
         "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
       ]
     }
@@ -1223,6 +1563,30 @@
         "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
         "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
         "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
+      ]
+    }
+  },
+  {
+    "name": "task",
+    "type": "registry:ui",
+    "title": "Task",
+    "description": "Task primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/task",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "trace"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays dynamic steps an AI agent takes sequentially as it executes work (e.g., reading files, running queries, making edits).",
+        "Unlike `Plan` (which renders predetermined future steps), `Task` visualizes real-time execution where each new step is discovered as previous ones finish.",
+        "Exports: Task, TaskTrigger, TaskContent, TaskItem.",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on interactive elements.",
+        "Follows DESIGN.md tokens: floating 2px focus ring, semantic tokens, zero triple-tints."
       ]
     }
   },
@@ -1313,22 +1677,6 @@
     ]
   },
   {
-    "name": "thinking-trace",
-    "type": "registry:ui",
-    "title": "Thinking Trace",
-    "description": "Eolas UI Thinking Trace component built on Base UI and DESIGN.md design tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "registryDependencies": [
-      "utils",
-      "collapsible",
-      "icon"
-    ]
-  },
-  {
     "name": "toast",
     "type": "registry:ui",
     "title": "Toast",
@@ -1405,6 +1753,33 @@
     ]
   },
   {
+    "name": "tool",
+    "type": "registry:ui",
+    "title": "Tool",
+    "description": "Tool primitive (ToolCall). Base UI Integration: Consumes Base UI Collapsible primitive, Button primitive, and Icon primitive.",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon",
+      "chip",
+      "code-block"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Use Tool to represent an agent tool invocation from input parameters to returned output, supporting live execution states ('calling', 'complete', 'error').",
+        "Conforms to shadcn AI Elements Tool specification and DESIGN.md:",
+        "High-contrast visual hierarchy with calm neutral container fill.",
+        "Monospace font for tool function names and JSON argument inspection.",
+        "Accessible Collapsible disclosure with rotation chevron and keyboard navigation.",
+        "Integrates seamlessly with CodeBlock for syntax-highlighted parameters."
+      ]
+    }
+  },
+  {
     "name": "toolbar",
     "type": "registry:ui",
     "title": "Toolbar",
@@ -1442,6 +1817,30 @@
     "registryDependencies": [
       "utils"
     ]
+  },
+  {
+    "name": "trace",
+    "type": "registry:ui",
+    "title": "Trace",
+    "description": "Trace primitive suite. Base UI Integration: Consumes `@base-ui/react/collapsible` for headless accessible disclosures. Specification & Reference: - https://ui.shadcn.com/docs/components/base/trace - https://ui.shadcn.com/docs/ai-elements",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "icon",
+      "button"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Universal primitive for AI agent execution lifecycle: step-by-step reasoning, tool calls, multi-stage task plans, error stack traces, and agent activity logs.",
+        "Replaces monolithic steppers with a flexible, composable compound architecture.",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
+        "Strictly follows DESIGN.md tokens: floating 2px focus ring (outline-offset: 2px), concentric radius, and semantic high-contrast colors without monochrome triple-tints."
+      ]
+    }
   },
   {
     "name": "view-transition",
@@ -1483,6 +1882,33 @@
       "radio",
       "input"
     ]
+  },
+  {
+    "name": "chat",
+    "type": "registry:block",
+    "title": "Chat",
+    "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `EmptyState` (`src/components/ui/empty-state.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "message-scroller",
+      "chat-message",
+      "prompt-input",
+      "suggestion-chips",
+      "empty-state"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Controlled presentational chat workspace assembling the streaming viewport engine, assistant/user messages, suggestion prompts, and message composer.",
+        "Pure UI: receives items via props, emits intents via callbacks. Zero direct fetch or auth.",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive elements.",
+        "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic high-contrast colors, concentric radius, zero triple-tints."
+      ]
+    }
   },
   {
     "name": "delete-confirmation-dialog",
@@ -1536,5 +1962,50 @@
       "chip",
       "icon"
     ]
+  },
+  {
+    "name": "plan",
+    "type": "registry:block",
+    "title": "Plan",
+    "description": "Plan composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "trace",
+      "progress"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays an AI agent's multi-step plan determined up-front before execution (e.g., a 4-stage minimal pair therapy drill, clinical phonological assessment plan).",
+        "Tracks progress with a progress bar and completion counter (e.g. \"2 of 4 done\"). <Plan title=\"...\" steps={[...]} /> and declarative compound composition: <Plan defaultOpen> <PlanHeader> <PlanTitle>Assessment Plan</PlanTitle> <PlanDescription>2 of 4 done</PlanDescription> <PlanTrigger /> </PlanHeader> <PlanContent>...</PlanContent> </Plan>",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
+      ]
+    }
+  },
+  {
+    "name": "queue",
+    "type": "registry:block",
+    "title": "Queue",
+    "description": "Queue composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [
+      "utils",
+      "trace"
+    ],
+    "meta": {
+      "taxonomy": [
+        "Displays an AI agent's dynamic queue / to-do list, cleanly partitioned into remaining tasks ('To do') and finished tasks ('Completed').",
+        "As the agent works, tasks transition across sections. <Queue items={[...]} /> and declarative compound composition: <Queue> <Queue.Section title=\"2 to do\" status=\"pending\"> <Queue.Item title=\"Task 1\" status=\"pending\" /> </Queue.Section> </Queue>",
+        "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
+      ]
+    }
   }
 ]

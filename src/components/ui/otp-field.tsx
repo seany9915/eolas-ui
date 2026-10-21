@@ -145,7 +145,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
                 className={cn(
                   'w-10 @sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg @sm:text-xl font-bold rounded',
                   'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
-                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
                   'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
                   error ? 'border-error focus-visible:border-error focus-visible:outline-error' : 'border-outline'
                 )}

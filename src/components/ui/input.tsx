@@ -101,15 +101,21 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
     lg: 'h-14 min-h-[56px] text-base',
   }[size];
 
+  // Symmetrical icon inset balance: edge-to-icon gap equals icon-to-text gap
   const paddingClasses = size === 'sm'
     ? cn(
         hasLeading ? 'pl-10' : 'pl-3.5',
         hasTrailing ? (showClear || trailingAction ? 'pr-12' : 'pr-10') : 'pr-3.5'
       )
-    : cn(
-        hasLeading ? 'pl-11' : 'pl-4',
-        hasTrailing ? (showClear || trailingAction ? 'pr-14' : 'pr-11') : 'pr-4'
-      );
+    : size === 'lg'
+      ? cn(
+          hasLeading ? 'pl-14' : 'pl-4.5',
+          hasTrailing ? (showClear || trailingAction ? 'pr-16' : 'pr-14') : 'pr-4.5'
+        )
+      : cn(
+          hasLeading ? 'pl-12' : 'pl-4',
+          hasTrailing ? (showClear || trailingAction ? 'pr-14' : 'pr-12') : 'pr-4'
+        );
 
   const inputElement = (
     <BaseInput
@@ -119,7 +125,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
         'w-full rounded bg-surface text-on-surface font-sans transition-[border-color,box-shadow]',
         sizeClasses,
         paddingClasses,
-        'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
         'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
         'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
@@ -138,7 +144,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
     <div className="relative flex items-center w-full">
       {leadingIcon && (
         <span
-          className="text-on-surface-variant absolute left-3.5 flex items-center pointer-events-none text-xl select-none z-10"
+          className={cn(
+            'text-on-surface-variant absolute flex items-center pointer-events-none select-none z-10',
+            size === 'sm' ? 'left-3 text-lg' : size === 'lg' ? 'left-4 text-2xl' : 'left-3.5 text-xl'
+          )}
           aria-hidden="true"
         >
           {leadingIcon}
@@ -148,8 +157,15 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(({
       {effectiveTrailing && (
         <span
           className={cn(
-            'absolute flex items-center text-xl z-10',
-            (trailingAction || showClear) ? 'right-1 text-on-surface' : 'right-3.5 text-on-surface-variant pointer-events-none select-none'
+            'absolute flex items-center z-10',
+            size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl',
+            (trailingAction || showClear)
+              ? 'right-1 text-on-surface'
+              : size === 'sm'
+                ? 'right-3 text-on-surface-variant pointer-events-none select-none'
+                : size === 'lg'
+                  ? 'right-4 text-on-surface-variant pointer-events-none select-none'
+                  : 'right-3.5 text-on-surface-variant pointer-events-none select-none'
           )}
         >
           {effectiveTrailing}

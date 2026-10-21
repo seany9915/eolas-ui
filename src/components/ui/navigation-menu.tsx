@@ -8,16 +8,19 @@ export interface NavigationSubItem {
   href?: string;
   description?: string;
   icon?: string;
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export interface NavigationMenuItemData {
   id: string;
   label: string;
+  shortLabel?: string;
   href?: string;
   description?: string;
   icon?: string;
   active?: boolean;
   children?: NavigationSubItem[];
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export type NavigationMenuItem = NavigationMenuItemData;
@@ -28,7 +31,7 @@ export const NavigationMenuList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.List
     ref={ref}
-    className={cn('flex flex-1 list-none items-center gap-1.5 p-1 bg-surface border-b border-outline-variant w-full', className)}
+    className={cn('flex flex-1 list-none items-center gap-2 px-1 bg-surface border-b border-outline-variant w-full', className)}
     {...props}
   />
 ));
@@ -36,17 +39,26 @@ NavigationMenuList.displayName = 'NavigationMenuList';
 
 export const NavigationMenuItemPrimitive = BaseNavigationMenu.Item;
 
+export interface NavigationMenuTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Trigger> {
+  active?: boolean;
+}
+
 export const NavigationMenuTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Trigger>
->(({ className, children, ...props }, ref) => (
+  NavigationMenuTriggerProps
+>(({ className, children, active = false, ...props }, ref) => (
   <BaseNavigationMenu.Trigger
     ref={ref}
+    aria-current={active ? 'page' : undefined}
     className={cn(
-      'group inline-flex min-h-[44px] h-11 w-max items-center justify-center px-4 py-2 font-label text-sm font-semibold transition-colors outline-none cursor-pointer rounded-md border-b-2 border-transparent text-on-surface-variant',
-      'hover:text-primary hover:bg-surface-container',
-      'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container data-[popup-open]:border-primary',
+      'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
+      'hover:text-on-surface hover:bg-surface-container/60',
+      'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container/40',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      active
+        ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-primary after:rounded-none'
+        : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-transparent after:rounded-none',
       className
     )}
     {...props}
@@ -78,21 +90,44 @@ export const NavigationMenuContent = React.forwardRef<
 ));
 NavigationMenuContent.displayName = 'NavigationMenuContent';
 
+export interface NavigationMenuLinkProps
+  extends React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Link> {
+  active?: boolean;
+  variant?: 'default' | 'bar';
+}
+
 export const NavigationMenuLink = React.forwardRef<
   HTMLAnchorElement,
-  React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Link>
->(({ className, ...props }, ref) => (
-  <BaseNavigationMenu.Link
-    ref={ref}
-    className={cn(
-      'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded-md transition-colors cursor-pointer outline-none select-none',
-      'text-on-surface hover:bg-surface-container focus:bg-surface-container',
-      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-      className
-    )}
-    {...props}
-  />
-));
+  NavigationMenuLinkProps
+>(({ className, active = false, variant = 'default', ...props }, ref) => {
+  const isBar = variant === 'bar';
+
+  return (
+    <BaseNavigationMenu.Link
+      ref={ref}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        isBar
+          ? cn(
+              'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
+              active
+                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-primary after:rounded-none'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-transparent after:rounded-none',
+              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+            )
+          : cn(
+              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded-md transition-colors cursor-pointer outline-none select-none',
+              active
+                ? 'bg-primary-container text-on-primary-container font-semibold'
+                : 'text-on-surface hover:bg-surface-container focus:bg-surface-container',
+              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+            ),
+        className
+      )}
+      {...props}
+    />
+  );
+});
 NavigationMenuLink.displayName = 'NavigationMenuLink';
 
 export const NavigationMenuPositioner = React.forwardRef<
@@ -219,48 +254,83 @@ function NavigationMenuComponent<Value = string>({
         <>
           <NavigationMenuList>
             {items?.map((item) => {
-              const isActive = item.active || activeId === item.id;
+              const isChildActive = item.children?.some((child) => child.id === activeId);
+              const isActive = Boolean(item.active || activeId === item.id || isChildActive);
               const hasChildren = item.children && item.children.length > 0;
 
               if (hasChildren) {
                 return (
                   <BaseNavigationMenu.Item key={item.id} value={item.id as Value} className="relative">
-                    <NavigationMenuTrigger
-                      className={cn(
-                        isActive && 'border-primary text-primary font-bold'
-                      )}
-                    >
+                    <NavigationMenuTrigger active={isActive}>
                       {item.icon && (
-                        <span className="material-symbols-outlined text-lg mr-2" aria-hidden="true">
+                        <span className="material-symbols-outlined text-lg mr-2 leading-none" aria-hidden="true">
                           {item.icon}
                         </span>
                       )}
-                      <span>{item.label}</span>
+                      <span className={cn(item.shortLabel && 'hidden xl:inline')}>{item.label}</span>
+                      {item.shortLabel && (
+                        <span className="inline xl:hidden whitespace-nowrap">{item.shortLabel}</span>
+                      )}
                       <NavigationMenuIcon />
                     </NavigationMenuTrigger>
 
                     <NavigationMenuContent>
-                      <div className="flex flex-col gap-1">
-                        {item.children?.map((sub) => (
-                          <NavigationMenuLink
-                            key={sub.id}
-                            href={sub.href || '#'}
-                          >
-                            <div className="flex items-center gap-2 font-sans text-sm font-semibold">
-                              {sub.icon && (
-                                <span className="material-symbols-outlined text-base" aria-hidden="true">
-                                  {sub.icon}
+                      <div className="flex flex-col gap-1 p-1">
+                        {item.children?.map((sub) => {
+                          const isSubActive = activeId === sub.id;
+                          return (
+                            <NavigationMenuLink
+                              key={sub.id}
+                              href={sub.href || `#${sub.id}`}
+                              active={isSubActive}
+                              onClick={(e) => {
+                                if (sub.onClick) {
+                                  if (!sub.href || sub.href === '#' || sub.href.startsWith('#')) {
+                                    e.preventDefault();
+                                  }
+                                  sub.onClick(e);
+                                }
+                              }}
+                              className={cn(
+                                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg transition-colors cursor-pointer outline-none select-none text-left',
+                                isSubActive
+                                  ? 'bg-primary-container text-on-primary-container font-semibold'
+                                  : 'text-on-surface hover:bg-surface-container focus:bg-surface-container'
+                              )}
+                            >
+                              <div className="flex items-center gap-2 font-sans text-sm font-semibold">
+                                {sub.icon && (
+                                  <span
+                                    className={cn(
+                                      'material-symbols-outlined text-base leading-none',
+                                      isSubActive ? 'text-primary' : 'text-on-surface-variant'
+                                    )}
+                                    aria-hidden="true"
+                                  >
+                                    {sub.icon}
+                                  </span>
+                                )}
+                                <span>{sub.label}</span>
+                                {isSubActive && (
+                                  <span className="material-symbols-outlined text-base ml-auto text-primary leading-none" aria-hidden="true">
+                                    check
+                                  </span>
+                                )}
+                              </div>
+                              {sub.description && (
+                                <span
+                                  className={cn(
+                                    'font-sans text-xs leading-relaxed',
+                                    sub.icon ? 'pl-6' : '',
+                                    isSubActive ? 'text-on-primary-container/85' : 'text-on-surface-variant'
+                                  )}
+                                >
+                                  {sub.description}
                                 </span>
                               )}
-                              <span>{sub.label}</span>
-                            </div>
-                            {sub.description && (
-                              <span className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                                {sub.description}
-                              </span>
-                            )}
-                          </NavigationMenuLink>
-                        ))}
+                            </NavigationMenuLink>
+                          );
+                        })}
                       </div>
                     </NavigationMenuContent>
                   </BaseNavigationMenu.Item>
@@ -269,24 +339,29 @@ function NavigationMenuComponent<Value = string>({
 
               return (
                 <BaseNavigationMenu.Item key={item.id} value={item.id as Value}>
-                  <BaseNavigationMenu.Link
-                    href={item.href || '#'}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={cn(
-                      'inline-flex min-h-[44px] h-11 w-max items-center justify-center px-4 py-2 font-label text-sm font-semibold transition-colors outline-none cursor-pointer rounded-md border-b-2',
-                      isActive
-                        ? 'border-primary text-primary font-bold'
-                        : 'border-transparent text-on-surface-variant hover:text-primary hover:bg-surface-container',
-                      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                    )}
+                  <NavigationMenuLink
+                    href={item.href || `#${item.id}`}
+                    variant="bar"
+                    active={isActive}
+                    onClick={(e) => {
+                      if (item.onClick) {
+                        if (!item.href || item.href === '#' || item.href.startsWith('#')) {
+                          e.preventDefault();
+                        }
+                        item.onClick(e);
+                      }
+                    }}
                   >
                     {item.icon && (
-                      <span className="material-symbols-outlined text-lg mr-2" aria-hidden="true">
+                      <span className="material-symbols-outlined text-lg mr-2 leading-none" aria-hidden="true">
                         {item.icon}
                       </span>
                     )}
-                    <span>{item.label}</span>
-                  </BaseNavigationMenu.Link>
+                    <span className={cn(item.shortLabel && 'hidden xl:inline')}>{item.label}</span>
+                    {item.shortLabel && (
+                      <span className="inline xl:hidden whitespace-nowrap">{item.shortLabel}</span>
+                    )}
+                  </NavigationMenuLink>
                 </BaseNavigationMenu.Item>
               );
             })}

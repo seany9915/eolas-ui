@@ -96,7 +96,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         aria-label={!label ? ariaLabel || 'Switch' : ariaLabel}
         aria-labelledby={ariaLabelBy}
         className={cn(
-          'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none',
+          'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
           'bg-surface-variant',
           error ? 'border-error focus-visible:outline-error' : 'border-outline',
           'data-[checked]:bg-primary data-[checked]:border-primary',

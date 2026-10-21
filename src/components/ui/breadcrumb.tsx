@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
+import { UnstyledButton } from './button';
+import { Tooltip } from './tooltip';
 
 export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {
   separator?: React.ReactNode;
@@ -92,27 +94,31 @@ export const BreadcrumbSeparator = ({
 );
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 
-export interface BreadcrumbEllipsisProps extends React.ComponentPropsWithoutRef<'button'> {}
+export interface BreadcrumbEllipsisProps extends React.ComponentPropsWithoutRef<'button'> {
+  tooltipContent?: React.ReactNode;
+}
 
 export const BreadcrumbEllipsis = React.forwardRef<HTMLButtonElement, BreadcrumbEllipsisProps>(
-  ({ className, children, ...props }, ref) => (
-    <button
-      ref={ref}
-      type="button"
-      aria-label="More links"
-      className={cn(
-        'inline-flex min-h-[44px] min-w-[44px] size-11 items-center justify-center rounded-sm text-outline hover:text-on-surface hover:bg-surface-container transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 select-none cursor-pointer',
-        className
-      )}
-      {...props}
-    >
-      {children ?? (
-        <>
-          <Icon name="more_horiz" size="sm" className="text-base" aria-hidden="true" />
-          <span className="sr-only">More links</span>
-        </>
-      )}
-    </button>
+  ({ className, children, tooltipContent = 'More links', ...props }, ref) => (
+    <Tooltip content={tooltipContent}>
+      <UnstyledButton
+        ref={ref}
+        type="button"
+        aria-label="More links"
+        className={cn(
+          'inline-flex min-h-[44px] min-w-[44px] size-11 items-center justify-center rounded-sm text-outline hover:text-on-surface hover:bg-surface-container transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 select-none cursor-pointer',
+          className
+        )}
+        {...props}
+      >
+        {children ?? (
+          <>
+            <Icon name="more_horiz" size="sm" className="text-base" aria-hidden="true" />
+            <span className="sr-only">More links</span>
+          </>
+        )}
+      </UnstyledButton>
+    </Tooltip>
   )
 );
 BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis';

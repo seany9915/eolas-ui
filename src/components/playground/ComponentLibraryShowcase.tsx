@@ -44,7 +44,13 @@ import { DirectionProvider, type TextDirection } from '@/components/ui/direction
 import { ThinkingOrb, type OrbState } from '@/components/ui/thinking-orb';
 import { BotAvatar, botAvatarTypes, type BotAvatarType, type BotAvatarState } from '@/components/ui/bot-avatar';
 import { Icon } from '@/components/ui/icon';
-import { ThinkingTrace } from '@/components/ui/thinking-trace';
+import { Trace } from '@/components/ui/trace';
+import { CodeBlock } from '@/components/ui/code-block';
+import { Reasoning } from '@/components/ui/reasoning';
+import { ChainOfThought } from '@/components/ui/chain-of-thought';
+import { Task } from '@/components/ui/task';
+import { Plan } from '@/components/blocks/plan';
+import { Queue } from '@/components/blocks/queue';
 import { ApprovalCard } from '@/components/blocks/approval-card';
 import { ClinicianTip } from '@/components/ui/clinician-tip';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis } from '@/components/ui/breadcrumb';
@@ -53,7 +59,27 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { Textarea, TextareaField } from '@/components/ui/textarea';
 import { Attachment } from '@/components/ui/attachment';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselDots } from '@/components/ui/carousel';
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuBadge,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+  SidebarRail,
+  SidebarInset,
+} from '@/components/ui/sidebar';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselDots, CarouselProgressBar, CarouselCounter, CarouselControls } from '@/components/ui/carousel';
 import { StepWizard } from '@/components/ui/step-wizard';
 import { NumberRoll } from '@/components/ui/number-roll';
 import { SuccessCheck } from '@/components/ui/success-check';
@@ -62,6 +88,586 @@ import { ErrorShake } from '@/components/ui/error-shake';
 import { ShimmerText } from '@/components/ui/shimmer-text';
 import { TextsReveal, TextsRevealLine } from '@/components/ui/texts-reveal';
 import { NotificationBadge } from '@/components/ui/notification-badge';
+import { PromptInput } from '@/components/ui/prompt-input';
+import { ChatMessage } from '@/components/ui/chat-message';
+import {
+  MessageScroller,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerButton,
+} from '@/components/ui/message-scroller';
+import { Chat } from '@/components/blocks/chat';
+import { Sources, SourcesCitationRef, type SourceCitation } from '@/components/ui/sources';
+import { SuggestionChips, type SuggestionItem } from '@/components/ui/suggestion-chips';
+import { Checkpoint } from '@/components/ui/checkpoint';
+import { Confirmation, type ConfirmationStatus } from '@/components/ui/confirmation';
+import { Tool } from '@/components/ui/tool';
+import { ModelSelector, type ThinkingEffort } from '@/components/ui/model-selector';
+
+interface AttachedFileItem {
+  id: string;
+  fileName: string;
+  fileType: 'audio' | 'pdf' | 'image' | 'video' | 'document' | 'generic';
+  fileSize: string;
+}
+
+const sampleAttachmentTemplates: AttachedFileItem[] = [
+  {
+    id: 'att-1',
+    fileName: 'initial_phonology_screener.pdf',
+    fileType: 'pdf',
+    fileSize: '420 KB',
+  },
+  {
+    id: 'att-2',
+    fileName: 'vocal_tract_recording.wav',
+    fileType: 'audio',
+    fileSize: '1.2 MB',
+  },
+  {
+    id: 'att-3',
+    fileName: 'articulation_card_preview.png',
+    fileType: 'image',
+    fileSize: '310 KB',
+  },
+];
+
+const starterSuggestions: SuggestionItem[] = [
+  {
+    id: 'sug-1',
+    label: 'Minimal pairs for /s/ stopping',
+    prompt: 'What are the top 5 minimal pairs for /s/ stopping into [t] in word-initial position?',
+    icon: 'record_voice_over',
+  },
+  {
+    id: 'sug-2',
+    label: 'Draft parent-friendly home guide',
+    prompt: 'Draft concise, parent-friendly wording explaining auditory discrimination practice at home.',
+    icon: 'family_restroom',
+  },
+  {
+    id: 'sug-3',
+    label: 'Classroom TA accommodations',
+    prompt: 'What simple accommodations can a teaching assistant use during classroom reading circles?',
+    icon: 'school',
+  },
+  {
+    id: 'sug-4',
+    label: 'Progression criteria to clusters',
+    prompt: 'What percentage accuracy threshold determines progression from singletons to consonant clusters?',
+    icon: 'verified',
+  },
+];
+
+interface ConversationalAIShowcaseSectionProps {
+  showToast: (
+    title: string,
+    description?: string,
+    type?: 'success' | 'info' | 'warning' | 'error'
+  ) => void;
+}
+
+const ConversationalAIShowcaseSection = React.memo<ConversationalAIShowcaseSectionProps>(
+  ({ showToast }) => {
+    const [promptInputVal, setPromptInputVal] = React.useState('');
+    const [isAiStreaming, setIsAiStreaming] = React.useState(false);
+    const [bookmarkedChatIds, setBookmarkedChatIds] = React.useState<Set<string>>(new Set(['m2']));
+    const [attachedFiles, setAttachedFiles] = React.useState<AttachedFileItem[]>([
+      sampleAttachmentTemplates[0],
+    ]);
+    const [selectedModel, setSelectedModel] = React.useState('gemini-2.5-pro');
+    const [thinkingEffort, setThinkingEffort] = React.useState<ThinkingEffort>('medium');
+    const [confirmationStatus, setConfirmationStatus] = React.useState<ConfirmationStatus>('pending');
+    const [chatTurnHistory, setChatTurnHistory] = React.useState<
+      Array<{
+        id: string;
+        role: 'user' | 'assistant';
+        content: string;
+        timestamp: number;
+        thoughtSteps?: string[];
+        citations?: SourceCitation[];
+      }>
+    >([
+      {
+        id: 'm1',
+        role: 'user',
+        content:
+          'How should I sequence phonological contrast pairs for a 5-year-old child stopping fricatives /s/ to [t]?',
+        timestamp: Date.now() - 1000 * 60 * 6,
+      },
+      {
+        id: 'm2',
+        role: 'assistant',
+        content:
+          'Begin with near-minimal pairs in the word-initial position where auditory discrimination is clearest. Contrast /s/ (voiceless alveolar fricative) against [t] (voiceless alveolar stop) using high-imageability nouns like **sea** vs **tea**, and **sink** vs **tank**.\n\nEnsure perception trials reach 80% accuracy across 20 trials before advancing to motor production chaining.',
+        timestamp: Date.now() - 1000 * 60 * 5,
+        thoughtSteps: [
+          'EHR profile: 5yo, moderate phonological delay without organic dyspraxia',
+          'Acoustic contrast: isolated manner of articulation (+continuant vs -continuant)',
+          'Synthesised perception-first protocol per Baker & McLeod (2011)',
+        ],
+        citations: [
+          {
+            id: 'c1',
+            title: 'Baker & McLeod — Interventions for Speech Sound Disorders in Children',
+            url: 'https://doi.org/10.1044/1058-0360',
+            domain: 'asha.org',
+          },
+          {
+            id: 'c2',
+            title: 'RCSLT Clinical Guidance — Developmental Speech Sound Disorders',
+            url: 'https://www.rcslt.org/speech-sound-disorders',
+            domain: 'rcslt.org',
+          },
+        ],
+      },
+    ]);
+
+    const handleAiSend = (textToSend?: string) => {
+      const text = textToSend || promptInputVal.trim();
+      if (!text) return;
+
+      const userMsgId = 'u-' + Date.now();
+      setChatTurnHistory((prev) => [
+        ...prev,
+        {
+          id: userMsgId,
+          role: 'user',
+          content: text,
+          timestamp: Date.now(),
+        },
+      ]);
+      setPromptInputVal('');
+      setIsAiStreaming(true);
+
+      setTimeout(() => {
+        setChatTurnHistory((prev) => [
+          ...prev,
+          {
+            id: 'a-' + Date.now(),
+            role: 'assistant',
+            content:
+              'For "' +
+              text +
+              '": Recommendations emphasize tactile-proprioceptive cues alongside auditory discrimination cards. Prompt the child to feel continuous airflow on the back of their hand for /s/ before transitioning to minimal pair contrasts.',
+            timestamp: Date.now(),
+            thoughtSteps: [
+              'Analyzed target query against developmental normative bands',
+              'Cross-referenced articulation motor chaining benchmarks',
+            ],
+            citations: [
+              {
+                id: 'c3',
+                title: 'Tyler et al. — Minimal Pair Intervention in Children',
+                url: 'https://pubs.asha.org/doi/10.1044/jslhr',
+                domain: 'asha.org',
+              },
+            ],
+          },
+        ]);
+        setIsAiStreaming(false);
+        showToast('Assistant Response Generated', 'New clinical guidance added to turn history.', 'info');
+      }, 1100);
+    };
+
+    return (
+      <section className="space-y-4">
+        <div className="border-b border-outline-variant pb-2">
+          <h3 className="font-heading text-xl font-bold text-on-surface">
+            22. Conversational AI & Agentic Primitives (PromptInput, ChatMessage, Sources, SuggestionChips)
+          </h3>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Comprehensive agentic primitives conforming to Base UI and shadcn AI Elements: auto-resizing prompt composer with Shift+Enter and stop states, multi-role message bubbles with thought disclosure, collapsible citation lists, and clinical starter suggestions.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main Conversational Thread with PromptInput */}
+          <div className="lg:col-span-8">
+            <Card variant="default" className="h-full flex flex-col justify-between">
+              <div className="p-6 space-y-6 flex-1 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+                        <Icon name="psychology" size="md" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <h4 className="font-heading text-base font-bold text-on-surface leading-tight">
+                          Clinical Chat Thread (Interactive Turn History)
+                        </h4>
+                        <p className="font-sans text-xs text-on-surface-variant">
+                          Rendered via ChatMessage with Trace and Sources integration
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <ModelSelector
+                        model={selectedModel}
+                        onModelChange={setSelectedModel}
+                        effort={thinkingEffort}
+                        onEffortChange={setThinkingEffort}
+                        size="sm"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outlined"
+                        colorRole="neutral"
+                        onClick={() => {
+                          setChatTurnHistory([]);
+                          showToast('Conversation Reset', 'Chat turn history cleared.', 'info');
+                        }}
+                        className="text-xs h-8 px-2.5"
+                      >
+                        <Icon name="refresh" size="xs" aria-hidden="true" />
+                        <span>Reset</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Message Stream with MessageScroller Engine */}
+                  <div className="relative min-h-[300px] max-h-[480px] h-[380px] rounded-lg bg-background border border-outline-variant/50 overflow-hidden">
+                    <MessageScrollerProvider autoScroll>
+                      <MessageScroller className="h-full">
+                        <MessageScrollerViewport>
+                          <MessageScrollerContent className="p-3 space-y-3">
+                            {chatTurnHistory.length === 0 ? (
+                              <div className="p-8 text-center space-y-2">
+                                <Icon name="chat_bubble_outline" size="lg" className="text-outline mx-auto" aria-hidden="true" />
+                                <p className="font-heading text-sm font-semibold text-on-surface">No active messages</p>
+                                <p className="font-sans text-xs text-on-surface-variant max-w-sm mx-auto">
+                                  Select a starter prompt below or enter a clinical question in the PromptInput composer.
+                                </p>
+                              </div>
+                            ) : (
+                              chatTurnHistory.map((msg, idx) => (
+                                <React.Fragment key={msg.id}>
+                                  <MessageScrollerItem
+                                    messageId={msg.id}
+                                    scrollAnchor={msg.role === 'user'}
+                                  >
+                                    <ChatMessage
+                                      role={msg.role}
+                                      authorName={msg.role === 'user' ? 'Lead Clinician' : 'Eolas Clinical Agent'}
+                                      timestamp={msg.timestamp}
+                                      botType={msg.role === 'assistant' ? 'clover' : undefined}
+                                      content={
+                                        <div className="space-y-1.5">
+                                          <p className="whitespace-pre-wrap">{msg.content}</p>
+                                        </div>
+                                      }
+                                      thoughtSteps={msg.thoughtSteps}
+                                      citations={
+                                        msg.citations && msg.citations.length > 0 ? (
+                                          <Sources sources={msg.citations} collapsible={true} defaultOpen={false} />
+                                        ) : undefined
+                                      }
+                                      isBookmarked={bookmarkedChatIds.has(msg.id)}
+                                      onBookmark={() => {
+                                        setBookmarkedChatIds((prev) => {
+                                          const next = new Set(prev);
+                                          if (next.has(msg.id)) {
+                                            next.delete(msg.id);
+                                            showToast('Removed from Library', 'Clinical response removed from bookmarks.', 'info');
+                                          } else {
+                                            next.add(msg.id);
+                                            showToast('Saved to Library', 'Clinical response bookmarked in clinical knowledge base.', 'success');
+                                          }
+                                          return next;
+                                        });
+                                      }}
+                                      onCopy={() => {
+                                        navigator.clipboard?.writeText(msg.content);
+                                        showToast('Copied to Clipboard', 'Clinical message text copied.', 'info');
+                                      }}
+                                      onRetry={() => {
+                                        showToast('Regenerating', 'Requesting alternate phrasing...', 'info');
+                                        handleAiSend(msg.content);
+                                      }}
+                                    />
+                                  </MessageScrollerItem>
+                                  {idx === 1 && (
+                                    <Checkpoint
+                                      turn={1}
+                                      tag="Baseline Plan"
+                                      timestamp={Date.now() - 1000 * 60 * 5}
+                                      onRestore={() => {
+                                        setChatTurnHistory((prev) => prev.slice(0, 2));
+                                        showToast('Checkpoint Restored', 'Conversation history reverted to Turn 1.', 'info');
+                                      }}
+                                    />
+                                  )}
+                                </React.Fragment>
+                              ))
+                            )}
+
+                            {isAiStreaming && (
+                              <div className="flex items-center gap-3 p-3 bg-surface rounded-2xl rounded-bl-xs border border-outline-variant text-xs text-on-surface-variant shadow-ambient">
+                                <ThinkingOrb state="solving" size="sm" className="shrink-0" />
+                                <span className="font-medium text-on-surface">Agent synthesizing clinical protocol...</span>
+                              </div>
+                            )}
+                          </MessageScrollerContent>
+                        </MessageScrollerViewport>
+
+                        {/* Floating Jump-to-bottom control */}
+                        <MessageScrollerButton />
+                      </MessageScroller>
+                    </MessageScrollerProvider>
+                  </div>
+
+                  {/* Starter Suggestion Chips */}
+                  <div className="pt-1">
+                    <SuggestionChips
+                      suggestions={starterSuggestions}
+                      onSelect={(prompt) => handleAiSend(prompt)}
+                      label="Quick Clinical Queries (Click to Send):"
+                      layout="wrap"
+                      variant="compact"
+                    />
+                  </div>
+                  {/* Human-in-the-Loop Confirmation Gate */}
+                  <div className="pt-1">
+                    <Confirmation
+                      status={confirmationStatus}
+                      title="Clinical Protocol Consent Required"
+                      description="Agent requests authorization to export therapy transcripts and motor progress notes to the NHS EHR."
+                      riskLevel="medium"
+                      onApprove={() => {
+                        setConfirmationStatus('approved');
+                        showToast('Action Approved', 'Protocol export authorized.', 'success');
+                      }}
+                      onDeny={() => {
+                        setConfirmationStatus('denied');
+                        showToast('Action Denied', 'Protocol export cancelled by clinician.', 'warning');
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* PromptInput Composer */}
+                <div className="pt-3 border-t border-outline-variant/60 space-y-2">
+                  <span className="font-label text-xs font-bold text-on-surface-variant block">
+                    PromptInput Composer (field-sizing auto-grow, Shift+Enter, attachment tray)
+                  </span>
+
+                  <PromptInput
+                    value={promptInputVal}
+                    onValueChange={setPromptInputVal}
+                    onSubmit={() => handleAiSend()}
+                    onStop={() => {
+                      setIsAiStreaming(false);
+                      showToast('Generation Cancelled', 'Agent processing stopped by clinician.', 'warning');
+                    }}
+                    isLoading={isAiStreaming}
+                    placeholder="Ask about speech therapy protocols, minimal pairs, or session notes..."
+                    attachments={
+                      attachedFiles.length > 0 ? (
+                        <>
+                          {attachedFiles.map((file) => (
+                            <PromptInput.Attachment
+                              key={file.id}
+                              fileName={file.fileName}
+                              fileType={file.fileType}
+                              fileSize={file.fileSize}
+                              onRemove={() => {
+                                setAttachedFiles((prev) => prev.filter((f) => f.id !== file.id));
+                                showToast('Attachment Removed', `${file.fileName} detached from prompt.`, 'warning');
+                              }}
+                            />
+                          ))}
+                        </>
+                      ) : undefined
+                    }
+                    actionsStart={
+                      <div className="flex items-center gap-1">
+                        <Tooltip
+                          content={
+                            attachedFiles.length >= sampleAttachmentTemplates.length
+                              ? 'Max sample attachments reached'
+                              : 'Attach sample clinical document'
+                          }
+                        >
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            colorRole="neutral"
+                            size="sm"
+                            disabled={attachedFiles.length >= sampleAttachmentTemplates.length}
+                            onClick={() => {
+                              const nextAttachment = sampleAttachmentTemplates.find(
+                                (t) => !attachedFiles.some((f) => f.id === t.id)
+                              );
+                              if (nextAttachment) {
+                                setAttachedFiles((prev) => [...prev, nextAttachment]);
+                                showToast('Attachment Added', `${nextAttachment.fileName} attached to prompt composer.`, 'success');
+                              }
+                            }}
+                            aria-label="Attach sample document"
+                            className="size-8 min-h-[32px] min-w-[32px] p-0 text-on-surface-variant hover:text-primary"
+                          >
+                            <Icon name="attach_file" size="xs" aria-hidden="true" />
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    }
+                    hint="Shift + Enter for new line • Enter to submit"
+                    submitLabel="Send Prompt"
+                    stopLabel="Cancel"
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Lateral Column: SuggestionCards & Standalone Sources */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* SuggestionChips Stacked Card Mode */}
+            <Card variant="default">
+              <div className="p-6 space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">
+                    SuggestionChips (Card Variant)
+                  </h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Full-width stacked cards for protocol exploration with accessible 44px touch targets.
+                  </p>
+                </div>
+
+                <SuggestionChips
+                  suggestions={starterSuggestions.slice(0, 3)}
+                  onSelect={(prompt) => {
+                    setPromptInputVal(prompt);
+                    showToast('Prompt Injected', 'Query copied into the prompt input bar.', 'info');
+                  }}
+                  label="Explore Protocol Scenarios:"
+                  layout="stack"
+                  variant="card"
+                />
+
+                <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                  Pattern 2 neutral surface fill with high-contrast text and 44px min-height
+                </span>
+              </div>
+            </Card>
+
+            {/* Standalone Grounding Sources */}
+            <Card variant="default">
+              <div className="p-6 space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">
+                    Sources & Inline Citation Ref
+                  </h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Grounded trial citations and inline footnote anchors.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-lg bg-surface-container/60 border border-outline-variant/60 space-y-2">
+                  <span className="font-label text-xs font-semibold text-on-surface block">
+                    Inline Text Integration:
+                  </span>
+                  <p className="font-sans text-xs text-on-surface leading-relaxed">
+                    Perception training before production chaining yields higher generalization across fricative targets{' '}
+                    <SourcesCitationRef
+                      index={1}
+                      title="Baker & McLeod (2011)"
+                      href="https://doi.org/10.1044/1058-0360"
+                    />
+                    , especially when paired with high-frequency contrast stimuli{' '}
+                    <SourcesCitationRef
+                      index={2}
+                      title="RCSLT Clinical Guidance (2023)"
+                      href="https://www.rcslt.org/speech-sound-disorders"
+                    />
+                    .
+                  </p>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-outline-variant/40">
+                  <span className="font-label text-xs font-semibold text-on-surface block">
+                    Static Sources List:
+                  </span>
+                  <Sources
+                    collapsible={false}
+                    sources={[
+                      {
+                        id: 's-ex-1',
+                        title: 'Acoustic voice analysis guidelines in pediatric dysphonia',
+                        url: 'https://doi.org/10.1044/2020_JSLHR',
+                        domain: 'asha.org',
+                      },
+                      {
+                        id: 's-ex-2',
+                        title: 'NICE Guidelines: Speech sound disorders in children',
+                        url: 'https://www.nice.org.uk/guidance/conditions/speech-disorders',
+                        domain: 'nice.org.uk',
+                      },
+                    ]}
+                  />
+                </div>
+
+                <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                  WCAG 2.2 external link indicators with auto-parsed hostname badges
+                </span>
+              </div>
+            </Card>
+
+            {/* Tool & ToolCall Execution Primitive */}
+            <Card variant="default">
+              <div className="p-6 space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">
+                    Tool & ToolCall Execution
+                  </h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Direct tracking of agent tool invocations from parameters to returned output.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Tool
+                    name="queryClinicalGuidelines"
+                    status="complete"
+                    duration="0.3s"
+                    input={{
+                      patientAge: 5,
+                      targetPhoneme: '/s/',
+                      contrastPhoneme: '/t/',
+                      protocol: 'minimal_pairs',
+                    }}
+                    output={{
+                      guidelineSource: 'RCSLT Clinical Guidance (2023)',
+                      recommendedTrials: 20,
+                      criterionAccuracy: '80%',
+                      recommendedStimuli: ['sea vs tea', 'sink vs tank'],
+                    }}
+                    defaultOpen={true}
+                  />
+
+                  <Tool
+                    name="exportCarePlanToEHR"
+                    status="calling"
+                    duration="0.8s"
+                    input={{ format: 'FHIR-R4', recordId: 'patient-492' }}
+                  />
+                </div>
+
+                <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                  Collapsible Base UI disclosure with syntax-highlighted CodeBlock parameters
+                </span>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+    );
+  }
+);
+ConversationalAIShowcaseSection.displayName = 'ConversationalAIShowcaseSection';
 
 export const ComponentLibraryShowcase: React.FC = () => {
   const [toastState, setToastState] = React.useState<{
@@ -118,6 +724,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
   const [successTrigger, setSuccessTrigger] = React.useState(1);
   const [swapState, setSwapState] = React.useState(false);
   const [shakeTrigger, setShakeTrigger] = React.useState(0);
+  const [activeSidebarNav, setActiveSidebarNav] = React.useState('caseload');
   const [badgeCount, setBadgeCount] = React.useState(3);
   const [clinicalNotes, setClinicalNotes] = React.useState('Patient demonstrates clear vocal onset with reduced glottal attack across all sustained vowel repetitions.');
 
@@ -561,7 +1168,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
             Tier A modal overlays (2px border, backdrop scrim, modal shadow) with aligned trigger controls.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card variant="default" className="h-full">
             <div className="p-6 h-full flex flex-col justify-between space-y-4">
               <div>
@@ -573,6 +1180,21 @@ export const ComponentLibraryShowcase: React.FC = () => {
               </div>
               <Button colorRole="primary" onClick={() => setDialogOpen(true)}>
                 Open Confirmation Dialog
+              </Button>
+            </div>
+          </Card>
+
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div>
+                <span className="font-label text-xs font-bold text-on-surface-variant block mb-1">Destructive alert tier</span>
+                <h4 className="font-heading text-base font-bold text-on-surface">Critical Alert Dialog</h4>
+                <p className="font-sans text-xs text-on-surface-variant mt-1">
+                  Urgent modal dialog layer designed for high-consequence destructive actions with explicit accessibility alert roles.
+                </p>
+              </div>
+              <Button colorRole="error" onClick={() => setAlertDialogOptionsOpen(true)}>
+                Open Alert Dialog
               </Button>
             </div>
           </Card>
@@ -592,6 +1214,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
             </div>
           </Card>
 
+          {/* Dialog, AlertDialog & Drawer controlled overlays */}
           <Dialog
             open={dialogOpen}
             onOpenChange={setDialogOpen}
@@ -599,6 +1222,15 @@ export const ComponentLibraryShowcase: React.FC = () => {
             description="Your current exercise attempt will be recorded in your clinical milestone history."
             confirmLabel="Save Record"
             onConfirm={() => showToast('Progress Saved', 'Exercise attempt recorded in clinical milestone history.', 'success')}
+          />
+
+          <AlertDialog
+            open={alertDialogOptionsOpen}
+            onOpenChange={setAlertDialogOptionsOpen}
+            title="Permanently Delete Patient Telemetry Logs?"
+            description="This action cannot be undone. All 48kHz audio recordings and pitch glide harmonic logs for this patient will be permanently removed from Cloud Firestore."
+            confirmLabel="Delete Telemetry Records"
+            onConfirm={() => showToast('Telemetry Records Purged', 'All 48kHz audio recordings and pitch glide logs were permanently removed from Cloud Firestore.', 'error')}
           />
 
           <Drawer
@@ -960,9 +1592,10 @@ export const ComponentLibraryShowcase: React.FC = () => {
             columns={[
               { header: 'Patient Name', accessor: 'patientName' },
               { header: 'Assigned Drill', accessor: 'exercise' },
-              { header: 'Accuracy Rate', accessor: 'accuracy' },
+              { header: 'Accuracy Rate', accessor: 'accuracy', numeric: true },
               {
                 header: 'Status',
+                align: 'center',
                 accessor: (row) => (
                   <Chip
                     label={row.status}
@@ -1146,6 +1779,186 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </div>
         </div>
       </section>
+
+          {/* 14b. Sidebar Primitive Showcase */}
+          <div className="space-y-3">
+            <span className="font-label text-xs font-bold text-on-surface-variant block">
+              Base UI `Sidebar` Primitive (shadcn/ui Parity &amp; Responsive Drawer)
+            </span>
+            <div className="h-[460px] w-full border border-outline-variant rounded-lg relative overflow-hidden bg-surface flex shadow-ambient">
+              <SidebarProvider defaultOpen={true} embedded className="min-h-0 h-full w-full">
+                <Sidebar collapsible="icon" embedded className="h-full">
+                  <SidebarHeader>
+                    <div className="flex items-center gap-2.5 px-2 py-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
+                      <div className="size-9 rounded-md bg-primary-container flex items-center justify-center shrink-0">
+                        <Icon name="clinical_notes" size="md" className="text-primary" />
+                      </div>
+                      <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
+                        <span className="font-heading text-sm font-bold truncate text-on-surface leading-tight">
+                          ClinSLT Suite
+                        </span>
+                        <span className="font-sans text-[11px] text-on-surface-variant truncate leading-tight">
+                          Clinical Workspace
+                        </span>
+                      </div>
+                    </div>
+                  </SidebarHeader>
+                  <SidebarContent>
+                    <SidebarGroup>
+                      <SidebarGroupLabel>Clinical Workflow</SidebarGroupLabel>
+                      <SidebarGroupContent>
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              isActive={activeSidebarNav === 'caseload'}
+                              onClick={() => setActiveSidebarNav('caseload')}
+                              tooltip="Caseload Management"
+                            >
+                              <Icon name="group" />
+                              <span>Caseload</span>
+                            </SidebarMenuButton>
+                            <SidebarMenuBadge>18</SidebarMenuBadge>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              isActive={activeSidebarNav === 'sessions'}
+                              onClick={() => setActiveSidebarNav('sessions')}
+                              tooltip="Therapy Sessions"
+                            >
+                              <Icon name="event_note" />
+                              <span>Sessions</span>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              isActive={activeSidebarNav === 'assessments'}
+                              onClick={() => setActiveSidebarNav('assessments')}
+                              tooltip="Clinical Assessments"
+                            >
+                              <Icon name="quiz" />
+                              <span>Assessments</span>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </SidebarGroupContent>
+                    </SidebarGroup>
+                    <SidebarGroup>
+                      <SidebarGroupLabel>Interventions</SidebarGroupLabel>
+                      <SidebarGroupContent>
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              isActive={activeSidebarNav === 'phonology'}
+                              onClick={() => setActiveSidebarNav('phonology')}
+                              tooltip="Phonology Therapy"
+                            >
+                              <Icon name="record_voice_over" />
+                              <span>Phonology</span>
+                            </SidebarMenuButton>
+                            <SidebarMenuSub>
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  isActive={activeSidebarNav === 'minimal-pairs'}
+                                  onClick={() => setActiveSidebarNav('minimal-pairs')}
+                                  size="sm"
+                                >
+                                  <span>Minimal Pairs</span>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  isActive={activeSidebarNav === 'auditory-discrimination'}
+                                  onClick={() => setActiveSidebarNav('auditory-discrimination')}
+                                  size="sm"
+                                >
+                                  <span>Auditory Discrimination</span>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            </SidebarMenuSub>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              isActive={activeSidebarNav === 'morphosyntax'}
+                              onClick={() => setActiveSidebarNav('morphosyntax')}
+                              tooltip="Grammar and Syntax"
+                            >
+                              <Icon name="account_tree" />
+                              <span>Morphosyntax</span>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              isActive={activeSidebarNav === 'storybuild'}
+                              onClick={() => setActiveSidebarNav('storybuild')}
+                              tooltip="Narrative Tools"
+                            >
+                              <Icon name="auto_stories" />
+                              <span>StoryBuild</span>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </SidebarGroupContent>
+                    </SidebarGroup>
+                  </SidebarContent>
+                  <SidebarFooter>
+                    <div className="flex items-center gap-2.5 p-1 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center overflow-hidden">
+                      <Avatar fallback="SJ" alt="Dr. Sarah Jenkins" size="sm" />
+                      <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
+                        <span className="font-label text-xs font-semibold truncate text-on-surface">Dr. S. Jenkins</span>
+                        <span className="font-sans text-[11px] text-on-surface-variant truncate">Band 7 Specialist SLT</span>
+                      </div>
+                    </div>
+                  </SidebarFooter>
+                  <SidebarRail />
+                </Sidebar>
+                <SidebarInset className="p-6 bg-surface flex flex-col justify-between overflow-y-auto">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-outline-variant/60 pb-3">
+                      <div className="flex items-center gap-3">
+                        <SidebarTrigger />
+                        <div>
+                          <h4 className="font-heading text-lg font-bold text-on-surface capitalize">
+                            {activeSidebarNav.replace('-', ' ')}
+                          </h4>
+                          <span className="font-label text-xs text-on-surface-variant">
+                            Active ClinSLT Clinical Module
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-mono text-xs px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-semibold">
+                        Selected: {activeSidebarNav}
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-surface-container/30 border border-outline-variant/60 space-y-2">
+                      <span className="font-label text-xs font-semibold text-primary block">
+                        Controlled Mode Integration
+                      </span>
+                      <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
+                        {activeSidebarNav === 'caseload' && '18 active patients under active care. Caseload filtering by risk and review schedule.'}
+                        {activeSidebarNav === 'sessions' && '3 therapy sessions scheduled today. 1 assessment review pending signature.'}
+                        {activeSidebarNav === 'assessments' && 'Standardized assessment batteries: CELF-5, DEAP, and South Tyneside Assessment of Phonology.'}
+                        {activeSidebarNav === 'phonology' && 'Targeting velar fronting and stopping of fricatives across 4 contrast sets.'}
+                        {activeSidebarNav === 'minimal-pairs' && 'Minimal pairs contrast drill active: /t/ vs /k/ contrast discrimination cards.'}
+                        {activeSidebarNav === 'auditory-discrimination' && 'Same/different discrimination training: 20 acoustic pairs with visual confirmation.'}
+                        {activeSidebarNav === 'morphosyntax' && 'Expressive grammar development: third-person singular -s and past tense -ed.'}
+                        {activeSidebarNav === 'storybuild' && 'Narrative generation: 5-stage story mountain scaffold with character goal prompt.'}
+                      </p>
+                    </div>
+
+                    <p className="font-sans text-xs text-on-surface-variant/80">
+                      Press <kbd className="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant font-mono text-xs text-primary font-bold">Ctrl+B</kbd> to toggle icon-rail mode. Hover over rail icons to verify tooltips.
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-md bg-surface-container/40 border border-outline-variant/60 flex items-center justify-between mt-4">
+                    <span className="font-label text-xs text-on-surface-variant font-medium">Responsive Viewport Handling</span>
+                    <span className="font-label text-xs font-semibold text-primary">Base UI Drawer &lt; 768px (Auto-detected)</span>
+                  </div>
+                </SidebarInset>
+              </SidebarProvider>
+            </div>
+          </div>
 
       {/* 15. Utility & Gauge Primitives */}
       <section className="space-y-4">
@@ -1522,6 +2335,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <BaseButton
                   key={item.state}
                   type="button"
+                  aria-label={`Switch agent orb state to ${item.label}`}
                   onClick={() => setOrbState(item.state)}
                   className={cn(
                     'flex items-center gap-2.5 p-3 rounded-lg border text-left transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] cursor-pointer min-h-13',
@@ -1553,38 +2367,91 @@ export const ComponentLibraryShowcase: React.FC = () => {
       {/* 18. AI Agent Workflows & Clinical Decision Support */}
       <section className="space-y-4">
         <div className="border-b border-outline-variant pb-2">
-          <h3 className="font-heading text-xl font-bold text-on-surface">18. AI Agent Workflows & Clinical Guidance (ThinkingTrace, ApprovalCard, ClinicianTip)</h3>
+          <h3 className="font-heading text-xl font-bold text-on-surface">18. AI Agent Workflows & Clinical Guidance (Trace, ApprovalCard, ClinicianTip)</h3>
           <p className="font-sans text-xs text-on-surface-variant">
-            Multi-step reasoning disclosure panels, human-in-the-loop decision approval cards, and dual-variant clinical tips (unboxed inside cards, inset with wash).
+            Multi-step agent trace disclosure suite (shadcn-aligned): collapsible reasoning disclosures, tool execution lines with payload inspection, active streaming actions, human-in-the-loop decision approval cards, and dual-variant clinical tips.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* ThinkingTrace & ClinicianTip */}
+          {/* Trace & ClinicianTip */}
           <Card variant="default" className="h-full">
             <div className="p-6 h-full flex flex-col justify-between space-y-6">
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-heading text-base font-bold text-on-surface">ThinkingTrace (Reasoning Audit Trail)</h4>
+                  <h4 className="font-heading text-base font-bold text-on-surface">Trace (Agent Execution & Reasoning Suite)</h4>
                   <p className="font-sans text-xs text-on-surface-variant mt-1">
-                    Collapsible agent reasoning disclosure with step-by-step progress duration and elapsed timing.
+                    Universal execution stream for reasoning steps, tool calling payloads, and in-flight operations with accessible Base UI collapsible disclosures.
                   </p>
                 </div>
 
-                <ThinkingTrace
-                  title="Clinical reasoning & EHR cross-reference"
-                  elapsedTime="1.8s"
-                  defaultOpen={true}
-                  steps={[
-                    { id: 's1', label: 'EHR baseline retrieved (NHS No. 948 201 4920)', duration: '0.4s', isComplete: true },
-                    { id: 's2', label: 'Acoustic pitch jitter evaluated against clinical normative bands', duration: '0.9s', isComplete: true },
-                    { id: 's3', label: 'Synthesising next-stage consonant cluster recommendation', duration: '0.5s', icon: 'pending', isComplete: false },
-                  ]}
-                >
-                  <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                    Patient completed 5 sustained vowel repetitions with 92% pitch stability. Harmonic jitter fell below the 1.8% pathology threshold. Model recommends advancing to plosive consonants /b/ and /p/.
-                  </p>
-                </ThinkingTrace>
+                <Trace variant="card">
+                  {/* Step 1: Collapsible Reasoning Line */}
+                  <Trace.Collapsible defaultOpen={true}>
+                    <Trace.CollapsibleTrigger>
+                      <Trace.Line status="complete">
+                        <Trace.Icon name="psychology" status="complete" />
+                        <Trace.Title>Clinical reasoning & EHR cross-reference</Trace.Title>
+                        <Trace.Description>
+                          <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">1.8s</span>
+                        </Trace.Description>
+                      </Trace.Line>
+                    </Trace.CollapsibleTrigger>
+                    <Trace.CollapsibleContent>
+                      <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                        Patient completed 5 sustained vowel repetitions with 92% pitch stability. Harmonic jitter fell below the 1.8% pathology threshold. Model recommends advancing to plosive consonants /b/ and /p/.
+                      </p>
+                    </Trace.CollapsibleContent>
+                  </Trace.Collapsible>
+
+                  {/* Step 2: Tool Call Execution with Collapsible Code/JSON output */}
+                  <Trace.Collapsible defaultOpen={false}>
+                    <Trace.CollapsibleTrigger>
+                      <Trace.Line status="complete">
+                        <Trace.Icon name="terminal" status="complete" />
+                        <Trace.Title>Executed tool: queryAcousticNorms()</Trace.Title>
+                        <Trace.Description>
+                          <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">0.4s</span>
+                        </Trace.Description>
+                      </Trace.Line>
+                    </Trace.CollapsibleTrigger>
+                    <Trace.CollapsibleContent>
+                      <div className="space-y-1.5 pt-1">
+                        <span className="font-label text-xs font-semibold text-on-surface block">Returned Telemetry Payload:</span>
+                        <CodeBlock language="json">
+                          <CodeBlock.Header>
+                            <CodeBlock.Title>telemetry.json</CodeBlock.Title>
+                            <CodeBlock.Actions>
+                              <CodeBlock.CopyButton value={JSON.stringify({ patientId: 'NHS-9482', f0Mean: 182.4, jitterPercent: 1.12, shimmerDb: 0.18, normativeStatus: 'within_normal_limits' }, null, 2)} />
+                            </CodeBlock.Actions>
+                          </CodeBlock.Header>
+                          <CodeBlock.Content>
+                            {JSON.stringify({ patientId: 'NHS-9482', f0Mean: 182.4, jitterPercent: 1.12, shimmerDb: 0.18, normativeStatus: 'within_normal_limits' }, null, 2)}
+                          </CodeBlock.Content>
+                        </CodeBlock>
+                      </div>
+                    </Trace.CollapsibleContent>
+                  </Trace.Collapsible>
+
+                  {/* Step 3: Active in-flight agent action */}
+                  <Trace.Line status="running">
+                    <Trace.Icon name="progress_activity" status="running" />
+                    <Trace.Title>Synthesising next-stage consonant cluster recommendation...</Trace.Title>
+                    <Trace.Description>
+                      <span className="font-mono text-[11px] tabular-nums text-primary font-medium">streaming</span>
+                    </Trace.Description>
+                  </Trace.Line>
+                </Trace>
+
+                {/* Reasoning Component Showcase */}
+                <div className="pt-2 space-y-2">
+                  <span className="font-label text-xs font-bold text-on-surface-variant block">
+                    Reasoning Wrapper (Streaming Thought Lifecycle)
+                  </span>
+                  <Reasoning duration="1.8s" defaultOpen={false}>
+                    The clinical model evaluated Arthur&apos;s vocal stability across 5 sustained vowel repetitions. Harmonic jitter fell below the 1.8% threshold, indicating sufficient motor control to progress to fricative and plosive pairs.
+                  </Reasoning>
+                </div>
 
                 {/* ClinicianTip Showcase (Dual Variants) */}
                 <div className="pt-4 border-t border-outline-variant/60 space-y-3">
@@ -1660,6 +2527,203 @@ export const ComponentLibraryShowcase: React.FC = () => {
 
               <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
                 Radio selection, optional custom textarea override, and stepped navigation
+              </span>
+            </div>
+          </Card>
+        </div>
+
+        {/* Row 2: Plan & Queue Specialized Compositions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+          {/* Plan Composition */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">Plan (Predetermined Multi-Step Execution)</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Specialized Trace composition with a step progress bar, ratio counter, and expandable step actions with clinical notes.
+                  </p>
+                </div>
+
+                <Plan
+                  title="4-Stage Minimal Pair Drill Plan"
+                  description="Clinical articulation sequence designed for /s/ vs /θ/ contrast."
+                  steps={[
+                    {
+                      id: 'step-1',
+                      title: 'Acoustic Baseline Calibration',
+                      description: 'Verify ambient noise < 35dB and record 3 vowel phonations.',
+                      status: 'complete',
+                      duration: '1.2s',
+                      details: 'Ambient noise registered at 28dB. Baseline F0 calculated at 182Hz.',
+                    },
+                    {
+                      id: 'step-2',
+                      title: 'Auditory Discrimination Test',
+                      description: 'Patient identifies sound contrasts across 10 audio trials.',
+                      status: 'complete',
+                      duration: '4.5s',
+                      details: '10/10 correct pair discrimination recorded.',
+                    },
+                    {
+                      id: 'step-3',
+                      title: 'Minimal Pair Production: "sink" vs "think"',
+                      description: 'Live phonetic transcription and formant jitter evaluation.',
+                      status: 'running',
+                      duration: 'streaming',
+                      details: 'Awaiting 4th repetition of target phoneme /θ/.',
+                    },
+                    {
+                      id: 'step-4',
+                      title: 'Clinical Milestone Summary & Record Update',
+                      description: 'Persist exercise telemetry into Cloud Firestore.',
+                      status: 'pending',
+                    },
+                  ]}
+                />
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Calculates completion ratios and renders Base UI Collapsible step details
+              </span>
+            </div>
+          </Card>
+
+          {/* Queue Composition */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">Queue (Batch Execution & Task Tracking)</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Split-section queue organizing operations into Pending ("To do") and Completed batches with collapsible group toggles.
+                  </p>
+                </div>
+
+                <Queue
+                  title="Session Audio Processing Queue"
+                  description="Batch acoustic extraction and phonetic alignment jobs."
+                  items={[
+                    {
+                      id: 'job-1',
+                      title: 'Arthur Dent - Audio Segment 01 (Vowel Phonation)',
+                      duration: '0.8s',
+                      status: 'complete',
+                    },
+                    {
+                      id: 'job-2',
+                      title: 'Arthur Dent - Audio Segment 02 (Pitch Glides)',
+                      duration: '1.4s',
+                      status: 'complete',
+                    },
+                    {
+                      id: 'job-3',
+                      title: 'Arthur Dent - Audio Segment 03 (Minimal Pairs)',
+                      status: 'running',
+                    },
+                    {
+                      id: 'job-4',
+                      title: 'Trillian Astra - Audio Segment 01 (Baseline Calibration)',
+                      status: 'pending',
+                    },
+                  ]}
+                />
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Segmented sections for Remaining and Completed agent operations
+              </span>
+            </div>
+          </Card>
+        </div>
+
+        {/* Row 3: ChainOfThought & Task (AI Elements Spec) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+          {/* ChainOfThought */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">ChainOfThought (Historical Action Summary)</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Summary disclosure with step counts and chip indicators expanding into historical tool executions.
+                  </p>
+                </div>
+
+                <ChainOfThought defaultOpen={true}>
+                  <ChainOfThought.Header title="Researched patient acoustic norms" stepCount={3} badgeLabel="completed" />
+                  <ChainOfThought.Content>
+                    <ChainOfThought.Step
+                      title="Queried NHS Phonological Database"
+                      description="Retrieved age-matched normative formant frequencies."
+                      duration="0.4s"
+                      status="complete"
+                      icon="database"
+                    />
+                    <ChainOfThought.Step
+                      title="Computed F0 Baseline Harmonic Ratio"
+                      description="Mean pitch 182Hz within 95% confidence interval."
+                      duration="0.8s"
+                      status="complete"
+                      icon="analytics"
+                    />
+                    <ChainOfThought.Step
+                      title="Generated Target Consonant Pairs"
+                      description="Formulated minimal pair contrasts for /s/ vs /θ/."
+                      duration="0.6s"
+                      status="complete"
+                      icon="check_circle"
+                    />
+                  </ChainOfThought.Content>
+                </ChainOfThought>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Compound API: Header, Trigger, Content, Step built on Trace and Chip
+              </span>
+            </div>
+          </Card>
+
+          {/* Task */}
+          <Card variant="default" className="h-full">
+            <div className="p-6 h-full flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-heading text-base font-bold text-on-surface">Task (Dynamic Discovered Workflows)</h4>
+                  <p className="font-sans text-xs text-on-surface-variant mt-1">
+                    Step-by-step agent workflow where future steps emerge in real time as previous tools complete.
+                  </p>
+                </div>
+
+                <Task defaultOpen={true}>
+                  <Task.Trigger title="Clinical Voice Analysis Workflow" status="running" duration="streaming" />
+                  <Task.Content>
+                    <Task.Item
+                      title="Audio Stream Ingested (48kHz Mono)"
+                      description="Zero packet drops detected over WebSocket stream."
+                      duration="0.2s"
+                      status="complete"
+                      icon="mic"
+                    />
+                    <Task.Item
+                      title="Jitter & Shimmer Fast Fourier Transform"
+                      description="Harmonic noise ratio computed at 22.4dB."
+                      duration="0.5s"
+                      status="complete"
+                      icon="equalizer"
+                    />
+                    <Task.Item
+                      title="Evaluating Formant Glides for Minimal Pair Drill"
+                      description="Synthesising auditory feedback prompt..."
+                      status="running"
+                      icon="progress_activity"
+                    />
+                  </Task.Content>
+                </Task>
+              </div>
+
+              <span className="font-label text-xs text-on-surface-variant/80 block pt-2 border-t border-outline-variant/40">
+                Compound API: Trigger, Content, Item for live agent execution
               </span>
             </div>
           </Card>
@@ -1962,7 +3026,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                     </h4>
                     <span className="font-label text-xs text-on-surface-variant">3 Modules</span>
                   </div>
-                  <div className="px-5 py-2 relative">
+                  <div className="py-1">
                     <Carousel className="w-full">
                       <CarouselContent>
                         <CarouselItem>
@@ -1996,11 +3060,16 @@ export const ComponentLibraryShowcase: React.FC = () => {
                           </div>
                         </CarouselItem>
                       </CarouselContent>
-                      <CarouselPrevious />
-                      <CarouselNext />
-                      <div className="mt-3 flex justify-center">
-                        <CarouselDots />
-                      </div>
+                      <CarouselControls className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CarouselPrevious position="inline" />
+                          <CarouselNext position="inline" />
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <CarouselCounter />
+                          <CarouselProgressBar className="w-24 sm:w-32" />
+                        </div>
+                      </CarouselControls>
                     </Carousel>
                   </div>
                 </div>
@@ -2300,6 +3369,9 @@ export const ComponentLibraryShowcase: React.FC = () => {
           </Card>
         </div>
       </section>
+
+      {/* 22. Conversational AI & Agentic Primitives */}
+      <ConversationalAIShowcaseSection showToast={showToast} />
 
       {/* Floating Design System Toast Notification Layer */}
       {toastState && (

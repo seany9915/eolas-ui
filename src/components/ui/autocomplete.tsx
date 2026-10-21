@@ -358,6 +358,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
         )}
 
         <BaseAutocomplete.Input
+          data-slot="autocomplete-input"
           ref={inputRef}
           id={autocompleteId}
           name={name || autocompleteId}
@@ -552,11 +553,11 @@ export const AutocompleteInputGroup = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseAutocomplete.InputGroup>
 >(({ className, ...props }, ref) => (
   <BaseAutocomplete.InputGroup
+    data-slot="autocomplete-input-group"
     ref={ref}
     className={cn(
       'relative flex items-center w-full rounded border border-outline bg-surface transition-[border-color,box-shadow]',
-      'focus-within:border-primary focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
-      'data-[popup-open]:border-primary',
+      'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
       'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
       'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
       className
@@ -576,6 +577,7 @@ export const AutocompleteInput = React.forwardRef<
   AutocompleteInputProps
 >(({ className, size = 'md', ...props }, ref) => (
   <BaseAutocomplete.Input
+    data-slot="autocomplete-input"
     ref={ref}
     className={cn(
       'w-full bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',

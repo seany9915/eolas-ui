@@ -225,13 +225,14 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
           </p>
         )}
         <BaseSelect.Trigger
+          data-slot="select-trigger"
           id={selectId}
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
-            size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
-            size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
+            'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer',
+            size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
+            size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
             size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
             'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
             error && 'border-error focus-visible:outline-error'
@@ -276,7 +277,7 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
               {showScrollArrows && <SelectScrollUpArrow />}
               <BaseSelect.List
                 className={cn(
-                  'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 space-y-0.5 outline-none',
+                  'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 space-y-0.5 outline-none [scrollbar-width:thin]',
                   showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                   listClassName
                 )}
@@ -335,14 +336,14 @@ export const SelectTrigger = React.forwardRef<
   SelectTriggerProps
 >(({ className, children, error, size = 'md', showIcon = true, icon, ...props }, ref) => (
   <BaseSelect.Trigger
+    data-slot="select-trigger"
     ref={ref}
     className={cn(
       'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container transition-colors cursor-pointer',
-      size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
-      size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
+      size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
+      size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
       size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-      'data-[popup-open]:border-primary data-[open]:border-primary',
+      'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
       'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
       error && 'border-error focus-visible:outline-error',
       className
@@ -470,7 +471,7 @@ export const SelectContent = React.forwardRef<
             {showScrollArrows && <SelectScrollUpArrow />}
             <BaseSelect.List
               className={cn(
-                'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 space-y-0.5 outline-none',
+                'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 space-y-0.5 outline-none [scrollbar-width:thin]',
                 showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                 listClassName
               )}
@@ -501,8 +502,9 @@ export const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
-      'hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+      'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
       'data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:font-semibold',
+      'data-[selected]:data-[highlighted]:bg-primary-container/80 data-[selected]:data-[highlighted]:ring-1 data-[selected]:data-[highlighted]:ring-inset data-[selected]:data-[highlighted]:ring-primary/40',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
       className

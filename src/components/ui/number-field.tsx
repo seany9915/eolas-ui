@@ -146,7 +146,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
         className={cn(
           'inline-flex w-max items-center rounded border bg-surface overflow-hidden',
           'transition-[border-color,box-shadow]',
-          'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary focus-within:border-primary',
+          'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
           error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline'
         )}
       >

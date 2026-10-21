@@ -1,19 +1,22 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
+export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'inline';
+
 export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: IconSize;
   srLabel?: string;
   className?: string;
 }
 
-const sizeClasses = {
+const sizeClasses: Record<IconSize, string> = {
   xs: 'text-xs text-[14px]',
   sm: 'text-base text-[16px]',
   md: 'text-lg text-[20px]',
   lg: 'text-xl text-[24px]',
   xl: 'text-2xl text-[32px]',
+  inline: 'text-[1.15cap] align-baseline inline-block leading-none',
 };
 
 const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
@@ -47,7 +50,7 @@ export interface ToggleIconProps extends Omit<React.HTMLAttributes<HTMLSpanEleme
   active: boolean;
   onName: string;
   offName: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: IconSize;
   srLabel?: string;
   onLabel?: string;
   offLabel?: string;
@@ -109,7 +112,7 @@ ToggleIcon.displayName = 'ToggleIcon';
 
 export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   name: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: IconSize;
   srLabel?: string;
   className?: string;
 }

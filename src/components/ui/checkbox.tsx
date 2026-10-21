@@ -72,7 +72,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
         disabled={disabled}
         inputRef={inputRef}
         className={cn(
-          'size-5 rounded-xs border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none',
+          'relative size-5 rounded-xs border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
           'data-[checked]:bg-primary data-[checked]:border-primary text-on-primary',
           'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary text-on-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',

@@ -142,8 +142,8 @@ export const ColorTokensExplorer: React.FC = () => {
         {
           name: 'Outline (Default Control Boundaries)',
           hex: '#737688',
-          textHex: '#ffffff',
-          bgClass: 'bg-outline text-surface',
+          textHex: '#1a1c1e',
+          bgClass: 'border-2 border-outline bg-surface text-on-surface font-semibold',
           usage: '1px resting border for interactive form controls (Input, Checkbox, Radio).',
         },
         {
@@ -162,6 +162,7 @@ export const ColorTokensExplorer: React.FC = () => {
       {/* Intro Banner */}
       <InlineAlert
         title="Color System & Hierarchy"
+        titleAs="h2"
         role="neutral"
         icon="palette"
       >

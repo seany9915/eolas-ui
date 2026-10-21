@@ -306,9 +306,13 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
         >
           <ComboboxStatus />
           {label && (
-            <ComboboxLabel>
+            <label
+              htmlFor={comboboxId}
+              id={`${comboboxId}-label`}
+              className="block font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none"
+            >
               {label}
-            </ComboboxLabel>
+            </label>
           )}
           {description && (
             <p id={descriptionId} className="text-xs text-on-surface-variant font-sans">
@@ -324,6 +328,7 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
             )}
           >
             <BaseCombobox.Input
+              data-slot="combobox-input"
               id={comboboxId}
               name={name || comboboxId}
               placeholder={placeholder}
@@ -427,6 +432,7 @@ export const ComboboxInput = React.forwardRef<
   ComboboxInputProps
 >(({ className, size = 'md', error, ...props }, ref) => (
   <BaseCombobox.Input
+    data-slot="combobox-input"
     ref={ref}
     className={cn(
       'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-colors',
@@ -452,29 +458,34 @@ export interface ComboboxTriggerProps
 export const ComboboxTrigger = React.forwardRef<
   React.ComponentRef<typeof BaseCombobox.Trigger>,
   ComboboxTriggerProps
->(({ className, children, showIcon = true, icon, ...props }, ref) => (
-  <BaseCombobox.Trigger
-    ref={ref}
-    className={cn(
-      'inline-flex items-center justify-between rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container transition-colors cursor-pointer',
-      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-      'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-      className
-    )}
-    {...props}
-  >
-    {children}
-    {showIcon && (
-      <BaseCombobox.Icon className="ml-2 shrink-0 text-on-surface-variant">
-        {icon ?? (
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">
-            unfold_more
-          </span>
-        )}
-      </BaseCombobox.Icon>
-    )}
-  </BaseCombobox.Trigger>
-));
+>(({ className, children, showIcon = true, icon, ...props }, ref) => {
+  const hasChildren = Boolean(children);
+
+  return (
+    <BaseCombobox.Trigger
+      ref={ref}
+      tabIndex={hasChildren ? props.tabIndex : (props.tabIndex ?? -1)}
+      className={cn(
+        hasChildren
+          ? 'inline-flex items-center justify-between h-11 px-3.5 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
+          : 'size-7 min-w-[28px] min-h-[28px] rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40',
+        className
+      )}
+      {...props}
+    >
+      {children}
+      {showIcon && (
+        <BaseCombobox.Icon className={cn('shrink-0 text-on-surface-variant flex items-center justify-center', hasChildren && 'ml-2')}>
+          {icon ?? (
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              unfold_more
+            </span>
+          )}
+        </BaseCombobox.Icon>
+      )}
+    </BaseCombobox.Trigger>
+  );
+});
 ComboboxTrigger.displayName = 'ComboboxTrigger';
 
 export interface ComboboxItemProps
@@ -678,9 +689,10 @@ export const ComboboxInputGroup = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseCombobox.InputGroup>
 >(({ className, ...props }, ref) => (
   <BaseCombobox.InputGroup
+    data-slot="combobox-input-group"
     ref={ref}
     className={cn(
-      'relative w-full rounded-md border border-outline bg-surface text-on-surface focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary transition-[border-color,box-shadow]',
+      'relative w-full rounded-md border border-outline bg-surface text-on-surface focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary transition-[border-color,box-shadow]',
       className
     )}
     {...props}

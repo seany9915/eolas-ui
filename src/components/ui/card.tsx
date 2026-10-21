@@ -16,9 +16,10 @@ export type CardProminence = 'default' | 'accent' | 'inverted' | 'filled' | 'spo
  * - 'static': Passive grouping container (no hover/press).
  * - 'actionable': Interactive click destination with hover elevation lift and focus ring (canonical).
  * - 'selectable': Accessible choice card with selection border and pressed state.
+ * - 'link': Whole card clickable via an inner CardLink / [data-card-trigger] anchor (Good CSS #28).
  * - 'interactive': @deprecated Use 'actionable' instead.
  */
-export type CardAffordance = 'static' | 'actionable' | 'selectable' | 'interactive';
+export type CardAffordance = 'static' | 'actionable' | 'selectable' | 'interactive' | 'link';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   prominence?: CardProminence;
@@ -26,6 +27,18 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'standard' | 'selectable' | 'filled' | 'spotlight' | 'inverted' | 'accent';
   selected?: boolean;
   colorRole?: 'primary' | 'secondary' | 'tertiary';
+  /**
+   * When true, adopts CSS Subgrid row tracks (grid-row: span 3; grid-template-rows: subgrid)
+   * to align header, content body, and action footer rows across cards in a grid.
+   * Platform Reference: Good CSS #09.
+   */
+  subgrid?: boolean;
+  /**
+   * When true, uses compositor-only opacity shadow crossfade (card-lift) on hover lift
+   * rather than repainting box-shadow on every frame.
+   * Platform Reference: Good CSS #35.
+   */
+  lift?: boolean;
   /** Accent configuration for Inverted Cards ('tertiary' Sunny Amber headline/badge or 'neutral' pure white) */
   invertedAccent?: 'tertiary' | 'neutral';
   /** @deprecated Use 'invertedAccent' instead */
@@ -33,12 +46,14 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
+const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   prominence,
   affordance,
   variant,
   selected = false,
   colorRole = 'primary',
+  subgrid = false,
+  lift = false,
   invertedAccent,
   spotlightAccent,
   className,
@@ -77,6 +92,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
 
   const isSelectable = resolvedAffordance === 'selectable';
   const isActionable = resolvedAffordance === 'actionable' || resolvedAffordance === 'interactive';
+  const isLink = resolvedAffordance === 'link';
 
   let affordanceStyles = '';
   if (isSelectable) {
@@ -87,10 +103,20 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
         : 'bg-surface border-[2px] border-transparent text-on-surface shadow-ambient hover:shadow-ambient-hover hover:border-outline-variant/50'
     );
   } else if (isActionable) {
-    affordanceStyles = 'cursor-pointer hover:shadow-ambient-hover active:scale-[0.99] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary';
+    affordanceStyles = cn(
+      'cursor-pointer active:scale-[0.99] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
+      lift ? 'card-lift shadow-none' : 'hover:shadow-ambient-hover'
+    );
+  } else if (isLink) {
+    affordanceStyles = cn(
+      'cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
+      lift ? 'card-lift shadow-none' : 'hover:shadow-ambient-hover'
+    );
   } else {
     // Static: retains standard ambient hover if default, but no pointer cursor or focus ring
-    affordanceStyles = resolvedProminence === 'default' ? 'hover:shadow-ambient-hover' : '';
+    affordanceStyles = resolvedProminence === 'default'
+      ? (lift ? 'card-lift shadow-none' : 'hover:shadow-ambient-hover')
+      : '';
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -115,7 +141,13 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
       aria-pressed={ariaPressed}
       aria-checked={ariaChecked}
       onKeyDown={handleKeyDown}
-      className={cn(baseStyles, prominenceStyles[resolvedProminence], affordanceStyles, className)}
+      className={cn(
+        baseStyles,
+        prominenceStyles[resolvedProminence],
+        affordanceStyles,
+        subgrid && 'card-subgrid',
+        className
+      )}
       {...props}
     >
       {children}
@@ -123,4 +155,29 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
   );
 });
 
-Card.displayName = 'Card';
+CardComponent.displayName = 'Card';
+
+export interface CardLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  children: React.ReactNode;
+}
+
+/**
+ * CardLink primitive implementing the Heydon Pickering Inclusive Card pattern (Good CSS #28).
+ * Expands the clickable hit area of an anchor to cover the entire Card container via ::after,
+ * while ensuring screen readers announce only the link text and nested buttons remain clickable.
+ */
+export const CardLink = React.forwardRef<HTMLAnchorElement, CardLinkProps>(
+  ({ className, ...props }, ref) => (
+    <a
+      ref={ref}
+      data-card-trigger=""
+      className={cn('card-link focus:outline-none', className)}
+      {...props}
+    />
+  )
+);
+CardLink.displayName = 'CardLink';
+
+export const Card = Object.assign(CardComponent, {
+  Link: CardLink,
+});

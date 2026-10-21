@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { Icon } from './icon';
 import { Progress } from './progress';
+import { Tooltip } from './tooltip';
 
 export type AttachmentType = 'audio' | 'pdf' | 'image' | 'video' | 'document' | 'generic';
 export type AttachmentStatus = 'idle' | 'uploading' | 'completed' | 'error';
@@ -98,9 +99,11 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
 
           {/* Filename and Meta */}
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate font-sans text-sm font-medium text-on-surface" title={fileName}>
-              {fileName}
-            </span>
+            <Tooltip content={fileName}>
+              <span className="truncate font-sans text-sm font-medium text-on-surface cursor-default">
+                {fileName}
+              </span>
+            </Tooltip>
             <div className="flex items-center gap-2 font-mono text-xs text-on-surface-variant tabular-nums">
               {fileSize && <span>{fileSize}</span>}
               {isUploading && (

@@ -7,6 +7,7 @@ export type InlineAlertRole = 'neutral' | 'warning' | 'error' | 'success';
 
 export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
+  titleAs?: 'h2' | 'h3' | 'h4' | 'h5' | 'div';
   children: React.ReactNode;
   role?: InlineAlertRole;
   icon?: string;
@@ -17,6 +18,7 @@ export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
   title,
+  titleAs = 'h3',
   children,
   role = 'neutral',
   icon,
@@ -74,9 +76,11 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
         aria-hidden="true"
       />
       <div className="flex-1 min-w-0">
-        <h4 className="font-heading text-base font-bold text-on-surface mb-1 text-balance">
-          {title}
-        </h4>
+        {React.createElement(
+          titleAs,
+          { className: 'font-heading text-base font-bold text-on-surface mb-1 text-balance' },
+          title
+        )}
         <div className="font-sans text-sm text-on-surface-variant leading-relaxed text-pretty">
           {children}
         </div>

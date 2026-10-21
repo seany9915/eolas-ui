@@ -1,3 +1,16 @@
+/**
+ * Carousel primitive built on embla-carousel-react and Base UI.
+ *
+ * Base UI Documentation: https://base-ui.com/react/components/button
+ * Embla Carousel Documentation: https://www.embla-carousel.com/
+ *
+ * TAXONOMY & USAGE:
+ * - Provides horizontal and vertical cyclic or bounded content carousels and sliders.
+ * - Supports touch/drag gestures, physics-based momentum, and keyboard navigation (Arrow keys).
+ * - Follows DESIGN.md Tier B tokens: hairline borders (outline-variant), floating 2px focus rings,
+ *   motion restraint (duration-quick, ease-standard), and accessible 44px touch targets.
+ * - Supports Google-style paired bottom controls with progress bars or floating side navigation.
+ */
 import * as React from 'react';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
@@ -42,7 +55,7 @@ export function useCarousel() {
   return context;
 }
 
-export const Carousel = React.forwardRef<
+const CarouselComponent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & CarouselProps
 >(
@@ -181,7 +194,7 @@ export const Carousel = React.forwardRef<
     );
   }
 );
-Carousel.displayName = 'Carousel';
+CarouselComponent.displayName = 'Carousel';
 
 export const CarouselContent = React.forwardRef<
   HTMLDivElement,
@@ -227,11 +240,21 @@ export const CarouselItem = React.forwardRef<
 });
 CarouselItem.displayName = 'CarouselItem';
 
+export interface CarouselControlProps
+  extends React.ComponentProps<typeof Button> {
+  position?: 'floating' | 'inline';
+}
+
 export const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<typeof Button>
->(({ className, variant = 'outlined', size = 'icon', ...props }, ref) => {
+  CarouselControlProps
+>(({ className, variant = 'outlined', size = 'icon', position, ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+
+  const isInline =
+    position === 'inline' ||
+    className?.includes('relative') ||
+    className?.includes('static');
 
   return (
     <Button
@@ -239,15 +262,17 @@ export const CarouselPrevious = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'rounded-full min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-40 disabled:pointer-events-none',
-        // If not styled with static/relative positioning (e.g. In header controls bar), use floating absolute positioning
-        !className?.includes('relative') &&
-          !className?.includes('static') &&
+        'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
+        'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+        'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+        'disabled:opacity-30 disabled:pointer-events-none',
+        'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
+        !isInline &&
           cn(
             'absolute z-10',
             orientation === 'horizontal'
-              ? '-left-4 md:-left-6 top-1/2 -translate-y-1/2'
-              : '-top-4 md:-top-6 left-1/2 -translate-x-1/2'
+              ? '-left-12 top-1/2 -translate-y-1/2'
+              : '-top-12 left-1/2 -translate-x-1/2'
           ),
         className
       )}
@@ -269,9 +294,14 @@ CarouselPrevious.displayName = 'CarouselPrevious';
 
 export const CarouselNext = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<typeof Button>
->(({ className, variant = 'outlined', size = 'icon', ...props }, ref) => {
+  CarouselControlProps
+>(({ className, variant = 'outlined', size = 'icon', position, ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
+
+  const isInline =
+    position === 'inline' ||
+    className?.includes('relative') ||
+    className?.includes('static');
 
   return (
     <Button
@@ -279,15 +309,17 @@ export const CarouselNext = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'rounded-full min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient hover:bg-surface-container active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 disabled:opacity-40 disabled:pointer-events-none',
-        // If not styled with static/relative positioning (e.g. In header controls bar), use floating absolute positioning
-        !className?.includes('relative') &&
-          !className?.includes('static') &&
+        'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
+        'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+        'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+        'disabled:opacity-30 disabled:pointer-events-none',
+        'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
+        !isInline &&
           cn(
             'absolute z-10',
             orientation === 'horizontal'
-              ? '-right-4 md:-right-6 top-1/2 -translate-y-1/2'
-              : '-bottom-4 md:-bottom-6 left-1/2 -translate-x-1/2'
+              ? '-right-12 top-1/2 -translate-y-1/2'
+              : '-bottom-12 left-1/2 -translate-x-1/2'
           ),
         className
       )}
@@ -307,6 +339,98 @@ export const CarouselNext = React.forwardRef<
 });
 CarouselNext.displayName = 'CarouselNext';
 
+export interface CarouselProgressBarProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  indicatorClassName?: string;
+}
+
+export const CarouselProgressBar = React.forwardRef<
+  HTMLDivElement,
+  CarouselProgressBarProps
+>(({ className, indicatorClassName, ...props }, ref) => {
+  const { scrollSnaps, selectedIndex } = useCarousel();
+
+  const total = scrollSnaps.length || 1;
+  const progressPercent = ((selectedIndex + 1) / total) * 100;
+
+  return (
+    <div
+      ref={ref}
+      role="progressbar"
+      aria-label="Slide progress"
+      aria-valuenow={selectedIndex + 1}
+      aria-valuemin={1}
+      aria-valuemax={total}
+      className={cn(
+        'relative h-1 w-full max-w-[160px] overflow-hidden rounded-full bg-outline-variant/50 select-none',
+        className
+      )}
+      {...props}
+    >
+      <div
+        className={cn(
+          'h-full rounded-full bg-primary transition-[width] duration-medium ease-standard motion-reduce:transition-none',
+          indicatorClassName
+        )}
+        style={{ width: `${progressPercent}%` }}
+      />
+    </div>
+  );
+});
+CarouselProgressBar.displayName = 'CarouselProgressBar';
+
+export interface CarouselCounterProps
+  extends React.HTMLAttributes<HTMLSpanElement> {
+  format?: (current: number, total: number) => string;
+}
+
+export const CarouselCounter = React.forwardRef<
+  HTMLSpanElement,
+  CarouselCounterProps
+>(({ className, format, ...props }, ref) => {
+  const { scrollSnaps, selectedIndex } = useCarousel();
+  const current = selectedIndex + 1;
+  const total = scrollSnaps.length || 1;
+
+  const defaultFormatted = `${String(current).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+  const text = format ? format(current, total) : defaultFormatted;
+
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        'font-mono text-xs font-semibold tabular-nums text-on-surface-variant select-none',
+        className
+      )}
+      {...props}
+    >
+      {text}
+    </span>
+  );
+});
+CarouselCounter.displayName = 'CarouselCounter';
+
+export interface CarouselControlsProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+}
+
+export const CarouselControls = React.forwardRef<
+  HTMLDivElement,
+  CarouselControlsProps
+>(({ className, children, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn('flex items-center gap-3 pt-3 select-none', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
+CarouselControls.displayName = 'CarouselControls';
+
 export const CarouselDots = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -322,7 +446,10 @@ export const CarouselDots = React.forwardRef<
       ref={ref}
       role="group"
       aria-label="Slide navigation"
-      className={cn('flex flex-wrap max-w-full items-center justify-center gap-1 pt-4 select-none', className)}
+      className={cn(
+        'flex flex-wrap max-w-full items-center justify-center gap-1 pt-4 select-none',
+        className
+      )}
       {...props}
     >
       {scrollSnaps.map((_, index) => {
@@ -338,7 +465,7 @@ export const CarouselDots = React.forwardRef<
           >
             <span
               className={cn(
-                'size-2.5 rounded-full transition-[width,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                'size-2.5 rounded-full transition-[width,background-color] duration-quick ease-standard motion-reduce:transition-none',
                 isSelected
                   ? 'w-6 bg-primary'
                   : 'bg-outline-variant hover:bg-outline'
@@ -351,3 +478,15 @@ export const CarouselDots = React.forwardRef<
   );
 });
 CarouselDots.displayName = 'CarouselDots';
+
+// Compound export mapping Base UI / shadcn style conventions
+export const Carousel = Object.assign(CarouselComponent, {
+  Content: CarouselContent,
+  Item: CarouselItem,
+  Previous: CarouselPrevious,
+  Next: CarouselNext,
+  Dots: CarouselDots,
+  Progress: CarouselProgressBar,
+  Counter: CarouselCounter,
+  Controls: CarouselControls,
+});

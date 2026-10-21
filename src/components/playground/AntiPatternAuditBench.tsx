@@ -72,7 +72,7 @@ export const AntiPatternAuditBench: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Intro Banner */}
-      <InlineAlert title="Anti-Pattern & Accessibility Compliance Audit" role="success" icon="verified">
+      <InlineAlert title="Anti-Pattern & Accessibility Compliance Audit" titleAs="h2" role="success" icon="verified">
         All components in this prototyping playground are actively audited against <code>.agents/rules/anti-patterns.md</code> to guarantee zero AI UI shortcuts or accessibility violations.
       </InlineAlert>
 
@@ -83,7 +83,7 @@ export const AntiPatternAuditBench: React.FC = () => {
             <div className="flex flex-col justify-between space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between border-b border-outline-variant pb-2">
-                  <h4 className="font-heading text-base font-bold text-on-surface">{check.title}</h4>
+                  <h3 className="font-heading text-base font-bold text-on-surface">{check.title}</h3>
                   <Chip icon="check_circle" pattern="neutral" colorRole="success" size="sm">
                     {check.status}
                   </Chip>

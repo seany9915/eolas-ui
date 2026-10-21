@@ -32,20 +32,20 @@ export interface ToggleProps<Value extends string = string>
 
 const variantStyles: Record<ToggleVariant, string> = {
   default: cn(
-    'bg-surface border border-outline text-on-surface hover:bg-surface-container',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-2 data-[pressed]:border-primary data-[pressed]:shadow-ambient'
+    'bg-surface border-2 border-outline-variant text-on-surface hover:bg-surface-container',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
   outline: cn(
-    'bg-transparent border border-outline text-on-surface hover:bg-surface-container/60',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:shadow-ambient'
+    'bg-transparent border-2 border-outline text-on-surface hover:bg-surface-container/60',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
   ghost: cn(
-    'bg-transparent border border-transparent text-on-surface hover:bg-surface-container',
+    'bg-transparent border-2 border-transparent text-on-surface hover:bg-surface-container',
     'data-[pressed]:bg-surface-variant data-[pressed]:text-on-surface data-[pressed]:font-semibold'
   ),
   subtle: cn(
-    'bg-surface-container border border-transparent text-on-surface hover:bg-surface-variant',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary/20'
+    'bg-surface-container border-2 border-transparent text-on-surface hover:bg-surface-variant',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
 };
 

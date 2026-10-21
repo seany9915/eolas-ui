@@ -115,6 +115,17 @@
   accent-color: var(--primary);
   interpolate-size: allow-keywords;
   scrollbar-gutter: stable;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Safe Area Inset Tokens (Good CSS #47) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
   --font-mono: "Roboto Mono", monospace;
   --background: #F6F7FB;
   --on-background: #1a1c1e;
@@ -199,6 +210,46 @@
   --margin-desktop: 4rem;
   --container-max: 80rem;
   --measure: 40rem;
+  --header-height: 4rem;
+}
+
+/* Document-level overscroll containment, sticky anchor clearance & motion rules (Good CSS #45, #46) */
+html {
+  overscroll-behavior-y: none;
+  scroll-padding-block-start: calc(var(--header-height, 4rem) + 1rem);
+}
+
+@media (any-pointer: coarse) {
+  html {
+    overscroll-behavior-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Tabular figures for tables, counters, metrics, and timestamps (Good CSS #21) */
+td,
+time,
+[data-tabular-nums] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Defensive input zoom prevention on iOS Safari while respecting body font floor (Good CSS #01) */
+input,
+textarea,
+select {
+  font-size: max(16px, 1rem);
+}
+
+/* Prevent text selection highlight during rapid control activation (Good CSS #01) */
+button,
+[role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Border Width Token Utility Classes */
@@ -236,18 +287,55 @@
   outline-offset: 2px;
 }
 
-/* Streamlined focus integration for form controls: pairs border-primary with standard floating focus ring */
-input:focus-visible,
+/* Suppress UA default black focus outline on mouse/pointer clicks while preserving WCAG keyboard focus */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 1. Standard Form Controls (flush 2px focus ring) */
+input:not([data-slot="combobox-input"]):not([data-slot="autocomplete-input"]):focus-visible,
 select:focus-visible,
-textarea:focus-visible {
+textarea:not([data-slot="prompt-input-textarea"]):focus-visible,
+[data-slot="select-trigger"]:focus-visible,
+[data-slot="combobox-input-group"]:focus-within,
+[data-slot="autocomplete-input-group"]:focus-within {
   border-color: var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+
+/* 2. Invalid / Error Form Controls (Overrides via cascade + :is() specificity) */
+input:not([data-slot="combobox-input"]):not([data-slot="autocomplete-input"]):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+textarea:not([data-slot="prompt-input-textarea"]):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+[data-slot="select-trigger"]:is([aria-invalid="true"], [data-invalid], .border-error):focus-visible,
+[data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within,
+[data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within {
+  border-color: var(--error);
+  outline: 2px solid var(--error);
+  outline-offset: -1px;
+}
+
+/* 3. Discrete Buttons maintain floating 2px ring */
+button:focus-visible:not([data-slot="select-trigger"]) {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-button:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+/* 4. Dropdown / Menu / Listbox Items: Inset outline for Windows High Contrast mode, prevents overflow clipping */
+[role="option"]:focus-visible,
+[role="menuitem"]:focus-visible,
+[role="menuitemcheckbox"]:focus-visible,
+[role="menuitemradio"]:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+/* 5. Compound Inner Inputs: Suppress internal ring so outer group handles focus */
+input[data-slot="combobox-input"]:focus-visible,
+input[data-slot="autocomplete-input"]:focus-visible,
+textarea[data-slot="prompt-input-textarea"]:focus-visible {
+  outline: none;
+  border-color: transparent;
 }
 
 /* Autofill Credential Highlighting: maintains calibrated surface tokens and typography on browser autofill */
@@ -897,4 +985,145 @@ form[data-tool-active] {
   border-top-right-radius: var(--radius-default);
   border-bottom-right-radius: var(--radius-default);
 }
+
+/* Expand Touch Target Beyond Visual Size (Good CSS #27, WCAG 2.2 SC 2.5.8) */
+@utility touch-target-expanded {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: min(0px, calc((100% - 44px) / 2));
+    pointer-events: auto;
+  }
+}
+
+/* Compositor-Only Shadow Lift via Opacity Crossfade (Good CSS #35) */
+@utility card-lift {
+  position: relative;
+  isolation: isolate;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  &::before {
+    box-shadow: var(--shadow-ambient);
+    opacity: 1;
+    transition: opacity var(--duration-fast) var(--ease-standard);
+  }
+
+  &::after {
+    box-shadow: var(--shadow-ambient-hover);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-standard);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover::before {
+      opacity: 0;
+    }
+    &:hover::after {
+      opacity: 1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift::before,
+  .card-lift::after {
+    transition: none !important;
+  }
+}
+
+/* CSS Subgrid Card Layouts (Good CSS #09) */
+@utility card-subgrid {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+}
+
+@utility card-grid-subgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+/* Font-Relative Optical Icon Sizing (Good CSS #23) */
+@utility icon-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+
+  & > svg,
+  & > .material-symbols-outlined {
+    flex: none;
+    block-size: 1cap;
+    inline-size: auto;
+  }
+}
+
+@utility text-cap {
+  font-size: 1.15cap;
+  line-height: 1;
+  vertical-align: baseline;
+}
+
+/* Safe Area Inset Utilities (Good CSS #47) */
+@utility pt-safe {
+  padding-top: max(var(--safe-top), 0px);
+}
+
+@utility pb-safe {
+  padding-bottom: max(var(--safe-bottom), 0px);
+}
+
+@utility pl-safe {
+  padding-left: max(var(--safe-left), 0px);
+}
+
+@utility pr-safe {
+  padding-right: max(var(--safe-right), 0px);
+}
+
+@utility p-safe {
+  padding-top: max(var(--safe-top), 0px);
+  padding-bottom: max(var(--safe-bottom), 0px);
+  padding-left: max(var(--safe-left), 0px);
+  padding-right: max(var(--safe-right), 0px);
+}
+
+/* Safe Alignment Utilities for Scrollable Containers (Good CSS #13) */
+@utility justify-safe-center {
+  justify-content: safe center;
+}
+
+@utility items-safe-center {
+  align-items: safe center;
+}
+
+/* Whole Card Clickable Link Pattern (Good CSS #28, Heydon Pickering Inclusive Cards) */
+@utility card-link {
+  position: static;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  &:focus-visible {
+    outline: 2px solid transparent;
+  }
+}
+
+@utility card-interactive-child {
+  position: relative;
+  z-index: 1;
+}
+
+
 

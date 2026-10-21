@@ -28,7 +28,7 @@ export const BrandAssetsShowcase: React.FC = () => {
   return (
     <div className="space-y-10">
       {/* Guidance Callout */}
-      <InlineAlert title="Eolas Brand Assets & Tonal Guidelines" role="neutral" icon="branding_watermark">
+      <InlineAlert title="Eolas Brand Assets & Tonal Guidelines" titleAs="h2" role="neutral" icon="branding_watermark">
         Mark type (Stacked, Horizontal, Pictorial, Wordmark) and tonal variant (Primary, White, Black, Amber) are independent choices. Pick a mark type based on layout, then pick a tonal variant based on the background luminance.
       </InlineAlert>
 
@@ -39,7 +39,7 @@ export const BrandAssetsShowcase: React.FC = () => {
             <div className="h-full flex flex-col justify-between space-y-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-outline-variant pb-2">
-                  <h4 className="font-heading text-sm font-bold text-on-surface truncate pr-2">{asset.name}</h4>
+                  <h3 className="font-heading text-sm font-bold text-on-surface truncate pr-2">{asset.name}</h3>
                   <span className="font-mono text-xs text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded shrink-0">SVG</span>
                 </div>
                 <div className={`p-4 rounded-md ${asset.bg} border border-outline-variant flex items-center justify-center h-32`}>
