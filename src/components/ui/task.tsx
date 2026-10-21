@@ -168,9 +168,7 @@ export const TaskContent = React.forwardRef<HTMLDivElement, TaskContentProps>(
   ({ children, className, ...props }, ref) => {
     return (
       <TraceCollapsibleContent ref={ref} className={className} {...props}>
-        <div className="pt-1">
-          <Trace variant="embedded">{children}</Trace>
-        </div>
+        <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
       </TraceCollapsibleContent>
     );
   }
@@ -195,7 +193,7 @@ const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
       defaultOpen = true,
       open,
       onOpenChange,
-      variant = 'card',
+      variant = 'embedded',
       children,
       className,
     },

@@ -16,6 +16,7 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
+import { Avatar } from './avatar';
 import { BotAvatar, type BotAvatarType } from './bot-avatar';
 import { Trace } from './trace';
 import { Reasoning } from './reasoning';
@@ -124,13 +125,13 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
         ref={ref}
         data-role={role}
         className={cn(
-          'p-4 text-base font-sans leading-relaxed transition-[border-color,box-shadow]',
+          'p-4 text-base font-sans leading-relaxed transition-colors',
           role === 'user' &&
-            'bg-primary-container text-on-primary-container rounded-2xl rounded-br-xs shadow-ambient',
+            'bg-primary-container text-on-primary-container rounded-2xl rounded-br-xs',
           role === 'assistant' &&
-            'bg-surface text-on-surface border border-outline-variant rounded-2xl rounded-bl-xs shadow-ambient',
+            'bg-surface text-on-surface border border-outline-variant rounded-2xl rounded-bl-xs',
           role === 'system' &&
-            'bg-surface-container text-on-surface-variant border border-outline-variant/60 rounded-xl text-sm italic',
+            'bg-surface-container text-on-surface-variant border border-outline-variant/60 rounded-xl text-sm font-medium',
           className
         )}
         {...props}
@@ -142,7 +143,8 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
 );
 ChatMessageBubble.displayName = 'ChatMessage.Bubble';
 
-export interface ChatMessageAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ChatMessageAvatarProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof Avatar>, 'fallback'> {
   role?: ChatRole;
   botType?: BotAvatarType;
   src?: string;
@@ -164,24 +166,6 @@ const ChatMessageAvatar: React.FC<ChatMessageAvatarProps> = ({
     return <BotAvatar type={botType} size="sm" className={className} />;
   }
 
-  if (src) {
-    return (
-      <div
-        className={cn(
-          'size-7 rounded-full overflow-hidden shrink-0 border border-outline-variant bg-surface-container',
-          className
-        )}
-        {...props}
-      >
-        <img
-          src={src}
-          alt={name || (role === 'user' ? 'User avatar' : 'Assistant avatar')}
-          className="size-full object-cover"
-        />
-      </div>
-    );
-  }
-
   const initials = name
     ? name
         .split(' ')
@@ -194,20 +178,20 @@ const ChatMessageAvatar: React.FC<ChatMessageAvatarProps> = ({
     : 'AI';
 
   return (
-    <div
-      role="img"
-      aria-label={name || (role === 'user' ? 'User avatar' : 'Assistant avatar')}
+    <Avatar
+      src={src}
+      alt={name || (role === 'user' ? 'User avatar' : 'Assistant avatar')}
+      fallback={fallback || initials}
+      size="sm"
       className={cn(
-        'size-7 rounded-full shrink-0 flex items-center justify-center font-label text-xs font-semibold select-none border',
+        'size-7 text-xs shrink-0 select-none border',
         role === 'user'
           ? 'bg-primary text-on-primary border-primary'
           : 'bg-surface-container text-on-surface border-outline-variant',
         className
       )}
       {...props}
-    >
-      {fallback || initials}
-    </div>
+    />
   );
 };
 ChatMessageAvatar.displayName = 'ChatMessage.Avatar';
@@ -345,7 +329,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   <Trace.Collapsible defaultOpen={false}>
                     <Trace.CollapsibleTrigger>
                       <Trace.Line status="complete">
-                        <Trace.Icon name="psychology" status="complete" />
+                        <Trace.Icon name="checklist" status="complete" />
                         <Trace.Title>
                           Clinical Reasoning ({thoughtSteps!.length} step{thoughtSteps!.length > 1 ? 's' : ''})
                         </Trace.Title>

@@ -35,7 +35,7 @@ const ToolRoot = React.forwardRef<HTMLDivElement, ToolRootProps>(
         data-slot="tool-root"
         data-status={status}
         className={cn(
-          '@container w-full rounded-xl border border-outline-variant/80 bg-surface shadow-ambient overflow-hidden',
+          '@container w-full rounded-xl border border-outline-variant/80 bg-surface overflow-hidden',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
           status === 'calling' && 'border-primary/50',
           status === 'error' && 'border-error/50',

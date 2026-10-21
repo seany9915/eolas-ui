@@ -43,9 +43,9 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
         className={cn(
           '@container w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
           variant === 'default' &&
-            'rounded-lg border border-outline-variant bg-surface overflow-hidden shadow-ambient divide-y divide-outline-variant/40',
+            'rounded-lg border border-outline-variant bg-surface overflow-hidden divide-y divide-outline-variant/40',
           variant === 'card' &&
-            'rounded-xl border border-outline-variant bg-surface overflow-hidden shadow-ambient divide-y divide-outline-variant/40',
+            'rounded-xl bg-surface overflow-hidden shadow-ambient divide-y divide-outline-variant/40',
           variant === 'embedded' &&
             'rounded-lg border border-outline-variant/60 bg-surface-container/30 overflow-hidden divide-y divide-outline-variant/30',
           variant === 'timeline' &&
@@ -116,7 +116,7 @@ export const TraceIcon: React.FC<TraceIconProps> = ({
         status === 'complete' && 'bg-primary-container text-on-primary-container font-bold',
         status === 'running' && 'bg-secondary-container text-on-secondary-container',
         status === 'error' && 'bg-error-container text-on-error-container font-bold',
-        status === 'pending' && 'bg-surface-variant/50 text-on-surface-variant border border-outline-variant',
+        status === 'pending' && 'bg-surface-variant/50 text-on-surface-variant border border-outline',
         status === 'default' && 'bg-surface-container text-on-surface-variant',
         className
       )}

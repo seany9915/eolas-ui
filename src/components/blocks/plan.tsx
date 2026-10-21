@@ -246,6 +246,7 @@ export interface PlanProps {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  variant?: 'default' | 'card' | 'embedded';
   children?: React.ReactNode;
   className?: string;
 }
@@ -257,6 +258,7 @@ const PlanRoot: React.FC<PlanProps> = ({
   defaultOpen = true,
   open,
   onOpenChange,
+  variant = 'embedded',
   children,
   className,
 }) => {
@@ -287,7 +289,7 @@ const PlanRoot: React.FC<PlanProps> = ({
       }}
     >
       <div data-slot="plan" className={cn('w-full', className)}>
-        <Trace variant="card">
+        <Trace variant={variant}>
           <TraceCollapsible
             defaultOpen={defaultOpen}
             open={open}
@@ -299,57 +301,54 @@ const PlanRoot: React.FC<PlanProps> = ({
               <>
                 <PlanTrigger title={title} description={description} />
                 <PlanContent>
-                  {/* Sub-steps nested Trace */}
-                  <Trace variant="embedded">
-                    {steps.map((step) => {
-                      const stepContent = step.content ?? step.details;
-                      const stepDescription = (
-                        <span className="flex items-center gap-2">
-                          {step.description && <span>{step.description}</span>}
-                          {step.duration && (
-                            <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
-                              {typeof step.duration === 'number' ? `${step.duration}s` : step.duration}
-                            </span>
-                          )}
-                        </span>
-                      );
+                  {steps.map((step) => {
+                    const stepContent = step.content ?? step.details;
+                    const stepDescription = (
+                      <span className="flex items-center gap-2">
+                        {step.description && <span>{step.description}</span>}
+                        {step.duration && (
+                          <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
+                            {typeof step.duration === 'number' ? `${step.duration}s` : step.duration}
+                          </span>
+                        )}
+                      </span>
+                    );
 
-                      if (stepContent) {
-                        return (
-                          <TraceCollapsible key={step.id} defaultOpen={step.status === 'running'}>
-                            <TraceCollapsibleTrigger>
-                              <TraceLine status={step.status}>
-                                <TraceIcon status={step.status} />
-                                <TraceTitle>{step.title}</TraceTitle>
-                                {(step.description || step.duration) && (
-                                  <TraceDescription>{stepDescription}</TraceDescription>
-                                )}
-                              </TraceLine>
-                            </TraceCollapsibleTrigger>
-                            <TraceCollapsibleContent>
-                              {typeof stepContent === 'string' ? (
-                                <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                                  {stepContent}
-                                </p>
-                              ) : (
-                                stepContent
-                              )}
-                            </TraceCollapsibleContent>
-                          </TraceCollapsible>
-                        );
-                      }
-
+                    if (stepContent) {
                       return (
-                        <TraceLine key={step.id} status={step.status}>
-                          <TraceIcon status={step.status} />
-                          <TraceTitle>{step.title}</TraceTitle>
-                          {(step.description || step.duration) && (
-                            <TraceDescription>{stepDescription}</TraceDescription>
-                          )}
-                        </TraceLine>
+                        <TraceCollapsible key={step.id} defaultOpen={step.status === 'running'}>
+                          <TraceCollapsibleTrigger>
+                            <TraceLine status={step.status}>
+                              <TraceIcon status={step.status} />
+                              <TraceTitle>{step.title}</TraceTitle>
+                              {(step.description || step.duration) && (
+                                <TraceDescription>{stepDescription}</TraceDescription>
+                              )}
+                            </TraceLine>
+                          </TraceCollapsibleTrigger>
+                          <TraceCollapsibleContent>
+                            {typeof stepContent === 'string' ? (
+                              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                                {stepContent}
+                              </p>
+                            ) : (
+                              stepContent
+                            )}
+                          </TraceCollapsibleContent>
+                        </TraceCollapsible>
                       );
-                    })}
-                  </Trace>
+                    }
+
+                    return (
+                      <TraceLine key={step.id} status={step.status}>
+                        <TraceIcon status={step.status} />
+                        <TraceTitle>{step.title}</TraceTitle>
+                        {(step.description || step.duration) && (
+                          <TraceDescription>{stepDescription}</TraceDescription>
+                        )}
+                      </TraceLine>
+                    );
+                  })}
                 </PlanContent>
               </>
             )}

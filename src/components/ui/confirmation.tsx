@@ -45,7 +45,7 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
         data-slot="confirmation-root"
         data-status={status}
         className={cn(
-          'w-full rounded-xl border p-4 transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none shadow-ambient',
+          'w-full rounded-xl border p-4 transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
           !isApproved && !isDenied && 'bg-surface border-outline-variant',
           isApproved && 'bg-surface-container/30 border-outline-variant/80',
           isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80',

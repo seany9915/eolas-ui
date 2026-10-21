@@ -129,7 +129,7 @@ export const ChainOfThoughtHeader = React.forwardRef<HTMLButtonElement, ChainOfT
             <TraceDescription>
               <span className="flex items-center gap-2">
                 {stepCount !== undefined && (
-                  <Chip variant="tonal" size="sm" className="font-mono text-[10px] py-0 px-1.5 h-5">
+                  <Chip pattern="outline-neutral-fill" colorRole="neutral" size="sm" className="font-mono text-[10px] py-0 px-1.5 h-5">
                     {stepCount} {stepCount === 1 ? 'step' : 'steps'}
                   </Chip>
                 )}
@@ -162,9 +162,7 @@ export const ChainOfThoughtContent = React.forwardRef<HTMLDivElement, ChainOfTho
   ({ children, className, ...props }, ref) => {
     return (
       <TraceCollapsibleContent ref={ref} className={className} {...props}>
-        <div className="pt-1">
-          <Trace variant="embedded">{children}</Trace>
-        </div>
+        <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
       </TraceCollapsibleContent>
     );
   }
@@ -189,7 +187,7 @@ const ChainOfThoughtRoot = React.forwardRef<HTMLDivElement, ChainOfThoughtProps>
       defaultOpen = false,
       open,
       onOpenChange,
-      variant = 'card',
+      variant = 'embedded',
       children,
       className,
     },

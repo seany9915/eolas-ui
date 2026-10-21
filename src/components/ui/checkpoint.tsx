@@ -38,7 +38,7 @@ const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
         )}
         {...props}
       >
-        <div className="relative z-10 flex items-center gap-2 px-3 py-1 bg-surface border border-outline-variant/80 rounded-full shadow-ambient text-xs text-on-surface-variant">
+        <div className="relative z-10 flex items-center gap-2 px-3 py-1 bg-surface border border-outline-variant/80 rounded-full text-xs text-on-surface-variant">
           {children}
         </div>
       </div>

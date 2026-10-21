@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Collapsible } from '@base-ui/react/collapsible';
 import { Icon } from './icon';
 import { Tooltip } from './tooltip';
+import { UnstyledButton } from './button';
 import { cn } from '@/lib/utils';
 
 export interface SourceCitation {
@@ -191,13 +192,12 @@ const SourcesCitationRef: React.FC<SourcesCitationRefProps> = ({
 }) => {
   const tooltipText = title ? `[${index}] ${title}` : `Citation [${index}]`;
 
-  const badge = (
+  const badgeContent = (
     <span
       className={cn(
         'inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded font-mono text-[11px] tabular-nums font-semibold',
-        'bg-surface-container text-secondary hover:bg-secondary hover:text-on-secondary border border-outline-variant',
-        'align-super cursor-pointer transition-[color,background-color] duration-micro motion-reduce:transition-none',
-        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary',
+        'bg-surface-container text-secondary group-hover:bg-secondary group-hover:text-on-secondary border border-outline-variant',
+        'transition-[color,background-color] duration-micro motion-reduce:transition-none',
         className
       )}
     >
@@ -213,12 +213,22 @@ const SourcesCitationRef: React.FC<SourcesCitationRefProps> = ({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Citation [${index}]: ${title || href}`}
-          className="inline-block p-1 -m-1 focus-visible:outline-none"
+          className={cn(
+            'group relative inline-flex items-center align-super p-0.5 rounded cursor-pointer',
+            'after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:min-w-[44px] after:min-h-[44px]',
+            'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary'
+          )}
         >
-          {badge}
+          {badgeContent}
         </a>
       ) : (
-        badge
+        <UnstyledButton
+          expandedTouchTarget
+          aria-label={`Citation [${index}]: ${title || index}`}
+          className="group relative inline-flex items-center align-super p-0.5 rounded cursor-pointer"
+        >
+          {badgeContent}
+        </UnstyledButton>
       )}
     </Tooltip>
   );

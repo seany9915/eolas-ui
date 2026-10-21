@@ -18,6 +18,7 @@ import { Button } from './button';
 import { Icon } from './icon';
 import { Textarea } from './textarea';
 import { Tooltip } from './tooltip';
+import { Attachment, type AttachmentProps } from './attachment';
 import { cn } from '@/lib/utils';
 
 export interface PromptInputRootProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -33,9 +34,9 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
         ref={ref}
         data-disabled={disabled ? 'true' : undefined}
         className={cn(
-          '@container relative flex flex-col w-full bg-surface border border-outline rounded-lg p-2.5 shadow-ambient',
-          'focus-within:border-primary focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
-          'transition-[border-color,box-shadow] duration-quick ease-standard motion-reduce:transition-none',
+          '@container relative flex flex-col w-full bg-surface border border-outline rounded-lg p-2.5',
+          'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
+          'transition-[border-color] duration-quick ease-standard motion-reduce:transition-none',
           disabled && 'opacity-60 bg-surface-variant/30 border-outline-variant cursor-not-allowed',
           className
         )}
@@ -72,113 +73,9 @@ const PromptInputAttachments = React.forwardRef<HTMLDivElement, PromptInputAttac
 );
 PromptInputAttachments.displayName = 'PromptInput.Attachments';
 
-export interface PromptInputAttachmentProps {
-  fileName: string;
-  fileSize?: string;
-  fileType?: 'audio' | 'pdf' | 'image' | 'video' | 'document' | 'generic';
-  onRemove?: () => void;
-  className?: string;
-}
+export interface PromptInputAttachmentProps extends AttachmentProps {}
 
-const attachmentTypeTokens: Record<
-  string,
-  { icon: string; wash: string; text: string }
-> = {
-  audio: {
-    icon: 'mic',
-    wash: 'bg-primary-container',
-    text: 'text-on-primary-container',
-  },
-  pdf: {
-    icon: 'description',
-    wash: 'bg-error-container',
-    text: 'text-on-error-container',
-  },
-  image: {
-    icon: 'image',
-    wash: 'bg-secondary-container',
-    text: 'text-on-secondary-container',
-  },
-  video: {
-    icon: 'movie',
-    wash: 'bg-tertiary-container',
-    text: 'text-on-tertiary-container',
-  },
-  document: {
-    icon: 'article',
-    wash: 'bg-surface-container',
-    text: 'text-on-surface-variant',
-  },
-  generic: {
-    icon: 'attach_file',
-    wash: 'bg-surface-container',
-    text: 'text-on-surface-variant',
-  },
-};
-
-const PromptInputAttachment: React.FC<PromptInputAttachmentProps> = ({
-  fileName,
-  fileSize,
-  fileType = 'generic',
-  onRemove,
-  className,
-}) => {
-  const meta = attachmentTypeTokens[fileType] || attachmentTypeTokens.generic;
-
-  return (
-    <div
-      role="group"
-      aria-label={`Attachment: ${fileName}`}
-      className={cn(
-        'inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-surface-container border border-outline-variant max-w-[280px] shrink-0',
-        'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-        className
-      )}
-    >
-      <div
-        className={cn(
-          'flex size-6 shrink-0 items-center justify-center rounded select-none',
-          meta.wash,
-          meta.text
-        )}
-        aria-hidden="true"
-      >
-        <Icon name={meta.icon} size="xs" />
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col pr-1">
-        <span className="truncate font-sans text-xs font-medium text-on-surface">
-          {fileName}
-        </span>
-        {fileSize && (
-          <span className="font-mono text-[10px] tabular-nums text-on-surface-variant/80">
-            {fileSize}
-          </span>
-        )}
-      </div>
-
-      {onRemove && (
-        <Tooltip content={`Remove ${fileName}`}>
-          <Button
-            type="button"
-            variant="ghost"
-            colorRole="neutral"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            expandedTouchTarget
-            className="size-6 min-h-[24px] min-w-[24px] p-0 shrink-0 text-on-surface-variant hover:text-error"
-            aria-label={`Remove ${fileName}`}
-          >
-            <Icon name="close" size="xs" aria-hidden="true" />
-          </Button>
-        </Tooltip>
-      )}
-    </div>
-  );
-};
+const PromptInputAttachment = Attachment;
 PromptInputAttachment.displayName = 'PromptInput.Attachment';
 
 export interface PromptInputTextareaProps

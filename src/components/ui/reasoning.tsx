@@ -75,7 +75,7 @@ export const ReasoningTrigger = React.forwardRef<HTMLButtonElement, ReasoningTri
         {children ?? (
           <TraceLine status={computedStatus}>
             <TraceIcon
-              name={isRunning ? 'progress_activity' : 'psychology'}
+              name={isRunning ? 'progress_activity' : 'schema'}
               status={computedStatus}
             />
             <TraceTitle>{displayTitle}</TraceTitle>

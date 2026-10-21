@@ -278,6 +278,7 @@
       "utils",
       "button",
       "icon",
+      "avatar",
       "bot-avatar",
       "trace",
       "reasoning",
@@ -1063,7 +1064,8 @@
       "button",
       "icon",
       "textarea",
-      "tooltip"
+      "tooltip",
+      "attachment"
     ],
     "meta": {
       "taxonomy": [
@@ -1352,7 +1354,8 @@
     "registryDependencies": [
       "utils",
       "icon",
-      "tooltip"
+      "tooltip",
+      "button"
     ],
     "meta": {
       "taxonomy": [

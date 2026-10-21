@@ -1,6 +1,6 @@
 {
   "name": "@seany9915/eolas-ui",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Eolas UI CLI - Private Base UI design system component distributor",
   "type": "module",
   "bin": {

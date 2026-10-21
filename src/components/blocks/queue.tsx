@@ -183,9 +183,7 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
           </TraceCollapsibleTrigger>
 
           <TraceCollapsibleContent>
-            <div className="pt-1">
-              <Trace variant="embedded">{children}</Trace>
-            </div>
+            <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
           </TraceCollapsibleContent>
         </TraceCollapsible>
       </div>
@@ -205,6 +203,7 @@ export interface QueueProps {
   completedTitle?: string;
   defaultTodoOpen?: boolean;
   defaultCompletedOpen?: boolean;
+  variant?: 'default' | 'card' | 'embedded';
   children?: React.ReactNode;
   className?: string;
 }
@@ -217,6 +216,7 @@ const QueueRoot: React.FC<QueueProps> = ({
   completedTitle,
   defaultTodoOpen = true,
   defaultCompletedOpen = false,
+  variant = 'embedded',
   children,
   className,
 }) => {
@@ -236,7 +236,7 @@ const QueueRoot: React.FC<QueueProps> = ({
 
   return (
     <div data-slot="queue" className={cn('w-full', className)}>
-      <Trace variant="card">
+      <Trace variant={variant}>
         {(title || description) && (
           <div className="px-3.5 pt-3 pb-2 border-b border-outline-variant/40">
             {title && <h5 className="font-heading text-sm font-bold text-on-surface">{title}</h5>}
