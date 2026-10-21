@@ -140,7 +140,7 @@ const ChatRoot: React.FC<ChatProps> = ({
     <div
       data-slot="chat"
       className={cn(
-        'relative flex flex-col w-full h-[600px] max-h-[85vh] rounded-xl border border-outline-variant bg-surface overflow-hidden shadow-ambient',
+        'relative flex flex-col w-full h-[600px] max-h-[85vh] rounded-xl border border-outline-variant bg-surface overflow-hidden',
         className
       )}
     >

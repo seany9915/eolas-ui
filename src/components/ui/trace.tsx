@@ -287,7 +287,7 @@ export const TraceCollapsibleContent = React.forwardRef<
         className={cn(
           unstyled
             ? ''
-            : 'px-4 py-3 bg-surface-container/20 border-t border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed',
+            : 'px-4 py-3 border-t border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed',
           className
         )}
       >

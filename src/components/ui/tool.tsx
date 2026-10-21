@@ -161,7 +161,7 @@ const ToolContent = React.forwardRef<HTMLDivElement, ToolContentProps>(
         )}
         {...props}
       >
-        <div className="p-3.5 pt-1 space-y-3 border-t border-outline-variant/40 bg-surface-container/20 text-xs">
+        <div className="p-3.5 pt-1 space-y-3 border-t border-outline-variant/40 text-xs">
           {children}
         </div>
       </BaseCollapsible.Panel>

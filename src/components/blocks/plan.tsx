@@ -163,9 +163,7 @@ export const PlanContent = React.forwardRef<HTMLDivElement, PlanContentProps>(
             <Progress value={progressPercent} className="h-1.5" />
           </div>
 
-          <div className="pt-1">
-            <Trace variant="embedded">{children}</Trace>
-          </div>
+          <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
         </div>
       </TraceCollapsibleContent>
     );

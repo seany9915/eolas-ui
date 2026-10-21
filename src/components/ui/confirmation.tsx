@@ -181,7 +181,7 @@ const ConfirmationDetails: React.FC<ConfirmationDetailsProps> = ({
   return (
     <div
       className={cn(
-        'mt-2.5 p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/50 font-mono text-xs text-on-surface-variant overflow-x-auto',
+        'mt-2.5 p-2.5 rounded-lg bg-surface-container font-mono text-xs text-on-surface-variant overflow-x-auto',
         className
       )}
       {...props}
