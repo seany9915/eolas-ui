@@ -7,6 +7,7 @@ import { Tooltip } from './tooltip';
 
 export type AttachmentType = 'audio' | 'pdf' | 'image' | 'video' | 'document' | 'generic';
 export type AttachmentStatus = 'idle' | 'uploading' | 'completed' | 'error';
+export type AttachmentVariant = 'card' | 'chip' | 'compact' | 'default';
 
 export interface AttachmentProps extends React.HTMLAttributes<HTMLDivElement> {
   fileName: string;
@@ -15,6 +16,7 @@ export interface AttachmentProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: AttachmentStatus;
   uploadProgress?: number;
   errorMessage?: string;
+  variant?: AttachmentVariant;
   onRemove?: () => void;
   onDownload?: () => void;
 }
@@ -62,6 +64,7 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
       status = 'idle',
       uploadProgress = 0,
       errorMessage,
+      variant = 'default',
       onRemove,
       onDownload,
       ...props
@@ -72,13 +75,74 @@ export const Attachment = React.forwardRef<HTMLDivElement, AttachmentProps>(
     const isUploading = status === 'uploading';
     const isError = status === 'error';
 
+    if (variant === 'chip' || variant === 'compact') {
+      return (
+        <div
+          ref={ref}
+          role="group"
+          aria-label={`File attachment: ${fileName}`}
+          className={cn(
+            'inline-flex items-center gap-2 px-2.5 py-1 min-h-[36px] max-w-[280px] rounded-md bg-surface-container border border-outline-variant shrink-0',
+            'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+            isError ? 'border-error' : 'hover:border-outline',
+            className
+          )}
+          {...props}
+        >
+          <div
+            className={cn(
+              'flex size-6 shrink-0 items-center justify-center rounded select-none',
+              config.wash,
+              config.text
+            )}
+            aria-hidden="true"
+          >
+            <Icon name={config.icon} size="xs" />
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col pr-1">
+            <Tooltip content={fileName}>
+              <span className="truncate font-sans text-xs font-medium text-on-surface cursor-default">
+                {fileName}
+              </span>
+            </Tooltip>
+            {fileSize && (
+              <span className="font-mono text-[10px] tabular-nums text-on-surface-variant/80">
+                {fileSize}
+              </span>
+            )}
+          </div>
+
+          {onRemove && (
+            <Tooltip content={`Remove ${fileName}`}>
+              <Button
+                type="button"
+                variant="ghost"
+                colorRole="neutral"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
+                expandedTouchTarget
+                className="size-6 min-h-[24px] min-w-[24px] p-0 shrink-0 text-on-surface-variant hover:text-error"
+                aria-label={`Remove ${fileName}`}
+              >
+                <Icon name="close" size="xs" aria-hidden="true" />
+              </Button>
+            </Tooltip>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div
         ref={ref}
         role="group"
         aria-label={`File attachment: ${fileName}`}
         className={cn(
-          '@container relative flex flex-col rounded-lg border bg-surface p-3 transition-[border-color,background-color] duration-[var(--duration-quick)]',
+          '@container relative flex flex-col w-full rounded-lg border bg-surface p-3 transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
           isError ? 'border-error' : 'border-outline-variant hover:border-outline',
           className
         )}

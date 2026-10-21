@@ -75,7 +75,11 @@ PromptInputAttachments.displayName = 'PromptInput.Attachments';
 
 export interface PromptInputAttachmentProps extends AttachmentProps {}
 
-const PromptInputAttachment = Attachment;
+const PromptInputAttachment = React.forwardRef<HTMLDivElement, PromptInputAttachmentProps>(
+  ({ variant = 'chip', ...props }, ref) => {
+    return <Attachment ref={ref} variant={variant} {...props} />;
+  }
+);
 PromptInputAttachment.displayName = 'PromptInput.Attachment';
 
 export interface PromptInputTextareaProps
