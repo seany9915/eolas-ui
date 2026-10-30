@@ -56,7 +56,7 @@ export interface TabsRootProps<Value extends TabValue = TabValue>
   showIndicator?: boolean;
 }
 
-export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<any>>(
+export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>>(
   (
     {
       variant = 'line',
@@ -376,7 +376,7 @@ export interface TabsProps<Value extends TabValue = string> {
   panelClassName?: string;
 }
 
-const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<any>>(
+const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
   (
     {
       items,

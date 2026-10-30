@@ -101,7 +101,7 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('min-w-[140px] sm:min-w-[160px]', className)}>
+    <div className={cn('min-w-[140px] @sm:min-w-[160px]', className)}>
       <Select
         options={models}
         value={value}
@@ -140,7 +140,7 @@ const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('min-w-[110px] sm:min-w-[130px]', className)}>
+    <div className={cn('min-w-[110px] @sm:min-w-[130px]', className)}>
       <Tooltip content="Adjust depth of model reasoning steps">
         <div>
           <Select

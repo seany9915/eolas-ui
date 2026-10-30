@@ -65,10 +65,14 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-full: 9999px;
+}
 
-  --shadow-ambient: var(--shadow-ambient);
-  --shadow-ambient-hover: var(--shadow-ambient-hover);
-  --shadow-modal: var(--shadow-modal);
+/* `static` always emits these to :root so inline styles and raw CSS can use var(--shadow-*), var(--duration-*) etc. */
+@theme static {
+  /* Layered Ambient & Modal Shadows (Umbra + Penumbra) */
+  --shadow-ambient: 0 1px 3px rgba(26, 28, 30, 0.04), 0 4px 12px rgba(26, 28, 30, 0.06);
+  --shadow-ambient-hover: 0 2px 4px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.08);
+  --shadow-modal: 0 2px 6px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.06), 0 20px 48px rgba(26, 28, 30, 0.12);
 
   /* Motion Tokens */
   --duration-stagger: 40ms;
@@ -99,7 +103,9 @@
 
   --blur-small: 2px;
   --blur-medium: 3px;
+}
 
+@theme {
   /* Spacing & Layout Tokens (DESIGN.md) */
   --spacing-gutter: var(--gutter);
   --spacing-gutter-mobile: var(--gutter-mobile);
@@ -126,7 +132,6 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
-  --font-mono: "Roboto Mono", monospace;
   --background: #F6F7FB;
   --on-background: #1a1c1e;
   --surface: #ffffff;
@@ -165,41 +170,6 @@
   --on-neutral: #ffffff;
   --neutral-container: #D5DCEB;
   --on-neutral-container: #1a1c1e;
-
-  /* Layered Ambient & Modal Shadows (Umbra + Penumbra) */
-  --shadow-ambient: 0 1px 3px rgba(26, 28, 30, 0.04), 0 4px 12px rgba(26, 28, 30, 0.06);
-  --shadow-ambient-hover: 0 2px 4px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.08);
-  --shadow-modal: 0 2px 6px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.06), 0 20px 48px rgba(26, 28, 30, 0.12);
-
-  /* Motion Tokens */
-  --duration-stagger: 40ms;
-  --duration-micro: 80ms;
-  --duration-quick: 150ms;
-  --duration-fast: 250ms;
-  --duration-medium: 350ms;
-  --duration-slow: 400ms;
-  --duration-very-slow: 500ms;
-  --duration-emphasis: 500ms;
-
-  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --ease-in-out: ease-in-out;
-  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
-
-  --scale-large: 0.96;
-  --scale-medium: 0.97;
-  --scale-small: 0.98;
-  --scale-tiny: 0.99;
-
-  --distance-micro: 4px;
-  --distance-small: 6px;
-  --distance-base: 8px;
-  --distance-medium: 12px;
-  --distance-roomy: 16px;
-
-  --blur-small: 2px;
-  --blur-medium: 3px;
 
   /* Spacing & Layout Tokens (DESIGN.md) */
   --spacing-base: 0.5rem;

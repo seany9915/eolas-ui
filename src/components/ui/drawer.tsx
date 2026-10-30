@@ -33,7 +33,7 @@ export interface DrawerProps {
   modal?: boolean | 'trap-focus';
   disablePointerDismissal?: boolean;
   actionsRef?: React.RefObject<BaseDrawer.Root.Actions | null>;
-  handle?: BaseDrawer.Handle<any>;
+  handle?: BaseDrawer.Handle<unknown>;
   triggerId?: string | null;
   defaultTriggerId?: string | null;
   showCloseButton?: boolean;

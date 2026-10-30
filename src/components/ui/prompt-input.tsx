@@ -57,7 +57,7 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
             'border rounded-2xl p-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20',
             isFloating
               ? 'bg-surface/95 backdrop-blur-xs border-outline/70 shadow-ambient'
-              : 'bg-surface border-outline shadow-xs hover:border-outline/80'
+              : 'bg-surface border-outline hover:border-outline/80'
           ),
       disabled && 'opacity-60 bg-surface-variant/30 border-outline-variant cursor-not-allowed',
       className

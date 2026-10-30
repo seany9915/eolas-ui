@@ -54,7 +54,7 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
           loopFocus={loopFocus}
           disabled={disabled}
           className={cn(
-            'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant shadow-ambient w-max select-none',
+            'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant w-max select-none',
             orientation === 'vertical' && 'flex-col items-stretch',
             className
           )}
@@ -94,7 +94,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
     const context = React.useContext(ToolbarContext);
 
     const sizeClasses = {
-      sm: 'w-9 h-9 min-w-[36px] min-h-[36px] text-xs',
+      sm: 'w-11 h-11 min-w-[44px] min-h-[44px] text-xs',
       md: 'w-11 h-11 min-w-[44px] min-h-[44px] text-sm',
       lg: 'w-12 h-12 min-w-[48px] min-h-[48px] text-base',
     }[size];
@@ -112,7 +112,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
           sizeClasses,
           active
-            ? 'bg-primary text-on-primary shadow-xs'
+            ? 'bg-primary text-on-primary'
             : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
           'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
           className

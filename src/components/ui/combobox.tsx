@@ -65,9 +65,9 @@ export interface ComboboxProps<Item = ComboboxOption, Value = string, Multiple e
   modal?: boolean;
   actionsRef?: React.RefObject<BaseCombobox.Root.Actions | null>;
   inputRef?: React.Ref<HTMLInputElement>;
-  itemToStringLabel?: (itemValue: any) => string;
-  itemToStringValue?: (itemValue: any) => string;
-  isItemEqualToValue?: (itemValue: any, value: any) => boolean;
+  itemToStringLabel?: (itemValue: Item) => string;
+  itemToStringValue?: (itemValue: Item) => string;
+  isItemEqualToValue?: (itemValue: Item, value: Value) => boolean;
   filter?: BaseCombobox.Root.Props<Value, Multiple, Item>['filter'];
   filteredItems?: BaseCombobox.Root.Props<Value, Multiple, Item>['filteredItems'];
   limit?: number;

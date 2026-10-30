@@ -64,7 +64,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
         role="region"
         aria-label={`AI agent approval: ${title}`}
         className={cn(
-          '@container relative flex flex-col rounded-lg bg-surface border border-outline-variant shadow-ambient overflow-hidden max-w-md w-full',
+          '@container relative flex flex-col rounded-lg bg-surface shadow-ambient overflow-hidden max-w-md w-full',
           className
         )}
         {...props}
@@ -96,7 +96,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   <label
                     key={opt.id}
                     className={cn(
-                      'flex items-start gap-3 p-3 rounded-md border text-left transition-colors duration-150 cursor-pointer select-none',
+                      'flex items-start gap-3 p-3 rounded-md border text-left transition-colors duration-quick motion-reduce:transition-none cursor-pointer select-none',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       isSelected
                         ? 'border-primary bg-primary-container text-on-surface'
@@ -123,7 +123,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   <label
                     onClick={() => onSelectOption?.('__custom__')}
                     className={cn(
-                      'flex items-center gap-3 p-3 rounded-md border transition-colors duration-150 cursor-pointer',
+                      'flex items-center gap-3 p-3 rounded-md border transition-colors duration-quick motion-reduce:transition-none cursor-pointer',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       selectedOptionId === '__custom__'
                         ? 'border-primary bg-primary-container text-on-surface'

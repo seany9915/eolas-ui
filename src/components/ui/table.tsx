@@ -46,7 +46,7 @@ export function Table<T>({
   return (
     <div
       className={cn(
-        'w-full overflow-x-auto rounded-[0.75rem] border border-outline-variant bg-surface',
+        'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
         isStack && '@container',
         className
       )}
@@ -82,7 +82,7 @@ export function Table<T>({
               key={keyExtractor(row)}
               className={cn(
                 'min-h-[56px] hover:bg-surface-container/30 transition-colors',
-                isStack && '@max-sm:block @max-sm:p-4 @max-sm:rounded-lg @max-sm:border @max-sm:border-outline-variant @max-sm:bg-surface @max-sm:shadow-sm'
+                isStack && '@max-sm:block @max-sm:p-4 @max-sm:rounded-lg @max-sm:border @max-sm:border-outline-variant @max-sm:bg-surface'
               )}
             >
               {columns.map((col, cIdx) => {

@@ -38,7 +38,7 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(({
   toolautosubmit,
   ...props
 }, ref) => {
-  const webMcpProps: Record<string, any> = {};
+  const webMcpProps: Record<string, string> = {};
   if (toolname) webMcpProps.toolname = toolname;
   if (tooldescription) webMcpProps.tooldescription = tooldescription;
   if (toolautosubmit) webMcpProps.toolautosubmit = '';

@@ -1045,7 +1045,7 @@ export const ComponentLibraryShowcase: React.FC = () => {
                 <div className="p-6 h-full flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-label text-xs uppercase font-bold text-secondary tracking-wider">
+                      <span className="font-label text-xs font-bold text-secondary">
                         DirectionProvider ({showcaseDirection.toUpperCase()})
                       </span>
                       <span className="font-label text-xs text-on-surface-variant">

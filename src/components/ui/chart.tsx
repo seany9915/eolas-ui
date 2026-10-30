@@ -317,7 +317,7 @@ export const ChartLegend = RechartsPrimitive.Legend;
 
 export interface ChartLegendContentProps
   extends React.ComponentProps<'div'> {
-  payload?: any[];
+  payload?: RechartsPrimitive.LegendPayload[];
   verticalAlign?: 'top' | 'bottom';
   hideIcon?: boolean;
   nameKey?: string;

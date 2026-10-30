@@ -16,13 +16,31 @@
 import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { Tooltip, TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, type TooltipProps } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+
+type SidebarButtonClassName = React.ComponentPropsWithoutRef<typeof BaseButton>['className'];
+type ClonedChildProps = React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<unknown> };
+
+/** Merges sidebar classes, ref and props onto the single child used by the `asChild` pattern. */
+function cloneAsChild(
+  child: React.ReactElement,
+  classes: string,
+  ref: React.Ref<unknown>,
+  props: object
+) {
+  const element = child as React.ReactElement<ClonedChildProps>;
+  return React.cloneElement(element, {
+    ref,
+    className: cn(classes, element.props.className),
+    ...props,
+  } as ClonedChildProps);
+}
 
 // Constants exported for SSR hydration and custom layout sizing
 export const SIDEBAR_COOKIE_NAME = 'sidebar_state';
@@ -608,11 +626,7 @@ export const SidebarGroupLabel = React.forwardRef<HTMLDivElement, SidebarGroupLa
     );
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children, {
-        ref,
-        className: cn(classes, children.props.className),
-        ...props,
-      } as any);
+      return cloneAsChild(children, classes, ref, props);
     }
 
     return (
@@ -643,11 +657,7 @@ export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGro
     );
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children, {
-        ref,
-        className: cn(classes, children.props.className),
-        ...props,
-      } as any);
+      return cloneAsChild(children, classes, ref, props);
     }
 
     return (
@@ -770,10 +780,10 @@ export interface SidebarMenuButtonProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'size' | 'className'> {
   asChild?: boolean;
   isActive?: boolean;
-  tooltip?: string | { children?: React.ReactNode; [key: string]: any };
+  tooltip?: string | (Omit<Partial<TooltipProps>, 'children'> & { children?: React.ReactNode });
   variant?: 'default' | 'outline';
   size?: 'default' | 'sm' | 'lg';
-  className?: string | ((state: any) => string | undefined);
+  className?: SidebarButtonClassName;
 }
 
 export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
@@ -800,7 +810,7 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
 
     const computedClassName =
       typeof className === 'function'
-        ? (buttonState: any) => cn(baseVariantClasses, className(buttonState))
+        ? (buttonState: Parameters<typeof className>[0]) => cn(baseVariantClasses, className(buttonState))
         : cn(baseVariantClasses, className);
 
     // Support both asChild and polymorphic Base UI render prop
@@ -864,11 +874,7 @@ export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenu
     );
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children, {
-        ref,
-        className: cn(classes, children.props.className),
-        ...props,
-      } as any);
+      return cloneAsChild(children, classes, ref, props);
     }
 
     return (
@@ -973,7 +979,7 @@ export interface SidebarMenuSubButtonProps
   asChild?: boolean;
   size?: 'sm' | 'md';
   isActive?: boolean;
-  className?: string | ((state: any) => string | undefined);
+  className?: SidebarButtonClassName;
 }
 
 export const SidebarMenuSubButton = React.forwardRef<
@@ -1009,7 +1015,7 @@ export const SidebarMenuSubButton = React.forwardRef<
 
     const computedClassName =
       typeof className === 'function'
-        ? (buttonState: any) => cn(baseClasses, className(buttonState))
+        ? (buttonState: Parameters<typeof className>[0]) => cn(baseClasses, className(buttonState))
         : cn(baseClasses, className);
 
     const effectiveRender = asChild && React.isValidElement(children) ? children : render;

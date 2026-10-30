@@ -170,7 +170,7 @@ const AccordionComponent: React.FC<AccordionProps> = ({
   }, [defaultValue]);
 
   const handleValueChange = React.useCallback(
-    (val: any[], eventDetails: BaseAccordion.Root.ChangeEventDetails) => {
+    (val: string[], eventDetails: BaseAccordion.Root.ChangeEventDetails) => {
       if (onValueChange) {
         if (!isMultiple && type === 'single') {
           onValueChange(val[val.length - 1] ?? '', eventDetails);
