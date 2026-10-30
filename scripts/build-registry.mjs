@@ -1,5 +1,14 @@
-import fs from 'node:fs';
+import nodeFs from 'node:fs';
 import path from 'node:path';
+
+// Normalise CRLF to LF so generated JSON is identical regardless of each machine's git line-ending settings.
+const fs = {
+  ...nodeFs,
+  readFileSync: (file, options) => {
+    const data = nodeFs.readFileSync(file, options);
+    return typeof data === 'string' ? data.replace(/\r\n/g, '\n') : data;
+  },
+};
 
 const UI_DIR = path.resolve('src/components/ui');
 const LIB_DIR = path.resolve('src/lib');
@@ -187,6 +196,19 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
     title: agentRulesItem.title,
     description: agentRulesItem.description,
   });
+} else {
+  // `.agents/` is gitignored, so it is absent in worktrees and fresh clones: keep the committed item instead of dropping it.
+  const existingAgentRules = path.join(OUT_DIR, 'agent-rules.json');
+  if (fs.existsSync(existingAgentRules)) {
+    const existing = JSON.parse(fs.readFileSync(existingAgentRules, 'utf8'));
+    console.warn('.agents/ sources not found: keeping existing agent-rules.json unchanged.');
+    registryItems.push({
+      name: 'agent-rules',
+      type: 'registry:file',
+      title: existing.title,
+      description: existing.description,
+    });
+  }
 }
 
 // Eolas Lint preset item (lint.json)
