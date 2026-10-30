@@ -17,6 +17,7 @@ import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
 import { Chip } from './chip';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 export type ConfirmationStatus =
@@ -30,12 +31,15 @@ export type ConfirmationStatus =
 
 export interface ConfirmationRootProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: ConfirmationStatus;
+  variant?: 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>(
-  ({ status = 'pending', children, className, ...props }, ref) => {
+  ({ status = 'pending', variant, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'card');
     const isApproved = status === 'approved' || status === 'approval-responded' || status === 'output-available';
     const isDenied = status === 'denied' || status === 'output-denied';
 
@@ -45,10 +49,15 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
         data-slot="confirmation-root"
         data-status={status}
         className={cn(
-          'w-full rounded-xl border p-4 transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-          !isApproved && !isDenied && 'bg-surface border-outline-variant',
-          isApproved && 'bg-surface-container/30 border-outline-variant/80',
-          isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80',
+          'w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+          (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
+            ? 'rounded-none border-none bg-transparent p-0'
+            : cn(
+                'rounded-lg border p-4',
+                !isApproved && !isDenied && 'bg-surface border-outline-variant',
+                isApproved && 'bg-surface-container/30 border-outline-variant/80',
+                isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80'
+              ),
           className
         )}
         {...props}
@@ -181,7 +190,7 @@ const ConfirmationDetails: React.FC<ConfirmationDetailsProps> = ({
   return (
     <div
       className={cn(
-        'mt-2.5 p-2.5 rounded-lg bg-surface-container font-mono text-xs text-on-surface-variant overflow-x-auto',
+        'mt-2.5 p-2.5 rounded-sm bg-surface-container font-mono text-xs text-on-surface-variant overflow-x-auto',
         className
       )}
       {...props}
@@ -191,6 +200,49 @@ const ConfirmationDetails: React.FC<ConfirmationDetailsProps> = ({
   );
 };
 ConfirmationDetails.displayName = 'Confirmation.Details';
+
+export interface ConfirmationChangesProps extends React.HTMLAttributes<HTMLDivElement> {
+  changes?: Record<string, { from?: unknown; to?: unknown }> | Array<{ label: string; from?: unknown; to?: unknown }>;
+  children?: React.ReactNode;
+}
+
+const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, children, className, ...props }) => {
+  if (children) {
+    return (
+      <div className={cn('mt-2 text-xs font-mono space-y-1', className)} {...props}>
+        {children}
+      </div>
+    );
+  }
+
+  if (!changes) return null;
+
+  const items = Array.isArray(changes)
+    ? changes
+    : Object.entries(changes).map(([key, val]) => ({ label: key, from: val.from, to: val.to }));
+
+  return (
+    <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container/60 font-mono text-xs space-y-1.5', className)} {...props}>
+      {items.map((item, idx) => (
+        <div key={idx} className="flex items-center justify-between gap-2 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
+          <span className="text-on-surface-variant font-semibold">{item.label}:</span>
+          <div className="flex items-center gap-1.5 truncate">
+            {item.from !== undefined && (
+              <span className="text-error/80 line-through truncate max-w-[120px]">{String(item.from)}</span>
+            )}
+            {item.from !== undefined && item.to !== undefined && (
+              <Icon name="arrow_forward" size="xs" className="text-on-surface-variant/60 shrink-0" />
+            )}
+            {item.to !== undefined && (
+              <span className="text-success font-semibold truncate max-w-[140px]">{String(item.to)}</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+ConfirmationChanges.displayName = 'Confirmation.Changes';
 
 export interface ConfirmationActionsProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
@@ -281,6 +333,31 @@ const ConfirmationDeny: React.FC<ConfirmationDenyProps> = ({
 };
 ConfirmationDeny.displayName = 'Confirmation.Deny';
 
+export interface ConfirmationActionProps extends React.ComponentPropsWithoutRef<typeof Button> {
+  children: React.ReactNode;
+}
+
+export const ConfirmationAction = React.forwardRef<HTMLButtonElement, ConfirmationActionProps>(
+  ({ children, className, variant = 'outlined', colorRole = 'neutral', size = 'sm', ...props }, ref) => {
+    return (
+      <Button
+        ref={ref}
+        variant={variant}
+        colorRole={colorRole}
+        size={size}
+        expandedTouchTarget
+        className={cn('min-h-[44px] px-3.5 text-xs font-semibold gap-1.5', className)}
+        {...props}
+      >
+        {children}
+      </Button>
+    );
+  }
+);
+ConfirmationAction.displayName = 'Confirmation.Action';
+
+export const ConfirmationRequest = ConfirmationHeader;
+
 /* -------------------------------------------------------------------------------------------------
  * Full Confirmation Composition Component
  * -----------------------------------------------------------------------------------------------*/
@@ -290,6 +367,7 @@ export interface ConfirmationProps {
   details?: React.ReactNode;
   riskLevel?: 'low' | 'medium' | 'high';
   status?: ConfirmationStatus;
+  variant?: 'card' | 'embedded' | 'ghost' | 'unboxed';
   onApprove?: () => void;
   onDeny?: () => void;
   approveLabel?: string;
@@ -307,6 +385,7 @@ const ConfirmationComponent = React.forwardRef<HTMLDivElement, ConfirmationProps
       details,
       riskLevel = 'medium',
       status = 'pending',
+      variant,
       onApprove,
       onDeny,
       approveLabel = 'Approve',
@@ -318,12 +397,14 @@ const ConfirmationComponent = React.forwardRef<HTMLDivElement, ConfirmationProps
     },
     ref
   ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'card');
     const isApproved = status === 'approved' || status === 'approval-responded' || status === 'output-available';
     const isDenied = status === 'denied' || status === 'output-denied';
     const isPending = !isApproved && !isDenied;
 
     return (
-      <ConfirmationRoot ref={ref} status={status} className={className} {...props}>
+      <ConfirmationRoot ref={ref} status={status} variant={resolvedVariant} className={className} {...props}>
         {children ? (
           children
         ) : (
@@ -397,9 +478,15 @@ export const Confirmation = Object.assign(ConfirmationComponent, {
   Title: ConfirmationTitle,
   Description: ConfirmationDescription,
   Details: ConfirmationDetails,
+  Changes: ConfirmationChanges,
+  Diff: ConfirmationChanges,
   Actions: ConfirmationActions,
+  Action: ConfirmationAction,
   Approve: ConfirmationApprove,
   Deny: ConfirmationDeny,
+  Request: ConfirmationHeader,
+  Accepted: ConfirmationMedia,
+  Rejected: ConfirmationMedia,
 });
 
 export {
@@ -409,6 +496,7 @@ export {
   ConfirmationTitle,
   ConfirmationDescription,
   ConfirmationDetails,
+  ConfirmationChanges,
   ConfirmationActions,
   ConfirmationApprove,
   ConfirmationDeny,

@@ -26,8 +26,11 @@ import {
   TraceIcon,
   TraceTitle,
   TraceDescription,
+  TraceBadge,
   type TraceStatus,
 } from './trace';
+import { UnstyledButton } from './button';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 /* -------------------------------------------------------------------------------------------------
@@ -50,18 +53,25 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
     const itemLine = (
-      <TraceLine ref={ref} status={status} className={className} {...props}>
-        <TraceIcon name={icon} status={status} />
-        <TraceTitle>{title}</TraceTitle>
-        {(description || formattedDuration) && (
-          <TraceDescription>
-            <span className="flex items-center gap-2">
-              {description && <span>{description}</span>}
-              {formattedDuration && (
-                <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
-                  {formattedDuration}
-                </span>
-              )}
+      <TraceLine
+        ref={ref}
+        status={status}
+        className={cn(description ? 'items-start py-2' : 'items-center', className)}
+        {...props}
+      >
+        <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
+        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+          <TraceTitle className="truncate">{title}</TraceTitle>
+          {description && (
+            <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+              {description}
+            </span>
+          )}
+        </div>
+        {formattedDuration && (
+          <TraceDescription className="ml-auto shrink-0 pl-2">
+            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
+              {formattedDuration}
             </span>
           </TraceDescription>
         )}
@@ -74,9 +84,9 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
           <TraceCollapsibleTrigger>
             {itemLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent>
+          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof children === 'string' ? (
-              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+              <p>
                 {children}
               </p>
             ) : (
@@ -89,12 +99,16 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
 
     if (href) {
       return (
-        <a
-          href={href}
-          className="group/task-link block w-full hover:bg-surface-container/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+        <UnstyledButton
+          render={
+            <a
+              href={href}
+              className="group/task-link block w-full hover:bg-surface-container/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+            />
+          }
         >
           {itemLine}
-        </a>
+        </UnstyledButton>
       );
     }
 
@@ -143,7 +157,7 @@ export const TaskTrigger = React.forwardRef<HTMLButtonElement, TaskTriggerProps>
             <TraceTitle>{title}</TraceTitle>
             {formattedDuration && (
               <TraceDescription>
-                <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
+                <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
                   {formattedDuration}
                 </span>
               </TraceDescription>
@@ -182,26 +196,29 @@ export interface TaskProps {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  variant?: 'default' | 'card' | 'embedded';
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
-const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
+export const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
   (
     {
       defaultOpen = true,
       open,
       onOpenChange,
-      variant = 'embedded',
+      variant,
       children,
       className,
     },
     ref
   ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
+
     return (
       <div ref={ref} data-slot="task" className={cn('w-full', className)}>
-        <Trace variant={variant}>
+        <Trace variant={resolvedVariant}>
           <TraceCollapsible
             defaultOpen={defaultOpen}
             open={open}
@@ -216,13 +233,23 @@ const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
 );
 TaskRoot.displayName = 'Task';
 
+export const TaskHeader = TaskTrigger;
+export const TaskTitle = TraceTitle;
+export const TaskDescription = TraceDescription;
+
 /* -------------------------------------------------------------------------------------------------
  * Compound Export
  * -----------------------------------------------------------------------------------------------*/
 export const Task = Object.assign(TaskRoot, {
+  Header: TaskTrigger,
   Trigger: TaskTrigger,
+  Title: TraceTitle,
+  Description: TraceDescription,
   Content: TaskContent,
   Item: TaskItem,
+  Icon: TraceIcon,
+  Badge: TraceBadge,
+  Status: TraceBadge,
 });
 
 export default Task;

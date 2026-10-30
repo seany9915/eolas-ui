@@ -36,9 +36,13 @@ import {
   TraceCollapsible,
   TraceCollapsibleTrigger,
   TraceCollapsibleContent,
+  TraceAction,
+  TraceActions,
+  TraceBadge,
   type TraceStatus,
-} from '@/components/ui/trace';
+} from './trace';
 import { Progress } from '@/components/ui/progress';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 export interface PlanStepItem {
@@ -121,15 +125,19 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
-          <TraceLine status={overallStatus}>
-            <TraceIcon name="route" status={overallStatus} />
-            <TraceTitle>{title}</TraceTitle>
-            <TraceDescription>
-              <span className="flex items-center gap-2">
-                {description && <span>{description}</span>}
-                <span className="font-mono tabular-nums">
-                  {completedCount} of {totalCount} done
+          <TraceLine status={overallStatus} className={description ? 'items-start py-2' : 'items-center'}>
+            <TraceIcon name="route" status={overallStatus} className={description ? 'mt-0.5' : undefined} />
+            <div className="flex flex-col min-w-0 flex-1 text-left leading-tight">
+              <TraceTitle className="truncate">{title}</TraceTitle>
+              {description && (
+                <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+                  {description}
                 </span>
+              )}
+            </div>
+            <TraceDescription className="ml-auto shrink-0 pl-2">
+              <span className="font-mono tabular-nums">
+                {completedCount} of {totalCount} done
               </span>
             </TraceDescription>
           </TraceLine>
@@ -141,6 +149,8 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
 PlanTrigger.displayName = 'PlanTrigger';
 
 export const PlanHeader = PlanTrigger;
+export const PlanAction = TraceAction;
+export const PlanActions = TraceActions;
 
 export interface PlanContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
@@ -156,7 +166,7 @@ export const PlanContent = React.forwardRef<HTMLDivElement, PlanContentProps>(
         <div className="space-y-3 pt-1">
           {/* Progress Track */}
           <div className="space-y-1">
-            <div className="flex items-center justify-between text-[11px] font-sans text-on-surface-variant">
+            <div className="flex items-center justify-between text-xs font-sans text-on-surface-variant">
               <span>Progress</span>
               <span className="font-mono tabular-nums">{progressPercent}%</span>
             </div>
@@ -200,7 +210,7 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
             <span className="flex items-center gap-2">
               {description && <span>{description}</span>}
               {formattedDuration && (
-                <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
+                <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
                   {formattedDuration}
                 </span>
               )}
@@ -216,9 +226,9 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
           <TraceCollapsibleTrigger>
             {stepLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent>
+          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof stepContent === 'string' ? (
-              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+              <p>
                 {stepContent}
               </p>
             ) : (
@@ -244,22 +254,24 @@ export interface PlanProps {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  variant?: 'default' | 'card' | 'embedded';
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
-const PlanRoot: React.FC<PlanProps> = ({
+export const PlanRoot: React.FC<PlanProps> = ({
   title = 'Execution Plan',
   description,
   steps = [],
   defaultOpen = true,
   open,
   onOpenChange,
-  variant = 'embedded',
+  variant,
   children,
   className,
 }) => {
+  const chatContext = useChatMessageContext();
+  const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
   const completedCount = steps.filter((s) => s.status === 'complete').length;
   const runningCount = steps.filter((s) => s.status === 'running').length;
   const totalCount = steps.length;
@@ -287,7 +299,7 @@ const PlanRoot: React.FC<PlanProps> = ({
       }}
     >
       <div data-slot="plan" className={cn('w-full', className)}>
-        <Trace variant={variant}>
+        <Trace variant={resolvedVariant}>
           <TraceCollapsible
             defaultOpen={defaultOpen}
             open={open}
@@ -301,32 +313,40 @@ const PlanRoot: React.FC<PlanProps> = ({
                 <PlanContent>
                   {steps.map((step) => {
                     const stepContent = step.content ?? step.details;
-                    const stepDescription = (
-                      <span className="flex items-center gap-2">
-                        {step.description && <span>{step.description}</span>}
-                        {step.duration && (
-                          <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
-                            {typeof step.duration === 'number' ? `${step.duration}s` : step.duration}
-                          </span>
+                    const formattedDuration = step.duration
+                      ? (typeof step.duration === 'number' ? `${step.duration}s` : step.duration)
+                      : null;
+
+                    const renderStepLine = (
+                      <TraceLine status={step.status} className={step.description ? 'items-start py-2' : 'items-center'}>
+                        <TraceIcon status={step.status} className={step.description ? 'mt-0.5' : undefined} />
+                        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+                          <TraceTitle className="truncate">{step.title}</TraceTitle>
+                          {step.description && (
+                            <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+                              {step.description}
+                            </span>
+                          )}
+                        </div>
+                        {formattedDuration && (
+                          <TraceDescription className="ml-auto shrink-0 pl-2">
+                            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
+                              {formattedDuration}
+                            </span>
+                          </TraceDescription>
                         )}
-                      </span>
+                      </TraceLine>
                     );
 
                     if (stepContent) {
                       return (
                         <TraceCollapsible key={step.id} defaultOpen={step.status === 'running'}>
                           <TraceCollapsibleTrigger>
-                            <TraceLine status={step.status}>
-                              <TraceIcon status={step.status} />
-                              <TraceTitle>{step.title}</TraceTitle>
-                              {(step.description || step.duration) && (
-                                <TraceDescription>{stepDescription}</TraceDescription>
-                              )}
-                            </TraceLine>
+                            {renderStepLine}
                           </TraceCollapsibleTrigger>
-                          <TraceCollapsibleContent>
+                          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
                             {typeof stepContent === 'string' ? (
-                              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                              <p>
                                 {stepContent}
                               </p>
                             ) : (
@@ -338,13 +358,9 @@ const PlanRoot: React.FC<PlanProps> = ({
                     }
 
                     return (
-                      <TraceLine key={step.id} status={step.status}>
-                        <TraceIcon status={step.status} />
-                        <TraceTitle>{step.title}</TraceTitle>
-                        {(step.description || step.duration) && (
-                          <TraceDescription>{stepDescription}</TraceDescription>
-                        )}
-                      </TraceLine>
+                      <React.Fragment key={step.id}>
+                        {renderStepLine}
+                      </React.Fragment>
                     );
                   })}
                 </PlanContent>
@@ -368,6 +384,10 @@ export const Plan = Object.assign(PlanRoot, {
   Trigger: PlanTrigger,
   Content: PlanContent,
   Step: PlanStep,
+  Action: PlanAction,
+  Actions: PlanActions,
+  Badge: TraceBadge,
+  Status: TraceBadge,
 });
 
 export default Plan;

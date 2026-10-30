@@ -17,34 +17,51 @@ import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
 import { Icon } from './icon';
 import { Chip } from './chip';
 import { CodeBlock } from './code-block';
+import { InlineAlert } from './inline-alert';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 export type ToolStatus = 'calling' | 'complete' | 'error';
 
+interface ToolContextValue {
+  variant: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
+}
+
+const ToolContext = React.createContext<ToolContextValue>({ variant: 'default' });
+
 export interface ToolRootProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Root> {
   status?: ToolStatus;
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ToolRoot = React.forwardRef<HTMLDivElement, ToolRootProps>(
-  ({ status = 'complete', children, className, ...props }, ref) => {
+  ({ status = 'complete', variant, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'default');
+
     return (
-      <BaseCollapsible.Root
-        ref={ref}
-        data-slot="tool-root"
-        data-status={status}
-        className={cn(
-          '@container w-full rounded-xl border border-outline-variant/80 bg-surface overflow-hidden',
-          'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-          status === 'calling' && 'border-primary/50',
-          status === 'error' && 'border-error/50',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </BaseCollapsible.Root>
+      <ToolContext.Provider value={{ variant: resolvedVariant }}>
+        <BaseCollapsible.Root
+          ref={ref}
+          data-slot="tool-root"
+          data-status={status}
+          className={cn(
+            '@container w-full overflow-hidden',
+            'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+            (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
+              ? 'rounded-none border-none bg-transparent divide-y divide-outline-variant/30'
+              : 'rounded-lg border border-outline-variant/80 bg-surface',
+            resolvedVariant !== 'ghost' && resolvedVariant !== 'unboxed' && status === 'calling' && 'border-primary',
+            resolvedVariant !== 'ghost' && resolvedVariant !== 'unboxed' && status === 'error' && 'border-error',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </BaseCollapsible.Root>
+      </ToolContext.Provider>
     );
   }
 );
@@ -72,12 +89,15 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
         ? 'progress_activity'
         : status === 'error'
         ? 'error'
+        : status === 'complete'
+        ? 'check'
         : iconName || 'terminal';
 
     return (
       <BaseCollapsible.Trigger
         ref={ref}
         data-slot="tool-header"
+        aria-label={props['aria-label'] || `${name} (${status === 'calling' ? 'Running' : status === 'error' ? 'Failed' : 'Complete'})`}
         className={cn(
           'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-left select-none',
           'hover:bg-surface-container/40 transition-colors duration-quick ease-standard motion-reduce:transition-none',
@@ -91,8 +111,8 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
             className={cn(
               'size-6 rounded-md flex items-center justify-center shrink-0 select-none text-xs',
               status === 'calling' && 'bg-primary-container text-on-primary-container font-bold',
-              status === 'complete' && 'bg-surface-container text-primary',
-              status === 'error' && 'bg-error-container text-on-error-container'
+              status === 'complete' && 'bg-success-container text-on-success-container font-bold',
+              status === 'error' && 'bg-error-container text-on-error-container font-bold'
             )}
             aria-hidden="true"
           >
@@ -103,7 +123,10 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
             />
           </div>
 
-          <span className="font-mono text-xs font-semibold text-on-surface truncate">
+          <span
+            className="font-mono text-xs font-semibold text-on-surface truncate"
+            title={name}
+          >
             {name}
           </span>
 
@@ -124,7 +147,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
               Failed
             </Chip>
           ) : (
-            <Chip size="sm" pattern="outline-neutral-fill" colorRole="neutral" className="text-[10px] h-5 py-0">
+            <Chip size="sm" pattern="outline-neutral-fill" colorRole="success" className="text-[10px] h-5 py-0">
               Complete
             </Chip>
           )}
@@ -151,6 +174,9 @@ export interface ToolContentProps extends React.ComponentPropsWithoutRef<typeof 
 
 const ToolContent = React.forwardRef<HTMLDivElement, ToolContentProps>(
   ({ children, className, ...props }, ref) => {
+    const { variant } = React.useContext(ToolContext);
+    const isGhost = variant === 'ghost' || variant === 'unboxed';
+
     return (
       <BaseCollapsible.Panel
         ref={ref}
@@ -161,7 +187,12 @@ const ToolContent = React.forwardRef<HTMLDivElement, ToolContentProps>(
         )}
         {...props}
       >
-        <div className="p-3.5 pt-1 space-y-3 border-t border-outline-variant/40 text-xs">
+        <div
+          className={cn(
+            'p-3.5 pt-1 space-y-3 text-sm font-sans text-on-surface-variant',
+            isGhost ? 'px-0 border-t border-outline-variant/30' : 'border-t border-outline-variant/40'
+          )}
+        >
           {children}
         </div>
       </BaseCollapsible.Panel>
@@ -198,11 +229,11 @@ const ToolInput: React.FC<ToolInputProps> = ({
       {children ? (
         children
       ) : codeString ? (
-        <CodeBlock language="json">
-          <div className="flex items-center justify-between px-3 py-1 border-b border-outline-variant/40 bg-surface-container/60">
-            <span className="text-[10px] font-mono text-on-surface-variant">arguments.json</span>
+        <CodeBlock language="json" variant="flush">
+          <CodeBlock.Header className="px-3 py-1 bg-surface-container/60">
+            <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">arguments.json</CodeBlock.Title>
             <CodeBlock.CopyButton value={codeString} />
-          </div>
+          </CodeBlock.Header>
           <CodeBlock.Content>
             <code>{codeString}</code>
           </CodeBlock.Content>
@@ -241,11 +272,11 @@ const ToolOutput: React.FC<ToolOutputProps> = ({
       {children ? (
         children
       ) : codeString ? (
-        <CodeBlock language="json">
-          <div className="flex items-center justify-between px-3 py-1 border-b border-outline-variant/40 bg-surface-container/60">
-            <span className="text-[10px] font-mono text-on-surface-variant">result.json</span>
+        <CodeBlock language="json" variant="flush">
+          <CodeBlock.Header className="px-3 py-1 bg-surface-container/60">
+            <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">result.json</CodeBlock.Title>
             <CodeBlock.CopyButton value={codeString} />
-          </div>
+          </CodeBlock.Header>
           <CodeBlock.Content>
             <code>{codeString}</code>
           </CodeBlock.Content>
@@ -256,7 +287,7 @@ const ToolOutput: React.FC<ToolOutputProps> = ({
 };
 ToolOutput.displayName = 'Tool.Output';
 
-export interface ToolErrorProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ToolErrorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role'> {
   error?: string;
   title?: string;
   children?: React.ReactNode;
@@ -271,20 +302,14 @@ const ToolError: React.FC<ToolErrorProps> = ({
   ...props
 }) => {
   return (
-    <div
-      role="alert"
-      className={cn(
-        'p-3 rounded-lg bg-error-container text-on-error-container border border-error/30 font-mono text-xs space-y-1',
-        className
-      )}
+    <InlineAlert
+      role="error"
+      title={title}
+      className={cn('font-mono text-xs', className)}
       {...props}
     >
-      <div className="flex items-center gap-1.5 font-bold">
-        <Icon name="error" size="xs" aria-hidden="true" />
-        <span>{title}</span>
-      </div>
-      <div>{children || error}</div>
-    </div>
+      {children || error}
+    </InlineAlert>
   );
 };
 ToolError.displayName = 'Tool.Error';
@@ -295,6 +320,7 @@ ToolError.displayName = 'Tool.Error';
 export interface ToolProps {
   name: string;
   status?: ToolStatus;
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   input?: Record<string, unknown> | string;
   output?: Record<string, unknown> | string;
   error?: string;
@@ -310,6 +336,7 @@ const ToolComponent = React.forwardRef<HTMLDivElement, ToolProps>(
     {
       name,
       status = 'complete',
+      variant,
       input,
       output,
       error,
@@ -322,10 +349,14 @@ const ToolComponent = React.forwardRef<HTMLDivElement, ToolProps>(
     },
     ref
   ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'default');
+
     return (
       <ToolRoot
         ref={ref}
         status={status}
+        variant={resolvedVariant}
         defaultOpen={defaultOpen || status === 'error'}
         className={className}
         {...props}
@@ -359,12 +390,16 @@ ToolComponent.displayName = 'Tool';
 export const Tool = Object.assign(ToolComponent, {
   Root: ToolRoot,
   Header: ToolHeader,
+  Trigger: ToolHeader,
   Content: ToolContent,
+  Panel: ToolContent,
   Input: ToolInput,
   Args: ToolInput,
   Output: ToolOutput,
   Result: ToolOutput,
   Error: ToolError,
+  State: Chip,
+  Badge: Chip,
 });
 
 export {
@@ -378,7 +413,9 @@ export {
   Tool as ToolCall,
   ToolRoot as ToolCallRoot,
   ToolHeader as ToolCallHeader,
+  ToolHeader as ToolTrigger,
   ToolContent as ToolCallContent,
+  ToolContent as ToolPanel,
   ToolInput as ToolCallInput,
   ToolOutput as ToolCallOutput,
 };

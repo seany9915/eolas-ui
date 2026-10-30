@@ -32,8 +32,11 @@ import {
   TraceCollapsible,
   TraceCollapsibleTrigger,
   TraceCollapsibleContent,
+  TraceAction,
+  TraceActions,
   type TraceStatus,
 } from '@/components/ui/trace';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 export interface QueueItem {
@@ -109,18 +112,25 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
     return (
-      <TraceLine ref={ref} status={status} className={className} {...props}>
-        <TraceIcon name={icon} status={status} />
-        <TraceTitle>{title}</TraceTitle>
-        {(description || formattedDuration) && (
-          <TraceDescription>
-            <span className="flex items-center gap-2">
-              {description && <span>{description}</span>}
-              {formattedDuration && (
-                <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
-                  {formattedDuration}
-                </span>
-              )}
+      <TraceLine
+        ref={ref}
+        status={status}
+        className={cn(description ? 'items-start py-2' : 'items-center', className)}
+        {...props}
+      >
+        <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
+        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+          <TraceTitle className="truncate">{title}</TraceTitle>
+          {description && (
+            <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+              {description}
+            </span>
+          )}
+        </div>
+        {formattedDuration && (
+          <TraceDescription className="ml-auto shrink-0 pl-2">
+            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
+              {formattedDuration}
             </span>
           </TraceDescription>
         )}
@@ -203,12 +213,12 @@ export interface QueueProps {
   completedTitle?: string;
   defaultTodoOpen?: boolean;
   defaultCompletedOpen?: boolean;
-  variant?: 'default' | 'card' | 'embedded';
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
-const QueueRoot: React.FC<QueueProps> = ({
+export const QueueRoot: React.FC<QueueProps> = ({
   items = [],
   title,
   description,
@@ -216,10 +226,12 @@ const QueueRoot: React.FC<QueueProps> = ({
   completedTitle,
   defaultTodoOpen = true,
   defaultCompletedOpen = false,
-  variant = 'embedded',
+  variant,
   children,
   className,
 }) => {
+  const chatContext = useChatMessageContext();
+  const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
   const isItemCompleted = (i: QueueItem) => i.isCompleted === true || i.status === 'complete';
   const pendingItems = items.filter((i) => !isItemCompleted(i));
   const completedItems = items.filter((i) => isItemCompleted(i));
@@ -236,7 +248,7 @@ const QueueRoot: React.FC<QueueProps> = ({
 
   return (
     <div data-slot="queue" className={cn('w-full', className)}>
-      <Trace variant={variant}>
+      <Trace variant={resolvedVariant}>
         {(title || description) && (
           <div className="px-3.5 pt-3 pb-2 border-b border-outline-variant/40">
             {title && <h5 className="font-heading text-sm font-bold text-on-surface">{title}</h5>}
@@ -304,6 +316,52 @@ const QueueRoot: React.FC<QueueProps> = ({
     </div>
   );
 };
+export interface QueueEmptyProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string;
+  description?: string;
+  icon?: string;
+  children?: React.ReactNode;
+}
+
+export const QueueEmpty: React.FC<QueueEmptyProps> = ({
+  title = 'Queue is empty',
+  description = 'No active agent tasks',
+  icon = 'inbox',
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <TraceLine status="default" className={className} {...props}>
+      <TraceIcon name={icon} status="default" />
+      <TraceTitle>{children || title}</TraceTitle>
+      {description && <TraceDescription>{description}</TraceDescription>}
+    </TraceLine>
+  );
+};
+QueueEmpty.displayName = 'QueueEmpty';
+
+export const QueueAction = TraceAction;
+export const QueueActions = TraceActions;
+
+export interface QueueListProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+}
+
+export const QueueList = React.forwardRef<HTMLDivElement, QueueListProps>(
+  ({ children, className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="queue-list"
+      className={cn('pt-1 divide-y divide-outline-variant/30', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+);
+QueueList.displayName = 'QueueList';
+
 QueueRoot.displayName = 'Queue';
 
 /* -------------------------------------------------------------------------------------------------
@@ -313,7 +371,15 @@ export const Queue = Object.assign(QueueRoot, {
   Header: QueueHeader,
   Title: QueueTitle,
   Section: QueueSection,
+  List: QueueList,
   Item: QueueItemComponent,
+  Action: QueueAction,
+  Actions: QueueActions,
+  Empty: QueueEmpty,
 });
+
+export {
+  QueueItemComponent as QueueItem,
+};
 
 export default Queue;

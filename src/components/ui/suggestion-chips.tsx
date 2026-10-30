@@ -79,20 +79,37 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
 SuggestionChipsList.displayName = 'SuggestionChips.List';
 
 export interface SuggestionChipProps {
-  suggestion: SuggestionItem;
-  onSelect: (prompt: string) => void;
-  variant?: 'compact' | 'card';
+  suggestion?: SuggestionItem | string;
+  onSelect?: (prompt: string) => void;
+  onClick?: (prompt: string) => void;
+  variant?: 'compact' | 'card' | 'ghost';
   className?: string;
+  children?: React.ReactNode;
 }
 
 const SuggestionChip: React.FC<SuggestionChipProps> = ({
-  suggestion,
+  suggestion = '',
   onSelect,
+  onClick,
   variant = 'compact',
   className,
+  children,
 }) => {
+  const item: SuggestionItem =
+    typeof suggestion === 'string'
+      ? { label: suggestion, prompt: suggestion }
+      : suggestion;
+
+  const itemLabel = item.label || '';
+  const itemPrompt = item.prompt || itemLabel;
+  const itemIcon = item.icon;
+  const accessibleLabel =
+    itemLabel ||
+    (typeof children === 'string' ? children : 'Suggested question');
+
   const handleClick = () => {
-    onSelect(suggestion.prompt || suggestion.label);
+    onSelect?.(itemPrompt);
+    onClick?.(itemPrompt);
   };
 
   if (variant === 'card') {
@@ -102,30 +119,65 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         onClick={handleClick}
         className={cn(
           'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
-          'bg-surface border border-outline-variant hover:border-secondary hover:bg-secondary-container/30 text-left',
+          'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-left',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           className
         )}
-        aria-label={`Ask: ${suggestion.label}`}
+        aria-label={`Ask: ${accessibleLabel}`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          {suggestion.icon && (
+          {itemIcon && (
             <Icon
-              name={suggestion.icon}
+              name={itemIcon}
               size="sm"
               className="text-secondary group-hover:scale-105 transition-transform shrink-0"
               aria-hidden="true"
             />
           )}
-          <span className="text-xs font-sans font-medium text-on-surface truncate leading-snug">
-            {suggestion.label}
+          <span className="text-sm font-sans font-medium text-on-surface truncate leading-snug">
+            {children || itemLabel}
           </span>
         </div>
         <Icon
           name="arrow_forward"
           size="xs"
           className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
+          aria-hidden="true"
+        />
+      </Button>
+    );
+  }
+
+  if (variant === 'ghost') {
+    return (
+      <Button
+        variant="unstyled"
+        onClick={handleClick}
+        className={cn(
+          'group inline-flex items-center gap-2 px-2.5 py-1.5 min-h-[44px] rounded-md',
+          'bg-transparent border-0 hover:bg-surface-container/60 text-left',
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
+          className
+        )}
+        aria-label={`Ask: ${accessibleLabel}`}
+      >
+        {itemIcon && (
+          <Icon
+            name={itemIcon}
+            size="xs"
+            className="text-primary group-hover:scale-105 transition-transform shrink-0"
+            aria-hidden="true"
+          />
+        )}
+        <span className="text-sm font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
+          {children || itemLabel}
+        </span>
+        <Icon
+          name="arrow_forward"
+          size="xs"
+          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
           aria-hidden="true"
         />
       </Button>
@@ -143,18 +195,18 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
         className
       )}
-      aria-label={`Ask: ${suggestion.label}`}
+      aria-label={`Ask: ${accessibleLabel}`}
     >
-      {suggestion.icon && (
+      {itemIcon && (
         <Icon
-          name={suggestion.icon}
+          name={itemIcon}
           size="xs"
           className="text-primary group-hover:scale-105 transition-transform shrink-0"
           aria-hidden="true"
         />
       )}
-      <span className="text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
-        {suggestion.label}
+      <span className="text-sm font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
+        {children || itemLabel}
       </span>
       <Icon
         name="arrow_forward"
@@ -168,47 +220,82 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
 SuggestionChip.displayName = 'SuggestionChip';
 
 export interface SuggestionChipsProps {
-  suggestions: SuggestionItem[];
-  onSelect: (prompt: string) => void;
+  suggestions?: (SuggestionItem | string)[];
+  onSelect?: (prompt: string) => void;
   label?: string;
   layout?: 'wrap' | 'scroll' | 'stack';
-  variant?: 'compact' | 'card';
+  variant?: 'compact' | 'card' | 'ghost';
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const SuggestionChips: React.FC<SuggestionChipsProps> = ({
+const SuggestionChipsComponent: React.FC<SuggestionChipsProps> = ({
   suggestions,
-  onSelect,
+  onSelect = () => {},
   label = 'Suggested Clinical Questions',
   layout = 'wrap',
   variant = 'compact',
   className,
+  children,
 }) => {
-  if (!suggestions || suggestions.length === 0) return null;
+  if (!children && (!suggestions || suggestions.length === 0)) return null;
 
   return (
     <SuggestionChipsRoot label={label} className={className}>
       <SuggestionChipsList layout={layout}>
-        {suggestions.map((item, idx) => (
-          <SuggestionChip
-            key={item.id || idx}
-            suggestion={item}
-            onSelect={onSelect}
-            variant={variant}
-          />
-        ))}
+        {children ||
+          suggestions?.map((item, idx) => (
+            <SuggestionChip
+              key={typeof item === 'string' ? item : item.id || idx}
+              suggestion={item}
+              onSelect={onSelect}
+              variant={variant}
+            />
+          ))}
       </SuggestionChipsList>
     </SuggestionChipsRoot>
   );
 };
-SuggestionChips.displayName = 'SuggestionChips';
+SuggestionChipsComponent.displayName = 'SuggestionChips';
+
+export interface SuggestionChipsGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  label?: string;
+  children: React.ReactNode;
+}
+
+const SuggestionChipsGroup: React.FC<SuggestionChipsGroupProps> = ({
+  label,
+  children,
+  className,
+  ...props
+}) => (
+  <div className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
+    {label && (
+      <span className="font-heading text-xs font-semibold text-on-surface-variant select-none px-0.5">
+        {label}
+      </span>
+    )}
+    <div className="flex flex-wrap gap-2">{children}</div>
+  </div>
+);
+SuggestionChipsGroup.displayName = 'SuggestionChips.Group';
+
+export const SuggestionChips = Object.assign(SuggestionChipsComponent, {
+  Root: SuggestionChipsRoot,
+  List: SuggestionChipsList,
+  Item: SuggestionChip,
+  Chip: SuggestionChip,
+  Group: SuggestionChipsGroup,
+});
 
 export {
   SuggestionChipsRoot,
   SuggestionChipsList,
   SuggestionChip,
+  SuggestionChipsGroup,
   // shadcn AI Elements direct aliases
   SuggestionChips as Suggestions,
   SuggestionChip as Suggestion,
   SuggestionChipsList as SuggestionList,
+  SuggestionChipsGroup as SuggestionGroup,
 };

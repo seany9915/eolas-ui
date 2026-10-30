@@ -28,10 +28,25 @@ import {
   TraceIcon,
   TraceTitle,
   TraceDescription,
+  TraceBadge,
   type TraceStatus,
 } from './trace';
 import { Chip } from './chip';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
+
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+interface ChainOfThoughtContextValue {
+  isStreaming: boolean;
+}
+
+const ChainOfThoughtContext = React.createContext<ChainOfThoughtContextValue>({ isStreaming: false });
+
+export function useChainOfThought() {
+  return React.useContext(ChainOfThoughtContext);
+}
 
 /* -------------------------------------------------------------------------------------------------
  * ChainOfThoughtStep
@@ -52,18 +67,25 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
     const stepLine = (
-      <TraceLine ref={ref} status={status} className={className} {...props}>
-        <TraceIcon name={icon} status={status} />
-        <TraceTitle>{title}</TraceTitle>
-        {(description || formattedDuration) && (
-          <TraceDescription>
-            <span className="flex items-center gap-2">
-              {description && <span>{description}</span>}
-              {formattedDuration && (
-                <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
-                  {formattedDuration}
-                </span>
-              )}
+      <TraceLine
+        ref={ref}
+        status={status}
+        className={cn(description ? 'items-start py-2' : 'items-center', className)}
+        {...props}
+      >
+        <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
+        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+          <TraceTitle className="truncate">{title}</TraceTitle>
+          {description && (
+            <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+              {description}
+            </span>
+          )}
+        </div>
+        {formattedDuration && (
+          <TraceDescription className="ml-auto shrink-0 pl-2">
+            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
+              {formattedDuration}
             </span>
           </TraceDescription>
         )}
@@ -76,11 +98,9 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
           <TraceCollapsibleTrigger>
             {stepLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent>
+          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof children === 'string' ? (
-              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                {children}
-              </p>
+              <p>{children}</p>
             ) : (
               children
             )}
@@ -112,7 +132,7 @@ export const ChainOfThoughtHeader = React.forwardRef<HTMLButtonElement, ChainOfT
     {
       title = 'Chain of thought',
       stepCount,
-      status = 'complete',
+      status: propStatus,
       badgeLabel,
       children,
       className,
@@ -120,21 +140,24 @@ export const ChainOfThoughtHeader = React.forwardRef<HTMLButtonElement, ChainOfT
     },
     ref
   ) => {
+    const { isStreaming } = useChainOfThought();
+    const status = propStatus ?? (isStreaming ? 'running' : 'complete');
+
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
           <TraceLine status={status}>
-            <TraceIcon name="hub" status={status} />
+            <TraceIcon name={isStreaming && !propStatus ? 'progress_activity' : 'hub'} status={status} />
             <TraceTitle>{title}</TraceTitle>
             <TraceDescription>
               <span className="flex items-center gap-2">
                 {stepCount !== undefined && (
-                  <Chip pattern="outline-neutral-fill" colorRole="neutral" size="sm" className="font-mono text-[10px] py-0 px-1.5 h-5">
+                  <Chip pattern="outline-neutral-fill" colorRole="neutral" size="sm" className="font-mono text-xs py-0 px-1.5 h-5">
                     {stepCount} {stepCount === 1 ? 'step' : 'steps'}
                   </Chip>
                 )}
                 {badgeLabel && (
-                  <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
+                  <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
                     {badgeLabel}
                   </span>
                 )}
@@ -176,35 +199,43 @@ export interface ChainOfThoughtProps {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  variant?: 'default' | 'card' | 'embedded';
+  isStreaming?: boolean;
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
-const ChainOfThoughtRoot = React.forwardRef<HTMLDivElement, ChainOfThoughtProps>(
+export const ChainOfThoughtRoot = React.forwardRef<HTMLDivElement, ChainOfThoughtProps>(
   (
     {
-      defaultOpen = false,
+      defaultOpen,
       open,
       onOpenChange,
-      variant = 'embedded',
+      isStreaming = false,
+      variant,
       children,
       className,
     },
     ref
   ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
+    const resolvedDefaultOpen = defaultOpen ?? isStreaming;
+
     return (
-      <div ref={ref} data-slot="chain-of-thought" className={cn('w-full', className)}>
-        <Trace variant={variant}>
-          <TraceCollapsible
-            defaultOpen={defaultOpen}
-            open={open}
-            onOpenChange={onOpenChange}
-          >
-            {children}
-          </TraceCollapsible>
-        </Trace>
-      </div>
+      <ChainOfThoughtContext.Provider value={{ isStreaming }}>
+        <div ref={ref} data-slot="chain-of-thought" className={cn('w-full', className)}>
+          <Trace variant={resolvedVariant}>
+            <TraceCollapsible
+              defaultOpen={resolvedDefaultOpen}
+              open={open}
+              onOpenChange={onOpenChange}
+            >
+              {children}
+            </TraceCollapsible>
+          </Trace>
+        </div>
+      </ChainOfThoughtContext.Provider>
     );
   }
 );
@@ -218,6 +249,8 @@ export const ChainOfThought = Object.assign(ChainOfThoughtRoot, {
   Trigger: ChainOfThoughtTrigger,
   Content: ChainOfThoughtContent,
   Step: ChainOfThoughtStep,
+  Badge: TraceBadge,
+  Status: TraceBadge,
 });
 
 export default ChainOfThought;

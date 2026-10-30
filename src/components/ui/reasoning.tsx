@@ -34,6 +34,10 @@ import {
   TraceDescription,
   type TraceStatus,
 } from './trace';
+import { ShimmerText } from './shimmer-text';
+import { Button } from './button';
+import { Icon } from './icon';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 /* -------------------------------------------------------------------------------------------------
@@ -78,7 +82,15 @@ export const ReasoningTrigger = React.forwardRef<HTMLButtonElement, ReasoningTri
               name={isRunning ? 'progress_activity' : 'schema'}
               status={computedStatus}
             />
-            <TraceTitle>{displayTitle}</TraceTitle>
+            <TraceTitle>
+              {isRunning ? (
+                <ShimmerText variant="secondary" active={true}>
+                  {displayTitle}
+                </ShimmerText>
+              ) : (
+                displayTitle
+              )}
+            </TraceTitle>
             {formattedDuration && displayTitle !== `Thought for ${formattedDuration}` && (
               <TraceDescription>
                 <span className="font-mono tabular-nums">{formattedDuration}</span>
@@ -91,6 +103,36 @@ export const ReasoningTrigger = React.forwardRef<HTMLButtonElement, ReasoningTri
   }
 );
 ReasoningTrigger.displayName = 'ReasoningTrigger';
+
+export interface ReasoningCopyButtonProps {
+  value: string;
+  className?: string;
+}
+
+export const ReasoningCopyButton: React.FC<ReasoningCopyButtonProps> = ({ value, className }) => {
+  const [copied, setCopied] = React.useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      colorRole="neutral"
+      size="sm"
+      onClick={handleCopy}
+      expandedTouchTarget
+      aria-label={copied ? 'Copied thoughts' : 'Copy thoughts'}
+      className={cn('size-7 min-h-[28px] min-w-[28px] p-0 text-on-surface-variant hover:text-on-surface', className)}
+    >
+      <Icon name={copied ? 'check' : 'content_copy'} size="xs" aria-hidden="true" />
+    </Button>
+  );
+};
+ReasoningCopyButton.displayName = 'ReasoningCopyButton';
 
 /* -------------------------------------------------------------------------------------------------
  * ReasoningContent
@@ -105,7 +147,7 @@ export const ReasoningContent = React.forwardRef<HTMLDivElement, ReasoningConten
     return (
       <TraceCollapsibleContent ref={ref} className={className} {...props}>
         {typeof children === 'string' ? (
-          <div className="whitespace-pre-wrap font-sans text-xs text-on-surface-variant leading-relaxed">
+          <div className="whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
             {children}
           </div>
         ) : (
@@ -129,11 +171,11 @@ export interface ReasoningProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
-  variant?: 'default' | 'card' | 'embedded';
+  variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   className?: string;
 }
 
-const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
+export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
   (
     {
       isStreaming = false,
@@ -144,11 +186,13 @@ const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
       open,
       onOpenChange,
       children,
-      variant = 'embedded',
+      variant,
       className,
     },
     ref
   ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
     const computedStatus: TraceStatus = status ?? (isStreaming ? 'running' : 'complete');
     const isRunning = computedStatus === 'running';
 
@@ -186,7 +230,7 @@ const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
         }}
       >
         <div ref={ref} data-slot="reasoning" className={cn('w-full', className)}>
-          <Trace variant={variant}>
+          <Trace variant={resolvedVariant}>
             <TraceCollapsible
               defaultOpen={resolvedDefaultOpen}
               open={open}
@@ -209,17 +253,16 @@ const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
 );
 ReasoningRoot.displayName = 'Reasoning';
 
+export const ReasoningHeader = ReasoningTrigger;
+
 /* -------------------------------------------------------------------------------------------------
  * Compound Export
  * -----------------------------------------------------------------------------------------------*/
 export const Reasoning = Object.assign(ReasoningRoot, {
+  Header: ReasoningTrigger,
   Trigger: ReasoningTrigger,
   Content: ReasoningContent,
-});
-
-/* Attach compound alias to Trace */
-export const TraceWithReasoning = Object.assign(Trace, {
-  Reasoning,
+  CopyButton: ReasoningCopyButton,
 });
 
 export default Reasoning;

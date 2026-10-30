@@ -8,17 +8,20 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
   action?: React.ReactNode;
+  variant?: 'default' | 'flush' | 'unboxed';
 }
 
 export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
-  ({ className, icon, iconProps, title, description, action, children, ...props }, ref) => {
+  ({ className, icon, iconProps, title, description, action, variant = 'default', children, ...props }, ref) => {
     return (
       <div
         ref={ref}
         role="status"
         aria-label={title || 'No data available'}
         className={cn(
-          '@container flex flex-col items-center justify-center text-center p-8 @sm:p-12 rounded-lg bg-surface border border-dashed border-outline-variant max-w-2xl mx-auto my-4',
+          '@container flex flex-col items-center justify-center text-center p-8 @sm:p-12 max-w-2xl mx-auto my-4',
+          variant === 'default' && 'rounded-lg bg-surface border border-dashed border-outline-variant',
+          (variant === 'flush' || variant === 'unboxed') && 'border-none bg-transparent shadow-none',
           className
         )}
         {...props}

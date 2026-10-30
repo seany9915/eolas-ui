@@ -27,18 +27,21 @@ export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   className?: string;
   language?: string;
+  variant?: 'default' | 'flush' | 'ghost';
 }
 
 const CodeBlockRoot = React.forwardRef<HTMLDivElement, CodeBlockProps>(
-  ({ children, className, language, ...props }, ref) => {
+  ({ children, className, language, variant = 'default', ...props }, ref) => {
     return (
       <div
         ref={ref}
         data-slot="code-block"
         data-language={language}
         className={cn(
-          '@container relative w-full rounded-lg border border-outline-variant bg-surface-container/60 overflow-hidden font-mono text-xs',
+          '@container relative w-full font-mono text-xs overflow-hidden',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+          variant === 'default' && 'rounded-lg border border-outline-variant bg-surface-container/60',
+          (variant === 'flush' || variant === 'ghost') && 'rounded-sm border-none bg-surface-container/60',
           className
         )}
         {...props}
@@ -196,6 +199,7 @@ export const CodeBlockContent = React.forwardRef<HTMLPreElement, CodeBlockConten
         data-slot="code-block-content"
         className={cn(
           'p-3.5 overflow-x-auto font-mono text-[11px] leading-relaxed text-on-surface selection:bg-primary-container selection:text-on-primary-container',
+          '[scrollbar-width:thin] [scrollbar-color:theme(colors.outline-variant/60)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant/60 [&::-webkit-scrollbar-track]:bg-transparent',
           className
         )}
         {...props}

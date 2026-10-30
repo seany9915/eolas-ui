@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "chat-message-context",
+  "type": "registry:ui",
+  "title": "Chat Message Context",
+  "description": "Eolas UI Chat Message Context component built on Base UI and DESIGN.md design tokens.",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/chat-message-context.tsx",
+      "content": "import * as React from 'react';\n\nexport type ChatRole = 'user' | 'assistant' | 'system';\n\nexport interface ChatMessageContextValue {\n  inMessage: boolean;\n  role: ChatRole;\n}\n\nexport const ChatMessageContext = React.createContext<ChatMessageContextValue>({\n  inMessage: false,\n  role: 'assistant',\n});\n\nexport const useChatMessageContext = () => React.useContext(ChatMessageContext);\n",
+      "type": "registry:ui",
+      "target": "@ui/chat-message-context.tsx"
+    }
+  ]
+}

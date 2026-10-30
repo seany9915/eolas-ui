@@ -23,38 +23,51 @@ import { Reasoning } from './reasoning';
 import { Tooltip } from './tooltip';
 import { cn } from '@/lib/utils';
 
-export type ChatRole = 'user' | 'assistant' | 'system';
+import {
+  type ChatRole,
+  type ChatMessageContextValue,
+  ChatMessageContext,
+  useChatMessageContext,
+} from './chat-message-context';
+
+export type { ChatRole, ChatMessageContextValue };
+export { ChatMessageContext, useChatMessageContext };
 
 export interface ChatMessageRootProps extends React.HTMLAttributes<HTMLDivElement> {
-  role: ChatRole;
+  role?: ChatRole;
+  align?: 'start' | 'end';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
-  ({ role, children, className, ...props }, ref) => {
+  ({ role = 'assistant', align, children, className, ...props }, ref) => {
+    const resolvedAlign = align ?? (role === 'user' ? 'end' : 'start');
     return (
-      <div
-        ref={ref}
-        data-role={role}
-        className={cn(
-          '@container flex w-full gap-3 py-2',
-          role === 'user' ? 'justify-end' : 'justify-start',
-          className
-        )}
-        {...props}
-      >
+      <ChatMessageContext.Provider value={{ inMessage: true, role }}>
         <div
+          ref={ref}
+          data-role={role}
+          data-align={resolvedAlign}
           className={cn(
-            'flex flex-col gap-1.5',
-            role === 'user'
-              ? 'items-end max-w-[90%] @md:max-w-[80%]'
-              : 'items-start max-w-[95%] @md:max-w-[85%]'
+            '@container flex w-full gap-3 py-2',
+            resolvedAlign === 'end' ? 'justify-end' : 'justify-start',
+            className
           )}
+          {...props}
         >
-          {children}
+          <div
+            className={cn(
+              'flex flex-col gap-1.5',
+              resolvedAlign === 'end'
+                ? 'items-end max-w-[90%] @md:max-w-[80%]'
+                : 'items-start max-w-[95%] @md:max-w-[85%]'
+            )}
+          >
+            {children}
+          </div>
         </div>
-      </div>
+      </ChatMessageContext.Provider>
     );
   }
 );
@@ -102,7 +115,7 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
       )}
       <span className="font-semibold text-on-surface">{displayName}</span>
       {formattedTime && (
-        <span className="text-[11px] font-mono tabular-nums text-on-surface-variant/80">
+        <span className="text-xs font-mono tabular-nums text-on-surface-variant/80">
           {formattedTime}
         </span>
       )}
@@ -114,12 +127,13 @@ ChatMessageHeader.displayName = 'ChatMessage.Header';
 
 export interface ChatMessageBubbleProps extends React.HTMLAttributes<HTMLDivElement> {
   role: ChatRole;
+  variant?: 'card' | 'ghost';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProps>(
-  ({ role, children, className, ...props }, ref) => {
+  ({ role, variant = 'card', children, className, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -127,11 +141,13 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
         className={cn(
           'p-4 text-base font-sans leading-relaxed transition-colors',
           role === 'user' &&
-            'bg-primary-container text-on-primary-container rounded-2xl rounded-br-xs',
+            'bg-primary-container text-on-primary-container rounded-lg rounded-br-xs',
           role === 'assistant' &&
-            'bg-surface text-on-surface border border-outline-variant rounded-2xl rounded-bl-xs',
+            (variant === 'ghost'
+              ? 'bg-transparent text-on-surface border-0 p-0 rounded-none'
+              : 'bg-surface text-on-surface border border-outline-variant rounded-lg rounded-bl-xs'),
           role === 'system' &&
-            'bg-surface-container text-on-surface-variant border border-outline-variant/60 rounded-xl text-sm font-medium',
+            'bg-surface-container text-on-surface-variant rounded-lg text-sm font-medium',
           className
         )}
         {...props}
@@ -217,6 +233,28 @@ const ChatMessageGroup = React.forwardRef<HTMLDivElement, ChatMessageGroupProps>
 );
 ChatMessageGroup.displayName = 'ChatMessage.Group';
 
+export interface ChatMessageAttachmentsProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const ChatMessageAttachments = React.forwardRef<HTMLDivElement, ChatMessageAttachmentsProps>(
+  ({ children, className, ...props }, ref) => {
+    if (!children) return null;
+    return (
+      <div
+        ref={ref}
+        data-slot="chat-message-attachments"
+        className={cn('flex flex-wrap items-center gap-2 mb-2', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+ChatMessageAttachments.displayName = 'ChatMessage.Attachments';
+
 export interface ChatMessageActionsProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   className?: string;
@@ -239,6 +277,7 @@ ChatMessageActions.displayName = 'ChatMessage.Actions';
 export interface ChatMessageProps {
   role: ChatRole;
   content: React.ReactNode;
+  variant?: 'card' | 'ghost';
   authorName?: string;
   timestamp?: number | string;
   botType?: BotAvatarType;
@@ -249,6 +288,7 @@ export interface ChatMessageProps {
   trace?: React.ReactNode;
   thoughtSteps?: string[];
   citations?: React.ReactNode;
+  attachments?: React.ReactNode;
   isBookmarked?: boolean;
   onBookmark?: () => void;
   onCopy?: () => void;
@@ -262,6 +302,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
     {
       role,
       content,
+      variant = 'card',
       authorName,
       timestamp,
       botType,
@@ -272,6 +313,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
       trace,
       thoughtSteps,
       citations,
+      attachments,
       isBookmarked,
       onBookmark,
       onCopy,
@@ -302,11 +344,16 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
           botType={botType}
         />
 
-        <ChatMessageBubble role={role}>
+        <ChatMessageBubble role={role} variant={variant}>
+          {attachments && (
+            <ChatMessageAttachments>{attachments}</ChatMessageAttachments>
+          )}
+
           {reasoning && (
             <div className="mb-3">
               {typeof reasoning === 'string' ? (
                 <Reasoning
+                  variant="ghost"
                   isStreaming={isReasoningStreaming}
                   duration={reasoningDuration}
                 >
@@ -318,14 +365,20 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             </div>
           )}
 
-          {plan && <div className="mb-3">{plan}</div>}
+          {plan && (
+            <div className="mb-3">
+              {React.isValidElement(plan) && (plan.props as { variant?: string }).variant === undefined
+                ? React.cloneElement(plan as React.ReactElement<{ variant?: string }>, { variant: 'ghost' })
+                : plan}
+            </div>
+          )}
 
           {(trace || (thoughtSteps && thoughtSteps.length > 0)) && (
             <div className="mb-3">
               {trace ? (
                 trace
               ) : (
-                <Trace variant="embedded">
+                <Trace variant="ghost">
                   <Trace.Collapsible defaultOpen={false}>
                     <Trace.CollapsibleTrigger>
                       <Trace.Line status="complete">
@@ -336,14 +389,16 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                       </Trace.Line>
                     </Trace.CollapsibleTrigger>
                     <Trace.CollapsibleContent>
-                      <ul className="space-y-1.5 pl-1">
+                      <div className="pt-1 divide-y divide-outline-variant/30">
                         {thoughtSteps!.map((step, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-xs text-on-surface-variant">
-                            <span className="size-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                            <span>{step}</span>
-                          </li>
+                          <Trace.Line key={idx} status="complete">
+                            <Trace.Icon status="complete" />
+                            <Trace.Title className="font-normal font-sans text-sm text-on-surface-variant">
+                              {step}
+                            </Trace.Title>
+                          </Trace.Line>
                         ))}
-                      </ul>
+                      </div>
                     </Trace.CollapsibleContent>
                   </Trace.Collapsible>
                 </Trace>
@@ -353,7 +408,13 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
 
           <div className="typeset typeset-chat">{content}</div>
 
-          {citations && <div className="mt-3 pt-2.5 border-t border-outline-variant/50">{citations}</div>}
+          {citations && (
+            <div className="mt-3 pt-2.5 border-t border-outline-variant/50">
+              {React.isValidElement(citations) && (citations.props as { variant?: string }).variant === undefined
+                ? React.cloneElement(citations as React.ReactElement<{ variant?: string }>, { variant: 'ghost' })
+                : citations}
+            </div>
+          )}
         </ChatMessageBubble>
 
         {role === 'assistant' && (onCopy || onBookmark || onRetry || extraActions) && (
@@ -432,6 +493,25 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
 );
 ChatMessage.displayName = 'ChatMessage';
 
+export interface ChatMessageContentWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const ChatMessageContentWrapper = React.forwardRef<HTMLDivElement, ChatMessageContentWrapperProps>(
+  ({ children, className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="message-content"
+      className={cn('flex flex-col gap-1.5 w-full', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+);
+ChatMessageContentWrapper.displayName = 'ChatMessage.ContentWrapper';
+
 /* -------------------------------------------------------------------------------------------------
  * Compound Component
  * -----------------------------------------------------------------------------------------------*/
@@ -440,6 +520,8 @@ export const ChatMessageCompound = Object.assign(ChatMessage, {
   Header: ChatMessageHeader,
   Bubble: ChatMessageBubble,
   Content: ChatMessageBubble,
+  ContentWrapper: ChatMessageContentWrapper,
+  Attachments: ChatMessageAttachments,
   Actions: ChatMessageActions,
   Footer: ChatMessageActions,
   Avatar: ChatMessageAvatar,
@@ -450,6 +532,8 @@ export {
   ChatMessageRoot,
   ChatMessageHeader,
   ChatMessageBubble,
+  ChatMessageContentWrapper,
+  ChatMessageAttachments,
   ChatMessageActions,
   ChatMessageAvatar,
   ChatMessageGroup,
@@ -457,8 +541,10 @@ export {
   ChatMessageCompound as Message,
   ChatMessageRoot as MessageRoot,
   ChatMessageHeader as MessageHeader,
-  ChatMessageBubble as MessageContent,
+  ChatMessageContentWrapper as MessageContent,
+  ChatMessageBubble as MessageBubble,
   ChatMessageBubble as Bubble,
+  ChatMessageAttachments as MessageAttachments,
   ChatMessageActions as MessageFooter,
   ChatMessageActions as MessageActions,
   ChatMessageAvatar as MessageAvatar,

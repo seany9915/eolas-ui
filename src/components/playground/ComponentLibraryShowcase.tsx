@@ -49,8 +49,8 @@ import { CodeBlock } from '@/components/ui/code-block';
 import { Reasoning } from '@/components/ui/reasoning';
 import { ChainOfThought } from '@/components/ui/chain-of-thought';
 import { Task } from '@/components/ui/task';
-import { Plan } from '@/components/blocks/plan';
-import { Queue } from '@/components/blocks/queue';
+import { Plan } from '@/components/ui/plan';
+import { Queue } from '@/components/ui/queue';
 import { ApprovalCard } from '@/components/blocks/approval-card';
 import { ClinicianTip } from '@/components/ui/clinician-tip';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis } from '@/components/ui/breadcrumb';
@@ -514,8 +514,6 @@ const ConversationalAIShowcaseSection = React.memo<ConversationalAIShowcaseSecti
                         </Tooltip>
                       </div>
                     }
-                    hint="Shift + Enter for new line • Enter to submit"
-                    submitLabel="Send Prompt"
                     stopLabel="Cancel"
                   />
                 </div>

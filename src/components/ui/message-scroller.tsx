@@ -168,17 +168,23 @@ MessageScrollerProvider.displayName = 'MessageScrollerProvider';
  * MessageScroller (Root Container)
  * -----------------------------------------------------------------------------------------------*/
 export interface MessageScrollerProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'container' | 'canvas';
   children?: React.ReactNode;
   className?: string;
 }
 
 const MessageScrollerRoot = React.forwardRef<HTMLDivElement, MessageScrollerProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ variant = 'default', children, className, ...props }, ref) => {
     return (
       <div
         ref={ref}
         data-slot="message-scroller"
-        className={cn('relative flex flex-col w-full h-full overflow-hidden', className)}
+        className={cn(
+          'relative flex flex-col w-full h-full overflow-hidden',
+          variant === 'container' && 'bg-surface-container/20',
+          variant === 'canvas' && 'bg-background',
+          className
+        )}
         {...props}
       >
         {children}
@@ -351,7 +357,7 @@ export const MessageScrollerButton: React.FC<MessageScrollerButtonProps> = ({
       data-direction={direction}
       data-active={isVisible ? 'true' : 'false'}
       className={cn(
-        'absolute z-20 animate-in fade-in zoom-in-95 duration-quick',
+        'absolute z-20 transition-[opacity,transform] duration-quick ease-standard motion-reduce:transition-none',
         direction === 'end' ? 'bottom-4 right-4' : 'top-4 right-4',
         className
       )}
@@ -365,11 +371,11 @@ export const MessageScrollerButton: React.FC<MessageScrollerButtonProps> = ({
           onClick={() => (direction === 'end' ? scrollToBottom('smooth') : scrollToTop('smooth'))}
           aria-label={resolvedLabel}
           expandedTouchTarget
-          className="rounded-full shadow-elevation-2 flex items-center gap-1.5 px-3 py-1.5 h-9"
+          className="rounded-full shadow-ambient flex items-center gap-1.5 px-3 py-1.5 h-9"
         >
           <Icon name={direction === 'end' ? 'arrow_downward' : 'arrow_upward'} size="xs" aria-hidden="true" />
           {unreadCount > 0 && direction === 'end' && (
-            <span className="font-mono text-[11px] tabular-nums font-bold">
+            <span className="font-mono text-xs tabular-nums font-bold">
               {unreadCount}
             </span>
           )}

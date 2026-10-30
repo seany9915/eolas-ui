@@ -19,21 +19,25 @@ import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
 import { Icon } from './icon';
 import { Button } from './button';
+import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
-export type TraceStatus = 'default' | 'running' | 'error' | 'complete' | 'pending';
+export type TraceStatus = 'default' | 'running' | 'error' | 'complete' | 'pending' | 'warning' | 'cancelled';
 
 /* -------------------------------------------------------------------------------------------------
  * Trace (Root Container)
  * -----------------------------------------------------------------------------------------------*/
 export interface TraceRootProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'card' | 'embedded' | 'timeline';
+  variant?: 'default' | 'card' | 'embedded' | 'timeline' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
 export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
-  ({ variant = 'default', children, className, ...props }, ref) => {
+  ({ variant, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext?.inMessage ? 'ghost' : 'default');
+
     return (
       <div
         ref={ref}
@@ -42,13 +46,15 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
         aria-label="Agent execution trace"
         className={cn(
           '@container w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-          variant === 'default' &&
+          resolvedVariant === 'default' &&
             'rounded-lg border border-outline-variant bg-surface overflow-hidden divide-y divide-outline-variant/40',
-          variant === 'card' &&
-            'rounded-xl bg-surface overflow-hidden shadow-ambient divide-y divide-outline-variant/40',
-          variant === 'embedded' &&
+          resolvedVariant === 'card' &&
+            'rounded-lg bg-surface overflow-hidden shadow-ambient divide-y divide-outline-variant/40',
+          resolvedVariant === 'embedded' &&
             'rounded-lg border border-outline-variant/60 bg-surface-container/30 overflow-hidden divide-y divide-outline-variant/30',
-          variant === 'timeline' &&
+          (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed') &&
+            'rounded-none border-none bg-transparent divide-y divide-outline-variant/30',
+          resolvedVariant === 'timeline' &&
             'relative flex flex-col space-y-2.5 pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-outline-variant',
           className
         )}
@@ -113,10 +119,12 @@ export const TraceIcon: React.FC<TraceIconProps> = ({
       data-slot="trace-icon"
       className={cn(
         'flex size-6 shrink-0 items-center justify-center rounded-full text-xs transition-colors select-none',
-        status === 'complete' && 'bg-primary-container text-on-primary-container font-bold',
+        status === 'complete' && 'bg-success-container text-on-success-container font-bold',
         status === 'running' && 'bg-secondary-container text-on-secondary-container',
+        status === 'warning' && 'bg-warning-container text-on-warning-container font-bold',
         status === 'error' && 'bg-error-container text-on-error-container font-bold',
-        status === 'pending' && 'bg-surface-variant/50 text-on-surface-variant border border-outline',
+        status === 'pending' && 'bg-surface-variant text-on-surface-variant border border-outline',
+        status === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 border border-outline-variant',
         status === 'default' && 'bg-surface-container text-on-surface-variant',
         className
       )}
@@ -129,8 +137,12 @@ export const TraceIcon: React.FC<TraceIconProps> = ({
         <Icon name="progress_activity" size="xs" className="animate-spin text-xs" />
       ) : status === 'complete' ? (
         <Icon name="check" size="xs" className="text-xs" />
+      ) : status === 'warning' ? (
+        <Icon name="warning" size="xs" className="text-xs" />
       ) : status === 'error' ? (
         <Icon name="error" size="xs" className="text-xs" />
+      ) : status === 'cancelled' ? (
+        <Icon name="close" size="xs" className="text-xs" />
       ) : name ? (
         <Icon name={name} size="xs" className="text-xs" />
       ) : (
@@ -140,6 +152,43 @@ export const TraceIcon: React.FC<TraceIconProps> = ({
   );
 };
 TraceIcon.displayName = 'Trace.Icon';
+
+/* -------------------------------------------------------------------------------------------------
+ * TraceBadge (Status chip / counter tag)
+ * -----------------------------------------------------------------------------------------------*/
+export interface TraceBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  status?: TraceStatus;
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export const TraceBadge: React.FC<TraceBadgeProps> = ({
+  status = 'default',
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <span
+      data-slot="trace-badge"
+      className={cn(
+        'font-mono text-xs tabular-nums px-1.5 py-0.5 rounded-full select-none shrink-0 font-medium',
+        status === 'complete' && 'bg-success-container text-on-success-container',
+        status === 'running' && 'bg-secondary-container text-on-secondary-container',
+        status === 'warning' && 'bg-warning-container text-on-warning-container',
+        status === 'error' && 'bg-error-container text-on-error-container',
+        status === 'pending' && 'bg-surface-variant text-on-surface-variant border border-outline',
+        status === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 line-through',
+        status === 'default' && 'bg-surface-container text-on-surface-variant',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+};
+TraceBadge.displayName = 'Trace.Badge';
 
 /* -------------------------------------------------------------------------------------------------
  * TraceTitle
@@ -287,7 +336,7 @@ export const TraceCollapsibleContent = React.forwardRef<
         className={cn(
           unstyled
             ? ''
-            : 'px-4 py-3 border-t border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed',
+            : 'px-3.5 py-2.5 border-t border-outline-variant/30 text-sm font-sans text-on-surface-variant leading-relaxed',
           className
         )}
       >
@@ -360,18 +409,59 @@ export const TraceAction: React.FC<TraceActionProps> = ({
 TraceAction.displayName = 'Trace.Action';
 
 /* -------------------------------------------------------------------------------------------------
+ * TraceSeparator
+ * -----------------------------------------------------------------------------------------------*/
+export interface TraceSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
+
+const TraceSeparator = React.forwardRef<HTMLDivElement, TraceSeparatorProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="separator"
+      data-slot="trace-separator"
+      className={cn('h-px w-full bg-outline-variant/40 my-1', className)}
+      {...props}
+    />
+  )
+);
+TraceSeparator.displayName = 'Trace.Separator';
+
+export const TraceHeader = TraceCollapsibleTrigger;
+export const TraceBody = TraceCollapsibleContent;
+
+/* -------------------------------------------------------------------------------------------------
  * Compound Export
  * -----------------------------------------------------------------------------------------------*/
 export const Trace = Object.assign(TraceRoot, {
   Line: TraceLine,
+  Step: TraceLine,
   Icon: TraceIcon,
   Title: TraceTitle,
   Description: TraceDescription,
+  Badge: TraceBadge,
+  Tag: TraceBadge,
+  Status: TraceBadge,
   Collapsible: TraceCollapsible,
   CollapsibleTrigger: TraceCollapsibleTrigger,
   CollapsibleContent: TraceCollapsibleContent,
+  Header: TraceCollapsibleTrigger,
+  Body: TraceCollapsibleContent,
+  Trigger: TraceCollapsibleTrigger,
+  Content: TraceCollapsibleContent,
   Actions: TraceActions,
   Action: TraceAction,
+  Separator: TraceSeparator,
 });
+
+export {
+  // Direct shadcn AI Elements aliases
+  TraceLine as TraceStep,
+  TraceBadge as TraceStatusIndicator,
+  TraceCollapsibleTrigger as TraceTrigger,
+  TraceCollapsibleContent as TraceContent,
+  TraceSeparator,
+};
 
 export default Trace;

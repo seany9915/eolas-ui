@@ -16,6 +16,7 @@ import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
 import { Chip } from './chip';
+import { Separator } from './separator';
 import { cn } from '@/lib/utils';
 
 export interface CheckpointRootProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -28,16 +29,16 @@ const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
     return (
       <div
         ref={ref}
-        role="separator"
+        role="region"
         aria-label="Conversation checkpoint"
         data-slot="checkpoint-root"
         className={cn(
           'relative flex items-center justify-center w-full py-4 my-2 select-none',
-          'before:absolute before:inset-x-0 before:top-1/2 before:-translate-y-1/2 before:h-px before:bg-outline-variant/60',
           className
         )}
         {...props}
       >
+        <Separator orientation="horizontal" className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-outline-variant/60 my-0" />
         <div className="relative z-10 flex items-center gap-2 px-3 py-1 bg-surface border border-outline-variant/80 rounded-full text-xs text-on-surface-variant">
           {children}
         </div>
@@ -90,6 +91,27 @@ const CheckpointTitle: React.FC<CheckpointTitleProps> = ({
 };
 CheckpointTitle.displayName = 'Checkpoint.Title';
 
+export interface CheckpointDescriptionProps extends React.HTMLAttributes<HTMLSpanElement> {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const CheckpointDescription: React.FC<CheckpointDescriptionProps> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <span
+      className={cn('font-sans text-xs text-on-surface-variant truncate', className)}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+};
+CheckpointDescription.displayName = 'Checkpoint.Description';
+
 export interface CheckpointTimestampProps extends React.HTMLAttributes<HTMLSpanElement> {
   timestamp: number | string;
   className?: string;
@@ -111,7 +133,7 @@ const CheckpointTimestamp: React.FC<CheckpointTimestampProps> = ({
 
   return (
     <span
-      className={cn('font-mono text-[11px] tabular-nums text-on-surface-variant/80', className)}
+      className={cn('font-mono text-xs tabular-nums text-on-surface-variant/80', className)}
       {...props}
     >
       {formatted}
@@ -120,32 +142,42 @@ const CheckpointTimestamp: React.FC<CheckpointTimestampProps> = ({
 };
 CheckpointTimestamp.displayName = 'Checkpoint.Timestamp';
 
-export interface CheckpointTriggerProps {
+export interface CheckpointTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onRestore?: () => void;
   label?: string;
   disabled?: boolean;
   className?: string;
+  children?: React.ReactNode;
 }
 
 const CheckpointTrigger: React.FC<CheckpointTriggerProps> = ({
   onRestore,
+  onClick,
   label = 'Restore',
   disabled = false,
   className,
+  children,
+  ...props
 }) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(e);
+    onRestore?.();
+  };
+
   return (
     <Button
       variant="ghost"
       colorRole="primary"
       size="sm"
       disabled={disabled}
-      onClick={onRestore}
+      onClick={handleClick}
       expandedTouchTarget
-      aria-label={`${label} conversation to this checkpoint`}
+      aria-label={typeof children === 'string' ? children : `${label} conversation to this checkpoint`}
       className={cn('h-6 px-2 text-xs font-semibold gap-1 rounded-full', className)}
+      {...props}
     >
       <Icon name="history" size="xs" aria-hidden="true" />
-      <span>{label}</span>
+      <span>{children || label}</span>
     </Button>
   );
 };
@@ -194,14 +226,14 @@ const CheckpointComponent = React.forwardRef<HTMLDivElement, CheckpointProps>(
             <CheckpointIcon />
             <CheckpointTitle>{displayLabel}</CheckpointTitle>
             {tag && (
-              <Chip size="sm" pattern="outline-neutral-fill" colorRole="neutral" className="text-[10px] py-0 px-1.5 h-4">
+              <Chip size="sm" pattern="outline-neutral-fill" colorRole="neutral" className="text-xs py-0 px-1.5 h-5 font-mono">
                 {tag}
               </Chip>
             )}
             {timestamp && <CheckpointTimestamp timestamp={timestamp} />}
             {onRestore && (
               <>
-                <div className="w-px h-3 bg-outline-variant/80" aria-hidden="true" />
+                <Separator orientation="vertical" className="h-3 my-0 mx-0.5 bg-outline-variant/80" />
                 <CheckpointTrigger
                   onRestore={onRestore}
                   label={restoreLabel}
@@ -224,21 +256,30 @@ export const Checkpoint = Object.assign(CheckpointComponent, {
   Root: CheckpointRoot,
   Icon: CheckpointIcon,
   Title: CheckpointTitle,
+  Content: CheckpointTitle,
+  Description: CheckpointDescription,
   Timestamp: CheckpointTimestamp,
   Trigger: CheckpointTrigger,
   Button: CheckpointTrigger,
+  Tag: Chip,
+  Separator,
 });
 
 export {
   CheckpointRoot,
   CheckpointIcon,
   CheckpointTitle,
+  CheckpointDescription,
   CheckpointTimestamp,
   CheckpointTrigger,
+  Separator as CheckpointSeparator,
   // shadcn AI Elements direct aliases
   CheckpointRoot as Marker,
   CheckpointTitle as MarkerContent,
   CheckpointTrigger as MarkerButton,
+  CheckpointIcon as MarkerIcon,
+  CheckpointTimestamp as MarkerTimestamp,
+  Separator as MarkerSeparator,
 };
 
 export default Checkpoint;

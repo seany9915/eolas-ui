@@ -241,7 +241,8 @@
       "registryDependencies": [
         "utils",
         "trace",
-        "chip"
+        "chip",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -269,6 +270,20 @@
       ]
     },
     {
+      "name": "chat-message-context",
+      "type": "registry:ui",
+      "title": "Chat Message Context",
+      "description": "Eolas UI Chat Message Context component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils"
+      ]
+    },
+    {
       "name": "chat-message",
       "type": "registry:ui",
       "title": "Chat Message",
@@ -286,7 +301,8 @@
         "bot-avatar",
         "trace",
         "reasoning",
-        "tooltip"
+        "tooltip",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -358,7 +374,8 @@
         "utils",
         "button",
         "icon",
-        "chip"
+        "chip",
+        "separator"
       ],
       "meta": {
         "taxonomy": [
@@ -481,7 +498,8 @@
         "utils",
         "button",
         "icon",
-        "chip"
+        "chip",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -729,6 +747,34 @@
         "utils",
         "icon"
       ]
+    },
+    {
+      "name": "inline-citation",
+      "type": "registry:ui",
+      "title": "Inline Citation",
+      "description": "Inline Citation primitive. Base UI Integration: Built on Base UI PreviewCard (@base-ui/react/preview-card), Button (UnstyledButton), and Carousel primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/inline-citation",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "icon",
+        "carousel"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use InlineCitation to embed source references, RAG grounding passages, and web search literature directly inside prose or assistant messages.",
+          "Conforms to DESIGN.md:",
+          "Pattern 2 high-contrast citation pill (neutral surface fill, outline-secondary border, Rich Emerald text).",
+          "WCAG 2.2 SC 2.5.8 compliant 44x44px touch target on interactive triggers.",
+          "Floating 2px focus ring with 2px offset (outline-primary).",
+          "Single-source preview or multi-source Carousel with tabular navigation.",
+          "Full keyboard accessibility and prefers-reduced-motion safety."
+        ]
+      }
     },
     {
       "name": "input",
@@ -982,6 +1028,30 @@
       ]
     },
     {
+      "name": "plan",
+      "type": "registry:ui",
+      "title": "Plan",
+      "description": "Plan composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "trace",
+        "progress",
+        "chat-message-context"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays an AI agent's multi-step plan determined up-front before execution (e.g., a 4-stage minimal pair therapy drill, clinical phonological assessment plan).",
+          "Tracks progress with a progress bar and completion counter (e.g. \"2 of 4 done\"). <Plan title=\"...\" steps={[...]} /> and declarative compound composition: <Plan defaultOpen> <PlanHeader> <PlanTitle>Assessment Plan</PlanTitle> <PlanDescription>2 of 4 done</PlanDescription> <PlanTrigger /> </PlanHeader> <PlanContent>...</PlanContent> </Plan>",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
+        ]
+      }
+    },
+    {
       "name": "popover",
       "type": "registry:ui",
       "title": "Popover",
@@ -1057,7 +1127,7 @@
       "name": "prompt-input",
       "type": "registry:ui",
       "title": "Prompt Input",
-      "description": "PromptInput primitive. Base UI Integration: Consumes Base UI Button, Textarea primitive, and Tooltip primitive.",
+      "description": "PromptInput primitive. Base UI Integration: Consumes Base UI Button, Textarea primitive, Menu primitive, and Tooltip primitive. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1069,14 +1139,40 @@
         "icon",
         "textarea",
         "tooltip",
-        "attachment"
+        "attachment",
+        "menu",
+        "chip"
       ],
       "meta": {
         "taxonomy": [
           "Use PromptInput for conversational AI prompts, multi-turn clinical query inputs, and structured message composition.",
+          "Supports Model Selection (PromptInputModelSelect) and Reasoning Effort (PromptInputEffort) in the bottom-left action bar, alongside file attachments and tool toggles.",
           "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
           "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
           "Supports Enter to submit and Shift+Enter for newline insertion."
+        ]
+      }
+    },
+    {
+      "name": "queue",
+      "type": "registry:ui",
+      "title": "Queue",
+      "description": "Queue composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "trace",
+        "chat-message-context"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays an AI agent's dynamic queue / to-do list, cleanly partitioned into remaining tasks ('To do') and finished tasks ('Completed').",
+          "As the agent works, tasks transition across sections. <Queue items={[...]} /> and declarative compound composition: <Queue> <Queue.Section title=\"2 to do\" status=\"pending\"> <Queue.Item title=\"Task 1\" status=\"pending\" /> </Queue.Section> </Queue>",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
         ]
       }
     },
@@ -1135,7 +1231,11 @@
       ],
       "registryDependencies": [
         "utils",
-        "trace"
+        "trace",
+        "shimmer-text",
+        "button",
+        "icon",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1349,7 +1449,7 @@
       "name": "sources",
       "type": "registry:ui",
       "title": "Sources",
-      "description": "Sources primitive. Base UI Integration: Works with Base UI Collapsible and Tooltip primitives.",
+      "description": "Sources primitive. Base UI Integration: Works with Base UI Collapsible and Tooltip primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/sources",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1359,7 +1459,9 @@
         "utils",
         "icon",
         "tooltip",
-        "button"
+        "button",
+        "chat-message-context",
+        "inline-citation"
       ],
       "meta": {
         "taxonomy": [
@@ -1367,6 +1469,7 @@
           "Follows DESIGN.md:",
           "Pattern 2 chip styling (neutral surface fill, outline-variant border, high-contrast text).",
           "Never uses triple-tint monochrome styling.",
+          "Prevents Overcontainment & Card-within-card: supports `variant=\"ghost\"` for clean, unbordered display within chat message bubbles, preventing \"pill rain\" or nested boxes.",
           "Never uses hand-rolled native browser tooltips (`title` attribute); all citations and inline footnote markers consume the Base UI Tooltip primitive for full keyboard and touch accessibility.",
           "All clickable citations maintain WCAG 2.2 SC 2.5.8 compliant 44px touch targets.",
           "Floating focus rings on links and triggers."
@@ -1585,7 +1688,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "trace"
+        "trace",
+        "button",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1773,7 +1878,9 @@
         "utils",
         "icon",
         "chip",
-        "code-block"
+        "code-block",
+        "inline-alert",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1838,7 +1945,8 @@
       "registryDependencies": [
         "utils",
         "icon",
-        "button"
+        "button",
+        "chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1894,7 +2002,7 @@
       "name": "chat",
       "type": "registry:block",
       "title": "Chat",
-      "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `EmptyState` (`src/components/ui/empty-state.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements",
+      "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `EmptyState` (`src/components/ui/empty-state.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1911,6 +2019,8 @@
       "meta": {
         "taxonomy": [
           "Controlled presentational chat workspace assembling the streaming viewport engine, assistant/user messages, suggestion prompts, and message composer.",
+          "Supports both Docked (pinned bottom) and Floating Island (centered, floating) prompt positioning.",
+          "Supports Model Selection, Reasoning Effort, and Tool Toggles.",
           "Pure UI: receives items via props, emits intents via callbacks. Zero direct fetch or auth.",
           "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive elements.",
           "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic high-contrast colors, concentric radius, zero triple-tints."
@@ -1969,51 +2079,6 @@
         "chip",
         "icon"
       ]
-    },
-    {
-      "name": "plan",
-      "type": "registry:block",
-      "title": "Plan",
-      "description": "Plan composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "utils",
-        "trace",
-        "progress"
-      ],
-      "meta": {
-        "taxonomy": [
-          "Displays an AI agent's multi-step plan determined up-front before execution (e.g., a 4-stage minimal pair therapy drill, clinical phonological assessment plan).",
-          "Tracks progress with a progress bar and completion counter (e.g. \"2 of 4 done\"). <Plan title=\"...\" steps={[...]} /> and declarative compound composition: <Plan defaultOpen> <PlanHeader> <PlanTitle>Assessment Plan</PlanTitle> <PlanDescription>2 of 4 done</PlanDescription> <PlanTrigger /> </PlanHeader> <PlanContent>...</PlanContent> </Plan>",
-          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
-        ]
-      }
-    },
-    {
-      "name": "queue",
-      "type": "registry:block",
-      "title": "Queue",
-      "description": "Queue composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "utils",
-        "trace"
-      ],
-      "meta": {
-        "taxonomy": [
-          "Displays an AI agent's dynamic queue / to-do list, cleanly partitioned into remaining tasks ('To do') and finished tasks ('Completed').",
-          "As the agent works, tasks transition across sections. <Queue items={[...]} /> and declarative compound composition: <Queue> <Queue.Section title=\"2 to do\" status=\"pending\"> <Queue.Item title=\"Task 1\" status=\"pending\" /> </Queue.Section> </Queue>",
-          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
-        ]
-      }
     }
   ]
 }
