@@ -729,7 +729,11 @@ export const AutocompleteEmpty = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Empty
     ref={ref}
-    className={cn('px-3 py-2.5 font-sans text-sm text-on-surface-variant select-none', className)}
+    className={cn(
+      'px-3 py-2.5 font-sans text-sm text-on-surface-variant select-none',
+      'empty:p-0 empty:m-0 empty:h-0 empty:min-h-0 empty:border-0 overflow-hidden',
+      className
+    )}
     {...props}
   >
     {children ?? 'No matching suggestions found'}

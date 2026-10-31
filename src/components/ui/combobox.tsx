@@ -640,7 +640,11 @@ export const ComboboxEmpty = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseCombobox.Empty
     ref={ref}
-    className={cn('px-3 py-2.5 text-xs font-sans text-on-surface-variant text-center select-none', className)}
+    className={cn(
+      'px-3 py-2.5 text-xs font-sans text-on-surface-variant text-center select-none',
+      'empty:p-0 empty:m-0 empty:h-0 empty:min-h-0 empty:border-0 overflow-hidden',
+      className
+    )}
     {...props}
   >
     {children ?? 'No matching options found'}
