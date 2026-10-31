@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Chip } from '@/components/ui/chip';
 import { Button } from '@/components/ui/button';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -13,9 +14,9 @@ export const AntiPatternAuditBench: React.FC = () => {
       status: 'Passed',
       demonstration: (
         <div className="flex flex-wrap items-center gap-2">
-          <Chip label="Pattern 1: Outline + Surface" pattern="outlined" colorRole="primary" />
-          <Chip label="Pattern 2: Saturated Mixed" pattern="filled" colorRole="tertiary" />
-          <Chip label="Pattern 3: Neutral Fill + Text" pattern="neutral" colorRole="primary" />
+          <Badge variant="outline" colorRole="primary">Pattern 2: Outline + Surface</Badge>
+          <Badge variant="filled" colorRole="tertiary">Pattern 1: Saturated Mixed</Badge>
+          <Badge variant="soft" colorRole="primary">Pattern 3: Soft Container Wash</Badge>
         </div>
       ),
     },
@@ -84,9 +85,9 @@ export const AntiPatternAuditBench: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between border-b border-outline-variant pb-2">
                   <h3 className="font-heading text-base font-bold text-on-surface">{check.title}</h3>
-                  <Chip icon="check_circle" pattern="neutral" colorRole="success" size="sm">
+                  <Badge icon="check_circle" variant="soft" colorRole="success" size="sm">
                     {check.status}
-                  </Chip>
+                  </Badge>
                 </div>
                 <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
                   {check.rule}

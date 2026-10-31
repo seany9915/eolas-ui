@@ -32,7 +32,7 @@ import {
   MenuRadioGroup,
   MenuRadioItem,
 } from './menu';
-import { Chip } from './chip';
+import { Badge } from './badge';
 import { cn } from '@/lib/utils';
 
 export interface PromptInputRootProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -344,9 +344,9 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
                     <div className="flex items-center gap-1.5">
                       <span className="font-heading font-semibold text-xs text-on-surface">{item.name}</span>
                       {item.badge && (
-                        <Chip size="sm" pattern="soft-container" colorRole="secondary" className="text-[10px] h-4 py-0 px-1">
+                        <Badge size="sm" variant="soft" colorRole="secondary" className="text-[10px] h-4 py-0 px-1">
                           {item.badge}
-                        </Chip>
+                        </Badge>
                       )}
                     </div>
                     {item.description && (

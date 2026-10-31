@@ -31,7 +31,7 @@ import {
   TraceBadge,
   type TraceStatus,
 } from './trace';
-import { Chip } from './chip';
+import { Badge } from './badge';
 import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
@@ -152,9 +152,9 @@ export const ChainOfThoughtHeader = React.forwardRef<HTMLButtonElement, ChainOfT
             <TraceDescription>
               <span className="flex items-center gap-2">
                 {stepCount !== undefined && (
-                  <Chip pattern="outline-neutral-fill" colorRole="neutral" size="sm" className="font-mono text-xs py-0 px-1.5 h-5">
+                  <Badge variant="outline" colorRole="neutral" size="sm" className="font-mono text-xs py-0 px-1.5 h-5">
                     {stepCount} {stepCount === 1 ? 'step' : 'steps'}
-                  </Chip>
+                  </Badge>
                 )}
                 {badgeLabel && (
                   <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { Chip } from '@/components/ui/chip';
+import { Badge } from '@/components/ui/badge';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Collapsible } from '@/components/ui/collapsible';
 import {
@@ -129,12 +129,11 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-heading text-sm font-bold text-on-surface">Registry</span>
-            <Chip
-              label={String(totalCount)}
-              pattern="primary-container"
+            <Badge
+              variant="soft"
               colorRole="primary"
               size="sm"
-            />
+            >{String(totalCount)}</Badge>
           </div>
           <Button
             size="sm"

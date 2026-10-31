@@ -15,7 +15,7 @@
 import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
 import { Icon } from './icon';
-import { Chip } from './chip';
+import { Badge } from './badge';
 import { CodeBlock } from './code-block';
 import { InlineAlert } from './inline-alert';
 import { useChatMessageContext } from './chat-message-context';
@@ -137,17 +137,17 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
 
         <div className="flex items-center gap-2 shrink-0">
           {status === 'calling' ? (
-            <Chip size="sm" pattern="outline-neutral-fill" colorRole="primary" className="text-[10px] h-5 py-0">
+            <Badge size="sm" variant="outline" colorRole="primary" className="text-[10px] h-5 py-0">
               Running
-            </Chip>
+            </Badge>
           ) : status === 'error' ? (
-            <Chip size="sm" pattern="high-contrast-mixed" colorRole="error" className="text-[10px] h-5 py-0">
+            <Badge size="sm" variant="filled" colorRole="error" className="text-[10px] h-5 py-0">
               Failed
-            </Chip>
+            </Badge>
           ) : (
-            <Chip size="sm" pattern="outline-neutral-fill" colorRole="success" className="text-[10px] h-5 py-0">
+            <Badge size="sm" variant="outline" colorRole="success" className="text-[10px] h-5 py-0">
               Complete
-            </Chip>
+            </Badge>
           )}
 
           {children}
@@ -396,8 +396,8 @@ export const Tool = Object.assign(ToolComponent, {
   Output: ToolOutput,
   Result: ToolOutput,
   Error: ToolError,
-  State: Chip,
-  Badge: Chip,
+  State: Badge,
+  Badge: Badge,
 });
 
 export {

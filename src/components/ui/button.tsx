@@ -17,12 +17,12 @@ import { cn } from '@/lib/utils';
 
 export type ButtonVariant =
   | 'filled'
+  | 'outline'
   | 'outlined'
   | 'text'
-  | 'outline'
-  | 'ghost'
+  | 'soft'
   | 'tonal'
-  | 'secondary'
+  | 'ghost'
   | 'default'
   | 'unstyled';
 
@@ -41,11 +41,9 @@ export interface ButtonProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'color' | 'className'> {
   className?: string;
   variant?: ButtonVariant;
-  /** Legacy alias for `variant` */
-  emphasis?: ButtonVariant;
   colorRole?: ButtonColorRole;
-  /** Legacy alias for `colorRole`. If matching a color role name, mapped safely to avoid polluting DOM ARIA role. */
-  role?: string;
+  /** Button form type. Unlike native HTML buttons, Base UI defaults to 'button' rather than 'submit'. */
+  type?: 'button' | 'submit' | 'reset';
   size?: ButtonSize;
   loading?: boolean;
   /**
@@ -87,7 +85,7 @@ const filledStyles: Record<ButtonColorRole, string> = {
   neutral: 'bg-neutral text-on-neutral hover:brightness-95 active:brightness-90',
 };
 
-const tonalStyles: Record<ButtonColorRole, string> = {
+const softStyles: Record<ButtonColorRole, string> = {
   primary: 'bg-primary-container text-on-primary-container hover:brightness-95 active:brightness-90',
   secondary: 'bg-secondary-container text-on-secondary-container hover:brightness-95 active:brightness-90',
   tertiary: 'bg-tertiary text-on-tertiary',
@@ -96,6 +94,9 @@ const tonalStyles: Record<ButtonColorRole, string> = {
   success: 'bg-success-container text-on-success-container hover:brightness-95 active:brightness-90',
   neutral: 'bg-neutral-container text-on-neutral-container hover:brightness-95 active:brightness-90',
 };
+
+// Legacy alias for softStyles
+const tonalStyles = softStyles;
 
 const outlinedStyles: Record<ButtonColorRole, string> = {
   primary: 'bg-surface text-primary border-2 border-primary hover:bg-surface-container',
@@ -119,32 +120,29 @@ const textStyles: Record<ButtonColorRole, string> = {
 
 export interface ButtonVariantsProps {
   variant?: ButtonVariant;
-  emphasis?: ButtonVariant;
   colorRole?: ButtonColorRole;
-  role?: string;
   size?: ButtonSize;
   expandedTouchTarget?: boolean;
   className?: string;
 }
 
 export function buttonVariants({
-  variant,
-  emphasis,
-  colorRole,
-  role,
+  variant = 'filled',
+  colorRole = 'primary',
   size = 'md',
   expandedTouchTarget = false,
   className,
 }: ButtonVariantsProps = {}): string {
-  const rawVariant = variant ?? emphasis ?? 'filled';
   const normalizedVariant =
-    rawVariant === 'outline'
-      ? 'outlined'
-      : rawVariant === 'ghost'
+    variant === 'outline' || variant === 'outlined'
+      ? 'outline'
+      : variant === 'ghost'
         ? 'text'
-        : rawVariant === 'default'
+        : variant === 'default'
           ? 'filled'
-          : rawVariant;
+          : variant === 'soft' || variant === 'tonal'
+            ? 'soft'
+            : variant;
 
   if (normalizedVariant === 'unstyled') {
     return cn(
@@ -154,39 +152,20 @@ export function buttonVariants({
     );
   }
 
-  const validColorRoles: ButtonColorRole[] = [
-    'primary',
-    'secondary',
-    'tertiary',
-    'error',
-    'warning',
-    'success',
-    'neutral',
-  ];
-
-  let resolvedColorRole: ButtonColorRole = colorRole ?? 'primary';
-  if (rawVariant === 'secondary') {
-    resolvedColorRole = 'secondary';
-  }
-
-  if (role && (validColorRoles as string[]).includes(role)) {
-    resolvedColorRole = role as ButtonColorRole;
-  }
-
   // Ensure Sunny Amber (tertiary) always uses high-contrast filled container
   const safeVariant =
-    resolvedColorRole === 'tertiary' && normalizedVariant !== 'filled'
+    colorRole === 'tertiary' && normalizedVariant !== 'filled'
       ? 'filled'
       : normalizedVariant;
 
   const variantClass =
     safeVariant === 'filled'
-      ? filledStyles[resolvedColorRole]
-      : safeVariant === 'tonal'
-        ? tonalStyles[resolvedColorRole]
-        : safeVariant === 'outlined'
-          ? outlinedStyles[resolvedColorRole]
-          : textStyles[resolvedColorRole];
+      ? filledStyles[colorRole]
+      : safeVariant === 'soft'
+        ? softStyles[colorRole]
+        : safeVariant === 'outline'
+          ? outlinedStyles[colorRole]
+          : textStyles[colorRole];
 
   return cn(
     baseStyles,
@@ -201,9 +180,8 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       variant,
-      emphasis,
       colorRole,
-      role,
+      type,
       size = 'md',
       expandedTouchTarget,
       className,
@@ -217,21 +195,6 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const validColorRoles = [
-      'primary',
-      'secondary',
-      'tertiary',
-      'error',
-      'warning',
-      'success',
-      'neutral',
-    ];
-    let domRole: string | undefined = undefined;
-
-    if (role && !validColorRoles.includes(role)) {
-      domRole = role; // valid ARIA role like 'tab', 'switch', etc.
-    }
-
     const isActuallyDisabled = disabled || loading;
     const isFocusableWhenDisabled =
       focusableWhenDisabled ?? (loading ? true : undefined);
@@ -239,17 +202,16 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <BaseButton
         ref={ref}
+        data-slot="button"
+        type={type}
         disabled={isActuallyDisabled}
         focusableWhenDisabled={isFocusableWhenDisabled}
         nativeButton={nativeButton}
         render={render}
-        role={domRole}
         aria-busy={loading ? true : undefined}
         className={buttonVariants({
           variant,
-          emphasis,
           colorRole,
-          role,
           size,
           expandedTouchTarget,
           className,

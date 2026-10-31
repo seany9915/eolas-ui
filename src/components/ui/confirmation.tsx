@@ -19,7 +19,7 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
-import { Chip } from './chip';
+import { Badge } from './badge';
 import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
@@ -436,21 +436,21 @@ const ConfirmationComponent = React.forwardRef<HTMLDivElement, ConfirmationProps
               {/* Status or Risk Badge */}
               <div className="shrink-0">
                 {isApproved ? (
-                  <Chip size="sm" pattern="high-contrast-mixed" colorRole="success">
+                  <Badge size="sm" variant="filled" colorRole="success">
                     Approved
-                  </Chip>
+                  </Badge>
                 ) : isDenied ? (
-                  <Chip size="sm" pattern="outline-neutral-fill" colorRole="neutral">
+                  <Badge size="sm" variant="outline" colorRole="neutral">
                     Denied
-                  </Chip>
+                  </Badge>
                 ) : riskLevel === 'high' ? (
-                  <Chip size="sm" pattern="high-contrast-mixed" colorRole="warning">
+                  <Badge size="sm" variant="filled" colorRole="warning">
                     Action Required
-                  </Chip>
+                  </Badge>
                 ) : (
-                  <Chip size="sm" pattern="outline-neutral-fill" colorRole="neutral">
+                  <Badge size="sm" variant="outline" colorRole="neutral">
                     Confirmation
-                  </Chip>
+                  </Badge>
                 )}
               </div>
             </ConfirmationHeader>

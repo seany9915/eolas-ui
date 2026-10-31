@@ -15,7 +15,7 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
-import { Chip } from './chip';
+import { Badge } from './badge';
 import { Separator } from './separator';
 import { cn } from '@/lib/utils';
 
@@ -226,9 +226,9 @@ const CheckpointComponent = React.forwardRef<HTMLDivElement, CheckpointProps>(
             <CheckpointIcon />
             <CheckpointTitle>{displayLabel}</CheckpointTitle>
             {tag && (
-              <Chip size="sm" pattern="outline-neutral-fill" colorRole="neutral" className="text-xs py-0 px-1.5 h-5 font-mono">
+              <Badge size="sm" variant="outline" colorRole="neutral" className="text-xs py-0 px-1.5 h-5 font-mono">
                 {tag}
-              </Chip>
+              </Badge>
             )}
             {timestamp && <CheckpointTimestamp timestamp={timestamp} />}
             {onRestore && (
@@ -261,7 +261,7 @@ export const Checkpoint = Object.assign(CheckpointComponent, {
   Timestamp: CheckpointTimestamp,
   Trigger: CheckpointTrigger,
   Button: CheckpointTrigger,
-  Tag: Chip,
+  Tag: Badge,
   Separator,
 });
 

@@ -223,6 +223,40 @@
       }
     },
     {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Badge primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/badge",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/badge.tsx",
+          "type": "registry:ui",
+          "target": "@ui/badge.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Badge for PASSIVE, non-interactive status indicators, counts, categories, or labels.",
+          "Do NOT use Badge for interactive filters, toggles, or removable tags (use Chip instead).",
+          "Implements DESIGN.md High-Contrast Accessible standards:",
+          "Pattern 1 (filled): Solid brand fill + high-contrast on-color text.",
+          "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+          "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+          "Never uses the banned triple-tint monochrome pattern (light tint + same-hue border + same-hue text).",
+          "Full WCAG 2.2 AA contrast compliance.",
+          "Polymorphic composition powered by Base UI's `useRender` hook."
+        ]
+      }
+    },
+    {
       "name": "bot-avatar",
       "type": "registry:ui",
       "title": "Bot Avatar",
@@ -364,7 +398,7 @@
       "registryDependencies": [
         "utils",
         "trace",
-        "chip",
+        "badge",
         "chat-message-context"
       ],
       "files": [
@@ -541,7 +575,7 @@
         "utils",
         "button",
         "icon",
-        "chip",
+        "badge",
         "separator"
       ],
       "files": [
@@ -566,7 +600,7 @@
       "name": "chip",
       "type": "registry:ui",
       "title": "Chip",
-      "description": "Eolas UI Chip component built on Base UI and DESIGN.md design tokens.",
+      "description": "Chip primitive. Built on Base UI (@base-ui/react) interaction foundations.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -581,7 +615,19 @@
           "type": "registry:ui",
           "target": "@ui/chip.tsx"
         }
-      ]
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Chip for INTERACTIVE compact elements: 1. Filter chips: Toggleable selection filters with keyboard navigation (aria-pressed). 2. Input/Removable chips: Dismissible tags with accessible remove buttons (onRemove). 3. Action chips: Clickable compact triggers (onClick).",
+          "For PASSIVE, non-interactive status labels or counts, use Badge instead.",
+          "Implements DESIGN.md High-Contrast Accessible standards:",
+          "Pattern 1 (filled): Solid brand fill + high-contrast text.",
+          "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+          "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+          "Full WCAG 2.2 SC 2.5.8 touch target compliance (expands to 44px when interactive or removable).",
+          "Floating 2px focus ring (outline-offset: 2px) on keyboard focus."
+        ]
+      }
     },
     {
       "name": "clinician-tip",
@@ -707,7 +753,7 @@
         "utils",
         "button",
         "icon",
-        "chip",
+        "badge",
         "chat-message-context"
       ],
       "files": [
@@ -1593,7 +1639,7 @@
         "tooltip",
         "attachment",
         "menu",
-        "chip"
+        "badge"
       ],
       "files": [
         {
@@ -2585,7 +2631,7 @@
       "registryDependencies": [
         "utils",
         "icon",
-        "chip",
+        "badge",
         "code-block",
         "inline-alert",
         "chat-message-context"

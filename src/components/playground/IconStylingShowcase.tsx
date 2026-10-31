@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Chip } from '@/components/ui/chip';
+import { Badge } from '@/components/ui/badge';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Icon } from '@/components/ui/icon';
 import { Field } from '@/components/ui/field';
@@ -98,9 +98,9 @@ export const IconStylingShowcase: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2">
                 <span className="font-label text-xs font-bold text-on-surface">Decorative Icon Pattern</span>
-                <Chip variant="tonal" colorRole="secondary" size="sm">
+                <Badge variant="soft" colorRole="secondary" size="sm">
                   aria-hidden="true"
-                </Chip>
+                </Badge>
               </div>
               <div className="flex items-center gap-3 p-3 bg-surface-container rounded">
                 <span className="text-primary">
@@ -118,9 +118,9 @@ export const IconStylingShowcase: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2">
                 <span className="font-label text-xs font-bold text-on-surface">Standalone Interactive Icon Pattern</span>
-                <Chip variant="tonal" colorRole="primary" size="sm">
+                <Badge variant="soft" colorRole="primary" size="sm">
                   aria-label / sr-only
-                </Chip>
+                </Badge>
               </div>
               <div className="flex items-center gap-4 p-3 bg-surface-container rounded">
                 <Tooltip content="Print therapy summary">
@@ -152,9 +152,9 @@ export const IconStylingShowcase: React.FC = () => {
               Icon glyphs inside soft role-container washes (<code className="font-mono text-primary">primary-container</code>, <code className="font-mono text-primary">surface-variant</code>) with charcoal (<code className="font-mono">#1a1c1e</code>) or brand blue glyphs. Delivers visual weight, clear structural framing, and 8.0:1+ contrast.
             </p>
           </div>
-          <Chip variant="tonal" colorRole="primary" size="sm">
+          <Badge variant="soft" colorRole="primary" size="sm">
             Common Row/Card Pattern
-          </Chip>
+          </Badge>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -208,9 +208,9 @@ export const IconStylingShowcase: React.FC = () => {
               Bare Sunny Amber (<code className="font-mono font-bold text-tertiary">#F9A825</code>) icon glyphs fail contrast (1.99:1) on white. <code className="font-mono font-bold">DESIGN.md</code> requires a solid amber badge with charcoal (<code className="font-mono">#1a1c1e</code>) icon inside.
             </p>
           </div>
-          <Chip variant="tonal" colorRole="tertiary" size="sm">
+          <Badge variant="soft" colorRole="tertiary" size="sm">
             8.66:1 AA Compliant
-          </Chip>
+          </Badge>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

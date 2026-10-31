@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { Chip } from '@/components/ui/chip';
+import { Badge } from '@/components/ui/badge';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { TabsRoot, TabsList, Tab, TabsPanel } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -88,23 +88,21 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               </h2>
 
               {/* Badges - Following DESIGN.md chips */}
-              <Chip
-                label={entry.tier === 'block' ? 'Composite Block' : 'Primitive'}
-                pattern={entry.tier === 'block' ? 'secondary-container' : 'primary-container'}
+              <Badge
+                variant="soft"
                 colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
                 size="sm"
-              />
+              >{entry.tier === 'block' ? 'Composite Block' : 'Primitive'}</Badge>
               <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 {entry.basePrimitive}
               </span>
               {entry.isDeprecated && (
-                <Chip
-                  label="Legacy Re-export"
-                  pattern="warning-container"
+                <Badge
+                  variant="soft"
                   colorRole="warning"
                   size="sm"
                   icon="warning"
-                />
+                >Legacy Re-export</Badge>
               )}
             </div>
 

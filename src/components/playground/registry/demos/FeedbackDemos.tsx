@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Toast } from '@/components/ui/toast';
+import { Badge } from '@/components/ui/badge';
 import { Chip } from '@/components/ui/chip';
 import { NotificationBadge } from '@/components/ui/notification-badge';
 import { Meter } from '@/components/ui/meter';
@@ -89,12 +90,12 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
           Semantic Status Roles
         </h4>
         <div className="flex flex-wrap items-center gap-2">
-          <Chip label="High Priority" colorRole="error" icon="priority_high" />
-          <Chip label="Needs Review" colorRole="warning" icon="schedule" />
-          <Chip label="Completed" colorRole="success" icon="verified" />
-          <Chip label="In Progress" colorRole="primary" icon="play_arrow" />
-          <Chip label="Daily Drill" colorRole="secondary" icon="checklist" />
-          <Chip label="Archived" colorRole="neutral" icon="archive" />
+          <Badge colorRole="error" icon="priority_high">High Priority</Badge>
+          <Badge colorRole="warning" icon="schedule">Needs Review</Badge>
+          <Badge colorRole="success" icon="verified">Completed</Badge>
+          <Badge colorRole="primary" icon="play_arrow">In Progress</Badge>
+          <Badge colorRole="secondary" icon="checklist">Daily Drill</Badge>
+          <Badge colorRole="neutral" icon="archive">Archived</Badge>
         </div>
       </div>
 
@@ -103,10 +104,11 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
           Patterns & Emphasis
         </h4>
         <div className="flex flex-wrap items-center gap-2">
-          <Chip label="Mixed Contrast" pattern="high-contrast-mixed" colorRole="primary" />
-          <Chip label="Neutral Fill Accent" pattern="neutral-fill-accent-text" colorRole="secondary" />
-          <Chip label="Soft Wash" pattern="soft-wash" colorRole="tertiary" />
-          <Chip label="Removable Filter" colorRole="primary" onRemove={() => {}} />
+          <Chip variant="filled" colorRole="primary">Filled Chip</Chip>
+          <Chip variant="outline" colorRole="secondary">Outline Chip</Chip>
+          <Chip variant="soft" colorRole="tertiary">Soft Chip</Chip>
+          <Chip selected={true} colorRole="primary">Filter Chip</Chip>
+          <Chip colorRole="primary" onRemove={() => {}}>Removable Filter</Chip>
         </div>
       </div>
     </div>

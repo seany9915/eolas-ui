@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Icon } from '@/components/ui/icon';
-import { Chip } from '@/components/ui/chip';
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { UnstyledButton } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -82,12 +82,11 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-2">
-              <Chip
-                label="Registry v3.1"
-                pattern="primary-container"
+              <Badge
+                variant="soft"
                 colorRole="primary"
                 size="sm"
-              />
+              >Registry v3.1</Badge>
               <span className="font-mono text-xs px-2.5 py-1 rounded-md bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 Base UI (@base-ui/react)
               </span>
@@ -232,12 +231,11 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                       <h3 className="font-heading text-base font-bold text-on-surface group-hover:text-primary transition-colors truncate">
                         {entry.title}
                       </h3>
-                      <Chip
-                        label={entry.tier === 'block' ? 'Block' : 'Primitive'}
-                        pattern={entry.tier === 'block' ? 'secondary-container' : 'primary-container'}
+                      <Badge
+                        variant="soft"
                         colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
                         size="sm"
-                      />
+                      >{entry.tier === 'block' ? 'Block' : 'Primitive'}</Badge>
                     </div>
 
                     <p className="font-sans text-sm text-on-surface-variant line-clamp-2 leading-relaxed">
