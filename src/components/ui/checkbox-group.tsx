@@ -13,6 +13,7 @@
 import * as React from 'react';
 import { CheckboxGroup as BaseCheckboxGroup } from '@base-ui/react/checkbox-group';
 import { Checkbox } from './checkbox';
+import { Icon } from './icon';
 import { cn } from '@/lib/utils';
 
 export interface CheckboxGroupOption {
@@ -54,6 +55,10 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
     },
     ref
   ) => {
+    const generatedId = React.useId();
+    const labelId = label ? `${generatedId}-label` : undefined;
+    const descId = description ? `${generatedId}-desc` : undefined;
+
     return (
       <BaseCheckboxGroup
         ref={ref}
@@ -62,16 +67,18 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
         allValues={allValues}
         onValueChange={onValueChange}
         disabled={disabled}
+        aria-labelledby={labelId}
+        aria-describedby={descId}
         className={cn('w-full', className)}
         {...props}
       >
         {label && (
           <div className="space-y-0.5 mb-2.5">
-            <span className="font-label text-sm font-bold text-on-surface block">
+            <span id={labelId} className="font-label text-sm font-bold text-on-surface block">
               {label}
             </span>
             {description && (
-              <span className="font-sans text-sm text-on-surface-variant block">
+              <span id={descId} className="font-sans text-sm text-on-surface-variant block">
                 {description}
               </span>
             )}
@@ -97,9 +104,7 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
         </div>
         {error && (
           <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none mt-1.5">
-            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-              error
-            </span>
+            <Icon name="error" size="sm" className="shrink-0" />
             <span>{error}</span>
           </span>
         )}

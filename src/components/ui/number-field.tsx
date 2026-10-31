@@ -12,6 +12,7 @@
 import * as React from 'react';
 import { NumberField as BaseNumberField } from '@base-ui/react/number-field';
 import { cn } from '@/lib/utils';
+import { Icon } from './icon';
 
 export interface NumberFieldProps {
   label?: React.ReactNode;
@@ -146,30 +147,29 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
         className={cn(
           'inline-flex w-max items-center rounded border bg-surface overflow-hidden',
           'transition-[border-color,box-shadow]',
-          'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
-          error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline'
+          'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
+          'disabled:opacity-50 disabled:bg-surface-variant/30 disabled:pointer-events-none',
+          error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline-variant hover:border-outline'
         )}
       >
         <BaseNumberField.Decrement
           aria-label="Decrease value"
-          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container active:bg-primary-container active:text-on-primary-container transition-colors disabled:opacity-40 border-r border-outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer select-none"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-variant/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-r border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
         >
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">remove</span>
+          <Icon name="remove" size="sm" />
         </BaseNumberField.Decrement>
-        <BaseNumberField.Input className="h-11 w-16 text-center font-mono text-base font-bold text-on-surface bg-transparent focus:outline-none" />
+        <BaseNumberField.Input className="h-11 min-w-[4.5rem] w-auto px-2 text-center font-mono text-base font-bold text-on-surface tabular-nums bg-transparent focus:outline-none" />
         <BaseNumberField.Increment
           aria-label="Increase value"
-          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container active:bg-primary-container active:text-on-primary-container transition-colors disabled:opacity-40 border-l border-outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer select-none"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-variant/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-l border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
         >
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span>
+          <Icon name="add" size="sm" />
         </BaseNumberField.Increment>
       </BaseNumberField.Group>
 
       {error && (
         <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none">
-          <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-            error
-          </span>
+          <Icon name="error" size="sm" className="shrink-0" />
           <span>{error}</span>
         </span>
       )}

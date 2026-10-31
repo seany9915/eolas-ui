@@ -14,6 +14,7 @@ import { OTPField as BaseOTPField } from '@base-ui/react/otp-field';
 import { Field as BaseField } from '@base-ui/react/field';
 import { cn } from '@/lib/utils';
 import { useWebOtp } from '@/lib/use-web-otp';
+import { Icon } from './icon';
 
 export interface OTPFieldProps {
   id?: string;
@@ -134,7 +135,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
             <React.Fragment key={idx}>
               {showSeparator && idx === sepIndex && (
                 <BaseOTPField.Separator
-                  className="text-outline flex items-center justify-center font-bold px-0.5 select-none"
+                  className="text-on-surface-variant/60 flex items-center justify-center font-bold px-1 select-none"
                   aria-hidden="true"
                 >
                   –
@@ -143,11 +144,11 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
               <BaseOTPField.Input
                 pattern={pattern}
                 className={cn(
-                  'w-10 @sm:w-12 h-12 min-h-[48px] text-center font-heading text-lg @sm:text-xl font-bold rounded',
+                  'w-11 min-w-[44px] @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded',
                   'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
-                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                   'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-                  error ? 'border-error focus-visible:border-error focus-visible:outline-error' : 'border-outline'
+                  error ? 'border-error focus-visible:border-error focus-visible:outline-error' : 'border-outline-variant hover:border-outline'
                 )}
               />
             </React.Fragment>
@@ -160,9 +161,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
           match
           className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
         >
-          <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
-            error
-          </span>
+          <Icon name="error" size="sm" className="shrink-0 select-none" />
           <span>{error}</span>
         </BaseField.Error>
       ) : (
@@ -176,9 +175,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
                 elementProps.className
               )}
             >
-              <span className="material-symbols-outlined text-base shrink-0 select-none" aria-hidden="true">
-                error
-              </span>
+              <Icon name="error" size="sm" className="shrink-0 select-none" />
               <span>{elementProps.children}</span>
             </div>
           )}

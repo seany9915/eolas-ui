@@ -327,7 +327,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "checkbox"
+        "checkbox",
+        "icon"
       ],
       "meta": {
         "taxonomy": [
@@ -349,7 +350,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ],
       "meta": {
         "taxonomy": [
@@ -435,7 +437,7 @@
       ],
       "meta": {
         "taxonomy": [
-          "Displays source code, JSON telemetry parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
+          "Displays source code, JSON parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
           "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
           "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
         ]
@@ -835,7 +837,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ]
     },
     {
@@ -924,7 +927,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ]
     },
     {
@@ -952,7 +956,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1002,7 +1007,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1666,7 +1672,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1817,7 +1824,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon"
       ],
       "meta": {
         "taxonomy": [

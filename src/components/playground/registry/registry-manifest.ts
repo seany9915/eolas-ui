@@ -398,7 +398,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/code-block.tsx",
     "taxonomy": [
-      "Displays source code, JSON telemetry parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
+      "Displays source code, JSON parameters, query outputs, and formatted data structures inside assistant execution traces or messages.",
       "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
       "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
     ],
@@ -2020,7 +2020,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "metric-card",
     "name": "metric-card",
     "title": "Metric Card",
-    "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Chip, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
+    "description": "MetricCard block. Presentational metric card for analytics, session overviews, and progress monitoring. Composes Card, Chip, and Icon primitives with tabular numbers, ambient elevation, and high-contrast status tokens.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",

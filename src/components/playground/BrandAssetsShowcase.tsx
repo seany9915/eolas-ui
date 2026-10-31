@@ -8,14 +8,14 @@ export const BrandAssetsShowcase: React.FC = () => {
   const brandAssets = [
     { name: 'Primary Mark (Stacked)', file: assetUrl('/logos/primary-mark.svg'), bg: 'bg-surface', text: 'Standalone hero blocks, splash screens, welcome portals. Min 3rem padding.' },
     { name: 'Horizontal Lockup (Primary)', file: assetUrl('/logos/horizontal-lockup.svg'), bg: 'bg-surface', text: 'Main desktop navigation top bar (top-left alignment).' },
-    { name: 'Horizontal Lockup (Amber)', file: assetUrl('/logos/horizontal-lockup-amber.svg'), bg: 'bg-surface', text: 'Interactive highlights, themed clinic dashboards.' },
+    { name: 'Horizontal Lockup (Amber)', file: assetUrl('/logos/horizontal-lockup-amber.svg'), bg: 'bg-surface', text: 'Interactive highlights, themed practice dashboards.' },
     { name: 'Horizontal Lockup (Black)', file: assetUrl('/logos/horizontal-lockup-black.svg'), bg: 'bg-surface', text: 'Print media, legal utility docs, high-contrast monochrome.' },
     { name: 'Horizontal Lockup (White)', file: assetUrl('/logos/horizontal-lockup-white.svg'), bg: 'bg-on-surface', text: 'Inverted surfaces (Electric Blue or Charcoal containers).' },
     { name: 'Pictorial Mark (Symbol)', file: assetUrl('/logos/pictorial-mark.svg'), bg: 'bg-surface', text: 'High-density screen headers, favicons, account avatars (Min 32px).' },
     { name: 'Pictorial Mark (White)', file: assetUrl('/logos/pictorial-mark-white.svg'), bg: 'bg-on-surface', text: 'Inverted surfaces (Dark Charcoal / Electric Blue background containers).' },
     { name: 'Pictorial Mark (Pure White)', file: assetUrl('/logos/pictorial-mark-pure-white.svg'), bg: 'bg-on-surface', text: 'High-contrast monochrome inverted surfaces and dark mode favicons.' },
     { name: 'Pictorial Mark (Amber)', file: assetUrl('/logos/pictorial-mark-amber.svg'), bg: 'bg-on-surface', text: 'Inverted surface highlights, milestone avatars, streak badges on dark containers.' },
-    { name: 'Pictorial Mark (Sunny Amber)', file: assetUrl('/logos/pictorial-mark-sunny-amber.svg'), bg: 'bg-on-surface', text: 'Warm high-saturation accent symbol for clinical achievement dashboards.' },
+    { name: 'Pictorial Mark (Sunny Amber)', file: assetUrl('/logos/pictorial-mark-sunny-amber.svg'), bg: 'bg-on-surface', text: 'Warm accent symbol for practice achievement dashboards.' },
     { name: 'Pictorial Mark (Amber & White Blend)', file: assetUrl('/logos/pictorial-mark-amber-white.svg'), bg: 'bg-on-surface', text: 'Dynamic inverted surfaces combining Sunny Amber highlight and Pure White luminance gradient.' },
     { name: 'Pictorial Mark (Amber & White Bitone)', file: assetUrl('/logos/pictorial-mark-amber-white-bitone.svg'), bg: 'bg-on-surface', text: 'Dual-tone inverted mark pairing pure white phonic waves with amber core accent.' },
     { name: 'Wordmark (Logotype Only)', file: assetUrl('/logos/wordmark.svg'), bg: 'bg-surface', text: 'Internal widget footers, clean editorial headers.' },
@@ -74,7 +74,7 @@ export const BrandAssetsShowcase: React.FC = () => {
                 <img src={assetUrl('/logos/primary-mark.svg')} alt="Stacked Mark" className="h-28 w-auto object-contain" />
                 <h4 className="font-heading text-2xl font-bold text-on-surface">Welcome to Eolas Speech Therapy</h4>
                 <p className="font-sans text-sm text-on-surface-variant max-w-md">
-                  An accessible clinical speech therapy platform engineered for cognitive ease and WCAG 2.2 AA compliance.
+                  An accessible speech therapy platform designed for daily practice and WCAG 2.2 AA compliance.
                 </p>
               </div>
               <Button colorRole="primary" size="md" className="mt-4">Start Daily Exercises</Button>
@@ -89,10 +89,10 @@ export const BrandAssetsShowcase: React.FC = () => {
                 <img src={assetUrl('/logos/wordmark-amber.svg')} alt="Amber Wordmark" className="h-5 w-auto object-contain" />
               </div>
               <p className="font-sans text-xs text-surface/80 leading-relaxed">
-                Eolas Clinical Platform. Certified accessible healthcare technology built with Base UI primitives and Material Symbols.
+                Eolas Practice Platform. Accessible speech practice built with Base UI primitives and Material Symbols.
               </p>
               <div className="border-t border-surface/20 pt-4 flex items-center justify-between text-xs text-surface/60 font-label">
-                <span>© 2026 Eolas Healthcare Ltd.</span>
+                <span>© 2026 Eolas Ltd.</span>
                 <span>WCAG 2.2 AA Compliant</span>
               </div>
             </div>

@@ -13,6 +13,7 @@
 import * as React from 'react';
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import { cn } from '@/lib/utils';
+import { Icon } from './icon';
 
 export interface CheckboxProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseCheckbox.Root>, 'onChange' | 'checked'> {
@@ -77,7 +78,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary text-on-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'data-[disabled]:bg-surface-variant/40 data-[disabled]:border-outline-variant data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
-          error ? 'border-error focus-visible:outline-error' : 'border-outline',
+          error ? 'border-error focus-visible:outline-error' : 'border-outline-variant hover:border-outline',
           !label && className
         )}
         {...props}
@@ -88,12 +89,11 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
               {...indicatorProps}
               className="flex items-center justify-center transition-[transform,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:scale-75 data-[starting-style]:opacity-0"
             >
-              <span
-                className="material-symbols-outlined text-sm font-bold text-on-primary select-none"
-                aria-hidden="true"
-              >
-                {state.indeterminate ? 'remove' : 'check'}
-              </span>
+              <Icon
+                name={state.indeterminate ? 'remove' : 'check'}
+                size="xs"
+                className="font-bold text-on-primary select-none leading-none"
+              />
             </span>
           )}
         />
@@ -130,9 +130,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           )}
           {typeof error === 'string' && error && (
             <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
-              <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-                error
-              </span>
+              <Icon name="error" size="sm" className="shrink-0" />
               <span>{error}</span>
             </span>
           )}

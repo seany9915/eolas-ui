@@ -68,7 +68,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
             <Button size="lg" colorRole="primary">Large (56px)</Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="icon" colorRole="primary" aria-label="Add prescription">
+            <Button size="icon" colorRole="primary" aria-label="Add item">
               <Icon name="add" size="sm" />
             </Button>
           </div>
@@ -79,12 +79,12 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const InputDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState('NHS-992-019-281');
+  const [val, setVal] = React.useState('P-2024-819');
   return (
     <div className="space-y-6 w-full max-w-xl mx-auto">
       <FormField
-        label="Clinical Patient ID"
-        description="Assigned 10-digit National Health Service patient identifier"
+        label="Patient ID"
+        description="Assigned patient identification number"
         value={val}
         onChange={(e) => setVal(e.target.value)}
         leadingIcon={<Icon name="badge" size="xs" />}
@@ -92,18 +92,18 @@ export const InputDemo: React.FC<ComponentDemoProps> = () => {
         onClear={() => setVal('')}
       />
       <FormField
-        label="Required Clinician Password"
+        label="Password"
         type="password"
-        description="Single-ring floating 2px focus indicator"
-        placeholder="Enter hospital SSO password"
+        description="Must be at least 8 characters long"
+        placeholder="Enter your account password"
         leadingIcon={<Icon name="lock" size="xs" />}
       />
       <FormField
-        label="Invalid Prescription Dosage"
-        value="999 mg/kg (Critical Overdose)"
+        label="Session Duration"
+        value="180 minutes"
         readOnly
-        error="Dosage exceeds max safe threshold (50 mg/kg)"
-        leadingIcon={<Icon name="medication" size="xs" />}
+        error="Duration exceeds recommended 45-minute limit"
+        leadingIcon={<Icon name="timer" size="xs" />}
       />
     </div>
   );
@@ -113,9 +113,9 @@ export const TextareaDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="space-y-4 w-full max-w-xl mx-auto">
       <TextareaField
-        label="Clinical Observation Notes"
-        description="Document subjective and objective findings during patient consultation"
-        placeholder="Enter consultation summary notes..."
+        label="Session Notes"
+        description="Record practice notes and speech clarity observations"
+        placeholder="Enter session notes..."
         rows={4}
       />
     </div>
@@ -126,9 +126,9 @@ export const FieldDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="space-y-4 w-full max-w-xl mx-auto">
       <Field name="ward-code">
-        <FieldLabel>Ward Classification</FieldLabel>
-          <Input placeholder="e.g. ICU-NORTH-04" />
-        <FieldDescription>Base UI Field wrapper providing accessible labeling and aria descriptions</FieldDescription>
+        <FieldLabel>Practice Group</FieldLabel>
+          <Input placeholder="e.g. MORNING-GRP-A" />
+        <FieldDescription>Group code assigned for scheduled practice sessions</FieldDescription>
       </Field>
     </div>
   );
@@ -158,38 +158,38 @@ export const FormDemo: React.FC<ComponentDemoProps> = () => {
         <h4 className="font-heading text-sm font-bold text-on-surface">Base UI Form Root</h4>
         <p className="font-sans text-xs text-on-surface-variant">Built on @base-ui/react/form with native validation context.</p>
       </div>
-      <Input placeholder="Consultant Name" required />
-      <Input placeholder="Hospital Email" type="email" required />
-      <Button colorRole="primary" className="w-full">Submit Consultation Record</Button>
+      <Input placeholder="Therapist Name" required />
+      <Input placeholder="Email Address" type="email" required />
+      <Button colorRole="primary" className="w-full">Save Consultation Notes</Button>
     </Form>
   );
 };
 
 export const SelectDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState('icu');
+  const [val, setVal] = React.useState('r-sound');
   return (
     <div className="space-y-4 w-full max-w-md mx-auto">
       <div className="space-y-1.5">
-        <label className="font-label text-xs font-bold text-on-surface block">Department Assignment</label>
+        <label className="font-label text-xs font-bold text-on-surface block">Practice Module</label>
         <Select.Root value={val} onValueChange={(v) => v && setVal(v)}>
           <Select.Trigger className="w-full">
-            <Select.Value placeholder="Select clinical ward..." />
+            <Select.Value placeholder="Select practice module..." />
           </Select.Trigger>
           <Select.Portal>
             <Select.Positioner sideOffset={4}>
               <Select.Popup>
                 <Select.List>
-                  <Select.Item value="icu">Intensive Care Unit (ICU)</Select.Item>
-                  <Select.Item value="peds">Paediatrics Ward</Select.Item>
-                  <Select.Item value="cardio">Cardiology Care</Select.Item>
-                  <Select.Item value="er">Emergency Trauma</Select.Item>
+                  <Select.Item value="r-sound">Vocalic /r/ Practice</Select.Item>
+                  <Select.Item value="s-blend">S-Blend Syllables</Select.Item>
+                  <Select.Item value="vowels">Vowel Prolongation</Select.Item>
+                  <Select.Item value="consonants">Consonant Repetition</Select.Item>
                 </Select.List>
               </Select.Popup>
             </Select.Positioner>
           </Select.Portal>
         </Select.Root>
       </div>
-      <p className="font-mono text-xs text-on-surface-variant">Selected ward value: {val}</p>
+      <p className="font-mono text-xs text-on-surface-variant">Selected module: {val}</p>
     </div>
   );
 };
@@ -197,17 +197,17 @@ export const SelectDemo: React.FC<ComponentDemoProps> = () => {
 export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="space-y-3 w-full max-w-md mx-auto">
-      <label className="font-label text-xs font-bold text-on-surface block">ICD-10 Diagnostic Code Search</label>
-      <Combobox.Root items={['I10 Essential Hypertension', 'E11 Type 2 Diabetes Mellitus', 'J45 Asthma', 'R05 Cough']}>
+      <label className="font-label text-xs font-bold text-on-surface block">Sound Library Search</label>
+      <Combobox.Root items={['/r/ Vocalic Sounds', '/s/ Initial Blends', '/th/ Voiced Pairs', '/ch/ Affricates']}>
         <Combobox.InputGroup className="w-full">
-          <Combobox.Input placeholder="Search diagnostic terminology..." />
+          <Combobox.Input placeholder="Search target sounds..." />
           <Combobox.Clear />
           <Combobox.Trigger />
         </Combobox.InputGroup>
         <Combobox.Portal>
           <Combobox.Positioner sideOffset={4}>
             <Combobox.Popup>
-              <Combobox.Empty>No clinical matches found</Combobox.Empty>
+              <Combobox.Empty>No matching sounds found</Combobox.Empty>
               <Combobox.List>
                 {(item: string) => <Combobox.Item key={item} value={item}>{item}</Combobox.Item>}
               </Combobox.List>
@@ -222,9 +222,9 @@ export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
 export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="space-y-3 w-full max-w-md mx-auto">
-      <label className="font-label text-xs font-bold text-on-surface block">Medication Dosage Autocomplete</label>
-      <Autocomplete.Root openOnInputClick items={['Amoxicillin 500mg', 'Paracetamol 1000mg', 'Ibuprofen 400mg', 'Metformin 500mg']}>
-        <Autocomplete.Input placeholder="Type medication name..." className="w-full" />
+      <label className="font-label text-xs font-bold text-on-surface block">Practice Exercise Search</label>
+      <Autocomplete.Root openOnInputClick items={['Word Repetition', 'Picture Naming', 'Minimal Pairs', 'Sentence Reading']}>
+        <Autocomplete.Input placeholder="Type exercise name..." className="w-full" />
         <Autocomplete.Portal>
           <Autocomplete.Positioner sideOffset={4}>
             <Autocomplete.Popup>
@@ -247,19 +247,19 @@ export const CheckboxDemo: React.FC<ComponentDemoProps> = () => {
       <div className="flex items-center gap-3">
         <Checkbox checked={checked} onCheckedChange={setChecked} id="allergy-check" />
         <label htmlFor="allergy-check" className="font-label text-sm font-medium text-on-surface cursor-pointer select-none">
-          Patient has confirmed medication allergies
+          Practice notifications enabled
         </label>
       </div>
       <div className="flex items-center gap-3">
         <Checkbox checked={false} id="fasting-check" />
         <label htmlFor="fasting-check" className="font-label text-sm font-medium text-on-surface cursor-pointer select-none">
-          Patient has been fasting for 12 hours
+          Audio recording permission granted
         </label>
       </div>
       <div className="flex items-center gap-3">
         <Checkbox checked="indeterminate" id="consent-check" />
         <label htmlFor="consent-check" className="font-label text-sm font-medium text-on-surface cursor-pointer select-none">
-          Partial surgical consent acquired (Indeterminate)
+          Include weekly summary reports
         </label>
       </div>
     </div>
@@ -267,54 +267,63 @@ export const CheckboxDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const CheckboxGroupDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState<string[]>(['monitoring']);
+  const [val, setVal] = React.useState<string[]>(['daily']);
+
+  const protocolOptions = [
+    {
+      value: 'daily',
+      label: 'Daily Practice Reminder',
+      description: 'Morning prompt to begin daily word drills',
+    },
+    {
+      value: 'weekly',
+      label: 'Weekly Progress Summary',
+      description: 'Email summary of session scores and milestones',
+    },
+    {
+      value: 'milestones',
+      label: 'Streak Milestone Alerts',
+      description: 'Notification when a 5-day practice streak is reached',
+    },
+  ];
+
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto">
-      <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-        Clinical Protocol Group
-      </h4>
-      <CheckboxGroup value={val} onValueChange={setVal} className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Checkbox value="monitoring" id="opt-1" />
-          <label htmlFor="opt-1" className="font-label text-xs text-on-surface cursor-pointer">Continuous SpO2 Monitoring</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox value="ecg" id="opt-2" />
-          <label htmlFor="opt-2" className="font-label text-xs text-on-surface cursor-pointer">12-Lead ECG Tracking</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox value="temp" id="opt-3" />
-          <label htmlFor="opt-3" className="font-label text-xs text-on-surface cursor-pointer">Hourly Temperature Logging</label>
-        </div>
-      </CheckboxGroup>
+    <div className="w-full max-w-md mx-auto">
+      <CheckboxGroup
+        label="Practice Reminders"
+        description="Choose which reminders to send before practice sessions"
+        value={val}
+        onValueChange={setVal}
+        options={protocolOptions}
+      />
     </div>
   );
 };
 
 export const RadioDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState('stat');
+  const [val, setVal] = React.useState('high');
   return (
     <div className="space-y-3 w-full max-w-md mx-auto">
-      <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-        Triage Priority Level
+      <h4 className="font-heading text-xs font-bold text-on-surface-variant">
+        Priority Level
       </h4>
       <RadioGroup value={val} onValueChange={setVal} className="space-y-2.5">
         <div className="flex items-center gap-2.5">
-          <Radio value="stat" id="stat-opt" />
-          <label htmlFor="stat-opt" className="font-label text-xs font-medium text-error cursor-pointer">
-            STAT - Immediate Emergency Resuscitation
+          <Radio value="high" id="high-opt" />
+          <label htmlFor="high-opt" className="font-label text-xs font-medium text-error cursor-pointer">
+            High - Immediate review
           </label>
         </div>
         <div className="flex items-center gap-2.5">
-          <Radio value="urgent" id="urgent-opt" />
-          <label htmlFor="urgent-opt" className="font-label text-xs font-medium text-warning cursor-pointer">
-            Urgent - Within 30 Minutes
+          <Radio value="medium" id="medium-opt" />
+          <label htmlFor="medium-opt" className="font-label text-xs font-medium text-warning cursor-pointer">
+            Medium - Within 24 hours
           </label>
         </div>
         <div className="flex items-center gap-2.5">
-          <Radio value="routine" id="routine-opt" />
-          <label htmlFor="routine-opt" className="font-label text-xs font-medium text-on-surface cursor-pointer">
-            Routine - Scheduled Round
+          <Radio value="standard" id="standard-opt" />
+          <label htmlFor="standard-opt" className="font-label text-xs font-medium text-on-surface cursor-pointer">
+            Standard - Routine review
           </label>
         </div>
       </RadioGroup>
@@ -328,70 +337,169 @@ export const SwitchDemo: React.FC<ComponentDemoProps> = () => {
     <div className="space-y-4 w-full max-w-md mx-auto">
       <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-outline-variant">
         <div className="space-y-0.5">
-          <span className="font-label text-sm font-bold text-on-surface block">Auditory Alarm Broadcast</span>
-          <span className="font-sans text-xs text-on-surface-variant">Notify ward nurse station on vital signs anomaly</span>
+          <span className="font-label text-sm font-bold text-on-surface block">Audio Feedback</span>
+          <span className="font-sans text-xs text-on-surface-variant">Play audio cues during pronunciation drills</span>
         </div>
-        <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Toggle auditory alarm" />
+        <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Toggle audio feedback" />
       </div>
     </div>
   );
 };
 
 export const ToggleDemo: React.FC<ComponentDemoProps> = () => {
-  const [pressed, setPressed] = React.useState(true);
+  const [isPinned, setIsPinned] = React.useState(true);
+  const [isStarred, setIsStarred] = React.useState(false);
+  const [isMuted, setIsMuted] = React.useState(false);
+
   return (
-    <div className="flex flex-wrap items-center gap-3 justify-center">
-      <Toggle pressed={pressed} onPressedChange={setPressed}>
-        <Icon name="bookmark" size="xs" className="mr-1.5" />
-        Pin Patient to Active Caseload
-      </Toggle>
+    <div className="space-y-4 w-full max-w-md mx-auto text-center">
+      <div className="space-y-1">
+        <h4 className="font-heading text-sm font-semibold text-on-surface">Action Controls</h4>
+        <p className="font-sans text-xs text-on-surface-variant">Standalone two-state actions using aria-pressed</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-3 justify-center">
+        <Toggle pressed={isPinned} onPressedChange={setIsPinned} variant="default" size="md">
+          <Icon name="bookmark" size="sm" />
+          <span>Pin to Top</span>
+        </Toggle>
+        <Toggle
+          pressed={isStarred}
+          onPressedChange={setIsStarred}
+          variant="outline"
+          size="md"
+          aria-label="Flag for review"
+        >
+          <Icon name="flag" size="sm" />
+        </Toggle>
+        <Toggle pressed={isMuted} onPressedChange={setIsMuted} variant="subtle" size="md">
+          <Icon name={isMuted ? 'volume_off' : 'volume_up'} size="sm" />
+          <span>{isMuted ? 'Alerts Muted' : 'Mute Alerts'}</span>
+        </Toggle>
+      </div>
     </div>
   );
 };
 
 export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState<string[]>(['vitals']);
+  const [viewMode, setViewMode] = React.useState('grid');
+  const [activeFilters, setActiveFilters] = React.useState<string[]>(['words']);
+
+  const filterItems = [
+    { value: 'words', label: 'Word Drills', icon: 'record_voice_over' },
+    { value: 'phrases', label: 'Phrases', icon: 'forum' },
+    { value: 'sentences', label: 'Sentences', icon: 'menu_book' },
+  ];
+
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto text-center">
-      <span className="font-label text-xs font-bold text-on-surface-variant block">Caseload Filter Toggles</span>
-      <ToggleGroup value={val} onValueChange={setVal} className="inline-flex justify-center">
-        <Toggle value="vitals">Vitals</Toggle>
-        <Toggle value="labs">Lab Results</Toggle>
-        <Toggle value="scans">Radiology</Toggle>
-      </ToggleGroup>
+    <div className="space-y-6 w-full max-w-md mx-auto text-center">
+      <div className="space-y-2">
+        <div className="space-y-0.5">
+          <span className="font-label text-sm font-semibold text-on-surface block">View Mode</span>
+          <span className="font-sans text-xs text-on-surface-variant block">Single-select segmented switch</span>
+        </div>
+        <ToggleGroup
+          type="single"
+          value={viewMode}
+          onValueChange={(v) => v && setViewMode(v)}
+          aria-label="Layout view mode"
+          variant="segmented"
+          className="inline-flex justify-center"
+        >
+          <ToggleGroup.Item value="grid" icon="grid_view">
+            Grid View
+          </ToggleGroup.Item>
+          <ToggleGroup.Item value="list" icon="view_list">
+            List View
+          </ToggleGroup.Item>
+          <ToggleGroup.Item value="summary" icon="table_chart">
+            Summary
+          </ToggleGroup.Item>
+        </ToggleGroup>
+      </div>
+
+      <div className="space-y-2">
+        <div className="space-y-0.5">
+          <span className="font-label text-sm font-semibold text-on-surface block">Exercise Type Filters</span>
+          <span className="font-sans text-xs text-on-surface-variant block">Multi-select filter tags</span>
+        </div>
+        <ToggleGroup
+          type="multiple"
+          value={activeFilters}
+          onValueChange={setActiveFilters}
+          aria-label="Filter exercise types"
+          items={filterItems}
+          variant="outline"
+          className="inline-flex justify-center"
+        />
+      </div>
     </div>
   );
 };
 
 export const SliderDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState(37.2);
+  const [val, setVal] = React.useState(20);
   return (
     <div className="space-y-3 w-full max-w-md mx-auto">
       <div className="flex items-center justify-between">
-        <label className="font-label text-xs font-bold text-on-surface">Target Patient Body Temperature</label>
-        <span className="font-mono text-xs font-bold text-primary">{val.toFixed(1)} °C</span>
+        <label className="font-label text-xs font-bold text-on-surface">Daily Practice Goal</label>
+        <span className="font-mono text-xs font-bold text-primary">{Math.round(val)} minutes</span>
       </div>
-      <Slider value={val} onValueChange={setVal} min={35} max={42} step={0.1} />
+      <Slider value={val} onValueChange={setVal} min={5} max={60} step={5} />
     </div>
   );
 };
 
 export const NumberFieldDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState(120);
+  const [sessionMinutes, setSessionMinutes] = React.useState<number | null>(20);
+  const [targetWpm, setTargetWpm] = React.useState<number | null>(110);
+
   return (
-    <div className="space-y-2 w-full max-w-xs mx-auto">
-      <label className="font-label text-xs font-bold text-on-surface block">Systolic Blood Pressure (mmHg)</label>
-      <NumberField value={val} onValueChange={(v) => v !== null && setVal(v)} min={50} max={250} step={5} />
+    <div className="space-y-6 w-full max-w-sm mx-auto">
+      <NumberField
+        label="Session Duration (minutes)"
+        description="Recommended practice session: 10–30 minutes"
+        value={sessionMinutes}
+        onValueChange={setSessionMinutes}
+        min={5}
+        max={60}
+        step={5}
+      />
+      <NumberField
+        label="Target Speech Rate (words/min)"
+        description="Pacing target for conversational reading drills"
+        value={targetWpm}
+        onValueChange={setTargetWpm}
+        min={60}
+        max={180}
+        step={5}
+        smallStep={1}
+      />
     </div>
   );
 };
 
 export const OTPFieldDemo: React.FC<ComponentDemoProps> = () => {
   const [otp, setOtp] = React.useState('');
+  const [completedCode, setCompletedCode] = React.useState<string | null>(null);
+
   return (
-    <div className="space-y-3 w-full max-w-xs mx-auto text-center">
-      <label className="font-label text-xs font-bold text-on-surface block">Two-Factor Clinician Auth PIN</label>
-      <OTPField length={6} value={otp} onValueChange={setOtp} />
+    <div className="w-full max-w-md mx-auto space-y-4">
+      <OTPField
+        center
+        showSeparator
+        length={6}
+        value={otp}
+        onValueChange={setOtp}
+        onComplete={(code) => setCompletedCode(code)}
+        label="Security PIN"
+        description="Enter the 6-digit code sent to your phone"
+      />
+      {completedCode && (
+        <div className="p-3 rounded-lg bg-success-container text-on-success-container font-sans text-xs font-medium flex items-center justify-center gap-2">
+          <Icon name="check_circle" size="sm" className="text-success shrink-0" />
+          <span>Security PIN verified</span>
+        </div>
+      )}
     </div>
   );
 };

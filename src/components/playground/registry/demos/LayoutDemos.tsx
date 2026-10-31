@@ -38,7 +38,7 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
           </span>
         </div>
         <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-          High-contrast clinical surface card for telemetry monitoring and critical patient alerts.
+          Surface card with primary border accent for highlighted items.
         </p>
       </Card>
     </div>
@@ -46,33 +46,33 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const TableDemo: React.FC<ComponentDemoProps> = () => {
-  interface PatientRow {
+  interface LearnerRow {
     id: string;
     name: string;
-    bed: string;
+    group: string;
     status: string;
-    spo2: number;
-    hr: number;
+    accuracy: number;
+    streak: number;
   }
 
   const columns = [
-    { header: 'Patient Name', accessor: (row: PatientRow) => row.name },
-    { header: 'Bed Assignment', accessor: (row: PatientRow) => row.bed },
-    { header: 'Clinical Status', accessor: (row: PatientRow) => row.status },
-    { header: 'SpO2 (%)', accessor: (row: PatientRow) => `${row.spo2}%`, numeric: true },
-    { header: 'Heart Rate (bpm)', accessor: (row: PatientRow) => `${row.hr} bpm`, numeric: true },
+    { header: 'Learner Name', accessor: (row: LearnerRow) => row.name },
+    { header: 'Group', accessor: (row: LearnerRow) => row.group },
+    { header: 'Status', accessor: (row: LearnerRow) => row.status },
+    { header: 'Accuracy', accessor: (row: LearnerRow) => `${row.accuracy}%`, numeric: true },
+    { header: 'Practice Streak', accessor: (row: LearnerRow) => `${row.streak} days`, numeric: true },
   ];
 
-  const data: PatientRow[] = [
-    { id: '1', name: 'Eleanor Vance', bed: 'Bay 03 - Bed 01', status: 'Stable', spo2: 98, hr: 72 },
-    { id: '2', name: 'Arthur Pendelton', bed: 'Bay 03 - Bed 02', status: 'Observation', spo2: 95, hr: 84 },
-    { id: '3', name: 'Marcus Brody', bed: 'Bay 03 - Bed 03', status: 'STAT Review', spo2: 89, hr: 118 },
+  const data: LearnerRow[] = [
+    { id: '1', name: 'Eleanor Vance', group: 'Morning Sound Drills', status: 'Completed', accuracy: 94, streak: 5 },
+    { id: '2', name: 'Arthur Pendelton', group: 'Morning Sound Drills', status: 'In Progress', accuracy: 88, streak: 3 },
+    { id: '3', name: 'Marcus Brody', group: 'Afternoon Practice', status: 'Needs Review', accuracy: 76, streak: 1 },
   ];
 
   return (
     <div className="w-full py-4 space-y-2">
       <div className="flex items-center justify-between text-xs text-on-surface-variant px-1">
-        <span className="font-heading font-bold text-on-surface">Unconstrained Clinical Caseload Table</span>
+        <span className="font-heading font-bold text-on-surface">Practice Group Table</span>
         <span className="font-mono text-[11px]">Supports responsive stack &amp; tabular-nums</span>
       </div>
       <Table columns={columns} data={data} keyExtractor={(r) => r.id} responsive="scroll" />
@@ -84,11 +84,11 @@ export const ChartDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto p-6 rounded-xl bg-surface border border-outline-variant space-y-4">
       <div className="flex items-center justify-between">
-        <span className="font-heading text-xs font-bold text-on-surface">Telemetry SpO2 Trend (24h)</span>
-        <span className="font-mono text-xs font-bold text-primary">Normal Range 95-100%</span>
+        <span className="font-heading text-xs font-bold text-on-surface">Sound Accuracy Trend (7 Days)</span>
+        <span className="font-mono text-xs font-bold text-primary">Target: 80% or Higher</span>
       </div>
       <div className="h-44 rounded-lg bg-surface-container/60 border border-outline-variant/60 flex items-center justify-center text-xs font-mono text-on-surface-variant">
-        Recharts Clinical Visualization Primitive
+        Practice Accuracy Chart Preview
       </div>
     </div>
   );
@@ -97,11 +97,11 @@ export const ChartDemo: React.FC<ComponentDemoProps> = () => {
 export const SeparatorDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-6 space-y-4 text-center text-xs font-sans text-on-surface-variant">
-      <div>Section 1: Admission Criteria</div>
+      <div>Section 1: Sound Drills</div>
       <Separator />
-      <div>Section 2: Pharmacological Protocol</div>
+      <div>Section 2: Syllable Repetition</div>
       <Separator />
-      <div>Section 3: Discharge Clearance</div>
+      <div>Section 3: Weekly Review</div>
     </div>
   );
 };
@@ -115,13 +115,13 @@ export const ResizableDemo: React.FC<ComponentDemoProps> = () => {
       <div className="h-48 rounded-xl border border-outline-variant overflow-hidden bg-surface">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={40} minSize={25} className="p-4 bg-surface-container/30 text-xs font-sans">
-            <span className="font-bold text-on-surface block mb-1">Left Pane: Patient Longitudinal Chart</span>
-            <span className="text-on-surface-variant">NHS Patient Record #992-019-281</span>
+            <span className="font-bold text-on-surface block mb-1">Left Pane: Practice History</span>
+            <span className="text-on-surface-variant">Learner ID: P-2024-819</span>
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={60} minSize={30} className="p-4 bg-surface text-xs font-sans">
-            <span className="font-bold text-on-surface block mb-1">Right Pane: Active Vitals Stream</span>
-            <span className="text-on-surface-variant">Continuous 12-lead telemetry channel 1</span>
+            <span className="font-bold text-on-surface block mb-1">Right Pane: Session Notes</span>
+            <span className="text-on-surface-variant">Target sound sets and recorded audio clips</span>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
@@ -135,10 +135,10 @@ export const CollapsibleDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-md mx-auto py-4">
       <Collapsible.Root open={open} onOpenChange={setOpen} className="rounded-xl border border-outline-variant bg-surface p-4 space-y-3">
         <Collapsible.Trigger>
-          <span>Emergency Resuscitation Protocol</span>
+          <span>Articulation Exercise Instructions</span>
         </Collapsible.Trigger>
         <Collapsible.Panel className="text-xs font-sans text-on-surface-variant pt-2 border-t border-outline-variant/60 leading-relaxed">
-          Administer 1mg Adrenaline (1:10,000) IV every 3-5 minutes during cardiopulmonary resuscitation.
+          Repeat each word three times with audio feedback. Pause 2 seconds between repetitions.
         </Collapsible.Panel>
       </Collapsible.Root>
     </div>
@@ -166,12 +166,12 @@ export const CarouselDemo: React.FC<ComponentDemoProps> = () => {
         <CarouselContent>
           <CarouselItem className="p-4">
             <div className="h-32 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
-              Clinical Slide 1: Primary Assessment
+              Exercise 1: Initial /s/ Sounds
             </div>
           </CarouselItem>
           <CarouselItem className="p-4">
             <div className="h-32 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-sm">
-              Clinical Slide 2: Airway &amp; Breathing
+              Exercise 2: Medial /s/ Sounds
             </div>
           </CarouselItem>
         </CarouselContent>
@@ -189,7 +189,7 @@ export const AvatarDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex items-center justify-center gap-4 py-6">
       <Avatar src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" fallback="SJ" />
       <Avatar fallback="DR" />
-      <Avatar fallback="ICU" />
+      <Avatar fallback="EP" />
     </div>
   );
 };
@@ -197,10 +197,10 @@ export const AvatarDemo: React.FC<ComponentDemoProps> = () => {
 export const IconDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-6">
-      <Icon name="local_hospital" size="lg" className="text-primary" />
-      <Icon name="vital_signs" size="lg" className="text-secondary" />
-      <Icon name="emergency" size="lg" className="text-error" />
-      <Icon name="clinical_notes" size="lg" className="text-warning" />
+      <Icon name="record_voice_over" size="lg" className="text-primary" />
+      <Icon name="hearing" size="lg" className="text-secondary" />
+      <Icon name="mic" size="lg" className="text-error" />
+      <Icon name="assignment" size="lg" className="text-warning" />
       <Icon name="verified" size="lg" className="text-success" />
     </div>
   );
@@ -210,13 +210,13 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4 space-y-3">
       <Attachment
-        fileName="Chest_XRay_AP_Bed04.pdf"
+        fileName="Practice_Worksheet_Module2.pdf"
         fileSize="4.2 MB"
         fileType="pdf"
         status="completed"
       />
       <Attachment
-        fileName="Longitudinal_ECHO_Telemetry.dcm"
+        fileName="Session_Audio_Recording.mp3"
         fileSize="18.5 MB"
         fileType="video"
         status="uploading"
@@ -230,7 +230,7 @@ export const StickyContainerDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4">
       <StickyContainer className="p-3 rounded-lg bg-surface-container border border-outline-variant text-xs font-mono text-center">
-        Sticky Floating Clinical Banner: Active Code Blue in ICU 3
+        Banner: Daily practice reminder scheduled for 10:00 AM
       </StickyContainer>
     </div>
   );
@@ -241,7 +241,7 @@ export const DeferredViewDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-md mx-auto py-4">
       <DeferredView estimatedHeight={80}>
         <div className="p-4 rounded-xl bg-surface border border-outline-variant text-xs font-sans">
-          Deferred telemetry module mounted safely without blocking main hydration.
+          Module loaded without blocking page interaction.
         </div>
       </DeferredView>
     </div>
@@ -271,7 +271,7 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4 space-y-3">
       <div className="flex items-center justify-between text-xs text-on-surface-variant">
-        <span className="font-heading font-bold text-on-surface">Patient Caseload Quick Action</span>
+        <span className="font-heading font-bold text-on-surface">Learner Card Actions</span>
         <span className="font-mono text-[11px]">Swipe or tap actions</span>
       </div>
 
@@ -286,7 +286,7 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
         actions={
           <SwipeReveal.Action variant="primary" className="flex flex-col items-center justify-center gap-1 w-20">
             <Icon name="check_circle" size="sm" />
-            <span>Triage</span>
+            <span>Review</span>
           </SwipeReveal.Action>
         }
       >
@@ -294,12 +294,12 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="font-heading text-sm font-bold text-on-surface">Eleanor Vance</span>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-bold">
-                STAT
+              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-warning-container text-on-warning-container font-bold">
+                Review
               </span>
             </div>
             <p className="font-sans text-xs text-on-surface-variant">
-              Bay 03 · Bed 01 · Acute SpO2 Desaturation (88%)
+              Morning Drills · Initial /r/ sounds need review
             </p>
           </div>
           <span className="font-label text-[11px] text-on-surface-variant shrink-0 flex items-center gap-1 bg-surface-container/40 px-2 py-1 rounded">
@@ -313,7 +313,7 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
           Peek Archive (Right)
         </Button>
         <Button size="sm" variant="outlined" onClick={handleRevealTrailing}>
-          Peek Triage (Left)
+          Peek Review (Left)
         </Button>
         <Button size="sm" variant="tonal" onClick={handleReset}>
           Reset
@@ -327,7 +327,7 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4 text-xs font-sans text-on-surface leading-relaxed">
       <div className="leading-relaxed">
-        Patient was administered <TextHighlight query="Paracetamol">Paracetamol 1000mg</TextHighlight> intravenously following high-grade pyrexia.
+        The learner practiced <TextHighlight query="consonant">consonant blends</TextHighlight> during today's sound drills.
       </div>
     </div>
   );

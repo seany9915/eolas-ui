@@ -18,14 +18,14 @@ export const NumberRollDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-8">
       <div className="font-mono text-3xl font-bold text-primary">
-        <NumberRoll value={val} suffix=" bpm" />
+        <NumberRoll value={val} suffix=" words" />
       </div>
       <div className="flex items-center gap-2">
         <Button size="sm" variant="outlined" onClick={() => setVal((v) => v - 10)}>
-          -10 bpm
+          -10 words
         </Button>
         <Button size="sm" variant="filled" onClick={() => setVal((v) => v + 10)}>
-          +10 bpm
+          +10 words
         </Button>
       </div>
     </div>
@@ -40,7 +40,7 @@ export const SpinningCounterDemo: React.FC<ComponentDemoProps> = () => {
         <SpinningCounter value={count} />
       </div>
       <Button size="sm" onClick={() => setCount((c) => c + 1)}>
-        Increment Telemetry Pulse
+        Increment Daily Count
       </Button>
     </div>
   );
@@ -54,7 +54,7 @@ export const NumberPopInDemo: React.FC<ComponentDemoProps> = () => {
         <NumberPopIn value={val} suffix="%" />
       </div>
       <Button size="sm" variant="outlined" onClick={() => setVal((v) => (v === 98 ? 94 : 98))}>
-        Simulate SpO2 Fluctuation
+        Simulate Score Change
       </Button>
     </div>
   );
@@ -62,14 +62,14 @@ export const NumberPopInDemo: React.FC<ComponentDemoProps> = () => {
 
 export const TextSwapDemo: React.FC<ComponentDemoProps> = () => {
   const [idx, setIdx] = React.useState(0);
-  const states = ['Normal Sinus Rhythm', 'Atrial Fibrillation Detected', 'Telemetry Re-syncing'];
+  const states = ['Initial Practice', 'Review Needed', 'Goal Completed'];
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-8">
       <div className="font-heading text-lg font-bold text-on-surface">
         <TextSwap>{states[idx]}</TextSwap>
       </div>
       <Button size="sm" variant="tonal" onClick={() => setIdx((i) => (i + 1) % states.length)}>
-        Cycle Rhythm State
+        Cycle Status State
       </Button>
     </div>
   );
@@ -88,7 +88,7 @@ export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-6 space-y-4">
       <div className="flex items-center justify-between">
-        <span className="font-heading text-xs font-bold text-on-surface">Emergency Resuscitation Sequence</span>
+        <span className="font-heading text-xs font-bold text-on-surface">Articulation Exercise Steps</span>
         <Button size="sm" variant="tonal" onClick={handleReplay}>
           Replay Sequence
         </Button>
@@ -96,10 +96,10 @@ export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
 
       <div className="p-4 rounded-xl bg-surface-container/30 border border-outline-variant/60 min-h-[140px] flex items-center">
         <TextsReveal show={show} className="space-y-2 font-heading text-sm font-semibold text-on-surface">
-          <TextsRevealLine index={0}>1. Airway Clearance Confirmed</TextsRevealLine>
-          <TextsRevealLine index={1}>2. Dual IV Cannulation Established</TextsRevealLine>
-          <TextsRevealLine index={2}>3. Defibrillator Telemetry Active</TextsRevealLine>
-          <TextsRevealLine index={3}>4. Emergency Epinephrine 1mg Administered</TextsRevealLine>
+          <TextsRevealLine index={0}>1. Breath Support & Warm-up</TextsRevealLine>
+          <TextsRevealLine index={1}>2. Vowel Sound Prolongation</TextsRevealLine>
+          <TextsRevealLine index={2}>3. Consonant Blend Drills</TextsRevealLine>
+          <TextsRevealLine index={3}>4. Sentence Practice & Review</TextsRevealLine>
         </TextsReveal>
       </div>
     </div>
@@ -110,7 +110,7 @@ export const ShimmerTextDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-8">
       <ShimmerText className="font-heading text-lg font-bold">
-        Clinical AI synthesizing 72-hour longitudinal chart...
+        Synthesizing speech practice summary...
       </ShimmerText>
     </div>
   );
@@ -121,7 +121,7 @@ export const SuccessCheckDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-8">
       <SuccessCheck trigger={active} size={48} />
-      <span className="font-label text-xs font-bold text-success">Prescription Verified</span>
+      <span className="font-label text-xs font-bold text-success">Practice Plan Verified</span>
       <Button size="sm" variant="outlined" onClick={() => setActive(!active)}>
         Re-trigger Animation
       </Button>
@@ -130,17 +130,17 @@ export const SuccessCheckDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
-  const [dosage, setDosage] = React.useState('750');
+  const [duration, setDuration] = React.useState('75');
   const [error, setError] = React.useState<string | null>(null);
   const [shakeTrigger, setShakeTrigger] = React.useState<number>(0);
 
   const handleValidate = () => {
-    const num = Number(dosage);
+    const num = Number(duration);
     if (isNaN(num) || num > 500) {
-      setError('Prescribed dosage exceeds maximum recommended ceiling (500mg)');
+      setError('Practice duration exceeds recommended maximum (60 minutes)');
       setShakeTrigger((prev) => prev + 1);
     } else if (num <= 0) {
-      setError('Prescribed dosage must be greater than 0mg');
+      setError('Practice duration must be greater than 0 minutes');
       setShakeTrigger((prev) => prev + 1);
     } else {
       setError(null);
@@ -150,9 +150,9 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-6 space-y-4">
       <div className="space-y-1">
-        <h4 className="font-heading text-xs font-bold text-on-surface">Prescription Dosage Verification</h4>
+        <h4 className="font-heading text-xs font-bold text-on-surface">Practice Session Duration</h4>
         <p className="font-sans text-xs text-on-surface-variant">
-          Form micro-shake wrapper adhering to transitions.dev overshoot curve with coordinated error reveals.
+          Form micro-shake alert with coordinated error reveals.
         </p>
       </div>
 
@@ -162,33 +162,33 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
         autoRevert={false}
       >
         <div className="space-y-1.5">
-          <label htmlFor="dosage-input" className="font-label text-xs font-medium text-on-surface block">
-            Amoxicillin Dosage (mg)
+          <label htmlFor="duration-input" className="font-label text-xs font-medium text-on-surface block">
+            Daily Practice Minutes
           </label>
           <Input
-            id="dosage-input"
+            id="duration-input"
             type="number"
-            value={dosage}
-            onChange={(e) => setDosage(e.target.value)}
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
             error={Boolean(error)} aria-invalid={Boolean(error)}
-            placeholder="e.g. 250 or 500"
+            placeholder="e.g. 15 or 30"
           />
         </div>
       </ErrorShake>
 
       <div className="flex items-center gap-3">
         <Button size="sm" onClick={handleValidate}>
-          Verify Dosage
+          Verify Duration
         </Button>
         <Button
           size="sm"
           variant="outlined"
           onClick={() => {
-            setDosage('250');
+            setDuration('20');
             setError(null);
           }}
         >
-          Reset to Safe (250mg)
+          Reset to 20 Minutes
         </Button>
       </div>
     </div>

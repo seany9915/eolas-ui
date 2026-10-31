@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Menubar as BaseMenubar } from '@base-ui/react/menubar';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { cn } from '@/lib/utils';
+import { Icon } from './icon';
 
 export interface MenubarMenuItem {
   id: string;
@@ -29,7 +30,7 @@ export const MenubarTrigger = React.forwardRef<
   <BaseMenu.Trigger
     ref={ref}
     className={cn(
-      'inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-md font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none',
+      'relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none after:absolute after:-inset-1 after:content-[\'\']',
       'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
       'data-[popup-open]:bg-surface-container data-[popup-open]:text-primary',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
@@ -114,9 +115,7 @@ export const MenubarItem = React.forwardRef<HTMLDivElement, MenubarItemProps>(
     >
       <div className="flex items-center gap-2.5 truncate">
         {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
+          <Icon name={icon} size="sm" className="shrink-0" />
         )}
         <span className="truncate">{children}</span>
       </div>
@@ -149,16 +148,12 @@ export const MenubarCheckboxItem = React.forwardRef<HTMLDivElement, MenubarCheck
     >
       <div className="flex items-center gap-2.5 truncate">
         {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
+          <Icon name={icon} size="sm" className="shrink-0" />
         )}
         <span className="truncate">{children}</span>
       </div>
       <BaseMenu.CheckboxItemIndicator className="shrink-0 text-primary flex items-center justify-center">
-        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
-          check
-        </span>
+        <Icon name="check" size="xs" className="font-bold" />
       </BaseMenu.CheckboxItemIndicator>
     </BaseMenu.CheckboxItem>
   )
@@ -184,16 +179,12 @@ export const MenubarRadioItem = React.forwardRef<HTMLDivElement, MenubarRadioIte
     >
       <div className="flex items-center gap-2.5 truncate">
         {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
+          <Icon name={icon} size="sm" className="shrink-0" />
         )}
         <span className="truncate">{children}</span>
       </div>
       <BaseMenu.RadioItemIndicator className="shrink-0 text-primary flex items-center justify-center">
-        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
-          radio_button_checked
-        </span>
+        <Icon name="radio_button_checked" size="xs" className="font-bold" />
       </BaseMenu.RadioItemIndicator>
     </BaseMenu.RadioItem>
   )
@@ -219,15 +210,11 @@ export const MenubarSubmenuTrigger = React.forwardRef<HTMLDivElement, MenubarSub
     >
       <div className="flex items-center gap-2.5 truncate">
         {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
+          <Icon name={icon} size="sm" className="shrink-0" />
         )}
         <span className="truncate">{children}</span>
       </div>
-      <span className="material-symbols-outlined text-base text-on-surface-variant shrink-0" aria-hidden="true">
-        chevron_right
-      </span>
+      <Icon name="chevron_right" size="xs" className="text-on-surface-variant shrink-0" />
     </BaseMenu.SubmenuTrigger>
   )
 );
@@ -250,36 +237,42 @@ export const MenubarGroupLabel = BaseMenu.GroupLabel;
 export const MenubarRadioGroup = BaseMenu.RadioGroup;
 export const MenubarSubmenu = BaseMenu.SubmenuRoot;
 
-export interface MenubarMenuProps {
-  triggerLabel: string;
+export interface MenubarMenuProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Root> {
+  triggerLabel?: string;
   items?: MenubarMenuItem[];
   children?: React.ReactNode;
 }
 
 export const MenubarMenu = React.forwardRef<HTMLButtonElement, MenubarMenuProps>(
-  ({ triggerLabel, items, children }, ref) => (
-    <BaseMenu.Root>
-      <MenubarTrigger ref={ref}>
-        <span>{triggerLabel}</span>
-      </MenubarTrigger>
-      <MenubarContent>
-        {children
-          ? children
-          : items?.map((item) => (
-              <MenubarItem
-                key={item.id}
-                disabled={item.disabled}
-                destructive={item.destructive}
-                icon={item.icon}
-                shortcut={item.shortcut}
-                onClick={item.onClick}
-              >
-                {item.label}
-              </MenubarItem>
-            ))}
-      </MenubarContent>
-    </BaseMenu.Root>
-  )
+  ({ triggerLabel, items, children, ...menuRootProps }, ref) => {
+    if (triggerLabel) {
+      return (
+        <BaseMenu.Root {...menuRootProps}>
+          <MenubarTrigger ref={ref}>
+            <span>{triggerLabel}</span>
+          </MenubarTrigger>
+          <MenubarContent>
+            {children
+              ? children
+              : items?.map((item) => (
+                  <MenubarItem
+                    key={item.id}
+                    disabled={item.disabled}
+                    destructive={item.destructive}
+                    icon={item.icon}
+                    shortcut={item.shortcut}
+                    onClick={item.onClick}
+                  >
+                    {item.label}
+                  </MenubarItem>
+                ))}
+          </MenubarContent>
+        </BaseMenu.Root>
+      );
+    }
+
+    return <BaseMenu.Root {...menuRootProps}>{children}</BaseMenu.Root>;
+  }
 );
 MenubarMenu.displayName = 'MenubarMenu';
 
@@ -313,7 +306,7 @@ const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(
       orientation={orientation}
       modal={modal}
       className={cn(
-        'inline-flex items-center gap-1 p-1 rounded-lg bg-surface border border-outline-variant w-full shadow-ambient',
+        'inline-flex items-center gap-1 p-1 rounded-lg bg-surface border border-outline-variant w-full',
         className
       )}
       {...props}

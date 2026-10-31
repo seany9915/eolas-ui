@@ -32,27 +32,27 @@ export interface ToggleProps<Value extends string = string>
 
 const variantStyles: Record<ToggleVariant, string> = {
   default: cn(
-    'bg-surface border-2 border-outline-variant text-on-surface hover:bg-surface-container',
+    'bg-surface border-2 border-outline-variant text-on-surface hover:bg-surface-container/70',
     'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
   outline: cn(
-    'bg-transparent border-2 border-outline text-on-surface hover:bg-surface-container/60',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
+    'bg-transparent border-2 border-outline-variant text-on-surface hover:bg-surface-container/60 hover:border-outline',
+    'data-[pressed]:bg-surface data-[pressed]:text-primary data-[pressed]:border-primary'
   ),
   ghost: cn(
-    'bg-transparent border-2 border-transparent text-on-surface hover:bg-surface-container',
-    'data-[pressed]:bg-surface-variant data-[pressed]:text-on-surface data-[pressed]:font-semibold'
+    'bg-transparent border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
+    'data-[pressed]:bg-surface-variant data-[pressed]:text-on-surface data-[pressed]:border-transparent'
   ),
   subtle: cn(
-    'bg-surface-container border-2 border-transparent text-on-surface hover:bg-surface-variant',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
+    'bg-surface-container border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-variant',
+    'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:border-outline-variant data-[pressed]:shadow-ambient'
   ),
 };
 
 const sizeStyles: Record<ToggleSize, string> = {
-  sm: 'h-11 px-3 min-w-[44px] min-h-[44px] text-xs gap-2 rounded-sm',
-  md: 'h-11 px-4 min-w-[44px] min-h-[44px] text-sm gap-2.5 rounded',
-  lg: 'h-12 px-5 min-w-[48px] min-h-[48px] text-base gap-3 rounded-md',
+  sm: 'relative h-9 px-3 min-w-[36px] text-xs gap-1.5 rounded-sm after:absolute after:-inset-1 after:content-[\'\']',
+  md: 'h-11 px-4 min-w-[44px] min-h-[44px] text-sm gap-2 rounded',
+  lg: 'h-12 px-5 min-w-[48px] min-h-[48px] text-base gap-2.5 rounded-md',
 };
 
 const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<string>>(

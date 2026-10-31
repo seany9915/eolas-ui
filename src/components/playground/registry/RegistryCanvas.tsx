@@ -58,7 +58,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
     mobile: 'Mobile (375px)',
     tablet: 'Tablet (768px)',
     desktop: 'Desktop (1024px)',
-    full: 'Full Width (Unconstrained)',
+    full: 'Full Width',
   }[viewport];
 
   return (
@@ -225,12 +225,12 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             <div className="flex items-center justify-between text-xs font-mono text-on-surface-variant px-1">
               <span className="flex items-center gap-1.5">
                 <Icon name="crop_free" size="xs" className="text-primary" />
-                <span>Isolated Sandbox Stage: <strong>{viewportLabel}</strong></span>
+                <span>Preview: <strong>{viewportLabel}</strong></span>
               </span>
               <span>Direction: <strong>{direction.toUpperCase()}</strong></span>
             </div>
 
-            {/* The Unconstrained Sandbox Stage */}
+            {/* Preview Canvas */}
             <div className="border border-outline-variant rounded-xl bg-surface p-4 sm:p-8 shadow-xs overflow-hidden min-h-[420px] flex items-center justify-center">
               <div className={cn('transition-[max-width] duration-200 ease-in-out w-full', viewportWidthClass)}>
                 <DirectionProvider direction={direction}>

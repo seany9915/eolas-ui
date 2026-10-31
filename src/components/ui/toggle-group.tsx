@@ -15,6 +15,7 @@ import * as React from 'react';
 import { ToggleGroup as BaseToggleGroup } from '@base-ui/react/toggle-group';
 import { Toggle as BaseToggle } from '@base-ui/react/toggle';
 import { cn } from '@/lib/utils';
+import { Icon } from './icon';
 
 export type ToggleGroupVariant = 'default' | 'outline' | 'segmented';
 export type ToggleGroupSize = 'sm' | 'md' | 'lg';
@@ -64,9 +65,9 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
     const label = ariaLabel ?? ariaLabelProp;
 
     const sizeClasses = {
-      sm: 'h-9 px-2.5 min-w-[36px] text-xs gap-2',
-      md: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-sm gap-2.5',
-      lg: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-base gap-3',
+      sm: 'relative h-9 px-2.5 min-w-[36px] text-xs gap-1.5 after:absolute after:-inset-1 after:content-[\'\']',
+      md: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-sm gap-2',
+      lg: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-base gap-2.5',
     }[effectiveSize];
 
     return (
@@ -83,7 +84,7 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
           effectiveVariant === 'outline'
             ? cn(
                 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border border-transparent',
-                'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:border-outline-variant/60 data-[pressed]:shadow-ambient'
+                'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
               )
             : cn(
                 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border border-transparent',
@@ -96,9 +97,7 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
         {...props}
       >
         {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
+          <Icon name={icon} size="sm" className="shrink-0" />
         )}
         {children}
       </BaseToggle>

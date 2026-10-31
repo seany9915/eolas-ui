@@ -96,7 +96,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
               Eolas Component Registry
             </h2>
             <p className="font-sans text-sm sm:text-base text-on-surface-variant leading-relaxed">
-              Explore 100+ accessible primitives and clinical composite blocks. Select any component to inspect its unconstrained sandbox, responsive viewports, Base UI contracts, and copyable install commands.
+              Explore 100+ accessible primitives and composite blocks. Select any component to inspect interactive previews, responsive viewports, Base UI properties, and copyable install commands.
             </p>
           </div>
 

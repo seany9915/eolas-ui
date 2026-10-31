@@ -28,11 +28,11 @@ export const ThinkingOrbDemo: React.FC<ComponentDemoProps> = () => {
       </div>
       <div className="flex flex-col items-center gap-2">
         <ThinkingOrb state="searching" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Searching EHR</span>
+        <span className="font-mono text-xs text-on-surface-variant">Searching Library</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <ThinkingOrb state="solving" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Solving Dose</span>
+        <span className="font-mono text-xs text-on-surface-variant">Analyzing Audio</span>
       </div>
     </div>
   );
@@ -43,15 +43,15 @@ export const BotAvatarDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-wrap items-center justify-center gap-6 py-8">
       <div className="flex flex-col items-center gap-2">
         <BotAvatar type="droid" state="working" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Clinical Droid</span>
+        <span className="font-mono text-xs text-on-surface-variant">Speech Assistant</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <BotAvatar type="cat" state="default" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Paediatric Companion</span>
+        <span className="font-mono text-xs text-on-surface-variant">Practice Companion</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <BotAvatar type="cloud" state="sleeping" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Night Telemetry</span>
+        <span className="font-mono text-xs text-on-surface-variant">Audio Monitor</span>
       </div>
     </div>
   );
@@ -63,12 +63,12 @@ export const TraceDemo: React.FC<ComponentDemoProps> = () => {
       <Trace>
         <Trace.Line status="complete">
           <Trace.Icon status="complete" />
-          <Trace.Title>Queried NHS Digital Spine ICD-10 registry for J45.0 (Asthma)</Trace.Title>
+          <Trace.Title>Loaded articulation drill set for /r/ vocalic sounds</Trace.Title>
           <Trace.Badge status="complete">200 OK</Trace.Badge>
         </Trace.Line>
         <Trace.Line status="complete">
           <Trace.Icon status="complete" />
-          <Trace.Title>Retrieved recent blood gas chemistry (pH 7.38, pCO2 42)</Trace.Title>
+          <Trace.Title>Retrieved practice history (accuracy 88%, 5-day streak)</Trace.Title>
           <Trace.Badge status="complete">Done</Trace.Badge>
         </Trace.Line>
       </Trace>
@@ -80,7 +80,7 @@ export const ReasoningDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <Reasoning duration="1.8s">
-        Given patient weight (14 kg) and documented acute status asthmaticus, Salbutamol nebulisation dose is calculated at 2.5 mg every 20 minutes for the first hour.
+        Based on baseline accuracy (78%) with initial /s/ blends, starting with picture card prompts before moving to sentence drills.
       </Reasoning>
     </div>
   );
@@ -90,13 +90,13 @@ export const ChainOfThoughtDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <ChainOfThought defaultOpen>
-        <ChainOfThought.Header title="Multi-Step Diagnostic Evaluation" stepCount={2} />
+        <ChainOfThought.Header title="Step-by-Step Exercise Plan" stepCount={2} />
         <ChainOfThought.Content>
-          <ChainOfThought.Step title="Assess Airway & Work of Breathing" status="complete">
-            Bilateral wheezing noted. Moderate subcostal retractions present.
+          <ChainOfThought.Step title="Review Initial /r/ Words" status="complete">
+            Correct tongue position achieved on 8 of 10 trials.
           </ChainOfThought.Step>
-          <ChainOfThought.Step title="Check Renal Function Baseline" status="complete">
-            Serum creatinine 44 umol/L (within normal age bounds).
+          <ChainOfThought.Step title="Practice Word Pairs" status="complete">
+            Pacing was steady with clear consonant releases.
           </ChainOfThought.Step>
         </ChainOfThought.Content>
       </ChainOfThought>
@@ -108,11 +108,11 @@ export const TaskDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <Task defaultOpen>
-        <Task.Trigger title="Administer Bronchodilator Protocol" status="running" />
+        <Task.Trigger title="Daily Word Sound Practice" status="running" />
         <Task.Content>
-          <Task.Item title="Check Patient Identity & Bay" status="complete" />
-          <Task.Item title="Deliver Nebulised Salbutamol 2.5mg" status="running" />
-          <Task.Item title="Re-assess SpO2 and Heart Rate" status="pending" />
+          <Task.Item title="Warm-up Vowel Sounds" status="complete" />
+          <Task.Item title="Practice Initial Consonants" status="running" />
+          <Task.Item title="Record 3 Review Sentences" status="pending" />
         </Task.Content>
       </Task>
     </div>
@@ -123,11 +123,11 @@ export const PlanDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <Plan
-        title="Paediatric ICU Admission Strategy"
+        title="Weekly Practice Schedule"
         steps={[
-          { id: '1', title: 'Transfer to Bed Bay 03', status: 'complete' },
-          { id: '2', title: 'Initiate Continuous Telemetry', status: 'running' },
-          { id: '3', title: 'Pediatric Consultant Sign-Off', status: 'pending' },
+          { id: '1', title: 'Complete Syllable Drills', status: 'complete' },
+          { id: '2', title: 'Record Voice Practice', status: 'running' },
+          { id: '3', title: 'Therapist Progress Review', status: 'pending' },
         ]}
       />
     </div>
@@ -139,8 +139,8 @@ export const QueueDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-xl mx-auto py-4">
       <Queue
         items={[
-          { id: '1', title: 'FBC Lab Panel Analysis', status: 'complete' },
-          { id: '2', title: 'Bedside Ultrasound Echo', status: 'running' },
+          { id: '1', title: 'Pronunciation Analysis', status: 'complete' },
+          { id: '2', title: 'Voice Recording Evaluation', status: 'running' },
         ]}
       />
     </div>
@@ -151,7 +151,7 @@ export const ClinicianTipDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <ClinicianTip>
-        Always check recent serum potassium prior to intravenous Salbutamol administration to prevent hypokalaemic cardiac arrhythmias.
+        Encourage gentle breaths between repetitions to help learners maintain a relaxed vocal posture.
       </ClinicianTip>
     </div>
   );
@@ -162,12 +162,12 @@ export const ChatMessageDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-xl mx-auto py-4 space-y-4">
       <ChatMessage
         role="user"
-        content="What is the recommended starting dose of Prednisolone for a 14kg child with acute exacerbation?"
+        content="What exercises work best for practicing the vocalic /r/ sound at home?"
       />
       <ChatMessage
         role="assistant"
         botType="droid"
-        content="Under BNF for Children (BNFC) guidelines, oral Prednisolone is dosed at 1 to 2 mg/kg (maximum 40 mg). For a 14kg child, this corresponds to 14 mg to 28 mg once daily for 3 days."
+        content='Start with syllable repetition cards (e.g., "ray", "row", "ree") using picture cues. Spend 5 to 10 minutes once daily with immediate audio feedback.'
       />
     </div>
   );
@@ -179,7 +179,7 @@ export const PromptInputDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-xl mx-auto py-4">
       <PromptInput.Root>
         <PromptInput.Textarea
-          placeholder="Ask a clinical question or summarize longitudinal notes..."
+          placeholder="Ask a question about exercises or session notes..."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
@@ -193,16 +193,16 @@ export const PromptInputDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const CodeBlockDemo: React.FC<ComponentDemoProps> = () => {
-  const code = `// Clinical Dosage Algorithm
-function calculateDose(weightKg: number, mgPerKg: number): number {
-  const maxSafeDoseMg = 40;
-  return Math.min(weightKg * mgPerKg, maxSafeDoseMg);
+  const code = `// Sound Accuracy Calculation
+function calculateAccuracy(correctTrials: number, totalTrials: number): number {
+  if (totalTrials === 0) return 0;
+  return Math.round((correctTrials / totalTrials) * 100);
 }`;
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <CodeBlock language="typescript">
         <CodeBlock.Header>
-          <CodeBlock.Title>dosage-algorithm.ts</CodeBlock.Title>
+          <CodeBlock.Title>accuracy-calculator.ts</CodeBlock.Title>
           <CodeBlock.CopyButton value={code} />
         </CodeBlock.Header>
         <CodeBlock.Content>{code}</CodeBlock.Content>
@@ -217,14 +217,14 @@ export const SourcesDemo: React.FC<ComponentDemoProps> = () => {
       <Sources.Root>
         <Sources.List>
           <Sources.Item
-            title="NICE Clinical Guideline CG54: Neonatal Resuscitation"
-            href="https://nice.org.uk"
-            domain="nice.org.uk"
+            title="Speech Articulation Practice Guidelines 2026"
+            href="https://eolas-speech.org"
+            domain="eolas-speech.org"
           />
           <Sources.Item
-            title="British National Formulary for Children (BNFC) 2026"
-            href="https://bnf.nice.org.uk"
-            domain="bnf.nice.org.uk"
+            title="Paediatric Speech and Language Resources"
+            href="https://eolas-speech.org/resources"
+            domain="eolas-speech.org"
           />
         </Sources.List>
       </Sources.Root>
@@ -235,11 +235,11 @@ export const SourcesDemo: React.FC<ComponentDemoProps> = () => {
 export const InlineCitationDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-6 text-xs font-sans text-on-surface leading-relaxed">
-      Continuous pulse oximetry monitoring has been shown to reduce undetected hypoxic events by 78%
+      Daily home sound practice with audio feedback has been shown to improve articulation clarity by 40%
       <InlineCitation.Badge
         index={1}
         source={{
-          title: 'NICE Monitoring Guidance 2026',
+          title: 'Speech Practice Study 2026',
           url: 'https://nice.org.uk',
           domain: 'nice.org.uk',
         }}
@@ -253,9 +253,9 @@ export const SuggestionChipsDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-xl mx-auto py-4">
       <SuggestionChips
         suggestions={[
-          'Check Renal Function Baseline',
-          'Calculate Paediatric Salbutamol Dose',
-          'Review Critical Lab Alerts',
+          'Review Vowel Warm-ups',
+          'Suggest /r/ Sound Drills',
+          'Review Weekly Accuracy',
         ]}
         onSelect={() => {}}
       />
@@ -280,10 +280,10 @@ export const ToolDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <Tool.Root status="complete">
-        <Tool.Header name="NHS_Spine_EHR_Lookup" iconName="database" status="complete" duration="1.2s" />
+        <Tool.Header name="Speech_Library_Lookup" iconName="database" status="complete" duration="1.2s" />
         <Tool.Content>
           <div className="p-3 text-xs font-mono bg-surface-container rounded-b-lg border-t border-outline-variant/60">
-            Lookup status: 200 OK | Patient: NHS# 882-102-491 | Allergies: Verified
+            Lookup status: 200 OK | Learner: P-2024-819 | Plan: Active
           </div>
         </Tool.Content>
       </Tool.Root>

@@ -124,7 +124,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
         role="region"
         aria-label={`Step ${currentStepIndex + 1} of ${steps.length}: ${currentStep?.title}`}
         className={cn(
-          '@container flex flex-col w-full max-w-2xl mx-auto',
+          '@container flex flex-col w-full mx-auto',
           variant === 'card'
             ? 'rounded-lg bg-surface border border-outline-variant shadow-ambient overflow-hidden'
             : 'bg-transparent overflow-hidden',
@@ -151,7 +151,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 {currentStep?.title}
               </h3>
             </div>
-            <div className="flex items-center -mr-2 font-mono text-xs text-on-surface-variant tabular-nums shrink-0">
+            <nav aria-label="Wizard Steps Progress" className="flex items-center gap-1 shrink-0 -mr-2">
               {steps.map((s, idx) => {
                 const isSelected = idx === currentStepIndex;
                 const isPast = idx < currentStepIndex;
@@ -163,24 +163,30 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                     type="button"
                     onClick={() => canNavigate && onStepChange?.(idx)}
                     disabled={!canNavigate && !isSelected}
-                    aria-label={`Jump to step ${idx + 1}: ${s.title}`}
+                    aria-label={`Step ${idx + 1}: ${s.title}${isPast ? ' (completed)' : isSelected ? ' (current)' : ''}`}
                     aria-current={isSelected ? 'step' : undefined}
                     className="flex min-w-[44px] min-h-[44px] items-center justify-center focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:pointer-events-none"
                   >
                     <span
                       className={cn(
-                        'size-2.5 rounded-full transition-[width,background-color] duration-[var(--duration-quick)] motion-reduce:transition-none',
+                        'size-7 rounded-full flex items-center justify-center font-mono text-xs font-bold tabular-nums transition-[background-color,border-color,color] duration-[var(--duration-quick)] select-none',
                         isSelected
-                          ? 'w-6 bg-primary'
+                          ? 'bg-primary text-on-primary shadow-ambient'
                           : isPast
-                          ? 'bg-outline hover:bg-on-surface'
-                          : 'bg-outline-variant opacity-60'
+                          ? 'bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary'
+                          : 'border border-outline-variant text-on-surface-variant/60 bg-surface'
                       )}
-                    />
+                    >
+                      {isPast ? (
+                        <Icon name="check" size="xs" className="font-bold leading-none" />
+                      ) : (
+                        idx + 1
+                      )}
+                    </span>
                   </BaseButton>
                 );
               })}
-            </div>
+            </nav>
           </div>
           {currentStep?.description && (
             <p className="font-sans text-body-md text-on-surface-variant" style={{ textWrap: 'pretty' }}>

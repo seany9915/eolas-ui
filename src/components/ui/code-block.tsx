@@ -8,7 +8,7 @@
  * - https://ui.shadcn.com/docs/ai-elements
  *
  * TAXONOMY & USAGE:
- * - Displays source code, JSON telemetry parameters, database query outputs,
+ * - Displays source code, JSON parameters, database query outputs,
  *   and formatted clinical data structures inside agent execution traces or messages.
  * - WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.
  * - Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text,

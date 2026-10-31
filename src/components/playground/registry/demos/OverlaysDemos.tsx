@@ -17,23 +17,23 @@ export const DialogDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Dialog
-        title="Schedule Clinical Consultation"
-        description="Configure patient admission, assigned consultant, and triage priority."
+        title="Schedule Practice Session"
+        description="Configure session time, assigned therapist, and practice goals."
         trigger={
           <Button colorRole="primary">
             <Icon name="event" size="xs" className="mr-2" />
             Open Consultation Dialog
           </Button>
         }
-        confirmLabel="Confirm Admission"
+        confirmLabel="Confirm Session"
         cancelLabel="Discard"
       >
         <div className="space-y-3 py-2 text-xs font-sans text-on-surface-variant">
           <p>
-            Patient NHS #882-102-491 has been scheduled for emergency triage evaluation under Dr. Sarah Jenkins (On-Call Consultant).
+            Learner P-2024-819 has been scheduled for sound practice evaluation under Sarah Jenkins, Speech-Language Pathologist.
           </p>
           <div className="p-3 rounded-lg bg-surface-container border border-outline-variant font-mono text-xs">
-            Ward: ICU-Bay-02 | Priority: High | Bed: #4
+            Room: Studio B | Focus: /r/ Blends | Format: Individual
           </div>
         </div>
       </Dialog>
@@ -45,15 +45,15 @@ export const AlertDialogDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <AlertDialog
-        title="Revoke Clinician Access Tokens"
-        description="Are you certain you wish to revoke all cryptographic signing keys for Dr. Mark Thorne? This action will immediately terminate active clinical sessions."
+        title="Reset Security Access Key"
+        description="Are you sure you want to reset the security access key for this account? This will require signing in again on all devices."
         trigger={
           <Button colorRole="error">
             <Icon name="warning" size="xs" className="mr-2" />
-            Revoke Access (Alert Dialog)
+            Reset Key (Alert Dialog)
           </Button>
         }
-        confirmLabel="Revoke Access Now"
+        confirmLabel="Reset Key Now"
         cancelLabel="Keep Active"
       />
     </div>
@@ -64,24 +64,24 @@ export const DrawerDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Drawer
-        title="Emergency Patient Chart Drawer"
-        description="Complete longitudinal health record and active telemetry stream."
+        title="Learner Profile Drawer"
+        description="Practice history and recent audio recordings."
         swipeDirection="right"
         trigger={
           <Button variant="outlined" colorRole="secondary">
             <Icon name="menu_open" size="xs" className="mr-2" />
-            Open Patient Drawer
+            Open Profile Drawer
           </Button>
         }
       >
         <div className="space-y-4 py-4 text-xs font-sans text-on-surface-variant">
           <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
-            <span className="font-bold text-on-surface block mb-1">Telemetry Status: Normal Sinus</span>
-            <span>Heart Rate: 72 bpm | SpO2: 98% | BP: 120/80 mmHg</span>
+            <span className="font-bold text-on-surface block mb-1">Practice Status: Active</span>
+            <span>Accuracy: 92% | Streak: 5 days | Weekly Goal: Met</span>
           </div>
           <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
-            <span className="font-bold text-on-surface block mb-1">Recent Lab Panels:</span>
-            <span>Potassium: 4.1 mEq/L | Sodium: 139 mEq/L | Creatinine: 0.9 mg/dL</span>
+            <span className="font-bold text-on-surface block mb-1">Recent Practice Sessions:</span>
+            <span>Session 12: 95% | Session 11: 88% | Session 10: 91%</span>
           </div>
         </div>
       </Drawer>
@@ -93,15 +93,15 @@ export const PopoverDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Popover.Root>
-        <Popover.Trigger render={<Button variant="outlined">Clinical Dosage Calculation Rules</Button>} />
+        <Popover.Trigger render={<Button variant="outlined">Practice Scoring Rules</Button>} />
         <Popover.Portal>
           <Popover.Positioner side="bottom" sideOffset={8}>
             <Popover.Popup className="p-4 max-w-sm rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-2">
               <span className="font-heading text-xs font-bold text-on-surface block">
-                Dosage Safety Matrix
+                Scoring Rubric
               </span>
               <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                Calculations strictly follow NICE BNF pediatric body surface area (BSA) equations. Maximum daily cumulative threshold is 4,000 mg.
+                Pronunciation scoring evaluates initial consonant clarity and sustained vowel duration. Accuracy scores reflect therapist-verified target sounds.
               </p>
             </Popover.Popup>
           </Popover.Positioner>
@@ -120,14 +120,14 @@ export const MenuDemo: React.FC<ComponentDemoProps> = () => {
           <Menu.Positioner sideOffset={4}>
             <Menu.Popup className="p-1 min-w-48 rounded-xl bg-surface border border-outline-variant shadow-ambient">
               <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
-                Export Clinical Audit PDF
+                Export Progress Report
               </Menu.Item>
               <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
-                Transfer Patient to Bay
+                Assign Practice Group
               </Menu.Item>
               <Menu.Separator className="h-px bg-outline-variant my-1" />
               <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-error hover:bg-error-container rounded-lg cursor-pointer">
-                Discharge Patient
+                Archive Learner Profile
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
@@ -138,32 +138,127 @@ export const MenuDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
+  const [showVitals, setShowVitals] = React.useState(true);
+  const [showWaveform, setShowWaveform] = React.useState(false);
+  const [density, setDensity] = React.useState('normal');
+
   return (
-    <div className="w-full max-w-md mx-auto py-6">
-      <Menubar
-        menus={[
-          {
-            triggerLabel: 'File',
-            items: [
-              { id: 'new', label: 'New Caseload' },
-              { id: 'save', label: 'Save Audit', shortcut: '⌘S' },
-            ],
-          },
-          {
-            triggerLabel: 'View',
-            items: [
-              { id: 'telemetry', label: 'Telemetry Stream' },
-              { id: 'vitals', label: 'Patient Vitals' },
-            ],
-          },
-          {
-            triggerLabel: 'Help',
-            items: [
-              { id: 'docs', label: 'Clinical Guidelines' },
-            ],
-          },
-        ]}
-      />
+    <div className="w-full max-w-2xl mx-auto rounded-xl border border-outline-variant bg-surface overflow-hidden">
+      {/* Top Application Menubar Chrome */}
+      <Menubar className="border-b border-outline-variant rounded-none bg-surface-container/30 px-2 py-1">
+        <Menubar.Menu>
+          <Menubar.Trigger>File</Menubar.Trigger>
+          <Menubar.Content>
+            <Menubar.Item icon="person_add" shortcut="⌘N">
+              New Learner Profile
+            </Menubar.Item>
+            <Menubar.Item icon="file_download" shortcut="⌘E">
+              Export Practice Summary
+            </Menubar.Item>
+            <Menubar.Separator />
+            <Menubar.Item icon="logout" destructive>
+              Close Session
+            </Menubar.Item>
+          </Menubar.Content>
+        </Menubar.Menu>
+
+        <Menubar.Menu>
+          <Menubar.Trigger>Edit</Menubar.Trigger>
+          <Menubar.Content>
+            <Menubar.Item icon="undo" shortcut="⌘Z">
+              Undo Session Note
+            </Menubar.Item>
+            <Menubar.Item icon="redo" shortcut="⇧⌘Z">
+              Redo Entry
+            </Menubar.Item>
+            <Menubar.Separator />
+            <Menubar.Item icon="content_copy">
+              Copy Practice Notes
+            </Menubar.Item>
+          </Menubar.Content>
+        </Menubar.Menu>
+
+        <Menubar.Menu>
+          <Menubar.Trigger>View</Menubar.Trigger>
+          <Menubar.Content>
+            <Menubar.CheckboxItem
+              checked={showVitals}
+              onCheckedChange={(c) => setShowVitals(Boolean(c))}
+              icon="monitor_heart"
+            >
+              Show Live Waveform
+            </Menubar.CheckboxItem>
+            <Menubar.CheckboxItem
+              checked={showWaveform}
+              onCheckedChange={(c) => setShowWaveform(Boolean(c))}
+              icon="show_chart"
+            >
+              Show Accuracy Chart
+            </Menubar.CheckboxItem>
+            <Menubar.Separator />
+            <Menubar.Submenu>
+              <Menubar.SubmenuTrigger icon="density_medium">
+                Interface Density
+              </Menubar.SubmenuTrigger>
+              <Menubar.Content>
+                <Menubar.RadioGroup value={density} onValueChange={setDensity}>
+                  <Menubar.RadioItem value="compact">
+                    Compact (36px rows)
+                  </Menubar.RadioItem>
+                  <Menubar.RadioItem value="normal">
+                    Standard (44px rows)
+                  </Menubar.RadioItem>
+                  <Menubar.RadioItem value="roomy">
+                    Comfortable (52px rows)
+                  </Menubar.RadioItem>
+                </Menubar.RadioGroup>
+              </Menubar.Content>
+            </Menubar.Submenu>
+          </Menubar.Content>
+        </Menubar.Menu>
+
+        <Menubar.Menu>
+          <Menubar.Trigger>Clinical</Menubar.Trigger>
+          <Menubar.Content>
+            <Menubar.Item icon="mic">
+              Phonetic Transcription
+            </Menubar.Item>
+            <Menubar.Item icon="record_voice_over">
+              Articulation Drill
+            </Menubar.Item>
+            <Menubar.Item icon="summarize">
+              Synthesize Diagnostic Report
+            </Menubar.Item>
+          </Menubar.Content>
+        </Menubar.Menu>
+      </Menubar>
+
+      {/* Mock Workspace Content Area */}
+      <div className="p-6 bg-surface space-y-3 min-h-[140px]">
+        <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
+          <div>
+            <h5 className="font-heading text-sm font-semibold text-on-surface">Practice Session: Learner #4892</h5>
+            <p className="font-sans text-xs text-on-surface-variant">Speech Therapy — Morning Studio Group</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {showVitals && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-mono font-semibold bg-success-container text-on-success-container">
+                <Icon name="favorite" size="xs" className="text-success" />
+                <span>92% Accuracy</span>
+              </span>
+            )}
+            {showWaveform && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-mono font-semibold bg-primary-container text-on-primary-container">
+                <Icon name="wifi_tethering" size="xs" className="text-primary" />
+                <span>Live Audio</span>
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
+          Use the menubar above to toggle views, adjust density, or export session notes. Fully operable with keyboard shortcuts.
+        </p>
+      </div>
     </div>
   );
 };
@@ -181,10 +276,10 @@ export const ContextMenuDemo: React.FC<ComponentDemoProps> = () => {
           <ContextMenu.Positioner>
             <ContextMenu.Popup className="p-1 min-w-40 rounded-xl bg-surface border border-outline-variant shadow-ambient text-xs">
               <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
-                View Full Vitals Stream
+                View Session History
               </ContextMenu.Item>
               <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
-                Assign Primary Nurse
+                Assign Therapist
               </ContextMenu.Item>
             </ContextMenu.Popup>
           </ContextMenu.Positioner>
@@ -205,7 +300,7 @@ export const TooltipDemo: React.FC<ComponentDemoProps> = () => {
             <Tooltip.Positioner side="top" sideOffset={8}>
               <Tooltip.Popup className="relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient">
                 <Tooltip.Arrow className="text-on-surface" />
-                NICE Guidelines: Section 4.2 Triage Metric
+                Pronunciation Guide: Section 2.1 Sound Blends
               </Tooltip.Popup>
             </Tooltip.Positioner>
           </Tooltip.Portal>
@@ -231,7 +326,7 @@ export const PreviewCardDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-wrap items-center justify-center gap-6 py-8">
       <PreviewCard.Root>
         <PreviewCard.Trigger href="#" className="font-sans text-sm font-bold text-primary underline underline-offset-4">
-          Hover over Dr. Alex Rivera (Consultant Card)
+          Hover over Alex Rivera (Therapist Card)
         </PreviewCard.Trigger>
         <PreviewCard.Portal>
           <PreviewCard.Positioner side="bottom" sideOffset={8}>
@@ -242,11 +337,11 @@ export const PreviewCardDemo: React.FC<ComponentDemoProps> = () => {
                 </div>
                 <div>
                   <h4 className="font-heading text-xs font-bold text-on-surface">Dr. Alex Rivera</h4>
-                  <span className="font-sans text-[11px] text-on-surface-variant">Lead Paediatric Intensivist</span>
+                  <span className="font-sans text-[11px] text-on-surface-variant">Speech-Language Pathologist</span>
                 </div>
               </div>
               <p className="font-sans text-xs text-on-surface-variant">
-                On duty at Royal Victoria Hospital ICU Bay 3. GMC Registry #7492019.
+                Specializes in child speech and language development. Outpatient Clinic Team.
               </p>
             </PreviewCard.Popup>
           </PreviewCard.Positioner>
@@ -264,25 +359,25 @@ export const ConfirmationDemo: React.FC<ComponentDemoProps> = () => {
       <Confirmation.Root status={status} variant="card">
         <Confirmation.Header>
           <div>
-            <Confirmation.Title>Confirm Automated Dose Adjustment</Confirmation.Title>
+            <Confirmation.Title>Confirm Weekly Goal Update</Confirmation.Title>
             <Confirmation.Description>
-              The clinical AI agent has proposed lowering the Infusion Rate from 12 mL/hr to 8 mL/hr based on normalized blood pressure.
+              The practice assistant recommends increasing the daily goal from 15 minutes to 20 minutes based on recent accuracy scores.
             </Confirmation.Description>
           </div>
         </Confirmation.Header>
         <Confirmation.Details>
-          Proposed Action: TITRATE_INFUSION (rate: 8.0, unit: mL/hr)
+          Proposed Action: Set daily practice target to 20 minutes
         </Confirmation.Details>
         <Confirmation.Actions>
           <Confirmation.Deny
             onDeny={() => setStatus('denied')}
             disabled={status !== 'pending'}
-            label="Reject Proposal"
+            label="Keep Current Goal"
           />
           <Confirmation.Approve
             onApprove={() => setStatus('approved')}
             disabled={status !== 'pending'}
-            label="Approve Adjustment"
+            label="Update Goal"
           />
         </Confirmation.Actions>
       </Confirmation.Root>

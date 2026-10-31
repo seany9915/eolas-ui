@@ -14,6 +14,7 @@
 import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { cn } from '@/lib/utils';
+import { Icon } from './icon';
 
 export type TabValue = string | number | null;
 
@@ -145,7 +146,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             effectiveVariant === 'unstyled'
               ? ''
               : isSegmented
-                ? 'p-1 rounded bg-surface-container border border-outline-variant w-max gap-1 select-none'
+                ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none'
                 : cn(
                     'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden scrollbar-none select-none',
                     'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
@@ -160,7 +161,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             isSegmented ? (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute rounded-sm bg-primary z-0 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'absolute rounded-sm bg-surface shadow-ambient border border-outline-variant/60 z-0 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
                   'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-1',
                   'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-1',
                   indicatorClassName
@@ -170,8 +171,8 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               <BaseTabs.Indicator
                 className={cn(
                   'absolute bg-primary rounded-none z-10 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2.5px]',
-                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2.5px]',
+                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2px]',
+                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2px]',
                   indicatorClassName
                 )}
               />
@@ -204,7 +205,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
 
     // Size height tokens (enforcing min 44px hit-target for standard accessibility)
     const sizeClasses = {
-      sm: isSegmented ? 'py-1.5 px-3 min-h-[38px] text-xs' : 'py-2 px-3.5 min-h-[44px] text-xs',
+      sm: isSegmented ? 'relative py-1.5 px-3 min-h-[36px] text-xs after:absolute after:-inset-1 after:content-[\'\']' : 'py-2 px-3.5 min-h-[44px] text-xs',
       md: isSegmented ? 'py-2 px-3.5 min-h-[44px] text-sm' : 'py-2.5 px-4 min-h-[44px] text-sm',
       lg: isSegmented ? 'py-2.5 px-4.5 min-h-[48px] text-base' : 'py-3.5 px-5 min-h-[48px] text-base',
     }[effectiveSize];
@@ -226,19 +227,19 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                   hasSlidingIndicator
                     ? cn(
                         'bg-transparent',
-                        'data-[active]:text-on-primary',
-                        'data-[selected]:text-on-primary',
-                        'aria-selected:text-on-primary'
+                        'data-[active]:text-on-surface',
+                        'data-[selected]:text-on-surface',
+                        'aria-selected:text-on-surface font-semibold'
                       )
                     : cn(
                         'hover:bg-surface-variant/30',
-                        'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:shadow-ambient',
-                        'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:shadow-ambient',
-                        'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:shadow-ambient'
+                        'data-[active]:bg-surface data-[active]:text-on-surface data-[active]:shadow-ambient data-[active]:border-outline-variant/60',
+                        'data-[selected]:bg-surface data-[selected]:text-on-surface data-[selected]:shadow-ambient data-[selected]:border-outline-variant/60',
+                        'aria-selected:bg-surface aria-selected:text-on-surface aria-selected:shadow-ambient aria-selected:border-outline-variant/60'
                       )
                 )
               : cn(
-                  'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 border-b-[2.5px] border-transparent',
+                  'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 border-b-2 border-transparent',
                   hasSlidingIndicator
                     ? cn(
                         'data-[active]:text-primary',
@@ -258,9 +259,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         {...props}
       >
         {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
+          <Icon name={icon} size="sm" className="shrink-0" />
         )}
         {children}
       </BaseTabs.Tab>

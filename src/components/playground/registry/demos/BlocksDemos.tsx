@@ -12,17 +12,17 @@ export const ApprovalCardDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-6">
       <ApprovalCard
-        title="Approve Antibiotic Step-Down"
-        description="Clinical decision support has evaluated blood cultures as negative for 48 hours."
+        title="Update Weekly Practice Plan"
+        description="Select the target sound set for this week's practice sessions."
         options={[
-          { id: 'opt-1', label: 'Oral Co-Amoxiclav 625mg TDS', description: 'Standard 5-day step-down regime' },
-          { id: 'opt-2', label: 'Continue IV Cefotaxime 1g BD', description: 'Extend IV cover for further 24 hours' },
+          { id: 'opt-1', label: 'Vocalic /r/ Sound Practice', description: '15 minutes daily with audio feedback' },
+          { id: 'opt-2', label: 'S-Blend Syllables', description: '10 minutes daily with picture cards' },
         ]}
         selectedOptionId={selected}
         onSelectOption={setSelected}
         stepCurrent={1}
         stepTotal={2}
-        confirmLabel="Confirm Step-Down Plan"
+        confirmLabel="Confirm Practice Plan"
         onConfirm={() => {}}
       />
     </div>
@@ -33,28 +33,28 @@ export const MetricCardDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl mx-auto py-6">
       <MetricCard
-        title="Total Inpatient Admissions"
+        title="Active Practice Sessions"
         value={142}
-        icon="hotel"
-        change="+8% vs yesterday"
+        icon="record_voice_over"
+        change="+8% vs last week"
         changeType="positive"
-        description="Active caseload in Ward A & B"
+        description="Active sessions across groups"
       />
       <MetricCard
-        title="ICU Bed Utilization"
+        title="Daily Goal Completion"
         value="92%"
-        icon="local_hospital"
-        change="Near Capacity"
-        changeType="negative"
-        description="2 beds remaining in Unit"
+        icon="task_alt"
+        change="+4% this week"
+        changeType="positive"
+        description="Learners meeting daily goal"
       />
       <MetricCard
-        title="Average Triage Time"
+        title="Average Session Time"
         value="14 min"
         icon="timer"
         change="-3 min faster"
         changeType="positive"
-        description="Median arrival to triage"
+        description="Median practice duration"
       />
     </div>
   );
@@ -66,12 +66,12 @@ export const DeleteConfirmationDialogDemo: React.FC<ComponentDemoProps> = () => 
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Button colorRole="error" onClick={() => setOpen(true)}>
         <Icon name="delete" size="xs" className="mr-2" />
-        Open Delete Confirmation Block
+        Open Delete Confirmation
       </Button>
       <DeleteConfirmationDialog
         open={open}
         onOpenChange={setOpen}
-        itemName="Discharge Protocol Template (Draft)"
+        itemName="Session Notes Template (Draft)"
         onConfirm={() => setOpen(false)}
       />
     </div>
@@ -85,16 +85,16 @@ export const FilterToolbarDemo: React.FC<ComponentDemoProps> = () => {
       <FilterToolbar
         searchQuery={q}
         onSearchChange={setQ}
-        searchPlaceholder="Filter patients by name or NHS number..."
+        searchPlaceholder="Filter learners by name or ID..."
         filterGroups={[
           {
             id: 'status',
-            label: 'Triage Status',
+            label: 'Status',
             value: 'all',
             options: [
               { value: 'all', label: 'All Statuses' },
-              { value: 'critical', label: 'STAT / Critical' },
-              { value: 'routine', label: 'Routine' },
+              { value: 'review', label: 'Needs Review' },
+              { value: 'active', label: 'Active' },
             ],
           },
         ]}
@@ -110,14 +110,14 @@ export const ChatBlockDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex items-center justify-between border-b border-outline-variant pb-3">
           <div className="flex items-center gap-2">
             <Icon name="chat" size="sm" className="text-primary" />
-            <span className="font-heading text-sm font-bold text-on-surface">Clinical Assistant Workspace Block</span>
+            <span className="font-heading text-sm font-bold text-on-surface">Assistant Chat Workspace</span>
           </div>
           <span className="font-mono text-xs px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-bold">
             Composite Block
           </span>
         </div>
         <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-          The <code>Chat</code> block assembles <code>MessageScroller</code>, <code>ChatMessage</code>, <code>PromptInput</code>, and <code>SuggestionChips</code> into a full clinical AI assistant workspace.
+          The <code>Chat</code> block assembles <code>MessageScroller</code>, <code>ChatMessage</code>, <code>PromptInput</code>, and <code>SuggestionChips</code> into an interactive chat workspace.
         </p>
         <div className="bg-surface-container rounded-lg p-3 font-mono text-xs border border-outline-variant">
           import &#123; Chat &#125; from '@/components/blocks/chat';

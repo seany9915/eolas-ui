@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NavigationMenu as BaseNavigationMenu } from '@base-ui/react/navigation-menu';
 import { cn } from '@/lib/utils';
+import { Icon } from './icon';
 
 export interface NavigationSubItem {
   id: string;
@@ -57,8 +58,8 @@ export const NavigationMenuTrigger = React.forwardRef<
       'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container/40',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
       active
-        ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-primary after:rounded-none'
-        : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-transparent after:rounded-none',
+        ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
+        : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
       className
     )}
     {...props}
@@ -111,8 +112,8 @@ export const NavigationMenuLink = React.forwardRef<
           ? cn(
               'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
               active
-                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-primary after:rounded-none'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 after:absolute after:bottom-0 after:inset-x-0 after:h-[3px] after:bg-transparent after:rounded-none',
+                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
               'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
             )
           : cn(
@@ -202,7 +203,7 @@ export const NavigationMenuIcon = React.forwardRef<
     )}
     {...props}
   >
-    {children ?? <span className="material-symbols-outlined text-lg ml-1" aria-hidden="true">expand_more</span>}
+    {children ?? <Icon name="expand_more" size="sm" className="ml-1" />}
   </BaseNavigationMenu.Icon>
 ));
 NavigationMenuIcon.displayName = 'NavigationMenuIcon';
@@ -263,9 +264,7 @@ function NavigationMenuComponent<Value = string>({
                   <BaseNavigationMenu.Item key={item.id} value={item.id as Value} className="relative">
                     <NavigationMenuTrigger active={isActive}>
                       {item.icon && (
-                        <span className="material-symbols-outlined text-lg mr-2 leading-none" aria-hidden="true">
-                          {item.icon}
-                        </span>
+                        <Icon name={item.icon} size="sm" className="mr-2 leading-none" />
                       )}
                       <span className={cn(item.shortLabel && 'hidden xl:inline')}>{item.label}</span>
                       {item.shortLabel && (
@@ -300,21 +299,18 @@ function NavigationMenuComponent<Value = string>({
                             >
                               <div className="flex items-center gap-2 font-sans text-sm font-semibold">
                                 {sub.icon && (
-                                  <span
+                                  <Icon
+                                    name={sub.icon}
+                                    size="sm"
                                     className={cn(
-                                      'material-symbols-outlined text-base leading-none',
+                                      'leading-none',
                                       isSubActive ? 'text-primary' : 'text-on-surface-variant'
                                     )}
-                                    aria-hidden="true"
-                                  >
-                                    {sub.icon}
-                                  </span>
+                                  />
                                 )}
                                 <span>{sub.label}</span>
                                 {isSubActive && (
-                                  <span className="material-symbols-outlined text-base ml-auto text-primary leading-none" aria-hidden="true">
-                                    check
-                                  </span>
+                                  <Icon name="check" size="sm" className="ml-auto text-primary leading-none" />
                                 )}
                               </div>
                               {sub.description && (
@@ -353,9 +349,7 @@ function NavigationMenuComponent<Value = string>({
                     }}
                   >
                     {item.icon && (
-                      <span className="material-symbols-outlined text-lg mr-2 leading-none" aria-hidden="true">
-                        {item.icon}
-                      </span>
+                      <Icon name={item.icon} size="sm" className="mr-2 leading-none" />
                     )}
                     <span className={cn(item.shortLabel && 'hidden xl:inline')}>{item.label}</span>
                     {item.shortLabel && (
