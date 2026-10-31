@@ -273,9 +273,9 @@ button,
 }
 
 /* 1. Standard Form Controls (flush 2px focus ring) */
-input:not([data-slot="combobox-input"]):not([data-slot="autocomplete-input"]):focus-visible,
+input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):focus-visible,
 select:focus-visible,
-textarea:not([data-slot="prompt-input-textarea"]):focus-visible,
+textarea:not([data-slot="prompt-input"] *):focus-visible,
 [data-slot="select-trigger"]:focus-visible,
 [data-slot="combobox-input-group"]:focus-within,
 [data-slot="autocomplete-input-group"]:focus-within {
@@ -285,9 +285,9 @@ textarea:not([data-slot="prompt-input-textarea"]):focus-visible,
 }
 
 /* 2. Invalid / Error Form Controls (Overrides via cascade + :is() specificity) */
-input:not([data-slot="combobox-input"]):not([data-slot="autocomplete-input"]):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
 select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
-textarea:not([data-slot="prompt-input-textarea"]):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+textarea:not([data-slot="prompt-input"] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
 [data-slot="select-trigger"]:is([aria-invalid="true"], [data-invalid], .border-error):focus-visible,
 [data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within,
 [data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within {
@@ -310,10 +310,10 @@ button:focus-visible:not([data-slot="select-trigger"]) {
   outline: 2px solid transparent;
   outline-offset: -2px;
 }
-/* 5. Compound Inner Inputs: Suppress internal ring so outer group handles focus */
-input[data-slot="combobox-input"]:focus-visible,
-input[data-slot="autocomplete-input"]:focus-visible,
-textarea[data-slot="prompt-input-textarea"]:focus-visible {
+/* 5. Compound Inner Inputs: Suppress internal ring when nested inside an input group so the outer group handles focus */
+[data-slot="combobox-input-group"] input[data-slot="combobox-input"]:focus-visible,
+[data-slot="autocomplete-input-group"] input[data-slot="autocomplete-input"]:focus-visible,
+[data-slot="prompt-input"] textarea[data-slot="prompt-input-textarea"]:focus-visible {
   outline: none;
   border-color: transparent;
 }

@@ -223,7 +223,7 @@ export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="space-y-3 w-full max-w-md mx-auto">
       <label className="font-label text-xs font-bold text-on-surface block">Medication Dosage Autocomplete</label>
-      <Autocomplete.Root items={['Amoxicillin 500mg', 'Paracetamol 1000mg', 'Ibuprofen 400mg', 'Metformin 500mg']}>
+      <Autocomplete.Root openOnInputClick items={['Amoxicillin 500mg', 'Paracetamol 1000mg', 'Ibuprofen 400mg', 'Metformin 500mg']}>
         <Autocomplete.Input placeholder="Type medication name..." className="w-full" />
         <Autocomplete.Portal>
           <Autocomplete.Positioner sideOffset={4}>

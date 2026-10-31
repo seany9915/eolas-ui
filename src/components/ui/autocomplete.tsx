@@ -583,8 +583,8 @@ export const AutocompleteInput = React.forwardRef<
     data-slot="autocomplete-input"
     ref={ref}
     className={cn(
-      'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-[border-color,box-shadow]',
-      'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 transition-[border-color,box-shadow]',
+      'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
       '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0',
       size === 'sm' && 'h-9 min-h-[44px] text-xs',
       size === 'md' && 'h-11 min-h-[44px] text-sm',

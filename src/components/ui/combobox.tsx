@@ -435,12 +435,12 @@ export const ComboboxInput = React.forwardRef<
     data-slot="combobox-input"
     ref={ref}
     className={cn(
-      'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-colors',
+      'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 transition-colors',
       size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
       size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
       size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
       'hover:border-on-surface-variant/80',
-      'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
       '[[data-slot=combobox-input-group]_&]:border-0 [[data-slot=combobox-input-group]_&]:bg-transparent [[data-slot=combobox-input-group]_&]:rounded-none [[data-slot=combobox-input-group]_&]:focus-visible:outline-none [[data-slot=combobox-input-group]_&]:hover:border-0',
       'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
       error && 'border-error focus-visible:outline-error',
