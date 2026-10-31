@@ -137,38 +137,38 @@
   --surface: #ffffff;
   --on-surface: #1a1c1e;
   --on-surface-variant: #434656;
-  --surface-container: #EEF1F8;
-  --surface-variant: #E1E6F0;
+  --surface-container: #EBF0F8;
+  --surface-variant: #DDE1EB;
   --outline: #737688;
-  --outline-variant: #C8D0E0;
+  --outline-variant: #BEC6D6;
   --primary: #0052FF;
   --on-primary: #ffffff;
   --primary-container: #dce6ff;
   --on-primary-container: #1a1c1e;
   --secondary: #00796B;
   --on-secondary: #ffffff;
-  --secondary-container: #e0f2f1;
+  --secondary-container: #D5F0EE;
   --on-secondary-container: #1a1c1e;
   --tertiary: #F9A825;
   --on-tertiary: #1a1c1e;
   --tertiary-container: #fff0c2;
   --on-tertiary-container: #1a1c1e;
-  --error: #ba1a1a;
+  --error: #C4161C;
   --on-error: #ffffff;
   --error-container: #ffdad6;
   --on-error-container: #1a1c1e;
-  --warning: #8a5200;
+  --warning: #A64B00;
   --on-warning: #ffffff;
-  --warning-container: #ffe0b3;
+  --warning-container: #FDE3B8;
   --on-warning-container: #1a1c1e;
-  --success: #146c2e;
+  --success: #157331;
   --on-success: #ffffff;
   --success-container: #c8f5ce;
   --on-success-container: #1a1c1e;
 
   --neutral: #1a1c1e;
   --on-neutral: #ffffff;
-  --neutral-container: #D5DCEB;
+  --neutral-container: #D1D5DF;
   --on-neutral-container: #1a1c1e;
 
   /* Spacing & Layout Tokens (DESIGN.md) */

@@ -6,37 +6,37 @@ colors:
   surface: '#ffffff'
   on-surface: '#1a1c1e'
   on-surface-variant: '#434656'
-  surface-container: '#EEF1F8'
-  surface-variant: '#E1E6F0'
+  surface-container: '#EBF0F8'
+  surface-variant: '#DDE1EB'
   outline: '#737688'
-  outline-variant: '#C8D0E0'
+  outline-variant: '#BEC6D6'
   primary: '#0052FF'
   on-primary: '#ffffff'
   primary-container: '#dce6ff'
   on-primary-container: '#1a1c1e'
   secondary: '#00796B'
   on-secondary: '#ffffff'
-  secondary-container: '#e0f2f1'
+  secondary-container: '#D5F0EE'
   on-secondary-container: '#1a1c1e'
   tertiary: '#F9A825'
   on-tertiary: '#1a1c1e'
   tertiary-container: '#fff0c2'
   on-tertiary-container: '#1a1c1e'
-  error: '#ba1a1a'
+  error: '#C4161C'
   on-error: '#ffffff'
   error-container: '#ffdad6'
   on-error-container: '#1a1c1e'
-  warning: '#8a5200'
+  warning: '#A64B00'
   on-warning: '#ffffff'
-  warning-container: '#ffe0b3'
+  warning-container: '#FDE3B8'
   on-warning-container: '#1a1c1e'
-  success: '#146c2e'
+  success: '#157331'
   on-success: '#ffffff'
   success-container: '#c8f5ce'
   on-success-container: '#1a1c1e'
   neutral: '#1a1c1e'
   on-neutral: '#ffffff'
-  neutral-container: '#D5DCEB'
+  neutral-container: '#D1D5DF'
   on-neutral-container: '#1a1c1e'
 borderWidth:
   default: 1px
@@ -183,8 +183,8 @@ The color system is organized into functional roles governed by visual hierarchy
 2. **Supporting Accents (`secondary` & `tertiary`):**
    Optional supporting palette accents used for visual pacing, category separation, and focal emphasis. They are never mandatory:
    * **Secondary (`#00796B`, Rich Emerald):**
-     * *Tokens:* `secondary` (`#00796B`) | `on-secondary` (`#ffffff`) — solid fill. `secondary-container` (`#e0f2f1`) | `on-secondary-container` (`#1a1c1e`, neutral charcoal) — soft fill.
-     * *Role:* A cool, high-contrast supporting accent. Used for secondary action tiers, Category / Accent Card borders (`border-secondary`), and multi-series data differentiation. Distinct from `success` (`#146c2e`), which is reserved strictly for completed actions and positive outcomes.
+     * *Tokens:* `secondary` (`#00796B`) | `on-secondary` (`#ffffff`) — solid fill. `secondary-container` (`#D5F0EE`) | `on-secondary-container` (`#1a1c1e`, neutral charcoal) — soft fill.
+     * *Role:* A cool, high-contrast supporting accent. Used for secondary action tiers, Category / Accent Card borders (`border-secondary`), and multi-series data differentiation. Distinct from `success` (`#157331`), which is reserved strictly for completed actions and positive outcomes.
      * *Contrast:* Passes WCAG AA contrast (~4.6:1) as text and borders on light backgrounds. Usable across all button and chip emphasis tiers (Filled, Outlined, Text).
    * **Tertiary (`#F9A825`, Sunny Amber):**
      * *Tokens:* `tertiary` (`#F9A825`) | `on-tertiary` (`#1a1c1e`) — solid fill. `tertiary-container` (`#fff0c2`) | `on-tertiary-container` (`#1a1c1e`, neutral charcoal) — soft fill.
@@ -201,27 +201,27 @@ The color system is organized into functional roles governed by visual hierarchy
 These four roles exist specifically to carry *system, operational, and task state* meaning — including domain-specific outcome feedback (correct/incorrect exercise responses) and operational conditions (offline, sync) — and must never be substituted with brand accents (`primary`/`secondary`/`tertiary`) or with each other.
 
 *   **Error (Red): Destructive & Invalid States**
-    *   *Tokens:* `error` (`#ba1a1a`) | `on-error` (`#ffffff`) — solid fill use (buttons, icons). `error-container` (`#ffdad6`) | `on-error-container` (`#1a1c1e`, neutral charcoal) — soft-fill use (banners, field error backgrounds).
+    *   *Tokens:* `error` (`#C4161C`) | `on-error` (`#ffffff`) — solid fill use (buttons, icons). `error-container` (`#ffdad6`) | `on-error-container` (`#1a1c1e`, neutral charcoal) — soft-fill use (banners, field error backgrounds).
     *   *Usage:* Validation errors, destructive confirmations, failed states, and incorrect-answer feedback in therapy exercises (e.g. a wrong-response indicator) — the same token covers both app-level failure states and domain-level "incorrect" outcomes; don't invent a separate color for exercise feedback.
 *   **Warning (Burnt Orange): Caution States**
-    *   *Tokens:* `warning` (`#8a5200`) | `on-warning` (`#ffffff`) — solid fill use. `warning-container` (`#ffe0b3`) | `on-warning-container` (`#1a1c1e`, neutral charcoal) — soft-fill use.
+    *   *Tokens:* `warning` (`#A64B00`) | `on-warning` (`#ffffff`) — solid fill use. `warning-container` (`#FDE3B8`) | `on-warning-container` (`#1a1c1e`, neutral charcoal) — soft-fill use.
     *   *Usage:* Non-blocking caution states (e.g. "session expiring soon", "unsaved changes"). Deliberately a distinct orange, not `tertiary`'s amber — `tertiary` carries brand-highlight meaning (milestones, positive emphasis) and reusing that hue for warnings would make the same color mean two contradictory things.
 *   **Success (Deep Green): Confirmation States**
-    *   *Tokens:* `success` (`#146c2e`) | `on-success` (`#ffffff`) — solid fill use. `success-container` (`#c8f5ce`) | `on-success-container` (`#1a1c1e`, neutral charcoal) — soft-fill use.
+    *   *Tokens:* `success` (`#157331`) | `on-success` (`#ffffff`) — solid fill use. `success-container` (`#c8f5ce`) | `on-success-container` (`#1a1c1e`, neutral charcoal) — soft-fill use.
     *   *Usage:* Completed actions, saved confirmations, passed checks, and correct-answer feedback in therapy exercises (e.g. a correct-response indicator) — the same token covers both app-level completion states and domain-level "correct" outcomes; don't invent a separate color for exercise feedback. Distinct from `secondary` (Rich Emerald), which is for informational/auxiliary content, not a confirmation state — a completed-state chip should use `success`, not `secondary`, even though both are in the green family.
 *   **Neutral (Charcoal): Operational & Ambient System Status**
-    *   *Tokens:* `neutral` (`#1a1c1e`) | `on-neutral` (`#ffffff`) — solid fill use. `neutral-container` (`#D5DCEB`) | `on-neutral-container` (`#1a1c1e`, neutral charcoal) — soft-fill use. For `InlineAlert` accent bars and icons, `on-surface` (`#1a1c1e`) and `surface` (`#ffffff`) may also be used directly.
-    *   *Usage:* Non-critical operational conditions and background system status (e.g. offline mode active, sync pending, read-only session). Used in `InlineAlert` (`role="neutral"`) and `Chip` (`colorRole="neutral"`) to present informative system feedback without the urgency of a warning or the severity of an error. Stepping `neutral-container` (`#D5DCEB`, 87.8% lightness) one rung darker than `surface-variant` (`#E1E6F0`, 91.2% lightness) guarantees that neutral status tags remain distinctly visible even when placed inside highlighted table rows or menu headers (12.6:1 AAA contrast against `#1a1c1e` text).
+    *   *Tokens:* `neutral` (`#1a1c1e`) | `on-neutral` (`#ffffff`) — solid fill use. `neutral-container` (`#D1D5DF`) | `on-neutral-container` (`#1a1c1e`, neutral charcoal) — soft-fill use. For `InlineAlert` accent bars and icons, `on-surface` (`#1a1c1e`) and `surface` (`#ffffff`) may also be used directly.
+    *   *Usage:* Non-critical operational conditions and background system status (e.g. offline mode active, sync pending, read-only session). Used in `InlineAlert` (`role="neutral"`) and `Chip` (`colorRole="neutral"`) to present informative system feedback without the urgency of a warning or the severity of an error. Stepping `neutral-container` (`#D1D5DF`, 87.8% lightness) one rung darker than `surface-variant` (`#DDE1EB`, 91.2% lightness) guarantees that neutral status tags remain distinctly visible even when placed inside highlighted table rows or menu headers (12.6:1 AAA contrast against `#1a1c1e` text).
 
 ### 3. Surface Hierarchy
 
 Surfaces establish visual depth and guide attention. Instead of treating every container as a card, choose the surface prominence based on the element's priority and role in the interface:
 
 1.  **Low Prominence (Canvas & Dividers — default layout):**
-    *   *Tokens:* `background` (`#F6F7FB`), `outline-variant` (`#C8D0E0`) dividers.
+    *   *Tokens:* `background` (`#F6F7FB`), `outline-variant` (`#BEC6D6`) dividers.
     *   *Role:* Page canvas, full-width sections, and dense data displays (tables, lists). Relies on whitespace, typography, and subtle hairline dividers rather than container boxes. This should form the vast majority of any view.
 2.  **Medium Prominence (Grouping & Content Containers):**
-    *   *Grouped Fill:* `surface-container` (`#EEF1F8`), borderless, flat. A cool desaturated slate wash (42% saturation, Blue channel 248) used to visually cluster related form fields or secondary controls inside white cards without creating an elevated object. Because saturation is capped at 42%, it never competes with active 100% saturated blue selections (`primary-container`, `#dce6ff`).
+    *   *Grouped Fill:* `surface-container` (`#EBF0F8`), borderless, flat. A cool desaturated slate wash (42% saturation, Blue channel 248) used to visually cluster related form fields or secondary controls inside white cards without creating an elevated object. Because saturation is capped at 42%, it never competes with active 100% saturated blue selections (`primary-container`, `#dce6ff`).
     *   *Standard Cards:* White `surface` (`#ffffff`) with ambient elevation (`shadow-ambient`). Used to bundle a discrete, self-contained unit (e.g. an exercise, a progress summary, a metric group).
     *   *Accent Cards:* White `surface` with a `2px` solid border in `secondary` (`#00796B`, Rich Emerald). Used to denote a specific category or track (e.g. a practice guide or reference sheet).
 3.  **High Prominence (Spotlight & Hero Containers):**
@@ -229,16 +229,16 @@ Surfaces establish visual depth and guide attention. Instead of treating every c
     *   *Filled Card (`prominence="filled"`):* Saturated brand fill (`primary`, `secondary`, or `tertiary`) with high-contrast text. Used for solitary celebratory achievements or focal hero highlights. (For navigation choice sets or mode pickers, use Medium-Prominence Selectable Cards or a `ToggleGroup` instead).
     *   *High-Prominence Containers:* High-Prominence containers carry the most visual weight. Reserve them for primary focal points rather than scattering them across a grid. When multiple items compete for attention, step secondary items down to Medium-Prominence Standard Cards or Low-Prominence canvas groupings.
 
-*   **Borders & Dividers:** Use `outline-variant` (`#C8D0E0`, 28% saturation slate) for subtle `1px` structural dividers and passive component borders (Menus, Popovers), and `outline` (`#737688`) for default interactive form-control boundaries. Standard content cards remain borderless.
+*   **Borders & Dividers:** Use `outline-variant` (`#BEC6D6`, 28% saturation slate) for subtle `1px` structural dividers and passive component borders (Menus, Popovers), and `outline` (`#737688`) for default interactive form-control boundaries. Standard content cards remain borderless.
 *   **Rule of thumb:** If content can be structured using typography, whitespace, and list dividers (Low Prominence), do that first. Elevate to a Standard Card (Medium Prominence) only when the content forms a distinct, self-contained unit. Reserve Inverted and Filled Cards (High Prominence) for the primary focal point of the screen.
 *   **Card nesting:** Never nest a Card inside another Card. A Card may sit within a `surface-container` section if separated by generous padding, but nesting identical elevation levels causes visual noise.
-*   **Practice & Therapist Tips (`<ClinicianTip />`):** When showing a practice tip, pronunciation cue, or helpful hint inside a Card or form, avoid nesting additional cards or alert banners. Instead, use an **unboxed `<ClinicianTip />`**: an inline icon (`lightbulb` or `info` in `secondary`, `#00796B`) or an inline micro-badge paired directly with `text-base text-on-surface-variant` and an optional bold lead-in (`<span className="font-semibold text-on-surface">Tip:</span>` or `"Clinician tip:"`). It adds zero container weight inside an already-contained card. For multi-field form canvas groupings outside cards, an unbordered flat `surface-container` (`#EEF1F8`, `rounded-md p-3`) wash may be used inside white cards; if placed directly on the `#F6F7FB` page canvas, pair with a `1px` `outline-variant` border.
+*   **Practice & Therapist Tips (`<ClinicianTip />`):** When showing a practice tip, pronunciation cue, or helpful hint inside a Card or form, avoid nesting additional cards or alert banners. Instead, use an **unboxed `<ClinicianTip />`**: an inline icon (`lightbulb` or `info` in `secondary`, `#00796B`) or an inline micro-badge paired directly with `text-base text-on-surface-variant` and an optional bold lead-in (`<span className="font-semibold text-on-surface">Tip:</span>` or `"Clinician tip:"`). It adds zero container weight inside an already-contained card. For multi-field form canvas groupings outside cards, an unbordered flat `surface-container` (`#EBF0F8`, `rounded-md p-3`) wash may be used inside white cards; if placed directly on the `#F6F7FB` page canvas, pair with a `1px` `outline-variant` border.
 *   **Overlays are a separate axis, not a prominence tier:** Dialog, Popover, Menu, and Drawer chrome renders using a surface treatment with dedicated scrims, elevation, and focus-traps governed by Base UI portal setups (`component-library.md`).
 *   **Page-frame chrome (Navigation):** The top navigation bar's `surface` background sits outside this containment ranking, distinguished from canvas only by a single `1px` `outline-variant` bottom border.
 *   **Tooltips:** Tooltips intentionally invert this pattern (a solid high-contrast dark fill, no border — see Tooltips in Components) as a transient hint layer distinct from in-page surfaces.
-*   **`surface-variant` (`#E1E6F0`) — component-internal neutral fill:** Paired with `on-surface-variant` (`#434656`) text (6.2:1 contrast, exceeding WCAG AA). Use this token for neutral fills inside a single component (avatar fallbacks, progress tracks, loading skeletons, and selected menu rows). Its cool desaturated slate tone (31% saturation, 91.2% lightness) ensures it never clashes with `primary-container` (`#dce6ff`, 100% saturation Electric Blue), while preserving clear separation between active brand selections and passive component internals. In contrast, `surface-container` (`#EEF1F8`) is reserved for grouping multiple items together.
-*   **Border pairing rule for `surface-variant`:** If a component requires both a neutral fill and a visible border, use `outline` (`#737688`, 3.55+:1) for interactive controls (`Switch`, `Slider`), and `outline-variant` (`#C8D0E0`) for passive structural perimeters.
-*   **Neutral Surface Contrast:** Adjacent rungs on the neutral ladder (`background` `#F6F7FB` $\rightarrow$ `surface-container` `#EEF1F8` $\rightarrow$ `surface-variant` `#E1E6F0` $\rightarrow$ `neutral-container` `#D5DCEB` $\rightarrow$ `outline-variant` `#C8D0E0`) are ~4% lightness apart. Unbordered fills must skip at least one rung from their container background (e.g., inside white `#FFFFFF` surface cards, unbordered `surface-container` or `surface-variant` pops at 1.12:1 to 1.26:1). Directly on the `#F6F7FB` page background, `surface-container` must be paired with a `1px` `outline-variant` border so it doesn't vanish.
+*   **`surface-variant` (`#DDE1EB`) — component-internal neutral fill:** Paired with `on-surface-variant` (`#434656`) text (6.2:1 contrast, exceeding WCAG AA). Use this token for neutral fills inside a single component (avatar fallbacks, progress tracks, loading skeletons, and selected menu rows). Its cool desaturated slate tone (31% saturation, 91.2% lightness) ensures it never clashes with `primary-container` (`#dce6ff`, 100% saturation Electric Blue), while preserving clear separation between active brand selections and passive component internals. In contrast, `surface-container` (`#EBF0F8`) is reserved for grouping multiple items together.
+*   **Border pairing rule for `surface-variant`:** If a component requires both a neutral fill and a visible border, use `outline` (`#737688`, 3.55+:1) for interactive controls (`Switch`, `Slider`), and `outline-variant` (`#BEC6D6`) for passive structural perimeters.
+*   **Neutral Surface Contrast:** Adjacent rungs on the neutral ladder (`background` `#F6F7FB` $\rightarrow$ `surface-container` `#EBF0F8` $\rightarrow$ `surface-variant` `#DDE1EB` $\rightarrow$ `neutral-container` `#D1D5DF` $\rightarrow$ `outline-variant` `#BEC6D6`) are ~4% lightness apart. Unbordered fills must skip at least one rung from their container background (e.g., inside white `#FFFFFF` surface cards, unbordered `surface-container` or `surface-variant` pops at 1.12:1 to 1.26:1). Directly on the `#F6F7FB` page background, `surface-container` must be paired with a `1px` `outline-variant` border so it doesn't vanish.
 
 ### 4. Tonal & Callout Backdrops
 
@@ -364,7 +364,7 @@ To maintain high contrast and visual clarity while avoiding heavy visual clutter
   - `shadow-modal`: Tier A blocking dialogs and full-height drawers over backdrop scrims.
   - *Zero-Shadow Baseline:* Page-frame chrome (Header, Navigation Bar), Toolbars, Buttons, Text Inputs, Chips, and Inline Alerts maintain **zero box-shadow**. Never give shadows to flat controls. *(Exception: Sticky Navigation Bar maintains zero box-shadow at rest, but applies `shadow-ambient` dynamically when stuck over scrolled page content via `@container scroll-state(stuck: top)`).*
 - **Physical Borders Over Faux Shadow-Rings:** Do not use `box-shadow: 0 0 0 1px ...` (`smooth-shadow-ring`) in place of a real CSS border. In Windows High Contrast Mode (`forced-colors: active`), browsers strip all `box-shadow` properties, making shadow-only borders invisible. All floating overlays must maintain real CSS borders (`border-outline-variant` 1px or 2px).
-- **Structural Controls (Forms):** Form fields (inputs, selects, textareas) retain crisp 1px `outline` borders (`#737688`) to guarantee WCAG 2.2 SC 1.4.11 3:1 non-text contrast for interactive controls (`outline-variant` `#C8D0E0` is reserved for passive structural dividers and disabled states).
+- **Structural Controls (Forms):** Form fields (inputs, selects, textareas) retain crisp 1px `outline` borders (`#737688`) to guarantee WCAG 2.2 SC 1.4.11 3:1 non-text contrast for interactive controls (`outline-variant` `#BEC6D6` is reserved for passive structural dividers and disabled states).
 - **Matching Input and Button Heights:** When an `<Input />`, `<Select />`, or `<Textarea />` sits side-by-side with a `<Button />` in a horizontal row (e.g. search bars, filter toolbars, prompt inputs, subscription boxes), both controls must share identical computed heights across all size tiers:
   - `sm` (Compact Tier): `44px` (`h-11 min-h-[44px]`).
   - `md` (Standard Tier — Default for CTAs & Forms): `48px` (`h-12 min-h-[48px]`).
@@ -561,7 +561,7 @@ Practice tips, pronunciation cues, and helpful advice provide simple, in-context
   - **Copy:** `text-base` (`1rem` / 16px, upholding the 1rem body text floor) in `text-on-surface-variant` (`#434656`), with an optional bold prefix in `text-on-surface` (`#1a1c1e`, e.g., `<span className="font-semibold text-on-surface">Tip: </span>` or `"Clinician tip: "`).
   - **Accessibility:** Ensure the icon has `aria-hidden="true"` when paired with a visible prefix like "Tip:".
 - **Canvas / Multi-Field Grouping (Secondary Pattern):**
-  When tips appear directly on the `#F6F7FB` page canvas or between separate form groups (outside of cards), they must sit within a `bg-surface-container` (`#EEF1F8`, `rounded-md px-3.5 py-2.5`) wash paired with a `1px` `outline-variant` border (`border border-outline-variant`, `#C8D0E0`) per the neutral surface contrast rule so the grouping remains distinctly visible against the canvas.
+  When tips appear directly on the `#F6F7FB` page canvas or between separate form groups (outside of cards), they must sit within a `bg-surface-container` (`#EBF0F8`, `rounded-md px-3.5 py-2.5`) wash paired with a `1px` `outline-variant` border (`border border-outline-variant`, `#BEC6D6`) per the neutral surface contrast rule so the grouping remains distinctly visible against the canvas.
 - **Component Primitive:** Use `<ClinicianTip />` (`src/components/ui/clinician-tip.tsx`).
 
 ### Inline Alerts
@@ -570,9 +570,9 @@ Inline alerts communicate urgent, time-sensitive, or state-dependent feedback: s
 
 They feature an asymmetric rectangular shape (`rounded-l-none rounded-r-default`, with `rounded-r` supported as an alias) on a neutral white `surface` background (`#ffffff`), **completely borderless on top, right, and bottom edges** (`border-t-0 border-r-0 border-b-0`), paired with a solid vertical `4px` (`borderWidth.accent`, `border-l-4`) accent bar in the state role color along the left edge:
 - **Straight vertical left accent bar:** A pure vertical `4px` stripe along the left edge (`border-l-4 border-l-[role]`), rendered in the state/status role's solid accent color:
-  - `error` (`#ba1a1a`): Destructive, blocked actions, or critical failures.
-  - `warning` (`#8a5200`): Cautionary notices, unsaved changes, expiring sessions.
-  - `success` (`#146c2e`): Confirmation of completed workflows or saved states.
+  - `error` (`#C4161C`): Destructive, blocked actions, or critical failures.
+  - `warning` (`#A64B00`): Cautionary notices, unsaved changes, expiring sessions.
+  - `success` (`#157331`): Confirmation of completed workflows or saved states.
   - `neutral` (`#1a1c1e`, `on-surface`): System and operational status notices (e.g. offline mode, sync status, background connectivity).
   *Role Restriction:* Brand and content roles (`primary` Electric Blue, `secondary` Rich Emerald, `tertiary` Sunny Amber) are **strictly excluded** from Inline Alerts. Operational alerts use state tokens (`error`, `warning`, `success`) or neutral charcoal (`on-surface`), preserving `primary` exclusively for interactive controls and brand hierarchy. Because the container uses asymmetric rounding (`rounded-l-none rounded-r-default`), the accent bar remains a crisp, perfectly straight vertical edge without corner-miter distortion, while the right corners gently align with surrounding 0.5rem controls.
 - **Surface & Text:** White `surface` background (`#ffffff`), `on-surface` (`#1a1c1e`) headline text, `on-surface-variant` (`#434656`) body text, and a matching role-colored leading icon for instant visual recognition.
@@ -597,10 +597,10 @@ Use chips for filtering categories or status updates (e.g., "Completed"). Chips 
 | **`primary`** (Electric Blue, `#0052FF`) | `bg-primary text-on-primary` (Solid blue fill, white text) | `border-primary bg-surface text-primary` (1px blue border, white fill, blue text) | `bg-primary-container text-on-primary-container` (Soft blue fill `#dce6ff`, charcoal text `#1a1c1e`) | Solid/outline text achieves 5.59:1 AA on `#ffffff`. Soft wash achieves 12.8:1 AAA. |
 | **`secondary`** (Rich Emerald, `#00796B`) | `bg-secondary text-on-secondary` (Solid emerald fill, white text) | `border-secondary bg-surface text-secondary` (1px emerald border, white fill, emerald text) | `bg-secondary-container text-on-secondary-container` (Soft emerald fill, charcoal text `#1a1c1e`) | Solid/outline text achieves 5.05:1 AA on `#ffffff`. Soft wash achieves 13.5:1 AAA. |
 | **`tertiary`** (Sunny Amber, `#F9A825`) | `bg-tertiary text-on-tertiary` (Solid amber fill, **charcoal text** `#1a1c1e`) | **BANNED on white surfaces** (Amber text fails WCAG 1.4.3 AA at 1.99:1; use Pattern 1 or Pattern 3) | `bg-tertiary-container text-on-tertiary-container` (Soft amber fill, charcoal text `#1a1c1e`) | Pattern 1 requires dark text (`text-on-tertiary` = `#1a1c1e`, 8.55:1 AAA). White text on `#F9A825` fails at 2.45:1. |
-| **`success`** (Forest Green, `#146c2e`) | `bg-success text-on-success` (Solid green fill, white text) | `border-success bg-surface text-success` (1px green border, white fill, green text) | `bg-success-container text-on-success-container` (Soft green fill, charcoal text `#1a1c1e`) | Solid/outline text achieves 6.57:1 AA on `#ffffff`. Soft wash achieves 12.5:1 AAA. |
-| **`warning`** (Ochre Amber, `#8a5200`) | `bg-warning text-on-warning` (Solid ochre fill, white text) | `border-warning bg-surface text-warning` (1px ochre border, white fill, ochre text) | `bg-warning-container text-on-warning-container` (Soft ochre fill, charcoal text `#1a1c1e`) | Deep ochre `#8a5200` achieves 5.9:1 AA on `#ffffff`. Never substitute with `#F9A825`. Soft wash achieves 12.2:1 AAA. |
-| **`error`** (Crimson Red, `#ba1a1a`) | `bg-error text-on-error` (Solid crimson fill, white text) | `border-error bg-surface text-error` (1px crimson border, white fill, crimson text) | `bg-error-container text-on-error-container` (Soft crimson fill, charcoal text `#1a1c1e`) | Solid/outline text achieves 6.8:1 AA on `#ffffff`. Soft wash achieves 11.9:1 AAA. |
-| **`neutral`** (Charcoal / Slate) | `bg-neutral text-on-neutral` (Solid charcoal `#1a1c1e` fill, white text) | `border-outline bg-surface text-on-surface` (1px slate border `#737688`, white fill, charcoal text) | `bg-neutral-container text-on-neutral-container` (Soft slate fill `#D5DCEB`, charcoal text `#1a1c1e`) | Solid text achieves 15.3:1 AAA. Outline border meets 3:1 non-text contrast. Soft wash achieves 12.6:1 AAA. |
+| **`success`** (Forest Green, `#157331`) | `bg-success text-on-success` (Solid green fill, white text) | `border-success bg-surface text-success` (1px green border, white fill, green text) | `bg-success-container text-on-success-container` (Soft green fill, charcoal text `#1a1c1e`) | Solid/outline text achieves 6.57:1 AA on `#ffffff`. Soft wash achieves 12.5:1 AAA. |
+| **`warning`** (Ochre Amber, `#A64B00`) | `bg-warning text-on-warning` (Solid ochre fill, white text) | `border-warning bg-surface text-warning` (1px ochre border, white fill, ochre text) | `bg-warning-container text-on-warning-container` (Soft ochre fill, charcoal text `#1a1c1e`) | Deep ochre `#A64B00` achieves 5.9:1 AA on `#ffffff`. Never substitute with `#F9A825`. Soft wash achieves 12.2:1 AAA. |
+| **`error`** (Crimson Red, `#C4161C`) | `bg-error text-on-error` (Solid crimson fill, white text) | `border-error bg-surface text-error` (1px crimson border, white fill, crimson text) | `bg-error-container text-on-error-container` (Soft crimson fill, charcoal text `#1a1c1e`) | Solid/outline text achieves 6.8:1 AA on `#ffffff`. Soft wash achieves 11.9:1 AAA. |
+| **`neutral`** (Charcoal / Slate) | `bg-neutral text-on-neutral` (Solid charcoal `#1a1c1e` fill, white text) | `border-outline bg-surface text-on-surface` (1px slate border `#737688`, white fill, charcoal text) | `bg-neutral-container text-on-neutral-container` (Soft slate fill `#D1D5DF`, charcoal text `#1a1c1e`) | Solid text achieves 15.3:1 AAA. Outline border meets 3:1 non-text contrast. Soft wash achieves 12.6:1 AAA. |
 
 Tinted pastel backgrounds matching the border/text hue are never permitted for chips. Chips and badges must never use all-caps text or colored status dots for static states — see "No Static Status Dots" in `anti-patterns.md` for the full rule and the live/real-time exception.
 
@@ -646,7 +646,7 @@ Reuse the existing semantic tokens before ever introducing a chart-only color �
 - **Neutral categorical/multi-series charts** (e.g. sessions by category, non-outcome comparisons): use `primary` → `secondary` → `tertiary`, in that fixed order (`#0052FF` Electric Blue → `#00796B` Rich Emerald → `#F9A825` Sunny Amber), for up to 3 simultaneous series. This keeps the state tokens (`error`/`warning`/`success`) reserved for actual outcomes, so a legend never accidentally implies something went wrong.
   - *Non-Text Contrast Compliance (WCAG 2.2 SC 1.4.11):* Sunny Amber (`#F9A825`) on white (`#ffffff`) or canvas (`#F6F7FB`) has a contrast ratio of only 1.99:1, which is below the mandatory 3:1 graphical object threshold. When Series 3 (`tertiary`) is rendered on light backgrounds, it must either:
     1. Include a `1px` high-contrast boundary stroke (`border border-outline` `#737688` or `border-on-surface` `#1a1c1e`) for filled bars, pie slices, and area shapes,
-    2. Use a darkened amber token (`#8A5200`, 6.4:1 contrast, or `#9E5D00`, 3.6:1 contrast) for line chart strokes and point markers, or
+    2. Use a darkened amber token (`#A64B00`, 6.4:1 contrast, or `#9E5D00`, 3.6:1 contrast) for line chart strokes and point markers, or
     3. Be paired with a distinct graphic texture/pattern (e.g. diagonal hatching).
     In legend text, always render the series name in neutral charcoal (`text-on-surface`), using amber strictly for swatches with a 1px boundary stroke — never use unbordered `text-tertiary` on light backgrounds.
 - **`warning`** is reserved for its own meaning (e.g. a threshold or caution annotation line) — not a generic 4th series color.
@@ -659,14 +659,14 @@ Built on Base UI's `Avatar` primitive (see `component-library.md`). Avatars are 
 - **Interactive Avatar Touch Targets (WCAG 2.2 SC 2.5.8):** When an Avatar acts as an interactive trigger (e.g. account profile menu in the navigation bar or user selection toggle), the visual avatar (32px or 40px) must never be used as a naked interactive element. Wrap it in a `2.75rem × 2.75rem` (44×44px) minimum hit area (e.g. `<AvatarButton />` or `min-h-[2.75rem] min-w-[2.75rem] inline-flex items-center justify-center p-1 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`).
 
 ### Progress & Loading States
-Built on Base UI's `Progress` primitive (see `component-library.md`) for determinate bars/rings; skeleton pulses are plain elements, not a Base UI primitive. Use the `primary` color for determinate progress bars/rings on a `surface-variant` (`#E1E6F0`) track. For loading skeletons, use a subtle `surface-variant`-toned pulse — never a generic grey unrelated to the palette. Every component that can load asynchronously must define its loading and empty states, not just its populated state (see "Design for the Zero-State" in `anti-patterns.md`).
+Built on Base UI's `Progress` primitive (see `component-library.md`) for determinate bars/rings; skeleton pulses are plain elements, not a Base UI primitive. Use the `primary` color for determinate progress bars/rings on a `surface-variant` (`#DDE1EB`) track. For loading skeletons, use a subtle `surface-variant`-toned pulse — never a generic grey unrelated to the palette. Every component that can load asynchronously must define its loading and empty states, not just its populated state (see "Design for the Zero-State" in `anti-patterns.md`).
 
 - **Functional Element Guidance & Non-Text Contrast (WCAG 2.2 SC 1.4.11 / SC 1.3.1):**
-  - **Progress Bars:** Because passive ambient fills (`surface-variant` `#E1E6F0` and `surface-container` `#EEF1F8`) have low contrast against each other (~1.13:1), determinate progress indicators must **never rely on track fill alone** to communicate progress or state. Determinate progress bars and rings must always pair the visual indicator with:
+  - **Progress Bars:** Because passive ambient fills (`surface-variant` `#DDE1EB` and `surface-container` `#EBF0F8`) have low contrast against each other (~1.13:1), determinate progress indicators must **never rely on track fill alone** to communicate progress or state. Determinate progress bars and rings must always pair the visual indicator with:
     1. An accessible, high-contrast visible text readout (rendered in `text-on-surface` or `text-on-surface-variant`, e.g. "Step 3 of 10" or "45% completed"), and
     2. Explicit programmatic state exposure via `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, and `aria-valuemax`.
   - **Loading Skeletons:** Skeletons serve as temporary spatial placeholders, relying on dynamic motion (shimmer/pulse sweep) rather than static 3:1 boundary contrast. Active loading containers must announce state changes using `aria-busy="true"` or an adjacent polite live region (`aria-live="polite"`).
-  - **Interactive Form Boundaries:** Form fields (inputs, selects, textareas) and selection controls must strictly maintain a real 1px `outline` border (`#737688`, 3:1+ contrast against adjacent surfaces per SC 1.4.11) and must never rely on passive fills (`surface-variant`, `surface-container`) or `outline-variant` (`#C8D0E0`) to define their boundaries.
+  - **Interactive Form Boundaries:** Form fields (inputs, selects, textareas) and selection controls must strictly maintain a real 1px `outline` border (`#737688`, 3:1+ contrast against adjacent surfaces per SC 1.4.11) and must never rely on passive fills (`surface-variant`, `surface-container`) or `outline-variant` (`#BEC6D6`) to define their boundaries.
 
 ### AI Activity Indicators (Thinking Orbs)
 Built on `thinking-orbs` via the `<ThinkingOrb />` design system wrapper (`src/components/ui/thinking-orb.tsx`). Used to show active AI work (searching guides, summarizing notes, generating exercises) rather than displaying a plain spinner.

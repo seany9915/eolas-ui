@@ -6,7 +6,7 @@ import { Icon } from '@/components/ui/icon';
 export const ColorTokensExplorer: React.FC = () => {
   const tokenGroups = [
     {
-      category: '1. Three-Level Containment Model (Layout & Nesting)',
+      category: '1. Three-Level Containment Model (Layout & Surfaces)',
       description: 'Every screen uses exactly three containment levels. Pick the lowest level that solves the grouping.',
       tokens: [
         {
@@ -18,29 +18,56 @@ export const ColorTokensExplorer: React.FC = () => {
         },
         {
           name: 'surface-container (Grouped Fill L2)',
-          hex: ['#', 'EEF1F8'].join(''),
-          textHex: ['#', '1a1c1e'].join(''),
+          hex: '#EBF0F8',
+          textHex: '#1a1c1e',
           bgClass: 'bg-surface-container text-on-surface border border-outline-variant',
           usage: 'Flat, borderless grouping of input clusters or section backgrounds without implying a distinct interactive object.',
         },
         {
           name: 'surface (Surface / Card L3)',
-          hex: ['#', 'ffffff'].join(''),
-          textHex: ['#', '1a1c1e'].join(''),
+          hex: '#ffffff',
+          textHex: '#1a1c1e',
           bgClass: 'bg-surface text-on-surface border border-outline-variant shadow-xs',
           usage: 'High-focus encapsulation for distinct, interactive entities (modals, dialogs, primary cards).',
         },
         {
           name: 'surface-variant (Component Internal Fill)',
-          hex: ['#', 'E1E6F0'].join(''),
-          textHex: ['#', '434656'].join(''),
+          hex: '#DDE1EB',
+          textHex: '#434656',
           bgClass: 'bg-surface-variant text-on-surface-variant border border-outline-variant',
           usage: 'Decorative fill for atomic components: chips, progress tracks, avatar fallbacks, selected menu rows.',
         },
       ],
     },
     {
-      category: '2. Brand & Accent Roles',
+      category: '2. Typographic Inks & Text Colors',
+      description: 'Standardized text inks calibrated for AA/AAA contrast without harsh pure-black glare.',
+      tokens: [
+        {
+          name: 'on-surface (Primary Charcoal Ink)',
+          hex: '#1a1c1e',
+          textHex: '#ffffff',
+          bgClass: 'bg-on-surface text-surface font-semibold',
+          usage: 'Primary body copy, headlines, and data values. Formulated to eliminate eye strain while hitting 17.1:1 AAA on white.',
+        },
+        {
+          name: 'on-surface-variant (Secondary Text Ink)',
+          hex: '#434656',
+          textHex: '#ffffff',
+          bgClass: 'bg-on-surface-variant text-surface font-semibold',
+          usage: 'Secondary descriptions, timestamps, table column headers, and form helper text (9.3:1 AAA contrast on white).',
+        },
+        {
+          name: 'on-primary / Reverse White Ink',
+          hex: '#ffffff',
+          textHex: '#1a1c1e',
+          bgClass: 'bg-primary text-on-primary font-semibold',
+          usage: 'High-contrast white text for solid CTA buttons, destructive badges, and dark spotlight cards (17.1:1 AAA on charcoal, 5.75:1 AA on primary).',
+        },
+      ],
+    },
+    {
+      category: '3. Brand & Accent Roles',
       description: 'Color balance directive: do not default to grey or primary alone — secondary and tertiary must have visible uses.',
       tokens: [
         {
@@ -66,7 +93,7 @@ export const ColorTokensExplorer: React.FC = () => {
         },
         {
           name: 'secondary-container & on-secondary-container',
-          hex: '#e0f2f1 / #1a1c1e',
+          hex: '#D5F0EE / #1a1c1e',
           textHex: '#1a1c1e',
           bgClass: 'bg-secondary-container text-on-secondary-container font-semibold',
           usage: 'Soft-fill backdrop for therapy guides, hints, and informational support boxes. Text MUST be neutral charcoal (#1a1c1e).',
@@ -88,12 +115,12 @@ export const ColorTokensExplorer: React.FC = () => {
       ],
     },
     {
-      category: '3. System State Roles (Error / Warning / Success)',
-      description: 'Domain & app state feedback. Never substitute state colors with brand colors.',
+      category: '4. System State & Operational Roles (Error / Warning / Success / Neutral)',
+      description: 'Domain state and operational feedback. Never substitute state colors with brand colors.',
       tokens: [
         {
           name: 'error (Red)',
-          hex: '#ba1a1a',
+          hex: '#C4161C',
           textHex: '#ffffff',
           bgClass: 'bg-error text-on-error',
           usage: 'Validation errors, destructive confirmations, wrong exercise response indicators.',
@@ -107,21 +134,21 @@ export const ColorTokensExplorer: React.FC = () => {
         },
         {
           name: 'warning (Burnt Orange)',
-          hex: '#8a5200',
+          hex: '#A64B00',
           textHex: '#ffffff',
           bgClass: 'bg-warning text-on-warning',
           usage: 'Non-blocking caution states (session expiry, unsaved changes). Distinct from Sunny Amber.',
         },
         {
           name: 'warning-container & on-warning-container',
-          hex: '#ffe0b3 / #1a1c1e',
+          hex: '#FDE3B8 / #1a1c1e',
           textHex: '#1a1c1e',
           bgClass: 'bg-warning-container text-on-warning-container font-semibold',
           usage: 'Caution backdrops. Text MUST be neutral charcoal (#1a1c1e).',
         },
         {
           name: 'success (Deep Green)',
-          hex: '#146c2e',
+          hex: '#157331',
           textHex: '#ffffff',
           bgClass: 'bg-success text-on-success',
           usage: 'Completed actions, saved confirmations, correct exercise response indicators.',
@@ -133,10 +160,24 @@ export const ColorTokensExplorer: React.FC = () => {
           bgClass: 'bg-success-container text-on-success-container font-semibold',
           usage: 'Confirmation backdrops and correct-answer feedback containers. Text MUST be neutral charcoal (#1a1c1e).',
         },
+        {
+          name: 'neutral (Operational Charcoal)',
+          hex: '#1a1c1e',
+          textHex: '#ffffff',
+          bgClass: 'bg-neutral text-on-neutral',
+          usage: 'Operational and ambient system status indicators (offline, sync pending, read-only session).',
+        },
+        {
+          name: 'neutral-container & on-neutral-container',
+          hex: '#D1D5DF / #1a1c1e',
+          textHex: '#1a1c1e',
+          bgClass: 'bg-neutral-container text-on-neutral-container font-semibold',
+          usage: 'Soft-fill backdrop for operational status tags, info badges, and system feedback. Text MUST be neutral charcoal (#1a1c1e).',
+        },
       ],
     },
     {
-      category: '4. Structural Outlines & Boundaries',
+      category: '5. Structural Outlines & Boundaries',
       description: 'Precise linear separation without heavy skeuomorphic shadows.',
       tokens: [
         {
@@ -148,10 +189,10 @@ export const ColorTokensExplorer: React.FC = () => {
         },
         {
           name: 'Outline-Variant (Subtle Card & Divider Borders)',
-          hex: ['#', 'C8D0E0'].join(''),
-          textHex: ['#', '1a1c1e'].join(''),
-          bgClass: 'bg-outline-variant text-on-surface',
-          usage: '1px structural outlines for Popovers, Menus, and list dividers.',
+          hex: '#BEC6D6',
+          textHex: '#1a1c1e',
+          bgClass: 'border-2 border-outline-variant bg-surface text-on-surface font-semibold',
+          usage: 'Subtle 1px structural outlines for Popovers, Menus, and list dividers (shown here as an outline on surface).',
         },
       ],
     },

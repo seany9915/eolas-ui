@@ -355,7 +355,7 @@ export const IconStylingShowcase: React.FC = () => {
           </InlineAlert>
 
           <InlineAlert title="Critical Notice" role="error" icon="error">
-            Leading icon colored in Destructive Red (<code className="font-mono">#ba1a1a</code>).
+            Leading icon colored in Destructive Red (<code className="font-mono">#C4161C</code>).
           </InlineAlert>
         </div>
       </section>
