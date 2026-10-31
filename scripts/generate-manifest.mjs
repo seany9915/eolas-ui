@@ -12,7 +12,7 @@ const catMap = {
 
   // Overlays
   'dialog': 'overlays', 'alert-dialog': 'overlays', 'drawer': 'overlays', 'popover': 'overlays', 'menu': 'overlays',
-  'menubar': 'overlays', 'context-menu': 'overlays', 'tooltip': 'overlays', 'preview-card': 'overlays', 'confirmation': 'overlays',
+  'menubar': 'overlays', 'context-menu': 'overlays', 'tooltip': 'overlays', 'preview-card': 'overlays',
 
   // Feedback
   'inline-alert': 'feedback', 'toast': 'feedback', 'chip': 'feedback', 'notification-badge': 'feedback',
@@ -35,7 +35,7 @@ const catMap = {
   'clinician-tip': 'clinical-ai', 'chat-message': 'clinical-ai', 'chat-message-context': 'clinical-ai',
   'prompt-input': 'clinical-ai', 'message-scroller': 'clinical-ai', 'code-block': 'clinical-ai', 'sources': 'clinical-ai',
   'inline-citation': 'clinical-ai', 'suggestion-chips': 'clinical-ai', 'model-selector': 'clinical-ai', 'tool': 'clinical-ai',
-  'checkpoint': 'clinical-ai',
+  'checkpoint': 'clinical-ai', 'confirmation': 'clinical-ai', 'reasoning': 'clinical-ai', 'trace': 'clinical-ai', 'bot-avatar': 'clinical-ai', 'thinking-orb': 'clinical-ai',
 
   // Blocks
   'approval-card': 'blocks', 'chat': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'metric-card': 'blocks',
@@ -47,14 +47,15 @@ const catMap = {
   'view-transition': 'motion',
 
   // System
-  'direction-provider': 'system', 'csp-provider': 'system'
+  'direction-provider': 'system', 'csp-provider': 'system', 'utils': 'system'
 };
 
-const items = r.items.filter(i => i.type === 'registry:ui' || i.type === 'registry:block');
+const items = r.items.filter(i => i.type === 'registry:ui' || i.type === 'registry:block' || (i.type === 'registry:lib' && i.name === 'utils'));
 
 const registryEntries = items.map(item => {
   const isBlock = item.type === 'registry:block';
-  const filePath = isBlock ? `src/components/blocks/${item.name}.tsx` : `src/components/ui/${item.name}.tsx`;
+  const isLib = item.type === 'registry:lib';
+  const filePath = isBlock ? `src/components/blocks/${item.name}.tsx` : isLib ? `src/lib/${item.name}.ts` : `src/components/ui/${item.name}.tsx`;
   let fileContent = '';
   try {
     fileContent = fs.readFileSync(filePath, 'utf8');
@@ -63,22 +64,26 @@ const registryEntries = items.map(item => {
   }
 
   const baseUIMatch = fileContent.match(/@base-ui\/react\/([a-z0-9-]+)/);
-  const basePrimitive = baseUIMatch ? `@base-ui/react/${baseUIMatch[1]}` : (isBlock ? 'Composite Block' : 'DESIGN.md Token Primitive');
+  const basePrimitive = isLib ? 'Base UI Headless Library' : baseUIMatch ? `@base-ui/react/${baseUIMatch[1]}` : (isBlock ? 'Composite Block' : 'DESIGN.md Token Primitive');
 
-  const isDeprecated = item.name === 'selection-controls' || item.name === 'toggles';
+  const isDeprecated = item.name === 'selection-controls' || item.name === 'toggles' || item.name === 'steppers';
   const deprecatedNote = item.name === 'selection-controls'
     ? 'Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/checkbox, radio, switch.'
     : item.name === 'toggles'
     ? 'Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/toggle, toggle-group.'
+    : item.name === 'steppers'
+    ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.'
     : undefined;
   const replacedBy = item.name === 'selection-controls'
     ? 'checkbox, radio, switch'
     : item.name === 'toggles'
     ? 'toggle, toggle-group'
+    : item.name === 'steppers'
+    ? 'number-field'
     : undefined;
 
   const category = catMap[item.name] || 'layout';
-  const tier = isBlock ? 'block' : (isDeprecated ? 'utility' : 'primitive');
+  const tier = isBlock ? 'block' : (isDeprecated || isLib ? 'utility' : 'primitive');
 
   const title = item.title || item.name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
   const description = item.description || `Eolas UI ${title} component.`;

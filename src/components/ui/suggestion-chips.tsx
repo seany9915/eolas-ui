@@ -83,6 +83,7 @@ export interface SuggestionChipProps {
   onSelect?: (prompt: string) => void;
   onClick?: (prompt: string) => void;
   variant?: 'compact' | 'card' | 'ghost';
+  showArrow?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
@@ -92,6 +93,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
   onSelect,
   onClick,
   variant = 'compact',
+  showArrow = false,
   className,
   children,
 }) => {
@@ -154,8 +156,9 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
       <Button
         variant="unstyled"
         onClick={handleClick}
+        expandedTouchTarget
         className={cn(
-          'group inline-flex items-center gap-2 px-2.5 py-1.5 min-h-[44px] rounded-md',
+          'group inline-flex items-center gap-2 px-3 py-1 h-8 rounded-full',
           'bg-transparent border-0 hover:bg-surface-container/60 text-left',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
@@ -171,15 +174,17 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
             aria-hidden="true"
           />
         )}
-        <span className="text-sm font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
+        <span className="text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
           {children || itemLabel}
         </span>
-        <Icon
-          name="arrow_forward"
-          size="xs"
-          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
-          aria-hidden="true"
-        />
+        {showArrow && (
+          <Icon
+            name="arrow_forward"
+            size="xs"
+            className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
+            aria-hidden="true"
+          />
+        )}
       </Button>
     );
   }
@@ -188,8 +193,9 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
     <Button
       variant="unstyled"
       onClick={handleClick}
+      expandedTouchTarget
       className={cn(
-        'group inline-flex items-center gap-2 px-3 py-1.5 min-h-[44px] rounded-md',
+        'group inline-flex items-center gap-2 px-3.5 py-1 h-8 rounded-full',
         'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-left',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
@@ -205,15 +211,17 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
           aria-hidden="true"
         />
       )}
-      <span className="text-sm font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
+      <span className="text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
         {children || itemLabel}
       </span>
-      <Icon
-        name="arrow_forward"
-        size="xs"
-        className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
-        aria-hidden="true"
-      />
+      {showArrow && (
+        <Icon
+          name="arrow_forward"
+          size="xs"
+          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
+          aria-hidden="true"
+        />
+      )}
     </Button>
   );
 };

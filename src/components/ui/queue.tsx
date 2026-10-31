@@ -36,6 +36,7 @@ import {
   TraceActions,
   type TraceStatus,
 } from '@/components/ui/trace';
+import { Icon } from './icon';
 import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
@@ -108,6 +109,8 @@ export interface QueueItemComponentProps extends React.HTMLAttributes<HTMLDivEle
 
 export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComponentProps>(
   ({ title, description, status = 'pending', duration, icon, className, ...props }, ref) => {
+    const isCompleted = status === 'complete';
+    const isRunning = status === 'running';
     const formattedDuration =
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
@@ -115,12 +118,44 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
       <TraceLine
         ref={ref}
         status={status}
-        className={cn(description ? 'items-start py-2' : 'items-center', className)}
+        className={cn(
+          'bg-surface hover:bg-surface-container/20 transition-colors',
+          description ? 'items-start py-2.5' : 'items-center py-2.5',
+          className
+        )}
         {...props}
       >
-        <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
+        <span
+          className={cn(
+            'flex size-5 shrink-0 items-center justify-center text-xs select-none',
+            isRunning && 'text-primary animate-spin',
+            isCompleted && 'text-success',
+            status === 'pending' && 'text-outline/70',
+            description && 'mt-0.5'
+          )}
+          aria-hidden="true"
+        >
+          {icon ? (
+            <Icon name={icon} size="xs" />
+          ) : isRunning ? (
+            <Icon name="progress_activity" size="xs" />
+          ) : isCompleted ? (
+            <Icon name="check_circle" size="xs" />
+          ) : (
+            <Icon name="radio_button_unchecked" size="xs" />
+          )}
+        </span>
         <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
-          <TraceTitle className="truncate">{title}</TraceTitle>
+          <span
+            className={cn(
+              'font-sans text-xs truncate',
+              isCompleted
+                ? 'text-on-surface-variant line-through decoration-outline-variant/60'
+                : 'text-on-surface font-medium'
+            )}
+          >
+            {title}
+          </span>
           {description && (
             <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
               {description}
@@ -171,7 +206,8 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
     },
     ref
   ) => {
-    const defaultIcon = status === 'complete' ? 'task_alt' : 'pending_actions';
+    const isCompleted = status === 'complete';
+    const defaultIcon = isCompleted ? 'task_alt' : 'pending_actions';
 
     return (
       <div ref={ref} className={className} {...props}>
@@ -180,20 +216,32 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
           open={open}
           onOpenChange={onOpenChange}
         >
-          <TraceCollapsibleTrigger>
-            <TraceLine status={status}>
-              <TraceIcon name={icon ?? defaultIcon} status={status} />
-              <TraceTitle>{title}</TraceTitle>
+          <TraceCollapsibleTrigger className="bg-surface-container/30 hover:bg-surface-container/50 py-2 min-h-[40px]">
+            <div className="flex items-center gap-2.5 w-full">
+              <span
+                className={cn(
+                  'flex size-5 shrink-0 items-center justify-center text-xs select-none',
+                  isCompleted ? 'text-success' : 'text-on-surface-variant'
+                )}
+                aria-hidden="true"
+              >
+                <Icon name={icon ?? defaultIcon} size="xs" />
+              </span>
+              <span className="font-sans text-xs font-semibold text-on-surface">
+                {title}
+              </span>
               {countLabel && (
                 <TraceDescription>
-                  <span className="font-mono tabular-nums">{countLabel}</span>
+                  <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
+                    {countLabel}
+                  </span>
                 </TraceDescription>
               )}
-            </TraceLine>
+            </div>
           </TraceCollapsibleTrigger>
 
-          <TraceCollapsibleContent>
-            <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
+          <TraceCollapsibleContent variant="flush">
+            <div className="divide-y divide-outline-variant/30">{children}</div>
           </TraceCollapsibleContent>
         </TraceCollapsible>
       </div>

@@ -107,7 +107,7 @@ function TooltipComponent<Payload = unknown>({
     >
       <BaseTooltip.Popup
         className={cn(
-          'px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
+          'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
           'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
           'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
           'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',
@@ -156,14 +156,14 @@ export const TooltipArrow = React.forwardRef<HTMLDivElement, TooltipArrowProps>(
     <BaseTooltip.Arrow
       ref={ref}
       className={cn(
-        'data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px]',
+        'text-on-surface z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px]',
         'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
         className
       )}
       {...props}
     >
       {children ?? (
-        <svg width="10" height="5" viewBox="0 0 10 5" className="fill-on-surface block" aria-hidden="true">
+        <svg width="10" height="5" viewBox="0 0 10 5" className="fill-current block" aria-hidden="true">
           <path d="M0 5 L5 0 L10 5 Z" />
         </svg>
       )}
@@ -225,7 +225,7 @@ export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentPro
         <BaseTooltip.Popup
           ref={ref}
           className={cn(
-            'px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
+            'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
             'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',

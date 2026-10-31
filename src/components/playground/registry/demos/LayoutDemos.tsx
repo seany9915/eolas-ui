@@ -249,16 +249,76 @@ export const DeferredViewDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
+  const scrollerRef = React.useRef<HTMLDivElement>(null);
+
+  const handleRevealLeading = () => {
+    scrollerRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+  };
+
+  const handleRevealTrailing = () => {
+    if (scrollerRef.current) {
+      scrollerRef.current.scrollTo({ left: scrollerRef.current.scrollWidth, behavior: 'smooth' });
+    }
+  };
+
+  const handleReset = () => {
+    if (scrollerRef.current) {
+      // Snap back to content pane
+      scrollerRef.current.scrollTo({ left: 88, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto py-4">
+    <div className="w-full max-w-md mx-auto py-4 space-y-3">
+      <div className="flex items-center justify-between text-xs text-on-surface-variant">
+        <span className="font-heading font-bold text-on-surface">Patient Caseload Quick Action</span>
+        <span className="font-mono text-[11px]">Swipe or tap actions</span>
+      </div>
+
       <SwipeReveal
-        leadingActions={<Button colorRole="error" size="sm">Dismiss</Button>}
-        actions={<Button colorRole="success" size="sm">Acknowledge</Button>}
+        ref={scrollerRef}
+        leadingActions={
+          <SwipeReveal.Action variant="error" className="flex flex-col items-center justify-center gap-1 w-20">
+            <Icon name="archive" size="sm" />
+            <span>Archive</span>
+          </SwipeReveal.Action>
+        }
+        actions={
+          <SwipeReveal.Action variant="primary" className="flex flex-col items-center justify-center gap-1 w-20">
+            <Icon name="check_circle" size="sm" />
+            <span>Triage</span>
+          </SwipeReveal.Action>
+        }
       >
-        <div className="p-4 rounded-xl bg-surface border border-outline-variant text-xs font-sans">
-          Swipe left or right on mobile devices to trigger clinical triage gestures.
+        <div className="p-4 bg-surface text-on-surface flex items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="font-heading text-sm font-bold text-on-surface">Eleanor Vance</span>
+              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-bold">
+                STAT
+              </span>
+            </div>
+            <p className="font-sans text-xs text-on-surface-variant">
+              Bay 03 · Bed 01 · Acute SpO2 Desaturation (88%)
+            </p>
+          </div>
+          <span className="font-label text-[11px] text-on-surface-variant shrink-0 flex items-center gap-1 bg-surface-container/40 px-2 py-1 rounded">
+            <Icon name="swipe" size="xs" /> Swipe
+          </span>
         </div>
       </SwipeReveal>
+
+      <div className="flex items-center justify-center gap-2 pt-1">
+        <Button size="sm" variant="outlined" onClick={handleRevealLeading}>
+          Peek Archive (Right)
+        </Button>
+        <Button size="sm" variant="outlined" onClick={handleRevealTrailing}>
+          Peek Triage (Left)
+        </Button>
+        <Button size="sm" variant="tonal" onClick={handleReset}>
+          Reset
+        </Button>
+      </div>
     </div>
   );
 };
@@ -266,9 +326,9 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
 export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4 text-xs font-sans text-on-surface leading-relaxed">
-      <p>
+      <div className="leading-relaxed">
         Patient was administered <TextHighlight query="Paracetamol">Paracetamol 1000mg</TextHighlight> intravenously following high-grade pyrexia.
-      </p>
+      </div>
     </div>
   );
 };

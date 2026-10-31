@@ -87,27 +87,21 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
       }
     }, []);
 
-    // Fallback scroll tracker for Safari/Firefox or when custom targetRef is provided
+    // Scroll tracker: updates React progress state for fallback bar animation, custom container tracking, and numeric percentage pill
     React.useEffect(() => {
-      const isWindowTarget = !targetRef?.current;
-      // If native root CSS scroll-driven animation is supported and we're tracking window, CSS handles it
-      if (supportsCssScrollTimeline && isWindowTarget) {
-        return;
-      }
-
       let rafId = 0;
 
       const updateProgress = () => {
-        if (isWindowTarget) {
+        const customEl = targetRef?.current;
+        if (customEl) {
+          const totalHeight = customEl.scrollHeight - customEl.clientHeight;
+          const currentScroll = Math.max(0, customEl.scrollTop);
+          const pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
+          setProgress(Math.round(pct));
+        } else {
           const scrollElement = document.scrollingElement || document.documentElement;
           const totalHeight = scrollElement.scrollHeight - window.innerHeight;
           const currentScroll = Math.max(0, window.scrollY || scrollElement.scrollTop);
-          const pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
-          setProgress(Math.round(pct));
-        } else if (targetRef?.current) {
-          const el = targetRef.current;
-          const totalHeight = el.scrollHeight - el.clientHeight;
-          const currentScroll = Math.max(0, el.scrollTop);
           const pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
           setProgress(Math.round(pct));
         }
@@ -118,23 +112,21 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         rafId = requestAnimationFrame(updateProgress);
       };
 
-      const target = isWindowTarget ? window : targetRef?.current;
-      if (target) {
-        target.addEventListener('scroll', handleScroll, { passive: true });
-        updateProgress();
-      }
+      updateProgress();
+
+      const customEl = targetRef?.current;
+      const target: EventTarget = customEl || window;
+      target.addEventListener('scroll', handleScroll, { passive: true });
 
       return () => {
         cancelAnimationFrame(rafId);
-        if (target) {
-          target.removeEventListener('scroll', handleScroll);
-        }
+        target.removeEventListener('scroll', handleScroll);
       };
-    }, [targetRef, supportsCssScrollTimeline]);
+    }, [targetRef, supportsCssScrollTimeline, showPercentage]);
 
     const colors = colorStyles[colorRole] || colorStyles.primary;
     const isWindowScroll = !targetRef?.current;
-    const useCssDriven = supportsCssScrollTimeline && isWindowScroll;
+    const useCssDriven = supportsCssScrollTimeline && isWindowScroll && !showPercentage;
 
     return (
       <BaseProgress.Root

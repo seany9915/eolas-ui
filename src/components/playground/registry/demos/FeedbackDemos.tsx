@@ -232,13 +232,61 @@ export const SkeletonDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ReadingProgressDemo: React.FC<ComponentDemoProps> = () => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <div className="space-y-4 w-full max-w-md mx-auto py-4">
-      <div className="space-y-1">
-        <h4 className="font-heading text-xs font-bold text-on-surface">Reading Progress Indicator</h4>
-        <p className="font-sans text-xs text-on-surface-variant">Progress bar synchronized with document or protocol scroll depth.</p>
+    <div className="space-y-3 w-full max-w-md mx-auto py-4">
+      <div className="flex items-center justify-between">
+        <h4 className="font-heading text-xs font-bold text-on-surface">Protocol Reading Progress</h4>
+        <span className="font-mono text-[11px] text-on-surface-variant">Scroll container to inspect</span>
       </div>
-      <ReadingProgress position="relative" colorRole="primary" showPercentage />
+
+      <div className="rounded-xl border border-outline-variant overflow-hidden bg-surface shadow-ambient relative">
+        {mounted && (
+          <ReadingProgress
+            targetRef={containerRef}
+            position="sticky"
+            colorRole="primary"
+            showPercentage
+          />
+        )}
+        <div
+          ref={containerRef}
+          tabIndex={0}
+          aria-label="Clinical Protocol Document"
+          className="h-48 overflow-y-auto p-4 space-y-3 font-sans text-xs text-on-surface-variant leading-relaxed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <p className="font-semibold text-on-surface">
+            Section 1: Initial Paediatric Trauma Protocol
+          </p>
+          <p>
+            Upon initial triage presentation, assess airway patency, cervical spine stabilization, and bilateral respiratory excursions. Record baseline SpO2 and non-invasive blood pressure immediately.
+          </p>
+          <p className="font-semibold text-on-surface">
+            Section 2: Secondary Resuscitation &amp; Cannulation
+          </p>
+          <p>
+            Establish wide-bore peripheral intravenous access or humeral intraosseous access if peripheral attempts exceed 90 seconds. Draw STAT type-and-screen, venous blood gas, and lactate telemetry.
+          </p>
+          <p className="font-semibold text-on-surface">
+            Section 3: Neurological &amp; Pain Re-assessment
+          </p>
+          <p>
+            Document Glasgow Coma Scale (GCS) and pupil reactivity. Titrate weight-adjusted analgesia in accordance with local paediatric intensive care guidance. Maintain thermal neutrality.
+          </p>
+          <p className="font-semibold text-on-surface">
+            Section 4: Handover &amp; Disposition
+          </p>
+          <p>
+            Synthesize handover using SBAR (Situation, Background, Assessment, Recommendation) framework before transferring to the paediatric intensive care unit.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

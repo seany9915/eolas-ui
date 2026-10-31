@@ -4,14 +4,17 @@
  * Base UI Integration: Consumes Base UI Button primitive and Icon primitive.
  *
  * TAXONOMY & USAGE:
- * - Use Confirmation to present a human-in-the-loop consent or approval gate before
- *   an agentic tool executes a sensitive clinical or system action (e.g. updating a patient
- *   record, finalizing an assessment, or running an external write operation).
+ * - Dual-purpose component:
+ *   1. AI Tool Approval Gate: Conforms to shadcn AI Elements confirmation lifecycle
+ *      (approval-requested -> approved / denied) for Human-in-the-Loop tool execution.
+ *   2. Clinical Decision Gate: Structured inline consent, prescription verification, order
+ *      sign-off, or risk acknowledgment card in clinical workflows and dashboards.
  * - Conforms to shadcn AI Elements Confirmation specification and DESIGN.md:
  *   - High-contrast visual structure with calm clinical amber/neutral tokens.
  *   - Clear distinction between pending, approved, and denied states.
  *   - WCAG 2.2 compliant 44x44px touch targets on decision buttons.
  *   - Floating 2px focus rings (`outline-offset: 2px`).
+ *   - Concentric radius hierarchy (`rounded-xl` container with `rounded` buttons).
  */
 import * as React from 'react';
 import { Button } from './button';
@@ -53,8 +56,8 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
           (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
             ? 'rounded-none border-none bg-transparent p-0'
             : cn(
-                'rounded-lg border p-4',
-                !isApproved && !isDenied && 'bg-surface border-outline-variant',
+                'rounded-xl border p-4 shadow-xs',
+                !isApproved && !isDenied && 'bg-surface border-outline-variant/80',
                 isApproved && 'bg-surface-container/30 border-outline-variant/80',
                 isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80'
               ),
@@ -71,12 +74,14 @@ ConfirmationRoot.displayName = 'Confirmation.Root';
 
 export interface ConfirmationMediaProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: ConfirmationStatus;
+  variant?: 'badge' | 'ghost';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ConfirmationMedia: React.FC<ConfirmationMediaProps> = ({
   status = 'pending',
+  variant = 'badge',
   children,
   className,
   ...props
@@ -88,10 +93,20 @@ const ConfirmationMedia: React.FC<ConfirmationMediaProps> = ({
     <div
       data-slot="confirmation-media"
       className={cn(
-        'size-7 rounded-md flex items-center justify-center shrink-0 select-none mt-0.5',
-        isApproved && 'bg-success text-on-success',
-        isDenied && 'bg-surface-container text-on-surface-variant',
-        !isApproved && !isDenied && 'bg-warning-container text-on-warning-container',
+        'shrink-0 flex items-center justify-center select-none mt-0.5 transition-colors',
+        variant === 'badge'
+          ? cn(
+              'size-7 rounded-md text-xs',
+              isApproved && 'bg-success text-on-success font-bold',
+              isDenied && 'bg-surface-container text-on-surface-variant',
+              !isApproved && !isDenied && 'bg-warning-container text-on-warning-container'
+            )
+          : cn(
+              'size-5 text-xs',
+              isApproved && 'text-success',
+              isDenied && 'text-on-surface-variant',
+              !isApproved && !isDenied && 'text-warning'
+            ),
         className
       )}
       aria-hidden="true"
@@ -101,7 +116,7 @@ const ConfirmationMedia: React.FC<ConfirmationMediaProps> = ({
         <Icon
           name={
             isApproved
-              ? 'check'
+              ? 'check_circle'
               : isDenied
               ? 'block'
               : 'shield'

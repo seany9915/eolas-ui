@@ -215,6 +215,16 @@ select {
   font-size: max(16px, 1rem);
 }
 
+/* Suppress native search clear button in WebKit/Blink to prevent double clear 'X' alongside custom clearable action */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 /* Prevent text selection highlight during rapid control activation (Good CSS #01) */
 button,
 [role="button"] {

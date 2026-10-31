@@ -144,6 +144,13 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
     const hasLeading = Boolean(leadingActions);
     const hasTrailing = Boolean(actions);
 
+    // Initial mount: ensure content pane is snapped into view when leading actions exist
+    React.useEffect(() => {
+      if (contentRef.current && hasLeading) {
+        contentRef.current.scrollIntoView({ inline: 'start', block: 'nearest' });
+      }
+    }, [hasLeading]);
+
     const gridColumns = hasLeading && hasTrailing
       ? 'grid-cols-[max-content_100%_max-content]'
       : hasLeading
@@ -158,7 +165,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
           else if (ref) ref.current = node;
         }}
         className={cn(
-          'grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-webkit-overflow-scrolling:touch]',
+          'grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-webkit-overflow-scrolling:touch] scroll-smooth',
           // overscroll-behavior: chain prevents local rubber-band bounce while allowing parent scroll chaining
           '[overscroll-behavior:auto] [overscroll-behavior:chain]',
           gridColumns,

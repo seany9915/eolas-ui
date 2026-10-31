@@ -84,7 +84,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
           <TraceCollapsibleTrigger>
             {itemLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
+          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof children === 'string' ? (
               <p>
                 {children}
@@ -181,8 +181,8 @@ export interface TaskContentProps extends React.HTMLAttributes<HTMLDivElement> {
 export const TaskContent = React.forwardRef<HTMLDivElement, TaskContentProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <TraceCollapsibleContent ref={ref} className={className} {...props}>
-        <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
+      <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
+        <div className="divide-y divide-outline-variant/30">{children}</div>
       </TraceCollapsibleContent>
     );
   }

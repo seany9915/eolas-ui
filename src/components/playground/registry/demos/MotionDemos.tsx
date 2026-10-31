@@ -9,6 +9,7 @@ import { SuccessCheck } from '@/components/ui/success-check';
 import { ErrorShake } from '@/components/ui/error-shake';
 import { ViewTransition } from '@/components/ui/view-transition';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
 
@@ -75,13 +76,32 @@ export const TextSwapDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
+  const [show, setShow] = React.useState(true);
+
+  const handleReplay = () => {
+    setShow(false);
+    setTimeout(() => {
+      setShow(true);
+    }, 150);
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto py-8">
-      <TextsReveal className="space-y-1 font-heading text-base font-bold text-on-surface">
-        <TextsRevealLine>1. Airway Clearance Confirmed</TextsRevealLine>
-        <TextsRevealLine>2. Dual IV Cannulation Established</TextsRevealLine>
-        <TextsRevealLine>3. Defibrillator Telemetry Active</TextsRevealLine>
-      </TextsReveal>
+    <div className="w-full max-w-md mx-auto py-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="font-heading text-xs font-bold text-on-surface">Emergency Resuscitation Sequence</span>
+        <Button size="sm" variant="tonal" onClick={handleReplay}>
+          Replay Sequence
+        </Button>
+      </div>
+
+      <div className="p-4 rounded-xl bg-surface-container/30 border border-outline-variant/60 min-h-[140px] flex items-center">
+        <TextsReveal show={show} className="space-y-2 font-heading text-sm font-semibold text-on-surface">
+          <TextsRevealLine index={0}>1. Airway Clearance Confirmed</TextsRevealLine>
+          <TextsRevealLine index={1}>2. Dual IV Cannulation Established</TextsRevealLine>
+          <TextsRevealLine index={2}>3. Defibrillator Telemetry Active</TextsRevealLine>
+          <TextsRevealLine index={3}>4. Emergency Epinephrine 1mg Administered</TextsRevealLine>
+        </TextsReveal>
+      </div>
     </div>
   );
 };
@@ -110,17 +130,67 @@ export const SuccessCheckDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
-  const [trigger, setTrigger] = React.useState(false);
+  const [dosage, setDosage] = React.useState('750');
+  const [error, setError] = React.useState<string | null>(null);
+  const [shakeTrigger, setShakeTrigger] = React.useState<number>(0);
+
+  const handleValidate = () => {
+    const num = Number(dosage);
+    if (isNaN(num) || num > 500) {
+      setError('Prescribed dosage exceeds maximum recommended ceiling (500mg)');
+      setShakeTrigger((prev) => prev + 1);
+    } else if (num <= 0) {
+      setError('Prescribed dosage must be greater than 0mg');
+      setShakeTrigger((prev) => prev + 1);
+    } else {
+      setError(null);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-8">
-      <ErrorShake shake={trigger}>
-        <div className="p-4 rounded-xl bg-error-container text-on-error-container font-mono text-xs font-bold border border-error">
-          CRITICAL DOSAGE EXCEEDS CEILING
+    <div className="w-full max-w-md mx-auto py-6 space-y-4">
+      <div className="space-y-1">
+        <h4 className="font-heading text-xs font-bold text-on-surface">Prescription Dosage Verification</h4>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Form micro-shake wrapper adhering to transitions.dev overshoot curve with coordinated error reveals.
+        </p>
+      </div>
+
+      <ErrorShake
+        shake={shakeTrigger}
+        errorMessage={error}
+        autoRevert={false}
+      >
+        <div className="space-y-1.5">
+          <label htmlFor="dosage-input" className="font-label text-xs font-medium text-on-surface block">
+            Amoxicillin Dosage (mg)
+          </label>
+          <Input
+            id="dosage-input"
+            type="number"
+            value={dosage}
+            onChange={(e) => setDosage(e.target.value)}
+            error={Boolean(error)} aria-invalid={Boolean(error)}
+            placeholder="e.g. 250 or 500"
+          />
         </div>
       </ErrorShake>
-      <Button size="sm" colorRole="error" onClick={() => setTrigger(!trigger)}>
-        Trigger Shake Warning
-      </Button>
+
+      <div className="flex items-center gap-3">
+        <Button size="sm" onClick={handleValidate}>
+          Verify Dosage
+        </Button>
+        <Button
+          size="sm"
+          variant="outlined"
+          onClick={() => {
+            setDosage('250');
+            setError(null);
+          }}
+        >
+          Reset to Safe (250mg)
+        </Button>
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input, FormField } from '@/components/ui/input';
 import { Textarea, TextareaField } from '@/components/ui/textarea';
-import { Field, FieldLabel, FieldControl, FieldDescription } from '@/components/ui/field';
+import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@/components/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
 import { Form } from '@/components/ui/form';
 import { Select } from '@/components/ui/select';
@@ -127,9 +127,7 @@ export const FieldDemo: React.FC<ComponentDemoProps> = () => {
     <div className="space-y-4 w-full max-w-xl mx-auto">
       <Field name="ward-code">
         <FieldLabel>Ward Classification</FieldLabel>
-        <FieldControl>
           <Input placeholder="e.g. ICU-NORTH-04" />
-        </FieldControl>
         <FieldDescription>Base UI Field wrapper providing accessible labeling and aria descriptions</FieldDescription>
       </Field>
     </div>
@@ -176,15 +174,16 @@ export const SelectDemo: React.FC<ComponentDemoProps> = () => {
         <Select.Root value={val} onValueChange={(v) => v && setVal(v)}>
           <Select.Trigger className="w-full">
             <Select.Value placeholder="Select clinical ward..." />
-            <Select.Icon />
           </Select.Trigger>
           <Select.Portal>
-            <Select.Positioner>
+            <Select.Positioner sideOffset={4}>
               <Select.Popup>
-                <Select.Item value="icu">Intensive Care Unit (ICU)</Select.Item>
-                <Select.Item value="peds">Paediatrics Ward</Select.Item>
-                <Select.Item value="cardio">Cardiology Care</Select.Item>
-                <Select.Item value="er">Emergency Trauma</Select.Item>
+                <Select.List>
+                  <Select.Item value="icu">Intensive Care Unit (ICU)</Select.Item>
+                  <Select.Item value="peds">Paediatrics Ward</Select.Item>
+                  <Select.Item value="cardio">Cardiology Care</Select.Item>
+                  <Select.Item value="er">Emergency Trauma</Select.Item>
+                </Select.List>
               </Select.Popup>
             </Select.Positioner>
           </Select.Portal>
@@ -200,9 +199,13 @@ export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
     <div className="space-y-3 w-full max-w-md mx-auto">
       <label className="font-label text-xs font-bold text-on-surface block">ICD-10 Diagnostic Code Search</label>
       <Combobox.Root items={['I10 Essential Hypertension', 'E11 Type 2 Diabetes Mellitus', 'J45 Asthma', 'R05 Cough']}>
-        <Combobox.Input placeholder="Search diagnostic terminology..." className="w-full" />
+        <Combobox.InputGroup className="w-full">
+          <Combobox.Input placeholder="Search diagnostic terminology..." />
+          <Combobox.Clear />
+          <Combobox.Trigger />
+        </Combobox.InputGroup>
         <Combobox.Portal>
-          <Combobox.Positioner>
+          <Combobox.Positioner sideOffset={4}>
             <Combobox.Popup>
               <Combobox.Empty>No clinical matches found</Combobox.Empty>
               <Combobox.List>
@@ -223,8 +226,9 @@ export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
       <Autocomplete.Root items={['Amoxicillin 500mg', 'Paracetamol 1000mg', 'Ibuprofen 400mg', 'Metformin 500mg']}>
         <Autocomplete.Input placeholder="Type medication name..." className="w-full" />
         <Autocomplete.Portal>
-          <Autocomplete.Positioner>
+          <Autocomplete.Positioner sideOffset={4}>
             <Autocomplete.Popup>
+              <Autocomplete.Empty>No matching suggestions found</Autocomplete.Empty>
               <Autocomplete.List>
                 {(item: string) => <Autocomplete.Item key={item} value={item}>{item}</Autocomplete.Item>}
               </Autocomplete.List>

@@ -230,7 +230,9 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer',
+            'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+            'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+            'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
             size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
             size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
             size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
@@ -334,34 +336,50 @@ export interface SelectTriggerProps
 export const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Trigger>,
   SelectTriggerProps
->(({ className, children, error, size = 'md', showIcon = true, icon, ...props }, ref) => (
-  <BaseSelect.Trigger
-    data-slot="select-trigger"
-    ref={ref}
-    className={cn(
-      'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:bg-surface-container transition-colors cursor-pointer',
-      size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
-      size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
-      size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-      'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-      'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
-      error && 'border-error focus-visible:outline-error',
-      className
-    )}
-    {...props}
-  >
-    {children}
-    {showIcon && (
-      <BaseSelect.Icon className="ml-2 shrink-0 text-on-surface-variant">
-        {icon ?? (
-          <span className="material-symbols-outlined text-lg" aria-hidden="true">
-            unfold_more
-          </span>
-        )}
-      </BaseSelect.Icon>
-    )}
-  </BaseSelect.Trigger>
-));
+>(({ className, children, error, size = 'md', showIcon = true, icon, ...props }, ref) => {
+  // Prevent duplicate chevron icon if caller passed an explicit <Select.Icon /> or icon component in children
+  const hasIconChild = React.useMemo(() => {
+    return React.Children.toArray(children).some((child) => {
+      if (!React.isValidElement(child)) return false;
+      const type = child.type;
+      return (
+        type === BaseSelect.Icon ||
+        (type && typeof type === 'object' && 'displayName' in type && ((type as { displayName?: string }).displayName === 'SelectIcon' || (type as { displayName?: string }).displayName === 'Icon')) ||
+        (typeof child.props === 'object' && child.props !== null && (child.props['data-slot'] === 'select-icon' || child.props['aria-hidden'] === 'true'))
+      );
+    });
+  }, [children]);
+
+  return (
+    <BaseSelect.Trigger
+      data-slot="select-trigger"
+      ref={ref}
+      className={cn(
+        'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+        'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+        size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
+        size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
+        size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
+        'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        error && 'border-error focus-visible:outline-error',
+        className
+      )}
+      {...props}
+    >
+      {children}
+      {showIcon && !hasIconChild && (
+        <BaseSelect.Icon className="ml-2 shrink-0 text-on-surface-variant">
+          {icon ?? (
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              unfold_more
+            </span>
+          )}
+        </BaseSelect.Icon>
+      )}
+    </BaseSelect.Trigger>
+  );
+});
 SelectTrigger.displayName = 'SelectTrigger';
 
 export interface SelectValueProps
@@ -408,6 +426,59 @@ export interface SelectContentProps
   withScrollArrows?: boolean;
 }
 
+export interface SelectPositionerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseSelect.Positioner> {}
+
+export const SelectPositioner = React.forwardRef<
+  React.ComponentRef<typeof BaseSelect.Positioner>,
+  SelectPositionerProps
+>(({ className, sideOffset = 4, collisionPadding = 8, ...props }, ref) => (
+  <BaseSelect.Positioner
+    ref={ref}
+    sideOffset={sideOffset}
+    collisionPadding={collisionPadding}
+    className={cn('z-50 outline-none', className)}
+    {...props}
+  />
+));
+SelectPositioner.displayName = 'SelectPositioner';
+
+export interface SelectPopupProps
+  extends React.ComponentPropsWithoutRef<typeof BaseSelect.Popup> {}
+
+export const SelectPopup = React.forwardRef<
+  React.ComponentRef<typeof BaseSelect.Popup>,
+  SelectPopupProps
+>(({ className, ...props }, ref) => (
+  <BaseSelect.Popup
+    ref={ref}
+    className={cn(
+      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+      className
+    )}
+    {...props}
+  />
+));
+SelectPopup.displayName = 'SelectPopup';
+
+export interface SelectListProps
+  extends React.ComponentPropsWithoutRef<typeof BaseSelect.List> {}
+
+export const SelectList = React.forwardRef<
+  React.ComponentRef<typeof BaseSelect.List>,
+  SelectListProps
+>(({ className, ...props }, ref) => (
+  <BaseSelect.List
+    ref={ref}
+    className={cn(
+      'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 space-y-0.5 outline-none [scrollbar-width:thin]',
+      className
+    )}
+    {...props}
+  />
+));
+SelectList.displayName = 'SelectList';
+
 export const SelectContent = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Popup>,
   SelectContentProps
@@ -444,7 +515,7 @@ export const SelectContent = React.forwardRef<
 
     return (
       <BaseSelect.Portal container={container}>
-        <BaseSelect.Positioner
+        <SelectPositioner
           anchor={anchor}
           side={side}
           sideOffset={sideOffset}
@@ -458,29 +529,25 @@ export const SelectContent = React.forwardRef<
           positionMethod={positionMethod}
           disableAnchorTracking={disableAnchorTracking}
           alignItemWithTrigger={isItemAligned}
-          className={cn('z-50 outline-none', positionerClassName, containerClassName)}
+          className={cn(positionerClassName, containerClassName)}
         >
-          <BaseSelect.Popup
+          <SelectPopup
             ref={ref}
-            className={cn(
-              'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
-              className
-            )}
+            className={className}
             {...props}
           >
             {showScrollArrows && <SelectScrollUpArrow />}
-            <BaseSelect.List
+            <SelectList
               className={cn(
-                'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 space-y-0.5 outline-none [scrollbar-width:thin]',
                 showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                 listClassName
               )}
             >
               {children}
-            </BaseSelect.List>
+            </SelectList>
             {showScrollArrows && <SelectScrollDownArrow />}
-          </BaseSelect.Popup>
-        </BaseSelect.Positioner>
+          </SelectPopup>
+        </SelectPositioner>
       </BaseSelect.Portal>
     );
   }
@@ -660,9 +727,9 @@ export const Select = Object.assign(SelectComponent, {
   Icon: SelectIcon,
   Portal: BaseSelect.Portal,
   Backdrop: SelectBackdrop,
-  Positioner: BaseSelect.Positioner,
-  Popup: BaseSelect.Popup,
-  List: BaseSelect.List,
+  Positioner: SelectPositioner,
+  Popup: SelectPopup,
+  List: SelectList,
   Item: SelectItem,
   ItemIndicator: BaseSelect.ItemIndicator,
   ItemText: BaseSelect.ItemText,
@@ -679,11 +746,8 @@ export const Select = Object.assign(SelectComponent, {
 export { BaseSelect };
 export const SelectRoot = BaseSelect.Root;
 export const SelectPortal = BaseSelect.Portal;
-export const SelectPositioner = BaseSelect.Positioner;
-export const SelectPopup = BaseSelect.Popup;
 export const SelectItemText = BaseSelect.ItemText;
 export const SelectItemIndicator = BaseSelect.ItemIndicator;
-export const SelectList = BaseSelect.List;
 
 export default Select;
 

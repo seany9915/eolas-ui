@@ -137,7 +137,36 @@ export const FieldLabel = React.forwardRef<HTMLLabelElement, React.ComponentProp
 );
 FieldLabel.displayName = 'FieldLabel';
 
-export const FieldControl = BaseField.Control;
+export interface FieldControlProps extends React.ComponentPropsWithoutRef<typeof BaseField.Control> {
+  asChild?: boolean;
+}
+
+export const FieldControl = React.forwardRef<HTMLInputElement, FieldControlProps>(
+  ({ children, render, ...props }, ref) => {
+    // If a single child React element is passed, use Base UI's polymorphic render prop so that
+    // children are not rendered inside the void <input> element.
+    if (children && !render && React.isValidElement(children)) {
+      return (
+        <BaseField.Control
+          ref={ref}
+          render={children}
+          {...props}
+        />
+      );
+    }
+
+    return (
+      <BaseField.Control
+        ref={ref}
+        render={render}
+        {...props}
+      >
+        {children}
+      </BaseField.Control>
+    );
+  }
+);
+FieldControl.displayName = 'FieldControl';
 
 export const FieldDescription = React.forwardRef<HTMLParagraphElement, React.ComponentPropsWithoutRef<typeof BaseField.Description>>(
   ({ className, ...props }, ref) => (

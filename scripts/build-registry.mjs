@@ -85,7 +85,7 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
     name: 'utils',
     type: 'registry:lib',
     title: 'Eolas UI Utilities',
-    description: 'Utility functions including cn() class merger for Tailwind CSS and Base UI',
+    description: 'Core utility library exporting cn() class merger, assetUrl() resolver, and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
     dependencies: ['clsx', 'tailwind-merge', '@base-ui/react'],
     files: [
       {

@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Chip } from '@/components/ui/chip';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { Tabs } from '@/components/ui/tabs';
+import { TabsRoot, TabsList, Tab, TabsPanel } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { DirectionProvider } from '@/components/ui/direction-provider';
 import { RegistryEntry, ViewportMode, ComponentDemoProps } from './types';
 
@@ -30,7 +31,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
   className,
 }) => {
   const [copiedType, setCopiedType] = React.useState<'import' | 'cli' | null>(null);
-  const [activeTab, setActiveTab] = React.useState('preview');
+  const [activeTab, setActiveTab] = React.useState<string>('preview');
 
   const copyToClipboard = async (text: string, type: 'import' | 'cli') => {
     try {
@@ -66,15 +67,15 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
       className={cn('w-full space-y-6', className)}
     >
       {/* Component Header Bar */}
-      <div className="bg-surface rounded-xl border border-outline-variant p-4 sm:p-6 shadow-xs">
+      <div className="bg-surface rounded-xl border border-outline-variant p-5 sm:p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-          <div className="space-y-1.5 min-w-0">
+          <div className="space-y-2 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onBackToCatalog}
-                className="text-xs px-2 h-6 -ml-2 text-on-surface-variant hover:text-on-surface"
+                className="text-xs px-2.5 h-7 -ml-2 text-on-surface-variant hover:text-on-surface"
               >
                 <Icon name="arrow_back" size="xs" className="mr-1" />
                 Registry
@@ -86,14 +87,14 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 {entry.title}
               </h2>
 
-              {/* Badges */}
+              {/* Badges - Following DESIGN.md chips */}
               <Chip
                 label={entry.tier === 'block' ? 'Composite Block' : 'Primitive'}
                 pattern={entry.tier === 'block' ? 'secondary-container' : 'primary-container'}
                 colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
                 size="sm"
               />
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium border border-outline-variant">
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 {entry.basePrimitive}
               </span>
               {entry.isDeprecated && (
@@ -118,8 +119,8 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               size="sm"
               variant="outlined"
               onClick={() => copyToClipboard(importStatement, 'import')}
-              className="text-xs font-mono h-8"
-              title="Copy React import"
+              className="text-xs font-mono h-9 px-3"
+              title="Copy React import statement"
             >
               <Icon name={copiedType === 'import' ? 'check' : 'content_copy'} size="xs" className="mr-1.5" />
               {copiedType === 'import' ? 'Copied Import' : 'Copy Import'}
@@ -128,7 +129,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               size="sm"
               variant="tonal"
               onClick={() => copyToClipboard(entry.shadcnCommand || `npx shadcn add @seany9915/eolas-ui/${entry.name}`, 'cli')}
-              className="text-xs font-mono h-8"
+              className="text-xs font-mono h-9 px-3"
               title="Copy shadcn CLI command"
             >
               <Icon name={copiedType === 'cli' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
@@ -137,7 +138,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
           </div>
         </div>
 
-        {/* Deprecation Warning Banner if applicable */}
+        {/* Deprecation Notice if applicable */}
         {entry.isDeprecated && (
           <div className="mt-4">
             <InlineAlert
@@ -149,87 +150,64 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
           </div>
         )}
 
-        {/* Canvas Toolbar & Tabs */}
-        <div className="mt-4 pt-4 border-t border-outline-variant/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* View Tabs */}
-          <div className="flex items-center gap-1">
-            <Button
-              size="sm"
-              variant={activeTab === 'preview' ? 'filled' : 'ghost'}
-              onClick={() => setActiveTab('preview')}
-              className="text-xs font-medium h-7 px-3"
-            >
-              <Icon name="visibility" size="xs" className="mr-1.5" />
-              Preview & Sandbox
-            </Button>
-            <Button
-              size="sm"
-              variant={activeTab === 'code' ? 'filled' : 'ghost'}
-              onClick={() => setActiveTab('code')}
-              className="text-xs font-medium h-7 px-3"
-            >
-              <Icon name="code" size="xs" className="mr-1.5" />
-              Code & Usage
-            </Button>
-            <Button
-              size="sm"
-              variant={activeTab === 'contract' ? 'filled' : 'ghost'}
-              onClick={() => setActiveTab('contract')}
-              className="text-xs font-medium h-7 px-3"
-            >
-              <Icon name="verified" size="xs" className="mr-1.5" />
-              Contract & A11y
-            </Button>
-          </div>
+        {/* Canvas Toolbar & Tabs via Base UI Tabs and ToggleGroup */}
+        <div className="mt-5 pt-4 border-t border-outline-variant flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          {/* Base UI Tabs List */}
+          <TabsRoot
+            value={activeTab}
+            onValueChange={(val) => setActiveTab(val as string)}
+            variant="segmented"
+            size="sm"
+          >
+            <TabsList>
+              <Tab value="preview">
+                <Icon name="visibility" size="xs" className="mr-1.5" />
+                Preview & Sandbox
+              </Tab>
+              <Tab value="code">
+                <Icon name="code" size="xs" className="mr-1.5" />
+                Code & Usage
+              </Tab>
+              <Tab value="contract">
+                <Icon name="verified" size="xs" className="mr-1.5" />
+                Contract & A11y
+              </Tab>
+            </TabsList>
+          </TabsRoot>
 
-          {/* Viewport & Direction Controls */}
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          {/* Viewport & Direction Controls via Base UI ToggleGroup */}
+          <div className="flex items-center gap-3 self-end sm:self-auto">
             {/* Viewport Switcher */}
-            <div className="flex items-center rounded-lg border border-outline-variant bg-surface-container/50 p-0.5" role="group" aria-label="Viewport size">
-              <Button
-                size="sm"
-                variant={viewport === 'mobile' ? 'filled' : 'ghost'}
-                onClick={() => onViewportChange('mobile')}
-                className="h-6 px-2 text-xs"
-                title="Mobile (375px)"
-              >
+            <ToggleGroup
+              type="single"
+              value={viewport}
+              onValueChange={(val) => {
+                if (val) onViewportChange(val as ViewportMode);
+              }}
+              variant="segmented"
+              size="sm"
+              aria-label="Responsive viewport mode"
+            >
+              <ToggleGroupItem value="mobile" aria-label="Mobile viewport (375px)" title="Mobile (375px)">
                 <Icon name="smartphone" size="xs" />
-              </Button>
-              <Button
-                size="sm"
-                variant={viewport === 'tablet' ? 'filled' : 'ghost'}
-                onClick={() => onViewportChange('tablet')}
-                className="h-6 px-2 text-xs"
-                title="Tablet (768px)"
-              >
+              </ToggleGroupItem>
+              <ToggleGroupItem value="tablet" aria-label="Tablet viewport (768px)" title="Tablet (768px)">
                 <Icon name="tablet_mac" size="xs" />
-              </Button>
-              <Button
-                size="sm"
-                variant={viewport === 'desktop' ? 'filled' : 'ghost'}
-                onClick={() => onViewportChange('desktop')}
-                className="h-6 px-2 text-xs"
-                title="Desktop (1024px)"
-              >
+              </ToggleGroupItem>
+              <ToggleGroupItem value="desktop" aria-label="Desktop viewport (1024px)" title="Desktop (1024px)">
                 <Icon name="desktop_windows" size="xs" />
-              </Button>
-              <Button
-                size="sm"
-                variant={viewport === 'full' ? 'filled' : 'ghost'}
-                onClick={() => onViewportChange('full')}
-                className="h-6 px-2 text-xs"
-                title="Full Width"
-              >
+              </ToggleGroupItem>
+              <ToggleGroupItem value="full" aria-label="Full width viewport" title="Full Width">
                 <Icon name="fullscreen" size="xs" />
-              </Button>
-            </div>
+              </ToggleGroupItem>
+            </ToggleGroup>
 
             {/* Direction Toggle */}
             <Button
               size="sm"
               variant="outlined"
               onClick={onDirectionToggle}
-              className="h-7 px-2.5 text-xs font-mono"
+              className="h-8 px-2.5 text-xs font-mono"
               title="Toggle LTR / RTL text direction"
             >
               <Icon name="swap_horiz" size="xs" className="mr-1" />
@@ -239,22 +217,22 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div>
-        {activeTab === 'preview' && (
+      {/* Main Content Area via Base UI TabsPanels */}
+      <TabsRoot value={activeTab} onValueChange={(val) => setActiveTab(val as string)}>
+        <TabsPanel value="preview">
           <div className="space-y-3">
-            {/* Sandbox Ruler & Viewport Indicator */}
+            {/* Sandbox Ruler & Semantic Viewport Indicator - NO static status dots */}
             <div className="flex items-center justify-between text-xs font-mono text-on-surface-variant px-1">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-success inline-block" />
-                <span>Isolated Canvas: <strong>{viewportLabel}</strong></span>
-              </div>
+              <span className="flex items-center gap-1.5">
+                <Icon name="crop_free" size="xs" className="text-primary" />
+                <span>Isolated Sandbox Stage: <strong>{viewportLabel}</strong></span>
+              </span>
               <span>Direction: <strong>{direction.toUpperCase()}</strong></span>
             </div>
 
             {/* The Unconstrained Sandbox Stage */}
-            <div className="border border-outline-variant rounded-xl bg-surface p-4 sm:p-8 shadow-sm transition-all overflow-hidden min-h-[420px] flex items-center justify-center">
-              <div className={cn('transition-all duration-200 w-full', viewportWidthClass)}>
+            <div className="border border-outline-variant rounded-xl bg-surface p-4 sm:p-8 shadow-xs overflow-hidden min-h-[420px] flex items-center justify-center">
+              <div className={cn('transition-[max-width] duration-200 ease-in-out w-full', viewportWidthClass)}>
                 <DirectionProvider direction={direction}>
                   {DemoComponent ? (
                     <DemoComponent viewport={viewport} direction={direction} />
@@ -280,10 +258,10 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               </div>
             </div>
           </div>
-        )}
+        </TabsPanel>
 
-        {activeTab === 'code' && (
-          <div className="max-w-4xl mx-auto space-y-6">
+        <TabsPanel value="code">
+          <div className="max-w-4xl mx-auto space-y-6 pt-2">
             <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="download" size="sm" className="text-primary" />
@@ -292,13 +270,13 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               <p className="font-sans text-xs text-on-surface-variant">
                 Install this component into your project with the shadcn CLI registry:
               </p>
-              <div className="bg-neutral text-on-neutral p-3 rounded-lg font-mono text-xs flex items-center justify-between">
+              <div className="bg-neutral text-on-neutral p-3.5 rounded-lg font-mono text-xs flex items-center justify-between">
                 <span>{entry.shadcnCommand || `npx shadcn add @seany9915/eolas-ui/${entry.name}`}</span>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => copyToClipboard(entry.shadcnCommand || `npx shadcn add @seany9915/eolas-ui/${entry.name}`, 'cli')}
-                  className="text-on-neutral hover:bg-neutral-container/20 h-6 px-2 text-xs"
+                  className="text-on-neutral hover:bg-neutral-container/20 h-7 px-2 text-xs"
                 >
                   <Icon name={copiedType === 'cli' ? 'check' : 'content_copy'} size="xs" />
                 </Button>
@@ -310,12 +288,12 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 <Icon name="code" size="sm" className="text-primary" />
                 Import & Usage
               </h3>
-              <div className="bg-surface-container p-3 rounded-lg font-mono text-xs border border-outline-variant">
+              <div className="bg-surface-container p-3.5 rounded-lg font-mono text-xs border border-outline-variant">
                 {importStatement}
               </div>
               <div className="font-sans text-xs text-on-surface-variant space-y-2">
                 <p>Source file location:</p>
-                <code className="block bg-surface-container px-2 py-1 rounded text-primary font-mono text-xs border border-outline-variant">
+                <code className="block bg-surface-container px-2.5 py-1.5 rounded text-primary font-mono text-xs border border-outline-variant">
                   {entry.sourcePath}
                 </code>
               </div>
@@ -340,10 +318,10 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               </div>
             )}
           </div>
-        )}
+        </TabsPanel>
 
-        {activeTab === 'contract' && (
-          <div className="max-w-4xl mx-auto space-y-6">
+        <TabsPanel value="contract">
+          <div className="max-w-4xl mx-auto space-y-6 pt-2">
             <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="gavel" size="sm" className="text-primary" />
@@ -369,14 +347,14 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 <Icon name="accessibility_new" size="sm" className="text-primary" />
                 Accessibility & Design Law
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans">
-                <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
+                <div className="p-4 rounded-lg bg-surface-container border border-outline-variant">
                   <span className="font-bold text-on-surface block mb-1">WCAG 2.2 AA Contrast:</span>
                   <span className="text-on-surface-variant">
                     All text and interactive borders meet 4.5:1 / 3:1 contrast ratios across clinical lighting conditions.
                   </span>
                 </div>
-                <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
+                <div className="p-4 rounded-lg bg-surface-container border border-outline-variant">
                   <span className="font-bold text-on-surface block mb-1">Touch Target Compliance:</span>
                   <span className="text-on-surface-variant">
                     Complies with WCAG 2.2 SC 2.5.8 Target Size with minimum 44x44px touch envelopes for clinical tablets and mobile devices.
@@ -385,8 +363,8 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </TabsPanel>
+      </TabsRoot>
     </section>
   );
 };

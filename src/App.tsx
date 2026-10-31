@@ -5,7 +5,7 @@ import { ComponentRegistry } from '@/components/playground/registry/ComponentReg
 import { BrandAssetsShowcase } from '@/components/playground/BrandAssetsShowcase';
 import { AntiPatternAuditBench } from '@/components/playground/AntiPatternAuditBench';
 import { IconStylingShowcase } from '@/components/playground/IconStylingShowcase';
-import { assetUrl } from '@/lib/utils';
+import { assetUrl, cn } from '@/lib/utils';
 
 export function App() {
   const getInitialTab = (): string => {
@@ -55,10 +55,15 @@ export function App() {
       {/* Main Content Area */}
       <main
         id="main-content"
-        className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+        className={cn(
+          'flex-1 w-full flex flex-col min-h-0',
+          activeTab === 'components'
+            ? 'max-w-none p-0'
+            : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'
+        )}
       >
         <h1 className="sr-only">Eolas Clinical Design System & Component Registry</h1>
-        <div key={activeTab}>
+        <div key={activeTab} className="flex-1 flex flex-col min-h-0">
           {activeTab === 'tokens' && <ColorTokensExplorer />}
           {activeTab === 'components' && <ComponentRegistry />}
           {activeTab === 'icons' && <IconStylingShowcase />}
@@ -67,18 +72,20 @@ export function App() {
         </div>
       </main>
 
-      {/* Clinical Playground Footer */}
-      <footer className="bg-surface border-t border-outline-variant py-8 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol" className="h-7 w-7 object-contain" />
-            <span className="font-label text-sm font-bold text-on-surface">Eolas Design System & Registry</span>
+      {/* Clinical Playground Footer (rendered for non-workbench tabs) */}
+      {activeTab !== 'components' && (
+        <footer className="bg-surface border-t border-outline-variant py-8 mt-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol" className="h-7 w-7 object-contain" />
+              <span className="font-label text-sm font-bold text-on-surface">Eolas Design System & Registry</span>
+            </div>
+            <p className="font-sans text-xs text-on-surface-variant text-center sm:text-right">
+              Engineered with Base UI primitives (<code className="bg-surface-variant px-1.5 py-0.5 rounded text-primary font-mono">@base-ui/react</code>), WCAG 2.2 AA contrast compliance, and Material Symbols.
+            </p>
           </div>
-          <p className="font-sans text-xs text-on-surface-variant text-center sm:text-right">
-            Engineered with Base UI primitives (<code className="bg-surface-variant px-1.5 py-0.5 rounded text-primary font-mono">@base-ui/react</code>), WCAG 2.2 AA contrast compliance, and Material Symbols.
-          </p>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }

@@ -120,13 +120,13 @@ export interface PlanTriggerProps
 
 export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>(
   ({ title = 'Execution Plan', description, children, className, ...props }, ref) => {
-    const { completedCount, totalCount, overallStatus } = usePlan();
+    const { completedCount, totalCount, progressPercent, overallStatus } = usePlan();
 
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
           <TraceLine status={overallStatus} className={description ? 'items-start py-2' : 'items-center'}>
-            <TraceIcon name="route" status={overallStatus} className={description ? 'mt-0.5' : undefined} />
+            <TraceIcon name="route" status="default" className={description ? 'mt-0.5' : undefined} />
             <div className="flex flex-col min-w-0 flex-1 text-left leading-tight">
               <TraceTitle className="truncate">{title}</TraceTitle>
               {description && (
@@ -136,8 +136,18 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
               )}
             </div>
             <TraceDescription className="ml-auto shrink-0 pl-2">
-              <span className="font-mono tabular-nums">
-                {completedCount} of {totalCount} done
+              <span className="flex items-center gap-2">
+                <span className="font-mono tabular-nums">
+                  {completedCount} of {totalCount} done
+                </span>
+                {totalCount > 0 && (
+                  <span className="w-12 h-1.5 bg-surface-container rounded-full overflow-hidden inline-flex" aria-hidden="true">
+                    <span
+                      className="h-full bg-primary rounded-full transition-[width] duration-quick ease-standard"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </span>
+                )}
               </span>
             </TraceDescription>
           </TraceLine>
@@ -162,18 +172,18 @@ export const PlanContent = React.forwardRef<HTMLDivElement, PlanContentProps>(
     const { progressPercent } = usePlan();
 
     return (
-      <TraceCollapsibleContent ref={ref} className={className} {...props}>
-        <div className="space-y-3 pt-1">
+      <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
+        <div>
           {/* Progress Track */}
-          <div className="space-y-1">
+          <div className="px-3.5 py-2.5 bg-surface-container/20 border-b border-outline-variant/30 space-y-1.5">
             <div className="flex items-center justify-between text-xs font-sans text-on-surface-variant">
-              <span>Progress</span>
-              <span className="font-mono tabular-nums">{progressPercent}%</span>
+              <span className="font-medium">Plan Progress</span>
+              <span className="font-mono tabular-nums font-semibold">{progressPercent}%</span>
             </div>
             <Progress value={progressPercent} className="h-1.5" />
           </div>
 
-          <div className="pt-1 divide-y divide-outline-variant/30">{children}</div>
+          <div className="divide-y divide-outline-variant/30">{children}</div>
         </div>
       </TraceCollapsibleContent>
     );
@@ -188,6 +198,7 @@ export interface PlanStepProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
   status?: TraceStatus;
+  stepNumber?: number | string;
   duration?: string | number;
   details?: React.ReactNode;
   children?: React.ReactNode;
@@ -195,7 +206,7 @@ export interface PlanStepProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
-  ({ title, description, status = 'pending', duration, details, children, className, ...props }, ref) => {
+  ({ title, description, status = 'pending', stepNumber, duration, details, children, className, ...props }, ref) => {
     const formattedDuration =
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
@@ -203,7 +214,7 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
 
     const stepLine = (
       <TraceLine ref={ref} status={status} className={className} {...props}>
-        <TraceIcon status={status} />
+        <TraceIcon status={status} stepNumber={status === 'pending' ? stepNumber : undefined} />
         <TraceTitle>{title}</TraceTitle>
         {(description || formattedDuration) && (
           <TraceDescription>
@@ -226,7 +237,7 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
           <TraceCollapsibleTrigger>
             {stepLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
+          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof stepContent === 'string' ? (
               <p>
                 {stepContent}
@@ -311,7 +322,7 @@ export const PlanRoot: React.FC<PlanProps> = ({
               <>
                 <PlanTrigger title={title} description={description} />
                 <PlanContent>
-                  {steps.map((step) => {
+                  {steps.map((step, idx) => {
                     const stepContent = step.content ?? step.details;
                     const formattedDuration = step.duration
                       ? (typeof step.duration === 'number' ? `${step.duration}s` : step.duration)
@@ -319,7 +330,11 @@ export const PlanRoot: React.FC<PlanProps> = ({
 
                     const renderStepLine = (
                       <TraceLine status={step.status} className={step.description ? 'items-start py-2' : 'items-center'}>
-                        <TraceIcon status={step.status} className={step.description ? 'mt-0.5' : undefined} />
+                        <TraceIcon
+                          status={step.status}
+                          stepNumber={step.status === 'pending' ? idx + 1 : undefined}
+                          className={step.description ? 'mt-0.5' : undefined}
+                        />
                         <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
                           <TraceTitle className="truncate">{step.title}</TraceTitle>
                           {step.description && (
@@ -344,7 +359,7 @@ export const PlanRoot: React.FC<PlanProps> = ({
                           <TraceCollapsibleTrigger>
                             {renderStepLine}
                           </TraceCollapsibleTrigger>
-                          <TraceCollapsibleContent unstyled className="px-3.5 py-2 pl-9 text-sm font-sans text-on-surface-variant leading-relaxed">
+                          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
                             {typeof stepContent === 'string' ? (
                               <p>
                                 {stepContent}

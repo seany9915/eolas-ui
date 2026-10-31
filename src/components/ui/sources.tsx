@@ -155,7 +155,7 @@ const SourcesTrigger: React.FC<SourcesTriggerProps> = ({
   return (
     <Collapsible.Trigger
       className={cn(
-        'group flex items-center justify-between gap-2 py-1 text-xs font-label font-semibold text-on-surface-variant',
+        'group flex items-center justify-between gap-2 min-h-[44px] py-2 px-1 text-xs font-label font-semibold text-on-surface-variant',
         'hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
         'cursor-pointer transition-[color] duration-quick ease-standard motion-reduce:transition-none',
         className
@@ -171,12 +171,12 @@ const SourcesTrigger: React.FC<SourcesTriggerProps> = ({
           </>
         )}
       </div>
-      <Icon
-        name="expand_more"
-        size="xs"
-        className="text-on-surface-variant transition-transform duration-quick group-data-[panel-open]:rotate-180 motion-reduce:transition-none shrink-0"
+      <span
+        className="flex items-center justify-center size-5 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
         aria-hidden="true"
-      />
+      >
+        <Icon name="expand_more" size="xs" />
+      </span>
     </Collapsible.Trigger>
   );
 };
@@ -324,9 +324,7 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
             {index + 1}
           </span>
         )}
-        {(itemFavicon || itemIcon) && (
-          <SourceIcon src={itemFavicon} name={itemIcon} />
-        )}
+        <SourceIcon src={itemFavicon} name={itemIcon || 'description'} />
         <div className="flex flex-col min-w-0 pr-1">
           <span className="text-sm font-sans font-medium text-on-surface truncate group-hover:text-secondary transition-colors">
             {itemTitle}

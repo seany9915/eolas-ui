@@ -142,7 +142,7 @@ const InlineCitationCardTrigger = React.forwardRef<
           expandedTouchTarget
           aria-label={defaultLabel}
           className={cn(
-            'group relative inline-flex items-center align-super p-0.5 rounded cursor-pointer',
+            'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer',
             'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
             className
           )}

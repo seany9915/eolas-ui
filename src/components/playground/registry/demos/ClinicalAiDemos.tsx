@@ -280,7 +280,7 @@ export const ToolDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <Tool.Root status="complete">
-        <Tool.Header name="NHS_Spine_EHR_Lookup" status="complete" duration="1.2s" />
+        <Tool.Header name="NHS_Spine_EHR_Lookup" iconName="database" status="complete" duration="1.2s" />
         <Tool.Content>
           <div className="p-3 text-xs font-mono bg-surface-container rounded-b-lg border-t border-outline-variant/60">
             Lookup status: 200 OK | Patient: NHS# 882-102-491 | Allergies: Verified

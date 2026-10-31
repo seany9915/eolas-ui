@@ -2,6 +2,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { RegistrySidebar } from './RegistrySidebar';
 import { RegistryCanvas } from './RegistryCanvas';
 import { CatalogOverview } from './CatalogOverview';
@@ -38,7 +39,7 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeCategory, setActiveCategory] = React.useState<ComponentCategory | 'all'>('all');
   const [tierFilter, setTierFilter] = React.useState<ComponentTier | 'all'>('all');
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   // Sync hash changes from browser back/forward
   React.useEffect(() => {
@@ -62,7 +63,7 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
       window.location.hash = 'components';
     }
     // On mobile screens, close sidebar when a component is picked
-    if (window.innerWidth < 1024) {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsSidebarOpen(false);
     }
   };
@@ -75,59 +76,71 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
   const DemoComponent = selectedId ? REGISTRY_DEMOS[selectedId] : undefined;
 
   return (
-    <div className={cn('flex flex-col lg:flex-row items-start gap-6 lg:gap-8 w-full', className)}>
-      {/* Mobile Sidebar Toggle Bar */}
-      <div className="lg:hidden w-full flex items-center justify-between p-3 rounded-xl border border-outline-variant bg-surface shadow-xs">
+    <SidebarProvider
+      embedded
+      className={cn('w-full flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-4.5rem)] relative', className)}
+      style={{ '--sidebar-width': '18.5rem', '--sidebar-width-mobile': '20rem' } as React.CSSProperties}
+    >
+      {/* Mobile Topbar for Sidebar Toggle (< lg screens) */}
+      <div className="lg:hidden w-full flex items-center justify-between p-3.5 border-b border-outline-variant bg-surface sticky top-0 z-30">
         <Button
           size="sm"
           variant="outlined"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="text-xs"
+          className="text-xs h-8 font-medium"
         >
-          <Icon name={isSidebarOpen ? 'menu_open' : 'menu'} size="xs" className="mr-1.5" />
-          {isSidebarOpen ? 'Hide Component Menu' : 'Browse Components'}
+          <Icon name={isSidebarOpen ? 'close' : 'menu'} size="xs" className="mr-1.5" />
+          {isSidebarOpen ? 'Close Menu' : 'Browse Components'}
         </Button>
-        {selectedEntry && (
-          <span className="font-heading text-xs font-bold text-on-surface truncate">
+        {selectedEntry ? (
+          <span className="font-heading text-xs font-bold text-on-surface truncate max-w-[200px]">
             {selectedEntry.title}
+          </span>
+        ) : (
+          <span className="font-heading text-xs font-bold text-on-surface truncate">
+            Component Catalog
           </span>
         )}
       </div>
 
-      {/* Registry Sidebar */}
-      <div className={cn('w-full lg:w-72 xl:w-80 shrink-0', !isSidebarOpen && 'hidden lg:block')}>
-        <RegistrySidebar
-          selectedId={selectedId}
-          onSelect={handleSelect}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-          tierFilter={tierFilter}
-          onTierFilterChange={setTierFilter}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      </div>
+      {/* Canonical Sidebar Component - Docked to left edge */}
+      <RegistrySidebar
+        selectedId={selectedId}
+        onSelect={handleSelect}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+        tierFilter={tierFilter}
+        onTierFilterChange={setTierFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        className={cn(!isSidebarOpen && 'hidden lg:flex')}
+      />
 
-      {/* Main Sandbox Canvas or Catalog Overview */}
-      <main className="flex-1 min-w-0 w-full">
-        {selectedEntry ? (
-          <RegistryCanvas
-            entry={selectedEntry}
-            viewport={viewport}
-            onViewportChange={setViewport}
-            direction={direction}
-            onDirectionToggle={toggleDirection}
-            demoComponent={DemoComponent}
-            onBackToCatalog={() => handleSelect(null)}
-          />
-        ) : (
-          <CatalogOverview
-            onSelect={handleSelect}
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-          />
-        )}
-      </main>
-    </div>
+      {/* Main Sandbox Canvas or Catalog Overview in SidebarInset */}
+      <SidebarInset className="flex-1 min-w-0 bg-background flex flex-col overflow-y-auto">
+        <div className="flex-1 p-6 sm:p-8 lg:p-10 xl:p-12 w-full max-w-[1600px] mx-auto">
+          {selectedEntry ? (
+            <RegistryCanvas
+              entry={selectedEntry}
+              viewport={viewport}
+              onViewportChange={setViewport}
+              direction={direction}
+              onDirectionToggle={toggleDirection}
+              demoComponent={DemoComponent}
+              onBackToCatalog={() => handleSelect(null)}
+            />
+          ) : (
+            <CatalogOverview
+              onSelect={handleSelect}
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+              tierFilter={tierFilter}
+              onTierFilterChange={setTierFilter}
+            />
+          )}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
+export default ComponentRegistry;

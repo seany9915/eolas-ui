@@ -89,8 +89,6 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
         ? 'progress_activity'
         : status === 'error'
         ? 'error'
-        : status === 'complete'
-        ? 'check'
         : iconName || 'terminal';
 
     return (
@@ -107,12 +105,12 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
         {...props}
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <div
+          <span
             className={cn(
-              'size-6 rounded-md flex items-center justify-center shrink-0 select-none text-xs',
-              status === 'calling' && 'bg-primary-container text-on-primary-container font-bold',
-              status === 'complete' && 'bg-success-container text-on-success-container font-bold',
-              status === 'error' && 'bg-error-container text-on-error-container font-bold'
+              'flex size-5 shrink-0 items-center justify-center text-xs select-none transition-colors',
+              status === 'calling' && 'text-primary',
+              status === 'complete' && 'text-secondary',
+              status === 'error' && 'text-error'
             )}
             aria-hidden="true"
           >
@@ -121,7 +119,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
               size="xs"
               className={status === 'calling' ? 'animate-spin' : undefined}
             />
-          </div>
+          </span>
 
           <span
             className="font-mono text-xs font-semibold text-on-surface truncate"
@@ -155,7 +153,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
           {children}
 
           <span
-            className="pl-1 text-on-surface-variant shrink-0 group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
+            className="flex items-center justify-center size-5 ml-1 text-on-surface-variant/80 shrink-0 group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
             aria-hidden="true"
           >
             <Icon name="expand_more" size="xs" />

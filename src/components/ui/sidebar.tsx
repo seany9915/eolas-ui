@@ -35,8 +35,9 @@ function cloneAsChild(
   props: object
 ) {
   const element = child as React.ReactElement<ClonedChildProps>;
+  const childRef = (element as unknown as { ref?: React.Ref<unknown> }).ref;
   return React.cloneElement(element, {
-    ref,
+    ref: ref || childRef,
     className: cn(classes, element.props.className),
     ...props,
   } as ClonedChildProps);
@@ -621,7 +622,7 @@ export const SidebarGroupLabel = React.forwardRef<HTMLDivElement, SidebarGroupLa
     const classes = cn(
       'duration-[var(--duration-fast)] flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-bold font-label text-on-surface-variant select-none outline-none transition-[margin,opacity] ease-[var(--ease-standard)] motion-reduce:transition-none',
       '[&>svg]:size-4 [&>svg]:shrink-0 [&>.material-symbols-outlined]:text-base [&>.material-symbols-outlined]:shrink-0',
-      'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 pointer-events-none group-data-[collapsible=icon]:pointer-events-none',
+      'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:pointer-events-none',
       className
     );
 

@@ -79,8 +79,9 @@ export const ReasoningTrigger = React.forwardRef<HTMLButtonElement, ReasoningTri
         {children ?? (
           <TraceLine status={computedStatus}>
             <TraceIcon
-              name={isRunning ? 'progress_activity' : 'schema'}
-              status={computedStatus}
+              name={isRunning ? 'progress_activity' : 'psychology'}
+              status={isRunning ? 'running' : 'default'}
+              className={!isRunning ? 'text-secondary' : undefined}
             />
             <TraceTitle>
               {isRunning ? (
@@ -145,14 +146,12 @@ export interface ReasoningContentProps extends React.HTMLAttributes<HTMLDivEleme
 export const ReasoningContent = React.forwardRef<HTMLDivElement, ReasoningContentProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <TraceCollapsibleContent ref={ref} className={className} {...props}>
-        {typeof children === 'string' ? (
-          <div className="whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
+      <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
+        <div className="px-3.5 py-3">
+          <div className="border-l-2 border-outline-variant/40 pl-3.5 ml-1 my-0.5 space-y-2 whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
             {children}
           </div>
-        ) : (
-          children
-        )}
+        </div>
       </TraceCollapsibleContent>
     );
   }

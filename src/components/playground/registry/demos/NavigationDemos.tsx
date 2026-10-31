@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import * as React from 'react';
 import { Tabs } from '@/components/ui/tabs';
 import { Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel } from '@/components/ui/accordion';
@@ -154,15 +155,15 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
       </div>
       <div className="space-y-1 text-xs font-sans text-on-surface-variant">
         <div className="p-2 rounded-lg bg-primary-container text-on-primary-container font-semibold flex items-center gap-2">
-          <Icon name="emergency" size="xs" />
+          <Icon name="emergency" size="sm" />
           <span>Active Resuscitation Bays (3)</span>
         </div>
         <div className="p-2 rounded-lg hover:bg-surface-container flex items-center gap-2">
-          <Icon name="hotel" size="xs" />
+          <Icon name="hotel" size="sm" />
           <span>Inpatient Floor 2 (18 beds)</span>
         </div>
         <div className="p-2 rounded-lg hover:bg-surface-container flex items-center gap-2">
-          <Icon name="medication" size="xs" />
+          <Icon name="medication" size="sm" />
           <span>Pharmacy Dispensing Queue</span>
         </div>
       </div>
@@ -238,15 +239,57 @@ export const ScrollAreaDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ScrollspyDemo: React.FC<ComponentDemoProps> = () => {
+  const [active, setActive] = React.useState('sec-2');
   const items = [
-    { id: 'sec-1', label: '1. Admission Criteria' },
-    { id: 'sec-2', label: '2. Clinical Triage Score' },
-    { id: 'sec-3', label: '3. Immediate Interventions' },
+    { id: 'sec-1', label: '1. Admission & Inclusion Criteria' },
+    { id: 'sec-2', label: '2. Rapid Triage Acuity Assessment' },
+    { id: 'sec-3', label: '3. Emergency Interventions & Resuscitation' },
+    { id: 'sec-4', label: '4. Continuous Monitoring & Handover' },
   ];
+
   return (
-    <div className="w-full max-w-md mx-auto p-4 rounded-xl bg-surface border border-outline-variant space-y-2">
-      <span className="font-heading text-xs font-bold text-on-surface block">Document Table of Contents (Scrollspy)</span>
-      <Scrollspy items={items} activeId="sec-2" />
+    <div className="w-full max-w-md mx-auto py-4 space-y-3">
+      <div className="flex items-center justify-between text-xs text-on-surface-variant">
+        <span className="font-heading font-bold text-on-surface">Clinical Protocol Table of Contents</span>
+        <span className="font-mono text-[11px]">Active: {active}</span>
+      </div>
+
+      <div className="p-2 rounded-xl bg-surface-container/20 border border-outline-variant/60">
+        <Scrollspy
+          items={items.map((item) => ({
+            ...item,
+            label: (
+              <span
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActive(item.id);
+                }}
+                className="w-full"
+              >
+                {item.label}
+              </span>
+            ),
+          }))}
+          activeId={active}
+          onActiveChange={setActive}
+        />
+      </div>
+
+      <div className="flex items-center gap-2 pt-1">
+        <span className="font-sans text-xs text-on-surface-variant">Select section:</span>
+        <Button size="sm" variant={active === 'sec-1' ? 'filled' : 'outlined'} onClick={() => setActive('sec-1')}>
+          Sec 1
+        </Button>
+        <Button size="sm" variant={active === 'sec-2' ? 'filled' : 'outlined'} onClick={() => setActive('sec-2')}>
+          Sec 2
+        </Button>
+        <Button size="sm" variant={active === 'sec-3' ? 'filled' : 'outlined'} onClick={() => setActive('sec-3')}>
+          Sec 3
+        </Button>
+        <Button size="sm" variant={active === 'sec-4' ? 'filled' : 'outlined'} onClick={() => setActive('sec-4')}>
+          Sec 4
+        </Button>
+      </div>
     </div>
   );
 };

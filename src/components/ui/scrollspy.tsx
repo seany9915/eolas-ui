@@ -10,6 +10,7 @@
  *   accessible `IntersectionObserver` fallback for Safari and Firefox.
  * - Sets explicit `aria-current="true"` on the active link for screen reader synchronicity.
  * - Adheres to WCAG 2.2 SC 2.5.8 (44x44px minimum touch targets) and WCAG 1.4.1 (non-color active cues).
+ * - Complies with DESIGN.md and anti-patterns.md: symmetrical rounded-md geometry without asymmetric single-sided card borders.
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
@@ -137,7 +138,9 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
         aria-label={ariaLabel}
         className={cn(
           'scrollspy-nav text-sm font-sans',
-          isHorizontal ? 'flex items-center gap-2 overflow-x-auto' : 'flex flex-col space-y-1',
+          isHorizontal
+            ? 'flex items-center gap-1 overflow-x-auto border-b border-outline-variant/40'
+            : 'flex flex-col space-y-1',
           className
         )}
         {...props}
@@ -154,23 +157,21 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
               className={cn(
                 // Base layout with mandatory 44px touch target floor
                 'scrollspy-link inline-flex items-center transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] select-none cursor-pointer',
-                'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-sm',
+                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isHorizontal
-                  ? 'min-h-[44px] px-3.5 py-2 border-b-2 font-medium text-on-surface-variant hover:text-on-surface'
-                  : 'min-h-[44px] px-3 py-2 border-l-2 font-medium text-on-surface-variant hover:text-on-surface',
-                isActive
-                  ? isHorizontal
-                    ? cn(
-                        'border-primary text-primary font-semibold bg-surface-container/30',
-                        activeItemClassName
-                      )
-                    : cn(
-                        'border-primary text-primary font-semibold bg-surface-container/30 rounded-r-sm',
-                        activeItemClassName
-                      )
-                  : isHorizontal
-                    ? 'border-transparent hover:border-outline-variant hover:bg-surface-variant/20'
-                    : 'border-transparent hover:border-outline-variant hover:bg-surface-variant/20',
+                  ? cn(
+                      'min-h-[44px] px-3.5 py-2 -mb-px border-b-2 font-medium text-xs',
+                      isActive
+                        ? 'border-primary text-primary font-semibold'
+                        : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline-variant'
+                    )
+                  : cn(
+                      'min-h-[44px] px-3.5 py-2 rounded-md font-medium text-xs transition-colors',
+                      isActive
+                        ? 'bg-primary-container/40 text-primary font-semibold'
+                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/50'
+                    ),
+                isActive && activeItemClassName,
                 itemClassName
               )}
             >

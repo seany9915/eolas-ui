@@ -3,6 +3,22 @@ import { RegistryEntry } from './types';
 
 export const REGISTRY_ENTRIES: RegistryEntry[] = [
   {
+    "id": "utils",
+    "name": "utils",
+    "title": "Eolas UI Utilities",
+    "description": "Core utility library exporting cn() class merger, assetUrl() resolver, and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+    "category": "system",
+    "tier": "utility",
+    "basePrimitive": "Base UI Headless Library",
+    "sourcePath": "src/lib/utils.ts",
+    "dependencies": [
+      "clsx",
+      "tailwind-merge",
+      "@base-ui/react"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/utils"
+  },
+  {
     "id": "accordion",
     "name": "accordion",
     "title": "Accordion",
@@ -102,7 +118,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "name": "bot-avatar",
     "title": "Bot Avatar",
     "description": "Eolas UI Bot Avatar component built on Base UI and DESIGN.md design tokens.",
-    "category": "layout",
+    "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/bot-avatar.tsx",
@@ -441,17 +457,18 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "name": "confirmation",
     "title": "Confirmation",
     "description": "Confirmation primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
-    "category": "overlays",
+    "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/confirmation.tsx",
     "taxonomy": [
-      "Use Confirmation to present a human-in-the-loop consent or approval gate before an agentic tool executes a sensitive clinical or system action (e.g. updating a patient record, finalizing an assessment, or running an external write operation).",
+      "Dual-purpose component: 1. AI Tool Approval Gate: Conforms to shadcn AI Elements confirmation lifecycle (approval-requested -> approved / denied) for Human-in-the-Loop tool execution. 2. Clinical Decision Gate: Structured inline consent, prescription verification, order sign-off, or risk acknowledgment card in clinical workflows and dashboards.",
       "Conforms to shadcn AI Elements Confirmation specification and DESIGN.md:",
       "High-contrast visual structure with calm clinical amber/neutral tokens.",
       "Clear distinction between pending, approved, and denied states.",
       "WCAG 2.2 compliant 44x44px touch targets on decision buttons.",
-      "Floating 2px focus rings (`outline-offset: 2px`)."
+      "Floating 2px focus rings (`outline-offset: 2px`).",
+      "Concentric radius hierarchy (`rounded-xl` container with `rounded` buttons)."
     ],
     "dependencies": [
       "@base-ui/react",
@@ -1174,7 +1191,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "name": "reasoning",
     "title": "Reasoning",
     "description": "Reasoning primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/reasoning",
-    "category": "layout",
+    "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/reasoning.tsx",
@@ -1251,7 +1268,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Synchronizes active reading position in navigation links with visible page sections.",
       "Uses compositor-driven `scroll-target-group: auto` (Chrome/Edge 140+) with an accessible `IntersectionObserver` fallback for Safari and Firefox.",
       "Sets explicit `aria-current=\"true\"` on the active link for screen reader synchronicity.",
-      "Adheres to WCAG 2.2 SC 2.5.8 (44x44px minimum touch targets) and WCAG 1.4.1 (non-color active cues)."
+      "Adheres to WCAG 2.2 SC 2.5.8 (44x44px minimum touch targets) and WCAG 1.4.1 (non-color active cues).",
+      "Complies with DESIGN.md and anti-patterns.md: symmetrical rounded-md geometry without asymmetric single-sided card borders."
     ],
     "dependencies": [
       "@base-ui/react",
@@ -1455,9 +1473,12 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "title": "Steppers",
     "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
     "category": "navigation",
-    "tier": "primitive",
+    "tier": "utility",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/steppers.tsx",
+    "isDeprecated": true,
+    "deprecatedNote": "Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.",
+    "replacedBy": "number-field",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -1722,7 +1743,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "name": "thinking-orb",
     "title": "Thinking Orb",
     "description": "Eolas UI Thinking Orb component built on Base UI and DESIGN.md design tokens.",
-    "category": "layout",
+    "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/thinking-orb.tsx",
@@ -1883,7 +1904,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "name": "trace",
     "title": "Trace",
     "description": "Trace primitive suite. Base UI Integration: Consumes `@base-ui/react/collapsible` for headless accessible disclosures. Specification & Reference: - https://ui.shadcn.com/docs/components/base/trace - https://ui.shadcn.com/docs/ai-elements",
-    "category": "layout",
+    "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/collapsible",
     "sourcePath": "src/components/ui/trace.tsx",

@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-surface border-b border-outline-variant transition-colors">
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 min-h-18 py-2 sm:py-0 flex items-center justify-between gap-3 sm:gap-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 min-h-18 py-2 sm:py-0 flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Horizontal Lockup Integration */}
         <div className="flex items-center gap-3 shrink-0">
           <img

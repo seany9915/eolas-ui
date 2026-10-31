@@ -196,19 +196,32 @@ export const ContextMenuDemo: React.FC<ComponentDemoProps> = () => {
 
 export const TooltipDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-6 py-8">
+    <div className="flex flex-wrap items-center justify-center gap-8 py-8">
+      {/* 1. Canonical Compound Base UI Tooltip with explicit Tooltip.Arrow */}
       <Tooltip.Provider>
         <Tooltip.Root>
-          <Tooltip.Trigger render={<Button variant="outlined" size="sm">Hover for Clinical Explanation</Button>} />
+          <Tooltip.Trigger render={<Button variant="outlined" size="sm">Compound Tooltip (with Arrow)</Button>} />
           <Tooltip.Portal>
-            <Tooltip.Positioner side="top" sideOffset={6}>
-              <Tooltip.Popup className="px-3 py-1.5 rounded-lg bg-neutral text-on-neutral font-sans text-xs shadow-ambient">
+            <Tooltip.Positioner side="top" sideOffset={8}>
+              <Tooltip.Popup className="relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient">
+                <Tooltip.Arrow className="text-on-surface" />
                 NICE Guidelines: Section 4.2 Triage Metric
               </Tooltip.Popup>
             </Tooltip.Positioner>
           </Tooltip.Portal>
         </Tooltip.Root>
       </Tooltip.Provider>
+
+      {/* 2. Shorthand Tooltip with showArrow prop */}
+      <Tooltip
+        content="Shorthand Tooltip with built-in arrow and portal"
+        showArrow
+        side="bottom"
+      >
+        <Button variant="tonal" size="sm">
+          Shorthand Tooltip
+        </Button>
+      </Tooltip>
     </div>
   );
 };

@@ -103,6 +103,8 @@ TraceLine.displayName = 'Trace.Line';
 export interface TraceIconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name?: string;
   status?: TraceStatus;
+  stepNumber?: number | string;
+  variant?: 'ghost' | 'badge';
   children?: React.ReactNode;
   className?: string;
 }
@@ -110,22 +112,46 @@ export interface TraceIconProps extends React.HTMLAttributes<HTMLSpanElement> {
 export const TraceIcon: React.FC<TraceIconProps> = ({
   name,
   status = 'default',
+  stepNumber,
+  variant,
   children,
   className,
   ...props
 }) => {
+  // If stepNumber is provided or caller explicitly requested badge, use the circular container;
+  // otherwise default to sleek unboxed 'ghost' glyph
+  const resolvedVariant = variant ?? (stepNumber !== undefined ? 'badge' : 'ghost');
+  const isBadge = resolvedVariant === 'badge';
+
   return (
     <span
       data-slot="trace-icon"
+      data-variant={resolvedVariant}
       className={cn(
-        'flex size-6 shrink-0 items-center justify-center rounded-full text-xs transition-colors select-none',
-        status === 'complete' && 'bg-success-container text-on-success-container font-bold',
-        status === 'running' && 'bg-secondary-container text-on-secondary-container',
-        status === 'warning' && 'bg-warning-container text-on-warning-container font-bold',
-        status === 'error' && 'bg-error-container text-on-error-container font-bold',
-        status === 'pending' && 'bg-surface-variant text-on-surface-variant border border-outline',
-        status === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 border border-outline-variant',
-        status === 'default' && 'bg-surface-container text-on-surface-variant',
+        'shrink-0 items-center justify-center select-none transition-colors inline-flex',
+        isBadge
+          ? cn(
+              'size-6 rounded-full text-xs font-medium',
+              stepNumber !== undefined &&
+                'border border-outline-variant/60 bg-surface-container text-on-surface font-mono text-[11px] font-semibold',
+              stepNumber === undefined && status === 'complete' && 'bg-success-container text-on-success-container font-bold',
+              stepNumber === undefined && status === 'running' && 'bg-secondary-container text-on-secondary-container',
+              stepNumber === undefined && status === 'warning' && 'bg-warning-container text-on-warning-container font-bold',
+              stepNumber === undefined && status === 'error' && 'bg-error-container text-on-error-container font-bold',
+              stepNumber === undefined && status === 'pending' && 'bg-surface-container text-on-surface-variant/90 border border-outline/40',
+              stepNumber === undefined && status === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 border border-outline-variant',
+              stepNumber === undefined && status === 'default' && 'bg-surface-container text-on-surface-variant'
+            )
+          : cn(
+              'size-5 text-xs',
+              status === 'complete' && 'text-success',
+              status === 'running' && 'text-primary',
+              status === 'warning' && 'text-warning',
+              status === 'error' && 'text-error',
+              status === 'pending' && 'text-outline/70',
+              status === 'cancelled' && 'text-on-surface-variant/70',
+              status === 'default' && 'text-on-surface-variant'
+            ),
         className
       )}
       aria-hidden="true"
@@ -133,18 +159,24 @@ export const TraceIcon: React.FC<TraceIconProps> = ({
     >
       {children ? (
         children
+      ) : stepNumber !== undefined ? (
+        <span className="font-mono text-[11px] font-semibold tabular-nums leading-none">
+          {stepNumber}
+        </span>
       ) : status === 'running' ? (
-        <Icon name="progress_activity" size="xs" className="animate-spin text-xs" />
-      ) : status === 'complete' ? (
-        <Icon name="check" size="xs" className="text-xs" />
-      ) : status === 'warning' ? (
-        <Icon name="warning" size="xs" className="text-xs" />
-      ) : status === 'error' ? (
-        <Icon name="error" size="xs" className="text-xs" />
-      ) : status === 'cancelled' ? (
-        <Icon name="close" size="xs" className="text-xs" />
+        <Icon name="progress_activity" size="xs" className="animate-spin inline-flex items-center justify-center" />
       ) : name ? (
-        <Icon name={name} size="xs" className="text-xs" />
+        <Icon name={name} size="xs" className="inline-flex items-center justify-center" />
+      ) : status === 'complete' ? (
+        <Icon name="check_circle" size="xs" className="inline-flex items-center justify-center" />
+      ) : status === 'warning' ? (
+        <Icon name="warning" size="xs" className="inline-flex items-center justify-center" />
+      ) : status === 'error' ? (
+        <Icon name="error" size="xs" className="inline-flex items-center justify-center" />
+      ) : status === 'cancelled' ? (
+        <Icon name="close" size="xs" className="inline-flex items-center justify-center" />
+      ) : status === 'pending' ? (
+        <Icon name="radio_button_unchecked" size="xs" className="inline-flex items-center justify-center" />
       ) : (
         <span className="size-1.5 rounded-full bg-current" />
       )}
@@ -172,12 +204,12 @@ export const TraceBadge: React.FC<TraceBadgeProps> = ({
     <span
       data-slot="trace-badge"
       className={cn(
-        'font-mono text-xs tabular-nums px-1.5 py-0.5 rounded-full select-none shrink-0 font-medium',
+        'font-mono text-xs tabular-nums px-2 py-0.5 rounded-full select-none shrink-0 font-medium inline-flex items-center justify-center min-h-[20px]',
         status === 'complete' && 'bg-success-container text-on-success-container',
         status === 'running' && 'bg-secondary-container text-on-secondary-container',
         status === 'warning' && 'bg-warning-container text-on-warning-container',
         status === 'error' && 'bg-error-container text-on-error-container',
-        status === 'pending' && 'bg-surface-variant text-on-surface-variant border border-outline',
+        status === 'pending' && 'bg-surface-container text-on-surface-variant/90 border border-outline/40',
         status === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 line-through',
         status === 'default' && 'bg-surface-container text-on-surface-variant',
         className
@@ -204,7 +236,7 @@ export const TraceTitle = React.forwardRef<HTMLSpanElement, TraceTitleProps>(
       <span
         ref={ref}
         data-slot="trace-title"
-        className={cn('font-sans text-xs font-semibold text-on-surface truncate leading-tight', className)}
+        className={cn('font-sans text-xs font-semibold text-on-surface truncate leading-normal', className)}
         {...props}
       >
         {children}
@@ -229,7 +261,7 @@ export const TraceDescription = React.forwardRef<HTMLSpanElement, TraceDescripti
         ref={ref}
         data-slot="trace-description"
         className={cn(
-          'ml-auto font-sans text-xs text-on-surface-variant flex items-center gap-1.5 shrink-0 leading-tight',
+          'ml-auto font-sans text-xs text-on-surface-variant flex items-center gap-1.5 shrink-0 leading-normal tabular-nums',
           className
         )}
         {...props}
@@ -303,10 +335,10 @@ export const TraceCollapsibleTrigger = React.forwardRef<
       <div className="flex-1 min-w-0 flex items-center gap-2.5">{children}</div>
       {!hideChevron && (
         <span
-          className="pl-2 text-on-surface-variant shrink-0 group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
+          className="flex items-center justify-center size-5 ml-2 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
           aria-hidden="true"
         >
-          <Icon name="expand_more" size="xs" />
+          <Icon name="expand_more" size="xs" className="inline-flex items-center justify-center" />
         </span>
       )}
     </BaseCollapsible.Trigger>
@@ -319,12 +351,16 @@ export interface TraceCollapsibleContentProps
   children?: React.ReactNode;
   className?: string;
   unstyled?: boolean;
+  variant?: 'default' | 'flush' | 'unboxed';
 }
 
 export const TraceCollapsibleContent = React.forwardRef<
   HTMLDivElement,
   TraceCollapsibleContentProps
->(({ children, className, unstyled = false, ...props }, ref) => {
+>(({ children, className, unstyled = false, variant = 'default', ...props }, ref) => {
+  const isFlush = variant === 'flush';
+  const isUnboxed = variant === 'unboxed';
+
   return (
     <BaseCollapsible.Panel
       ref={ref}
@@ -336,6 +372,10 @@ export const TraceCollapsibleContent = React.forwardRef<
         className={cn(
           unstyled
             ? ''
+            : isFlush
+            ? 'p-0 border-t border-outline-variant/30 text-sm font-sans text-on-surface-variant leading-relaxed'
+            : isUnboxed
+            ? 'p-0 text-sm font-sans text-on-surface-variant leading-relaxed'
             : 'px-3.5 py-2.5 border-t border-outline-variant/30 text-sm font-sans text-on-surface-variant leading-relaxed',
           className
         )}

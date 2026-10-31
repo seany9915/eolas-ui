@@ -370,7 +370,9 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
           className={cn(
-            'w-full bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',
+            'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-[border-color,box-shadow]',
+      'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0',
             size === 'sm' && 'h-9 min-h-[44px] text-xs',
             size === 'md' && 'h-11 min-h-[44px] text-sm',
             size === 'lg' && 'h-14 min-h-[56px] text-base',
@@ -557,7 +559,8 @@ export const AutocompleteInputGroup = React.forwardRef<
     ref={ref}
     className={cn(
       'relative flex items-center w-full rounded border border-outline bg-surface transition-[border-color,box-shadow]',
-      'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
+      'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+      'focus-within:border-primary focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary',
       'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
       'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
       className
@@ -580,7 +583,9 @@ export const AutocompleteInput = React.forwardRef<
     data-slot="autocomplete-input"
     ref={ref}
     className={cn(
-      'w-full bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',
+      'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-[border-color,box-shadow]',
+      'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+      '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0',
       size === 'sm' && 'h-9 min-h-[44px] text-xs',
       size === 'md' && 'h-11 min-h-[44px] text-sm',
       size === 'lg' && 'h-14 min-h-[56px] text-base',
@@ -662,7 +667,7 @@ AutocompleteClear.displayName = 'AutocompleteClear';
 export const AutocompletePositioner = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.Positioner>,
   React.ComponentPropsWithoutRef<typeof BaseAutocomplete.Positioner>
->(({ className, sideOffset = 6, collisionPadding = 8, ...props }, ref) => (
+>(({ className, sideOffset = 4, collisionPadding = 8, ...props }, ref) => (
   <BaseAutocomplete.Positioner
     ref={ref}
     sideOffset={sideOffset}
@@ -680,7 +685,7 @@ export const AutocompletePopup = React.forwardRef<
   <BaseAutocomplete.Popup
     ref={ref}
     className={cn(
-      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-lg bg-surface border border-outline-variant shadow-modal',
+      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-lg bg-surface border border-outline-variant shadow-ambient',
       'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
       'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
       'motion-reduce:transition-none motion-reduce:transform-none z-50',
