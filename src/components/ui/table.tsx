@@ -1,19 +1,25 @@
 /**
  * Table primitive.
  *
- * Platform Reference: Modern Web Guidance (MWG: responsive-table)
+ * Platform Reference:
+ * - Modern Web Guidance (MWG: responsive-table)
+ * - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table
  *
  * TAXONOMY & USAGE:
- * - A data table primitive supporting standard horizontal scroll or responsive container-query card stacking.
- * - When responsive="stack", transforms rows into accessible stacked cards on narrow container widths (@container width < 600px).
- * - Implements explicit column header semantics (scope="col") and 56px minimum row heights for OS text zoom adaptability.
- * - Supports column-level alignment ('left' | 'right' | 'center') and automatic tabular number formatting (numeric: true).
- * - Numerical columns (percentages, scores, durations, metrics) right-align both headers and cells with tabular-nums.
+ * - Dual-mode data table primitive supporting:
+ *   1. Atomic compound composition (<Table>, <Table.Header>, <Table.Body>, <Table.Row>, <Table.Head>, <Table.Cell>, <Table.Footer>, <Table.Caption>).
+ *   2. Declarative data-driven mode (<Table columns={...} data={...} keyExtractor={...} responsive="stack" />)
+ *      with automatic container-query card stacking (@container).
+ * - Implements explicit column header semantics (scope="col"), 56px minimum row heights for OS text zoom adaptability,
+ *   and automatic tabular-nums on numeric columns.
  * - Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint.
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
+/* -------------------------------------------------------------------------------------------------
+ * Data-Driven Types
+ * -----------------------------------------------------------------------------------------------*/
 export interface TableColumn<T> {
   header: string;
   accessor: keyof T | ((row: T) => React.ReactNode);
@@ -25,104 +31,283 @@ export interface TableColumn<T> {
   className?: string;
 }
 
-export interface TableProps<T> {
+export interface DataDrivenTableProps<T> {
   columns: TableColumn<T>[];
   data: T[];
   keyExtractor: (row: T) => string | number;
   className?: string;
+  containerClassName?: string;
   /** Responsive layout behavior. 'scroll' preserves tabular overflow-x; 'stack' wraps into cards on narrow screens */
   responsive?: 'scroll' | 'stack';
 }
 
-export function Table<T>({
-  columns,
-  data,
-  keyExtractor,
-  className,
-  responsive = 'scroll',
-}: TableProps<T>) {
-  const isStack = responsive === 'stack';
+export type TableProps<T = unknown> =
+  | (React.HTMLAttributes<HTMLTableElement> & {
+      columns?: never;
+      data?: never;
+      containerClassName?: string;
+      responsive?: 'scroll' | 'stack';
+    })
+  | DataDrivenTableProps<T>;
 
-  return (
-    <div
-      className={cn(
-        'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
-        isStack && '@container',
-        className
-      )}
-    >
-      <table className="w-full text-left border-collapse font-sans text-sm">
-        <thead className={cn(isStack && '@max-sm:hidden')}>
-          <tr className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
-            {columns.map((col, idx) => {
-              const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
-              const alignClass =
-                effectiveAlign === 'right'
-                  ? 'text-right'
-                  : effectiveAlign === 'center'
-                    ? 'text-center'
-                    : 'text-left';
-              const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
+/* -------------------------------------------------------------------------------------------------
+ * Atomic Subcomponents (Compound Architecture)
+ * -----------------------------------------------------------------------------------------------*/
+export const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <thead
+    ref={ref}
+    data-slot="table-header"
+    className={cn('[&_tr]:border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm', className)}
+    {...props}
+  />
+));
+TableHeader.displayName = 'TableHeader';
 
-              return (
-                <th
-                  key={idx}
-                  scope="col"
-                  className={cn('px-6 py-4 font-semibold', alignClass, numericClass, col.className)}
-                >
-                  {col.header}
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody className={cn('divide-y divide-outline-variant', isStack && '@max-sm:divide-y-0 @max-sm:space-y-3 @max-sm:block @max-sm:p-3')}>
-          {data.map((row) => (
-            <tr
-              key={keyExtractor(row)}
+export const TableBody = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tbody
+    ref={ref}
+    data-slot="table-body"
+    className={cn('divide-y divide-outline-variant [&_tr:last-child]:border-0', className)}
+    {...props}
+  />
+));
+TableBody.displayName = 'TableBody';
+
+export const TableFooter = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tfoot
+    ref={ref}
+    data-slot="table-footer"
+    className={cn(
+      'border-t border-outline-variant bg-surface-container/50 font-medium font-sans text-on-surface [&>tr]:last:border-b-0',
+      className
+    )}
+    {...props}
+  />
+));
+TableFooter.displayName = 'TableFooter';
+
+export const TableRow = React.forwardRef<
+  HTMLTableRowElement,
+  React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, ...props }, ref) => (
+  <tr
+    ref={ref}
+    data-slot="table-row"
+    className={cn(
+      'border-b border-outline-variant transition-colors hover:bg-surface-container/30 data-[state=selected]:bg-surface-container min-h-14',
+      className
+    )}
+    {...props}
+  />
+));
+TableRow.displayName = 'TableRow';
+
+export const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, scope = 'col', ...props }, ref) => (
+  <th
+    ref={ref}
+    scope={scope}
+    data-slot="table-head"
+    className={cn(
+      'h-12 px-4 text-left align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      className
+    )}
+    {...props}
+  />
+));
+TableHead.displayName = 'TableHead';
+
+export const TableCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td
+    ref={ref}
+    data-slot="table-cell"
+    className={cn(
+      'px-4 py-3.5 align-middle text-on-surface font-sans text-sm [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      className
+    )}
+    {...props}
+  />
+));
+TableCell.displayName = 'TableCell';
+
+export const TableCaption = React.forwardRef<
+  HTMLTableCaptionElement,
+  React.HTMLAttributes<HTMLTableCaptionElement>
+>(({ className, ...props }, ref) => (
+  <caption
+    ref={ref}
+    data-slot="table-caption"
+    className={cn('mt-4 text-xs font-sans text-on-surface-variant', className)}
+    {...props}
+  />
+));
+TableCaption.displayName = 'TableCaption';
+
+/* -------------------------------------------------------------------------------------------------
+ * Root Table Component (Supports both compound children and declarative data mode)
+ * -----------------------------------------------------------------------------------------------*/
+export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>>(
+  (props, ref) => {
+    // Declarative data-driven mode
+    if ('columns' in props && Array.isArray(props.columns) && Array.isArray(props.data)) {
+      const {
+        columns,
+        data,
+        keyExtractor,
+        className,
+        responsive = 'scroll',
+      } = props as DataDrivenTableProps<any>;
+      const isStack = responsive === 'stack';
+
+      return (
+        <div
+          data-slot="table-container"
+          className={cn(
+            'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+            isStack && '@container',
+            className
+          )}
+        >
+          <table ref={ref} data-slot="table" className="w-full text-left border-collapse font-sans text-sm">
+            <thead className={cn(isStack && '@max-sm:hidden')}>
+              <tr className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
+                {columns.map((col, idx) => {
+                  const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
+                  const alignClass =
+                    effectiveAlign === 'right'
+                      ? 'text-right'
+                      : effectiveAlign === 'center'
+                        ? 'text-center'
+                        : 'text-left';
+                  const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
+
+                  return (
+                    <th
+                      key={idx}
+                      scope="col"
+                      className={cn('px-6 py-4 font-semibold', alignClass, numericClass, col.className)}
+                    >
+                      {col.header}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody
               className={cn(
-                'min-h-[56px] hover:bg-surface-container/30 transition-colors',
-                isStack && '@max-sm:block @max-sm:p-4 @max-sm:rounded-lg @max-sm:border @max-sm:border-outline-variant @max-sm:bg-surface'
+                'divide-y divide-outline-variant',
+                isStack && '@max-sm:divide-y-0 @max-sm:space-y-3 @max-sm:block @max-sm:p-3'
               )}
             >
-              {columns.map((col, cIdx) => {
-                const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
-                const alignClass =
-                  effectiveAlign === 'right'
-                    ? 'text-right'
-                    : effectiveAlign === 'center'
-                      ? 'text-center'
-                      : 'text-left';
-                const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
+              {data.map((row) => (
+                <tr
+                  key={keyExtractor(row)}
+                  className={cn(
+                    'min-h-14 hover:bg-surface-container/30 transition-colors',
+                    isStack &&
+                      '@max-sm:block @max-sm:p-4 @max-sm:rounded-lg @max-sm:border @max-sm:border-outline-variant @max-sm:bg-surface'
+                  )}
+                >
+                  {columns.map((col, cIdx) => {
+                    const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
+                    const alignClass =
+                      effectiveAlign === 'right'
+                        ? 'text-right'
+                        : effectiveAlign === 'center'
+                          ? 'text-center'
+                          : 'text-left';
+                    const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
 
-                return (
-                  <td
-                    key={cIdx}
-                    className={cn(
-                      'px-6 py-4 text-on-surface',
-                      alignClass,
-                      numericClass,
-                      col.className,
-                      isStack && '@max-sm:flex @max-sm:items-center @max-sm:justify-between @max-sm:px-0 @max-sm:py-2 @max-sm:border-b @max-sm:border-outline-variant/40 @max-sm:last:border-b-0'
-                    )}
-                  >
-                    {isStack && (
-                      <span className="hidden @max-sm:inline-block font-label text-xs font-semibold text-on-surface-variant mr-3 select-none">
-                        {col.header}
-                      </span>
-                    )}
-                    <span className={cn(effectiveAlign === 'right' && isStack && '@max-sm:text-right')}>
-                      {typeof col.accessor === 'function'
-                        ? col.accessor(row)
-                        : (row[col.accessor] as React.ReactNode)}
-                    </span>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+                    return (
+                      <td
+                        key={cIdx}
+                        className={cn(
+                          'px-6 py-4 text-on-surface',
+                          alignClass,
+                          numericClass,
+                          col.className,
+                          isStack &&
+                            '@max-sm:flex @max-sm:items-center @max-sm:justify-between @max-sm:px-0 @max-sm:py-2 @max-sm:border-b @max-sm:border-outline-variant/40 @max-sm:last:border-b-0'
+                        )}
+                      >
+                        {isStack && (
+                          <span className="hidden @max-sm:inline-block font-label text-xs font-semibold text-on-surface-variant mr-3 select-none">
+                            {col.header}
+                          </span>
+                        )}
+                        <span className={cn(effectiveAlign === 'right' && isStack && '@max-sm:text-right')}>
+                          {typeof col.accessor === 'function'
+                            ? col.accessor(row)
+                            : (row[col.accessor] as React.ReactNode)}
+                        </span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    // Composable compound mode (shadcn standard anatomy)
+    const { className, containerClassName, children, responsive = 'scroll', ...tableProps } =
+      props as React.HTMLAttributes<HTMLTableElement> & {
+        containerClassName?: string;
+        responsive?: 'scroll' | 'stack';
+      };
+    const isStack = responsive === 'stack';
+
+    return (
+      <div
+        data-slot="table-container"
+        className={cn(
+          'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+          isStack && '@container',
+          containerClassName
+        )}
+      >
+        <table
+          ref={ref}
+          data-slot="table"
+          className={cn('w-full caption-bottom text-left border-collapse font-sans text-sm', className)}
+          {...tableProps}
+        >
+          {children}
+        </table>
+      </div>
+    );
+  }
+);
+TableComponent.displayName = 'Table';
+
+/* -------------------------------------------------------------------------------------------------
+ * Compound Object Export
+ * -----------------------------------------------------------------------------------------------*/
+export const Table = Object.assign(TableComponent, {
+  Root: TableComponent,
+  Header: TableHeader,
+  Body: TableBody,
+  Footer: TableFooter,
+  Row: TableRow,
+  Head: TableHead,
+  Cell: TableCell,
+  Caption: TableCaption,
+});
+
+export default Table;

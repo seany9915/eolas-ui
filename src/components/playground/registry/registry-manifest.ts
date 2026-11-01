@@ -117,15 +117,21 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "badge",
     "name": "badge",
     "title": "Badge",
-    "description": "Passive status badge primitive for counts, categories, and attributes.",
-    "category": "feedback",
+    "description": "Badge primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/badge",
+    "category": "layout",
     "tier": "primitive",
-    "basePrimitive": "Base UI useRender",
+    "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/badge.tsx",
     "taxonomy": [
-      "Use Badge for passive, non-interactive status indicators, counts, categories, or labels.",
+      "Use Badge for PASSIVE, non-interactive status indicators, counts, categories, or labels.",
       "Do NOT use Badge for interactive filters, toggles, or removable tags (use Chip instead).",
-      "Follows DESIGN.md high-contrast accessible standards (filled, outline, soft). No triple-tint monochrome chips."
+      "Implements DESIGN.md High-Contrast Accessible standards:",
+      "Pattern 1 (filled): Solid brand fill + high-contrast on-color text.",
+      "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+      "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+      "Never uses the banned triple-tint monochrome pattern (light tint + same-hue border + same-hue text).",
+      "Full WCAG 2.2 AA contrast compliance.",
+      "Polymorphic composition powered by Base UI's `useRender` hook."
     ],
     "dependencies": [
       "@base-ui/react",
@@ -168,6 +174,28 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/breadcrumb"
   },
   {
+    "id": "button-group",
+    "name": "button-group",
+    "title": "Button Group",
+    "description": "ButtonGroup primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/button-group",
+    "category": "inputs",
+    "tier": "primitive",
+    "basePrimitive": "DESIGN.md Token Primitive",
+    "sourcePath": "src/components/ui/button-group.tsx",
+    "taxonomy": [
+      "A container to group related buttons, segmented actions, and inputs with fused borders and shared geometry.",
+      "Resolves double-border artifacts (-space-x-px / -space-y-px) while ensuring focus rings stay visible with proper stacking context (focus-visible:z-20).",
+      "Fuses concentric border radii: rounds outer corners while flattening adjacent internal edges.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 touch target compliance."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/button-group"
+  },
+  {
     "id": "button",
     "name": "button",
     "title": "Button",
@@ -194,20 +222,22 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "calendar",
     "name": "calendar",
     "title": "Calendar",
-    "description": "Accessible date picker and range calendar primitive built on react-day-picker.",
-    "category": "inputs",
+    "description": "Calendar primitive (React DayPicker). Base UI Ecosystem Documentation: https://ui.shadcn.com/docs/components/base/calendar React DayPicker Documentation: https://daypicker.dev",
+    "category": "layout",
     "tier": "primitive",
-    "basePrimitive": "react-day-picker",
+    "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/calendar.tsx",
     "taxonomy": [
-      "Use Calendar for interactive single-day selection, date ranges, and consultation booking.",
-      "Styled with DESIGN.md clinical tokens: high-contrast selection wash, today indicator, and floating focus rings.",
-      "Complies with WCAG 2.2 keyboard navigation (arrow keys, home, end, page up/down)."
+      "Use Calendar for date, multiple date, and date range selections.",
+      "Integrates with React DayPicker v9/v10 while maintaining complete shadcn/ui API compatibility.",
+      "Commonly paired with Popover and Button to form a DatePicker.",
+      "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast."
     ],
     "dependencies": [
-      "react-day-picker",
+      "@base-ui/react",
       "clsx",
-      "tailwind-merge"
+      "tailwind-merge",
+      "react-day-picker"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/calendar"
   },
@@ -402,11 +432,21 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "chip",
     "name": "chip",
     "title": "Chip",
-    "description": "Eolas UI Chip component built on Base UI and DESIGN.md design tokens.",
+    "description": "Chip primitive. Built on Base UI (@base-ui/react) interaction foundations.",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/button",
     "sourcePath": "src/components/ui/chip.tsx",
+    "taxonomy": [
+      "Use Chip for INTERACTIVE compact elements: 1. Filter chips: Toggleable selection filters with keyboard navigation (aria-pressed). 2. Input/Removable chips: Dismissible tags with accessible remove buttons (onRemove). 3. Action chips: Clickable compact triggers (onClick).",
+      "For PASSIVE, non-interactive status labels or counts, use Badge instead.",
+      "Implements DESIGN.md High-Contrast Accessible standards:",
+      "Pattern 1 (filled): Solid brand fill + high-contrast text.",
+      "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+      "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+      "Full WCAG 2.2 SC 2.5.8 touch target compliance (expands to 44px when interactive or removable).",
+      "Floating 2px focus ring (outline-offset: 2px) on keyboard focus."
+    ],
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -440,7 +480,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/code-block.tsx",
     "taxonomy": [
-      "Displays source code, JSON parameters, query outputs, and formatted data structures inside assistant execution traces or messages.",
+      "Displays source code, JSON parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
       "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
       "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
     ],
@@ -498,21 +538,22 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "command",
     "name": "command",
     "title": "Command",
-    "description": "Fast, composable command menu palette and dialog built on cmdk and Base UI Dialog.",
-    "category": "overlays",
+    "description": "Command primitive (cmdk + Base UI Dialog). cmdk Documentation: https://cmdk.paco.me",
+    "category": "layout",
     "tier": "primitive",
-    "basePrimitive": "cmdk & Base UI Dialog",
+    "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/command.tsx",
     "taxonomy": [
-      "Use Command for quick-search palettes, keyboard-driven navigation, and clinical patient lookups.",
-      "Supports modal CommandDialog and inline embedded Command.",
-      "Exports Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, and CommandSeparator."
+      "Use Command for fast, accessible command palettes, spotlight search, and quick action menus.",
+      "Powered by cmdk for fuzzy searching, keyboard scoring, and grouped item filtering.",
+      "CommandDialog integrates Base UI Dialog (with screen-reader accessible DialogTitle and DialogDescription) while retaining complete shadcn Command API compatibility.",
+      "Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings, surface-container wash for item selection, and strict semantic tokens."
     ],
     "dependencies": [
-      "cmdk",
       "@base-ui/react",
       "clsx",
-      "tailwind-merge"
+      "tailwind-merge",
+      "cmdk"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/command"
   },
@@ -652,11 +693,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "empty-state",
     "name": "empty-state",
     "title": "Empty State",
-    "description": "Eolas UI Empty State component built on Base UI and DESIGN.md design tokens.",
+    "description": "EmptyState primitive (backward-compatibility alias for Empty). Canonical primitive resides at @/components/ui/empty. Conforms to https://ui.shadcn.com/docs/components/base/empty",
     "category": "feedback",
-    "tier": "primitive",
+    "tier": "utility",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/empty-state.tsx",
+    "isDeprecated": true,
+    "deprecatedNote": "Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/empty.",
+    "replacedBy": "empty",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -668,11 +712,23 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "empty",
     "name": "empty",
     "title": "Empty",
-    "description": "Eolas UI Empty component built on Base UI and DESIGN.md design tokens.",
+    "description": "Empty primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/empty",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/empty.tsx",
+    "taxonomy": [
+      "Use Empty to display empty states when collections, search results, or tables have no items.",
+      "Composable compound architecture:",
+      "Empty (Root container)",
+      "EmptyHeader (Group wrapper for media, title, and description)",
+      "EmptyMedia (Icon / Avatar / Graphic tile with variant=\"default\" | \"icon\")",
+      "EmptyTitle (Headline typography in Atkinson Hyperlegible Next)",
+      "EmptyDescription (Body typography in Lexend with accessible link styling)",
+      "EmptyContent (Actions and button container)",
+      "Also supports monolithic convenience props (icon, title, description, action) for backward compatibility.",
+      "Follows DESIGN.md: concentric border radius, semantic high-contrast colors, and text-balance / text-pretty."
+    ],
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -777,11 +833,18 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "inline-alert",
     "name": "inline-alert",
     "title": "Inline Alert",
-    "description": "Eolas UI Inline Alert component built on Base UI and DESIGN.md design tokens.",
+    "description": "InlineAlert primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/alert",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/button",
     "sourcePath": "src/components/ui/inline-alert.tsx",
+    "taxonomy": [
+      "Use InlineAlert for high-visibility system event or validation banners (neutral, warning, error, success).",
+      "Implements a mathematically straight 4px vertical accent bar, ambient elevation, and accessible live regions.",
+      "Supports both monolithic props (title, action, onClose) and compound subcomponents (InlineAlert.Title, InlineAlert.Description, InlineAlert.Action, InlineAlert.Close).",
+      "Distinct from ClinicianTip (which is low-prominence instructional micro-guidance) and AlertDialog (modal interrupt).",
+      "Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles."
+    ],
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -849,15 +912,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "item",
     "name": "item",
     "title": "Item",
-    "description": "Content row and media object primitive for structured list items, patient directories, and activity feeds.",
+    "description": "Item layout primitive (Content Row / Media Object). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/item",
     "category": "layout",
     "tier": "primitive",
-    "basePrimitive": "Base UI useRender",
+    "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/item.tsx",
     "taxonomy": [
-      "Use Item and ItemGroup for structured list rows, activity feeds, patient directories, and settings rows.",
-      "Directly eliminates the 'Card inside Card' anti-pattern by providing a clean, non-elevated content row.",
-      "Exports Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader, and ItemFooter."
+      "Use Item and ItemGroup for structured list rows, activity feeds, patient directories, notification trays, and settings rows.",
+      "Composes [Media] + [Content (Title, Description)] + [Actions] without custom flex boilerplate.",
+      "Directly eliminates the \"Card inside Card\" anti-pattern by providing a clean, non-elevated content row for lists inside cards and dialogs.",
+      "Supports polymorphic composition via Base UI's `useRender` hook (turning the item into a link or button).",
+      "Follows DESIGN.md tokens: Lexend body/description font, Lexend label headers, floating 2px focus ring, and strict semantic tokens."
     ],
     "dependencies": [
       "@base-ui/react",
@@ -869,16 +934,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
   {
     "id": "kbd",
     "name": "kbd",
-    "title": "Keyboard Key (Kbd)",
-    "description": "Accessible keyboard shortcut indicator styled with semantic typography and ambient elevation.",
+    "title": "Kbd",
+    "description": "Keyboard key primitive (Kbd). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/kbd",
     "category": "layout",
     "tier": "primitive",
-    "basePrimitive": "Base UI useRender",
+    "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/kbd.tsx",
     "taxonomy": [
-      "Use Kbd to display keyboard keys and shortcuts in menus, command palettes, tooltips, and documentation.",
-      "Use KbdGroup to display multi-key shortcut combinations (e.g. ⌘ + K).",
-      "Supports size variants (sm, md) and follows DESIGN.md Roboto Mono typography."
+      "Use Kbd to visually represent keyboard keys, hotkeys, and shortcut combinations (e.g. ⌘K, Ctrl+B).",
+      "Use KbdGroup to compose multiple keycaps together without line breaks.",
+      "Ideal for embedding in buttons, command palettes, menus, and tooltips.",
+      "Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container wash, subtle outline-variant border, and strict semantic tokens."
     ],
     "dependencies": [
       "@base-ui/react",
@@ -1542,6 +1608,28 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/sources"
   },
   {
+    "id": "spinner",
+    "name": "spinner",
+    "title": "Spinner",
+    "description": "Spinner primitive. Base UI Integration: Companion status & loading indicator. Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner",
+    "category": "feedback",
+    "tier": "primitive",
+    "basePrimitive": "DESIGN.md Token Primitive",
+    "sourcePath": "src/components/ui/spinner.tsx",
+    "taxonomy": [
+      "Lightweight, accessible loading indicator showing asynchronous operations.",
+      "Suitable for standalone loading states, form submission feedback, and inline button indicators.",
+      "Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.",
+      "Automatically inherits currentColor for flawless integration across buttons, badges, and text."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/spinner"
+  },
+  {
     "id": "spinning-counter",
     "name": "spinning-counter",
     "title": "Spinning Counter",
@@ -1556,22 +1644,6 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/spinning-counter"
-  },
-  {
-    "id": "step-wizard",
-    "name": "step-wizard",
-    "title": "Step Wizard",
-    "description": "Eolas UI Step Wizard component built on Base UI and DESIGN.md design tokens.",
-    "category": "navigation",
-    "tier": "primitive",
-    "basePrimitive": "@base-ui/react/button",
-    "sourcePath": "src/components/ui/step-wizard.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/step-wizard"
   },
   {
     "id": "steppers",
@@ -1703,17 +1775,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "table",
     "name": "table",
     "title": "Table",
-    "description": "Table primitive. Platform Reference: Modern Web Guidance (MWG: responsive-table)",
+    "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/table.tsx",
     "taxonomy": [
-      "A data table primitive supporting standard horizontal scroll or responsive container-query card stacking.",
-      "When responsive=\"stack\", transforms rows into accessible stacked cards on narrow container widths (@container width < 600px).",
-      "Implements explicit column header semantics (scope=\"col\") and 56px minimum row heights for OS text zoom adaptability.",
-      "Supports column-level alignment ('left' | 'right' | 'center') and automatic tabular number formatting (numeric: true).",
-      "Numerical columns (percentages, scores, durations, metrics) right-align both headers and cells with tabular-nums.",
+      "Dual-mode data table primitive supporting: 1. Atomic compound composition (<Table>, <Table.Header>, <Table.Body>, <Table.Row>, <Table.Head>, <Table.Cell>, <Table.Footer>, <Table.Caption>). 2. Declarative data-driven mode (<Table columns={...} data={...} keyExtractor={...} responsive=\"stack\" />) with automatic container-query card stacking (@container).",
+      "Implements explicit column header semantics (scope=\"col\"), 56px minimum row heights for OS text zoom adaptability, and automatic tabular-nums on numeric columns.",
       "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
     ],
     "dependencies": [
@@ -2091,6 +2160,29 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chat"
   },
   {
+    "id": "data-table",
+    "name": "data-table",
+    "title": "Data Table",
+    "description": "DataTable composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens: - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`) - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Select` (`src/components/ui/select.tsx`) - `Menu` (`src/components/ui/menu.tsx`) - `Checkbox` (`src/components/ui/checkbox.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `@tanstack/react-table`",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/data-table.tsx",
+    "taxonomy": [
+      "Enterprise-grade, accessible data table composite block conforming to shadcn/ui Data Table specification.",
+      "Powers complex data exploration with column sorting, global & column text filtering, faceted category filtering, row selection, dynamic column visibility toggling, loading/empty states, and accessible pagination.",
+      "Conforms to DESIGN.md Table rules: 56px minimum row height, right-aligned numeric columns with tabular-nums and font-mono, concentric geometry, floating focus rings, and container-query responsiveness (@container).",
+      "Exports both all-in-one <DataTable /> and composable subcomponents: DataTableColumnHeader, DataTablePagination, DataTableViewOptions, DataTableFacetedFilter, DataTableToolbar, DataTableRowActions, createSelectColumn, createActionsColumn."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "@tanstack/react-table"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/data-table"
+  },
+  {
     "id": "delete-confirmation-dialog",
     "name": "delete-confirmation-dialog",
     "title": "Delete Confirmation Dialog",
@@ -2126,7 +2218,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "metric-card",
     "name": "metric-card",
     "title": "Metric Card",
-    "description": "MetricCard block. Presentational metric card for analytics, session overviews, and progress monitoring. Composes Card, Chip, and Icon primitives with tabular numbers, ambient elevation, and high-contrast status tokens.",
+    "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Chip, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2137,6 +2229,50 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/metric-card"
+  },
+  {
+    "id": "questionnaire",
+    "name": "questionnaire",
+    "title": "Questionnaire",
+    "description": "Questionnaire composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Kbd` (`src/components/ui/kbd.tsx`)",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/questionnaire.tsx",
+    "taxonomy": [
+      "Multi-step guided question primitive and flow engine for intake forms, clinical assessments, onboarding sequences, configuration wizards, and conversational agent clarification prompts.",
+      "Conforms to shadcn/ui Questionnaire specification with full parity across compound subcomponents and flat exports: Root, Progress, Item, Title, Description, Choices, Choice, ChoiceInput, ChoiceLabel, ChoiceShortcut, Input, Error, Actions, Previous, Skip, Next, and Submit.",
+      "Supports single-choice, multiple-choice, freeform text entry, keyboard shortcuts (A-Z, 1-9), roving tabindex arrow key navigation, form validation, draft restoration, and native FormData serialization.",
+      "Accessible: WCAG 2.2 SC 2.5.8 compliant (min-h-11 touch targets), floating 2px focus indicators, fieldset/legend semantics, inert inactive items, live error regions, and container-query responsiveness (@container)."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/questionnaire"
+  },
+  {
+    "id": "step-wizard",
+    "name": "step-wizard",
+    "title": "Step Wizard",
+    "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/step-wizard.tsx",
+    "taxonomy": [
+      "Controlled multi-step workflow container for guided clinical intake, onboarding, assessment flows, and multi-stage form sequences.",
+      "Pure UI: receives step data via props, manages directional slide transitions, and emits progression intents via callbacks (`onStepChange`, `onComplete`).",
+      "Accessible: WCAG 2.2 SC 2.5.8 compliant (44x44px minimum touch targets on all interactive step markers and buttons), floating 2px focus indicators (`outline-offset: 2px`), and live regions (`aria-live=\"polite\"`).",
+      "Modern HTML integration: supports `hiddenUntilFound` with `hidden=\"until-found\"` and `beforematch` event listener so browser search (<kbd>Ctrl+F</kbd>) finds inactive step content."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/step-wizard"
   }
 ];
 

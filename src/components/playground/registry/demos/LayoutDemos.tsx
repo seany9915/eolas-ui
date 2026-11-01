@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Card } from '@/components/ui/card';
 import { Table } from '@/components/ui/table';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Separator } from '@/components/ui/separator';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Collapsible } from '@/components/ui/collapsible';
@@ -14,6 +16,8 @@ import { DeferredView } from '@/components/ui/deferred-view';
 import { SwipeReveal } from '@/components/ui/swipe-reveal';
 import { TextHighlight } from '@/components/ui/text-highlight';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
 import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from '@/components/ui/item';
 import { ComponentDemoProps } from '../types';
@@ -100,15 +104,71 @@ export const TableDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ChartDemo: React.FC<ComponentDemoProps> = () => {
+  const chartData = [
+    { day: 'Mon', minutes: 24, target: 20 },
+    { day: 'Tue', minutes: 32, target: 20 },
+    { day: 'Wed', minutes: 18, target: 20 },
+    { day: 'Thu', minutes: 28, target: 20 },
+    { day: 'Fri', minutes: 40, target: 20 },
+    { day: 'Sat', minutes: 35, target: 20 },
+    { day: 'Sun', minutes: 22, target: 20 },
+  ];
+
+  const chartConfig = {
+    minutes: {
+      label: 'Practice minutes',
+      color: 'var(--color-primary)',
+    },
+    target: {
+      label: 'Target goal',
+      color: 'var(--color-secondary)',
+    },
+  } satisfies ChartConfig;
+
   return (
     <div className="w-full max-w-xl mx-auto p-6 rounded-xl bg-surface border border-outline-variant space-y-4">
       <div className="flex items-center justify-between">
-        <span className="font-heading text-xs font-bold text-on-surface">Sound Accuracy Trend (7 Days)</span>
-        <span className="font-mono text-xs font-bold text-primary">Target: 80% or Higher</span>
+        <div>
+          <h4 className="font-heading text-sm font-bold text-on-surface">Weekly Articulation Activity</h4>
+          <p className="font-sans text-xs text-on-surface-variant">Daily recorded practice time versus baseline</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-block size-2.5 rounded-full bg-primary" />
+          <span className="font-sans text-xs text-on-surface-variant">Actual</span>
+          <span className="inline-block size-2.5 rounded-full bg-secondary ml-2" />
+          <span className="font-sans text-xs text-on-surface-variant">Target</span>
+        </div>
       </div>
-      <div className="h-44 rounded-lg bg-surface-container/60 border border-outline-variant/60 flex items-center justify-center text-xs font-mono text-on-surface-variant">
-        Practice Accuracy Chart Preview
-      </div>
+
+      <ChartContainer
+        role="img"
+        aria-label="Weekly articulation activity bar chart comparing actual practice minutes against a 20-minute daily target"
+        config={chartConfig}
+        className="h-56 w-full aspect-auto"
+      >
+        <BarChart data={chartData} margin={{ top: 12, right: 12, left: -16, bottom: 0 }}>
+          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-outline-variant/40" />
+          <XAxis
+            dataKey="day"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            className="font-sans text-xs text-on-surface-variant"
+          />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `${value}m`}
+            className="font-mono text-xs text-on-surface-variant"
+          />
+          <ChartTooltip
+            cursor={{ fill: 'var(--color-surface-container)' }}
+            content={<ChartTooltipContent indicator="dot" />}
+          />
+          <Bar dataKey="minutes" fill="var(--color-minutes)" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="target" fill="var(--color-target)" radius={[6, 6, 0, 0]} opacity={0.6} />
+        </BarChart>
+      </ChartContainer>
     </div>
   );
 };
@@ -343,10 +403,108 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
+  const [query, setQuery] = React.useState('sound');
+  const [caseSensitive, setCaseSensitive] = React.useState(false);
+
+  const sampleKeywords = ['sound', 'articulation', 'practice', 'accuracy'];
+
   return (
-    <div className="w-full max-w-md mx-auto py-4 text-xs font-sans text-on-surface leading-relaxed">
-      <div className="leading-relaxed">
-        The learner practiced <TextHighlight query="consonant">consonant blends</TextHighlight> during today's sound drills.
+    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          GPU Text Search & Highlight
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Highlights search keywords using the W3C CSS Custom Highlight API on the GPU compositor without splitting strings or fragmenting screen reader announcements.
+        </p>
+      </div>
+
+      {/* Interactive Search Controls */}
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="relative flex-1">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Type keyword to highlight..."
+              className="h-10 text-xs pl-9"
+              aria-label="Search keywords in clinical notes"
+            />
+            <Icon
+              name="search"
+              size="xs"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+            />
+          </div>
+
+          <Button
+            size="sm"
+            variant={caseSensitive ? 'tonal' : 'outlined'}
+            colorRole="neutral"
+            onClick={() => setCaseSensitive((prev) => !prev)}
+            className="h-10 text-xs shrink-0"
+            title="Toggle case-sensitive matching"
+          >
+            <Icon name="match_case" size="xs" className="mr-1.5" />
+            {caseSensitive ? 'Case Sensitive: On' : 'Case Sensitive: Off'}
+          </Button>
+        </div>
+
+        {/* Quick Suggestion Chips */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-label text-xs text-on-surface-variant mr-1">Suggested:</span>
+          {sampleKeywords.map((kw) => (
+            <Button
+              key={kw}
+              size="sm"
+              variant={query.toLowerCase() === kw ? 'filled' : 'outlined'}
+              colorRole={query.toLowerCase() === kw ? 'primary' : 'neutral'}
+              onClick={() => setQuery(kw)}
+              className="h-7 text-xs px-2.5 rounded-full"
+            >
+              {kw}
+            </Button>
+          ))}
+          {query && (
+            <Button
+              size="sm"
+              variant="ghost"
+              colorRole="neutral"
+              onClick={() => setQuery('')}
+              className="h-7 text-xs px-2 text-on-surface-variant"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Target Content with Live Highlight */}
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+        <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
+          <div className="flex items-center gap-2">
+            <Icon name="description" size="xs" className="text-primary" />
+            <span className="font-heading text-xs font-bold text-on-surface">
+              Speech Therapy Session Notes
+            </span>
+          </div>
+          <Badge variant="soft" colorRole="primary" size="sm">
+            {query.trim() ? `Highlighting: "${query}"` : 'No search query'}
+          </Badge>
+        </div>
+
+        <TextHighlight
+          query={query}
+          caseSensitive={caseSensitive}
+          className="font-sans text-xs text-on-surface leading-relaxed space-y-2"
+        >
+          <p>
+            The learner practiced articulation sound drills today with high accuracy. During the initial vowel repetition, accuracy reached ninety-four percent across consonant blends.
+          </p>
+          <p>
+            Ongoing speech practice focuses on initial sound clarity and breath control. Morning sound drills will continue five days a week with guided audio feedback.
+          </p>
+        </TextHighlight>
       </div>
     </div>
   );

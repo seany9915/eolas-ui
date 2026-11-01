@@ -374,6 +374,9 @@ if (fs.existsSync(BLOCKS_DIR)) {
     }
 
     const npmDeps = ['@base-ui/react', 'clsx', 'tailwind-merge'];
+    if (content.includes("from '@tanstack/react-table'") || content.includes('from "@tanstack/react-table"')) {
+      npmDeps.push('@tanstack/react-table');
+    }
 
     const item = {
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',

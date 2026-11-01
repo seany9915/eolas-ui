@@ -5,7 +5,7 @@ const r = JSON.parse(fs.readFileSync('public/r/registry.json', 'utf8'));
 
 const catMap = {
   // Inputs
-  'button': 'inputs', 'input': 'inputs', 'textarea': 'inputs', 'field': 'inputs', 'fieldset': 'inputs',
+  'button': 'inputs', 'button-group': 'inputs', 'input': 'inputs', 'textarea': 'inputs', 'field': 'inputs', 'fieldset': 'inputs',
   'form': 'inputs', 'select': 'inputs', 'combobox': 'inputs', 'autocomplete': 'inputs', 'checkbox': 'inputs',
   'checkbox-group': 'inputs', 'radio': 'inputs', 'switch': 'inputs', 'toggle': 'inputs', 'toggle-group': 'inputs',
   'slider': 'inputs', 'number-field': 'inputs', 'otp-field': 'inputs', 'selection-controls': 'inputs', 'toggles': 'inputs',
@@ -17,11 +17,11 @@ const catMap = {
   // Feedback
   'inline-alert': 'feedback', 'toast': 'feedback', 'chip': 'feedback', 'notification-badge': 'feedback',
   'meter': 'feedback', 'progress': 'feedback', 'progress-ring': 'feedback', 'empty': 'feedback',
-  'empty-state': 'feedback', 'skeleton': 'feedback', 'reading-progress': 'feedback',
+  'empty-state': 'feedback', 'spinner': 'feedback', 'skeleton': 'feedback', 'reading-progress': 'feedback',
 
   // Navigation
   'tabs': 'navigation', 'accordion': 'navigation', 'breadcrumb': 'navigation', 'pagination': 'navigation',
-  'navigation-menu': 'navigation', 'sidebar': 'navigation', 'step-wizard': 'navigation', 'steppers': 'navigation',
+  'navigation-menu': 'navigation', 'sidebar': 'navigation', 'steppers': 'navigation',
   'scroll-area': 'navigation', 'scrollspy': 'navigation',
 
   // Data & Layout
@@ -38,7 +38,7 @@ const catMap = {
   'checkpoint': 'clinical-ai', 'confirmation': 'clinical-ai', 'reasoning': 'clinical-ai', 'trace': 'clinical-ai', 'bot-avatar': 'clinical-ai', 'thinking-orb': 'clinical-ai',
 
   // Blocks
-  'approval-card': 'blocks', 'chat': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'metric-card': 'blocks',
+  'approval-card': 'blocks', 'chat': 'blocks', 'data-table': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'metric-card': 'blocks', 'questionnaire': 'blocks', 'step-wizard': 'blocks',
 
   // Motion
   'number-roll': 'motion', 'spinning-counter': 'motion', 'number-pop-in': 'motion',
@@ -66,13 +66,15 @@ const registryEntries = items.map(item => {
   const baseUIMatch = fileContent.match(/@base-ui\/react\/([a-z0-9-]+)/);
   const basePrimitive = isLib ? 'Base UI Headless Library' : baseUIMatch ? `@base-ui/react/${baseUIMatch[1]}` : (isBlock ? 'Composite Block' : 'DESIGN.md Token Primitive');
 
-  const isDeprecated = item.name === 'selection-controls' || item.name === 'toggles' || item.name === 'steppers';
+  const isDeprecated = item.name === 'selection-controls' || item.name === 'toggles' || item.name === 'steppers' || item.name === 'empty-state';
   const deprecatedNote = item.name === 'selection-controls'
     ? 'Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/checkbox, radio, switch.'
     : item.name === 'toggles'
     ? 'Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/toggle, toggle-group.'
     : item.name === 'steppers'
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.'
+    : item.name === 'empty-state'
+    ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/empty.'
     : undefined;
   const replacedBy = item.name === 'selection-controls'
     ? 'checkbox, radio, switch'
@@ -80,6 +82,8 @@ const registryEntries = items.map(item => {
     ? 'toggle, toggle-group'
     : item.name === 'steppers'
     ? 'number-field'
+    : item.name === 'empty-state'
+    ? 'empty'
     : undefined;
 
   const category = catMap[item.name] || 'layout';

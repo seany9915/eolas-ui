@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { Toast } from '@/components/ui/toast';
+import { Toast, toast, Toaster } from '@/components/ui/toast';
 import { Badge } from '@/components/ui/badge';
 import { Chip } from '@/components/ui/chip';
 import { NotificationBadge } from '@/components/ui/notification-badge';
@@ -9,6 +9,7 @@ import { Progress, Skeleton } from '@/components/ui/progress';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { Empty } from '@/components/ui/empty';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Spinner } from '@/components/ui/spinner';
 import { ReadingProgress } from '@/components/ui/reading-progress';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -77,31 +78,143 @@ export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ToastDemo: React.FC<ComponentDemoProps> = () => {
-  const [open, setOpen] = React.useState(false);
-  return (
-    <div className="flex flex-col items-center justify-center gap-4 py-8">
-      <Button
-        colorRole="primary"
-        onClick={() => setOpen(true)}
-      >
-        <Icon name="notifications" size="xs" className="mr-2" />
-        Trigger Toast Notification
-      </Button>
+  const triggerPromiseToast = () => {
+    const fakeAsyncOperation = new Promise<string>((resolve, reject) => {
+      setTimeout(() => {
+        if (Math.random() > 0.2) {
+          resolve('Practice audio uploaded to chart.');
+        } else {
+          reject(new Error('Network timeout'));
+        }
+      }, 1500);
+    });
 
-      {open && (
-        <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient flex items-center justify-between gap-4 max-w-md w-full transition-all duration-200">
-          <div className="flex items-center gap-3">
-            <Icon name="check_circle" size="sm" className="text-success shrink-0" />
-            <div className="space-y-0.5">
-              <span className="font-heading text-xs font-bold text-on-surface block">Session Notes Saved</span>
-              <span className="font-sans text-xs text-on-surface-variant">Your practice notes were saved to the patient record.</span>
-            </div>
-          </div>
-          <Button size="sm" variant="ghost" onClick={() => setOpen(false)} className="text-xs h-7 px-2">
-            Dismiss
+    toast.promise(fakeAsyncOperation, {
+      loading: 'Uploading practice audio...',
+      success: (msg) => ({
+        title: 'Upload Finished',
+        description: msg,
+        type: 'success',
+      }),
+      error: () => ({
+        title: 'Upload Failed',
+        description: 'Unable to reach the clinical sync server.',
+        type: 'error',
+      }),
+    });
+  };
+
+  const triggerActionToast = () => {
+    toast({
+      title: 'Practice Goal Removed',
+      description: 'Daily vowel repetition removed from plan.',
+      type: 'neutral',
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          toast.success('Goal Restored', 'Daily vowel repetition restored.');
+        },
+      },
+    });
+  };
+
+  return (
+    <div className="space-y-6 w-full max-w-xl mx-auto py-4 text-left">
+      {/* Toaster Viewport Mounting */}
+      <Toaster position="bottom-right" limit={4} />
+
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          Notification Toasts
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Trigger interactive Base UI toasts with stacked deck physics, swipe dismissal gestures, and action buttons.
+        </p>
+      </div>
+
+      {/* Semantic Variant Triggers */}
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+        <span className="font-label text-xs font-semibold text-on-surface-variant block">
+          Semantic Alerts
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="filled"
+            colorRole="primary"
+            onClick={() =>
+              toast.success('Notes Saved', 'Observation notes were added to the chart.')
+            }
+          >
+            <Icon name="check_circle" size="xs" className="mr-1.5 text-success" />
+            Success Toast
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outlined"
+            colorRole="neutral"
+            onClick={() =>
+              toast.warning('Audio Level Low', 'Please verify your microphone before recording.')
+            }
+          >
+            <Icon name="warning" size="xs" className="mr-1.5 text-warning" />
+            Warning Toast
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outlined"
+            colorRole="neutral"
+            onClick={() =>
+              toast.error('Sync Interrupted', 'Could not establish connection to the care portal.')
+            }
+          >
+            <Icon name="error" size="xs" className="mr-1.5 text-error" />
+            Error Toast
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outlined"
+            colorRole="neutral"
+            onClick={() =>
+              toast.neutral('New Update', 'Clinical guideline v3 is now active.')
+            }
+          >
+            <Icon name="info" size="xs" className="mr-1.5 text-on-surface-variant" />
+            Neutral Toast
           </Button>
         </div>
-      )}
+      </div>
+
+      {/* Advanced Workflows: Actions & Promises */}
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+        <span className="font-label text-xs font-semibold text-on-surface-variant block">
+          Async Promise & Action Callbacks
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="tonal"
+            colorRole="primary"
+            onClick={triggerPromiseToast}
+          >
+            <Icon name="cloud_upload" size="xs" className="mr-1.5" />
+            Async Promise Toast
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outlined"
+            colorRole="neutral"
+            onClick={triggerActionToast}
+          >
+            <Icon name="undo" size="xs" className="mr-1.5" />
+            Toast with Action (Undo)
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -276,30 +389,134 @@ export const ProgressRingDemo: React.FC<ComponentDemoProps> = () => {
 
 export const EmptyDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-md mx-auto py-6">
-      <Empty
-        icon="folder_open"
-        title="No Unread Notifications"
-        description="You are all caught up for today."
-      />
+    <div className="w-full max-w-lg mx-auto py-6">
+      <Empty>
+        <Empty.Header>
+          <Empty.Media variant="icon">
+            <Icon name="folder_open" size="xl" />
+          </Empty.Media>
+          <Empty.Title>No Active Consultations</Empty.Title>
+          <Empty.Description>
+            You have completed all scheduled appointments for today. You can create a new session or check patient records.
+          </Empty.Description>
+        </Empty.Header>
+        <Empty.Content>
+          <Button colorRole="primary" size="sm">
+            <Icon name="add" size="xs" />
+            <span>New Appointment</span>
+          </Button>
+          <Button variant="outlined" colorRole="neutral" size="sm">
+            <span>Review Records</span>
+          </Button>
+        </Empty.Content>
+      </Empty>
     </div>
   );
 };
 
 export const EmptyStateDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-md mx-auto py-6">
+    <div className="w-full max-w-lg mx-auto py-6">
       <EmptyState
         icon="assignment"
         title="No Practice Sessions Scheduled"
         description="There are no upcoming practice sessions scheduled for today."
         action={
           <Button colorRole="primary" size="sm">
-            <Icon name="add" size="xs" className="mr-1.5" />
-            Schedule Practice Session
+            <Icon name="add" size="xs" />
+            <span>Schedule Session</span>
           </Button>
         }
       />
+    </div>
+  );
+};
+
+export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSimulate = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 2000);
+  };
+
+  return (
+    <div className="w-full max-w-lg mx-auto py-6 space-y-6">
+      {/* Sizing scale */}
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant space-y-3">
+        <h4 className="font-heading text-sm font-semibold text-on-surface">Size Scale</h4>
+        <div className="flex items-center gap-6 text-on-surface-variant">
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="xs" />
+            <span className="font-mono text-xs">xs (12px)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="sm" />
+            <span className="font-mono text-xs">sm (16px)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="md" />
+            <span className="font-mono text-xs">md (20px)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="lg" />
+            <span className="font-mono text-xs">lg (24px)</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Spinner size="xl" />
+            <span className="font-mono text-xs">xl (32px)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Semantic Color Tokens */}
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant space-y-3">
+        <h4 className="font-heading text-sm font-semibold text-on-surface">Semantic Colors</h4>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <Spinner size="md" className="text-primary" />
+            <span className="font-sans text-xs text-on-surface">Primary</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Spinner size="md" className="text-secondary" />
+            <span className="font-sans text-xs text-on-surface">Secondary</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Spinner size="md" className="text-success" />
+            <span className="font-sans text-xs text-on-surface">Success</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Spinner size="md" className="text-error" />
+            <span className="font-sans text-xs text-on-surface">Error</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Button integration with data-icon */}
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant space-y-3">
+        <h4 className="font-heading text-sm font-semibold text-on-surface">Button Integration</h4>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            colorRole="primary"
+            size="md"
+            disabled={loading}
+            onClick={handleSimulate}
+          >
+            {loading && <Spinner size="sm" data-icon="inline-start" />}
+            <span>{loading ? 'Saving Changes...' : 'Click to Simulate Save'}</span>
+          </Button>
+
+          <Button
+            variant="outlined"
+            colorRole="neutral"
+            size="md"
+            disabled
+          >
+            <Spinner size="sm" data-icon="inline-start" />
+            <span>Processing</span>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

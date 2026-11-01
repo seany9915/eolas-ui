@@ -1,0 +1,32 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spinner",
+  "type": "registry:ui",
+  "title": "Spinner",
+  "description": "Spinner primitive. Base UI Integration: Companion status & loading indicator. Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "ui/spinner.tsx",
+      "content": "/**\n * Spinner primitive.\n *\n * Base UI Integration: Companion status & loading indicator.\n * Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner\n *\n * TAXONOMY & USAGE:\n * - Lightweight, accessible loading indicator showing asynchronous operations.\n * - Suitable for standalone loading states, form submission feedback, and inline button indicators.\n * - Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.\n * - Automatically inherits currentColor for flawless integration across buttons, badges, and text.\n */\nimport * as React from 'react';\nimport { cn } from '@/lib/utils';\n\nexport type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';\n\nexport interface SpinnerProps extends React.ComponentPropsWithoutRef<'svg'> {\n  size?: SpinnerSize;\n  label?: string;\n}\n\nconst sizeClasses: Record<SpinnerSize, string> = {\n  xs: 'size-3',\n  sm: 'size-4',\n  md: 'size-5',\n  lg: 'size-6',\n  xl: 'size-8',\n};\n\nexport const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(\n  ({ className, size = 'sm', label = 'Loading', ...props }, ref) => {\n    return (\n      <svg\n        ref={ref}\n        role=\"status\"\n        aria-label={label}\n        data-slot=\"spinner\"\n        viewBox=\"0 0 24 24\"\n        fill=\"none\"\n        stroke=\"currentColor\"\n        strokeWidth=\"2.5\"\n        strokeLinecap=\"round\"\n        strokeLinejoin=\"round\"\n        className={cn(\n          'animate-spin motion-reduce:animate-none shrink-0',\n          sizeClasses[size],\n          className\n        )}\n        {...props}\n      >\n        <circle cx=\"12\" cy=\"12\" r=\"9\" strokeOpacity=\"0.25\" />\n        <path d=\"M12 3a9 9 0 0 1 9 9\" />\n      </svg>\n    );\n  }\n);\nSpinner.displayName = 'Spinner';\n\nexport default Spinner;\n",
+      "type": "registry:ui",
+      "target": "@ui/spinner.tsx"
+    }
+  ],
+  "meta": {
+    "taxonomy": [
+      "Lightweight, accessible loading indicator showing asynchronous operations.",
+      "Suitable for standalone loading states, form submission feedback, and inline button indicators.",
+      "Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.",
+      "Automatically inherits currentColor for flawless integration across buttons, badges, and text."
+    ]
+  },
+  "docs": "Spinner primitive.\nBase UI Integration: Companion status & loading indicator.\nSpecification & Reference: https://ui.shadcn.com/docs/components/base/spinner\nTAXONOMY & USAGE:\n- Lightweight, accessible loading indicator showing asynchronous operations.\n- Suitable for standalone loading states, form submission feedback, and inline button indicators.\n- Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.\n- Automatically inherits currentColor for flawless integration across buttons, badges, and text."
+}

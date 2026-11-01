@@ -7,7 +7,24 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { NavigationMenu, NavigationMenuItemData } from '@/components/ui/navigation-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Scrollspy } from '@/components/ui/scrollspy';
-import { StepWizard } from '@/components/ui/step-wizard';
+import { StepWizard } from '@/components/blocks/step-wizard';
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarHeader,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuBadge,
+  SidebarFooter,
+  SidebarRail,
+  SidebarTrigger,
+  SidebarInset,
+} from '@/components/ui/sidebar';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
@@ -269,25 +286,155 @@ export const NavigationMenuDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
+  const [activeItem, setActiveItem] = React.useState('patients');
+
   return (
-    <div className="w-full max-w-md mx-auto p-4 rounded-xl border border-outline-variant bg-surface space-y-3">
-      <div className="flex items-center gap-2 border-b border-outline-variant pb-2">
-        <Icon name="record_voice_over" size="sm" className="text-primary" />
-        <span className="font-heading text-xs font-bold text-on-surface">Practice Navigation</span>
+    <div className="w-full max-w-4xl mx-auto space-y-4 text-left">
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          Collapsible Navigation Sidebar
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Application shell navigation with collapsible icon mode, keyboard shortcuts (<kbd className="font-mono bg-surface-container px-1 py-0.5 rounded border border-outline-variant">Ctrl+B</kbd>), edge resizing rail, and Base UI drawer fallback on mobile.
+        </p>
       </div>
-      <div className="space-y-1 text-xs font-sans text-on-surface-variant">
-        <div className="p-2 rounded-lg bg-primary-container text-on-primary-container font-semibold flex items-center gap-2">
-          <Icon name="groups" size="sm" />
-          <span>Active Practice Groups (3)</span>
-        </div>
-        <div className="p-2 rounded-lg hover:bg-surface-container flex items-center gap-2">
-          <Icon name="volume_up" size="sm" />
-          <span>Morning Sound Drills (18)</span>
-        </div>
-        <div className="p-2 rounded-lg hover:bg-surface-container flex items-center gap-2">
-          <Icon name="checklist" size="sm" />
-          <span>Weekly Review List</span>
-        </div>
+
+      <div className="w-full h-[460px] rounded-xl border border-outline-variant bg-background overflow-hidden flex shadow-ambient">
+        <SidebarProvider embedded defaultOpen={true}>
+          <Sidebar collapsible="icon" className="border-r border-outline-variant bg-surface">
+            <SidebarHeader className="p-3 border-b border-outline-variant">
+              <div className="flex items-center justify-between min-h-[36px]">
+                <div className="flex items-center gap-2 overflow-hidden group-data-[collapsible=icon]:hidden">
+                  <div className="size-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+                    <Icon name="record_voice_over" size="sm" className="text-primary" />
+                  </div>
+                  <span className="font-heading text-sm font-bold text-on-surface truncate">
+                    Speech Portal
+                  </span>
+                </div>
+                <SidebarTrigger />
+              </div>
+            </SidebarHeader>
+
+            <SidebarContent className="p-2 space-y-3">
+              <SidebarGroup>
+                <SidebarGroupLabel className="text-xs text-on-surface-variant font-medium px-2 py-1">
+                  Practice
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeItem === 'patients'}
+                        onClick={() => setActiveItem('patients')}
+                        tooltip="Patient Charts"
+                      >
+                        <Icon name="groups" size="sm" />
+                        <span>Patients</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeItem === 'drills'}
+                        onClick={() => setActiveItem('drills')}
+                        tooltip="Daily Drills"
+                      >
+                        <Icon name="volume_up" size="sm" />
+                        <span>Sound Drills</span>
+                      </SidebarMenuButton>
+                      <SidebarMenuBadge>18</SidebarMenuBadge>
+                    </SidebarMenuItem>
+
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeItem === 'plans'}
+                        onClick={() => setActiveItem('plans')}
+                        tooltip="Practice Plans"
+                      >
+                        <Icon name="checklist" size="sm" />
+                        <span>Plans</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+
+              <SidebarGroup>
+                <SidebarGroupLabel className="text-xs text-on-surface-variant font-medium px-2 py-1">
+                  Insights
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeItem === 'reports'}
+                        onClick={() => setActiveItem('reports')}
+                        tooltip="Progress Reports"
+                      >
+                        <Icon name="monitoring" size="sm" />
+                        <span>Reports</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeItem === 'settings'}
+                        onClick={() => setActiveItem('settings')}
+                        tooltip="Preferences"
+                      >
+                        <Icon name="tune" size="sm" />
+                        <span>Settings</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+
+            <SidebarFooter className="p-3 border-t border-outline-variant group-data-[collapsible=icon]:p-2">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <div className="size-8 rounded-full bg-secondary-container text-on-secondary-container font-heading text-xs font-bold flex items-center justify-center shrink-0">
+                  DR
+                </div>
+                <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
+                  <p className="font-heading text-xs font-semibold text-on-surface truncate">
+                    Dr. Robertson
+                  </p>
+                  <p className="font-sans text-[11px] text-on-surface-variant truncate">
+                    Speech Pathologist
+                  </p>
+                </div>
+              </div>
+            </SidebarFooter>
+            <SidebarRail />
+          </Sidebar>
+
+          <SidebarInset className="flex-1 flex flex-col min-w-0 bg-surface p-6">
+            <div className="flex items-center justify-between border-b border-outline-variant pb-4 mb-4">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger />
+                <div>
+                  <h4 className="font-heading text-sm font-bold text-on-surface capitalize">
+                    {activeItem} Overview
+                  </h4>
+                  <p className="font-sans text-xs text-on-surface-variant">
+                    Clinical view selected from sidebar
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-surface-container/60 border border-outline-variant space-y-2">
+              <p className="font-heading text-xs font-bold text-on-surface">
+                Interactive Sidebar Controls
+              </p>
+              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                Click the menu icon button or drag the right border rail to collapse the sidebar into icon rail mode. Click any menu item to switch the active view.
+              </p>
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
       </div>
     </div>
   );

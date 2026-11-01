@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Input, FormField } from '@/components/ui/input';
 import { Textarea, TextareaField } from '@/components/ui/textarea';
 import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@/components/ui/field';
@@ -458,7 +459,7 @@ export const NumberFieldDemo: React.FC<ComponentDemoProps> = () => {
     <div className="space-y-6 w-full max-w-sm mx-auto">
       <NumberField
         label="Session Duration (minutes)"
-        description="Recommended practice session: 10–30 minutes"
+        description="Recommended practice session: 10ΓÇô30 minutes"
         value={sessionMinutes}
         onValueChange={setSessionMinutes}
         min={5}
@@ -631,6 +632,66 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
             )}
           </p>
         </div>
+      </div>
+    </div>
+  );
+};
+
+
+export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
+  return (
+    <div className="space-y-8 w-full max-w-xl mx-auto py-4">
+      {/* 1. Split Button Action */}
+      <div className="space-y-2">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          Split Action Button
+        </h4>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Fused primary action with secondary dropdown trigger and zero double-border artifacts
+        </p>
+        <ButtonGroup>
+          <Button variant="filled" colorRole="primary" size="md">
+            Save Consultation Notes
+          </Button>
+          <Button variant="filled" colorRole="primary" size="md" aria-label="More save options">
+            <Icon name="expand_more" size="xs" />
+          </Button>
+        </ButtonGroup>
+      </div>
+
+      {/* 2. Navigation & Segmented Control with Separator */}
+      <div className="space-y-2">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          Segmented Navigation with Hairline Separator
+        </h4>
+        <ButtonGroup>
+          <Button variant="outlined" colorRole="neutral" size="sm">
+            <Icon name="chevron_left" size="xs" />
+            <span>Previous</span>
+          </Button>
+          <Button variant="outlined" colorRole="neutral" size="sm">
+            <span>Today</span>
+          </Button>
+          <ButtonGroup.Separator />
+          <Button variant="outlined" colorRole="neutral" size="sm">
+            <span>Next</span>
+            <Icon name="chevron_right" size="xs" />
+          </Button>
+        </ButtonGroup>
+      </div>
+
+      {/* 3. Fused Input and Action Button */}
+      <div className="space-y-2">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          Input Addon &amp; Action
+        </h4>
+        <ButtonGroup className="w-full max-w-md">
+          <ButtonGroup.Text>https://</ButtonGroup.Text>
+          <Input placeholder="clinic.example.com" className="flex-1" />
+          <Button variant="filled" colorRole="primary" size="md">
+            Connect
+          </Button>
+        </ButtonGroup>
       </div>
     </div>
   );

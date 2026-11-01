@@ -194,6 +194,28 @@
       ]
     },
     {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "ButtonGroup primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/button-group",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "meta": {
+        "taxonomy": [
+          "A container to group related buttons, segmented actions, and inputs with fused borders and shared geometry.",
+          "Resolves double-border artifacts (-space-x-px / -space-y-px) while ensuring focus rings stay visible with proper stacking context (focus-visible:z-20).",
+          "Fuses concentric border radii: rounds outer corners while flattening adjacent internal edges.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 touch target compliance."
+        ]
+      }
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
@@ -705,7 +727,22 @@
       "name": "empty-state",
       "type": "registry:ui",
       "title": "Empty State",
-      "description": "Eolas UI Empty State component built on Base UI and DESIGN.md design tokens.",
+      "description": "EmptyState primitive (backward-compatibility alias for Empty). Canonical primitive resides at @/components/ui/empty. Conforms to https://ui.shadcn.com/docs/components/base/empty",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "empty"
+      ]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "Empty primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/empty",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -714,22 +751,21 @@
       "registryDependencies": [
         "utils",
         "icon"
-      ]
-    },
-    {
-      "name": "empty",
-      "type": "registry:ui",
-      "title": "Empty",
-      "description": "Eolas UI Empty component built on Base UI and DESIGN.md design tokens.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
       ],
-      "registryDependencies": [
-        "utils",
-        "empty-state"
-      ]
+      "meta": {
+        "taxonomy": [
+          "Use Empty to display empty states when collections, search results, or tables have no items.",
+          "Composable compound architecture:",
+          "Empty (Root container)",
+          "EmptyHeader (Group wrapper for media, title, and description)",
+          "EmptyMedia (Icon / Avatar / Graphic tile with variant=\"default\" | \"icon\")",
+          "EmptyTitle (Headline typography in Atkinson Hyperlegible Next)",
+          "EmptyDescription (Body typography in Lexend with accessible link styling)",
+          "EmptyContent (Actions and button container)",
+          "Also supports monolithic convenience props (icon, title, description, action) for backward compatibility.",
+          "Follows DESIGN.md: concentric border radius, semantic high-contrast colors, and text-balance / text-pretty."
+        ]
+      }
     },
     {
       "name": "error-shake",
@@ -1626,6 +1662,28 @@
       }
     },
     {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "Spinner primitive. Base UI Integration: Companion status & loading indicator. Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Lightweight, accessible loading indicator showing asynchronous operations.",
+          "Suitable for standalone loading states, form submission feedback, and inline button indicators.",
+          "Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.",
+          "Automatically inherits currentColor for flawless integration across buttons, badges, and text."
+        ]
+      }
+    },
+    {
       "name": "spinning-counter",
       "type": "registry:ui",
       "title": "Spinning Counter",
@@ -1637,22 +1695,6 @@
       ],
       "registryDependencies": [
         "utils"
-      ]
-    },
-    {
-      "name": "step-wizard",
-      "type": "registry:ui",
-      "title": "Step Wizard",
-      "description": "Eolas UI Step Wizard component built on Base UI and DESIGN.md design tokens.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "utils",
-        "button",
-        "icon"
       ]
     },
     {
@@ -1781,7 +1823,7 @@
       "name": "table",
       "type": "registry:ui",
       "title": "Table",
-      "description": "Table primitive. Platform Reference: Modern Web Guidance (MWG: responsive-table)",
+      "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1792,11 +1834,8 @@
       ],
       "meta": {
         "taxonomy": [
-          "A data table primitive supporting standard horizontal scroll or responsive container-query card stacking.",
-          "When responsive=\"stack\", transforms rows into accessible stacked cards on narrow container widths (@container width < 600px).",
-          "Implements explicit column header semantics (scope=\"col\") and 56px minimum row heights for OS text zoom adaptability.",
-          "Supports column-level alignment ('left' | 'right' | 'center') and automatic tabular number formatting (numeric: true).",
-          "Numerical columns (percentages, scores, durations, metrics) right-align both headers and cells with tabular-nums.",
+          "Dual-mode data table primitive supporting: 1. Atomic compound composition (<Table>, <Table.Header>, <Table.Body>, <Table.Row>, <Table.Head>, <Table.Cell>, <Table.Footer>, <Table.Caption>). 2. Declarative data-driven mode (<Table columns={...} data={...} keyExtractor={...} responsive=\"stack\" />) with automatic container-query card stacking (@container).",
+          "Implements explicit column header semantics (scope=\"col\"), 56px minimum row heights for OS text zoom adaptability, and automatic tabular-nums on numeric columns.",
           "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
         ]
       }
@@ -2179,6 +2218,37 @@
       }
     },
     {
+      "name": "data-table",
+      "type": "registry:block",
+      "title": "Data Table",
+      "description": "DataTable composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens: - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`) - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Select` (`src/components/ui/select.tsx`) - `Menu` (`src/components/ui/menu.tsx`) - `Checkbox` (`src/components/ui/checkbox.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `@tanstack/react-table`",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "utils",
+        "table",
+        "button",
+        "input",
+        "select",
+        "menu",
+        "checkbox",
+        "badge",
+        "icon"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Enterprise-grade, accessible data table composite block conforming to shadcn/ui Data Table specification.",
+          "Powers complex data exploration with column sorting, global & column text filtering, faceted category filtering, row selection, dynamic column visibility toggling, loading/empty states, and accessible pagination.",
+          "Conforms to DESIGN.md Table rules: 56px minimum row height, right-aligned numeric columns with tabular-nums and font-mono, concentric geometry, floating focus rings, and container-query responsiveness (@container).",
+          "Exports both all-in-one <DataTable /> and composable subcomponents: DataTableColumnHeader, DataTablePagination, DataTableViewOptions, DataTableFacetedFilter, DataTableToolbar, DataTableRowActions, createSelectColumn, createActionsColumn."
+        ]
+      }
+    },
+    {
       "name": "delete-confirmation-dialog",
       "type": "registry:block",
       "title": "Delete Confirmation Dialog",
@@ -2190,7 +2260,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "dialog",
+        "alert-dialog",
         "button",
         "icon"
       ]
@@ -2230,6 +2300,57 @@
         "chip",
         "icon"
       ]
+    },
+    {
+      "name": "questionnaire",
+      "type": "registry:block",
+      "title": "Questionnaire",
+      "description": "Questionnaire composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Kbd` (`src/components/ui/kbd.tsx`)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "input",
+        "progress",
+        "icon",
+        "kbd"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Multi-step guided question primitive and flow engine for intake forms, clinical assessments, onboarding sequences, configuration wizards, and conversational agent clarification prompts.",
+          "Conforms to shadcn/ui Questionnaire specification with full parity across compound subcomponents and flat exports: Root, Progress, Item, Title, Description, Choices, Choice, ChoiceInput, ChoiceLabel, ChoiceShortcut, Input, Error, Actions, Previous, Skip, Next, and Submit.",
+          "Supports single-choice, multiple-choice, freeform text entry, keyboard shortcuts (A-Z, 1-9), roving tabindex arrow key navigation, form validation, draft restoration, and native FormData serialization.",
+          "Accessible: WCAG 2.2 SC 2.5.8 compliant (min-h-11 touch targets), floating 2px focus indicators, fieldset/legend semantics, inert inactive items, live error regions, and container-query responsiveness (@container)."
+        ]
+      }
+    },
+    {
+      "name": "step-wizard",
+      "type": "registry:block",
+      "title": "Step Wizard",
+      "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "icon"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Controlled multi-step workflow container for guided clinical intake, onboarding, assessment flows, and multi-stage form sequences.",
+          "Pure UI: receives step data via props, manages directional slide transitions, and emits progression intents via callbacks (`onStepChange`, `onComplete`).",
+          "Accessible: WCAG 2.2 SC 2.5.8 compliant (44x44px minimum touch targets on all interactive step markers and buttons), floating 2px focus indicators (`outline-offset: 2px`), and live regions (`aria-live=\"polite\"`).",
+          "Modern HTML integration: supports `hiddenUntilFound` with `hidden=\"until-found\"` and `beforematch` event listener so browser search (<kbd>Ctrl+F</kbd>) finds inactive step content."
+        ]
+      }
     }
   ]
 }

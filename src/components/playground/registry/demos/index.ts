@@ -22,6 +22,7 @@ import {
   SelectionControlsLegacyDemo,
   TogglesLegacyDemo,
   CalendarDemo,
+  ButtonGroupDemo,
 } from './InputsDemos';
 
 import {
@@ -48,6 +49,7 @@ import {
   ProgressRingDemo,
   EmptyDemo,
   EmptyStateDemo,
+  SpinnerDemo,
   SkeletonDemo,
   ReadingProgressDemo,
   BadgeDemo,
@@ -110,9 +112,11 @@ import {
 import {
   ApprovalCardDemo,
   ChatBlockDemo,
+  DataTableDemo,
   DeleteConfirmationDialogDemo,
   FilterToolbarDemo,
   MetricCardDemo,
+  QuestionnaireDemo,
 } from './BlocksDemos';
 
 import {
@@ -135,6 +139,7 @@ import {
 export const REGISTRY_DEMOS: ComponentDemoMap = {
   // Inputs
   'button': ButtonDemo,
+  'button-group': ButtonGroupDemo,
   'input': InputDemo,
   'textarea': TextareaDemo,
   'field': FieldDemo,
@@ -180,6 +185,7 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'progress-ring': ProgressRingDemo,
   'empty': EmptyDemo,
   'empty-state': EmptyStateDemo,
+  'spinner': SpinnerDemo,
   'skeleton': SkeletonDemo,
   'reading-progress': ReadingProgressDemo,
 
@@ -239,9 +245,11 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   // Blocks
   'approval-card': ApprovalCardDemo,
   'chat': ChatBlockDemo,
+  'data-table': DataTableDemo,
   'delete-confirmation-dialog': DeleteConfirmationDialogDemo,
   'filter-toolbar': FilterToolbarDemo,
   'metric-card': MetricCardDemo,
+  'questionnaire': QuestionnaireDemo,
 
   // Motion
   'number-roll': NumberRollDemo,
