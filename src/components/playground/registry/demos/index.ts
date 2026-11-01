@@ -21,6 +21,7 @@ import {
   OTPFieldDemo,
   SelectionControlsLegacyDemo,
   TogglesLegacyDemo,
+  CalendarDemo,
 } from './InputsDemos';
 
 import {
@@ -34,6 +35,7 @@ import {
   TooltipDemo,
   PreviewCardDemo,
   ConfirmationDemo,
+  CommandDemo,
 } from './OverlaysDemos';
 
 import {
@@ -48,6 +50,7 @@ import {
   EmptyStateDemo,
   SkeletonDemo,
   ReadingProgressDemo,
+  BadgeDemo,
 } from './FeedbackDemos';
 
 import {
@@ -79,6 +82,8 @@ import {
   DeferredViewDemo,
   SwipeRevealDemo,
   TextHighlightDemo,
+  KbdDemo,
+  ItemDemo,
 } from './LayoutDemos';
 
 import {
@@ -147,6 +152,7 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'slider': SliderDemo,
   'number-field': NumberFieldDemo,
   'otp-field': OTPFieldDemo,
+  'calendar': CalendarDemo,
   'selection-controls': SelectionControlsLegacyDemo,
   'toggles': TogglesLegacyDemo,
 
@@ -161,11 +167,13 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'tooltip': TooltipDemo,
   'preview-card': PreviewCardDemo,
   'confirmation': ConfirmationDemo,
+  'command': CommandDemo,
 
   // Feedback
   'inline-alert': InlineAlertDemo,
   'toast': ToastDemo,
   'chip': ChipDemo,
+  'badge': BadgeDemo,
   'notification-badge': NotificationBadgeDemo,
   'meter': MeterDemo,
   'progress': ProgressDemo,
@@ -189,6 +197,8 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
 
   // Layout
   'card': CardDemo,
+  'item': ItemDemo,
+  'kbd': KbdDemo,
   'table': TableDemo,
   'chart': ChartDemo,
   'separator': SeparatorDemo,

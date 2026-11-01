@@ -144,10 +144,11 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       )}
 
       <BaseNumberField.Group
+        data-slot="number-field-group"
         className={cn(
           'inline-flex w-max items-center rounded border bg-surface overflow-hidden',
           'transition-[border-color,box-shadow]',
-          'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
+          'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
           'disabled:opacity-50 disabled:bg-surface-variant/30 disabled:pointer-events-none',
           error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline-variant hover:border-outline'
         )}
@@ -158,7 +159,10 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
         >
           <Icon name="remove" size="sm" />
         </BaseNumberField.Decrement>
-        <BaseNumberField.Input className="h-11 min-w-[4.5rem] w-auto px-2 text-center font-mono text-base font-bold text-on-surface tabular-nums bg-transparent focus:outline-none" />
+        <BaseNumberField.Input
+          data-slot="number-field-input"
+          className="h-11 w-14 min-w-[3.5rem] px-1 text-center font-mono text-base font-bold text-on-surface tabular-nums bg-transparent outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
+        />
         <BaseNumberField.Increment
           aria-label="Increase value"
           className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-variant/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-l border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"

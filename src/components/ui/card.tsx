@@ -21,12 +21,15 @@ export type CardProminence = 'default' | 'accent' | 'inverted' | 'filled' | 'spo
  */
 export type CardAffordance = 'static' | 'actionable' | 'selectable' | 'interactive' | 'link';
 
+export type CardSize = 'default' | 'sm';
+
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   prominence?: CardProminence;
   affordance?: CardAffordance;
   variant?: 'default' | 'standard' | 'selectable' | 'filled' | 'spotlight' | 'inverted' | 'accent';
   selected?: boolean;
   colorRole?: 'primary' | 'secondary' | 'tertiary';
+  size?: CardSize;
   /**
    * When true, adopts CSS Subgrid row tracks (grid-row: span 3; grid-template-rows: subgrid)
    * to align header, content body, and action footer rows across cards in a grid.
@@ -46,12 +49,18 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
+const sizeStyles: Record<CardSize, string> = {
+  default: 'p-6',
+  sm: 'p-4',
+};
+
 const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   prominence,
   affordance,
   variant,
   selected = false,
   colorRole = 'primary',
+  size = 'default',
   subgrid = false,
   lift = false,
   invertedAccent,
@@ -73,7 +82,10 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   // Resolve accent: invertedAccent takes priority, fallback to deprecated spotlightAccent, default to 'tertiary'
   const resolvedAccent = invertedAccent ?? (spotlightAccent === 'neutral' ? 'neutral' : 'tertiary');
 
-  const baseStyles = 'p-6 rounded-[1rem] transition-[box-shadow,border-color,background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] relative motion-reduce:transition-none';
+  const baseStyles = cn(
+    sizeStyles[size] ?? sizeStyles.default,
+    'rounded-[1rem] transition-[box-shadow,border-color,background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] relative motion-reduce:transition-none'
+  );
 
   // Body copy remains pure white (text-surface) to avoid chromatic glare/fatigue; tertiary accents apply to headlines/icons
   const invertedStyles = 'bg-on-surface text-surface border-none shadow-ambient';
@@ -138,9 +150,15 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
       ref={ref}
       role={role}
       tabIndex={tabIndex}
+      data-slot="card"
+      data-size={size}
       aria-pressed={ariaPressed}
       aria-checked={ariaChecked}
       onKeyDown={handleKeyDown}
+      style={{
+        '--card-spacing': size === 'sm' ? '1rem' : '1.5rem',
+        ...props.style,
+      } as React.CSSProperties}
       className={cn(
         baseStyles,
         prominenceStyles[resolvedProminence],
@@ -156,6 +174,101 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
 });
 
 CardComponent.displayName = 'Card';
+
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="card-header"
+      className={cn(
+        '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 has-[[data-slot=card-action]]:grid-cols-[1fr_auto]',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+CardHeader.displayName = 'CardHeader';
+
+export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div' | 'span';
+}
+
+export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
+  ({ className, as: Tag = 'h3', ...props }, ref) => (
+    <Tag
+      ref={ref}
+      data-slot="card-title"
+      className={cn(
+        'font-heading text-lg font-semibold text-on-surface leading-snug tracking-tight text-balance',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+CardTitle.displayName = 'CardTitle';
+
+export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+
+export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
+  ({ className, ...props }, ref) => (
+    <p
+      ref={ref}
+      data-slot="card-description"
+      className={cn(
+        'font-sans text-sm text-on-surface-variant leading-relaxed text-pretty',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+CardDescription.displayName = 'CardDescription';
+
+export interface CardActionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const CardAction = React.forwardRef<HTMLDivElement, CardActionProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="card-action"
+      className={cn('col-start-2 row-start-1 row-span-2 self-start justify-self-end', className)}
+      {...props}
+    />
+  )
+);
+CardAction.displayName = 'CardAction';
+
+export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="card-content"
+      className={cn('pt-4', className)}
+      {...props}
+    />
+  )
+);
+CardContent.displayName = 'CardContent';
+
+export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="card-footer"
+      className={cn('flex items-center pt-4 mt-auto gap-3', className)}
+      {...props}
+    />
+  )
+);
+CardFooter.displayName = 'CardFooter';
 
 export interface CardLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   children: React.ReactNode;
@@ -179,5 +292,15 @@ export const CardLink = React.forwardRef<HTMLAnchorElement, CardLinkProps>(
 CardLink.displayName = 'CardLink';
 
 export const Card = Object.assign(CardComponent, {
+  Header: CardHeader,
+  Title: CardTitle,
+  Description: CardDescription,
+  Action: CardAction,
+  Content: CardContent,
+  Footer: CardFooter,
   Link: CardLink,
 });
+
+export { CardComponent };
+
+export default Card;

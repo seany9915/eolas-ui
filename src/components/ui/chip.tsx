@@ -20,7 +20,12 @@ import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 
-export type ChipVariant = 'filled' | 'outline' | 'outlined' | 'soft' | 'tonal';
+export type ChipVariant =
+  | 'filled'
+  | 'outline'
+  | 'soft'
+  | 'tonal' // backwards-compatible alias for soft
+  | 'outlined'; // backwards-compatible alias for outline
 
 export type ChipColorRole =
   | 'primary'
@@ -85,9 +90,9 @@ const softStyles: Record<ChipColorRole, string> = {
 };
 
 const sizeStyles: Record<ChipSize, string> = {
-  sm: 'px-2.5 py-0.5 text-xs gap-1.5',
-  md: 'px-3 py-1 text-xs gap-1.5',
-  lg: 'px-4 py-1.5 text-sm gap-2',
+  sm: 'h-7 px-2.5 text-xs gap-1.5 [&>svg]:size-3.5 [&>[data-icon]]:size-3.5 [&_.material-symbols-outlined]:!text-[15px] [&_.material-symbols-outlined]:!leading-none',
+  md: 'h-8 px-3 text-xs gap-2 [&>svg]:size-4 [&>[data-icon]]:size-4 [&_.material-symbols-outlined]:!text-[17px] [&_.material-symbols-outlined]:!leading-none',
+  lg: 'h-9 px-3.5 text-sm gap-2 [&>svg]:size-4.5 [&>[data-icon]]:size-4.5 [&_.material-symbols-outlined]:!text-[19px] [&_.material-symbols-outlined]:!leading-none',
 };
 
 export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
@@ -180,6 +185,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
         className={cn(
           'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
           'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+          '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
           sizeStyles[size],
           touchTargetClass,
           patternClass,
@@ -189,19 +195,19 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
         )}
         {...props}
       >
-        {avatar && <span className="shrink-0 -ml-1 mr-0.5">{avatar}</span>}
+        {avatar && <span className="shrink-0 -ml-1 mr-1">{avatar}</span>}
         {isCurrentlySelected && (
-          <span className="material-symbols-outlined text-[1.15em] shrink-0 font-bold" aria-hidden="true">
+          <span className="material-symbols-outlined shrink-0 font-bold -ml-0.5" aria-hidden="true">
             check
           </span>
         )}
         {!isCurrentlySelected && icon && (
           typeof icon === 'string' ? (
-            <span className="material-symbols-outlined text-[1.15em] shrink-0" aria-hidden="true">
+            <span className="material-symbols-outlined shrink-0 -ml-0.5" aria-hidden="true">
               {icon}
             </span>
           ) : (
-            icon
+            <span className="inline-flex items-center shrink-0 -ml-0.5">{icon}</span>
           )
         )}
         <span className="truncate">{children}</span>
@@ -213,10 +219,10 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
               if (!disabled) onRemove();
             }}
             disabled={disabled}
-            className="ml-1 -mr-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-1 rounded-full text-current shrink-0"
+            className="ml-1 -mr-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
             aria-label={labelText ? `Remove ${labelText}` : 'Remove'}
           >
-            <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
+            <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">
               close
             </span>
           </BaseButton>

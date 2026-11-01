@@ -15,38 +15,62 @@ import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
 
 export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
+  const [dismissed, setDismissed] = React.useState(false);
+
   return (
-    <div className="space-y-4 w-full max-w-xl mx-auto">
-      <InlineAlert
-        title="Microphone Access Blocked"
-        role="error"
-        icon="mic_off"
-      >
-        Enable microphone access in your browser settings to record voice drills.
+    <div className="space-y-4 w-full max-w-xl mx-auto text-left">
+      {/* Compound composition with action slot */}
+      <InlineAlert role="warning">
+        <InlineAlert.Title>Session Expiring Soon</InlineAlert.Title>
+        <InlineAlert.Description>
+          Your speech consultation has 5 minutes remaining. Please save any drill observations before the room closes.
+        </InlineAlert.Description>
+        <InlineAlert.Action>
+          <Button size="sm" variant="filled" colorRole="primary">
+            Extend Session (10m)
+          </Button>
+          <Button size="sm" variant="outlined" colorRole="neutral">
+            Save Notes
+          </Button>
+        </InlineAlert.Action>
       </InlineAlert>
 
-      <InlineAlert
-        title="Unsaved Session Notes"
-        role="warning"
-        icon="warning"
-      >
-        You have unsaved notes from your previous drill. Save them before continuing.
-      </InlineAlert>
+      {/* Dismissible alert */}
+      {!dismissed && (
+        <InlineAlert
+          title="Microphone Access Blocked"
+          role="error"
+          icon="mic_off"
+          onClose={() => setDismissed(true)}
+        >
+          Enable microphone permissions in your browser to record articulation drills.
+        </InlineAlert>
+      )}
 
+      {dismissed && (
+        <div className="text-center py-2">
+          <Button size="sm" variant="outlined" colorRole="neutral" onClick={() => setDismissed(false)}>
+            Reset Microphone Alert
+          </Button>
+        </div>
+      )}
+
+      {/* Monolithic usage with success role */}
       <InlineAlert
         title="Practice Goal Reached"
         role="success"
         icon="check_circle"
       >
-        You completed all 15 daily articulation exercises.
+        You completed all 15 daily articulation exercises with an average accuracy of 94%.
       </InlineAlert>
 
+      {/* Neutral informative alert */}
       <InlineAlert
         title="Offline Mode Active"
         role="neutral"
         icon="info"
       >
-        Practice drills are saved locally and will upload when you reconnect.
+        Practice drills are saved locally and will upload automatically when you reconnect.
       </InlineAlert>
     </div>
   );
@@ -83,32 +107,94 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ChipDemo: React.FC<ComponentDemoProps> = () => {
+  const [selectedFilter, setSelectedFilter] = React.useState<string>('drill');
+  const [activeTags, setActiveTags] = React.useState<string[]>(['Pediatrics', 'Articulation', 'Speech']);
+
+  const removeTag = (tagToRemove: string) => {
+    setActiveTags((prev) => prev.filter((t) => t !== tagToRemove));
+  };
+
   return (
-    <div className="space-y-6 w-full max-w-2xl mx-auto">
-      <div className="space-y-3">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
-          Semantic Status Roles
-        </h4>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge colorRole="error" icon="priority_high">High Priority</Badge>
-          <Badge colorRole="warning" icon="schedule">Needs Review</Badge>
-          <Badge colorRole="success" icon="verified">Completed</Badge>
-          <Badge colorRole="primary" icon="play_arrow">In Progress</Badge>
-          <Badge colorRole="secondary" icon="checklist">Daily Drill</Badge>
-          <Badge colorRole="neutral" icon="archive">Archived</Badge>
+    <div className="space-y-6 w-full max-w-2xl mx-auto py-2 text-left">
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          Interactive Chips
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Compact interactive elements for filtering, dismissible tags, and action triggers. For passive status labels, use Badge instead.
+        </p>
+      </div>
+
+      {/* Filter Selection Chips */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Filter selection chips (with leading icon & active check)
+        </span>
+        <div className="flex flex-wrap items-center gap-2 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
+          <Chip
+            icon="checklist"
+            colorRole="primary"
+            selected={selectedFilter === 'drill'}
+            onSelect={() => setSelectedFilter('drill')}
+          >
+            Daily Drill
+          </Chip>
+          <Chip
+            icon="mic"
+            colorRole="secondary"
+            selected={selectedFilter === 'audio'}
+            onSelect={() => setSelectedFilter('audio')}
+          >
+            Audio Drills
+          </Chip>
+          <Chip
+            icon="schedule"
+            colorRole="neutral"
+            selected={selectedFilter === 'scheduled'}
+            onSelect={() => setSelectedFilter('scheduled')}
+          >
+            Scheduled
+          </Chip>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
-          Patterns & Emphasis
-        </h4>
-        <div className="flex flex-wrap items-center gap-2">
-          <Chip variant="filled" colorRole="primary">Filled Chip</Chip>
-          <Chip variant="outline" colorRole="secondary">Outline Chip</Chip>
-          <Chip variant="soft" colorRole="tertiary">Soft Chip</Chip>
-          <Chip selected={true} colorRole="primary">Filter Chip</Chip>
-          <Chip colorRole="primary" onRemove={() => {}}>Removable Filter</Chip>
+      {/* Removable Input Tags */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Dismissible input chips (with remove button)
+        </span>
+        <div className="flex flex-wrap items-center gap-2 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
+          {activeTags.map((tag) => (
+            <Chip
+              key={tag}
+              variant="soft"
+              colorRole="primary"
+              onRemove={() => removeTag(tag)}
+            >
+              {tag}
+            </Chip>
+          ))}
+          {activeTags.length === 0 && (
+            <span className="text-xs text-on-surface-variant italic">All tags removed</span>
+          )}
+        </div>
+      </div>
+
+      {/* Design System Patterns & Sizes */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Approved patterns & sizes
+        </span>
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface-container">
+          <Chip size="sm" variant="filled" colorRole="primary" icon="flag">
+            Small Filled
+          </Chip>
+          <Chip size="md" variant="outline" colorRole="secondary" icon="tune">
+            Medium Outline
+          </Chip>
+          <Chip size="lg" variant="soft" colorRole="neutral" icon="folder">
+            Large Soft
+          </Chip>
         </div>
       </div>
     </div>
@@ -287,6 +373,62 @@ export const ReadingProgressDemo: React.FC<ComponentDemoProps> = () => {
           <p>
             Note which sounds felt easy and which needed extra effort. Save your recorded clips for therapist review.
           </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const BadgeDemo: React.FC<ComponentDemoProps> = () => {
+  return (
+    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          Status Badges & Category Labels
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Passive indicators for status counts, clinical categories, and attributes. For interactive filters, use Chip instead.
+        </p>
+      </div>
+
+      {/* Variants */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Badge variants (3 approved design system patterns)
+        </span>
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
+          <Badge variant="filled" colorRole="primary">Pattern 1: Filled</Badge>
+          <Badge variant="outline" colorRole="primary">Pattern 2: Outline</Badge>
+          <Badge variant="soft" colorRole="primary">Pattern 3: Soft</Badge>
+        </div>
+      </div>
+
+      {/* Color Roles */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Color roles (high contrast)
+        </span>
+        <div className="flex flex-wrap items-center gap-2.5 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
+          <Badge colorRole="primary" icon="play_arrow">Primary</Badge>
+          <Badge colorRole="secondary" icon="checklist">Secondary</Badge>
+          <Badge colorRole="tertiary" icon="star">Tertiary</Badge>
+          <Badge colorRole="error" icon="priority_high">Error</Badge>
+          <Badge colorRole="warning" icon="schedule">Warning</Badge>
+          <Badge colorRole="success" icon="verified">Success</Badge>
+          <Badge colorRole="neutral" icon="archive">Neutral</Badge>
+        </div>
+      </div>
+
+      {/* Shapes & Sizes */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Shapes & calibrated size scale
+        </span>
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface-container">
+          <Badge size="sm" shape="pill" colorRole="primary" icon="check">Small (20px)</Badge>
+          <Badge size="md" shape="pill" colorRole="secondary" icon="check">Medium (24px)</Badge>
+          <Badge size="lg" shape="pill" colorRole="success" icon="check">Large (28px)</Badge>
+          <Badge size="md" shape="rounded" colorRole="neutral">Rounded Rect</Badge>
         </div>
       </div>
     </div>

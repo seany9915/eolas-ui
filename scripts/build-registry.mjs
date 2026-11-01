@@ -312,6 +312,12 @@ for (const file of files) {
   if (content.includes("from 'react-resizable-panels'") || content.includes('from "react-resizable-panels"')) {
     npmDeps.push('react-resizable-panels');
   }
+  if (content.includes("from 'cmdk'") || content.includes('from "cmdk"')) {
+    npmDeps.push('cmdk');
+  }
+  if (content.includes("from 'react-day-picker'") || content.includes('from "react-day-picker"')) {
+    npmDeps.push('react-day-picker');
+  }
 
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',

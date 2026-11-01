@@ -11,6 +11,18 @@ import { PreviewCard } from '@/components/ui/preview-card';
 import { Confirmation } from '@/components/ui/confirmation';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+} from '@/components/ui/command';
+import { Kbd } from '@/components/ui/kbd';
 import { ComponentDemoProps } from '../types';
 
 export const DialogDemo: React.FC<ComponentDemoProps> = () => {
@@ -381,6 +393,148 @@ export const ConfirmationDemo: React.FC<ComponentDemoProps> = () => {
           />
         </Confirmation.Actions>
       </Confirmation.Root>
+    </div>
+  );
+};
+
+export const CommandDemo: React.FC<ComponentDemoProps> = () => {
+  const [open, setOpen] = React.useState(false);
+  const [lastAction, setLastAction] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
+
+  const handleSelect = (actionName: string) => {
+    setLastAction(actionName);
+    setOpen(false);
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto space-y-6 py-4">
+      {/* Trigger bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
+        <div className="space-y-0.5 text-left">
+          <p className="font-heading text-sm font-semibold text-on-surface">
+            Quick Actions & Patient Search
+          </p>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Press the shortcut or click the button to open the command palette.
+          </p>
+        </div>
+        <Button
+          colorRole="primary"
+          variant="outlined"
+          onClick={() => setOpen(true)}
+          className="shrink-0"
+        >
+          <Icon name="search" size="xs" aria-hidden="true" />
+          <span>Open Menu</span>
+          <Kbd size="sm" className="ml-1.5">⌘K</Kbd>
+        </Button>
+      </div>
+
+      {lastAction && (
+        <div className="p-3 rounded-lg bg-surface-container text-xs font-sans text-on-surface flex items-center justify-between">
+          <span>Selected action: <strong>{lastAction}</strong></span>
+          <Button variant="unstyled" onClick={() => setLastAction(null)} className="text-on-surface-variant hover:text-on-surface text-xs underline">
+            Clear
+          </Button>
+        </div>
+      )}
+
+      {/* Embedded inline command preview */}
+      <div className="space-y-2 text-left">
+        <span className="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+          Embedded Command Menu
+        </span>
+        <Command className="rounded-xl border border-outline-variant shadow-ambient bg-surface focus-within:border-primary transition-colors">
+          <CommandInput placeholder="Type a command or search..." />
+          <CommandList className="max-h-[260px]">
+            <CommandEmpty>No matching results found.</CommandEmpty>
+            <CommandGroup heading="Patients">
+              <CommandItem onSelect={() => setLastAction('Patient: Jane Doe')}>
+                <Icon name="person" size="sm" aria-hidden="true" />
+                <span>Jane Doe</span>
+                <CommandShortcut>
+                  <Kbd size="sm">P1</Kbd>
+                </CommandShortcut>
+              </CommandItem>
+              <CommandItem onSelect={() => setLastAction('Patient: Liam Smith')}>
+                <Icon name="person" size="sm" aria-hidden="true" />
+                <span>Liam Smith</span>
+                <CommandShortcut>
+                  <Kbd size="sm">P2</Kbd>
+                </CommandShortcut>
+              </CommandItem>
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup heading="Quick Actions">
+              <CommandItem onSelect={() => setLastAction('New Consultation')}>
+                <Icon name="add" size="sm" aria-hidden="true" />
+                <span>New Consultation</span>
+                <CommandShortcut>
+                  <Kbd size="sm">⌘N</Kbd>
+                </CommandShortcut>
+              </CommandItem>
+              <CommandItem onSelect={() => setLastAction('Record Audio Drill')}>
+                <Icon name="mic" size="sm" aria-hidden="true" />
+                <span>Record Audio Drill</span>
+                <CommandShortcut>
+                  <Kbd size="sm">⌘R</Kbd>
+                </CommandShortcut>
+              </CommandItem>
+              <CommandItem onSelect={() => setLastAction('Download Care Plan')}>
+                <Icon name="download" size="sm" aria-hidden="true" />
+                <span>Download Care Plan</span>
+                <CommandShortcut>
+                  <Kbd size="sm">⌘D</Kbd>
+                </CommandShortcut>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </div>
+
+      {/* Modal Command Dialog */}
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandEmpty>No matching results found.</CommandEmpty>
+          <CommandGroup heading="Patients">
+            <CommandItem onSelect={() => handleSelect('Patient: Jane Doe')}>
+              <Icon name="person" size="sm" aria-hidden="true" />
+              <span>Jane Doe</span>
+              <CommandShortcut><Kbd size="sm">P1</Kbd></CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => handleSelect('Patient: Liam Smith')}>
+              <Icon name="person" size="sm" aria-hidden="true" />
+              <span>Liam Smith</span>
+              <CommandShortcut><Kbd size="sm">P2</Kbd></CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Quick Actions">
+            <CommandItem onSelect={() => handleSelect('New Consultation')}>
+              <Icon name="add" size="sm" aria-hidden="true" />
+              <span>New Consultation</span>
+              <CommandShortcut><Kbd size="sm">⌘N</Kbd></CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => handleSelect('Record Audio Drill')}>
+              <Icon name="mic" size="sm" aria-hidden="true" />
+              <span>Record Audio Drill</span>
+              <CommandShortcut><Kbd size="sm">⌘R</Kbd></CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
     </div>
   );
 };

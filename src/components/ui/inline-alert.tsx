@@ -1,32 +1,125 @@
+/**
+ * InlineAlert primitive.
+ *
+ * Aligned with shadcn/ui and Base UI ecosystem patterns:
+ * https://ui.shadcn.com/docs/components/base/alert
+ *
+ * TAXONOMY & USAGE:
+ * - Use InlineAlert for high-visibility system event or validation banners (neutral, warning, error, success).
+ * - Implements a mathematically straight 4px vertical accent bar, ambient elevation, and accessible live regions.
+ * - Supports both monolithic props (title, action, onClose) and compound subcomponents (InlineAlert.Title, InlineAlert.Description, InlineAlert.Action, InlineAlert.Close).
+ * - Distinct from ClinicianTip (which is low-prominence instructional micro-guidance) and AlertDialog (modal interrupt).
+ * - Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles.
+ */
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 
 export type InlineAlertRole = 'neutral' | 'warning' | 'error' | 'success';
+export type InlineAlertVariant = 'default' | 'destructive' | InlineAlertRole;
 
 export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
-  title: string;
+  /** Optional title for monolithic usage. Omit when using `<InlineAlert.Title>` */
+  title?: string;
+  /** Semantic heading tag for title. Defaults to 'h3' */
   titleAs?: 'h2' | 'h3' | 'h4' | 'h5' | 'div';
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  /** Primary semantic role according to DESIGN.md */
   role?: InlineAlertRole;
-  icon?: string;
+  /** Ergonomic alias matching shadcn alert API ('default' -> 'neutral', 'destructive' -> 'error') */
+  variant?: InlineAlertVariant;
+  /** Material Symbol icon name, React icon element, or null/'none' to omit */
+  icon?: React.ReactNode;
+  /** Action slot for buttons/links in monolithic usage */
   action?: React.ReactNode;
+  /** Dismiss callback in monolithic usage */
   onClose?: () => void;
   className?: string;
 }
 
-export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
+export interface InlineAlertTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  as?: 'h2' | 'h3' | 'h4' | 'h5' | 'div';
+}
+
+export const InlineAlertTitle = React.forwardRef<HTMLHeadingElement, InlineAlertTitleProps>(
+  ({ className, as: Tag = 'h3', ...props }, ref) => (
+    <Tag
+      ref={ref}
+      data-slot="inline-alert-title"
+      className={cn('font-heading text-base font-bold text-on-surface mb-1 text-balance', className)}
+      {...props}
+    />
+  )
+);
+InlineAlertTitle.displayName = 'InlineAlertTitle';
+
+export interface InlineAlertDescriptionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const InlineAlertDescription = React.forwardRef<HTMLDivElement, InlineAlertDescriptionProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="inline-alert-description"
+      className={cn('font-sans text-sm text-on-surface-variant leading-relaxed text-pretty', className)}
+      {...props}
+    />
+  )
+);
+InlineAlertDescription.displayName = 'InlineAlertDescription';
+
+export interface InlineAlertActionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const InlineAlertAction = React.forwardRef<HTMLDivElement, InlineAlertActionProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="inline-alert-action"
+      className={cn('mt-3 flex items-center gap-3', className)}
+      {...props}
+    />
+  )
+);
+InlineAlertAction.displayName = 'InlineAlertAction';
+
+export interface InlineAlertCloseProps extends React.ComponentPropsWithoutRef<typeof BaseButton> {}
+
+export const InlineAlertClose = React.forwardRef<HTMLButtonElement, InlineAlertCloseProps>(
+  ({ className, children, ...props }, ref) => (
+    <BaseButton
+      ref={ref}
+      type="button"
+      data-slot="inline-alert-close"
+      aria-label="Dismiss alert"
+      className={cn(
+        'shrink-0 min-h-[44px] min-w-[44px] size-11 -mr-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none',
+        className
+      )}
+      {...props}
+    >
+      {children ?? <Icon name="close" size="md" aria-hidden="true" />}
+    </BaseButton>
+  )
+);
+InlineAlertClose.displayName = 'InlineAlertClose';
+
+const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
   title,
   titleAs = 'h3',
   children,
-  role = 'neutral',
+  role,
+  variant,
   icon,
   action,
   onClose,
   className,
   ...props
 }, ref) => {
+  // Resolve role: explicit role takes priority, fallback to variant, default to 'neutral'
+  const resolvedRole: InlineAlertRole = role ?? (
+    variant === 'destructive' ? 'error' : variant === 'default' ? 'neutral' : (variant ?? 'neutral')
+  );
+
   const accentBarBg: Record<InlineAlertRole, string> = {
     neutral: 'bg-on-surface',
     warning: 'bg-warning',
@@ -48,9 +141,29 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
     success: 'check_circle',
   };
 
-  const activeIcon = icon || defaultIcons[role];
-  const ariaRole = role === 'error' ? 'alert' : 'status';
-  const ariaLive = role === 'error' ? 'assertive' : 'polite';
+  const hasIcon = icon !== null && icon !== 'none' && icon !== false && icon !== '';
+  const ariaRole = resolvedRole === 'error' ? 'alert' : 'status';
+  const ariaLive = resolvedRole === 'error' ? 'assertive' : 'polite';
+
+  const renderIcon = () => {
+    if (!hasIcon) return null;
+    if (React.isValidElement(icon)) {
+      return (
+        <div className={cn('mt-0.5 shrink-0', iconColorClasses[resolvedRole])} aria-hidden="true">
+          {icon}
+        </div>
+      );
+    }
+    const iconName = typeof icon === 'string' && icon !== 'none' ? icon : defaultIcons[resolvedRole];
+    return (
+      <Icon
+        name={iconName}
+        size="lg"
+        className={cn('mt-0.5 shrink-0', iconColorClasses[resolvedRole])}
+        aria-hidden="true"
+      />
+    );
+  };
 
   return (
     <div
@@ -58,6 +171,9 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
       role={ariaRole}
       aria-live={ariaLive}
       aria-atomic="true"
+      data-slot="inline-alert"
+      data-variant={variant ?? resolvedRole}
+      data-role={resolvedRole}
       className={cn(
         'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default bg-surface border-none shadow-ambient overflow-hidden text-left',
         className
@@ -66,43 +182,43 @@ export const InlineAlert = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
     >
       {/* Mathematically straight 4px vertical accent bar */}
       <div
-        className={cn('absolute left-0 top-0 bottom-0 w-1', accentBarBg[role])}
+        className={cn('absolute left-0 top-0 bottom-0 w-1', accentBarBg[resolvedRole])}
         aria-hidden="true"
       />
-      <Icon
-        name={activeIcon}
-        size="lg"
-        className={cn('mt-0.5 shrink-0', iconColorClasses[role])}
-        aria-hidden="true"
-      />
+      {renderIcon()}
       <div className="flex-1 min-w-0">
-        {React.createElement(
-          titleAs,
-          { className: 'font-heading text-base font-bold text-on-surface mb-1 text-balance' },
-          title
+        {title && (
+          <InlineAlertTitle as={titleAs}>
+            {title}
+          </InlineAlertTitle>
         )}
-        <div className="font-sans text-sm text-on-surface-variant leading-relaxed text-pretty">
-          {children}
-        </div>
+        {typeof children === 'string' ? (
+          <InlineAlertDescription>{children}</InlineAlertDescription>
+        ) : (
+          children
+        )}
         {action && (
-          <div className="mt-3 flex items-center gap-3">
+          <InlineAlertAction>
             {action}
-          </div>
+          </InlineAlertAction>
         )}
       </div>
       {onClose && (
-        <BaseButton
-          type="button"
-          onClick={onClose}
-          aria-label="Dismiss alert"
-          className="shrink-0 min-h-[44px] min-w-[44px] size-11 -mr-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none"
-        >
-          <Icon name="close" size="md" aria-hidden="true" />
-        </BaseButton>
+        <InlineAlertClose onClick={onClose} />
       )}
     </div>
   );
 });
 
-InlineAlert.displayName = 'InlineAlert';
+InlineAlertComponent.displayName = 'InlineAlert';
 
+export const InlineAlert = Object.assign(InlineAlertComponent, {
+  Title: InlineAlertTitle,
+  Description: InlineAlertDescription,
+  Action: InlineAlertAction,
+  Close: InlineAlertClose,
+});
+
+export { InlineAlertComponent };
+
+export default InlineAlert;

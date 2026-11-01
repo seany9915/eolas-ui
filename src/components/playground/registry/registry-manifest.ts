@@ -114,6 +114,27 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/avatar"
   },
   {
+    "id": "badge",
+    "name": "badge",
+    "title": "Badge",
+    "description": "Passive status badge primitive for counts, categories, and attributes.",
+    "category": "feedback",
+    "tier": "primitive",
+    "basePrimitive": "Base UI useRender",
+    "sourcePath": "src/components/ui/badge.tsx",
+    "taxonomy": [
+      "Use Badge for passive, non-interactive status indicators, counts, categories, or labels.",
+      "Do NOT use Badge for interactive filters, toggles, or removable tags (use Chip instead).",
+      "Follows DESIGN.md high-contrast accessible standards (filled, outline, soft). No triple-tint monochrome chips."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/badge"
+  },
+  {
     "id": "bot-avatar",
     "name": "bot-avatar",
     "title": "Bot Avatar",
@@ -168,6 +189,27 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/button"
+  },
+  {
+    "id": "calendar",
+    "name": "calendar",
+    "title": "Calendar",
+    "description": "Accessible date picker and range calendar primitive built on react-day-picker.",
+    "category": "inputs",
+    "tier": "primitive",
+    "basePrimitive": "react-day-picker",
+    "sourcePath": "src/components/ui/calendar.tsx",
+    "taxonomy": [
+      "Use Calendar for interactive single-day selection, date ranges, and consultation booking.",
+      "Styled with DESIGN.md clinical tokens: high-contrast selection wash, today indicator, and floating focus rings.",
+      "Complies with WCAG 2.2 keyboard navigation (arrow keys, home, end, page up/down)."
+    ],
+    "dependencies": [
+      "react-day-picker",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/calendar"
   },
   {
     "id": "card",
@@ -451,6 +493,28 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/combobox"
+  },
+  {
+    "id": "command",
+    "name": "command",
+    "title": "Command",
+    "description": "Fast, composable command menu palette and dialog built on cmdk and Base UI Dialog.",
+    "category": "overlays",
+    "tier": "primitive",
+    "basePrimitive": "cmdk & Base UI Dialog",
+    "sourcePath": "src/components/ui/command.tsx",
+    "taxonomy": [
+      "Use Command for quick-search palettes, keyboard-driven navigation, and clinical patient lookups.",
+      "Supports modal CommandDialog and inline embedded Command.",
+      "Exports Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, and CommandSeparator."
+    ],
+    "dependencies": [
+      "cmdk",
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/command"
   },
   {
     "id": "confirmation",
@@ -780,6 +844,48 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/input"
+  },
+  {
+    "id": "item",
+    "name": "item",
+    "title": "Item",
+    "description": "Content row and media object primitive for structured list items, patient directories, and activity feeds.",
+    "category": "layout",
+    "tier": "primitive",
+    "basePrimitive": "Base UI useRender",
+    "sourcePath": "src/components/ui/item.tsx",
+    "taxonomy": [
+      "Use Item and ItemGroup for structured list rows, activity feeds, patient directories, and settings rows.",
+      "Directly eliminates the 'Card inside Card' anti-pattern by providing a clean, non-elevated content row.",
+      "Exports Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemHeader, and ItemFooter."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/item"
+  },
+  {
+    "id": "kbd",
+    "name": "kbd",
+    "title": "Keyboard Key (Kbd)",
+    "description": "Accessible keyboard shortcut indicator styled with semantic typography and ambient elevation.",
+    "category": "layout",
+    "tier": "primitive",
+    "basePrimitive": "Base UI useRender",
+    "sourcePath": "src/components/ui/kbd.tsx",
+    "taxonomy": [
+      "Use Kbd to display keyboard keys and shortcuts in menus, command palettes, tooltips, and documentation.",
+      "Use KbdGroup to display multi-key shortcut combinations (e.g. ⌘ + K).",
+      "Supports size variants (sm, md) and follows DESIGN.md Roboto Mono typography."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/kbd"
   },
   {
     "id": "menu",

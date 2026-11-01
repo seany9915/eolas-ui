@@ -245,20 +245,24 @@ button,
   border-width: 4px;
 }
 
-/* Material Symbols icon styling helper */
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  /* Material Symbols icon styling helper */
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 /* Accessible high-visibility focus ring compatible with forced-colors mode */
@@ -273,24 +277,26 @@ button,
 }
 
 /* 1. Standard Form Controls (flush 2px focus ring) */
-input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):focus-visible,
+input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):not([data-slot="number-field-group"] *):not([data-slot="command-input-wrapper"] *):not([cmdk-input-wrapper] *):focus-visible,
 select:focus-visible,
 textarea:not([data-slot="prompt-input"] *):focus-visible,
 [data-slot="select-trigger"]:focus-visible,
 [data-slot="combobox-input-group"]:focus-within,
-[data-slot="autocomplete-input-group"]:focus-within {
+[data-slot="autocomplete-input-group"]:focus-within,
+[data-slot="number-field-group"]:has(:focus-visible) {
   border-color: var(--primary);
   outline: 2px solid var(--primary);
   outline-offset: -1px;
 }
 
 /* 2. Invalid / Error Form Controls (Overrides via cascade + :is() specificity) */
-input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):not([data-slot="number-field-group"] *):not([data-slot="command-input-wrapper"] *):not([cmdk-input-wrapper] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
 select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
 textarea:not([data-slot="prompt-input"] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
 [data-slot="select-trigger"]:is([aria-invalid="true"], [data-invalid], .border-error):focus-visible,
 [data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within,
-[data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within {
+[data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within,
+[data-slot="number-field-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(:focus-visible) {
   border-color: var(--error);
   outline: 2px solid var(--error);
   outline-offset: -1px;
@@ -313,9 +319,12 @@ button:focus-visible:not([data-slot="select-trigger"]) {
 /* 5. Compound Inner Inputs: Suppress internal ring when nested inside an input group so the outer group handles focus */
 [data-slot="combobox-input-group"] input[data-slot="combobox-input"]:focus-visible,
 [data-slot="autocomplete-input-group"] input[data-slot="autocomplete-input"]:focus-visible,
-[data-slot="prompt-input"] textarea[data-slot="prompt-input-textarea"]:focus-visible {
-  outline: none;
-  border-color: transparent;
+[data-slot="prompt-input"] textarea[data-slot="prompt-input-textarea"]:focus-visible,
+[data-slot="number-field-group"] input:focus-visible,
+[data-slot="command-input-wrapper"] input:focus-visible,
+[cmdk-input-wrapper] input:focus-visible {
+  outline: none !important;
+  border-color: transparent !important;
 }
 
 /* Autofill Credential Highlighting: maintains calibrated surface tokens and typography on browser autofill */

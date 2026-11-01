@@ -23,7 +23,7 @@ export type BadgeVariant =
   | 'filled'
   | 'outline'
   | 'soft'
-  | 'tonal'
+  | 'tonal' // backwards-compatible alias for soft
   | 'default' // shadcn alias for filled
   | 'secondary' // shadcn alias for outline
   | 'destructive'; // shadcn alias for error
@@ -79,9 +79,9 @@ const softStyles: Record<BadgeColorRole, string> = {
 };
 
 const sizeStyles: Record<BadgeSize, string> = {
-  sm: 'px-2 py-0.5 text-[0.6875rem] gap-1',
-  md: 'px-2.5 py-0.5 text-xs gap-1.5',
-  lg: 'px-3 py-1 text-sm gap-2',
+  sm: 'h-5 px-2 text-[11px] leading-none gap-1 [&>svg]:size-3 [&>[data-icon]]:size-3 [&_.material-symbols-outlined]:!text-[13px] [&_.material-symbols-outlined]:!leading-none',
+  md: 'h-6 px-2.5 text-xs leading-none gap-1.5 [&>svg]:size-3.5 [&>[data-icon]]:size-3.5 [&_.material-symbols-outlined]:!text-[15px] [&_.material-symbols-outlined]:!leading-none',
+  lg: 'h-7 px-3 text-sm leading-none gap-2 [&>svg]:size-4 [&>[data-icon]]:size-4 [&_.material-symbols-outlined]:!text-[17px] [&_.material-symbols-outlined]:!leading-none',
 };
 
 export function badgeVariants({
@@ -91,7 +91,7 @@ export function badgeVariants({
   shape = 'pill',
   className,
 }: BadgeVariantsProps = {}): string {
-  // Normalize shadcn aliases
+  // Normalize shadcn and legacy aliases
   let resolvedColorRole: BadgeColorRole = colorRole;
   let normalizedVariant: 'filled' | 'outline' | 'soft' = 'outline';
 
@@ -120,7 +120,7 @@ export function badgeVariants({
 
   return cn(
     'inline-flex items-center justify-center font-label font-semibold select-none shrink-0 whitespace-nowrap',
-    '[&>svg]:size-3 [&>[data-icon]]:size-3 [&>.material-symbols-outlined]:text-[1.15em]',
+    '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
     shape === 'pill' ? 'rounded-full' : 'rounded-sm',
     sizeStyles[size],
     variantClass,
@@ -180,11 +180,22 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           />
         )}
         {typeof icon === 'string' ? (
-          <span data-icon="inline-start" className="material-symbols-outlined text-[1em]" aria-hidden="true">
+          <span
+            data-icon="inline-start"
+            className="material-symbols-outlined !text-[1.15em] !leading-none inline-flex items-center justify-center shrink-0"
+            aria-hidden="true"
+          >
             {icon}
           </span>
         ) : (
-          icon && <span data-icon="inline-start">{icon}</span>
+          icon && (
+            <span
+              data-icon="inline-start"
+              className="inline-flex items-center justify-center shrink-0"
+            >
+              {icon}
+            </span>
+          )
         )}
         <span>{children}</span>
       </>

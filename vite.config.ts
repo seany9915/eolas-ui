@@ -10,5 +10,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
+  },
+  optimizeDeps: {
+    include: ['@base-ui/react', 'cmdk', 'react-day-picker']
   }
 })

@@ -46,18 +46,20 @@ export function MetricCard({
 
   return (
     <Card className={cn('w-full', className)}>
-      <div className="flex flex-row items-center justify-between">
+      <Card.Header className="flex flex-row items-center justify-between">
         <span className="font-label text-xs font-semibold text-on-surface-variant truncate">
           {title}
         </span>
         {icon && (
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-surface-container text-on-surface-variant shrink-0">
-            <Icon name={icon} size="md" aria-hidden="true" />
-          </div>
+          <Card.Action>
+            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-surface-container text-on-surface-variant shrink-0">
+              <Icon name={icon} size="md" aria-hidden="true" />
+            </div>
+          </Card.Action>
         )}
-      </div>
+      </Card.Header>
 
-      <div className="space-y-2 mt-3.5">
+      <Card.Content className="space-y-2 mt-3.5 pt-0">
         <div className="flex items-baseline justify-between gap-3">
           <span className="font-heading font-bold text-3xl text-on-surface tabular-nums tracking-tight">
             {value}
@@ -79,11 +81,11 @@ export function MetricCard({
         </div>
 
         {description && (
-          <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+          <Card.Description>
             {description}
-          </p>
+          </Card.Description>
         )}
-      </div>
+      </Card.Content>
     </Card>
   );
 }

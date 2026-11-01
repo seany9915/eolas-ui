@@ -217,6 +217,29 @@
       }
     },
     {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Calendar primitive (React DayPicker). Base UI Ecosystem Documentation: https://ui.shadcn.com/docs/components/base/calendar React DayPicker Documentation: https://daypicker.dev",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "react-day-picker"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Calendar for date, multiple date, and date range selections.",
+          "Integrates with React DayPicker v9/v10 while maintaining complete shadcn/ui API compatibility.",
+          "Commonly paired with Popover and Button to form a DatePicker.",
+          "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast."
+        ]
+      }
+    },
+    {
       "name": "card",
       "type": "registry:ui",
       "title": "Card",
@@ -526,6 +549,30 @@
       }
     },
     {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "Command primitive (cmdk + Base UI Dialog). cmdk Documentation: https://cmdk.paco.me",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "cmdk"
+      ],
+      "registryDependencies": [
+        "utils",
+        "dialog"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Command for fast, accessible command palettes, spotlight search, and quick action menus.",
+          "Powered by cmdk for fuzzy searching, keyboard scoring, and grouped item filtering.",
+          "CommandDialog integrates Base UI Dialog (with screen-reader accessible DialogTitle and DialogDescription) while retaining complete shadcn Command API compatibility.",
+          "Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings, surface-container wash for item selection, and strict semantic tokens."
+        ]
+      }
+    },
+    {
       "name": "confirmation",
       "type": "registry:ui",
       "title": "Confirmation",
@@ -779,7 +826,7 @@
       "name": "inline-alert",
       "type": "registry:ui",
       "title": "Inline Alert",
-      "description": "Eolas UI Inline Alert component built on Base UI and DESIGN.md design tokens.",
+      "description": "InlineAlert primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/alert",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -788,7 +835,16 @@
       "registryDependencies": [
         "utils",
         "icon"
-      ]
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use InlineAlert for high-visibility system event or validation banners (neutral, warning, error, success).",
+          "Implements a mathematically straight 4px vertical accent bar, ambient elevation, and accessible live regions.",
+          "Supports both monolithic props (title, action, onClose) and compound subcomponents (InlineAlert.Title, InlineAlert.Description, InlineAlert.Action, InlineAlert.Close).",
+          "Distinct from ClinicianTip (which is low-prominence instructional micro-guidance) and AlertDialog (modal interrupt).",
+          "Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles."
+        ]
+      }
     },
     {
       "name": "inline-citation",
@@ -848,6 +904,51 @@
           "Clinical Code / NHS ID / Dosage: `autoCorrect=\"off\"` + `spellCheck={false}`",
           "OTP / PIN: `type=\"text\"` + `inputMode=\"numeric\"` + `autoComplete=\"one-time-code\"`",
           "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "Item layout primitive (Content Row / Media Object). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/item",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Item and ItemGroup for structured list rows, activity feeds, patient directories, notification trays, and settings rows.",
+          "Composes [Media] + [Content (Title, Description)] + [Actions] without custom flex boilerplate.",
+          "Directly eliminates the \"Card inside Card\" anti-pattern by providing a clean, non-elevated content row for lists inside cards and dialogs.",
+          "Supports polymorphic composition via Base UI's `useRender` hook (turning the item into a link or button).",
+          "Follows DESIGN.md tokens: Lexend body/description font, Lexend label headers, floating 2px focus ring, and strict semantic tokens."
+        ]
+      }
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Keyboard key primitive (Kbd). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/kbd",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Kbd to visually represent keyboard keys, hotkeys, and shortcut combinations (e.g. ⌘K, Ctrl+B).",
+          "Use KbdGroup to compose multiple keycaps together without line breaks.",
+          "Ideal for embedding in buttons, command palettes, menus, and tooltips.",
+          "Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container wash, subtle outline-variant border, and strict semantic tokens."
         ]
       }
     },

@@ -19,6 +19,7 @@ import { NumberField } from '@/components/ui/number-field';
 import { OTPField } from '@/components/ui/otp-field';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { Calendar, DateRange } from '@/components/ui/calendar';
 import { ComponentDemoProps } from '../types';
 
 export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
@@ -536,6 +537,100 @@ export const TogglesLegacyDemo: React.FC<ComponentDemoProps> = () => {
         <p className="text-on-surface">Modern replacement imports:</p>
         <p className="text-primary font-bold">import &#123; Toggle &#125; from '@/components/ui/toggle';</p>
         <p className="text-primary font-bold">import &#123; ToggleGroup &#125; from '@/components/ui/toggle-group';</p>
+      </div>
+    </div>
+  );
+};
+
+export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+  });
+  const [mode, setMode] = React.useState<'single' | 'range'>('single');
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto space-y-6 py-4">
+      {/* Mode Selector */}
+      <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
+        <div className="text-left space-y-0.5">
+          <p className="font-heading text-sm font-semibold text-on-surface">
+            Calendar & Date Selection
+          </p>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Built on react-day-picker and styled with high-contrast clinical tokens.
+          </p>
+        </div>
+        <div className="flex items-center gap-1 p-1 rounded-md bg-surface-container">
+          <Button
+            size="sm"
+            variant={mode === 'single' ? 'filled' : 'unstyled'}
+            colorRole={mode === 'single' ? 'primary' : 'neutral'}
+            onClick={() => setMode('single')}
+            className={mode === 'single' ? '' : 'text-xs text-on-surface-variant hover:text-on-surface px-2.5 py-1'}
+          >
+            Single Date
+          </Button>
+          <Button
+            size="sm"
+            variant={mode === 'range' ? 'filled' : 'unstyled'}
+            colorRole={mode === 'range' ? 'primary' : 'neutral'}
+            onClick={() => setMode('range')}
+            className={mode === 'range' ? '' : 'text-xs text-on-surface-variant hover:text-on-surface px-2.5 py-1'}
+          >
+            Date Range
+          </Button>
+        </div>
+      </div>
+
+      {/* Interactive Calendar Card */}
+      <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-surface border border-outline-variant shadow-ambient">
+        {mode === 'single' ? (
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            className="rounded-lg"
+          />
+        ) : (
+          <Calendar
+            mode="range"
+            selected={dateRange}
+            onSelect={setDateRange}
+            className="rounded-lg"
+          />
+        )}
+
+        <div className="mt-4 pt-4 border-t border-outline-variant/60 w-full text-center">
+          <p className="font-sans text-xs text-on-surface-variant">
+            {mode === 'single' ? (
+              selectedDate ? (
+                <span>Selected consultation date: <strong className="text-on-surface">{formatDate(selectedDate)}</strong></span>
+              ) : (
+                <span>Please select a date on the calendar.</span>
+              )
+            ) : (
+              dateRange?.from ? (
+                dateRange.to ? (
+                  <span>Selected range: <strong className="text-on-surface">{formatDate(dateRange.from)}</strong> to <strong className="text-on-surface">{formatDate(dateRange.to)}</strong></span>
+                ) : (
+                  <span>Selected start: <strong className="text-on-surface">{formatDate(dateRange.from)}</strong> (choose end date)</span>
+                )
+              ) : (
+                <span>Please select a start and end date.</span>
+              )
+            )}
+          </p>
+        </div>
       </div>
     </div>
   );

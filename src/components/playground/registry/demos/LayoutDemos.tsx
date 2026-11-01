@@ -14,32 +14,51 @@ import { DeferredView } from '@/components/ui/deferred-view';
 import { SwipeReveal } from '@/components/ui/swipe-reveal';
 import { TextHighlight } from '@/components/ui/text-highlight';
 import { Button } from '@/components/ui/button';
+import { Kbd, KbdGroup } from '@/components/ui/kbd';
+import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from '@/components/ui/item';
 import { ComponentDemoProps } from '../types';
 
 export const CardDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mx-auto">
-      <Card className="p-6 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="font-heading text-xs font-bold text-on-surface">Card Default Elevation</span>
-          <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-bold">
-            Ambient
-          </span>
-        </div>
-        <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-          Follows DESIGN.md surface tokens, border-outline-variant, and 8px concentric inner corner radii.
-        </p>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mx-auto text-left">
+      {/* Standard Compound Card */}
+      <Card>
+        <Card.Header>
+          <Card.Title>Sound Practice Plan</Card.Title>
+          <Card.Description>Daily articulation exercises</Card.Description>
+          <Card.Action>
+            <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium">
+              Active
+            </span>
+          </Card.Action>
+        </Card.Header>
+        <Card.Content>
+          <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+            Target blends: /sl/, /st/, /sp/. 15 minutes scheduled daily with therapist feedback.
+          </p>
+        </Card.Content>
+        <Card.Footer>
+          <Button size="sm" colorRole="primary">Start Session</Button>
+        </Card.Footer>
       </Card>
-      <Card className="p-6 space-y-3 border-primary/40 bg-surface-container/20">
-        <div className="flex items-center justify-between">
-          <span className="font-heading text-xs font-bold text-primary">Card Highlight Variant</span>
-          <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-bold">
-            Active
-          </span>
-        </div>
-        <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-          Surface card with primary border accent for highlighted items.
-        </p>
+
+      {/* Compact Card with Accent */}
+      <Card size="sm" prominence="accent">
+        <Card.Header>
+          <Card.Title>Weekly Milestone</Card.Title>
+          <Card.Description>Accuracy target met</Card.Description>
+          <Card.Action>
+            <Icon name="verified" size="sm" className="text-secondary" />
+          </Card.Action>
+        </Card.Header>
+        <Card.Content>
+          <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+            92% average pronunciation score across 45 drills completed this week.
+          </p>
+        </Card.Content>
+        <Card.Footer>
+          <Button size="sm" variant="outlined" colorRole="neutral">View Progress</Button>
+        </Card.Footer>
       </Card>
     </div>
   );
@@ -328,6 +347,135 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-md mx-auto py-4 text-xs font-sans text-on-surface leading-relaxed">
       <div className="leading-relaxed">
         The learner practiced <TextHighlight query="consonant">consonant blends</TextHighlight> during today's sound drills.
+      </div>
+    </div>
+  );
+};
+
+export const KbdDemo: React.FC<ComponentDemoProps> = () => {
+  return (
+    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          Keyboard Shortcuts & Accessibility Hints
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Semantic kbd elements styled with ambient shadows and monospaced typography.
+        </p>
+      </div>
+
+      {/* Common Shortcuts Table */}
+      <div className="rounded-xl border border-outline-variant bg-surface p-4 shadow-ambient space-y-3">
+        <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60 text-xs">
+          <span className="font-sans text-on-surface">Search patient records</span>
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>K</Kbd>
+          </KbdGroup>
+        </div>
+        <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60 text-xs">
+          <span className="font-sans text-on-surface">Start recording drill</span>
+          <KbdGroup>
+            <Kbd>Ctrl</Kbd>
+            <Kbd>R</Kbd>
+          </KbdGroup>
+        </div>
+        <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60 text-xs">
+          <span className="font-sans text-on-surface">Dismiss open dialog</span>
+          <Kbd>Esc</Kbd>
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-sans text-on-surface">Submit consultation notes</span>
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>Enter</Kbd>
+          </KbdGroup>
+        </div>
+      </div>
+
+      {/* Size comparison */}
+      <div className="space-y-2">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          Size comparison
+        </span>
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-surface-container">
+          <div className="flex items-center gap-2">
+            <span className="font-sans text-xs text-on-surface-variant">Default (md):</span>
+            <Kbd>Shift</Kbd>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-sans text-xs text-on-surface-variant">Small (sm):</span>
+            <Kbd size="sm">Shift</Kbd>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ItemDemo: React.FC<ComponentDemoProps> = () => {
+  return (
+    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
+      <div className="space-y-1">
+        <h3 className="font-heading text-sm font-semibold text-on-surface">
+          Structured List Rows & Activity Feed
+        </h3>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Flat content rows with media, titles, descriptions, and action slots. Replaces nested cards inside cards.
+        </p>
+      </div>
+
+      {/* Divided list in surface container */}
+      <div className="rounded-xl border border-outline-variant bg-surface p-2 shadow-ambient">
+        <ItemGroup divided>
+          <Item interactive>
+            <ItemMedia variant="avatar">
+              <Avatar
+                fallback="JD"
+                className="size-10 bg-primary-container text-on-primary-container font-semibold"
+              />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Jane Doe</ItemTitle>
+              <ItemDescription>
+                Initial /s/ blend drills completed with 94% accuracy score.
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button size="sm" variant="outlined" colorRole="neutral">Review</Button>
+            </ItemActions>
+          </Item>
+
+          <Item interactive>
+            <ItemMedia variant="icon">
+              <Icon name="mic" size="sm" />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Liam Smith</ItemTitle>
+              <ItemDescription>
+                Audio practice session recorded. Awaiting therapist review.
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button size="sm" colorRole="primary">Listen</Button>
+            </ItemActions>
+          </Item>
+
+          <Item interactive>
+            <ItemMedia variant="icon">
+              <Icon name="event" size="sm" />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Upcoming Consultation</ItemTitle>
+              <ItemDescription>
+                Speech therapy evaluation scheduled for Thursday, 10:00 AM.
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button size="sm" variant="outlined" colorRole="neutral">Details</Button>
+            </ItemActions>
+          </Item>
+        </ItemGroup>
       </div>
     </div>
   );
