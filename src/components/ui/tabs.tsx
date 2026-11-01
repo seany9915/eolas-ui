@@ -338,7 +338,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
         value={value}
         keepMounted={resolvedKeepMounted}
         className={cn(
-          'py-4 font-sans outline-none transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+          'py-4 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
           '[&[hidden]:not([hidden="until-found"])]:hidden',
           className
         )}

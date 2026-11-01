@@ -19,8 +19,11 @@ export interface MenubarMenuData {
   items: MenubarMenuItem[];
 }
 
+export type MenubarVariant = 'default' | 'flush';
+
 export interface MenubarProps extends React.ComponentPropsWithoutRef<typeof BaseMenubar> {
   menus?: MenubarMenuData[];
+  variant?: MenubarVariant;
 }
 
 export const MenubarTrigger = React.forwardRef<
@@ -291,6 +294,7 @@ const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(
   (
     {
       menus,
+      variant = 'default',
       loopFocus = true,
       orientation = 'horizontal',
       modal = true,
@@ -299,25 +303,33 @@ const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(
       ...props
     },
     ref
-  ) => (
-    <BaseMenubar
-      ref={ref}
-      loopFocus={loopFocus}
-      orientation={orientation}
-      modal={modal}
-      className={cn(
-        'inline-flex items-center gap-1 p-1 rounded-lg bg-surface border border-outline-variant w-full',
-        className
-      )}
-      {...props}
-    >
-      {children
-        ? children
-        : menus?.map((menu, i) => (
-            <MenubarMenu key={i} triggerLabel={menu.triggerLabel} items={menu.items} />
-          ))}
-    </BaseMenubar>
-  )
+  ) => {
+    const variantClasses =
+      variant === 'flush'
+        ? 'rounded-none border-0 border-b border-outline-variant'
+        : 'rounded-lg border border-outline-variant';
+
+    return (
+      <BaseMenubar
+        ref={ref}
+        loopFocus={loopFocus}
+        orientation={orientation}
+        modal={modal}
+        className={cn(
+          'inline-flex items-center gap-1 p-1 bg-surface w-full',
+          variantClasses,
+          className
+        )}
+        {...props}
+      >
+        {children
+          ? children
+          : menus?.map((menu, i) => (
+              <MenubarMenu key={i} triggerLabel={menu.triggerLabel} items={menu.items} />
+            ))}
+      </BaseMenubar>
+    );
+  }
 );
 
 MenubarComponent.displayName = 'Menubar';

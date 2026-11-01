@@ -32,7 +32,7 @@ export const NavigationMenuList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.List
     ref={ref}
-    className={cn('flex flex-1 list-none items-center gap-2 px-1 bg-surface border-b border-outline-variant w-full', className)}
+    className={cn('flex flex-1 list-none items-center gap-2 px-1 bg-surface w-full', className)}
     {...props}
   />
 ));
@@ -58,8 +58,8 @@ export const NavigationMenuTrigger = React.forwardRef<
       'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container/40',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
       active
-        ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
-        : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
+        ? 'text-primary font-bold after:absolute after:-bottom-px after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
+        : 'after:absolute after:-bottom-px after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
       className
     )}
     {...props}
@@ -112,8 +112,8 @@ export const NavigationMenuLink = React.forwardRef<
           ? cn(
               'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
               active
-                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
+                ? 'text-primary font-bold after:absolute after:-bottom-px after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 after:absolute after:-bottom-px after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
               'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
             )
           : cn(

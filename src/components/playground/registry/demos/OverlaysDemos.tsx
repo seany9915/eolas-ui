@@ -157,7 +157,7 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-2xl mx-auto rounded-xl border border-outline-variant bg-surface overflow-hidden">
       {/* Top Application Menubar Chrome */}
-      <Menubar className="border-b border-outline-variant rounded-none bg-surface-container/30 px-2 py-1">
+      <Menubar variant="flush" className="bg-surface-container/30 px-2 py-1">
         <Menubar.Menu>
           <Menubar.Trigger>File</Menubar.Trigger>
           <Menubar.Content>
