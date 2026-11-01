@@ -281,6 +281,10 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       setDeclaredItemNames((prev) => (prev.includes(name) ? prev : [...prev, name]));
       if (meta) {
         setItemMap((prev) => {
+          const existing = prev.get(name);
+          if (existing?.required === meta.required && existing?.type === meta.type) {
+            return prev;
+          }
           const next = new Map(prev);
           next.set(name, meta);
           return next;
@@ -293,8 +297,12 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
 
     const updateItemMeta = React.useCallback((name: string, meta: QuestionnaireItemMeta) => {
       setItemMap((prev) => {
+        const existing = prev.get(name);
+        if (existing?.required === meta.required && existing?.type === meta.type) {
+          return prev;
+        }
         const next = new Map(prev);
-        next.set(name, { ...next.get(name), ...meta });
+        next.set(name, { ...existing, ...meta });
         return next;
       });
     }, []);
@@ -379,8 +387,8 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       [controlledItem, handleItemChange]
     );
 
-    // Validation for current step
-    const validateCurrent = React.useCallback((): boolean => {
+    // Pure validity check without any state-setting side effects
+    const isCurrentValid = React.useCallback((): boolean => {
       if (!activeItem) return true;
       const meta = getItemMeta(activeItem);
       if (meta?.required) {
@@ -390,14 +398,20 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           Array.isArray(answer) ? answer.length > 0 : answer !== undefined && answer !== null && answer !== '';
         const hasText = textAnswer !== undefined && textAnswer !== null && String(textAnswer).trim().length > 0;
 
-        if (!hasChoice && !hasText) {
-          setError(activeItem, 'Please select or provide an answer to continue.');
-          return false;
-        }
+        return Boolean(hasChoice || hasText);
+      }
+      return true;
+    }, [activeItem, getItemMeta, values]);
+
+    // Validation for current step on user actions (e.g. Next, Submit)
+    const validateCurrent = React.useCallback((): boolean => {
+      if (!isCurrentValid()) {
+        setError(activeItem, 'Please select or provide an answer to continue.');
+        return false;
       }
       setError(activeItem, null);
       return true;
-    }, [activeItem, getItemMeta, values, setError]);
+    }, [activeItem, isCurrentValid, setError]);
 
     const goToPrevious = React.useCallback(() => {
       if (!canGoBack) return;
@@ -447,16 +461,23 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       handleValuesChange?.(initialValues);
     }, [itemNames, changeActiveItem, controlledValues, initialValues, handleValuesChange]);
 
+    const onStatusChangeRef = React.useRef(onStatusChange);
+    React.useEffect(() => {
+      onStatusChangeRef.current = onStatusChange;
+    });
+
+    const isCurrentStepValid = isCurrentValid();
+
     // Notify status changes
     React.useEffect(() => {
-      onStatusChange?.({
+      onStatusChangeRef.current?.({
         activeItem,
         activeIndex,
         totalItems,
         isFirst,
         isLast,
         progress: percentage,
-        canSubmit: isLast && (!currentMeta?.required || validateCurrent()),
+        canSubmit: isLast && isCurrentStepValid,
         canSkip,
         canGoBack,
       });
@@ -469,9 +490,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       percentage,
       canSkip,
       canGoBack,
-      currentMeta?.required,
-      validateCurrent,
-      onStatusChange,
+      isCurrentStepValid,
     ]);
 
     // Native Form submit handling
@@ -581,7 +600,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           ref={ref}
           role="form"
           data-state={isLast ? 'last' : isFirst ? 'first' : 'in-progress'}
-          data-status={isLast && (!currentMeta?.required || validateCurrent()) ? 'can-submit' : 'answering'}
+          data-status={isLast && isCurrentStepValid ? 'can-submit' : 'answering'}
           onSubmit={handleSubmit}
           className={cn(
             '@container w-full max-w-2xl mx-auto flex flex-col',
@@ -726,6 +745,13 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       setChoices((prev) => {
         const existingIdx = prev.findIndex((c) => c.value === choice.value);
         if (existingIdx >= 0) {
+          const existing = prev[existingIdx];
+          if (
+            existing.shortcut === choice.shortcut &&
+            existing.disabled === choice.disabled
+          ) {
+            return prev;
+          }
           const next = [...prev];
           next[existingIdx] = choice;
           return next;
