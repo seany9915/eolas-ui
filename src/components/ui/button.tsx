@@ -181,7 +181,7 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant,
       colorRole,
-      type,
+      type = 'button',
       size = 'md',
       expandedTouchTarget,
       className,

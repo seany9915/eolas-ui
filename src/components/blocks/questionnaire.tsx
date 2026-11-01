@@ -1425,6 +1425,7 @@ export const QuestionnairePrevious: React.FC<QuestionnairePreviousProps> = ({
   children = 'Previous',
   disabled,
   onClick,
+  type = 'button',
   ...props
 }) => {
   const rootContext = useQuestionnaire();
@@ -1438,13 +1439,15 @@ export const QuestionnairePrevious: React.FC<QuestionnairePreviousProps> = ({
 
   return (
     <Button
+      type={type}
       variant="outline"
       colorRole="neutral"
       disabled={isDisabled}
       data-state={isDisabled ? 'disabled' : 'enabled'}
       onClick={(e) => {
-        if (onClick) onClick(e);
+        onClick?.(e);
         if (!e.defaultPrevented && rootContext) {
+          e.preventDefault();
           rootContext.goToPrevious();
         }
       }}
@@ -1475,6 +1478,7 @@ export const QuestionnaireSkip: React.FC<QuestionnaireSkipProps> = ({
   children = 'Skip',
   disabled,
   onClick,
+  type = 'button',
   ...props
 }) => {
   const rootContext = useQuestionnaire();
@@ -1487,13 +1491,15 @@ export const QuestionnaireSkip: React.FC<QuestionnaireSkipProps> = ({
 
   return (
     <Button
+      type={type}
       variant="text"
       colorRole="neutral"
       disabled={isDisabled}
       data-state={isDisabled ? 'disabled' : 'enabled'}
       onClick={(e) => {
-        if (onClick) onClick(e);
+        onClick?.(e);
         if (!e.defaultPrevented && rootContext) {
+          e.preventDefault();
           rootContext.skipCurrent();
         }
       }}
@@ -1522,7 +1528,9 @@ export const QuestionnaireNext: React.FC<QuestionnaireNextProps> = ({
   showIcon = true,
   hideWhenLast = true,
   children = 'Next',
+  disabled,
   onClick,
+  type = 'button',
   ...props
 }) => {
   const rootContext = useQuestionnaire();
@@ -1534,12 +1542,15 @@ export const QuestionnaireNext: React.FC<QuestionnaireNextProps> = ({
 
   return (
     <Button
+      type={type}
       variant="filled"
       colorRole="primary"
+      disabled={disabled}
       data-state="enabled"
       onClick={(e) => {
-        if (onClick) onClick(e);
+        onClick?.(e);
         if (!e.defaultPrevented && rootContext) {
+          e.preventDefault();
           rootContext.goToNext();
         }
       }}
