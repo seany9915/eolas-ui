@@ -377,28 +377,41 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
         </Attachment.Group>
       </div>
 
-      {/* 3. Legacy Convenience Props Pattern */}
+      {/* 3. Compact Horizontal & Vertical Stacked Attachments */}
       <div className="space-y-2">
         <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
-          Shorthand Convenience Props
+          Compact & Stacked Layouts
         </span>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
-          <Attachment
-            fileName="Care_Plan_V2.pdf"
-            fileSize="1.2 MB"
-            fileType="pdf"
-            status="completed"
-            onDownload={() => {}}
-            onRemove={() => {}}
-          />
-          <Attachment
-            fileName="Lab_Report_Pending.pdf"
-            fileSize="840 KB"
-            fileType="document"
-            status="uploading"
-            uploadProgress={45}
-            onRemove={() => {}}
-          />
+        <div className="flex flex-wrap gap-3 max-w-lg">
+          <Attachment size="sm" state="done">
+            <Attachment.Media className="bg-primary-container text-on-primary-container size-7">
+              <Icon name="description" size="xs" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title className="text-xs">Care_Plan_V2.pdf</Attachment.Title>
+              <Attachment.Description className="text-[10px]">1.2 MB</Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Remove Care Plan">
+                <Icon name="close" size="xs" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+          </Attachment>
+
+          <Attachment orientation="vertical" state="uploading">
+            <Attachment.Media className="bg-secondary-container text-on-secondary-container">
+              <Icon name="mic" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Session_Audio.wav</Attachment.Title>
+              <Attachment.Description className="text-primary font-medium">Uploading (45%)</Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Cancel upload">
+                <Icon name="close" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+          </Attachment>
         </div>
       </div>
     </div>

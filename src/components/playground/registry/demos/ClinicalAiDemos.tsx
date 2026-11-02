@@ -17,6 +17,7 @@ import { SuggestionChips } from '@/components/ui/suggestion-chips';
 import { ModelSelector, type ThinkingEffort } from '@/components/ui/model-selector';
 import { Tool } from '@/components/ui/tool';
 import { Checkpoint } from '@/components/ui/checkpoint';
+import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
 
 export const ThinkingOrbDemo: React.FC<ComponentDemoProps> = () => {
@@ -175,16 +176,41 @@ export const ChatMessageDemo: React.FC<ComponentDemoProps> = () => {
 
 export const PromptInputDemo: React.FC<ComponentDemoProps> = () => {
   const [text, setText] = React.useState('');
+  const [hasAttachment, setHasAttachment] = React.useState(true);
+
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <PromptInput.Root>
+        {hasAttachment && (
+          <PromptInput.Attachments>
+            <PromptInput.Attachment state="done" size="sm">
+              <PromptInput.Attachment.Media>
+                <Icon name="description" size="sm" className="text-error" aria-hidden="true" />
+              </PromptInput.Attachment.Media>
+              <PromptInput.Attachment.Content>
+                <PromptInput.Attachment.Title>session-notes-may-2026.pdf</PromptInput.Attachment.Title>
+                <PromptInput.Attachment.Description>1.2 MB</PromptInput.Attachment.Description>
+              </PromptInput.Attachment.Content>
+              <PromptInput.Attachment.Actions>
+                <PromptInput.Attachment.Action
+                  aria-label="Remove attachment"
+                  onClick={() => setHasAttachment(false)}
+                >
+                  <Icon name="close" size="xs" aria-hidden="true" />
+                </PromptInput.Attachment.Action>
+              </PromptInput.Attachment.Actions>
+            </PromptInput.Attachment>
+          </PromptInput.Attachments>
+        )}
         <PromptInput.Textarea
           placeholder="Ask a question about exercises or session notes..."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
         <PromptInput.Actions>
-          <PromptInput.AttachButton />
+          <div className="flex items-center gap-1">
+            <PromptInput.AttachButton onFilesSelected={() => setHasAttachment(true)} />
+          </div>
           <PromptInput.Submit disabled={!text} />
         </PromptInput.Actions>
       </PromptInput.Root>

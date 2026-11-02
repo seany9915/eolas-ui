@@ -78,7 +78,7 @@
       "name": "attachment",
       "type": "registry:ui",
       "title": "Attachment",
-      "description": "Attachment component system. Full API and feature parity with shadcn/ui Base Attachment specification: https://ui.shadcn.com/docs/components/base/attachment ANATOMY: AttachmentGroup └── Attachment ├── AttachmentMedia ├── AttachmentContent │   ├── AttachmentTitle │   └── AttachmentDescription ├── AttachmentActions │   └── AttachmentAction └── AttachmentTrigger FEATURES & CAPABILITIES: - Full compound composition with subcomponents for flexible media, layout, and metadata display. - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'. - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card). - Media variants: 'default' (file-type icons with semantic washes) and 'image' (aspect-square thumbnails). - Stretched interactive overlay (`AttachmentTrigger`) with isolated action button stacking (`AttachmentActions`). - Horizontally scrollable, snapping container (`AttachmentGroup`) with smooth edge fades. - 100% backwards-compatible convenience props for legacy callers (`fileName`, `fileSize`, `status`, etc.). - Base UI polymorphic `useRender` support across all components. - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.",
+      "description": "Attachment component system. Full API and feature parity with shadcn/ui Base Attachment specification: https://ui.shadcn.com/docs/components/base/attachment ANATOMY: AttachmentGroup └── Attachment ├── AttachmentMedia ├── AttachmentContent │   ├── AttachmentTitle │   └── AttachmentDescription ├── AttachmentActions │   └── AttachmentAction └── AttachmentTrigger FEATURES & CAPABILITIES: - Full compound composition with subcomponents for flexible media, layout, and metadata display. - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'. - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card). - Component sizes: 'default' | 'sm' | 'xs'. - Media variants: 'default' (file-type icons or container wash) and 'image' (aspect-square thumbnails). - Stretched interactive overlay (AttachmentTrigger) with isolated action button stacking (AttachmentActions). - Horizontally scrollable, snapping container (AttachmentGroup) with smooth edge fades. - Base UI polymorphic useRender support across all subcomponents. - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -86,10 +86,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "button",
-        "icon",
-        "progress",
-        "tooltip"
+        "button"
       ]
     },
     {
@@ -911,6 +908,32 @@
       }
     },
     {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group ANATOMY: InputGroup ├── InputGroupInput (or InputGroupTextarea) └── InputGroupAddon (align=\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\") ├── InputGroupButton └── InputGroupText",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "textarea"
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use InputGroup to attach icons, buttons, text prefixes, suffixes, and action toolbars to input fields and textareas.",
+          "Bridges single-line search/URL fields and multi-line AI chat prompt inputs under a single visual boundary.",
+          "Eliminates double-border and double-focus ring artifacts by delegating focus exclusively to InputGroup.",
+          "Integrates seamlessly with Base UI Field (<Field.Control>) for accessible label and error wiring.",
+          "Supports polymorphic composition via Base UI's `useRender` hook across all sub-components.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+        ]
+      }
+    },
+    {
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
@@ -1324,7 +1347,8 @@
         "tooltip",
         "attachment",
         "menu",
-        "badge"
+        "badge",
+        "input-group"
       ],
       "meta": {
         "taxonomy": [

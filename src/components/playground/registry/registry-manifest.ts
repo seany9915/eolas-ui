@@ -878,6 +878,18 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/inline-citation"
   },
   {
+    "id": "input-group",
+    "name": "input-group",
+    "title": "Input Group",
+    "category": "inputs",
+    "tier": "primitive",
+    "basePrimitive": "@base-ui/react/input",
+    "description": "Composite input field container with prefixes, suffixes, action buttons, and textareas.",
+    "sourcePath": "src/components/ui/input-group.tsx",
+    "dependencies": ["@base-ui/react"],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/input-group"
+  },
+  {
     "id": "input",
     "name": "input",
     "title": "Input",

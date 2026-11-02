@@ -23,7 +23,29 @@ import { Button } from './button';
 import { Icon } from './icon';
 import { Textarea } from './textarea';
 import { Tooltip } from './tooltip';
-import { Attachment, type AttachmentProps } from './attachment';
+import {
+  Attachment,
+  AttachmentGroup,
+  AttachmentMedia,
+  AttachmentContent,
+  AttachmentTitle,
+  AttachmentDescription,
+  AttachmentActions,
+  AttachmentAction,
+  AttachmentTrigger,
+  type AttachmentProps,
+  type AttachmentGroupProps,
+  type AttachmentMediaProps,
+  type AttachmentContentProps,
+  type AttachmentTitleProps,
+  type AttachmentDescriptionProps,
+  type AttachmentActionsProps,
+  type AttachmentActionProps,
+  type AttachmentTriggerProps,
+  type AttachmentState,
+  type AttachmentOrientation,
+  type AttachmentSize,
+} from './attachment';
 import {
   Menu,
   MenuContent,
@@ -33,6 +55,16 @@ import {
   MenuRadioItem,
 } from './menu';
 import { Badge } from './badge';
+import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupTextarea,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  type InputGroupProps,
+  type InputGroupButtonProps,
+} from './input-group';
 import { cn } from '@/lib/utils';
 
 export interface PromptInputRootProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -50,16 +82,20 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
     const isGhost = variant === 'ghost' || variant === 'unboxed';
     const isFloating = floating || variant === 'floating';
     const rootClasses = cn(
-      '@container relative flex flex-col w-full transition-[border-color,box-shadow,background-color] duration-quick ease-standard motion-reduce:transition-none',
+      '@container relative flex flex-col w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
       isGhost
         ? 'bg-transparent border-0 rounded-none p-0 focus-within:outline-none'
         : cn(
-            'border rounded-2xl p-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20',
+            'border rounded-2xl p-2.5 bg-surface text-on-surface',
+            'border-outline focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
+            'has-[:invalid]:border-error has-[:invalid]:focus-within:border-error has-[:invalid]:focus-within:outline-error',
+            'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:focus-within:border-error has-[[aria-invalid=true]]:focus-within:outline-error',
             isFloating
-              ? 'bg-surface/95 backdrop-blur-xs border-outline/70 shadow-ambient [&:not(:focus-within)]:hover:border-outline'
-              : 'bg-surface border-outline [&:not(:focus-within)]:hover:border-outline/80'
+              ? 'shadow-ambient bg-surface/95 backdrop-blur-xs [&:not(:focus-within)]:hover:border-outline'
+              : '[&:not(:focus-within)]:hover:border-outline/80'
           ),
       disabled && 'opacity-60 bg-surface-variant/30 border-outline-variant cursor-not-allowed',
+      'has-[:disabled]:opacity-60 has-[:disabled]:bg-surface-variant/30 has-[:disabled]:border-outline-variant has-[:disabled]:cursor-not-allowed',
       className
     );
 
@@ -93,39 +129,33 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
 );
 PromptInputRoot.displayName = 'PromptInput.Root';
 
-export interface PromptInputAttachmentsProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PromptInputAttachmentsProps extends AttachmentGroupProps {
   children?: React.ReactNode;
   className?: string;
 }
 
 const PromptInputAttachments = React.forwardRef<HTMLDivElement, PromptInputAttachmentsProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, scrollable = true, ...props }, ref) => {
     if (!children) return null;
     return (
-      <div
-        ref={ref}
-        data-slot="prompt-input-attachments"
-        className={cn(
-          'flex flex-wrap items-center gap-2 pb-2 px-1',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <InputGroupAddon align="block-start" className="p-0 border-b-0 pb-1.5">
+        <AttachmentGroup
+          ref={ref}
+          scrollable={scrollable}
+          data-slot="prompt-input-attachments"
+          className={cn('w-full px-1', className)}
+          {...props}
+        >
+          {children}
+        </AttachmentGroup>
+      </InputGroupAddon>
     );
   }
 );
 PromptInputAttachments.displayName = 'PromptInput.Attachments';
 
-export interface PromptInputAttachmentProps extends AttachmentProps {}
-
-const PromptInputAttachment = React.forwardRef<HTMLDivElement, PromptInputAttachmentProps>(
-  ({ variant = 'chip', ...props }, ref) => {
-    return <Attachment ref={ref} variant={variant} {...props} />;
-  }
-);
-PromptInputAttachment.displayName = 'PromptInput.Attachment';
+/** Full compound Attachment primitive re-exported for PromptInput */
+const PromptInputAttachment = Attachment;
 
 export interface PromptInputTextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onSubmit'> {
@@ -142,7 +172,8 @@ export interface PromptInputTextareaProps
 const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTextareaProps>(
   ({ className, onSubmit, onFilesPasted, onKeyDown, onPaste, minRows = 3, maxHeight = '12rem', ...props }, ref) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      // Respect IME composition: do not submit while selecting characters in Asian input methods
+      if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
         e.preventDefault();
         onSubmit?.();
       }
@@ -170,7 +201,7 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
         onPaste={handlePaste}
         className={cn(
           'w-full bg-transparent px-1.5 py-1 text-base font-sans text-on-surface leading-relaxed',
-          'placeholder:text-on-surface-variant/70 resize-none min-h-[64px]',
+          'placeholder:text-on-surface-variant/80 resize-none min-h-[64px]',
           'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
           className
         )}
@@ -963,10 +994,20 @@ export const PromptInput = Object.assign(PromptInputComponent, {
   Body: PromptInputBody,
   Footer: PromptInputFooter,
   Attachments: PromptInputAttachments,
-  Attachment: PromptInputAttachment,
+  Attachment: Attachment,
+  AttachmentGroup: AttachmentGroup,
+  AttachmentMedia: AttachmentMedia,
+  AttachmentContent: AttachmentContent,
+  AttachmentTitle: AttachmentTitle,
+  AttachmentDescription: AttachmentDescription,
+  AttachmentActions: AttachmentActions,
+  AttachmentAction: AttachmentAction,
+  AttachmentTrigger: AttachmentTrigger,
   Textarea: PromptInputTextarea,
+  Input: InputGroupInput,
   Actions: PromptInputActions,
   Action: PromptInputAction,
+  Button: InputGroupButton,
   Text: PromptInputText,
   Submit: PromptInputSubmit,
   Stop: PromptInputStop,
@@ -983,17 +1024,36 @@ export {
   PromptInputBody,
   PromptInputFooter,
   PromptInputAttachments,
-  PromptInputAttachment,
+  Attachment as PromptInputAttachment,
+  AttachmentGroup as PromptInputAttachmentGroup,
+  AttachmentMedia as PromptInputAttachmentMedia,
+  AttachmentContent as PromptInputAttachmentContent,
+  AttachmentTitle as PromptInputAttachmentTitle,
+  AttachmentDescription as PromptInputAttachmentDescription,
+  AttachmentActions as PromptInputAttachmentActions,
+  AttachmentAction as PromptInputAttachmentAction,
+  AttachmentTrigger as PromptInputAttachmentTrigger,
   PromptInputTextarea,
   PromptInputActions,
   PromptInputAction,
   PromptInputText,
   PromptInputSubmit,
-  // shadcn AI Elements direct aliases
-  PromptInputRoot as InputGroup,
-  PromptInputTextarea as InputGroupTextarea,
-  PromptInputActions as InputGroupAddon,
-  PromptInputAction as InputGroupAction,
-  PromptInputText as InputGroupText,
-  PromptInputSubmit as InputGroupButton,
+  InputGroupButton as PromptInputButton,
+  // shadcn Base Input Group primitives
+  InputGroup,
+  InputGroupInput,
+  InputGroupTextarea,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  // shadcn Base Attachment primitives
+  Attachment,
+  AttachmentGroup,
+  AttachmentMedia,
+  AttachmentContent,
+  AttachmentTitle,
+  AttachmentDescription,
+  AttachmentActions,
+  AttachmentAction,
+  AttachmentTrigger,
 };

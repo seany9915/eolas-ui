@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
+import { InputGroup, InputGroupInput, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText } from '@/components/ui/input-group';
 import { Input, FormField } from '@/components/ui/input';
 import { Textarea, TextareaField } from '@/components/ui/textarea';
 import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@/components/ui/field';
@@ -692,6 +693,98 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
             Connect
           </Button>
         </ButtonGroup>
+      </div>
+    </div>
+  );
+};
+
+export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
+  const [search, setSearch] = React.useState('');
+  const [prompt, setPrompt] = React.useState('');
+
+  return (
+    <div className="space-y-8 w-full max-w-xl mx-auto py-4 text-left">
+      {/* 1. Search Bar with Prefix Icon and Clear Button */}
+      <div className="space-y-2">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          Search Input with Addons
+        </h4>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Inline prefix icon and trailing clear trigger with zero double-border artifacts
+        </p>
+        <InputGroup className="max-w-md">
+          <InputGroupAddon align="inline-start">
+            <Icon name="search" size="sm" aria-hidden="true" />
+          </InputGroupAddon>
+          <InputGroupInput
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search patients or clinical notes..."
+          />
+          {search && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                variant="ghost"
+                aria-label="Clear search input"
+                onClick={() => setSearch('')}
+              >
+                <Icon name="close" size="xs" aria-hidden="true" />
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
+        </InputGroup>
+      </div>
+
+      {/* 2. URL Prefix Input with Action Button */}
+      <div className="space-y-2">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          Prefix Text and Trailing Action
+        </h4>
+        <InputGroup className="max-w-md">
+          <InputGroupAddon align="inline-start">
+            <InputGroupText>https://</InputGroupText>
+          </InputGroupAddon>
+          <InputGroupInput placeholder="clinic.eolas.health" defaultValue="telehealth.eolas.health" />
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton size="icon-sm" variant="ghost" aria-label="Copy portal link">
+              <Icon name="content_copy" size="xs" aria-hidden="true" />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+
+      {/* 3. Multi-line AI Chat Prompt Input (shadcn Pattern) */}
+      <div className="space-y-2">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          Multi-line AI Prompt Composer
+        </h4>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Input group containing auto-growing textarea and a bottom action bar with attachment and submit triggers
+        </p>
+        <InputGroup className="max-w-md">
+          <InputGroupTextarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Ask the clinical AI assistant..."
+          />
+          <InputGroupAddon align="block-end">
+            <InputGroupButton size="icon-sm" variant="outline" aria-label="Attach clinical documents">
+              <Icon name="attach_file" size="xs" aria-hidden="true" />
+            </InputGroupButton>
+            <InputGroupButton
+              type="submit"
+              size="icon-sm"
+              variant="filled"
+              colorRole="primary"
+              disabled={!prompt.trim()}
+              className="ml-auto"
+              aria-label="Send message"
+            >
+              <Icon name="arrow_upward" size="xs" aria-hidden="true" />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
       </div>
     </div>
   );

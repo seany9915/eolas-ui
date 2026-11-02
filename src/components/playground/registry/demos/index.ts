@@ -3,6 +3,7 @@ import { ComponentDemoMap } from '../types';
 import {
   ButtonDemo,
   InputDemo,
+  InputGroupDemo,
   TextareaDemo,
   FieldDemo,
   FieldsetDemo,
@@ -141,6 +142,7 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'button': ButtonDemo,
   'button-group': ButtonGroupDemo,
   'input': InputDemo,
+  'input-group': InputGroupDemo,
   'textarea': TextareaDemo,
   'field': FieldDemo,
   'fieldset': FieldsetDemo,

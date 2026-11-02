@@ -19,11 +19,11 @@
  * - Full compound composition with subcomponents for flexible media, layout, and metadata display.
  * - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'.
  * - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card).
- * - Media variants: 'default' (file-type icons with semantic washes) and 'image' (aspect-square thumbnails).
- * - Stretched interactive overlay (`AttachmentTrigger`) with isolated action button stacking (`AttachmentActions`).
- * - Horizontally scrollable, snapping container (`AttachmentGroup`) with smooth edge fades.
- * - 100% backwards-compatible convenience props for legacy callers (`fileName`, `fileSize`, `status`, etc.).
- * - Base UI polymorphic `useRender` support across all components.
+ * - Component sizes: 'default' | 'sm' | 'xs'.
+ * - Media variants: 'default' (file-type icons or container wash) and 'image' (aspect-square thumbnails).
+ * - Stretched interactive overlay (AttachmentTrigger) with isolated action button stacking (AttachmentActions).
+ * - Horizontally scrollable, snapping container (AttachmentGroup) with smooth edge fades.
+ * - Base UI polymorphic useRender support across all subcomponents.
  * - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.
  */
 
@@ -31,22 +31,14 @@ import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
 import { Button, type ButtonProps } from './button';
-import { Icon } from './icon';
-import { Progress } from './progress';
-import { Tooltip } from './tooltip';
 
 // ============================================================================
 // Types & Context
 // ============================================================================
 
 export type AttachmentState = 'idle' | 'uploading' | 'processing' | 'error' | 'done';
-/** Backwards-compatible legacy status type */
-export type AttachmentStatus = 'idle' | 'uploading' | 'completed' | 'error';
-
 export type AttachmentOrientation = 'horizontal' | 'vertical';
 export type AttachmentSize = 'default' | 'sm' | 'xs';
-export type AttachmentVariant = 'card' | 'chip' | 'compact' | 'default';
-export type AttachmentType = 'audio' | 'pdf' | 'image' | 'video' | 'document' | 'generic';
 
 export interface AttachmentContextValue {
   state: AttachmentState;
@@ -61,39 +53,6 @@ const AttachmentContext = React.createContext<AttachmentContextValue>({
 });
 
 export const useAttachment = () => React.useContext(AttachmentContext);
-
-const fileTypeIcons: Record<AttachmentType, { icon: string; wash: string; text: string }> = {
-  audio: {
-    icon: 'mic',
-    wash: 'bg-primary-container',
-    text: 'text-on-primary-container',
-  },
-  pdf: {
-    icon: 'description',
-    wash: 'bg-error-container',
-    text: 'text-on-error-container',
-  },
-  image: {
-    icon: 'image',
-    wash: 'bg-secondary-container',
-    text: 'text-on-secondary-container',
-  },
-  video: {
-    icon: 'movie',
-    wash: 'bg-tertiary-container',
-    text: 'text-on-tertiary-container',
-  },
-  document: {
-    icon: 'article',
-    wash: 'bg-surface-container',
-    text: 'text-on-surface-variant',
-  },
-  generic: {
-    icon: 'attach_file',
-    wash: 'bg-surface-container',
-    text: 'text-on-surface-variant',
-  },
-};
 
 // ============================================================================
 // AttachmentGroup
@@ -137,29 +96,14 @@ AttachmentGroup.displayName = 'AttachmentGroup';
 export interface AttachmentProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: useRender.RenderProp;
   /**
-   * Upload and processing lifecycle state.
-   * Aligned with shadcn specification: 'idle' | 'uploading' | 'processing' | 'error' | 'done'.
+   * Upload and processing lifecycle state:
+   * 'idle' | 'uploading' | 'processing' | 'error' | 'done'.
    */
   state?: AttachmentState;
-  /** Layout orientation. 'horizontal' (row/chip) or 'vertical' (stacked card). */
+  /** Layout orientation: 'horizontal' (row/chip) or 'vertical' (stacked card). */
   orientation?: AttachmentOrientation;
-  /** Component size scale. */
+  /** Component size scale: 'default' | 'sm' | 'xs'. */
   size?: AttachmentSize;
-
-  // --------------------------------------------------------------------------
-  // Backwards-Compatible Convenience Props
-  // --------------------------------------------------------------------------
-  /** Legacy status prop ('completed' is normalized to 'done') */
-  status?: AttachmentStatus;
-  /** Legacy variant prop ('chip' | 'compact' | 'card' | 'default') */
-  variant?: AttachmentVariant;
-  fileName?: string;
-  fileSize?: string;
-  fileType?: AttachmentType;
-  uploadProgress?: number;
-  errorMessage?: string;
-  onRemove?: () => void;
-  onDownload?: () => void;
 }
 
 export const AttachmentRoot = React.forwardRef<HTMLDivElement, AttachmentProps>(
@@ -168,50 +112,25 @@ export const AttachmentRoot = React.forwardRef<HTMLDivElement, AttachmentProps>(
       className,
       render,
       children,
-      state: stateProp,
-      status: legacyStatus,
-      orientation: orientationProp,
-      variant: legacyVariant = 'default',
+      state = 'done',
+      orientation = 'horizontal',
       size = 'default',
-      fileName,
-      fileSize,
-      fileType = 'generic',
-      uploadProgress = 0,
-      errorMessage,
-      onRemove,
-      onDownload,
       ...props
     },
     ref
   ) => {
-    // Normalize state: prefer modern `state`, fallback to legacy `status`
-    const resolvedState: AttachmentState = React.useMemo(() => {
-      if (stateProp) return stateProp;
-      if (legacyStatus === 'completed') return 'done';
-      if (legacyStatus) return legacyStatus;
-      return 'done';
-    }, [stateProp, legacyStatus]);
-
-    // Normalize orientation: if legacy chip/compact was requested, default to horizontal
-    const resolvedOrientation: AttachmentOrientation = React.useMemo(() => {
-      if (orientationProp) return orientationProp;
-      if (legacyVariant === 'chip' || legacyVariant === 'compact') return 'horizontal';
-      if (legacyVariant === 'card') return 'vertical';
-      return 'horizontal';
-    }, [orientationProp, legacyVariant]);
-
-    const isCompact = legacyVariant === 'chip' || legacyVariant === 'compact' || size === 'sm' || size === 'xs';
-    const isError = resolvedState === 'error';
-    const isUploading = resolvedState === 'uploading';
-    const isProcessing = resolvedState === 'processing';
+    const isCompact = size === 'sm' || size === 'xs';
+    const isError = state === 'error';
+    const isUploading = state === 'uploading';
+    const isProcessing = state === 'processing';
 
     const contextValue = React.useMemo<AttachmentContextValue>(
       () => ({
-        state: resolvedState,
-        orientation: resolvedOrientation,
+        state,
+        orientation,
         size,
       }),
-      [resolvedState, resolvedOrientation, size]
+      [state, orientation, size]
     );
 
     // Root styling conforming to DESIGN.md tokens & WCAG AA requirements
@@ -222,42 +141,13 @@ export const AttachmentRoot = React.forwardRef<HTMLDivElement, AttachmentProps>(
         : isUploading || isProcessing
         ? 'border-primary bg-surface hover:border-primary has-[:focus-visible]:border-primary'
         : 'border-outline-variant hover:border-outline bg-surface has-[:focus-visible]:border-outline',
-      resolvedOrientation === 'horizontal'
+      orientation === 'horizontal'
         ? isCompact
           ? 'items-center gap-2 px-2.5 py-1 min-h-[36px] max-w-[280px] shrink-0'
           : 'items-center gap-3 p-3 w-full max-w-md shrink-0'
         : 'flex-col gap-2.5 p-3 w-48 shrink-0',
       className
     );
-
-    // If explicit compound children are provided, render them within context
-    if (children) {
-      return (
-        <AttachmentContext.Provider value={contextValue}>
-          {useRender({
-            render,
-            ref,
-            defaultTagName: 'div',
-            props: {
-              'data-slot': 'attachment',
-              'data-state': resolvedState,
-              'data-orientation': resolvedOrientation,
-              'data-size': size,
-              role: 'group',
-              className: rootClasses,
-              children,
-              ...props,
-            },
-          })}
-        </AttachmentContext.Provider>
-      );
-    }
-
-    // ------------------------------------------------------------------------
-    // Convenience Shorthand Mode (Matches existing props without boilerplate)
-    // ------------------------------------------------------------------------
-    const config = fileTypeIcons[fileType] || fileTypeIcons.generic;
-    const computedName = fileName || 'Attachment';
 
     return (
       <AttachmentContext.Provider value={contextValue}>
@@ -267,100 +157,12 @@ export const AttachmentRoot = React.forwardRef<HTMLDivElement, AttachmentProps>(
           defaultTagName: 'div',
           props: {
             'data-slot': 'attachment',
-            'data-state': resolvedState,
-            'data-orientation': resolvedOrientation,
+            'data-state': state,
+            'data-orientation': orientation,
             'data-size': size,
             role: 'group',
-            'aria-label': `File attachment: ${computedName}`,
             className: rootClasses,
-            children: (
-              <>
-                {/* Media Element */}
-                <AttachmentMedia
-                  className={cn(
-                    config.wash,
-                    config.text,
-                    isCompact ? 'size-6 rounded' : 'size-10 rounded-md'
-                  )}
-                >
-                  <Icon name={config.icon} size={isCompact ? 'xs' : 'md'} aria-hidden="true" />
-                </AttachmentMedia>
-
-                {/* Content & Metadata */}
-                <AttachmentContent className={resolvedOrientation === 'vertical' ? 'w-full' : undefined}>
-                  <Tooltip content={computedName}>
-                    <AttachmentTitle className={isCompact ? 'text-xs' : 'text-sm'}>
-                      {computedName}
-                    </AttachmentTitle>
-                  </Tooltip>
-                  <AttachmentDescription className={isCompact ? 'text-[10px]' : 'text-xs'}>
-                    {fileSize && <span>{fileSize}</span>}
-                    {isUploading && (
-                      <span className="text-primary font-medium">
-                        Uploading ({Math.round(uploadProgress)}%)
-                      </span>
-                    )}
-                    {isProcessing && (
-                      <span className="text-secondary font-medium">Processing...</span>
-                    )}
-                    {isError && (
-                      <span className="text-error font-medium">{errorMessage || 'Upload failed'}</span>
-                    )}
-                  </AttachmentDescription>
-                </AttachmentContent>
-
-                {/* Actions Layer */}
-                {(onDownload || onRemove) && (
-                  <AttachmentActions>
-                    {onDownload && !isUploading && (
-                      <AttachmentAction
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDownload();
-                        }}
-                        aria-label={`Download ${computedName}`}
-                      >
-                        <Icon name="download" size="sm" aria-hidden="true" />
-                      </AttachmentAction>
-                    )}
-                    {onRemove && (
-                      <AttachmentAction
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onRemove();
-                        }}
-                        aria-label={`Remove ${computedName}`}
-                        className="hover:text-error"
-                      >
-                        <Icon name="close" size={isCompact ? 'xs' : 'sm'} aria-hidden="true" />
-                      </AttachmentAction>
-                    )}
-                  </AttachmentActions>
-                )}
-
-                {/* Upload Progress Track */}
-                {isUploading && resolvedOrientation !== 'horizontal' && (
-                  <Progress
-                    value={uploadProgress}
-                    showValue={false}
-                    size="sm"
-                    aria-label={`Upload progress for ${computedName}`}
-                    className="w-full mt-1"
-                  />
-                )}
-                {isUploading && resolvedOrientation === 'horizontal' && !isCompact && (
-                  <div className="absolute inset-x-0 bottom-0 overflow-hidden rounded-b-lg">
-                    <Progress
-                      value={uploadProgress}
-                      showValue={false}
-                      size="sm"
-                      aria-label={`Upload progress for ${computedName}`}
-                      className="w-full rounded-none"
-                    />
-                  </div>
-                )}
-              </>
-            ),
+            children,
             ...props,
           },
         })}
@@ -429,7 +231,7 @@ export const AttachmentContent = React.forwardRef<HTMLDivElement, AttachmentCont
       defaultTagName: 'div',
       props: {
         'data-slot': 'attachment-content',
-        className: cn('flex min-w-0 flex-1 flex-col justify-center overflow-hidden pr-1', className),
+        className: cn('flex min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden', className),
         children,
         ...props,
       },
@@ -448,6 +250,9 @@ export interface AttachmentTitleProps extends React.HTMLAttributes<HTMLSpanEleme
 
 export const AttachmentTitle = React.forwardRef<HTMLSpanElement, AttachmentTitleProps>(
   ({ className, render, children, ...props }, ref) => {
+    const { size } = useAttachment();
+    const isCompact = size === 'sm' || size === 'xs';
+
     return useRender({
       render,
       ref,
@@ -455,7 +260,8 @@ export const AttachmentTitle = React.forwardRef<HTMLSpanElement, AttachmentTitle
       props: {
         'data-slot': 'attachment-title',
         className: cn(
-          'truncate font-sans text-sm font-medium text-on-surface leading-tight cursor-default',
+          'truncate font-medium font-sans text-on-surface',
+          isCompact ? 'text-xs' : 'text-sm',
           className
         ),
         children,
@@ -476,6 +282,9 @@ export interface AttachmentDescriptionProps extends React.HTMLAttributes<HTMLSpa
 
 export const AttachmentDescription = React.forwardRef<HTMLSpanElement, AttachmentDescriptionProps>(
   ({ className, render, children, ...props }, ref) => {
+    const { size } = useAttachment();
+    const isCompact = size === 'sm' || size === 'xs';
+
     return useRender({
       render,
       ref,
@@ -483,7 +292,8 @@ export const AttachmentDescription = React.forwardRef<HTMLSpanElement, Attachmen
       props: {
         'data-slot': 'attachment-description',
         className: cn(
-          'truncate font-mono text-xs text-on-surface-variant/90 leading-tight tabular-nums flex items-center gap-1.5',
+          'truncate font-sans text-on-surface-variant flex items-center gap-1.5',
+          isCompact ? 'text-[10px]' : 'text-xs',
           className
         ),
         children,
@@ -607,3 +417,5 @@ export const Attachment = Object.assign(AttachmentRoot, {
   Action: AttachmentAction,
   Trigger: AttachmentTrigger,
 });
+
+export default Attachment;
