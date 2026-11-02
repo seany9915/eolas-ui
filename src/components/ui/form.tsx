@@ -17,6 +17,24 @@ export interface FormProps<FormValues extends Record<string, any> = Record<strin
   extends BaseForm.Props<FormValues> {
   children?: React.ReactNode;
   className?: string;
+
+  /**
+   * WebMCP (Modern Web Guidance): Unique machine-readable tool identifier
+   * exposing this form to client-side AI agents (e.g. `toolname="searchPatients"`).
+   */
+  toolname?: string;
+
+  /**
+   * WebMCP (Modern Web Guidance): Natural-language description synthesized into
+   * the agent's tool schema explaining when and how to call this form tool.
+   */
+  tooldescription?: string;
+
+  /**
+   * WebMCP (Modern Web Guidance): Allows an AI agent to execute read-only or low-risk
+   * queries automatically upon field population without requiring modal user confirmation.
+   */
+  toolautosubmit?: boolean;
 }
 
 const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
@@ -29,10 +47,19 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
       actionsRef,
       children,
       className,
+      toolname,
+      tooldescription,
+      toolautosubmit,
       ...props
     },
     ref
   ) => {
+    // Declarative WebMCP attributes for client-side AI agent tool discovery
+    const webMcpProps: Record<string, string> = {};
+    if (toolname) webMcpProps.toolname = toolname;
+    if (tooldescription) webMcpProps.tooldescription = tooldescription;
+    if (toolautosubmit) webMcpProps.toolautosubmit = '';
+
     return (
       <BaseForm
         ref={ref}
@@ -43,6 +70,7 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
         onFormSubmit={onFormSubmit}
         onSubmit={onSubmit}
         className={cn('space-y-4 w-full transition-colors duration-quick', className)}
+        {...webMcpProps}
         {...props}
       >
         {children}
