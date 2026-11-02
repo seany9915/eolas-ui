@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { InputGroup, InputGroupInput, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText } from '@/components/ui/input-group';
 import { Input } from '@/components/ui/input';
-import { Textarea, TextareaField } from '@/components/ui/textarea';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Field,
   FieldLabel,
@@ -133,12 +133,15 @@ export const InputDemo: React.FC<ComponentDemoProps> = () => {
 export const TextareaDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="space-y-4 w-full max-w-xl mx-auto">
-      <TextareaField
-        label="Session Notes"
-        description="Record practice notes and speech clarity observations"
-        placeholder="Enter session notes..."
-        rows={4}
-      />
+      <Field>
+        <FieldLabel>Session Notes</FieldLabel>
+        <Textarea
+          placeholder="Enter session notes..."
+          rows={4}
+          autoGrow
+        />
+        <FieldDescription>Record practice notes and speech clarity observations</FieldDescription>
+      </Field>
     </div>
   );
 };

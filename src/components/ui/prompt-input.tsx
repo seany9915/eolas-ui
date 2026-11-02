@@ -1039,21 +1039,4 @@ export {
   PromptInputText,
   PromptInputSubmit,
   InputGroupButton as PromptInputButton,
-  // shadcn Base Input Group primitives
-  InputGroup,
-  InputGroupInput,
-  InputGroupTextarea,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupText,
-  // shadcn Base Attachment primitives
-  Attachment,
-  AttachmentGroup,
-  AttachmentMedia,
-  AttachmentContent,
-  AttachmentTitle,
-  AttachmentDescription,
-  AttachmentActions,
-  AttachmentAction,
-  AttachmentTrigger,
 };
