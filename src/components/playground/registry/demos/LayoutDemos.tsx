@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
-import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from '@/components/ui/item';
+import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemSeparator } from '@/components/ui/item';
 import { ComponentDemoProps } from '../types';
 
 export const CardDemo: React.FC<ComponentDemoProps> = () => {
@@ -287,20 +287,120 @@ export const IconDemo: React.FC<ComponentDemoProps> = () => {
 
 export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-md mx-auto py-4 space-y-3">
-      <Attachment
-        fileName="Practice_Worksheet_Module2.pdf"
-        fileSize="4.2 MB"
-        fileType="pdf"
-        status="completed"
-      />
-      <Attachment
-        fileName="Session_Audio_Recording.mp3"
-        fileSize="18.5 MB"
-        fileType="video"
-        status="uploading"
-        uploadProgress={65}
-      />
+    <div className="w-full max-w-xl mx-auto py-4 space-y-6">
+      {/* 1. Composable Compound Attachment with Trigger and Actions */}
+      <div className="space-y-2">
+        <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
+          Compound File Attachment
+        </span>
+        <Attachment state="done" className="max-w-md">
+          <Attachment.Media className="bg-primary-container text-on-primary-container">
+            <Icon name="description" size="md" aria-hidden="true" />
+          </Attachment.Media>
+          <Attachment.Content>
+            <Attachment.Title>Clinical_Summary_Q3.pdf</Attachment.Title>
+            <Attachment.Description>PDF · 3.4 MB · Ready</Attachment.Description>
+          </Attachment.Content>
+          <Attachment.Actions>
+            <Attachment.Action aria-label="Download document">
+              <Icon name="download" size="sm" aria-hidden="true" />
+            </Attachment.Action>
+            <Attachment.Action aria-label="Remove document">
+              <Icon name="close" size="sm" aria-hidden="true" />
+            </Attachment.Action>
+          </Attachment.Actions>
+          <Attachment.Trigger href="#preview" aria-label="Open Clinical Summary preview" />
+        </Attachment>
+      </div>
+
+      {/* 2. Scrollable Attachment Group with States and Image Previews */}
+      <div className="space-y-2">
+        <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
+          Attachment Group (Scrollable Row)
+        </span>
+        <Attachment.Group>
+          {/* Active upload state */}
+          <Attachment state="uploading" className="w-72">
+            <Attachment.Media className="bg-secondary-container text-on-secondary-container">
+              <Icon name="mic" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Dictation_Recording.wav</Attachment.Title>
+              <Attachment.Description className="text-primary font-medium">
+                Uploading (68%)
+              </Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Cancel upload">
+                <Icon name="close" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+          </Attachment>
+
+          {/* Image thumbnail preview */}
+          <Attachment state="done" className="w-72">
+            <Attachment.Media variant="image">
+              <img
+                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=120&auto=format&fit=crop&q=80"
+                alt="Radiology scan thumbnail"
+              />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Chest_XRay_Lateral.jpg</Attachment.Title>
+              <Attachment.Description>Image · 1.8 MB</Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Download image">
+                <Icon name="download" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+            <Attachment.Trigger href="#preview-xray" aria-label="View chest X-ray image" />
+          </Attachment>
+
+          {/* Error state */}
+          <Attachment state="error" className="w-72">
+            <Attachment.Media className="bg-error-container text-on-error-container">
+              <Icon name="error" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Patient_Chart_Corrupt.dat</Attachment.Title>
+              <Attachment.Description className="text-error font-medium">
+                File format not supported
+              </Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Dismiss error">
+                <Icon name="close" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+          </Attachment>
+        </Attachment.Group>
+      </div>
+
+      {/* 3. Legacy Convenience Props Pattern */}
+      <div className="space-y-2">
+        <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
+          Shorthand Convenience Props
+        </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
+          <Attachment
+            fileName="Care_Plan_V2.pdf"
+            fileSize="1.2 MB"
+            fileType="pdf"
+            status="completed"
+            onDownload={() => {}}
+            onRemove={() => {}}
+          />
+          <Attachment
+            fileName="Lab_Report_Pending.pdf"
+            fileSize="840 KB"
+            fileType="document"
+            status="uploading"
+            uploadProgress={45}
+            onRemove={() => {}}
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -583,9 +683,9 @@ export const ItemDemo: React.FC<ComponentDemoProps> = () => {
         </p>
       </div>
 
-      {/* Divided list in surface container */}
+      {/* Structured list with ItemSeparator in surface container */}
       <div className="rounded-xl border border-outline-variant bg-surface p-2 shadow-ambient">
-        <ItemGroup divided>
+        <ItemGroup>
           <Item interactive>
             <ItemMedia variant="avatar">
               <Avatar
@@ -604,6 +704,8 @@ export const ItemDemo: React.FC<ComponentDemoProps> = () => {
             </ItemActions>
           </Item>
 
+          <ItemSeparator />
+
           <Item interactive>
             <ItemMedia variant="icon">
               <Icon name="mic" size="sm" />
@@ -618,6 +720,8 @@ export const ItemDemo: React.FC<ComponentDemoProps> = () => {
               <Button size="sm" colorRole="primary">Listen</Button>
             </ItemActions>
           </Item>
+
+          <ItemSeparator />
 
           <Item interactive>
             <ItemMedia variant="icon">

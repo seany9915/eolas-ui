@@ -78,7 +78,7 @@
       "name": "attachment",
       "type": "registry:ui",
       "title": "Attachment",
-      "description": "Eolas UI Attachment component built on Base UI and DESIGN.md design tokens.",
+      "description": "Attachment component system. Full API and feature parity with shadcn/ui Base Attachment specification: https://ui.shadcn.com/docs/components/base/attachment ANATOMY: AttachmentGroup └── Attachment ├── AttachmentMedia ├── AttachmentContent │   ├── AttachmentTitle │   └── AttachmentDescription ├── AttachmentActions │   └── AttachmentAction └── AttachmentTrigger FEATURES & CAPABILITIES: - Full compound composition with subcomponents for flexible media, layout, and metadata display. - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'. - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card). - Media variants: 'default' (file-type icons with semantic washes) and 'image' (aspect-square thumbnails). - Stretched interactive overlay (`AttachmentTrigger`) with isolated action button stacking (`AttachmentActions`). - Horizontally scrollable, snapping container (`AttachmentGroup`) with smooth edge fades. - 100% backwards-compatible convenience props for legacy callers (`fileName`, `fileSize`, `status`, etc.). - Base UI polymorphic `useRender` support across all components. - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -947,7 +947,7 @@
       "name": "item",
       "type": "registry:ui",
       "title": "Item",
-      "description": "Item layout primitive (Content Row / Media Object). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/item",
+      "description": "Item layout primitive (Content Row / Media Object). Full API reference and feature parity with shadcn/ui Base Item specification: https://ui.shadcn.com/docs/components/base/item ANATOMY: ItemGroup └── Item ├── ItemHeader ├── ItemMedia ├── ItemContent │   ├── ItemTitle │   └── ItemDescription ├── ItemActions ├── ItemFooter └── ItemSeparator",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -961,8 +961,8 @@
           "Use Item and ItemGroup for structured list rows, activity feeds, patient directories, notification trays, and settings rows.",
           "Composes [Media] + [Content (Title, Description)] + [Actions] without custom flex boilerplate.",
           "Directly eliminates the \"Card inside Card\" anti-pattern by providing a clean, non-elevated content row for lists inside cards and dialogs.",
-          "Supports polymorphic composition via Base UI's `useRender` hook (turning the item into a link or button).",
-          "Follows DESIGN.md tokens: Lexend body/description font, Lexend label headers, floating 2px focus ring, and strict semantic tokens."
+          "Supports polymorphic composition via Base UI's `useRender` hook across ALL subcomponents.",
+          "Follows DESIGN.md tokens: Lexend body/description font, Lexend label headers, floating 2px focus ring, and strict semantic tokens with zero artificial elevation on list rows."
         ]
       }
     },
