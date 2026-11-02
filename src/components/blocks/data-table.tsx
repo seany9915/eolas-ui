@@ -97,25 +97,21 @@ export function createSelectColumn<TData>(): ColumnDef<TData, any> {
   return {
     id: 'select',
     header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(Boolean(value))}
-          aria-label="Select all rows on current page"
-        />
-      </div>
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(Boolean(value))}
+        aria-label="Select all rows on current page"
+      />
     ),
     cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
-          aria-label="Select row"
-        />
-      </div>
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
+        aria-label="Select row"
+      />
     ),
     enableSorting: false,
     enableHiding: false,
@@ -244,7 +240,7 @@ export function DataTableColumnHeader<TData, TValue>({
     return (
       <div
         className={cn(
-          'text-xs font-semibold text-on-surface',
+          'text-sm font-semibold text-on-surface font-label',
           isNumeric && 'text-right font-mono tabular-nums',
           isCentered && 'text-center',
           className
@@ -256,11 +252,20 @@ export function DataTableColumnHeader<TData, TValue>({
     );
   }
 
+  const sortIcon =
+    column.getIsSorted() === 'desc' ? (
+      <Icon name="arrow_downward" size="xs" aria-hidden="true" />
+    ) : column.getIsSorted() === 'asc' ? (
+      <Icon name="arrow_upward" size="xs" aria-hidden="true" />
+    ) : (
+      <Icon name="unfold_more" size="xs" aria-hidden="true" />
+    );
+
   return (
     <div
       className={cn(
         'flex items-center gap-1',
-        isNumeric ? 'justify-end' : isCentered ? 'justify-center' : 'justify-start',
+        isNumeric ? 'justify-end -mr-3.5' : isCentered ? 'justify-center' : 'justify-start -ml-3.5',
         className
       )}
       {...props}
@@ -274,14 +279,9 @@ export function DataTableColumnHeader<TData, TValue>({
             size="sm"
             colorRole="neutral"
           >
+            {isNumeric && sortIcon}
             <span className={cn(isNumeric && 'font-mono tabular-nums')}>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
-              <Icon name="arrow_downward" size="xs" aria-hidden="true" />
-            ) : column.getIsSorted() === 'asc' ? (
-              <Icon name="arrow_upward" size="xs" aria-hidden="true" />
-            ) : (
-              <Icon name="unfold_more" size="xs" aria-hidden="true" />
-            )}
+            {!isNumeric && sortIcon}
           </Button>
         }
       >
