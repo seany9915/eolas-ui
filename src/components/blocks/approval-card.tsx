@@ -121,7 +121,6 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
               {allowCustomInput && (
                 <div className="flex flex-col gap-2">
                   <label
-                    onClick={() => onSelectOption?.('__custom__')}
                     className={cn(
                       'flex items-center gap-3 p-3 rounded-md border transition-colors duration-quick motion-reduce:transition-none cursor-pointer',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
@@ -191,7 +190,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
 
           <div className="flex items-center gap-2">
             {onSkip && (
-              <Button type="button" variant="outlined" size="sm" onClick={onSkip}>
+              <Button type="button" variant="outlined" colorRole="neutral" size="sm" onClick={onSkip}>
                 {skipLabel}
               </Button>
             )}

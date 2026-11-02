@@ -75,7 +75,7 @@ export function FilterToolbar({
               <Select
                 value={group.value}
                 onValueChange={(val) => {
-                  if (val && onFilterChange) {
+                  if (val != null && onFilterChange) {
                     onFilterChange(group.id, val);
                   }
                 }}

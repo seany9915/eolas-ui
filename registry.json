@@ -3126,7 +3126,7 @@
       "name": "metric-card",
       "type": "registry:block",
       "title": "Metric Card",
-      "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Chip, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
+      "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -3135,7 +3135,7 @@
       "registryDependencies": [
         "utils",
         "card",
-        "chip",
+        "badge",
         "icon"
       ],
       "files": [

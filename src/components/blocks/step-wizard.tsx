@@ -252,6 +252,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
               <Button
                 type="button"
                 variant="outlined"
+                colorRole="neutral"
                 size="md"
                 onClick={handlePrevious}
                 disabled={isFirstStep}

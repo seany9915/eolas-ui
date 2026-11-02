@@ -22,7 +22,10 @@ export interface DeleteConfirmationDialogProps {
   isLoading?: boolean;
 }
 
-export function DeleteConfirmationDialog({
+export const DeleteConfirmationDialog = React.forwardRef<
+  HTMLDivElement,
+  DeleteConfirmationDialogProps
+>(({
   open,
   onOpenChange,
   title = 'Delete item',
@@ -32,14 +35,14 @@ export function DeleteConfirmationDialog({
   cancelLabel = 'Cancel',
   onConfirm,
   isLoading = false,
-}: DeleteConfirmationDialogProps) {
+}, ref) => {
   const defaultDescription = itemName
     ? `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
     : 'Are you sure you want to delete this item? This action cannot be undone.';
 
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Content size="sm" className="max-w-md">
+      <AlertDialog.Content ref={ref} size="md">
         <div className="flex items-start gap-3.5">
           <div className="flex items-center justify-center w-11 h-11 min-w-11 min-h-11 rounded-full bg-error-container text-on-error-container shrink-0">
             <Icon name="delete" size="lg" aria-hidden="true" />
@@ -73,6 +76,8 @@ export function DeleteConfirmationDialog({
       </AlertDialog.Content>
     </AlertDialog.Root>
   );
-}
+});
+
+DeleteConfirmationDialog.displayName = 'DeleteConfirmationDialog';
 
 export default DeleteConfirmationDialog;
