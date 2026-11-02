@@ -208,7 +208,8 @@ export const NavigationMenuIcon = React.forwardRef<
 ));
 NavigationMenuIcon.displayName = 'NavigationMenuIcon';
 
-export interface NavigationMenuProps<Value = string> {
+export interface NavigationMenuProps<Value = string>
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Root>, 'value' | 'defaultValue' | 'onValueChange'> {
   items?: NavigationMenuItemData[];
   activeId?: string;
   value?: Value | null;
@@ -223,22 +224,27 @@ export interface NavigationMenuProps<Value = string> {
   className?: string;
 }
 
-function NavigationMenuComponent<Value = string>({
-  items,
-  activeId,
-  value,
-  defaultValue,
-  onValueChange,
-  onOpenChangeComplete,
-  actionsRef,
-  delay = 50,
-  closeDelay = 50,
-  orientation = 'horizontal',
-  children,
-  className,
-}: NavigationMenuProps<Value>): React.JSX.Element {
+function NavigationMenuComponentInner<Value = string>(
+  {
+    items,
+    activeId,
+    value,
+    defaultValue,
+    onValueChange,
+    onOpenChangeComplete,
+    actionsRef,
+    delay = 50,
+    closeDelay = 50,
+    orientation = 'horizontal',
+    children,
+    className,
+    ...props
+  }: NavigationMenuProps<Value>,
+  ref: React.ForwardedRef<HTMLElement>
+): React.JSX.Element {
   return (
     <BaseNavigationMenu.Root<Value>
+      ref={ref}
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
@@ -248,6 +254,7 @@ function NavigationMenuComponent<Value = string>({
       closeDelay={closeDelay}
       orientation={orientation}
       className={cn('relative z-10 flex w-full items-center', className)}
+      {...props}
     >
       {children ? (
         children
@@ -374,6 +381,10 @@ function NavigationMenuComponent<Value = string>({
     </BaseNavigationMenu.Root>
   );
 }
+
+export const NavigationMenuComponent = React.forwardRef(NavigationMenuComponentInner) as <Value = string>(
+  props: NavigationMenuProps<Value> & React.RefAttributes<HTMLElement>
+) => React.JSX.Element;
 
 // Compound export mapping Base UI primitives
 export const NavigationMenu = Object.assign(NavigationMenuComponent, {

@@ -216,7 +216,7 @@ export const CollapsibleDemo: React.FC<ComponentDemoProps> = () => {
         <Collapsible.Trigger>
           <span>Articulation Exercise Instructions</span>
         </Collapsible.Trigger>
-        <Collapsible.Panel className="text-xs font-sans text-on-surface-variant pt-2 border-t border-outline-variant/60 leading-relaxed">
+        <Collapsible.Panel contentClassName="text-xs font-sans text-on-surface-variant pt-2 border-t border-outline-variant/60 leading-relaxed">
           Repeat each word three times with audio feedback. Pause 2 seconds between repetitions.
         </Collapsible.Panel>
       </Collapsible.Root>

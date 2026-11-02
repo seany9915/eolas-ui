@@ -113,7 +113,7 @@ export const AccordionDemo: React.FC<ComponentDemoProps> = () => {
               Practice History
             </AccordionTrigger>
           </AccordionHeader>
-          <AccordionPanel className="px-4 pb-3 pt-1 text-xs font-sans text-on-surface-variant leading-relaxed">
+          <AccordionPanel contentClassName="px-4 pb-3 pt-1 text-xs font-sans text-on-surface-variant leading-relaxed">
             Started speech practice in September 2024. Primary focus is clear articulation of /r/ and /s/ blends.
           </AccordionPanel>
         </AccordionItem>
@@ -123,7 +123,7 @@ export const AccordionDemo: React.FC<ComponentDemoProps> = () => {
               Session Preferences
             </AccordionTrigger>
           </AccordionHeader>
-          <AccordionPanel className="px-4 pb-3 pt-1 text-xs font-sans text-on-surface-variant leading-relaxed">
+          <AccordionPanel contentClassName="px-4 pb-3 pt-1 text-xs font-sans text-on-surface-variant leading-relaxed">
             Prefers picture card prompts over audio-only cues. 15-minute practice intervals.
           </AccordionPanel>
         </AccordionItem>

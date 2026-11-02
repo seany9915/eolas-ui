@@ -92,14 +92,18 @@ AccordionTrigger.displayName = 'AccordionTrigger';
 export interface AccordionPanelProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Panel> {
   children?: React.ReactNode;
   className?: string;
+  contentClassName?: string;
   unstyled?: boolean;
 }
 
 export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelProps>(
-  ({ children, className, unstyled = false, ...props }, ref) => (
+  ({ children, className, contentClassName, unstyled = false, ...props }, ref) => (
     <BaseAccordion.Panel
       ref={ref}
-      className="overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
+      className={cn(
+        "overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
+        className
+      )}
       {...props}
     >
       <div
@@ -107,7 +111,7 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
           unstyled
             ? ''
             : 'px-2 pb-4 font-sans text-base text-on-surface-variant leading-relaxed',
-          className
+          contentClassName
         )}
       >
         {children}
@@ -120,7 +124,8 @@ AccordionPanel.displayName = 'AccordionPanel';
 export const AccordionContent = AccordionPanel;
 export type AccordionContentProps = AccordionPanelProps;
 
-export interface AccordionProps {
+export interface AccordionProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseAccordion.Root>, 'value' | 'defaultValue' | 'onValueChange'> {
   items?: AccordionItemData[];
   level?: 1 | 2;
   value?: string | string[] | null;
@@ -129,7 +134,17 @@ export interface AccordionProps {
   multiple?: boolean;
   type?: 'single' | 'multiple';
   collapsible?: boolean;
+  /**
+   * Deprecated following the W3C APG guidance update to remove roving focus.
+   * Tab order is now standard across items.
+   * @deprecated
+   */
   orientation?: 'horizontal' | 'vertical';
+  /**
+   * Deprecated following the W3C APG guidance update to remove roving focus.
+   * Tab order is now standard across items.
+   * @deprecated
+   */
   loopFocus?: boolean;
   disabled?: boolean;
   hiddenUntilFound?: boolean;
@@ -138,7 +153,7 @@ export interface AccordionProps {
   className?: string;
 }
 
-const AccordionComponent: React.FC<AccordionProps> = ({
+const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
   items,
   level = 1,
   value,
@@ -154,7 +169,8 @@ const AccordionComponent: React.FC<AccordionProps> = ({
   keepMounted,
   children,
   className,
-}) => {
+  ...props
+}, ref) => {
   const isMultiple = type ? type === 'multiple' : !!multiple;
 
   const normalizedValue = React.useMemo(() => {
@@ -184,6 +200,7 @@ const AccordionComponent: React.FC<AccordionProps> = ({
 
   return (
     <BaseAccordion.Root
+      ref={ref}
       value={normalizedValue}
       defaultValue={normalizedDefaultValue}
       onValueChange={handleValueChange}
@@ -198,6 +215,7 @@ const AccordionComponent: React.FC<AccordionProps> = ({
         level === 2 && 'p-4 rounded-xl bg-surface-container border-none shadow-ambient',
         className
       )}
+      {...props}
     >
       {children
         ? children
@@ -220,7 +238,8 @@ const AccordionComponent: React.FC<AccordionProps> = ({
           ))}
     </BaseAccordion.Root>
   );
-};
+});
+AccordionComponent.displayName = 'Accordion';
 
 // Compound export mapping Base UI primitives
 export const Accordion = Object.assign(AccordionComponent, {

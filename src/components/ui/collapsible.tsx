@@ -13,7 +13,15 @@ import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
 import { cn } from '@/lib/utils';
 
-export interface CollapsibleProps {
+interface CollapsibleContextValue {
+  hiddenUntilFound?: boolean;
+  keepMounted?: boolean;
+}
+
+const CollapsibleContext = React.createContext<CollapsibleContextValue>({});
+export const useCollapsibleContext = () => React.useContext(CollapsibleContext);
+
+export interface CollapsibleProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Root> {
   title?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
@@ -29,28 +37,40 @@ export interface CollapsibleProps {
 export interface CollapsiblePanelProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Panel> {
   children?: React.ReactNode;
   className?: string;
+  contentClassName?: string;
   unstyled?: boolean;
 }
 
 export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePanelProps>(
-  ({ children, className, unstyled = false, ...props }, ref) => (
-    <BaseCollapsible.Panel
-      ref={ref}
-      className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
-      {...props}
-    >
-      <div
+  ({ children, className, contentClassName, unstyled = false, hiddenUntilFound, keepMounted, ...props }, ref) => {
+    const context = React.useContext(CollapsibleContext);
+    const resolvedHiddenUntilFound = hiddenUntilFound ?? context.hiddenUntilFound;
+    const resolvedKeepMounted = keepMounted ?? context.keepMounted;
+
+    return (
+      <BaseCollapsible.Panel
+        ref={ref}
+        hiddenUntilFound={resolvedHiddenUntilFound}
+        keepMounted={resolvedKeepMounted}
         className={cn(
-          unstyled
-            ? ''
-            : 'pt-3 border-t border-outline-variant/40 font-sans text-sm text-on-surface-variant leading-relaxed',
+          "overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
           className
         )}
+        {...props}
       >
-        {children}
-      </div>
-    </BaseCollapsible.Panel>
-  )
+        <div
+          className={cn(
+            unstyled
+              ? ''
+              : 'pt-3 border-t border-outline-variant/40 font-sans text-sm text-on-surface-variant leading-relaxed',
+            contentClassName
+          )}
+        >
+          {children}
+        </div>
+      </BaseCollapsible.Panel>
+    );
+  }
 );
 CollapsiblePanel.displayName = 'CollapsiblePanel';
 
@@ -89,7 +109,7 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
 );
 CollapsibleTrigger.displayName = 'CollapsibleTrigger';
 
-const CollapsibleComponent: React.FC<CollapsibleProps> = ({
+const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(({
   title,
   children,
   defaultOpen = false,
@@ -100,43 +120,46 @@ const CollapsibleComponent: React.FC<CollapsibleProps> = ({
   keepMounted,
   variant,
   className,
-}) => {
+  ...props
+}, ref) => {
   const isCard = variant === 'card' || (variant === undefined && Boolean(title));
 
   return (
-    <BaseCollapsible.Root
-      defaultOpen={defaultOpen}
-      open={open}
-      onOpenChange={onOpenChange}
-      disabled={disabled}
-      className={cn(
-        'w-full',
-        isCard && 'rounded-xl bg-surface border border-outline-variant p-4 shadow-ambient',
-        className
-      )}
-    >
-      {title ? (
-        <>
-          <CollapsibleTrigger>
-            <span>{title}</span>
-          </CollapsibleTrigger>
-          <CollapsiblePanel
-            hiddenUntilFound={hiddenUntilFound}
-            keepMounted={keepMounted}
-          >
-            {children}
-          </CollapsiblePanel>
-        </>
-      ) : (
-        children
-      )}
-    </BaseCollapsible.Root>
+    <CollapsibleContext.Provider value={{ hiddenUntilFound, keepMounted }}>
+      <BaseCollapsible.Root
+        ref={ref}
+        defaultOpen={defaultOpen}
+        open={open}
+        onOpenChange={onOpenChange}
+        disabled={disabled}
+        className={cn(
+          'w-full',
+          isCard && 'rounded-xl bg-surface border border-outline-variant p-4 shadow-ambient',
+          className
+        )}
+        {...props}
+      >
+        {title ? (
+          <>
+            <CollapsibleTrigger>
+              <span>{title}</span>
+            </CollapsibleTrigger>
+            <CollapsiblePanel>
+              {children}
+            </CollapsiblePanel>
+          </>
+        ) : (
+          children
+        )}
+      </BaseCollapsible.Root>
+    </CollapsibleContext.Provider>
   );
-};
+});
+CollapsibleComponent.displayName = 'Collapsible';
 
 // Compound export mapping Base UI primitives
 export const Collapsible = Object.assign(CollapsibleComponent, {
-  Root: BaseCollapsible.Root,
+  Root: CollapsibleComponent,
   Trigger: CollapsibleTrigger,
   Panel: CollapsiblePanel,
   Content: CollapsibleContent,
@@ -144,7 +167,8 @@ export const Collapsible = Object.assign(CollapsibleComponent, {
 
 // Re-export Base UI primitives for compound composition
 export { BaseCollapsible };
-export const CollapsibleRoot = BaseCollapsible.Root;
+export const CollapsibleRoot = CollapsibleComponent;
+export const CollapsiblePrimitive = BaseCollapsible.Root;
 export const CollapsibleTriggerPrimitive = BaseCollapsible.Trigger;
 export const CollapsiblePanelPrimitive = BaseCollapsible.Panel;
 export default Collapsible;

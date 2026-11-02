@@ -466,6 +466,80 @@ function MenuComponent<Payload = unknown>({
   return menuTree;
 }
 
+
+export interface MenuInputProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Input> {}
+
+export const MenuInput = React.forwardRef<HTMLInputElement, MenuInputProps>(
+  ({ className, ...props }, ref) => (
+    <div className="flex items-center gap-2 px-3 py-2 border-b border-outline-variant">
+      <span className="material-symbols-outlined text-lg text-on-surface-variant select-none" aria-hidden="true">
+        search
+      </span>
+      <BaseMenu.Input
+        ref={ref}
+        className={cn(
+          'w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-on-surface-variant/70 outline-none',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          className
+        )}
+        {...props}
+      />
+    </div>
+  )
+);
+MenuInput.displayName = 'MenuInput';
+
+export interface MenuListProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.List> {}
+
+export const MenuList = React.forwardRef<HTMLDivElement, MenuListProps>(
+  ({ className, ...props }, ref) => (
+    <BaseMenu.List
+      ref={ref}
+      className={cn('overflow-y-auto max-h-[300px] outline-none', className)}
+      {...props}
+    />
+  )
+);
+MenuList.displayName = 'MenuList';
+
+export interface MenuClearProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Clear> {}
+
+export const MenuClear = React.forwardRef<HTMLButtonElement, MenuClearProps>(
+  ({ className, children, ...props }, ref) => (
+    <BaseMenu.Clear
+      ref={ref}
+      className={cn(
+        'inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary',
+        className
+      )}
+      {...props}
+    >
+      {children || (
+        <span className="material-symbols-outlined text-base select-none" aria-hidden="true">
+          close
+        </span>
+      )}
+    </BaseMenu.Clear>
+  )
+);
+MenuClear.displayName = 'MenuClear';
+
+export interface MenuEmptyProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Empty> {}
+
+export const MenuEmpty = React.forwardRef<HTMLDivElement, MenuEmptyProps>(
+  ({ className, ...props }, ref) => (
+    <BaseMenu.Empty
+      ref={ref}
+      className={cn('py-4 px-3 text-center font-sans text-sm text-on-surface-variant select-none', className)}
+      {...props}
+    />
+  )
+);
+MenuEmpty.displayName = 'MenuEmpty';
+
+export const MenuFilterProvider = BaseMenu.FilterProvider;
+export const useMenuFilter = BaseMenu.useFilter;
+
 // Compound export mapping Base UI primitives and styled composites
 export const Menu = Object.assign(MenuComponent, {
   Root: BaseMenu.Root,
@@ -491,6 +565,12 @@ export const Menu = Object.assign(MenuComponent, {
   Viewport: BaseMenu.Viewport,
   createHandle: BaseMenu.createHandle,
   Handle: BaseMenu.Handle,
+  Input: MenuInput,
+  List: MenuList,
+  Clear: MenuClear,
+  Empty: MenuEmpty,
+  FilterProvider: BaseMenu.FilterProvider,
+  useFilter: BaseMenu.useFilter,
 });
 
 // Re-export Base UI primitives and styled components for composition
@@ -508,5 +588,9 @@ export const MenuBackdrop = BaseMenu.Backdrop;
 export const MenuViewport = BaseMenu.Viewport;
 export const createMenuHandle = BaseMenu.createHandle;
 export const MenuHandle = BaseMenu.Handle;
+export const MenuInputPrimitive = BaseMenu.Input;
+export const MenuListPrimitive = BaseMenu.List;
+export const MenuClearPrimitive = BaseMenu.Clear;
+export const MenuEmptyPrimitive = BaseMenu.Empty;
 
 export default Menu;

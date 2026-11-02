@@ -21,6 +21,15 @@ export const TooltipProvider: React.FC<TooltipProviderProps> = ({
 );
 TooltipProvider.displayName = 'TooltipProvider';
 
+interface TooltipContextValue {
+  delay?: number;
+  closeDelay?: number;
+  closeOnClick?: boolean;
+}
+
+const TooltipContext = React.createContext<TooltipContextValue>({});
+export const useTooltipContext = () => React.useContext(TooltipContext);
+
 export interface TooltipProps<Payload = unknown> {
   content?: React.ReactNode;
   children?: BaseTooltip.Root.Props<Payload>['children'];
@@ -48,50 +57,55 @@ export interface TooltipProps<Payload = unknown> {
   className?: string;
 }
 
-function TooltipComponent<Payload = unknown>({
-  content,
-  children,
-  side = 'top',
-  align = 'center',
-  sideOffset = 6,
-  alignOffset,
-  collisionPadding = 8,
-  open,
-  defaultOpen,
-  onOpenChange,
-  onOpenChangeComplete,
-  delay = 80,
-  closeDelay,
-  closeOnClick = true,
-  trackCursorAxis,
-  disableHoverablePopup,
-  disabled,
-  showArrow = true,
-  handle,
-  triggerId,
-  defaultTriggerId,
-  actionsRef,
-  portal = true,
-  className,
-}: TooltipProps<Payload>): React.JSX.Element {
+function TooltipComponentInner<Payload = unknown>(
+  {
+    content,
+    children,
+    side = 'top',
+    align = 'center',
+    sideOffset = 6,
+    alignOffset,
+    collisionPadding = 8,
+    open,
+    defaultOpen,
+    onOpenChange,
+    onOpenChangeComplete,
+    delay = 80,
+    closeDelay,
+    closeOnClick = true,
+    trackCursorAxis,
+    disableHoverablePopup,
+    disabled,
+    showArrow = true,
+    handle,
+    triggerId,
+    defaultTriggerId,
+    actionsRef,
+    portal = true,
+    className,
+  }: TooltipProps<Payload>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
   // If used as a compound Root container without shorthand content prop (<Tooltip><TooltipTrigger /><TooltipContent /></Tooltip>)
   if (content === undefined) {
     return (
-      <BaseTooltip.Root<Payload>
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={onOpenChange}
-        onOpenChangeComplete={onOpenChangeComplete}
-        trackCursorAxis={trackCursorAxis}
-        disableHoverablePopup={disableHoverablePopup}
-        disabled={disabled}
-        handle={handle}
-        triggerId={triggerId}
-        defaultTriggerId={defaultTriggerId}
-        actionsRef={actionsRef}
-      >
-        {children}
-      </BaseTooltip.Root>
+      <TooltipContext.Provider value={{ delay, closeDelay, closeOnClick }}>
+        <BaseTooltip.Root<Payload>
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          onOpenChangeComplete={onOpenChangeComplete}
+          trackCursorAxis={trackCursorAxis}
+          disableHoverablePopup={disableHoverablePopup}
+          disabled={disabled}
+          handle={handle}
+          triggerId={triggerId}
+          defaultTriggerId={defaultTriggerId}
+          actionsRef={actionsRef}
+        >
+          {children}
+        </BaseTooltip.Root>
+      </TooltipContext.Provider>
     );
   }
 
@@ -106,6 +120,7 @@ function TooltipComponent<Payload = unknown>({
       className="z-[70] outline-none"
     >
       <BaseTooltip.Popup
+        ref={ref}
         className={cn(
           'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
           'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
@@ -122,31 +137,37 @@ function TooltipComponent<Payload = unknown>({
   );
 
   return (
-    <BaseTooltip.Root<Payload>
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
-      onOpenChangeComplete={onOpenChangeComplete}
-      trackCursorAxis={trackCursorAxis}
-      disableHoverablePopup={disableHoverablePopup}
-      disabled={disabled}
-      handle={handle}
-      triggerId={triggerId}
-      defaultTriggerId={defaultTriggerId}
-      actionsRef={actionsRef}
-    >
-      <BaseTooltip.Trigger
-        render={React.isValidElement(children) ? children : undefined}
-        delay={delay}
-        closeDelay={closeDelay}
-        closeOnClick={closeOnClick}
+    <TooltipContext.Provider value={{ delay, closeDelay, closeOnClick }}>
+      <BaseTooltip.Root<Payload>
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        onOpenChangeComplete={onOpenChangeComplete}
+        trackCursorAxis={trackCursorAxis}
+        disableHoverablePopup={disableHoverablePopup}
+        disabled={disabled}
+        handle={handle}
+        triggerId={triggerId}
+        defaultTriggerId={defaultTriggerId}
+        actionsRef={actionsRef}
       >
-        {!React.isValidElement(children) && typeof children !== 'function' ? children : undefined}
-      </BaseTooltip.Trigger>
-      {portal ? <BaseTooltip.Portal>{popup}</BaseTooltip.Portal> : popup}
-    </BaseTooltip.Root>
+        <BaseTooltip.Trigger
+          render={React.isValidElement(children) ? children : undefined}
+          delay={delay}
+          closeDelay={closeDelay}
+          closeOnClick={closeOnClick}
+        >
+          {!React.isValidElement(children) && typeof children !== 'function' ? children : undefined}
+        </BaseTooltip.Trigger>
+        {portal ? <BaseTooltip.Portal>{popup}</BaseTooltip.Portal> : popup}
+      </BaseTooltip.Root>
+    </TooltipContext.Provider>
   );
 }
+
+export const TooltipComponent = React.forwardRef(TooltipComponentInner) as <Payload = unknown>(
+  props: TooltipProps<Payload> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element;
 
 export interface TooltipArrowProps
   extends React.ComponentPropsWithoutRef<typeof BaseTooltip.Arrow> {}
@@ -162,11 +183,7 @@ export const TooltipArrow = React.forwardRef<HTMLDivElement, TooltipArrowProps>(
       )}
       {...props}
     >
-      {children ?? (
-        <svg width="10" height="5" viewBox="0 0 10 5" className="fill-current block" aria-hidden="true">
-          <path d="M0 5 L5 0 L10 5 Z" />
-        </svg>
-      )}
+      {children}
     </BaseTooltip.Arrow>
   )
 );
@@ -175,13 +192,28 @@ TooltipArrow.displayName = 'TooltipArrow';
 export interface TooltipTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BaseTooltip.Trigger> {}
 
-export const TooltipTrigger = React.forwardRef<HTMLButtonElement, TooltipTriggerProps>(
-  ({ className, children, ...props }, ref) => (
-    <BaseTooltip.Trigger ref={ref} className={className} {...props}>
+export const TooltipTrigger = React.forwardRef<
+  HTMLButtonElement,
+  TooltipTriggerProps
+>(({ className, children, delay, closeDelay, closeOnClick, ...props }, ref) => {
+  const context = React.useContext(TooltipContext);
+  const resolvedDelay = delay ?? context.delay;
+  const resolvedCloseDelay = closeDelay ?? context.closeDelay;
+  const resolvedCloseOnClick = closeOnClick ?? context.closeOnClick;
+
+  return (
+    <BaseTooltip.Trigger
+      ref={ref}
+      delay={resolvedDelay}
+      closeDelay={resolvedCloseDelay}
+      closeOnClick={resolvedCloseOnClick}
+      className={cn('inline-flex cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary', className)}
+      {...props}
+    >
       {children}
     </BaseTooltip.Trigger>
-  )
-);
+  );
+});
 TooltipTrigger.displayName = 'TooltipTrigger';
 
 export interface TooltipContentProps
@@ -196,10 +228,14 @@ export interface TooltipContentProps
   portal?: boolean;
 }
 
-export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
+export const TooltipContent = React.forwardRef<
+  HTMLDivElement,
+  TooltipContentProps
+>(
   (
     {
       className,
+      children,
       side = 'top',
       align = 'center',
       sideOffset = 6,
@@ -208,7 +244,6 @@ export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentPro
       showArrow = true,
       containerClassName,
       portal = true,
-      children,
       ...props
     },
     ref

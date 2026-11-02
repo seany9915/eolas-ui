@@ -71,8 +71,9 @@ export interface SelectProps<Value = string, Multiple extends boolean | undefine
   className?: string;
 }
 
-function SelectComponent<Value = string, Multiple extends boolean | undefined = false>({
-  label,
+function SelectComponentInner<Value = string, Multiple extends boolean | undefined = false>(
+  {
+    label,
   options,
   items,
   groups,
@@ -125,7 +126,9 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
   size = 'md',
   children,
   className,
-}: SelectProps<Value, Multiple>): React.JSX.Element {
+  }: SelectProps<Value, Multiple>,
+  ref: React.ForwardedRef<HTMLButtonElement>
+): React.JSX.Element {
   const handleValueChange = (
     newVal: SelectValueType<Value, Multiple> | (Multiple extends true ? never : null),
     details: BaseSelect.Root.ChangeEventDetails
@@ -323,6 +326,13 @@ function SelectComponent<Value = string, Multiple extends boolean | undefined = 
     </BaseSelect.Root>
   );
 }
+
+export const SelectComponent = React.forwardRef(SelectComponentInner) as <
+  Value = string,
+  Multiple extends boolean | undefined = false
+>(
+  props: SelectProps<Value, Multiple> & React.RefAttributes<HTMLButtonElement>
+) => React.JSX.Element;
 
 // Compound Subcomponents for Compositional API
 export interface SelectTriggerProps

@@ -2,6 +2,16 @@ import * as React from 'react';
 import { Popover as BasePopover } from '@base-ui/react/popover';
 import { cn } from '@/lib/utils';
 
+
+interface PopoverContextValue {
+  openOnHover?: boolean;
+  delay?: number;
+  closeDelay?: number;
+}
+
+const PopoverContext = React.createContext<PopoverContextValue>({});
+export const usePopoverContext = () => React.useContext(PopoverContext);
+
 export interface PopoverProps<Payload = unknown> {
   label?: React.ReactNode;
   trigger?: React.ReactNode;
@@ -34,56 +44,61 @@ export interface PopoverProps<Payload = unknown> {
   className?: string;
 }
 
-function PopoverComponent<Payload = unknown>({
-  label,
-  trigger,
-  title,
-  description,
-  children,
-  open,
-  defaultOpen,
-  onOpenChange,
-  onOpenChangeComplete,
-  modal = false,
-  openOnHover = false,
-  delay = 300,
-  closeDelay = 0,
-  side,
-  align,
-  sideOffset = 8,
-  alignOffset,
-  collisionPadding = 8,
-  initialFocus,
-  finalFocus,
-  actionsRef,
-  handle,
-  triggerId,
-  defaultTriggerId,
-  showArrow = true,
-  showCloseButton = false,
-  closeLabel = 'Close',
-  portal = true,
-  className,
-}: PopoverProps<Payload>): React.JSX.Element {
+function PopoverComponentInner<Payload = unknown>(
+  {
+    label,
+    trigger,
+    title,
+    description,
+    children,
+    open,
+    defaultOpen,
+    onOpenChange,
+    onOpenChangeComplete,
+    modal = false,
+    openOnHover = false,
+    delay = 300,
+    closeDelay = 0,
+    side,
+    align,
+    sideOffset = 8,
+    alignOffset,
+    collisionPadding = 8,
+    initialFocus,
+    finalFocus,
+    actionsRef,
+    handle,
+    triggerId,
+    defaultTriggerId,
+    showArrow = true,
+    showCloseButton = false,
+    closeLabel = 'Close',
+    portal = true,
+    className,
+  }: PopoverProps<Payload>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
   const generatedId = React.useId();
   const popoverId = `popover-${generatedId}`;
 
   // If used as a composable compound root (<Popover open={...}><PopoverTrigger /><PopoverContent /></Popover>)
   if (!trigger && !title && !description) {
     return (
-      <BasePopover.Root<Payload>
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={onOpenChange}
-        onOpenChangeComplete={onOpenChangeComplete}
-        modal={modal}
-        actionsRef={actionsRef}
-        handle={handle}
-        triggerId={triggerId}
-        defaultTriggerId={defaultTriggerId}
-      >
-        {children}
-      </BasePopover.Root>
+      <PopoverContext.Provider value={{ openOnHover, delay, closeDelay }}>
+        <BasePopover.Root<Payload>
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          onOpenChangeComplete={onOpenChangeComplete}
+          modal={modal}
+          actionsRef={actionsRef}
+          handle={handle}
+          triggerId={triggerId}
+          defaultTriggerId={defaultTriggerId}
+        >
+          {children}
+        </BasePopover.Root>
+      </PopoverContext.Provider>
     );
   }
 
@@ -99,6 +114,7 @@ function PopoverComponent<Payload = unknown>({
       className="z-50 outline-none"
     >
       <BasePopover.Popup
+        ref={ref}
         initialFocus={initialFocus}
         finalFocus={finalFocus}
         className={cn(
@@ -186,6 +202,10 @@ function PopoverComponent<Payload = unknown>({
 
   return rootContent;
 }
+
+export const PopoverComponent = React.forwardRef(PopoverComponentInner) as <Payload = unknown>(
+  props: PopoverProps<Payload> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element;
 
 export interface PopoverContentProps
   extends React.ComponentPropsWithoutRef<typeof BasePopover.Popup> {

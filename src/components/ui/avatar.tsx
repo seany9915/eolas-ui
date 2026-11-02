@@ -15,12 +15,106 @@ import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 
+export type AvatarSize = 'sm' | 'md' | 'lg';
+
+interface AvatarContextValue {
+  size: AvatarSize;
+}
+
+const AvatarContext = React.createContext<AvatarContextValue>({ size: 'md' });
+export const useAvatarContext = () => React.useContext(AvatarContext);
+
+const sizeClasses: Record<AvatarSize, string> = {
+  sm: 'size-8 text-xs',
+  md: 'size-10 text-sm',
+  lg: 'size-14 text-base',
+};
+
+export interface AvatarRootProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Root> {
+  size?: AvatarSize;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
+  size = 'md',
+  className,
+  children,
+  ...props
+}, ref) => {
+  return (
+    <AvatarContext.Provider value={{ size }}>
+      <BaseAvatar.Root
+        ref={ref}
+        className={cn(
+          'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
+          'bg-surface-variant text-on-surface-variant font-label font-bold border border-outline-variant',
+          sizeClasses[size],
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </BaseAvatar.Root>
+    </AvatarContext.Provider>
+  );
+});
+AvatarRoot.displayName = 'AvatarRoot';
+
+export interface AvatarImageProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Image> {
+  className?: string;
+}
+
+export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(({
+  className,
+  ...props
+}, ref) => {
+  return (
+    <BaseAvatar.Image
+      ref={ref}
+      className={cn(
+        'w-full h-full object-cover transition-opacity duration-[var(--duration-quick)] data-[loading]:opacity-0 motion-reduce:transition-none',
+        className
+      )}
+      {...props}
+    />
+  );
+});
+AvatarImage.displayName = 'AvatarImage';
+
+export interface AvatarFallbackProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Fallback> {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(({
+  delay = 300,
+  className,
+  children,
+  ...props
+}, ref) => {
+  return (
+    <BaseAvatar.Fallback
+      ref={ref}
+      delay={delay}
+      className={cn(
+        'flex items-center justify-center w-full h-full font-label font-semibold',
+        className
+      )}
+      {...props}
+    >
+      {typeof children === 'string' ? children.slice(0, 2) : children}
+    </BaseAvatar.Fallback>
+  );
+});
+AvatarFallback.displayName = 'AvatarFallback';
+
 export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Root> {
   src?: string;
   alt?: string;
   fallback?: React.ReactNode;
   delay?: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: AvatarSize;
   keepMounted?: boolean;
   /** Browser fetch priority hint for Largest Contentful Paint (LCP) optimization */
   fetchPriority?: 'high' | 'low' | 'auto';
@@ -29,12 +123,6 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseA
   children?: React.ReactNode;
   className?: string;
 }
-
-const sizeClasses: Record<'sm' | 'md' | 'lg', string> = {
-  sm: 'size-8 text-xs',
-  md: 'size-10 text-sm',
-  lg: 'size-14 text-base',
-};
 
 const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
   src,
@@ -50,56 +138,32 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
   className,
   ...props
 }, ref) => {
-  // Composable compound usage
   if (children) {
     return (
-      <BaseAvatar.Root
-        ref={ref}
-        className={cn(
-          'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
-          'bg-surface-variant text-on-surface-variant font-label font-bold border border-outline-variant',
-          sizeClasses[size],
-          className
-        )}
-        {...props}
-      >
+      <AvatarRoot ref={ref} size={size} className={className} {...props}>
         {children}
-      </BaseAvatar.Root>
+      </AvatarRoot>
     );
   }
 
   return (
-    <BaseAvatar.Root
-      ref={ref}
-      className={cn(
-        'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
-        'bg-surface-variant text-on-surface-variant font-label font-bold border border-outline-variant',
-        sizeClasses[size],
-        className
-      )}
-      {...props}
-    >
+    <AvatarRoot ref={ref} size={size} className={className} {...props}>
       {src && (
-        <BaseAvatar.Image
+        <AvatarImage
           src={src}
           alt={alt}
           keepMounted={keepMounted}
           fetchPriority={fetchPriority}
           loading={loading}
           onLoadingStatusChange={onLoadingStatusChange}
-          className="w-full h-full object-cover transition-opacity duration-[var(--duration-quick)] data-[loading]:opacity-0 motion-reduce:transition-none"
         />
       )}
-      <BaseAvatar.Fallback
-        delay={delay}
-        className="flex items-center justify-center w-full h-full font-label font-semibold"
-      >
-        {typeof fallback === 'string' ? fallback.slice(0, 2) : fallback}
-      </BaseAvatar.Fallback>
-    </BaseAvatar.Root>
+      <AvatarFallback delay={delay}>
+        {fallback}
+      </AvatarFallback>
+    </AvatarRoot>
   );
 });
-
 AvatarComponent.displayName = 'Avatar';
 
 export interface AvatarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -130,22 +194,19 @@ export const AvatarButton = React.forwardRef<HTMLButtonElement, AvatarButtonProp
     </BaseButton>
   );
 });
-
 AvatarButton.displayName = 'AvatarButton';
 
-// Styled compound parts for advanced composition
-export const AvatarRoot = BaseAvatar.Root;
-export const AvatarImage = BaseAvatar.Image;
-export const AvatarFallback = BaseAvatar.Fallback;
-
-// Compound export mapping Base UI primitives
+// Compound export mapping Base UI primitives with default design tokens
 export const Avatar = Object.assign(AvatarComponent, {
-  Root: BaseAvatar.Root,
-  Image: BaseAvatar.Image,
-  Fallback: BaseAvatar.Fallback,
+  Root: AvatarRoot,
+  Image: AvatarImage,
+  Fallback: AvatarFallback,
   Button: AvatarButton,
 });
 
 export { BaseAvatar };
+export const AvatarPrimitive = BaseAvatar.Root;
+export const AvatarImagePrimitive = BaseAvatar.Image;
+export const AvatarFallbackPrimitive = BaseAvatar.Fallback;
 
 export default Avatar;

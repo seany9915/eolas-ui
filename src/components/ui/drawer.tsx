@@ -14,7 +14,7 @@ import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
 import { cn } from '@/lib/utils';
 
-export interface DrawerProps {
+export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean, eventDetails?: BaseDrawer.Root.ChangeEventDetails) => void;
@@ -29,7 +29,7 @@ export interface DrawerProps {
   snapToSequentialPoints?: boolean;
   snapPoint?: BaseDrawer.Root.SnapPoint | null;
   defaultSnapPoint?: BaseDrawer.Root.SnapPoint | null;
-  onSnapPointChange?: (snapPoint: BaseDrawer.Root.SnapPoint | null) => void;
+  onSnapPointChange?: (snapPoint: BaseDrawer.Root.SnapPoint | null, eventDetails?: BaseDrawer.Root.SnapPointChangeEventDetails) => void;
   modal?: boolean | 'trap-focus';
   disablePointerDismissal?: boolean;
   actionsRef?: React.RefObject<BaseDrawer.Root.Actions | null>;
@@ -234,7 +234,7 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
 );
 DrawerPanel.displayName = 'DrawerPanel';
 
-const DrawerComponent: React.FC<DrawerProps> = ({
+const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
   open,
   defaultOpen,
   onOpenChange,
@@ -260,7 +260,8 @@ const DrawerComponent: React.FC<DrawerProps> = ({
   showHandle = true,
   className,
   popupClassName,
-}) => {
+  ...props
+}, ref) => {
   // If used as pure headless compound root without shorthand config
   if (!title && !description && !trigger && !footer) {
     return (
@@ -318,8 +319,10 @@ const DrawerComponent: React.FC<DrawerProps> = ({
         <DrawerBackdrop />
         <DrawerViewport swipeDirection={swipeDirection}>
           <DrawerPopup
+            ref={ref}
             swipeDirection={swipeDirection}
             className={cn(popupClassName, className)}
+            {...props}
           >
             <DrawerContent>
               <div>
@@ -348,7 +351,8 @@ const DrawerComponent: React.FC<DrawerProps> = ({
       </BaseDrawer.Portal>
     </BaseDrawer.Root>
   );
-};
+});
+DrawerComponent.displayName = 'Drawer';
 
 // Compound export mapping Base UI primitives
 export const Drawer = Object.assign(DrawerComponent, {

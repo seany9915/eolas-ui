@@ -16,7 +16,8 @@ import { cn } from '@/lib/utils';
 import { useWebOtp } from '@/lib/use-web-otp';
 import { Icon } from './icon';
 
-export interface OTPFieldProps {
+export interface OTPFieldProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseOTPField.Root>, 'onChange' | 'length'> {
   id?: string;
   center?: boolean;
   label?: React.ReactNode;
@@ -26,7 +27,23 @@ export interface OTPFieldProps {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string, eventDetails?: BaseOTPField.Root.ChangeEventDetails) => void;
+  /**
+   * Callback fired when all OTP slots are complete.
+   * Alias for Base UI's official `onValueComplete`.
+   */
   onComplete?: (code: string, eventDetails?: BaseOTPField.Root.CompleteEventDetails) => void;
+  /**
+   * Official Base UI callback fired when all OTP slots are complete.
+   */
+  onValueComplete?: (value: string, eventDetails: BaseOTPField.Root.CompleteEventDetails) => void;
+  /**
+   * Callback fired when entered text contains characters rejected by validation or normalization.
+   */
+  onValueInvalid?: (value: string, eventDetails: BaseOTPField.Root.InvalidEventDetails) => void;
+  /**
+   * Normalization function running before validation filtering.
+   */
+  normalizeValue?: (value: string) => string;
   name?: string;
   form?: string;
   required?: boolean;
@@ -35,7 +52,7 @@ export interface OTPFieldProps {
   disabled?: boolean;
   autoSubmit?: boolean;
   mask?: boolean;
-  validationType?: 'numeric' | 'alpha' | 'alphanumeric' | 'none';
+  validationType?: BaseOTPField.Root.ValidationType;
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
   autoComplete?: string;
   pattern?: string;
@@ -43,6 +60,7 @@ export interface OTPFieldProps {
   separatorIndex?: number;
   /** Whether to listen for and auto-fill incoming SMS OTPs via the WebOTP API on supported mobile browsers */
   autoExtractSmsOtp?: boolean;
+  containerRef?: React.Ref<HTMLDivElement>;
   children?: React.ReactNode;
   className?: string;
 }
@@ -58,6 +76,9 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   defaultValue,
   onValueChange,
   onComplete,
+  onValueComplete,
+  onValueInvalid,
+  normalizeValue,
   name,
   form,
   required,
@@ -73,10 +94,20 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   showSeparator = false,
   separatorIndex,
   autoExtractSmsOtp,
+  containerRef,
   children,
   className,
+  ...props
 }, ref) => {
   const sepIndex = separatorIndex ?? Math.floor(length / 2);
+
+  const handleValueComplete = React.useCallback(
+    (val: string, eventDetails: BaseOTPField.Root.CompleteEventDetails) => {
+      onComplete?.(val, eventDetails);
+      onValueComplete?.(val, eventDetails);
+    },
+    [onComplete, onValueComplete]
+  );
 
   useWebOtp({
     enabled: Boolean(autoExtractSmsOtp && !disabled && !readOnly),
@@ -88,7 +119,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
 
   return (
     <BaseField.Root
-      ref={ref}
+      ref={containerRef}
       invalid={Boolean(error)}
       className={cn('@container flex flex-col gap-1.5 w-full', className)}
     >
@@ -108,12 +139,15 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       )}
 
       <BaseOTPField.Root
+        ref={ref}
         id={id}
         length={length}
         value={value}
         defaultValue={defaultValue}
         onValueChange={onValueChange}
-        onValueComplete={onComplete}
+        onValueComplete={handleValueComplete}
+        onValueInvalid={onValueInvalid}
+        normalizeValue={normalizeValue}
         name={name}
         form={form}
         required={required}
@@ -127,6 +161,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         autoComplete={autoComplete}
         aria-label={!label ? 'One-time passcode' : undefined}
         className={cn('flex gap-1.5 @sm:gap-2 items-center', center ? 'justify-center' : 'justify-start')}
+        {...props}
       >
         {children ? (
           children
@@ -157,30 +192,11 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       </BaseOTPField.Root>
 
       {error ? (
-        <BaseField.Error
-          match
-          className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
-        >
-          <Icon name="error" size="sm" className="shrink-0 select-none" />
+        <BaseField.Error className="text-xs text-error font-sans flex items-center gap-1 mt-1">
+          <Icon name="error" size="xs" className="leading-none text-error" />
           <span>{error}</span>
         </BaseField.Error>
-      ) : (
-        <BaseField.Error
-          className="flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]"
-          render={(elementProps) => (
-            <div
-              {...elementProps}
-              className={cn(
-                'flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-[var(--duration-quick)]',
-                elementProps.className
-              )}
-            >
-              <Icon name="error" size="sm" className="shrink-0 select-none" />
-              <span>{elementProps.children}</span>
-            </div>
-          )}
-        />
-      )}
+      ) : null}
     </BaseField.Root>
   );
 });
@@ -195,7 +211,7 @@ export const OTPField = Object.assign(OTPFieldComponent, {
 });
 
 // Re-export Base UI primitives for compound composition
-export { BaseOTPField, useWebOtp };
+export { BaseOTPField };
 export const OTPFieldRoot = BaseOTPField.Root;
 export const OTPFieldInput = BaseOTPField.Input;
 export const OTPFieldSeparator = BaseOTPField.Separator;
