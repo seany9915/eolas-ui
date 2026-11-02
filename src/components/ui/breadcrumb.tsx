@@ -8,7 +8,7 @@ export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {
   separator?: React.ReactNode;
 }
 
-export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
+export const BreadcrumbRoot = React.forwardRef<HTMLElement, BreadcrumbProps>(
   ({ className, ...props }, ref) => (
     <nav
       ref={ref}
@@ -18,7 +18,7 @@ export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
     />
   )
 );
-Breadcrumb.displayName = 'Breadcrumb';
+BreadcrumbRoot.displayName = 'Breadcrumb';
 
 export const BreadcrumbList = React.forwardRef<
   HTMLOListElement,
@@ -47,19 +47,46 @@ export const BreadcrumbItem = React.forwardRef<
 ));
 BreadcrumbItem.displayName = 'BreadcrumbItem';
 
-export interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<'a'> {}
+export interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<'a'> {
+  asChild?: boolean;
+  render?: React.ReactElement | ((props: Record<string, unknown>) => React.ReactElement);
+}
 
 export const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
-  ({ className, ...props }, ref) => (
-    <a
-      ref={ref}
-      className={cn(
-        'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, asChild = false, render, children, ...props }, ref) => {
+    const baseClasses =
+      'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none';
+
+    if (asChild && React.isValidElement(children)) {
+      const child = children as React.ReactElement<any>;
+      return React.cloneElement(child, {
+        ref: ref || child.props.ref,
+        className: cn(baseClasses, className, child.props.className),
+        ...props,
+      });
+    }
+
+    if (render) {
+      return typeof render === 'function'
+        ? render({ ref, className: cn(baseClasses, className), ...props, children })
+        : React.cloneElement(render, {
+            ref: ref || (render as any).props?.ref,
+            className: cn(baseClasses, className, (render as any).props?.className),
+            ...props,
+            children,
+          });
+    }
+
+    return (
+      <a
+        ref={ref}
+        className={cn(baseClasses, className)}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
 );
 BreadcrumbLink.displayName = 'BreadcrumbLink';
 
@@ -122,3 +149,16 @@ export const BreadcrumbEllipsis = React.forwardRef<HTMLButtonElement, Breadcrumb
   )
 );
 BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis';
+
+// Compound export mapping shadcn / Base UI style conventions
+export const Breadcrumb = Object.assign(BreadcrumbRoot, {
+  Root: BreadcrumbRoot,
+  List: BreadcrumbList,
+  Item: BreadcrumbItem,
+  Link: BreadcrumbLink,
+  Page: BreadcrumbPage,
+  Separator: BreadcrumbSeparator,
+  Ellipsis: BreadcrumbEllipsis,
+});
+
+export default Breadcrumb;

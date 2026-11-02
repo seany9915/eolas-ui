@@ -19,8 +19,12 @@ import {
   type GroupProps,
   type PanelProps,
   type SeparatorProps,
+  type PanelImperativeHandle,
+  type GroupImperativeHandle,
 } from 'react-resizable-panels';
 import { cn } from '@/lib/utils';
+
+export type { PanelImperativeHandle, GroupImperativeHandle };
 
 export interface ResizablePanelGroupProps
   extends Omit<GroupProps, 'orientation'> {

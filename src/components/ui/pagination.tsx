@@ -5,15 +5,18 @@ import { Icon } from './icon';
 
 export interface PaginationProps extends React.ComponentPropsWithoutRef<'nav'> {}
 
-export const Pagination = ({ className, ...props }: PaginationProps) => (
-  <nav
-    role="navigation"
-    aria-label="Pagination"
-    className={cn('@container mx-auto flex w-full justify-center', className)}
-    {...props}
-  />
+export const PaginationRoot = React.forwardRef<HTMLElement, PaginationProps>(
+  ({ className, ...props }, ref) => (
+    <nav
+      ref={ref}
+      role="navigation"
+      aria-label="Pagination"
+      className={cn('@container mx-auto flex w-full justify-center', className)}
+      {...props}
+    />
+  )
 );
-Pagination.displayName = 'Pagination';
+PaginationRoot.displayName = 'Pagination';
 
 export const PaginationContent = React.forwardRef<
   HTMLUListElement,
@@ -40,17 +43,21 @@ export type PaginationLinkProps = {
   href?: string;
 } & ButtonProps;
 
-export const PaginationLink = ({
+export const PaginationLink = React.forwardRef<
+  HTMLButtonElement,
+  PaginationLinkProps
+>(({
   className,
   isActive,
   size = 'sm',
   children,
   href,
   ...props
-}: PaginationLinkProps) => {
+}, ref) => {
   const isLink = Boolean(href);
   return (
     <Button
+      ref={ref}
       render={isLink ? <a href={href} aria-current={isActive ? 'page' : undefined} /> : undefined}
       aria-current={!isLink && isActive ? 'page' : undefined}
       variant={isActive ? 'filled' : 'outlined'}
@@ -68,15 +75,19 @@ export const PaginationLink = ({
       {children}
     </Button>
   );
-};
+});
 PaginationLink.displayName = 'PaginationLink';
 
-export const PaginationPrevious = ({
+export const PaginationPrevious = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof PaginationLink>
+>(({
   className,
   children = 'Previous',
   ...props
-}: React.ComponentPropsWithoutRef<typeof PaginationLink>) => (
+}, ref) => (
   <PaginationLink
+    ref={ref}
     aria-label="Go to previous page"
     className={cn('gap-1 pl-2.5 pr-3.5', className)}
     {...props}
@@ -84,15 +95,19 @@ export const PaginationPrevious = ({
     <Icon name="chevron_left" size="sm" className="text-base" />
     <span className="hidden @sm:inline">{children}</span>
   </PaginationLink>
-);
+));
 PaginationPrevious.displayName = 'PaginationPrevious';
 
-export const PaginationNext = ({
+export const PaginationNext = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof PaginationLink>
+>(({
   className,
   children = 'Next',
   ...props
-}: React.ComponentPropsWithoutRef<typeof PaginationLink>) => (
+}, ref) => (
   <PaginationLink
+    ref={ref}
     aria-label="Go to next page"
     className={cn('gap-1 pl-3.5 pr-2.5', className)}
     {...props}
@@ -100,14 +115,18 @@ export const PaginationNext = ({
     <span className="hidden @sm:inline">{children}</span>
     <Icon name="chevron_right" size="sm" className="text-base" />
   </PaginationLink>
-);
+));
 PaginationNext.displayName = 'PaginationNext';
 
-export const PaginationEllipsis = ({
+export const PaginationEllipsis = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<'span'>
+>(({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<'span'>) => (
+}, ref) => (
   <span
+    ref={ref}
     className={cn(
       'flex size-11 items-center justify-center font-sans text-on-surface-variant select-none',
       className
@@ -117,5 +136,18 @@ export const PaginationEllipsis = ({
     <Icon name="more_horiz" size="md" aria-hidden="true" />
     <span className="sr-only">More pages</span>
   </span>
-);
+));
 PaginationEllipsis.displayName = 'PaginationEllipsis';
+
+// Compound export mapping shadcn / Base UI style conventions
+export const Pagination = Object.assign(PaginationRoot, {
+  Root: PaginationRoot,
+  Content: PaginationContent,
+  Item: PaginationItem,
+  Link: PaginationLink,
+  Previous: PaginationPrevious,
+  Next: PaginationNext,
+  Ellipsis: PaginationEllipsis,
+});
+
+export default Pagination;
