@@ -28,6 +28,7 @@ export interface RegistryEntry {
   category: ComponentCategory;
   tier: ComponentTier;
   basePrimitive: string;
+  platformReference?: string;
   sourcePath: string;
   isDeprecated?: boolean;
   deprecatedNote?: string;

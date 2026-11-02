@@ -1,3 +1,16 @@
+/**
+ * SpinningCounter
+ *
+ * Slot-machine reel counter based strictly on transitions.dev (26-spinning-counter.md).
+ * Platform Reference: https://transitions.dev/detail.html?t=spinning-counter
+ *
+ * Each numeric character is a clipped vertical reel column that smoothly spins
+ * to the target digit with a 90ms per-column stagger and vertical edge soft-masks
+ * so numbers never hard-crop at bounding edges.
+ *
+ * Perfect for celebration milestones, dashboard KPIs, and gamified progress.
+ * Complies with WCAG 2.2 and motion-reduce:transition-none.
+ */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -70,19 +83,6 @@ const ReelColumn: React.FC<ReelColumnProps> = ({ char, columnIndex, cellHeight, 
   );
 };
 
-/**
- * SpinningCounter
- *
- * Slot-machine reel counter based strictly on transitions.dev
- * (https://transitions.dev/detail.html?t=spinning-counter / 26-spinning-counter.md).
- *
- * Each numeric character is a clipped vertical reel column that smoothly spins
- * to the target digit with a 90ms per-column stagger and vertical edge soft-masks
- * so numbers never hard-crop at bounding edges.
- *
- * Perfect for celebration milestones, dashboard KPIs, and gamified progress.
- * Complies with WCAG 2.2 and motion-reduce:transition-none.
- */
 export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounterProps>(
   (
     {

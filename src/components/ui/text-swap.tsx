@@ -1,3 +1,17 @@
+/**
+ * TextSwap
+ *
+ * Micro-transition for in-place text state changes based strictly on transitions.dev (04-text-states-swap.md).
+ * Platform Reference: https://transitions.dev/detail.html?t=text-states-swap
+ *
+ * Implements the 3-phase sequence:
+ * 1. .is-exit: Old text slides up 4px with 2px micro-blur and fades to 0 over 150ms.
+ * 2. .is-enter-start: Text swaps and jumps below (+4px) without transition.
+ * 3. Forced reflow -> .is-enter: New text rises smoothly back to rest (0) over 150ms.
+ *
+ * Prevents layout thrashing inside buttons, chips, and status badges.
+ * Complies with WCAG 2.2 and motion-reduce:transition-none.
+ */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -13,25 +27,15 @@ export interface TextSwapProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 type SwapPhase = 'idle' | 'exit' | 'enter-start' | 'enter';
 
-/**
- * TextSwap
- *
- * Micro-transition for in-place text state changes based strictly on transitions.dev
- * (https://transitions.dev/detail.html?t=text-states-swap / 04-text-states-swap.md).
- *
- * Implements the 3-phase sequence:
- * 1. .is-exit: Old text slides up 4px with 2px micro-blur and fades to 0 over 150ms.
- * 2. .is-enter-start: Text swaps and jumps below (+4px) without transition.
- * 3. Forced reflow -> .is-enter: New text rises smoothly back to rest (0) over 150ms.
- *
- * Prevents layout thrashing inside buttons, chips, and status badges.
- * Complies with WCAG 2.2 and motion-reduce:transition-none.
- */
 export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
   ({ children, duration = 150, translateY = 4, className, ...props }, ref) => {
     const [displayedText, setDisplayedText] = React.useState<React.ReactNode>(children);
     const [phase, setPhase] = React.useState<SwapPhase>('idle');
     const spanRef = React.useRef<HTMLSpanElement | null>(null);
+
+    const exitTimerRef = React.useRef<number | null>(null);
+    const settleTimerRef = React.useRef<number | null>(null);
+    const rafRef = React.useRef<number | null>(null);
 
     // Merge external ref with internal ref for forced reflow
     const setRefs = React.useCallback(
@@ -63,10 +67,15 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
           return;
         }
 
+        // Clear any running timers from previous quick switches
+        if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
+        if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
         // Phase 1: Start exit of old text
         setPhase('exit');
 
-        const exitTimer = window.setTimeout(() => {
+        exitTimerRef.current = window.setTimeout(() => {
           // Phase 2: Swap text and jump to below (instantaneous, no transition)
           setDisplayedText(children);
           setPhase('enter-start');
@@ -77,17 +86,19 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
           }
 
           // Phase 3: Transition new text back to rest
-          requestAnimationFrame(() => {
+          rafRef.current = requestAnimationFrame(() => {
             setPhase('enter');
-            const settleTimer = window.setTimeout(() => {
+            settleTimerRef.current = window.setTimeout(() => {
               setPhase('idle');
             }, duration);
-
-            return () => window.clearTimeout(settleTimer);
           });
         }, duration);
 
-        return () => window.clearTimeout(exitTimer);
+        return () => {
+          if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
+          if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
       }
     }, [children, duration]);
 

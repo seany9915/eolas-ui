@@ -768,7 +768,7 @@
       "name": "error-shake",
       "type": "registry:ui",
       "title": "Error Shake",
-      "description": "Eolas UI Error Shake component built on Base UI and DESIGN.md design tokens.",
+      "description": "ErrorShake Horizontal form micro-shake wrapper based on transitions.dev (12-error-state-shake.md). Platform Reference: https://transitions.dev/detail.html?t=error-state-shake Shakes invalid form inputs or blocked actions using a decaying overshoot curve: 0% -> 20% (-6px) -> 40% (+4px) -> 60% (-2px) -> 80% (+1px) -> 100% (0) Synchronized with the 300ms animate-error-shake keyframe in src/globals.css. Supports coordinated error message reveals and auto-revert timers. Complies with WCAG 2.2 and motion-reduce:animate-none.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1128,7 +1128,7 @@
       "name": "notification-badge",
       "type": "registry:ui",
       "title": "Notification Badge",
-      "description": "Eolas UI Notification Badge component built on Base UI and DESIGN.md design tokens.",
+      "description": "NotificationBadge Isolated diagonal slide-in and scale-pop badge based on transitions.dev (03-notification-badge.md). Platform Reference: https://transitions.dev/detail.html?t=notification-badge Anchors absolutely onto trigger elements (e.g. action buttons, navigation icons) without displacing trigger layout or causing parent jitter. Adheres to Pattern 1 (High-contrast solid fill) with WCAG AAA foreground contrast. Automatically disables motion under prefers-reduced-motion.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1163,7 +1163,7 @@
       "name": "number-pop-in",
       "type": "registry:ui",
       "title": "Number Pop In",
-      "description": "Eolas UI Number Pop In component built on Base UI and DESIGN.md design tokens.",
+      "description": "NumberPopIn Digit pop-in animation primitive based strictly on transitions.dev (02-number-pop-in.md). Platform Reference: https://transitions.dev/detail.html?t=number-pop-in Decomposes numeric strings into individual character spans. When updated, each digit pops into place with 8px vertical travel, 2px micro-blur, and spring overshoot (cubic-bezier(0.34, 1.45, 0.64, 1)). Trailing decimal digits stagger by 70ms so updates feel alive without looking chaotic. Tabular numerals prevent layout jitter. Complies with WCAG 2.2 and motion-reduce:animate-none.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1177,7 +1177,7 @@
       "name": "number-roll",
       "type": "registry:ui",
       "title": "Number Roll",
-      "description": "Eolas UI Number Roll component built on Base UI and DESIGN.md design tokens.",
+      "description": "NumberRoll Tabular number transition primitive based strictly on transitions.dev. Platform Reference: https://transitions.dev/library.html Supports: - 'pop-in' (default): Individual digit pop-in with spring overshoot and decimal stagger (02-number-pop-in.md). - 'spinning': Slot-machine vertical reel roll with soft edge masks (26-spinning-counter.md). Tabular numerals prevent layout jitter across all variants. Strictly adheres to Roboto Mono typography and prefers-reduced-motion.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1575,7 +1575,7 @@
       "name": "shimmer-text",
       "type": "registry:ui",
       "title": "Shimmer Text",
-      "description": "Eolas UI Shimmer Text component built on Base UI and DESIGN.md design tokens.",
+      "description": "ShimmerText Ambient streaming text shimmer based on transitions.dev (15-shimmer-text.md). Platform Reference: https://transitions.dev/detail.html?t=shimmer-text Sweeps a subtle brand highlight across muted text on a continuous loop to communicate live AI reasoning, clinical transcription, or background sync. Completely CSP-compliant with zero runtime inline <style> injection. Automatically suppresses animation and settles into high-contrast text when prefers-reduced-motion is active.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1705,7 +1705,7 @@
       "name": "spinning-counter",
       "type": "registry:ui",
       "title": "Spinning Counter",
-      "description": "Eolas UI Spinning Counter component built on Base UI and DESIGN.md design tokens.",
+      "description": "SpinningCounter Slot-machine reel counter based strictly on transitions.dev (26-spinning-counter.md). Platform Reference: https://transitions.dev/detail.html?t=spinning-counter Each numeric character is a clipped vertical reel column that smoothly spins to the target digit with a 90ms per-column stagger and vertical edge soft-masks so numbers never hard-crop at bounding edges. Perfect for celebration milestones, dashboard KPIs, and gamified progress. Complies with WCAG 2.2 and motion-reduce:transition-none.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1757,7 +1757,7 @@
       "name": "success-check",
       "type": "registry:ui",
       "title": "Success Check",
-      "description": "Eolas UI Success Check component built on Base UI and DESIGN.md design tokens.",
+      "description": "SuccessCheck Celebratory checkmark entrance transition based strictly on transitions.dev (10-success-check.md). Platform Reference: https://transitions.dev/detail.html?t=success-check Composes 5 synchronized layers in parallel: 1. Opacity fade (0 -> 1 over 500ms) 2. 80deg rotational upright spin (80deg -> 0deg over 500ms) 3. Optical blur settle (10px -> 0px over 500ms) 4. Y-bob spring overshoot (translateY 40px -> 0 with cubic-bezier(0.34, 1.35, 0.64, 1)) 5. SVG stroke-draw (delayed 80ms stroke-dashoffset transition) Complies strictly with WCAG 2.2 and motion-reduce:transition-none.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1935,7 +1935,7 @@
       "name": "text-swap",
       "type": "registry:ui",
       "title": "Text Swap",
-      "description": "Eolas UI Text Swap component built on Base UI and DESIGN.md design tokens.",
+      "description": "TextSwap Micro-transition for in-place text state changes based strictly on transitions.dev (04-text-states-swap.md). Platform Reference: https://transitions.dev/detail.html?t=text-states-swap Implements the 3-phase sequence: 1. .is-exit: Old text slides up 4px with 2px micro-blur and fades to 0 over 150ms. 2. .is-enter-start: Text swaps and jumps below (+4px) without transition. 3. Forced reflow -> .is-enter: New text rises smoothly back to rest (0) over 150ms. Prevents layout thrashing inside buttons, chips, and status badges. Complies with WCAG 2.2 and motion-reduce:transition-none.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1974,7 +1974,7 @@
       "name": "texts-reveal",
       "type": "registry:ui",
       "title": "Texts Reveal",
-      "description": "Eolas UI Texts Reveal component built on Base UI and DESIGN.md design tokens.",
+      "description": "TextsReveal Staggered text entrance container based strictly on transitions.dev (18-texts-reveal.md). Platform Reference: https://transitions.dev/detail.html?t=texts-reveal Features: - Entrance: Lines enter with 12px upward rise, 3px blur, and 40ms stagger. - Decoupled Exit: Single quiet 200ms opacity fade in-place without replaying the stagger in reverse. - Enforces the 5-item stagger cap (max 200ms cumulative delay). - Complies with prefers-reduced-motion.",
       "dependencies": [
         "@base-ui/react",
         "clsx",

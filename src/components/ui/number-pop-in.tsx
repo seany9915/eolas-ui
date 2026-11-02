@@ -1,3 +1,17 @@
+/**
+ * NumberPopIn
+ *
+ * Digit pop-in animation primitive based strictly on transitions.dev (02-number-pop-in.md).
+ * Platform Reference: https://transitions.dev/detail.html?t=number-pop-in
+ *
+ * Decomposes numeric strings into individual character spans. When updated,
+ * each digit pops into place with 8px vertical travel, 2px micro-blur, and spring overshoot
+ * (cubic-bezier(0.34, 1.45, 0.64, 1)). Trailing decimal digits stagger by 70ms so updates feel
+ * alive without looking chaotic.
+ *
+ * Tabular numerals prevent layout jitter.
+ * Complies with WCAG 2.2 and motion-reduce:animate-none.
+ */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -10,20 +24,6 @@ export interface NumberPopInProps extends React.HTMLAttributes<HTMLSpanElement> 
   className?: string;
 }
 
-/**
- * NumberPopIn
- *
- * Digit pop-in animation primitive based strictly on transitions.dev
- * (https://transitions.dev/detail.html?t=number-pop-in / 02-number-pop-in.md).
- *
- * Decomposes numeric strings into individual character spans. When updated,
- * each digit pops into place with 8px vertical travel, 2px micro-blur, and spring overshoot
- * (cubic-bezier(0.34, 1.45, 0.64, 1)). Trailing decimal digits stagger by 70ms so updates feel
- * alive without looking chaotic.
- *
- * Tabular numerals prevent layout jitter.
- * Complies with WCAG 2.2 and motion-reduce:animate-none.
- */
 export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
   (
     {
@@ -50,7 +50,6 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
     return (
       <span
         ref={ref}
-        key={formattedText}
         className={cn(
           'inline-flex items-baseline font-mono text-inherit tabular-nums select-none overflow-hidden',
           className
@@ -61,7 +60,7 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
       >
         {prefix && <span className="mr-0.5">{prefix}</span>}
 
-        <span className="inline-flex items-baseline">
+        <span key={formattedText} className="inline-flex items-baseline">
           {chars.map((char, idx) => {
             // Transitions.dev rule: The last two characters stagger (stagger=1, stagger=2)
             // so decimals feel alive.

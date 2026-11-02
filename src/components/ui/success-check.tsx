@@ -1,3 +1,18 @@
+/**
+ * SuccessCheck
+ *
+ * Celebratory checkmark entrance transition based strictly on transitions.dev (10-success-check.md).
+ * Platform Reference: https://transitions.dev/detail.html?t=success-check
+ *
+ * Composes 5 synchronized layers in parallel:
+ * 1. Opacity fade (0 -> 1 over 500ms)
+ * 2. 80deg rotational upright spin (80deg -> 0deg over 500ms)
+ * 3. Optical blur settle (10px -> 0px over 500ms)
+ * 4. Y-bob spring overshoot (translateY 40px -> 0 with cubic-bezier(0.34, 1.35, 0.64, 1))
+ * 5. SVG stroke-draw (delayed 80ms stroke-dashoffset transition)
+ *
+ * Complies strictly with WCAG 2.2 and motion-reduce:transition-none.
+ */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -17,21 +32,6 @@ const SIZE_MAP = {
   lg: 56,
 };
 
-/**
- * SuccessCheck
- *
- * Celebratory checkmark entrance transition based strictly on transitions.dev
- * (https://transitions.dev/detail.html?t=success-check / 10-success-check.md).
- *
- * Composes 5 synchronized layers in parallel:
- * 1. Opacity fade (0 -> 1 over 500ms)
- * 2. 80deg rotational upright spin (80deg -> 0deg over 500ms)
- * 3. Optical blur settle (10px -> 0px over 500ms)
- * 4. Y-bob spring overshoot (translateY 40px -> 0 with cubic-bezier(0.34, 1.35, 0.64, 1))
- * 5. SVG stroke-draw (delayed 80ms stroke-dashoffset transition)
- *
- * Complies strictly with WCAG 2.2 and motion-reduce:transition-none.
- */
 export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
   (
     {
@@ -44,59 +44,66 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
     },
     ref
   ) => {
-    const pixelSize = typeof size === 'number' ? size : SIZE_MAP[size];
+    const dimension = typeof size === 'number' ? size : SIZE_MAP[size] ?? 40;
+    const strokeWidth = dimension <= 24 ? 2.5 : dimension <= 40 ? 3 : 3.5;
+
+    const [animating, setAnimating] = React.useState(Boolean(trigger));
+    const prevTriggerRef = React.useRef(trigger);
+
+    React.useEffect(() => {
+      if (trigger && trigger !== prevTriggerRef.current) {
+        setAnimating(true);
+      }
+      prevTriggerRef.current = trigger;
+    }, [trigger]);
+
+    const handleAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>) => {
+      if (e.target === e.currentTarget) {
+        setAnimating(false);
+        onAnimationEnd?.();
+      }
+    };
+
     const isBadge = variant === 'badge';
 
     return (
       <div
         ref={ref}
-        key={String(trigger)}
+        onAnimationEnd={handleAnimationEnd}
+        style={{
+          width: `${dimension}px`,
+          height: `${dimension}px`,
+        }}
         className={cn(
-          'inline-flex items-center justify-center shrink-0 select-none transform-gpu origin-center will-change-[transform,opacity,filter]',
-          'animate-success-check motion-reduce:animate-none motion-reduce:transform-none motion-reduce:filter-none',
+          'relative inline-flex items-center justify-center select-none overflow-visible',
+          isBadge && 'rounded-full bg-success text-on-success shadow-ambient',
+          animating && 'animate-success-check',
+          'motion-reduce:animate-none motion-reduce:transform-none motion-reduce:filter-none',
           className
         )}
-        role="status"
-        aria-live="polite"
-        onAnimationEnd={onAnimationEnd}
+        aria-hidden="true"
         {...props}
       >
         <svg
-          width={pixelSize}
-          height={pixelSize}
-          viewBox="0 0 40 40"
+          viewBox="0 0 24 24"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="overflow-visible block"
-        >
-          {/* Background Circle if badge variant */}
-          {isBadge && (
-            <circle
-              cx="20"
-              cy="20"
-              r="18"
-              className="fill-success"
-            />
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={cn(
+            'w-[60%] h-[60%]',
+            isBadge ? 'text-on-success' : 'text-success',
+            animating && 'animate-check-draw',
+            'motion-reduce:animate-none'
           )}
-
-          {/* Stroke-Drawn Checkmark */}
-          <path
-            d="M12 20.5L17.5 26L28 15"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{
-              strokeDasharray: 26,
-              strokeDashoffset: 26,
-            }}
-            className={cn(
-              'animate-check-draw motion-reduce:stroke-dashoffset-0 motion-reduce:animate-none',
-              isBadge ? 'stroke-on-success' : 'stroke-success'
-            )}
-          />
+          style={{
+            strokeDasharray: 24,
+            strokeDashoffset: animating ? 0 : 0,
+          }}
+        >
+          <polyline points="20 6 9 17 4 12" />
         </svg>
-
-        <span className="sr-only">Success</span>
       </div>
     );
   }

@@ -63,8 +63,36 @@ const registryEntries = items.map(item => {
     console.warn('Could not read', filePath);
   }
 
+  const transitionsDevMap = {
+    'error-shake': 'Horizontal form micro-shake wrapper based on transitions.dev (12-error-state-shake.md).',
+    'number-pop-in': 'Digit pop-in animation primitive with spring overshoot and decimal stagger based on transitions.dev (02-number-pop-in.md).',
+    'spinning-counter': 'Slot-machine vertical reel roll counter with soft edge masks based on transitions.dev (26-spinning-counter.md).',
+    'number-roll': 'Tabular number transition primitive combining pop-in and spinning reels based on transitions.dev.',
+    'text-swap': 'Text state swap with directional slide and micro-blur based on transitions.dev (04-text-states-swap.md).',
+    'texts-reveal': 'Staggered text reveal with decoupled quiet fade exit based on transitions.dev (18-texts-reveal.md).',
+    'shimmer-text': 'Continuous sweeping highlight text shimmer based on transitions.dev (15-shimmer-text.md).',
+    'success-check': 'Five-layer success checkmark animation based on transitions.dev (10-success-check.md).',
+    'notification-badge': 'Popping notification badge dot and pill based on transitions.dev (03-notification-badge.md).',
+  };
+
+  const isTransitionsDev = Boolean(transitionsDevMap[item.name]) || fileContent.includes('transitions.dev');
+
   const baseUIMatch = fileContent.match(/@base-ui\/react\/([a-z0-9-]+)/);
-  const basePrimitive = isLib ? 'Base UI Headless Library' : baseUIMatch ? `@base-ui/react/${baseUIMatch[1]}` : (isBlock ? 'Composite Block' : 'DESIGN.md Token Primitive');
+  const basePrimitive = isLib
+    ? 'Base UI Headless Library'
+    : isTransitionsDev
+    ? 'transitions.dev (@jakubantalik)'
+    : baseUIMatch
+    ? `@base-ui/react/${baseUIMatch[1]}`
+    : (isBlock ? 'Composite Block' : 'DESIGN.md Token Primitive');
+
+  const platformReference = isTransitionsDev
+    ? 'https://transitions.dev/library.html'
+    : item.name === 'view-transition'
+    ? 'https://developer.chrome.com/docs/web-platform/view-transitions'
+    : item.name === 'swipe-reveal'
+    ? 'https://developer.chrome.com'
+    : undefined;
 
   const isDeprecated = item.name === 'selection-controls' || item.name === 'toggles' || item.name === 'steppers' || item.name === 'empty-state';
   const deprecatedNote = item.name === 'selection-controls'
@@ -90,7 +118,7 @@ const registryEntries = items.map(item => {
   const tier = isBlock ? 'block' : (isDeprecated || isLib ? 'utility' : 'primitive');
 
   const title = item.title || item.name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
-  const description = item.description || `Eolas UI ${title} component.`;
+  const description = transitionsDevMap[item.name] || item.description || `Eolas UI ${title} component.`;
   const taxonomy = item.meta?.taxonomy || [];
   const dependencies = item.dependencies || [];
   const shadcnCommand = `npx shadcn add @seany9915/eolas-ui/${item.name}`;
@@ -103,6 +131,7 @@ const registryEntries = items.map(item => {
     category,
     tier,
     basePrimitive,
+    ...(platformReference ? { platformReference } : {}),
     sourcePath: filePath,
     ...(isDeprecated ? { isDeprecated: true, deprecatedNote, replacedBy } : {}),
     ...(taxonomy.length > 0 ? { taxonomy } : {}),

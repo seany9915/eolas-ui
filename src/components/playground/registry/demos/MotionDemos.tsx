@@ -138,7 +138,7 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
 
   const handleValidate = () => {
     const num = Number(duration);
-    if (isNaN(num) || num > 500) {
+    if (isNaN(num) || num > 60) {
       setError('Practice duration exceeds recommended maximum (60 minutes)');
       setShakeTrigger((prev) => prev + 1);
     } else if (num <= 0) {
@@ -185,9 +185,11 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
         <Button
           size="sm"
           variant="outlined"
+          colorRole="neutral"
           onClick={() => {
             setDuration('20');
             setError(null);
+            setShakeTrigger(0);
           }}
         >
           Reset to 20 Minutes

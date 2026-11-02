@@ -1,3 +1,15 @@
+/**
+ * NotificationBadge
+ *
+ * Isolated diagonal slide-in and scale-pop badge based on transitions.dev (03-notification-badge.md).
+ * Platform Reference: https://transitions.dev/detail.html?t=notification-badge
+ *
+ * Anchors absolutely onto trigger elements (e.g. action buttons, navigation icons)
+ * without displacing trigger layout or causing parent jitter.
+ *
+ * Adheres to Pattern 1 (High-contrast solid fill) with WCAG AAA foreground contrast.
+ * Automatically disables motion under prefers-reduced-motion.
+ */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -15,16 +27,6 @@ export interface NotificationBadgeProps extends React.HTMLAttributes<HTMLSpanEle
   className?: string;
 }
 
-/**
- * NotificationBadge
- *
- * Isolated diagonal slide-in and scale-pop badge based on transitions.dev.
- * Anchors absolutely onto trigger elements (e.g. action buttons, navigation icons)
- * without displacing trigger layout or causing parent jitter.
- *
- * Adheres to Pattern 1 (High-contrast solid fill) with WCAG AAA foreground contrast.
- * Automatically disables motion under prefers-reduced-motion.
- */
 export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationBadgeProps>(
   (
     {
@@ -38,30 +40,27 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
     },
     ref
   ) => {
-    const isCounted = !dot && count !== undefined;
+    if (!visible) return null;
 
-    const variantStyles = {
-      primary: 'bg-primary text-on-primary',
-      error: 'bg-error text-on-error',
-      secondary: 'bg-secondary text-on-secondary',
-    }[variant];
+    const isCounted = !dot && count !== undefined;
 
     return (
       <span
         ref={ref}
-        aria-hidden={!srLabel}
         className={cn(
-          'absolute -top-1 -right-1 z-20 pointer-events-none select-none flex items-center justify-center font-mono font-bold leading-none',
-          isCounted
-            ? 'min-w-[18px] h-[18px] px-1 text-[11px] rounded-full tabular-nums shadow-ambient box-trim'
-            : 'w-2.5 h-2.5 rounded-full shadow-ambient',
-          variantStyles,
-          'transition-[transform,opacity,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
-          visible
-            ? 'opacity-100 scale-100 filter-none animate-badge-pop'
-            : 'opacity-0 scale-0 blur-[var(--blur-small,2px)] pointer-events-none',
+          'absolute -top-1 -right-1 z-10 select-none pointer-events-none inline-flex items-center justify-center font-mono font-bold leading-none',
+          'transition-[transform,opacity] duration-fast ease-smooth-out will-change-transform animate-badge-pop',
+          'motion-reduce:animate-none motion-reduce:transition-none motion-reduce:transform-none',
+          variant === 'primary' && 'bg-primary text-on-primary',
+          variant === 'error' && 'bg-error text-on-error',
+          variant === 'secondary' && 'bg-secondary text-on-secondary',
+          dot
+            ? 'size-2.5 rounded-full ring-2 ring-surface'
+            : 'min-w-4.5 h-4.5 px-1 text-[10px] rounded-full ring-2 ring-surface',
           className
         )}
+        role="status"
+        aria-live="polite"
         {...props}
       >
         {isCounted ? count : null}
