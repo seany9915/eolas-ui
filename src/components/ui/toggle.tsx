@@ -44,8 +44,8 @@ const variantStyles: Record<ToggleVariant, string> = {
     'data-[pressed]:bg-surface-variant data-[pressed]:text-on-surface data-[pressed]:border-transparent'
   ),
   subtle: cn(
-    'bg-surface-container border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-variant',
-    'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:border-outline-variant data-[pressed]:shadow-ambient'
+    'bg-surface border-2 border-outline-variant/60 text-on-surface-variant hover:bg-surface-container/40 hover:text-on-surface',
+    'data-[pressed]:bg-surface-container data-[pressed]:text-on-surface data-[pressed]:border-outline'
   ),
 };
 
