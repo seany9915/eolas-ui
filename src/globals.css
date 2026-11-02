@@ -677,8 +677,17 @@ select:autofill {
   }
 }
 
-/* Standardized Type Scale Utility Classes */
+/* Standardized Type Scale Utility Classes (text-* canonical, type-* aliases for tailwind-merge safety) */
 @utility text-display-lg {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+@utility type-display-lg {
   font-family: var(--font-heading);
   font-size: 3rem;
   font-weight: 700;
@@ -696,7 +705,24 @@ select:autofill {
   text-wrap: balance;
 }
 
+@utility type-display-sm {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
 @utility text-headline-lg {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+@utility type-headline-lg {
   font-family: var(--font-heading);
   font-size: 2rem;
   font-weight: 600;
@@ -712,7 +738,23 @@ select:autofill {
   text-wrap: balance;
 }
 
+@utility type-headline-md {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
 @utility text-headline-sm {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+@utility type-headline-sm {
   font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 600;
@@ -728,7 +770,23 @@ select:autofill {
   text-wrap: pretty;
 }
 
+@utility type-body-lg {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
 @utility text-body-md {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+@utility type-body-md {
   font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 400;
@@ -744,7 +802,22 @@ select:autofill {
   text-wrap: pretty;
 }
 
+@utility type-body-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
 @utility text-caption {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+@utility type-caption {
   font-family: var(--font-sans);
   font-size: 0.875rem;
   font-weight: 400;
@@ -758,7 +831,22 @@ select:autofill {
   line-height: 1.5;
 }
 
+@utility type-code-md {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 @utility text-label-lg {
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+@utility type-label-lg {
   font-family: var(--font-label);
   font-size: 0.875rem;
   font-weight: 600;
@@ -774,7 +862,23 @@ select:autofill {
   letter-spacing: 0.01em;
 }
 
+@utility type-label-md {
+  font-family: var(--font-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
 @utility text-label-sm {
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+}
+
+@utility type-label-sm {
   font-family: var(--font-label);
   font-size: 0.75rem;
   font-weight: 600;
@@ -803,9 +907,21 @@ p, li {
   font-family: var(--typeset-font-body);
   font-size: var(--typeset-size);
   line-height: var(--typeset-leading);
+  color: var(--on-surface);
 }
 
-.typeset h1, .typeset h2, .typeset h3, .typeset h4 {
+/* Prevent top margin leak on first child in articles, dialogs, or chat bubbles */
+.typeset > :first-child {
+  margin-top: 0;
+}
+
+/* Headings */
+.typeset h1,
+.typeset h2,
+.typeset h3,
+.typeset h4,
+.typeset h5,
+.typeset h6 {
   font-family: var(--typeset-font-heading);
   font-weight: 600;
   line-height: 1.25;
@@ -831,11 +947,146 @@ p, li {
   font-size: 1.125em;
 }
 
-.typeset p, .typeset ul, .typeset ol {
+.typeset h5 {
+  font-size: 1em;
+}
+
+.typeset h6 {
+  font-size: 0.875em;
+  color: var(--on-surface-variant);
+}
+
+/* Paragraphs & Text Flow */
+.typeset p {
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
   color: var(--on-surface);
   text-wrap: pretty;
+}
+
+/* Lists with restored bullets, numbers, and indentation */
+.typeset ul {
+  list-style-type: disc;
+  padding-inline-start: 1.5em;
+  margin-top: 0;
+  margin-bottom: var(--typeset-flow);
+  color: var(--on-surface);
+}
+
+.typeset ol {
+  list-style-type: decimal;
+  padding-inline-start: 1.5em;
+  margin-top: 0;
+  margin-bottom: var(--typeset-flow);
+  color: var(--on-surface);
+}
+
+.typeset li {
+  margin-top: calc(var(--typeset-flow) * 0.25);
+  margin-bottom: calc(var(--typeset-flow) * 0.25);
+  text-wrap: pretty;
+}
+
+.typeset li::marker {
+  color: var(--on-surface-variant);
+}
+
+/* Nested lists */
+.typeset ul ul,
+.typeset ol ol,
+.typeset ul ol,
+.typeset ol ul {
+  margin-top: calc(var(--typeset-flow) * 0.25);
+  margin-bottom: 0;
+}
+
+/* Inline Code & Code Blocks (wired to --typeset-font-mono) */
+.typeset code {
+  font-family: var(--typeset-font-mono);
+  font-size: 0.875em;
+  background-color: var(--surface-container);
+  color: var(--on-surface);
+  padding: 0.15em 0.35em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--outline-variant);
+}
+
+.typeset pre {
+  font-family: var(--typeset-font-mono);
+  font-size: 0.875em;
+  background-color: var(--surface-container);
+  color: var(--on-surface);
+  padding: 1em 1.25em;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--outline-variant);
+  overflow-x: auto;
+  margin-top: 0;
+  margin-bottom: var(--typeset-flow);
+}
+
+.typeset pre code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Blockquotes */
+.typeset blockquote {
+  margin-top: 0;
+  margin-bottom: var(--typeset-flow);
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid var(--primary);
+  color: var(--on-surface-variant);
+  font-style: italic;
+}
+
+.typeset blockquote > p:last-child {
+  margin-bottom: 0;
+}
+
+/* Links */
+.typeset a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color var(--duration-quick) var(--ease-standard);
+}
+
+.typeset a:hover {
+  color: color-mix(in srgb, var(--primary) 85%, black);
+}
+
+/* Tables */
+.typeset table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0;
+  margin-bottom: var(--typeset-flow);
+  font-size: 0.875em;
+}
+
+.typeset th,
+.typeset td {
+  padding: 0.5em 0.75em;
+  border-bottom: 1px solid var(--outline-variant);
+  text-align: start;
+}
+
+.typeset th {
+  font-weight: 600;
+  color: var(--on-surface);
+  background-color: color-mix(in srgb, var(--surface-container) 50%, transparent);
+}
+
+/* Horizontal Dividers */
+.typeset hr {
+  border: 0;
+  border-top: 1px solid var(--outline-variant);
+  margin-top: calc(var(--typeset-flow) * 1.5);
+  margin-bottom: calc(var(--typeset-flow) * 1.5);
 }
 
 /* Typeset opt-out isolation for embedded cards & interactive primitives */
@@ -847,8 +1098,8 @@ p, li {
   line-height: 1.5;
 }
 
-.typeset .not-typeset p,
-.typeset [data-not-typeset] p {
+.typeset .not-typeset p:last-child,
+.typeset [data-not-typeset] p:last-child {
   margin-bottom: 0;
 }
 
