@@ -17,51 +17,39 @@ export interface FormProps<FormValues extends Record<string, any> = Record<strin
   extends BaseForm.Props<FormValues> {
   children?: React.ReactNode;
   className?: string;
-  /** WebMCP: Unique tool identifier for client-side AI agent discovery */
-  toolname?: string;
-  /** WebMCP: Natural language description synthesized into the AI tool schema */
-  tooldescription?: string;
-  /** WebMCP: Allows the agent to automatically submit read-only or low-risk queries without modal confirmation */
-  toolautosubmit?: boolean;
 }
 
-const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(({
-  onSubmit,
-  onFormSubmit,
-  validationMode = 'onSubmit',
-  errors,
-  actionsRef,
-  children,
-  className,
-  toolname,
-  tooldescription,
-  toolautosubmit,
-  ...props
-}, ref) => {
-  const webMcpProps: Record<string, string> = {};
-  if (toolname) webMcpProps.toolname = toolname;
-  if (tooldescription) webMcpProps.tooldescription = tooldescription;
-  if (toolautosubmit) webMcpProps.toolautosubmit = '';
-
-  return (
-    <BaseForm
-      ref={ref}
-      validationMode={validationMode}
-      errors={errors}
-      actionsRef={actionsRef}
-      onFormSubmit={onFormSubmit}
-      onSubmit={onSubmit}
-      {...webMcpProps}
-      className={cn(
-        'space-y-4 w-full transition-colors duration-150',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </BaseForm>
-  );
-}) as <FormValues extends Record<string, any> = Record<string, any>>(
+const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
+  (
+    {
+      onSubmit,
+      onFormSubmit,
+      validationMode = 'onSubmit',
+      errors,
+      actionsRef,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <BaseForm
+        ref={ref}
+        data-slot="form"
+        validationMode={validationMode}
+        errors={errors}
+        actionsRef={actionsRef}
+        onFormSubmit={onFormSubmit}
+        onSubmit={onSubmit}
+        className={cn('space-y-4 w-full transition-colors duration-quick', className)}
+        {...props}
+      >
+        {children}
+      </BaseForm>
+    );
+  }
+) as <FormValues extends Record<string, any> = Record<string, any>>(
   props: FormProps<FormValues> & { ref?: React.Ref<HTMLFormElement> }
 ) => React.JSX.Element;
 

@@ -1094,7 +1094,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "icon",
+        "fieldset"
       ],
       "files": [
         {
@@ -1107,6 +1109,7 @@
         "taxonomy": [
           "Use Field to group a form control with its label, description, and error message.",
           "Supports automatic validation (onSubmit, onBlur, onChange), validation debouncing, and accessibility attribute wiring (id, aria-labelledby, aria-describedby, aria-invalid).",
+          "Supports vertical (default) and horizontal layouts (for Switch, Checkbox, Radio).",
           "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
         ]
       }
@@ -1133,7 +1136,8 @@
       ],
       "meta": {
         "taxonomy": [
-          "Use Fieldset to group related form controls with a shared legend.",
+          "Use Fieldset to group related form controls with a shared legend and description.",
+          "Cascades disabled state natively to all nested interactive form controls.",
           "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
         ]
       }

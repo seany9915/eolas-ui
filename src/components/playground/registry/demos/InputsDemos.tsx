@@ -4,8 +4,17 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { InputGroup, InputGroupInput, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText } from '@/components/ui/input-group';
 import { Input } from '@/components/ui/input';
 import { Textarea, TextareaField } from '@/components/ui/textarea';
-import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@/components/ui/field';
-import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
+import {
+  Field,
+  FieldLabel,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldContent,
+  FieldSeparator,
+} from '@/components/ui/field';
+import { Fieldset, FieldsetLegend, FieldsetDescription } from '@/components/ui/fieldset';
 import { Form } from '@/components/ui/form';
 import { Select } from '@/components/ui/select';
 import { Combobox } from '@/components/ui/combobox';
@@ -136,12 +145,24 @@ export const TextareaDemo: React.FC<ComponentDemoProps> = () => {
 
 export const FieldDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-4 w-full max-w-xl mx-auto">
-      <Field name="ward-code">
-        <FieldLabel>Practice Group</FieldLabel>
+    <div className="space-y-6 w-full max-w-xl mx-auto">
+      <FieldGroup>
+        <Field name="ward-code">
+          <FieldLabel>Practice Group</FieldLabel>
           <Input placeholder="e.g. MORNING-GRP-A" />
-        <FieldDescription>Group code assigned for scheduled practice sessions</FieldDescription>
-      </Field>
+          <FieldDescription>Group code assigned for scheduled practice sessions</FieldDescription>
+        </Field>
+
+        <FieldSeparator />
+
+        <Field orientation="horizontal">
+          <FieldContent>
+            <FieldLabel>Emergency Alerts</FieldLabel>
+            <FieldDescription>Receive instant push notifications for urgent triage updates</FieldDescription>
+          </FieldContent>
+          <Switch defaultChecked aria-label="Toggle emergency alerts" />
+        </Field>
+      </FieldGroup>
     </div>
   );
 };
@@ -149,11 +170,10 @@ export const FieldDemo: React.FC<ComponentDemoProps> = () => {
 export const FieldsetDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto">
-      <Fieldset className="space-y-3">
-        <FieldsetLegend className="font-heading text-sm font-bold text-on-surface">
-          Emergency Contact Details
-        </FieldsetLegend>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <Fieldset variant="card">
+        <FieldsetLegend>Emergency Contact Details</FieldsetLegend>
+        <FieldsetDescription>Designated individuals authorized to receive clinical updates</FieldsetDescription>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
           <Input placeholder="Full Name" />
           <Input placeholder="Relationship" />
           <Input placeholder="Phone Number" type="tel" className="sm:col-span-2" />
