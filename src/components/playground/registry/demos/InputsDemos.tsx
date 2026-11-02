@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { InputGroup, InputGroupInput, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText } from '@/components/ui/input-group';
-import { Input, FormField } from '@/components/ui/input';
+import { Input } from '@/components/ui/input';
 import { Textarea, TextareaField } from '@/components/ui/textarea';
 import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@/components/ui/field';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
@@ -85,29 +85,38 @@ export const InputDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState('P-2024-819');
   return (
     <div className="space-y-6 w-full max-w-xl mx-auto">
-      <FormField
-        label="Patient ID"
-        description="Assigned patient identification number"
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        leadingIcon={<Icon name="badge" size="xs" />}
-        clearable
-        onClear={() => setVal('')}
-      />
-      <FormField
-        label="Password"
-        type="password"
-        description="Must be at least 8 characters long"
-        placeholder="Enter your account password"
-        leadingIcon={<Icon name="lock" size="xs" />}
-      />
-      <FormField
-        label="Session Duration"
-        value="180 minutes"
-        readOnly
-        error="Duration exceeds recommended 45-minute limit"
-        leadingIcon={<Icon name="timer" size="xs" />}
-      />
+      <Field>
+        <FieldLabel>Patient ID</FieldLabel>
+        <Input
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          leadingIcon={<Icon name="badge" size="xs" />}
+          clearable
+          onClear={() => setVal('')}
+        />
+        <FieldDescription>Assigned patient identification number</FieldDescription>
+      </Field>
+
+      <Field>
+        <FieldLabel>Password</FieldLabel>
+        <Input
+          type="password"
+          placeholder="Enter your account password"
+          leadingIcon={<Icon name="lock" size="xs" />}
+        />
+        <FieldDescription>Must be at least 8 characters long</FieldDescription>
+      </Field>
+
+      <Field invalid>
+        <FieldLabel>Session Duration</FieldLabel>
+        <Input
+          value="180 minutes"
+          readOnly
+          error="Duration exceeds recommended 45-minute limit"
+          leadingIcon={<Icon name="timer" size="xs" />}
+        />
+        <FieldError>Duration exceeds recommended 45-minute limit</FieldError>
+      </Field>
     </div>
   );
 };

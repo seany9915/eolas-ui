@@ -87,9 +87,9 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
         ? 'bg-transparent border-0 rounded-none p-0 focus-within:outline-none'
         : cn(
             'border rounded-2xl p-2.5 bg-surface text-on-surface',
-            'border-outline focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
-            'has-[:invalid]:border-error has-[:invalid]:focus-within:border-error has-[:invalid]:focus-within:outline-error',
-            'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:focus-within:border-error has-[[aria-invalid=true]]:focus-within:outline-error',
+            'border-outline has-[input:focus-visible,textarea:focus-visible]:border-primary has-[input:focus-visible,textarea:focus-visible]:outline-2 has-[input:focus-visible,textarea:focus-visible]:-outline-offset-1 has-[input:focus-visible,textarea:focus-visible]:outline-primary',
+            'has-[:invalid]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
+            'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
             isFloating
               ? 'shadow-ambient bg-surface/95 backdrop-blur-xs [&:not(:focus-within)]:hover:border-outline'
               : '[&:not(:focus-within)]:hover:border-outline/80'

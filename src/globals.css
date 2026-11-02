@@ -265,8 +265,8 @@ button,
   }
 }
 
-/* Accessible high-visibility focus ring compatible with forced-colors mode */
-*:focus-visible {
+/* Accessible high-visibility focus ring compatible with forced-colors mode (zero specificity via :where) */
+:where(*:focus-visible) {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
@@ -276,27 +276,45 @@ button,
   outline: none;
 }
 
-/* 1. Standard Form Controls (flush 2px focus ring) */
-input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):not([data-slot="number-field-group"] *):not([data-slot="command-input-wrapper"] *):not([cmdk-input-wrapper] *):focus-visible,
-select:focus-visible,
-textarea:not([data-slot="prompt-input"] *):focus-visible,
+/* 1. Standard Form Controls (flush 2px focus ring fallback with zero specificity via :where) */
+:where(input:focus-visible, select:focus-visible, textarea:focus-visible),
 [data-slot="select-trigger"]:focus-visible,
-[data-slot="combobox-input-group"]:focus-within,
-[data-slot="autocomplete-input-group"]:focus-within,
-[data-slot="number-field-group"]:has(:focus-visible) {
+[data-slot="combobox-input-group"]:has(input:focus-visible),
+[data-slot="autocomplete-input-group"]:has(input:focus-visible),
+[data-slot="number-field-group"]:has(input:focus-visible),
+[data-slot="input-group"]:has(input:focus-visible, textarea:focus-visible),
+[data-slot="prompt-input"]:has(textarea:focus-visible, input:focus-visible) {
   border-color: var(--primary);
   outline: 2px solid var(--primary);
   outline-offset: -1px;
 }
 
-/* 2. Invalid / Error Form Controls (Overrides via cascade + :is() specificity) */
-input:not([data-slot="combobox-input-group"] *):not([data-slot="autocomplete-input-group"] *):not([data-slot="number-field-group"] *):not([data-slot="command-input-wrapper"] *):not([cmdk-input-wrapper] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
-select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
-textarea:not([data-slot="prompt-input"] *):is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+/* 2. InputGroup & PromptInput inner controls: suppress redundant inner focus ring & border */
+[data-slot="input-group"] :where(input, textarea),
+[data-slot="prompt-input"] :where(input, textarea) {
+  outline: none;
+  box-shadow: none;
+}
+[data-slot="input-group"] :where(input, textarea):focus,
+[data-slot="input-group"] :where(input, textarea):focus-visible,
+[data-slot="prompt-input"] :where(input, textarea):focus,
+[data-slot="prompt-input"] :where(input, textarea):focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 3. Invalid / Error Form Controls (Overrides via cascade) */
+:where(
+  input:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+  select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+  textarea:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible
+),
 [data-slot="select-trigger"]:is([aria-invalid="true"], [data-invalid], .border-error):focus-visible,
-[data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within,
-[data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):focus-within,
-[data-slot="number-field-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(:focus-visible) {
+[data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
+[data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
+[data-slot="number-field-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
+[data-slot="input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible, textarea:focus-visible),
+[data-slot="prompt-input"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(textarea:focus-visible, input:focus-visible) {
   border-color: var(--error);
   outline: 2px solid var(--error);
   outline-offset: -1px;
@@ -315,16 +333,6 @@ button:focus-visible:not([data-slot="select-trigger"]) {
 [role="menuitemradio"]:focus-visible {
   outline: 2px solid transparent;
   outline-offset: -2px;
-}
-/* 5. Compound Inner Inputs: Suppress internal ring when nested inside an input group so the outer group handles focus */
-[data-slot="combobox-input-group"] input[data-slot="combobox-input"]:focus-visible,
-[data-slot="autocomplete-input-group"] input[data-slot="autocomplete-input"]:focus-visible,
-[data-slot="prompt-input"] textarea[data-slot="prompt-input-textarea"]:focus-visible,
-[data-slot="number-field-group"] input:focus-visible,
-[data-slot="command-input-wrapper"] input:focus-visible,
-[cmdk-input-wrapper] input:focus-visible {
-  outline: none !important;
-  border-color: transparent !important;
 }
 
 /* Autofill Credential Highlighting: maintains calibrated surface tokens and typography on browser autofill */

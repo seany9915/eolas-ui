@@ -785,9 +785,7 @@
       "tailwind-merge"
     ],
     "registryDependencies": [
-      "utils",
-      "input",
-      "textarea"
+      "utils"
     ],
     "meta": {
       "taxonomy": [
@@ -933,32 +931,24 @@
     "name": "input",
     "type": "registry:ui",
     "title": "Input",
-    "description": "Input primitive (@base-ui/react/input).",
+    "description": "Input primitive (@base-ui/react/input). shadcn Base Input Documentation: https://ui.shadcn.com/docs/components/base/input ANATOMY: Input (or BaseInput / InputPrimitive)",
     "dependencies": [
       "@base-ui/react",
       "clsx",
       "tailwind-merge"
     ],
     "registryDependencies": [
-      "utils",
-      "field",
-      "textarea"
+      "utils"
     ],
     "meta": {
       "taxonomy": [
-        "A native input element that automatically works with Base UI Field context.",
-        "Supports leading/trailing icons, clear button, and accessible error styling.",
-        "Follows Modern Web Guidance (MWG: html) tri-token contract:",
-        "Match `type` (browser validation), `inputMode` (virtual keyboard layout), and `autoComplete` (autofill heuristic):",
-        "Email: `type=\"email\"` + `inputMode=\"email\"` + `autoComplete=\"email\"`",
-        "Phone: `type=\"tel\"` + `inputMode=\"tel\"` + `autoComplete=\"tel\"`",
-        "Sign-in Password: `type=\"password\"` + `autoComplete=\"current-password\"`",
-        "New Password / Reset: `type=\"password\"` + `autoComplete=\"new-password\"`",
-        "Passkey / WebAuthn: `type=\"text\"` + `autoComplete=\"username webauthn\"`",
-        "Search: `type=\"search\"` + `enterKeyHint=\"search\"`",
-        "Clinical Code / NHS ID / Dosage: `autoCorrect=\"off\"` + `spellCheck={false}`",
-        "OTP / PIN: `type=\"text\"` + `inputMode=\"numeric\"` + `autoComplete=\"one-time-code\"`",
-        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+        "A native input element that automatically works with Base UI Field context (<Field.Root>).",
+        "Implements Modern Web Guidance (MWG: html) tri-token contract for autocomplete, inputMode, enterKeyHint.",
+        "Follows DESIGN.md Tier B interactive controls:",
+        "0.5rem corner radius (rounded-lg) matching Buttons as the primary form control.",
+        "Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary) for WCAG 2.4.13 contrast and Windows High Contrast Mode (forced-colors: active) compatibility.",
+        "WCAG 2.2 SC 2.5.8 compliant hit target sizes: sm (44px), md (48px), lg (56px).",
+        "For complex input layouts with toolbars, prefixes, suffixes, or multiple buttons, compose with <InputGroup> (@/components/ui/input-group)."
       ]
     }
   },

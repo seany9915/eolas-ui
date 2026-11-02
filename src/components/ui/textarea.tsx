@@ -26,10 +26,12 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, error, variant = 'default', autoGrow = false, ...props }, ref) => (
   <textarea
     ref={ref}
+    data-slot="textarea"
     className={cn(
-      'w-full min-h-[80px] p-3 rounded font-sans text-base transition-[border-color,box-shadow]',
+      'w-full font-sans text-base',
       variant === 'default' && [
-        'bg-surface text-on-surface',
+        'min-h-[80px] p-3 rounded-lg',
+        'bg-surface text-on-surface transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
         'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
         'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
@@ -37,7 +39,7 @@ const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>((
         error && 'border-error focus-visible:border-error focus-visible:outline-error',
       ],
       (variant === 'unstyled' || variant === 'ghost') && [
-        'bg-transparent text-on-surface border-0 border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none p-0',
+        'bg-transparent text-on-surface border-0 border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none p-0 resize-none',
         'disabled:bg-transparent disabled:border-none disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
       ],
       autoGrow && '[field-sizing:content] min-h-[3lh] max-h-[12lh] h-auto resize-none',

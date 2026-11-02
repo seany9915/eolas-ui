@@ -95,13 +95,13 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
             'border bg-surface text-on-surface',
             roundedClass,
             // Standard state: border-outline, with real CSS outline for focus (Windows High Contrast compatible)
-            'border-outline focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
+            'border-outline has-[input:focus-visible,textarea:focus-visible]:border-primary has-[input:focus-visible,textarea:focus-visible]:outline-2 has-[input:focus-visible,textarea:focus-visible]:-outline-offset-1 has-[input:focus-visible,textarea:focus-visible]:outline-primary',
             // Invalid state (explicit prop or via inner control validation)
             (invalid || undefined) &&
-              'border-error focus-within:border-error focus-within:outline-error',
-            'has-[:invalid]:border-error has-[:invalid]:focus-within:border-error has-[:invalid]:focus-within:outline-error',
-            'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:focus-within:border-error has-[[aria-invalid=true]]:focus-within:outline-error',
-            'has-[[data-invalid]]:border-error has-[[data-invalid]]:focus-within:border-error has-[[data-invalid]]:focus-within:outline-error',
+              'border-error has-[input:focus-visible,textarea:focus-visible]:border-error has-[input:focus-visible,textarea:focus-visible]:outline-error',
+            'has-[:invalid]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
+            'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
+            'has-[[data-invalid]]:border-error has-[[data-invalid]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[data-invalid]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
             isFloating
               ? 'shadow-ambient bg-surface/95 backdrop-blur-xs [&:not(:focus-within)]:hover:border-outline'
               : '[&:not(:focus-within)]:hover:border-outline/80'
@@ -152,9 +152,11 @@ export const InputGroupInput = React.forwardRef<HTMLInputElement, InputGroupInpu
         data-slot-control="true"
         disabled={disabled}
         className={cn(
-          'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal',
+          'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
           size === 'sm' ? 'text-sm' : 'text-base',
-          'placeholder:text-on-surface-variant/80 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
+          '[data-slot=input-group-addon]+&:pl-1.5',
+          '[&:has(+[data-slot=input-group-addon])]:pr-1.5',
+          'placeholder:text-on-surface-variant/80',
           'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
           className
         )}
@@ -195,7 +197,7 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
     ref
   ) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
         e.preventDefault();
         onSubmit?.();
       }
@@ -223,7 +225,7 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
         onPaste={handlePaste}
         className={cn(
           'w-full flex-1 bg-transparent border-0 px-3 py-2 text-base font-sans text-on-surface leading-relaxed',
-          'placeholder:text-on-surface-variant/80 resize-none min-h-[64px] focus:outline-none focus:ring-0',
+          'placeholder:text-on-surface-variant/80 resize-none min-h-[64px] outline-none focus:outline-none focus:ring-0 focus-visible:outline-none border-none shadow-none',
           'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
           className
         )}

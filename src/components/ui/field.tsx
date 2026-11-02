@@ -13,8 +13,6 @@
 import * as React from 'react';
 import { Field as BaseField } from '@base-ui/react/field';
 import { cn } from '@/lib/utils';
-import { Input, type InputProps } from './input';
-import { Textarea, TextareaField, FormTextarea, type TextareaProps, type TextareaFieldProps } from './textarea';
 
 export interface FieldProps extends React.ComponentPropsWithoutRef<typeof BaseField.Root> {
   label?: React.ReactNode;
@@ -216,15 +214,5 @@ export const FieldValidity = BaseField.Validity;
 export const FieldItem = BaseField.Item;
 export { BaseField };
 
-// Cross-export Input and Textarea for backward compatibility with apps importing from Field
-export {
-  Input,
-  type InputProps,
-  Textarea,
-  TextareaField,
-  FormTextarea,
-  type TextareaProps,
-  type TextareaFieldProps,
-};
 
 export default Field;
