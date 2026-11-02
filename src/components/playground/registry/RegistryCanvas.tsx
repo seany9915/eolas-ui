@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 import { InlineAlert } from '@/components/ui/inline-alert';
@@ -67,7 +68,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
       className={cn('w-full space-y-6', className)}
     >
       {/* Component Header Bar */}
-      <div className="bg-surface rounded-xl border border-outline-variant p-5 sm:p-6 shadow-xs">
+      <Card className="p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div className="space-y-2 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -213,7 +214,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             </Button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Main Content Area via Base UI TabsPanels */}
       <TabsRoot value={activeTab} onValueChange={(val) => setActiveTab(val as string)}>
@@ -229,7 +230,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             </div>
 
             {/* Preview Canvas */}
-            <div className="border border-outline-variant rounded-xl bg-surface p-4 sm:p-8 shadow-xs overflow-hidden min-h-[420px] flex items-center justify-center">
+            <Card className="p-4 sm:p-8 overflow-hidden min-h-[420px] flex items-center justify-center">
               <div className={cn('transition-[max-width] duration-200 ease-in-out w-full', viewportWidthClass)}>
                 <DirectionProvider direction={direction}>
                   {DemoComponent ? (
@@ -254,13 +255,13 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   )}
                 </DirectionProvider>
               </div>
-            </div>
+            </Card>
           </div>
         </TabsPanel>
 
         <TabsPanel value="code">
           <div className="max-w-4xl mx-auto space-y-6 pt-2">
-            <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-4">
+            <Card className="p-6 space-y-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="download" size="sm" className="text-primary" />
                 Installation via CLI
@@ -279,9 +280,9 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   <Icon name={copiedType === 'cli' ? 'check' : 'content_copy'} size="xs" />
                 </Button>
               </div>
-            </div>
+            </Card>
 
-            <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-4">
+            <Card className="p-6 space-y-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="code" size="sm" className="text-primary" />
                 Import & Usage
@@ -295,10 +296,10 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   {entry.sourcePath}
                 </code>
               </div>
-            </div>
+            </Card>
 
             {entry.dependencies && entry.dependencies.length > 0 && (
-              <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-3">
+              <Card className="p-6 space-y-3">
                 <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                   <Icon name="extension" size="sm" className="text-primary" />
                   Package Dependencies
@@ -313,14 +314,14 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                     </span>
                   ))}
                 </div>
-              </div>
+              </Card>
             )}
           </div>
         </TabsPanel>
 
         <TabsPanel value="contract">
           <div className="max-w-4xl mx-auto space-y-6 pt-2">
-            <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-4">
+            <Card className="p-6 space-y-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="gavel" size="sm" className="text-primary" />
                 Core Contract & Taxonomy
@@ -338,9 +339,9 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   Follows DESIGN.md tokens, Base UI polymorphic render/slot architecture, and zero-business-logic primitive isolation.
                 </p>
               )}
-            </div>
+            </Card>
 
-            <div className="bg-surface rounded-xl border border-outline-variant p-6 space-y-3">
+            <Card className="p-6 space-y-3">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="accessibility_new" size="sm" className="text-primary" />
                 Accessibility & Design Law
@@ -359,7 +360,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   </span>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </TabsPanel>
       </TabsRoot>

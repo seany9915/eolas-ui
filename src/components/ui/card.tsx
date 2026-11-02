@@ -3,13 +3,13 @@ import { cn } from '@/lib/utils';
 
 /**
  * Prominence tiers for Card containers:
- * - 'default': Medium Prominence standard white card with ambient elevation.
- * - 'accent': Medium Prominence with 2px Rich Emerald border.
- * - 'inverted': High Prominence dark charcoal container with high-contrast text (canonical).
+ * - 'default': Medium Prominence standard white card with ambient elevation (canonical).
+ * - 'inverted': High Prominence dark charcoal container with high-contrast text.
  * - 'filled': High Prominence saturated brand container for solitary milestone achievements.
+ * - 'accent': @deprecated Use 'default' with an internal <Badge colorRole="secondary"> or <ClinicianTip />.
  * - 'spotlight': @deprecated Use 'inverted' instead.
  */
-export type CardProminence = 'default' | 'accent' | 'inverted' | 'filled' | 'spotlight';
+export type CardProminence = 'default' | 'inverted' | 'filled' | 'accent' | 'spotlight';
 
 /**
  * Affordance tiers for Card containers:
@@ -92,7 +92,7 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
 
   const prominenceStyles: Record<CardProminence, string> = {
     default: 'bg-surface border-none text-on-surface shadow-ambient',
-    accent: 'bg-surface border-[2px] border-secondary text-on-surface shadow-ambient',
+    accent: 'bg-surface border-none text-on-surface shadow-ambient', // @deprecated: falls back to default borderless card
     filled: colorRole === 'secondary'
       ? 'bg-secondary text-on-secondary border-none shadow-ambient'
       : colorRole === 'tertiary'

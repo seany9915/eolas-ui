@@ -143,7 +143,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
         className={cn(
           '@container flex flex-col w-full mx-auto',
           variant === 'card'
-            ? 'rounded-lg bg-surface border border-outline-variant shadow-ambient overflow-hidden'
+            ? 'rounded-lg bg-surface shadow-ambient overflow-hidden'
             : 'bg-transparent overflow-hidden',
           className
         )}

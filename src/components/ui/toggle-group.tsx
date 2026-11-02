@@ -84,7 +84,7 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
           effectiveVariant === 'outline'
             ? cn(
                 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border border-transparent',
-                'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
+                'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:border-outline data-[pressed]:shadow-ambient'
               )
             : cn(
                 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border border-transparent',
@@ -246,7 +246,10 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
           disabled={disabled}
           aria-label={label}
           className={cn(
-            'inline-flex p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none',
+            'inline-flex p-1 rounded gap-1 select-none',
+            variant === 'outline'
+              ? 'bg-transparent border border-outline-variant'
+              : 'bg-surface-container border border-outline-variant',
             orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
             className
           )}

@@ -132,7 +132,7 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
-  --background: #F6F7FB;
+  --background: #EFF2F7;
   --on-background: #1a1c1e;
   --surface: #ffffff;
   --on-surface: #1a1c1e;

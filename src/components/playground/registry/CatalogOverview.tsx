@@ -100,7 +100,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
           </div>
 
           {/* Typographic Stats Lockup - No Card Soup, Accessible Contrast */}
-          <div className="flex items-center gap-6 sm:gap-8 bg-surface px-6 py-4 rounded-xl border border-outline-variant shrink-0">
+          <div className="flex items-center gap-6 sm:gap-8 bg-surface px-6 py-4 rounded-xl shadow-ambient shrink-0">
             <div>
               <span className="font-heading text-2xl sm:text-3xl font-bold text-on-surface block leading-none mb-1 tabular-nums">
                 {totalCount}
@@ -206,7 +206,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
         </div>
 
         {filteredEntries.length === 0 ? (
-          <div className="py-16 px-4 text-center space-y-3 bg-surface rounded-xl border border-outline-variant">
+          <div className="py-16 px-4 text-center space-y-3 bg-surface rounded-xl shadow-ambient">
             <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mx-auto text-on-surface-variant">
               <Icon name="search_off" size="md" />
             </div>
@@ -220,7 +220,8 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             {filteredEntries.map((entry) => (
               <Card
                 key={entry.id}
-                className="group p-5 flex flex-col justify-between hover:border-primary transition-[border-color,box-shadow,transform] duration-200 bg-surface border border-outline-variant shadow-xs hover:shadow-ambient rounded-xl"
+                affordance="actionable"
+                className="group p-5 flex flex-col justify-between"
               >
                 <UnstyledButton
                   onClick={() => onSelect(entry.id)}

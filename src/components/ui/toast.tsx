@@ -29,14 +29,6 @@ const accentBorder: Record<string, string> = {
   loading: 'border-l-primary',
 };
 
-const accentBg: Record<string, string> = {
-  neutral: 'bg-neutral',
-  info: 'bg-neutral',
-  success: 'bg-success',
-  warning: 'bg-warning',
-  error: 'bg-error',
-};
-
 const iconMap: Record<string, { name: string; color: string }> = {
   neutral: { name: 'info', color: 'text-on-surface' },
   info: { name: 'info', color: 'text-on-surface' },
@@ -407,7 +399,7 @@ const ActiveToastItem: React.FC<{
 
         {/* Action button rendered via BaseToast.Action (returns null automatically if no actionProps/children) */}
         <BaseToast.Action
-          className="font-label text-xs font-semibold px-2.5 py-1 rounded-sm text-primary hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0"
+          className="font-label text-xs font-semibold px-2.5 py-1 rounded-sm text-primary hover:bg-surface-variant hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0"
           onClick={
             actionOption && isActionConfig(actionOption)
               ? actionOption.onClick

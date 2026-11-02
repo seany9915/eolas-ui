@@ -11,7 +11,7 @@ export const ColorTokensExplorer: React.FC = () => {
       tokens: [
         {
           name: 'background (Canvas L1)',
-          hex: '#F6F7FB',
+          hex: '#EFF2F7',
           textHex: '#1a1c1e',
           bgClass: 'bg-background text-on-background border border-outline-variant',
           usage: 'Viewport default for page-level layout. Rely on whitespace + typography alone.',

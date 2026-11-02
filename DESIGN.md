@@ -1,7 +1,7 @@
 ---
 name: Eolas High-Contrast Accessible
 colors:
-  background: '#F6F7FB'
+  background: '#EFF2F7'
   on-background: '#1a1c1e'
   surface: '#ffffff'
   on-surface: '#1a1c1e'
@@ -184,7 +184,7 @@ The color system is organized into functional roles governed by visual hierarchy
    Optional supporting palette accents used for visual pacing, category separation, and focal emphasis. They are never mandatory:
    * **Secondary (`#00796B`, Rich Emerald):**
      * *Tokens:* `secondary` (`#00796B`) | `on-secondary` (`#ffffff`) — solid fill. `secondary-container` (`#D5F0EE`) | `on-secondary-container` (`#1a1c1e`, neutral charcoal) — soft fill.
-     * *Role:* A cool, high-contrast supporting accent. Used for secondary action tiers, Category / Accent Card borders (`border-secondary`), and multi-series data differentiation. Distinct from `success` (`#157331`), which is reserved strictly for completed actions and positive outcomes.
+     * *Role:* A cool, high-contrast supporting accent. Used for secondary action tiers, category badges (`<Badge colorRole="secondary">`), clinician cues (`<ClinicianTip />`), and multi-series data differentiation. Distinct from `success` (`#157331`), which is reserved strictly for completed actions and positive outcomes.
      * *Contrast:* Passes WCAG AA contrast (~4.6:1) as text and borders on light backgrounds. Usable across all button and chip emphasis tiers (Filled, Outlined, Text).
    * **Tertiary (`#F9A825`, Sunny Amber):**
      * *Tokens:* `tertiary` (`#F9A825`) | `on-tertiary` (`#1a1c1e`) — solid fill. `tertiary-container` (`#fff0c2`) | `on-tertiary-container` (`#1a1c1e`, neutral charcoal) — soft fill.
@@ -218,12 +218,12 @@ These four roles exist specifically to carry *system, operational, and task stat
 Surfaces establish visual depth and guide attention. Instead of treating every container as a card, choose the surface prominence based on the element's priority and role in the interface:
 
 1.  **Low Prominence (Canvas & Dividers — default layout):**
-    *   *Tokens:* `background` (`#F6F7FB`), `outline-variant` (`#BEC6D6`) dividers.
+    *   *Tokens:* `background` (`#EFF2F7`), `outline-variant` (`#BEC6D6`) dividers.
     *   *Role:* Page canvas, full-width sections, and dense data displays (tables, lists). Relies on whitespace, typography, and subtle hairline dividers rather than container boxes. This should form the vast majority of any view.
 2.  **Medium Prominence (Grouping & Content Containers):**
     *   *Grouped Fill:* `surface-container` (`#EBF0F8`), borderless, flat. A cool desaturated slate wash (42% saturation, Blue channel 248) used to visually cluster related form fields or secondary controls inside white cards without creating an elevated object. Because saturation is capped at 42%, it never competes with active 100% saturated blue selections (`primary-container`, `#dce6ff`).
     *   *Standard Cards:* White `surface` (`#ffffff`) with ambient elevation (`shadow-ambient`). Used to bundle a discrete, self-contained unit (e.g. an exercise, a progress summary, a metric group).
-    *   *Accent Cards:* White `surface` with a `2px` solid border in `secondary` (`#00796B`, Rich Emerald). Used to denote a specific category or track (e.g. a practice guide or reference sheet).
+    *   *Accent Cards (Deprecated):* Deprecated in favor of Standard Cards with internal `<Badge colorRole="secondary">` or `<ClinicianTip />` indicators. All standard cards remain borderless.
 3.  **High Prominence (Spotlight & Hero Containers):**
     *   *Inverted Card (`prominence="inverted"`):* Solid dark charcoal `on-surface` (`#1a1c1e`) fill paired with high-contrast text (`invertedAccent="tertiary"` Sunny Amber or pure white). Used for primary callouts, hero milestones, or focal active drills.
     *   *Filled Card (`prominence="filled"`):* Saturated brand fill (`primary`, `secondary`, or `tertiary`) with high-contrast text. Used for solitary celebratory achievements or focal hero highlights. (For navigation choice sets or mode pickers, use Medium-Prominence Selectable Cards or a `ToggleGroup` instead).
@@ -232,20 +232,20 @@ Surfaces establish visual depth and guide attention. Instead of treating every c
 *   **Borders & Dividers:** Use `outline-variant` (`#BEC6D6`, 28% saturation slate) for subtle `1px` structural dividers and passive component borders (Menus, Popovers), and `outline` (`#737688`) for default interactive form-control boundaries. Standard content cards remain borderless.
 *   **Rule of thumb:** If content can be structured using typography, whitespace, and list dividers (Low Prominence), do that first. Elevate to a Standard Card (Medium Prominence) only when the content forms a distinct, self-contained unit. Reserve Inverted and Filled Cards (High Prominence) for the primary focal point of the screen.
 *   **Card nesting:** Never nest a Card inside another Card. A Card may sit within a `surface-container` section if separated by generous padding, but nesting identical elevation levels causes visual noise.
-*   **Practice & Therapist Tips (`<ClinicianTip />`):** When showing a practice tip, pronunciation cue, or helpful hint inside a Card or form, avoid nesting additional cards or alert banners. Instead, use an **unboxed `<ClinicianTip />`**: an inline icon (`lightbulb` or `info` in `secondary`, `#00796B`) or an inline micro-badge paired directly with `text-base text-on-surface-variant` and an optional bold lead-in (`<span className="font-semibold text-on-surface">Tip:</span>` or `"Clinician tip:"`). It adds zero container weight inside an already-contained card. For multi-field form canvas groupings outside cards, an unbordered flat `surface-container` (`#EBF0F8`, `rounded-md p-3`) wash may be used inside white cards; if placed directly on the `#F6F7FB` page canvas, pair with a `1px` `outline-variant` border.
+*   **Practice & Therapist Tips (`<ClinicianTip />`):** When showing a practice tip, pronunciation cue, or helpful hint inside a Card or form, avoid nesting additional cards or alert banners. Instead, use an **unboxed `<ClinicianTip />`**: an inline icon (`lightbulb` or `info` in `secondary`, `#00796B`) or an inline micro-badge paired directly with `text-base text-on-surface-variant` and an optional bold lead-in (`<span className="font-semibold text-on-surface">Tip:</span>` or `"Clinician tip:"`). It adds zero container weight inside an already-contained card. For multi-field form canvas groupings outside cards, an unbordered flat `surface-container` (`#EBF0F8`, `rounded-md p-3`) wash may be used inside white cards; if placed directly on the `#EFF2F7` page canvas, pair with a `1px` `outline-variant` border.
 *   **Overlays are a separate axis, not a prominence tier:** Dialog, Popover, Menu, and Drawer chrome renders using a surface treatment with dedicated scrims, elevation, and focus-traps governed by Base UI portal setups (`component-library.md`).
 *   **Page-frame chrome (Navigation):** The top navigation bar's `surface` background sits outside this containment ranking, distinguished from canvas only by a single `1px` `outline-variant` bottom border.
 *   **Tooltips:** Tooltips intentionally invert this pattern (a solid high-contrast dark fill, no border — see Tooltips in Components) as a transient hint layer distinct from in-page surfaces.
 *   **`surface-variant` (`#DDE1EB`) — component-internal neutral fill:** Paired with `on-surface-variant` (`#434656`) text (6.2:1 contrast, exceeding WCAG AA). Use this token for neutral fills inside a single component (avatar fallbacks, progress tracks, loading skeletons, and selected menu rows). Its cool desaturated slate tone (31% saturation, 91.2% lightness) ensures it never clashes with `primary-container` (`#dce6ff`, 100% saturation Electric Blue), while preserving clear separation between active brand selections and passive component internals. In contrast, `surface-container` (`#EBF0F8`) is reserved for grouping multiple items together.
 *   **Border pairing rule for `surface-variant`:** If a component requires both a neutral fill and a visible border, use `outline` (`#737688`, 3.55+:1) for interactive controls (`Switch`, `Slider`), and `outline-variant` (`#BEC6D6`) for passive structural perimeters.
-*   **Neutral Surface Contrast:** Adjacent rungs on the neutral ladder (`background` `#F6F7FB` $\rightarrow$ `surface-container` `#EBF0F8` $\rightarrow$ `surface-variant` `#DDE1EB` $\rightarrow$ `neutral-container` `#D1D5DF` $\rightarrow$ `outline-variant` `#BEC6D6`) are ~4% lightness apart. Unbordered fills must skip at least one rung from their container background (e.g., inside white `#FFFFFF` surface cards, unbordered `surface-container` or `surface-variant` pops at 1.12:1 to 1.26:1). Directly on the `#F6F7FB` page background, `surface-container` must be paired with a `1px` `outline-variant` border so it doesn't vanish.
+*   **Neutral Surface Contrast:** Adjacent rungs on the neutral ladder (`background` `#EFF2F7` $\rightarrow$ `surface-container` `#EBF0F8` $\rightarrow$ `surface-variant` `#DDE1EB` $\rightarrow$ `neutral-container` `#D1D5DF` $\rightarrow$ `outline-variant` `#BEC6D6`) are ~4% lightness apart. On the `#EFF2F7` canvas, pure white `surface` cards (`#FFFFFF`) pop naturally with a 1.12:1 lightness contrast and ambient elevation (`shadow-ambient`) without needing borders. Directly on the `#EFF2F7` page background, `surface-container` must be paired with a `1px` `outline-variant` border so it doesn't vanish.
 
 ### 4. Tonal & Callout Backdrops
 
 To make layouts feel colorful, premium, and lively while maintaining perfect contrast:
 *   Avoid placing saturated brand colors under small body text unless pairing with appropriate high-contrast text: white text (`on-primary` / `on-secondary` / `on-error` / `on-warning` / `on-success`) or charcoal text (`on-tertiary`, `#1a1c1e` — never white text on Sunny Amber).
 *   For urgent alerts, warnings, and system feedback, use `<InlineAlert />` (flat white `surface`, `rounded-l-none rounded-r`, borderless on top/right/bottom with a straight vertical 4px left accent bar). Do not use `InlineAlert` for routine tips or static advice — use `<ClinicianTip />` instead.
-*   **Soft Container Washes (`*-container`/`on-*-container`)** provide soft role-specific fills for Chips & Tags (Pattern 3) and full-bleed modal/feature highlights paired with neutral charcoal text (`#1a1c1e`) — they are not used as standalone card backgrounds.
+*   **Soft Container Washes (`*-container`/`on-*-container`)** provide soft role-specific fills for Chips & Tags (Pattern 3), full-bleed modal/feature highlights, and active selection states on interactive containers (e.g. `<Card affordance="selectable" selected />` pairing a flush 2px primary border with a surface wash per the Core Contract). Standard content cards remain pure white `surface` to prevent layout noise, reserving container washes for high-intent active selections and intentional callouts paired with neutral charcoal text (`#1a1c1e`).
 
 ## Voice & Tone
 
@@ -354,10 +354,10 @@ Content is organized into clear vertical stacks. Vertical spacing between logica
 
 To maintain high contrast and visual clarity while avoiding heavy visual clutter, this design system uses **Borderless Cards**, **Ambient Elevation**, and **High-Visibility Focus Indicators**.
 
-- **Borderless Cards:** Standard content cards are **borderless by default** (`border-none`), using flat white `surface` (`#ffffff`) on a light `background` canvas (`#F6F7FB`) paired with crisp ambient elevation (`shadows.ambient` / `shadow-ambient`). This provides clean layer separation without heavy outline ink.
+- **Borderless Cards:** Standard content cards are **borderless by default** (`border-none`), using flat white `surface` (`#ffffff`) on the cool slate `background` canvas (`#EFF2F7`) paired with crisp ambient elevation (`shadows.ambient` / `shadow-ambient`). This provides clean layer separation without heavy outline ink.
 - **Layered Multi-Stop Ambient Shadows:** Shadows in this system use two-stop compositions (`shadows.ambient`, `shadows.ambient-hover`) and three-stop modal compositions (`shadows.modal`) rather than muddy single-layer drop shadows (`0 4px 12px rgba(...)`):
   - A tight, low-opacity contact shadow grounds the container against the canvas, paired with a softer, wider outer shadow.
-  - All shadows are tinted with our neutral ink token (`rgba(26, 28, 30, ...)`) rather than pure black (`#000000`), matching the `#F6F7FB` page background.
+  - All shadows are tinted with our neutral ink token (`rgba(26, 28, 30, ...)`) rather than pure black (`#000000`), matching the `#EFF2F7` page background.
 - **Elevation Budget (3 Tiers):** Avoid sprawling multi-step shadow scales (`shadow-xs` through `shadow-2xl`). All elevation in the application uses three semantic roles:
   - `shadow-ambient`: Standard modular content cards and Tier B anchored overlays.
   - `shadow-ambient-hover`: Interactive card lift on pointer hover.
@@ -450,7 +450,7 @@ Radius and border-width are defined once as scales in the frontmatter (`rounded`
 - **asymmetric rounding (`rounded-l-none rounded-r`):** Toasts & Inline Alerts — keeping the 4px vertical accent bar perfectly straight on the left (0px) while softly harmonizing the right edge (0.5rem / DEFAULT) with surrounding components.
 - **`rounded.full` (9999px, fully rounded):** Chips & Tags, Avatars, and Radio controls — three circular exceptions to the rectangular radii above, two stylistic (Chips, Avatars) and one functional (Radio, where circular-vs-square is the functional shape distinguishing "choose one" from "choose any" — see Selection Controls). Grouping the container-scale pair together is what keeps that silhouette distinct: every *rectangular* container in the system (Buttons, Cards, Dialogs, Menus) stays on `DEFAULT`/`lg`, while Toasts and Inline Alerts use `rounded-l-none rounded-r`.
 - **`borderWidth.default` (1px):** Dialog modal borders, Menu/Select/Dropdown and Popover structural borders, the Colored Outline chip pattern (Chips & Tags), and resting form-control borders (Input Fields, Checkbox/Radio, Toggle, Toggle Group container). Standard content cards are borderless.
-- **`borderWidth.emphasis` (2px):** Drawer docked dividing borders, the Active Selection state and Accent Card variant (Components > Cards), Outlined buttons, and Radio's checked-state ring (Selection Controls).
+- **`borderWidth.emphasis` (2px):** Drawer docked dividing borders, the Active Selection state on selectable containers (Components > Cards), Outlined buttons, and Radio's checked-state ring (Selection Controls).
 - **`borderWidth.accent` (4px):** Inline Alert vertical left accent bar, and the matching vertical left accent bar on state-flavored Toasts (error/warning/success/neutral) — the only two components that use this accent-bar treatment; every other component sticks to `default`/`emphasis` border widths or no border at all.
 - **This list highlights the primary uses of each width, not an exhaustive registry** — as new components are added, default to `borderWidth.default` for any resting structural/form-control border and `borderWidth.emphasis` for any 2px selected/active/outlined treatment, rather than inventing a new width value.
 
@@ -520,8 +520,8 @@ Cards bundle related content into a distinct visual surface. Rather than restric
 
 - **Standard Card (`prominence="default"`, Medium Prominence — primary default):**
   A flat white background (`surface`, `#ffffff`), `1rem` corner radius (`rounded.lg`), padding of at least `1.5rem` (24px), borderless (`border-none`), with crisp ambient elevation (`shadows.ambient` / `shadow-ambient`). Used for modular content units: user summaries, exercise drills, metric summaries, and session notes.
-- **Accent Card (`prominence="accent"`, Medium Prominence):**
-  Neutral white `surface` fill with a `2px` (`borderWidth.emphasis`) solid border in `secondary` (`#00796B`, Rich Emerald). Used to visually classify a specific track or category (e.g. practice guides, reference materials) without competing with High-Prominence hero containers. `primary` is strictly reserved for active selection states, and `tertiary` is excluded because amber fails contrast on white.
+- **Accent Card (`prominence="accent"`, Deprecated):**
+  Deprecated in favor of Standard Cards with internal `<Badge colorRole="secondary">` or `<ClinicianTip />` indicators. All standard cards remain borderless with ambient elevation; 2px colored borders are reserved strictly for active selection (`affordance="selectable"`).
 - **Inverted Card (`prominence="inverted"`, High Prominence — canonical; `prominence="spotlight"` is supported as an alias):**
   Solid dark charcoal `on-surface` (`#1a1c1e`) fill paired with high-contrast text. Two contrast-verified accent configurations:
   1. `invertedAccent="tertiary"` (canonical default; `spotlightAccent="tertiary"` supported as legacy alias): Sunny Amber (`#F9A825`) headline/badge/icon (8.55:1 AAA) paired with pure white (`#ffffff`, `text-surface`) body copy (15.3:1 AAA). Keep body text pure white because long yellow paragraphs are hard to read.
@@ -564,7 +564,7 @@ Practice tips, pronunciation cues, and helpful advice provide simple, in-context
   - **Copy:** `text-base` (`1rem` / 16px, upholding the 1rem body text floor) in `text-on-surface-variant` (`#434656`), with an optional bold prefix in `text-on-surface` (`#1a1c1e`, e.g., `<span className="font-semibold text-on-surface">Tip: </span>` or `"Clinician tip: "`).
   - **Accessibility:** Ensure the icon has `aria-hidden="true"` when paired with a visible prefix like "Tip:".
 - **Canvas / Multi-Field Grouping (Secondary Pattern):**
-  When tips appear directly on the `#F6F7FB` page canvas or between separate form groups (outside of cards), they must sit within a `bg-surface-container` (`#EBF0F8`, `rounded-md px-3.5 py-2.5`) wash paired with a `1px` `outline-variant` border (`border border-outline-variant`, `#BEC6D6`) per the neutral surface contrast rule so the grouping remains distinctly visible against the canvas.
+  When tips appear directly on the `#EFF2F7` page canvas or between separate form groups (outside of cards), they must sit within a `bg-surface-container` (`#EBF0F8`, `rounded-md px-3.5 py-2.5`) wash paired with a `1px` `outline-variant` border (`border border-outline-variant`, `#BEC6D6`) per the neutral surface contrast rule so the grouping remains distinctly visible against the canvas.
 - **Component Primitive:** Use `<ClinicianTip />` (`src/components/ui/clinician-tip.tsx`).
 
 ### Inline Alerts
@@ -652,7 +652,7 @@ Prefer a proper data table (clear column headers, `outline-variant` row dividers
 Reuse the existing semantic tokens before ever introducing a chart-only color — the six roles already defined cover almost every case:
 - **Outcome/accuracy charts** (e.g. correct-vs-incorrect responses, pass-rate trends over time): use `success` (correct) and `error` (incorrect), matching their exercise-feedback meaning above — never a neutral or arbitrary hue for outcome data.
 - **Neutral categorical/multi-series charts** (e.g. sessions by category, non-outcome comparisons): use `primary` → `secondary` → `tertiary`, in that fixed order (`#0052FF` Electric Blue → `#00796B` Rich Emerald → `#F9A825` Sunny Amber), for up to 3 simultaneous series. This keeps the state tokens (`error`/`warning`/`success`) reserved for actual outcomes, so a legend never accidentally implies something went wrong.
-  - *Non-Text Contrast Compliance (WCAG 2.2 SC 1.4.11):* Sunny Amber (`#F9A825`) on white (`#ffffff`) or canvas (`#F6F7FB`) has a contrast ratio of only 1.99:1, which is below the mandatory 3:1 graphical object threshold. When Series 3 (`tertiary`) is rendered on light backgrounds, it must either:
+  - *Non-Text Contrast Compliance (WCAG 2.2 SC 1.4.11):* Sunny Amber (`#F9A825`) on white (`#ffffff`) or canvas (`#EFF2F7`) has a contrast ratio of only 1.99:1, which is below the mandatory 3:1 graphical object threshold. When Series 3 (`tertiary`) is rendered on light backgrounds, it must either:
     1. Include a `1px` high-contrast boundary stroke (`border border-outline` `#737688` or `border-on-surface` `#1a1c1e`) for filled bars, pie slices, and area shapes,
     2. Use a darkened amber token (`#A64B00`, 6.4:1 contrast, or `#9E5D00`, 3.6:1 contrast) for line chart strokes and point markers, or
     3. Be paired with a distinct graphic texture/pattern (e.g. diagonal hatching).
@@ -719,7 +719,7 @@ This section defines the usage rules for the Eolas brand marks to maintain legib
 ### 2. Tonal Color Selection (Surface & Background Contrast)
 
 *   **Primary Colored Assets**
-    *   *Usage*: On Light backgrounds (`#FFFFFF` and canvas `background` `#F6F7FB`). Never render the primary color logo on dark primary or charcoal panels, as the contrast ratio fails WCAG AA standards.
+    *   *Usage*: On Light backgrounds (`#FFFFFF` and canvas `background` `#EFF2F7`). Never render the primary color logo on dark primary or charcoal panels, as the contrast ratio fails WCAG AA standards.
 *   **White / Reverse Assets**
     *   *Usage*: On Dark backgrounds (Electric Blue primary color `#0052FF` or Charcoal dark panels `on-surface` `#1a1c1e`).
 *   **Solid Black Assets**

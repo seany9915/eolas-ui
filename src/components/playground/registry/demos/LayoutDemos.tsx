@@ -46,8 +46,8 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
         </Card.Footer>
       </Card>
 
-      {/* Compact Card with Accent */}
-      <Card size="sm" prominence="accent">
+      {/* Compact Card */}
+      <Card size="sm">
         <Card.Header>
           <Card.Title>Weekly Milestone</Card.Title>
           <Card.Description>Accuracy target met</Card.Description>

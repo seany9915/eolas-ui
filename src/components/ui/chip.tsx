@@ -134,7 +134,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
           : outlineStyles[colorRole];
 
     if (isCurrentlySelected) {
-      patternClass = 'bg-primary-container text-on-primary-container border-2 border-primary font-bold';
+      patternClass = cn(filledStyles[colorRole], 'shadow-ambient font-semibold');
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
