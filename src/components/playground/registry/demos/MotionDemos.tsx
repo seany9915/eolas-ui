@@ -88,7 +88,7 @@ export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto py-6 space-y-4">
+    <div className="w-full max-w-md mx-auto py-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="font-heading text-xs font-bold text-on-surface">Articulation Exercise Steps</span>
         <Button size="sm" variant="tonal" onClick={handleReplay}>
@@ -97,7 +97,7 @@ export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       <div className="p-4 rounded-xl bg-surface-container/30 border border-outline-variant/60 min-h-[140px] flex items-center">
-        <TextsReveal show={show} className="space-y-2 font-heading text-sm font-semibold text-on-surface">
+        <TextsReveal show={show} className="flex flex-col gap-2 font-heading text-sm font-semibold text-on-surface">
           <TextsRevealLine index={0}>1. Breath Support & Warm-up</TextsRevealLine>
           <TextsRevealLine index={1}>2. Vowel Sound Prolongation</TextsRevealLine>
           <TextsRevealLine index={2}>3. Consonant Blend Drills</TextsRevealLine>
@@ -150,8 +150,8 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto py-6 space-y-4">
-      <div className="space-y-1">
+    <div className="w-full max-w-md mx-auto py-6 flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
         <h4 className="font-heading text-xs font-bold text-on-surface">Practice Session Duration</h4>
         <p className="font-sans text-xs text-on-surface-variant">
           Form micro-shake alert with coordinated error reveals.
@@ -163,7 +163,7 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
         errorMessage={error}
         autoRevert={false}
       >
-        <div className="space-y-1.5">
+        <div className="flex flex-col gap-1.5">
           <label htmlFor="duration-input" className="font-label text-xs font-medium text-on-surface block">
             Daily Practice Minutes
           </label>
@@ -205,8 +205,8 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
   const [activeCategory, setActiveCategory] = React.useState<'drills' | 'notes'>('drills');
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
-      <div className="space-y-1">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4 text-left">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <h3 className="font-heading text-sm font-semibold text-on-surface">
             Same-Document View Transitions
@@ -225,7 +225,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Interactive Trigger Card with Shared Element Morph */}
-      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-4">
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <span className="font-label text-xs font-semibold text-on-surface-variant">
             Shared-Element Card Morph
@@ -239,7 +239,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
                 : 'bg-primary text-on-primary border-transparent hover:bg-primary/90'
             )}
           >
-            <Icon name={isExpanded ? 'unfold_less' : 'unfold_more'} size="xs" className="mr-1.5" />
+            <Icon name={isExpanded ? 'unfold_less' : 'unfold_more'} size="xs" />
             {isExpanded ? 'Show Summary' : 'Expand Details'}
           </ViewTransitionTrigger>
         </div>
@@ -249,7 +249,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
           name="care-card-morph"
           className="w-full block"
         >
-          <div className="p-4 rounded-xl bg-surface-container border border-outline-variant space-y-3">
+          <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="size-9 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
@@ -270,7 +270,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
             </div>
 
             {isExpanded && (
-              <div className="pt-3 border-t border-outline-variant/60 space-y-3">
+              <div className="pt-3 border-t border-outline-variant/60 flex flex-col gap-3">
                 <div className="grid grid-cols-2 gap-3 text-xs font-sans">
                   <div className="p-2.5 rounded-lg bg-surface border border-outline-variant">
                     <span className="font-label text-on-surface-variant block text-[11px]">
@@ -299,7 +299,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Tab Morph Workflow */}
-      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-3">
         <span className="font-label text-xs font-semibold text-on-surface-variant block">
           State Switching with Transition Trigger
         </span>

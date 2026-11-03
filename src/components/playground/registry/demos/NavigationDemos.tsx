@@ -31,10 +31,10 @@ import { ComponentDemoProps } from '../types';
 
 export const TabsDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto space-y-8">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-8">
       {/* 1. Primary Line Underline Variant */}
-      <div className="space-y-3">
-        <div className="space-y-0.5">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
           <h4 className="font-heading text-sm font-semibold text-on-surface">
             Session Notes Tabs (Line Variant)
           </h4>
@@ -67,8 +67,8 @@ export const TabsDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 2. Segmented Pill Tabs Variant */}
-      <div className="space-y-3">
-        <div className="space-y-0.5">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
           <h4 className="font-heading text-sm font-semibold text-on-surface">
             Activity View Switcher (Segmented Variant)
           </h4>
@@ -256,7 +256,7 @@ export const NavigationMenuDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Destination Content View */}
-      <div className="p-6 bg-surface min-h-[140px] space-y-2">
+      <div className="p-6 bg-surface min-h-[140px] flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-semibold text-primary">
             Active Section
@@ -289,8 +289,8 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
   const [activeItem, setActiveItem] = React.useState('patients');
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4 text-left">
-      <div className="space-y-1">
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-4 text-left">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           Collapsible Navigation Sidebar
         </h3>
@@ -316,7 +316,7 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
               </div>
             </SidebarHeader>
 
-            <SidebarContent className="p-2 space-y-3">
+            <SidebarContent className="p-2 flex flex-col gap-3">
               <SidebarGroup>
                 <SidebarGroupLabel className="text-xs text-on-surface-variant font-medium px-2 py-1">
                   Practice
@@ -425,7 +425,7 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-surface-container/60 border border-outline-variant space-y-2">
+            <div className="p-4 rounded-xl bg-surface-container/60 border border-outline-variant flex flex-col gap-2">
               <p className="font-heading text-xs font-bold text-on-surface">
                 Interactive Sidebar Controls
               </p>
@@ -450,7 +450,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       title: 'Initial Assessment',
       description: 'Record baseline articulation accuracy and target sounds',
       content: (
-        <div className="space-y-4 font-sans text-sm">
+        <div className="flex flex-col gap-4 font-sans text-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60">
             <div>
               <span className="font-mono text-xs text-on-surface-variant block">Sound Accuracy</span>
@@ -480,8 +480,8 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       title: 'Therapist Review',
       description: 'Review sound clarity scores and practice recommendations',
       content: (
-        <div className="space-y-4 font-sans text-sm">
-          <div className="p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60 space-y-2">
+        <div className="flex flex-col gap-4 font-sans text-sm">
+          <div className="p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="font-label font-semibold text-on-surface">Articulation Score</span>
               <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-primary-container text-on-primary-container">
@@ -504,10 +504,10 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       title: 'Weekly Practice Plan',
       description: 'Confirm practice exercises and session schedule',
       content: (
-        <div className="space-y-4 font-sans text-sm">
-          <div className="p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60 space-y-2">
+        <div className="flex flex-col gap-4 font-sans text-sm">
+          <div className="p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60 flex flex-col gap-2">
             <span className="font-label font-semibold text-on-surface block">Practice Plan Details</span>
-            <ul className="space-y-1.5 text-body-md text-on-surface-variant list-disc pl-5">
+            <ul className="flex flex-col gap-1.5 text-body-md text-on-surface-variant list-disc pl-5">
               <li>Two review sessions each week (Clinic Room 2B)</li>
               <li>Daily 15-minute home practice using interactive word cards</li>
               <li>Progress review at the end of week two</li>
@@ -540,14 +540,14 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
 
 export const SteppersLegacyDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-4 max-w-md mx-auto">
+    <div className="flex flex-col gap-4 max-w-md mx-auto">
       <InlineAlert
         role="warning"
         title="Legacy Re-Export Alias"
       >
         steppers.tsx is an alias for number-field.tsx. New code should import NumberField directly from @/components/ui/number-field.
       </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant space-y-2 text-xs font-mono">
+      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-mono">
         <p className="text-on-surface">Modern replacement import:</p>
         <p className="text-primary font-bold">import &#123; NumberField &#125; from '@/components/ui/number-field';</p>
       </div>
@@ -559,7 +559,7 @@ export const ScrollAreaDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4">
       <ScrollArea className="h-44 rounded-xl border border-outline-variant bg-surface p-4">
-        <div className="space-y-2 text-xs font-sans text-on-surface-variant">
+        <div className="flex flex-col gap-2 text-xs font-sans text-on-surface-variant">
           <h4 className="font-heading text-xs font-bold text-on-surface mb-2">Recent Practice Sessions</h4>
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="p-2 rounded bg-surface-container border border-outline-variant/50 font-mono text-[11px]">
@@ -582,7 +582,7 @@ export const ScrollspyDemo: React.FC<ComponentDemoProps> = () => {
   ];
 
   return (
-    <div className="w-full max-w-md mx-auto py-4 space-y-3">
+    <div className="w-full max-w-md mx-auto py-4 flex flex-col gap-3">
       <div className="flex items-center justify-between text-xs text-on-surface-variant">
         <span className="font-heading font-bold text-on-surface">Practice Guide Table of Contents</span>
         <span className="font-mono text-[11px]">Active: {active}</span>

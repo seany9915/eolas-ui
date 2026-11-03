@@ -160,7 +160,7 @@ export const ClinicianTipDemo: React.FC<ComponentDemoProps> = () => {
 
 export const ChatMessageDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto py-4 space-y-4">
+    <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-4">
       <ChatMessage
         role="user"
         content="What exercises work best for practicing the vocalic /r/ sound at home?"

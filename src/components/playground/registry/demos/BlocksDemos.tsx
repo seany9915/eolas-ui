@@ -89,7 +89,7 @@ export const DeleteConfirmationDialogDemo: React.FC<ComponentDemoProps> = () => 
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Button colorRole="error" onClick={() => setOpen(true)}>
-        <Icon name="delete" size="xs" className="mr-2" />
+        <Icon name="delete" size="xs" />
         Open Delete Confirmation
       </Button>
       <DeleteConfirmationDialog
@@ -133,11 +133,11 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
   if (completedData) {
     return (
       <div className="w-full max-w-2xl mx-auto py-8">
-        <div className="bg-surface rounded-lg p-6 @md:p-8 border border-outline-variant shadow-ambient text-center space-y-4">
+        <div className="bg-surface rounded-lg p-6 @md:p-8 border border-outline-variant shadow-ambient text-center flex flex-col gap-4">
           <div className="inline-flex items-center justify-center size-12 rounded-full bg-primary-container text-on-primary-container">
             <Icon name="check" size="md" aria-hidden="true" />
           </div>
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <h3 className="font-heading font-semibold text-xl text-on-surface">Questionnaire submitted</h3>
             <p className="font-sans text-sm text-on-surface-variant">
               Your responses have been recorded successfully.
@@ -271,7 +271,7 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
 export const ChatBlockDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-2xl mx-auto py-4">
-      <div className="p-4 rounded-xl border border-outline-variant bg-surface space-y-4">
+      <div className="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col gap-4">
         <div className="flex items-center justify-between border-b border-outline-variant pb-3">
           <div className="flex items-center gap-2">
             <Icon name="chat" size="sm" className="text-primary" />

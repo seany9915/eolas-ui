@@ -33,14 +33,14 @@ export const DialogDemo: React.FC<ComponentDemoProps> = () => {
         description="Configure session time, assigned therapist, and practice goals."
         trigger={
           <Button colorRole="primary">
-            <Icon name="event" size="xs" className="mr-2" />
+            <Icon name="event" size="xs" />
             Open Consultation Dialog
           </Button>
         }
         confirmLabel="Confirm Session"
         cancelLabel="Discard"
       >
-        <div className="space-y-3 py-2 text-xs font-sans text-on-surface-variant">
+        <div className="flex flex-col gap-3 py-2 text-xs font-sans text-on-surface-variant">
           <p>
             Learner P-2024-819 has been scheduled for sound practice evaluation under Sarah Jenkins, Speech-Language Pathologist.
           </p>
@@ -61,7 +61,7 @@ export const AlertDialogDemo: React.FC<ComponentDemoProps> = () => {
         description="Are you sure you want to reset the security access key for this account? This will require signing in again on all devices."
         trigger={
           <Button colorRole="error">
-            <Icon name="warning" size="xs" className="mr-2" />
+            <Icon name="warning" size="xs" />
             Reset Key (Alert Dialog)
           </Button>
         }
@@ -81,12 +81,12 @@ export const DrawerDemo: React.FC<ComponentDemoProps> = () => {
         swipeDirection="right"
         trigger={
           <Button variant="outlined" colorRole="secondary">
-            <Icon name="menu_open" size="xs" className="mr-2" />
+            <Icon name="menu_open" size="xs" />
             Open Profile Drawer
           </Button>
         }
       >
-        <div className="space-y-4 py-4 text-xs font-sans text-on-surface-variant">
+        <div className="flex flex-col gap-4 py-4 text-xs font-sans text-on-surface-variant">
           <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
             <span className="font-bold text-on-surface block mb-1">Practice Status: Active</span>
             <span>Accuracy: 92% | Streak: 5 days | Weekly Goal: Met</span>
@@ -108,10 +108,10 @@ export const PopoverDemo: React.FC<ComponentDemoProps> = () => {
         <Popover.Trigger render={<Button variant="outlined">Practice Scoring Rules</Button>} />
         <Popover.Portal>
           <Popover.Positioner side="bottom" sideOffset={8}>
-            <Popover.Popup className="p-4 max-w-sm rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-2">
-              <span className="font-heading text-xs font-bold text-on-surface block">
+            <Popover.Popup className="p-4 max-w-sm rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2">
+              <h4 className="font-heading text-xs font-bold text-on-surface block">
                 Scoring Rubric
-              </span>
+              </h4>
               <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
                 Pronunciation scoring evaluates initial consonant clarity and sustained vowel duration. Accuracy scores reflect therapist-verified target sounds.
               </p>
@@ -127,20 +127,24 @@ export const MenuDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Menu.Root>
-        <Menu.Trigger render={<Button variant="tonal">Actions Menu <Icon name="expand_more" size="xs" className="ml-1" /></Button>} />
+        <Menu.Trigger render={<Button variant="tonal">Actions Menu <Icon name="expand_more" size="xs" /></Button>} />
         <Menu.Portal>
           <Menu.Positioner sideOffset={4}>
             <Menu.Popup className="p-1 min-w-48 rounded-xl bg-surface border border-outline-variant shadow-ambient">
-              <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
-                Export Progress Report
-              </Menu.Item>
-              <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
-                Assign Practice Group
-              </Menu.Item>
+              <Menu.Group>
+                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
+                  Export Progress Report
+                </Menu.Item>
+                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
+                  Assign Practice Group
+                </Menu.Item>
+              </Menu.Group>
               <Menu.Separator className="h-px bg-outline-variant my-1" />
-              <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-error hover:bg-error-container rounded-lg cursor-pointer">
-                Archive Learner Profile
-              </Menu.Item>
+              <Menu.Group>
+                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-error hover:bg-error-container rounded-lg cursor-pointer">
+                  Archive Learner Profile
+                </Menu.Item>
+              </Menu.Group>
             </Menu.Popup>
           </Menu.Positioner>
         </Menu.Portal>
@@ -246,7 +250,7 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
       </Menubar>
 
       {/* Mock Workspace Content Area */}
-      <div className="p-6 bg-surface space-y-3 min-h-[140px]">
+      <div className="p-6 bg-surface flex flex-col gap-3 min-h-[140px]">
         <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
           <div>
             <h5 className="font-heading text-sm font-semibold text-on-surface">Practice Session: Learner #4892</h5>
@@ -287,12 +291,14 @@ export const ContextMenuDemo: React.FC<ComponentDemoProps> = () => {
         <ContextMenu.Portal>
           <ContextMenu.Positioner>
             <ContextMenu.Popup className="p-1 min-w-40 rounded-xl bg-surface border border-outline-variant shadow-ambient text-xs">
-              <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
-                View Session History
-              </ContextMenu.Item>
-              <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
-                Assign Therapist
-              </ContextMenu.Item>
+              <ContextMenu.Group>
+                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
+                  View Session History
+                </ContextMenu.Item>
+                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
+                  Assign Therapist
+                </ContextMenu.Item>
+              </ContextMenu.Group>
             </ContextMenu.Popup>
           </ContextMenu.Positioner>
         </ContextMenu.Portal>
@@ -342,9 +348,9 @@ export const PreviewCardDemo: React.FC<ComponentDemoProps> = () => {
         </PreviewCard.Trigger>
         <PreviewCard.Portal>
           <PreviewCard.Positioner side="bottom" sideOffset={8}>
-            <PreviewCard.Popup className="p-4 max-w-xs rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-2">
+            <PreviewCard.Popup className="p-4 max-w-xs rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold">
+                <div className="size-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold">
                   AR
                 </div>
                 <div>
@@ -418,10 +424,10 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4">
       {/* Trigger bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
-        <div className="space-y-0.5 text-left">
+        <div className="flex flex-col gap-0.5 text-left">
           <p className="font-heading text-sm font-semibold text-on-surface">
             Quick Actions & Patient Search
           </p>
@@ -451,7 +457,7 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
       )}
 
       {/* Embedded inline command preview */}
-      <div className="space-y-2 text-left">
+      <div className="flex flex-col gap-2 text-left">
         <span className="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
           Embedded Command Menu
         </span>

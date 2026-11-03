@@ -93,7 +93,7 @@ export const TableDemo: React.FC<ComponentDemoProps> = () => {
   ];
 
   return (
-    <div className="w-full py-4 space-y-2">
+    <div className="w-full py-4 flex flex-col gap-2">
       <div className="flex items-center justify-between text-xs text-on-surface-variant px-1">
         <span className="font-heading font-bold text-on-surface">Practice Group Table</span>
         <span className="font-mono text-[11px]">Supports responsive stack &amp; tabular-nums</span>
@@ -126,56 +126,60 @@ export const ChartDemo: React.FC<ComponentDemoProps> = () => {
   } satisfies ChartConfig;
 
   return (
-    <div className="w-full max-w-xl mx-auto p-6 rounded-xl bg-surface border border-outline-variant space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h4 className="font-heading text-sm font-bold text-on-surface">Weekly Articulation Activity</h4>
-          <p className="font-sans text-xs text-on-surface-variant">Daily recorded practice time versus baseline</p>
+    <Card className="w-full max-w-xl mx-auto">
+      <Card.Header className="flex flex-row items-center justify-between pb-2">
+        <div className="flex flex-col gap-0.5">
+          <Card.Title>Weekly Articulation Activity</Card.Title>
+          <Card.Description>Daily recorded practice time versus baseline</Card.Description>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-block size-2.5 rounded-full bg-primary" />
-          <span className="font-sans text-xs text-on-surface-variant">Actual</span>
-          <span className="inline-block size-2.5 rounded-full bg-secondary ml-2" />
-          <span className="font-sans text-xs text-on-surface-variant">Target</span>
-        </div>
-      </div>
+        <Card.Action>
+          <div className="flex items-center gap-2">
+            <span className="inline-block size-2.5 rounded-full bg-primary" />
+            <span className="font-sans text-xs text-on-surface-variant">Actual</span>
+            <span className="inline-block size-2.5 rounded-full bg-secondary ml-2" />
+            <span className="font-sans text-xs text-on-surface-variant">Target</span>
+          </div>
+        </Card.Action>
+      </Card.Header>
 
-      <ChartContainer
-        role="img"
-        aria-label="Weekly articulation activity bar chart comparing actual practice minutes against a 20-minute daily target"
-        config={chartConfig}
-        className="h-56 w-full aspect-auto"
-      >
-        <BarChart data={chartData} margin={{ top: 12, right: 12, left: -16, bottom: 0 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-outline-variant/40" />
-          <XAxis
-            dataKey="day"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            className="font-sans text-xs text-on-surface-variant"
-          />
-          <YAxis
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(value) => `${value}m`}
-            className="font-mono text-xs text-on-surface-variant"
-          />
-          <ChartTooltip
-            cursor={{ fill: 'var(--color-surface-container)' }}
-            content={<ChartTooltipContent indicator="dot" />}
-          />
-          <Bar dataKey="minutes" fill="var(--color-minutes)" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="target" fill="var(--color-target)" radius={[6, 6, 0, 0]} opacity={0.6} />
-        </BarChart>
-      </ChartContainer>
-    </div>
+      <Card.Content>
+        <ChartContainer
+          role="img"
+          aria-label="Weekly articulation activity bar chart comparing actual practice minutes against a 20-minute daily target"
+          config={chartConfig}
+          className="h-56 w-full aspect-auto"
+        >
+          <BarChart data={chartData} margin={{ top: 12, right: 12, left: -16, bottom: 0 }}>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-outline-variant/40" />
+            <XAxis
+              dataKey="day"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              className="font-sans text-xs text-on-surface-variant"
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `${value}m`}
+              className="font-mono text-xs text-on-surface-variant"
+            />
+            <ChartTooltip
+              cursor={{ fill: 'var(--color-surface-container)' }}
+              content={<ChartTooltipContent indicator="dot" />}
+            />
+            <Bar dataKey="minutes" fill="var(--color-minutes)" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="target" fill="var(--color-target)" radius={[6, 6, 0, 0]} opacity={0.6} />
+          </BarChart>
+        </ChartContainer>
+      </Card.Content>
+    </Card>
   );
 };
 
 export const SeparatorDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-md mx-auto py-6 space-y-4 text-center text-xs font-sans text-on-surface-variant">
+    <div className="w-full max-w-md mx-auto py-6 flex flex-col gap-4 text-center text-xs font-sans text-on-surface-variant">
       <div>Section 1: Sound Drills</div>
       <Separator />
       <div>Section 2: Syllable Repetition</div>
@@ -187,7 +191,7 @@ export const SeparatorDemo: React.FC<ComponentDemoProps> = () => {
 
 export const ResizableDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full py-4 space-y-2">
+    <div className="w-full py-4 flex flex-col gap-2">
       <div className="text-xs text-on-surface-variant px-1 font-mono">
         Draggable split pane layout. Drag center handle to resize panes:
       </div>
@@ -212,7 +216,7 @@ export const CollapsibleDemo: React.FC<ComponentDemoProps> = () => {
   const [open, setOpen] = React.useState(false);
   return (
     <div className="w-full max-w-md mx-auto py-4">
-      <Collapsible.Root open={open} onOpenChange={setOpen} className="rounded-xl border border-outline-variant bg-surface p-4 space-y-3">
+      <Collapsible.Root open={open} onOpenChange={setOpen} className="rounded-xl border border-outline-variant bg-surface p-4 flex flex-col gap-3">
         <Collapsible.Trigger>
           <span>Articulation Exercise Instructions</span>
         </Collapsible.Trigger>
@@ -287,9 +291,9 @@ export const IconDemo: React.FC<ComponentDemoProps> = () => {
 
 export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto py-4 space-y-6">
+    <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-6">
       {/* 1. Composable Compound Attachment with Trigger and Actions */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
           Compound File Attachment
         </span>
@@ -314,7 +318,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 2. Scrollable Attachment Group with States and Image Previews */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
           Attachment Group (Scrollable Row)
         </span>
@@ -378,7 +382,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 3. Compact Horizontal & Vertical Stacked Attachments */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
           Compact & Stacked Layouts
         </span>
@@ -461,7 +465,7 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto py-4 space-y-3">
+    <div className="w-full max-w-md mx-auto py-4 flex flex-col gap-3">
       <div className="flex items-center justify-between text-xs text-on-surface-variant">
         <span className="font-heading font-bold text-on-surface">Learner Card Actions</span>
         <span className="font-mono text-[11px]">Swipe or tap actions</span>
@@ -483,7 +487,7 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
         }
       >
         <div className="p-4 bg-surface text-on-surface flex items-center justify-between gap-3">
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <span className="font-heading text-sm font-bold text-on-surface">Eleanor Vance</span>
               <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-warning-container text-on-warning-container font-bold">
@@ -522,8 +526,8 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
   const sampleKeywords = ['sound', 'articulation', 'practice', 'accuracy'];
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
-      <div className="space-y-1">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4 text-left">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           GPU Text Search & Highlight
         </h3>
@@ -533,7 +537,7 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Interactive Search Controls */}
-      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-4">
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative flex-1">
             <Input
@@ -558,7 +562,7 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
             className="h-10 text-xs shrink-0"
             title="Toggle case-sensitive matching"
           >
-            <Icon name="match_case" size="xs" className="mr-1.5" />
+            <Icon name="match_case" size="xs" />
             {caseSensitive ? 'Case Sensitive: On' : 'Case Sensitive: Off'}
           </Button>
         </div>
@@ -593,7 +597,7 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Target Content with Live Highlight */}
-      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-3">
         <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
           <div className="flex items-center gap-2">
             <Icon name="description" size="xs" className="text-primary" />
@@ -609,7 +613,7 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
         <TextHighlight
           query={query}
           caseSensitive={caseSensitive}
-          className="font-sans text-xs text-on-surface leading-relaxed space-y-2"
+          className="font-sans text-xs text-on-surface leading-relaxed flex flex-col gap-2"
         >
           <p>
             The learner practiced articulation sound drills today with high accuracy. During the initial vowel repetition, accuracy reached ninety-four percent across consonant blends.
@@ -625,8 +629,8 @@ export const TextHighlightDemo: React.FC<ComponentDemoProps> = () => {
 
 export const KbdDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
-      <div className="space-y-1">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4 text-left">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           Keyboard Shortcuts & Accessibility Hints
         </h3>
@@ -636,7 +640,7 @@ export const KbdDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Common Shortcuts Table */}
-      <div className="rounded-xl border border-outline-variant bg-surface p-4 shadow-ambient space-y-3">
+      <div className="rounded-xl border border-outline-variant bg-surface p-4 shadow-ambient flex flex-col gap-3">
         <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60 text-xs">
           <span className="font-sans text-on-surface">Search patient records</span>
           <KbdGroup>
@@ -665,7 +669,7 @@ export const KbdDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Size comparison */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Size comparison
         </span>
@@ -686,8 +690,8 @@ export const KbdDemo: React.FC<ComponentDemoProps> = () => {
 
 export const ItemDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
-      <div className="space-y-1">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4 text-left">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           Structured List Rows & Activity Feed
         </h3>

@@ -35,9 +35,9 @@ import { ComponentDemoProps } from '../types';
 
 export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-8 w-full">
+    <div className="flex flex-col gap-8 w-full">
       {/* Primary Actions & Variants */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Button Variants & Emphasis
         </h4>
@@ -50,7 +50,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Color Roles Matrix */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Color Roles (WCAG AA Contrast)
         </h4>
@@ -65,7 +65,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Size Floors & Touch Targets */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Touch Floors (WCAG 2.2 SC 2.5.8 Compliant)
         </h4>
@@ -93,7 +93,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
 export const InputDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState('P-2024-819');
   return (
-    <div className="space-y-6 w-full max-w-xl mx-auto">
+    <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
       <Field>
         <FieldLabel>Patient ID</FieldLabel>
         <Input
@@ -132,7 +132,7 @@ export const InputDemo: React.FC<ComponentDemoProps> = () => {
 
 export const TextareaDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-4 w-full max-w-xl mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-xl mx-auto">
       <Field>
         <FieldLabel>Session Notes</FieldLabel>
         <Textarea
@@ -148,7 +148,7 @@ export const TextareaDemo: React.FC<ComponentDemoProps> = () => {
 
 export const FieldDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-6 w-full max-w-xl mx-auto">
+    <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
       <FieldGroup>
         <Field name="ward-code">
           <FieldLabel>Practice Group</FieldLabel>
@@ -176,11 +176,20 @@ export const FieldsetDemo: React.FC<ComponentDemoProps> = () => {
       <Fieldset variant="card">
         <FieldsetLegend>Emergency Contact Details</FieldsetLegend>
         <FieldsetDescription>Designated individuals authorized to receive clinical updates</FieldsetDescription>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-          <Input placeholder="Full Name" />
-          <Input placeholder="Relationship" />
-          <Input placeholder="Phone Number" type="tel" className="sm:col-span-2" />
-        </div>
+        <FieldGroup className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <Field>
+            <FieldLabel>Full Name</FieldLabel>
+            <Input placeholder="Enter contact full name" />
+          </Field>
+          <Field>
+            <FieldLabel>Relationship</FieldLabel>
+            <Input placeholder="e.g. Parent, Guardian" />
+          </Field>
+          <Field className="sm:col-span-2">
+            <FieldLabel>Phone Number</FieldLabel>
+            <Input placeholder="e.g. +353 87 123 4567" type="tel" />
+          </Field>
+        </FieldGroup>
       </Fieldset>
     </div>
   );
@@ -188,13 +197,21 @@ export const FieldsetDemo: React.FC<ComponentDemoProps> = () => {
 
 export const FormDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <Form className="space-y-4 w-full max-w-xl mx-auto">
-      <div className="space-y-1">
+    <Form className="flex flex-col gap-4 w-full max-w-xl mx-auto">
+      <div className="flex flex-col gap-1">
         <h4 className="font-heading text-sm font-bold text-on-surface">Base UI Form Root</h4>
         <p className="font-sans text-xs text-on-surface-variant">Built on @base-ui/react/form with native validation context.</p>
       </div>
-      <Input placeholder="Therapist Name" required />
-      <Input placeholder="Email Address" type="email" required />
+      <FieldGroup className="flex flex-col gap-3">
+        <Field>
+          <FieldLabel>Therapist Name</FieldLabel>
+          <Input placeholder="e.g. Dr. Sarah Jenkins" required />
+        </Field>
+        <Field>
+          <FieldLabel>Email Address</FieldLabel>
+          <Input placeholder="sarah.jenkins@eolas.health" type="email" required />
+        </Field>
+      </FieldGroup>
       <Button colorRole="primary" className="w-full">Save Consultation Notes</Button>
     </Form>
   );
@@ -203,8 +220,8 @@ export const FormDemo: React.FC<ComponentDemoProps> = () => {
 export const SelectDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState('r-sound');
   return (
-    <div className="space-y-4 w-full max-w-md mx-auto">
-      <div className="space-y-1.5">
+    <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
+      <div className="flex flex-col gap-1.5">
         <label className="font-label text-xs font-bold text-on-surface block">Practice Module</label>
         <Select.Root value={val} onValueChange={(v) => v && setVal(v)}>
           <Select.Trigger className="w-full">
@@ -214,10 +231,15 @@ export const SelectDemo: React.FC<ComponentDemoProps> = () => {
             <Select.Positioner sideOffset={4}>
               <Select.Popup>
                 <Select.List>
-                  <Select.Item value="r-sound">Vocalic /r/ Practice</Select.Item>
-                  <Select.Item value="s-blend">S-Blend Syllables</Select.Item>
-                  <Select.Item value="vowels">Vowel Prolongation</Select.Item>
-                  <Select.Item value="consonants">Consonant Repetition</Select.Item>
+                  <Select.Group>
+                    <Select.GroupLabel className="px-3 py-1.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                      Target Sound Modules
+                    </Select.GroupLabel>
+                    <Select.Item value="r-sound">Vocalic /r/ Practice</Select.Item>
+                    <Select.Item value="s-blend">S-Blend Syllables</Select.Item>
+                    <Select.Item value="vowels">Vowel Prolongation</Select.Item>
+                    <Select.Item value="consonants">Consonant Repetition</Select.Item>
+                  </Select.Group>
                 </Select.List>
               </Select.Popup>
             </Select.Positioner>
@@ -231,7 +253,7 @@ export const SelectDemo: React.FC<ComponentDemoProps> = () => {
 
 export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
       <label className="font-label text-xs font-bold text-on-surface block">Sound Library Search</label>
       <Combobox.Root items={['/r/ Vocalic Sounds', '/s/ Initial Blends', '/th/ Voiced Pairs', '/ch/ Affricates']}>
         <Combobox.InputGroup className="w-full">
@@ -256,7 +278,7 @@ export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
 
 export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
       <label className="font-label text-xs font-bold text-on-surface block">Practice Exercise Search</label>
       <Autocomplete.Root openOnInputClick items={['Word Repetition', 'Picture Naming', 'Minimal Pairs', 'Sentence Reading']}>
         <Autocomplete.Input placeholder="Type exercise name..." className="w-full" />
@@ -278,7 +300,7 @@ export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
 export const CheckboxDemo: React.FC<ComponentDemoProps> = () => {
   const [checked, setChecked] = React.useState(true);
   return (
-    <div className="space-y-4 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
       <div className="flex items-center gap-3">
         <Checkbox checked={checked} onCheckedChange={setChecked} id="allergy-check" />
         <label htmlFor="allergy-check" className="font-label text-sm font-medium text-on-surface cursor-pointer select-none">
@@ -338,11 +360,11 @@ export const CheckboxGroupDemo: React.FC<ComponentDemoProps> = () => {
 export const RadioDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState('high');
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
       <h4 className="font-heading text-xs font-bold text-on-surface-variant">
         Priority Level
       </h4>
-      <RadioGroup value={val} onValueChange={setVal} className="space-y-2.5">
+      <RadioGroup value={val} onValueChange={setVal} className="flex flex-col gap-2.5">
         <div className="flex items-center gap-2.5">
           <Radio value="high" id="high-opt" />
           <label htmlFor="high-opt" className="font-label text-xs font-medium text-error cursor-pointer">
@@ -369,9 +391,9 @@ export const RadioDemo: React.FC<ComponentDemoProps> = () => {
 export const SwitchDemo: React.FC<ComponentDemoProps> = () => {
   const [enabled, setEnabled] = React.useState(true);
   return (
-    <div className="space-y-4 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
       <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-outline-variant">
-        <div className="space-y-0.5">
+        <div className="flex flex-col gap-0.5">
           <span className="font-label text-sm font-bold text-on-surface block">Audio Feedback</span>
           <span className="font-sans text-xs text-on-surface-variant">Play audio cues during pronunciation drills</span>
         </div>
@@ -387,8 +409,8 @@ export const ToggleDemo: React.FC<ComponentDemoProps> = () => {
   const [isMuted, setIsMuted] = React.useState(false);
 
   return (
-    <div className="space-y-4 w-full max-w-md mx-auto text-center">
-      <div className="space-y-1">
+    <div className="flex flex-col gap-4 w-full max-w-md mx-auto text-center">
+      <div className="flex flex-col gap-1">
         <h4 className="font-heading text-sm font-semibold text-on-surface">Action Controls</h4>
         <p className="font-sans text-xs text-on-surface-variant">Standalone two-state actions using aria-pressed</p>
       </div>
@@ -426,9 +448,9 @@ export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
   ];
 
   return (
-    <div className="space-y-6 w-full max-w-md mx-auto text-center">
-      <div className="space-y-2">
-        <div className="space-y-0.5">
+    <div className="flex flex-col gap-6 w-full max-w-md mx-auto text-center">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-0.5">
           <span className="font-label text-sm font-semibold text-on-surface block">View Mode</span>
           <span className="font-sans text-xs text-on-surface-variant block">Single-select segmented switch</span>
         </div>
@@ -452,8 +474,8 @@ export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
         </ToggleGroup>
       </div>
 
-      <div className="space-y-2">
-        <div className="space-y-0.5">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-0.5">
           <span className="font-label text-sm font-semibold text-on-surface block">Exercise Type Filters</span>
           <span className="font-sans text-xs text-on-surface-variant block">Multi-select filter tags</span>
         </div>
@@ -474,7 +496,7 @@ export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
 export const SliderDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState(20);
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
       <div className="flex items-center justify-between">
         <label className="font-label text-xs font-bold text-on-surface">Daily Practice Goal</label>
         <span className="font-mono text-xs font-bold text-primary">{Math.round(val)} minutes</span>
@@ -489,7 +511,7 @@ export const NumberFieldDemo: React.FC<ComponentDemoProps> = () => {
   const [targetWpm, setTargetWpm] = React.useState<number | null>(110);
 
   return (
-    <div className="space-y-6 w-full max-w-sm mx-auto">
+    <div className="flex flex-col gap-6 w-full max-w-sm mx-auto">
       <NumberField
         label="Session Duration (minutes)"
         description="Recommended practice session: 10ΓÇô30 minutes"
@@ -518,7 +540,7 @@ export const OTPFieldDemo: React.FC<ComponentDemoProps> = () => {
   const [completedCode, setCompletedCode] = React.useState<string | null>(null);
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-4">
+    <div className="w-full max-w-md mx-auto flex flex-col gap-4">
       <OTPField
         center
         showSeparator
@@ -541,14 +563,14 @@ export const OTPFieldDemo: React.FC<ComponentDemoProps> = () => {
 
 export const SelectionControlsLegacyDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-4 max-w-md mx-auto">
+    <div className="flex flex-col gap-4 max-w-md mx-auto">
       <InlineAlert
         role="warning"
         title="Legacy Re-Export Barrel"
       >
         selection-controls.tsx re-exports Checkbox, Radio, and Switch. New code should import directly from @/components/ui/checkbox, @/components/ui/radio, or @/components/ui/switch.
       </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant space-y-2 text-xs font-mono">
+      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-mono">
         <p className="text-on-surface">Modern replacement imports:</p>
         <p className="text-primary font-bold">import &#123; Checkbox &#125; from '@/components/ui/checkbox';</p>
         <p className="text-primary font-bold">import &#123; Radio, RadioGroup &#125; from '@/components/ui/radio';</p>
@@ -560,14 +582,14 @@ export const SelectionControlsLegacyDemo: React.FC<ComponentDemoProps> = () => {
 
 export const TogglesLegacyDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-4 max-w-md mx-auto">
+    <div className="flex flex-col gap-4 max-w-md mx-auto">
       <InlineAlert
         role="warning"
         title="Legacy Re-Export Barrel"
       >
         toggles.tsx re-exports Toggle and ToggleGroup. New code should import directly from @/components/ui/toggle or @/components/ui/toggle-group.
       </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant space-y-2 text-xs font-mono">
+      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-mono">
         <p className="text-on-surface">Modern replacement imports:</p>
         <p className="text-primary font-bold">import &#123; Toggle &#125; from '@/components/ui/toggle';</p>
         <p className="text-primary font-bold">import &#123; ToggleGroup &#125; from '@/components/ui/toggle-group';</p>
@@ -593,10 +615,10 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4">
       {/* Mode Selector */}
       <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
-        <div className="text-left space-y-0.5">
+        <div className="text-left flex flex-col gap-0.5">
           <p className="font-heading text-sm font-semibold text-on-surface">
             Calendar & Date Selection
           </p>
@@ -673,9 +695,9 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
 
 export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-8 w-full max-w-xl mx-auto py-4">
+    <div className="flex flex-col gap-8 w-full max-w-xl mx-auto py-4">
       {/* 1. Split Button Action */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Split Action Button
         </h4>
@@ -693,7 +715,7 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 2. Navigation & Segmented Control with Separator */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Segmented Navigation with Hairline Separator
         </h4>
@@ -714,7 +736,7 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 3. Fused Input and Action Button */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Input Addon &amp; Action
         </h4>
@@ -735,9 +757,9 @@ export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
   const [prompt, setPrompt] = React.useState('');
 
   return (
-    <div className="space-y-8 w-full max-w-xl mx-auto py-4 text-left">
+    <div className="flex flex-col gap-8 w-full max-w-xl mx-auto py-4 text-left">
       {/* 1. Search Bar with Prefix Icon and Clear Button */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Search Input with Addons
         </h4>
@@ -769,7 +791,7 @@ export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 2. URL Prefix Input with Action Button */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Prefix Text and Trailing Action
         </h4>
@@ -787,7 +809,7 @@ export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* 3. Multi-line AI Chat Prompt Input (shadcn Pattern) */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
           Multi-line AI Prompt Composer
         </h4>

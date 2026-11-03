@@ -19,7 +19,7 @@ export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
   const [dismissed, setDismissed] = React.useState(false);
 
   return (
-    <div className="space-y-4 w-full max-w-xl mx-auto text-left">
+    <div className="flex flex-col gap-4 w-full max-w-xl mx-auto text-left">
       {/* Compound composition with action slot */}
       <InlineAlert role="warning">
         <InlineAlert.Title>Session Expiring Soon</InlineAlert.Title>
@@ -119,11 +119,11 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="space-y-6 w-full max-w-xl mx-auto py-4 text-left">
+    <div className="flex flex-col gap-6 w-full max-w-xl mx-auto py-4 text-left">
       {/* Toaster Viewport Mounting */}
       <Toaster position="bottom-right" limit={4} />
 
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           Notification Toasts
         </h3>
@@ -133,7 +133,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Semantic Variant Triggers */}
-      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-3">
         <span className="font-label text-xs font-semibold text-on-surface-variant block">
           Semantic Alerts
         </span>
@@ -146,7 +146,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.success('Notes Saved', 'Observation notes were added to the chart.')
             }
           >
-            <Icon name="check_circle" size="xs" className="mr-1.5 text-success" />
+            <Icon name="check_circle" size="xs" className="text-success" />
             Success Toast
           </Button>
 
@@ -158,7 +158,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.warning('Audio Level Low', 'Please verify your microphone before recording.')
             }
           >
-            <Icon name="warning" size="xs" className="mr-1.5 text-warning" />
+            <Icon name="warning" size="xs" className="text-warning" />
             Warning Toast
           </Button>
 
@@ -170,7 +170,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.error('Sync Interrupted', 'Could not establish connection to the care portal.')
             }
           >
-            <Icon name="error" size="xs" className="mr-1.5 text-error" />
+            <Icon name="error" size="xs" className="text-error" />
             Error Toast
           </Button>
 
@@ -182,14 +182,14 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.neutral('New Update', 'Clinical guideline v3 is now active.')
             }
           >
-            <Icon name="info" size="xs" className="mr-1.5 text-on-surface-variant" />
+            <Icon name="info" size="xs" className="text-on-surface-variant" />
             Neutral Toast
           </Button>
         </div>
       </div>
 
       {/* Advanced Workflows: Actions & Promises */}
-      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient space-y-3">
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-3">
         <span className="font-label text-xs font-semibold text-on-surface-variant block">
           Async Promise & Action Callbacks
         </span>
@@ -200,7 +200,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
             colorRole="primary"
             onClick={triggerPromiseToast}
           >
-            <Icon name="cloud_upload" size="xs" className="mr-1.5" />
+            <Icon name="cloud_upload" size="xs" />
             Async Promise Toast
           </Button>
 
@@ -210,7 +210,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
             colorRole="neutral"
             onClick={triggerActionToast}
           >
-            <Icon name="undo" size="xs" className="mr-1.5" />
+            <Icon name="undo" size="xs" />
             Toast with Action (Undo)
           </Button>
         </div>
@@ -228,8 +228,8 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="space-y-6 w-full max-w-2xl mx-auto py-2 text-left">
-      <div className="space-y-1">
+    <div className="flex flex-col gap-6 w-full max-w-2xl mx-auto py-2 text-left">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           Interactive Chips
         </h3>
@@ -239,7 +239,7 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Filter Selection Chips */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Filter selection chips (with leading icon & active check)
         </span>
@@ -272,7 +272,7 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Removable Input Tags */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Dismissible input chips (with remove button)
         </span>
@@ -294,7 +294,7 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Design System Patterns & Sizes */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Approved patterns & sizes
         </span>
@@ -319,7 +319,7 @@ export const NotificationBadgeDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-wrap items-center justify-center gap-8 py-8">
       <div className="relative inline-block">
         <Button variant="outlined" size="md">
-          <Icon name="mail" size="xs" className="mr-2" />
+          <Icon name="mail" size="xs" />
           Messages
         </Button>
         <NotificationBadge count={4} variant="error" />
@@ -327,7 +327,7 @@ export const NotificationBadgeDemo: React.FC<ComponentDemoProps> = () => {
 
       <div className="relative inline-block">
         <Button variant="outlined" size="md">
-          <Icon name="notifications" size="xs" className="mr-2" />
+          <Icon name="notifications" size="xs" />
           Notifications
         </Button>
         <NotificationBadge dot variant="primary" />
@@ -338,8 +338,8 @@ export const NotificationBadgeDemo: React.FC<ComponentDemoProps> = () => {
 
 export const MeterDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-6 w-full max-w-md mx-auto py-4">
-      <div className="space-y-2">
+    <div className="flex flex-col gap-6 w-full max-w-md mx-auto py-4">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="font-bold text-on-surface">Weekly Practice Goal</span>
           <span className="text-primary font-bold">82%</span>
@@ -347,7 +347,7 @@ export const MeterDemo: React.FC<ComponentDemoProps> = () => {
         <Meter value={82} colorRole="primary" />
       </div>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="font-bold text-on-surface">Storage Used</span>
           <span className="text-warning font-bold">68%</span>
@@ -360,8 +360,8 @@ export const MeterDemo: React.FC<ComponentDemoProps> = () => {
 
 export const ProgressDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="space-y-4 w-full max-w-md mx-auto py-4">
-      <div className="space-y-1.5">
+    <div className="flex flex-col gap-4 w-full max-w-md mx-auto py-4">
+      <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="font-bold text-on-surface">Downloading Sound Pack</span>
           <span className="text-primary font-bold">45%</span>
@@ -441,9 +441,9 @@ export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto py-6 space-y-6">
+    <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-6">
       {/* Sizing scale */}
-      <div className="p-5 rounded-xl bg-surface border border-outline-variant space-y-3">
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant flex flex-col gap-3">
         <h4 className="font-heading text-sm font-semibold text-on-surface">Size Scale</h4>
         <div className="flex items-center gap-6 text-on-surface-variant">
           <div className="flex flex-col items-center gap-2">
@@ -470,7 +470,7 @@ export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Semantic Color Tokens */}
-      <div className="p-5 rounded-xl bg-surface border border-outline-variant space-y-3">
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant flex flex-col gap-3">
         <h4 className="font-heading text-sm font-semibold text-on-surface">Semantic Colors</h4>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
@@ -493,7 +493,7 @@ export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Button integration with data-icon */}
-      <div className="p-5 rounded-xl bg-surface border border-outline-variant space-y-3">
+      <div className="p-5 rounded-xl bg-surface border border-outline-variant flex flex-col gap-3">
         <h4 className="font-heading text-sm font-semibold text-on-surface">Button Integration</h4>
         <div className="flex flex-wrap items-center gap-3">
           <Button
@@ -523,10 +523,10 @@ export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
 
 export const SkeletonDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-md mx-auto space-y-3 p-4 rounded-xl bg-surface border border-outline-variant">
+    <div className="w-full max-w-md mx-auto flex flex-col gap-3 p-4 rounded-xl bg-surface border border-outline-variant">
       <div className="flex items-center gap-3">
-        <Skeleton className="w-10 h-10 rounded-full" />
-        <div className="space-y-1.5 flex-1">
+        <Skeleton className="size-10 rounded-full" />
+        <div className="gap-1.5 flex-1">
           <Skeleton className="h-4 w-3/4 rounded" />
           <Skeleton className="h-3 w-1/2 rounded" />
         </div>
@@ -545,7 +545,7 @@ export const ReadingProgressDemo: React.FC<ComponentDemoProps> = () => {
   }, []);
 
   return (
-    <div className="space-y-3 w-full max-w-md mx-auto py-4">
+    <div className="flex flex-col gap-3 w-full max-w-md mx-auto py-4">
       <div className="flex items-center justify-between">
         <h4 className="font-heading text-xs font-bold text-on-surface">Practice Guide Progress</h4>
         <span className="font-mono text-[11px] text-on-surface-variant">Scroll container to inspect</span>
@@ -564,7 +564,7 @@ export const ReadingProgressDemo: React.FC<ComponentDemoProps> = () => {
           ref={containerRef}
           tabIndex={0}
           aria-label="Practice Guide Document"
-          className="h-48 overflow-y-auto p-4 space-y-3 font-sans text-xs text-on-surface-variant leading-relaxed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="h-48 overflow-y-auto p-4 flex flex-col gap-3 font-sans text-xs text-on-surface-variant leading-relaxed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           <p className="font-semibold text-on-surface">
             Section 1: Breath Support & Posture
@@ -598,8 +598,8 @@ export const ReadingProgressDemo: React.FC<ComponentDemoProps> = () => {
 
 export const BadgeDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 py-4 text-left">
-      <div className="space-y-1">
+    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4 text-left">
+      <div className="flex flex-col gap-1">
         <h3 className="font-heading text-sm font-semibold text-on-surface">
           Status Badges & Category Labels
         </h3>
@@ -609,7 +609,7 @@ export const BadgeDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Variants */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Badge variants (3 approved design system patterns)
         </span>
@@ -621,7 +621,7 @@ export const BadgeDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Color Roles */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Color roles (high contrast)
         </span>
@@ -637,7 +637,7 @@ export const BadgeDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Shapes & Sizes */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Shapes & calibrated size scale
         </span>
