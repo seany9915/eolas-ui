@@ -228,6 +228,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           </p>
         )}
         <BaseSelect.Trigger
+          ref={ref}
           data-slot="select-trigger"
           id={selectId}
           aria-invalid={!!error}
@@ -442,11 +443,14 @@ export interface SelectPositionerProps
 export const SelectPositioner = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Positioner>,
   SelectPositionerProps
->(({ className, sideOffset = 4, collisionPadding = 8, ...props }, ref) => (
+>(({ className, side = 'bottom', align = 'start', sideOffset = 4, collisionPadding = 8, alignItemWithTrigger = false, ...props }, ref) => (
   <BaseSelect.Positioner
     ref={ref}
+    side={side}
+    align={align}
     sideOffset={sideOffset}
     collisionPadding={collisionPadding}
+    alignItemWithTrigger={alignItemWithTrigger}
     className={cn('z-50 outline-none', className)}
     {...props}
   />

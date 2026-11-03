@@ -296,14 +296,20 @@ button,
 
 /* 2. InputGroup & PromptInput inner controls: suppress redundant inner focus ring & border */
 [data-slot="input-group"] :where(input, textarea),
-[data-slot="prompt-input"] :where(input, textarea) {
+[data-slot="prompt-input"] :where(input, textarea),
+[data-slot="combobox-input-group"] :where(input),
+[data-slot="autocomplete-input-group"] :where(input) {
   outline: none;
   box-shadow: none;
 }
 [data-slot="input-group"] :where(input, textarea):focus,
 [data-slot="input-group"] :where(input, textarea):focus-visible,
 [data-slot="prompt-input"] :where(input, textarea):focus,
-[data-slot="prompt-input"] :where(input, textarea):focus-visible {
+[data-slot="prompt-input"] :where(input, textarea):focus-visible,
+[data-slot="combobox-input-group"] :where(input):focus,
+[data-slot="combobox-input-group"] :where(input):focus-visible,
+[data-slot="autocomplete-input-group"] :where(input):focus,
+[data-slot="autocomplete-input-group"] :where(input):focus-visible {
   outline: none;
   box-shadow: none;
 }

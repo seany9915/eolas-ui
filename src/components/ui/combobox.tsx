@@ -511,6 +511,7 @@ export const ComboboxItem = React.forwardRef<
         'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
         'hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
         'data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:font-semibold',
+        'data-[selected]:data-[highlighted]:bg-primary-container/80 data-[selected]:data-[highlighted]:ring-1 data-[selected]:data-[highlighted]:ring-inset data-[selected]:data-[highlighted]:ring-primary/40',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
         className

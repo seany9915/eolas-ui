@@ -121,7 +121,7 @@ function DialogComponent<Payload = unknown>({
               className={cn(
                 'fixed inset-0 z-50 p-4',
                 isOutsideScroll
-                  ? 'overflow-y-auto flex min-h-full items-center justify-center'
+                  ? 'overflow-y-auto flex min-h-full items-start justify-center'
                   : 'flex items-center justify-center'
               )}
             >
@@ -221,7 +221,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
           className={cn(
             'fixed inset-0 z-50 p-4',
             isOutsideScroll
-              ? 'overflow-y-auto flex min-h-full items-center justify-center'
+              ? 'overflow-y-auto flex min-h-full items-start justify-center'
               : 'flex items-center justify-center',
             containerClassName
           )}

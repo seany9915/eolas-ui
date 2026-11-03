@@ -51,13 +51,13 @@ export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', str
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    'w-screen max-w-md h-full rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   left:
-    'w-screen max-w-md h-full rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   down:
-    'w-full max-h-[88vh] rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88vh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   up:
-    'w-full max-h-[88vh] rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88vh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
 };
 
 // Visual grab handle pill
@@ -110,7 +110,7 @@ export const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLD
 DrawerHeader.displayName = 'DrawerHeader';
 
 export const DrawerBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('py-2 flex-1 overflow-y-auto', className)} {...props} />
+  <div className={cn('py-2 flex-1 overflow-y-auto min-h-0', className)} {...props} />
 );
 DrawerBody.displayName = 'DrawerBody';
 
@@ -324,8 +324,8 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
             className={cn(popupClassName, className)}
             {...props}
           >
-            <DrawerContent>
-              <div>
+            <DrawerContent className="flex flex-col h-full min-h-0">
+              <div className="shrink-0">
                 {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
                 <div className="flex items-center justify-between mb-4">
                   {title && <DrawerTitle>{title}</DrawerTitle>}
@@ -334,12 +334,14 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
                   )}
                 </div>
                 {description && <DrawerDescription>{description}</DrawerDescription>}
+              </div>
+              <div className="flex-1 overflow-y-auto min-h-0 py-2">
                 {children}
               </div>
               {footer ? (
-                <div className="pt-6 border-t border-outline-variant mt-6">{footer}</div>
+                <div className="pt-6 border-t border-outline-variant mt-6 shrink-0">{footer}</div>
               ) : (
-                <div className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6">
+                <div className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6 shrink-0">
                   <BaseDrawer.Close className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
                     Close panel
                   </BaseDrawer.Close>
