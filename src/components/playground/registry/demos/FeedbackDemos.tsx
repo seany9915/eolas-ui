@@ -13,67 +13,126 @@ import { Spinner } from '@/components/ui/spinner';
 import { ReadingProgress } from '@/components/ui/reading-progress';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { BlockDemoShell } from '../BlockDemoShell';
 import { ComponentDemoProps } from '../types';
 
 export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
   const [dismissed, setDismissed] = React.useState(false);
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-xl mx-auto text-left">
-      {/* Compound composition with action slot */}
-      <InlineAlert role="warning">
-        <InlineAlert.Title>Session Expiring Soon</InlineAlert.Title>
-        <InlineAlert.Description>
-          Your speech consultation has 5 minutes remaining. Please save any drill observations before the room closes.
-        </InlineAlert.Description>
-        <InlineAlert.Action>
-          <Button size="sm" variant="filled" colorRole="primary">
-            Extend Session (10m)
-          </Button>
-          <Button size="sm" variant="outlined" colorRole="neutral">
-            Save Notes
-          </Button>
-        </InlineAlert.Action>
-      </InlineAlert>
-
-      {/* Dismissible alert */}
-      {!dismissed && (
-        <InlineAlert
-          title="Microphone Access Blocked"
-          role="error"
-          icon="mic_off"
-          onClose={() => setDismissed(true)}
-        >
-          Enable microphone permissions in your browser to record articulation drills.
-        </InlineAlert>
-      )}
-
-      {dismissed && (
-        <div className="text-center py-2">
-          <Button size="sm" variant="outlined" colorRole="neutral" onClick={() => setDismissed(false)}>
-            Reset Microphone Alert
-          </Button>
+    <BlockDemoShell
+      name="Inline Alert"
+      badge="Tier A Feedback"
+      description="High-prominence feedback container with a solid 4px vertical accent bar on the left. Communicates critical system state, warnings, expiring sessions, or blocking errors."
+      whenToUse="Urgent state-dependent notifications, hardware permission prompts, or expiring sessions. Never use for routine clinician tips or static advice (use ClinicianTip instead)."
+      typicalExample={
+        <div className="w-full max-w-xl">
+          <InlineAlert role="warning">
+            <InlineAlert.Title>Session Expiring Soon</InlineAlert.Title>
+            <InlineAlert.Description>
+              Your speech consultation has 5 minutes remaining. Please save any drill observations before the room closes.
+            </InlineAlert.Description>
+            <InlineAlert.Action>
+              <Button size="sm" variant="filled" colorRole="primary">
+                Extend Session (10m)
+              </Button>
+              <Button size="sm" variant="outline" colorRole="neutral">
+                Save Notes
+              </Button>
+            </InlineAlert.Action>
+          </InlineAlert>
         </div>
-      )}
-
-      {/* Monolithic usage with success role */}
-      <InlineAlert
-        title="Practice Goal Reached"
-        role="success"
-        icon="check_circle"
-      >
-        You completed all 15 daily articulation exercises with an average accuracy of 94%.
-      </InlineAlert>
-
-      {/* Neutral informative alert */}
-      <InlineAlert
-        title="Offline Mode Active"
-        role="neutral"
-        icon="info"
-      >
-        Practice drills are saved locally and will upload automatically when you reconnect.
-      </InlineAlert>
-    </div>
+      }
+      variantsSection={
+        <div className="flex flex-col gap-3 w-full max-w-xl">
+          <InlineAlert role="warning" title="Warning: Microphone Latency High">
+            Audio buffer exceeds 120ms. Ensure a stable network connection during articulation recording.
+          </InlineAlert>
+          <InlineAlert role="error" title="Error: Recording Interrupted">
+            Could not save vocalic audio sample. The local storage quota was exceeded.
+          </InlineAlert>
+          <InlineAlert role="success" title="Success: Practice Goal Met">
+            All 15 daily articulation exercises were saved and added to the patient chart.
+          </InlineAlert>
+          <InlineAlert role="neutral" title="Notice: Offline Mode Active">
+            Drills are saved locally on this device and will sync automatically when you reconnect.
+          </InlineAlert>
+        </div>
+      }
+      sizeLadderSection={
+        <div className="flex flex-col gap-3 w-full max-w-xl">
+          <div className="flex flex-col gap-1">
+            <span className="font-heading text-xs font-bold text-on-surface">Compact Alert (Single Line)</span>
+            <InlineAlert role="neutral" icon="info">
+              Consultation notes are visible to assigned clinical staff only.
+            </InlineAlert>
+          </div>
+          <div className="flex flex-col gap-1 pt-2">
+            <span className="font-heading text-xs font-bold text-on-surface">Roomy Compound Alert with Action Buttons</span>
+            <InlineAlert role="warning">
+              <InlineAlert.Title>Unsaved Audio Sample</InlineAlert.Title>
+              <InlineAlert.Description>
+                You recorded a 30-second sound blend sample that has not been submitted yet.
+              </InlineAlert.Description>
+              <InlineAlert.Action>
+                <Button size="sm" variant="filled" colorRole="primary">Submit Sample</Button>
+                <Button size="sm" variant="outline" colorRole="neutral">Discard</Button>
+              </InlineAlert.Action>
+            </InlineAlert>
+          </div>
+        </div>
+      }
+      iconPermutationsSection={
+        <div className="flex flex-col gap-3 w-full max-w-xl">
+          <InlineAlert role="error" icon="mic_off" title="Hardware Permission Denied">
+            Browser microphone access is blocked. Allow microphone permissions in site settings.
+          </InlineAlert>
+          <InlineAlert role="neutral" icon="cloud_sync" title="Background Data Sync">
+            Syncing exercise audio packages with the central clinical portal.
+          </InlineAlert>
+          <InlineAlert role="success" icon="verified" title="License Verification Active">
+            Speech-Language Pathologist license #SLP-8921 is verified for telehealth practice.
+          </InlineAlert>
+        </div>
+      }
+      pinnedStatesSection={
+        <div className="flex flex-col gap-3 w-full max-w-xl">
+          {!dismissed ? (
+            <InlineAlert
+              title="Dismissible Alert (Active)"
+              role="warning"
+              icon="notifications_active"
+              onClose={() => setDismissed(true)}
+            >
+              This alert includes an accessible dismiss button. Click the close button on the right to dismiss.
+            </InlineAlert>
+          ) : (
+            <div className="p-4 rounded-lg bg-surface-container/60 border border-outline-variant/60 flex items-center justify-between">
+              <span className="font-sans text-xs text-on-surface-variant">Alert was dismissed.</span>
+              <Button size="sm" variant="outline" colorRole="neutral" onClick={() => setDismissed(false)}>
+                Restore Alert
+              </Button>
+            </div>
+          )}
+        </div>
+      }
+      edgeCasesSection={
+        <div className="flex flex-col gap-3 w-full max-w-xl">
+          <div className="flex flex-col gap-1">
+            <span className="font-heading text-xs font-bold text-on-surface">Long Form Multi-Paragraph Description</span>
+            <InlineAlert role="warning" title="Comprehensive Data Migration Notice">
+              <p>
+                Patient record P-2024-819 contains historic acoustic waveforms recorded prior to system upgrade 4.2.
+                These legacy audio files have been converted into standard 48kHz WAV streams.
+              </p>
+              <p className="mt-2">
+                If you encounter playback distortion, download the raw diagnostic audio file from the export center.
+              </p>
+            </InlineAlert>
+          </div>
+        </div>
+      }
+    />
   );
 };
 

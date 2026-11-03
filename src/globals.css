@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+@custom-variant focus-visible (&:focus-visible, &[data-preview~="focus"]);
+@custom-variant active (&:active, &[data-preview~="active"]);
+@custom-variant hover (&:hover, &[data-preview~="hover"]);
+
 @theme {
   --font-heading: "Atkinson Hyperlegible Next", sans-serif;
   --font-sans: "Lexend", sans-serif;

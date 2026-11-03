@@ -31,62 +31,131 @@ import { OTPField } from '@/components/ui/otp-field';
 import { Icon } from '@/components/ui/icon';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { Calendar, DateRange } from '@/components/ui/calendar';
+import { BlockDemoShell } from '../BlockDemoShell';
+import { StateMatrix } from '../StateMatrix';
 import { ComponentDemoProps } from '../types';
 
 export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="flex flex-col gap-8 w-full">
-      {/* Primary Actions & Variants */}
-      <div className="flex flex-col gap-3">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-          Button Variants & Emphasis
-        </h4>
+    <BlockDemoShell
+      name="Button"
+      badge="Base UI Atom"
+      description="Interactive trigger for actions, submissions, modal reveals, and workflow progression. Standardized with 48px touch floors, Atkinson Hyperlegible Next typography, and floating 2px focus rings."
+      whenToUse="Executing actions within the current screen (saving records, opening modals, initiating drills). Never use for page-level navigation — use NavigationMenu or semantic links."
+      typicalExample={
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="filled" colorRole="primary">Filled Primary</Button>
-          <Button variant="outlined" colorRole="primary">Outlined Primary</Button>
-          <Button variant="text" colorRole="primary">Text Primary</Button>
-          <Button variant="tonal" colorRole="primary">Tonal Primary</Button>
+          <Button variant="filled" colorRole="primary">
+            <Icon name="check_circle" size="xs" />
+            <span>Save Consultation Notes</span>
+          </Button>
+          <Button variant="outline" colorRole="neutral">
+            Cancel
+          </Button>
+          <Button variant="tonal" colorRole="secondary">
+            <Icon name="ios_share" size="xs" />
+            <span>Export Summary</span>
+          </Button>
         </div>
-      </div>
-
-      {/* Color Roles Matrix */}
-      <div className="flex flex-col gap-3">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-          Color Roles (WCAG AA Contrast)
-        </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          <Button colorRole="primary" className="w-full">Primary</Button>
-          <Button colorRole="secondary" className="w-full">Secondary</Button>
-          <Button colorRole="tertiary" className="w-full">Tertiary</Button>
-          <Button colorRole="error" className="w-full">Error</Button>
-          <Button colorRole="warning" className="w-full">Warning</Button>
-          <Button colorRole="success" className="w-full">Success</Button>
+      }
+      variantsSection={
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="filled" colorRole="primary">Filled (High Emphasis)</Button>
+          <Button variant="outlined" colorRole="primary">Outlined (Secondary)</Button>
+          <Button variant="tonal" colorRole="primary">Tonal (Medium)</Button>
+          <Button variant="soft" colorRole="primary">Soft Wash</Button>
+          <Button variant="text" colorRole="primary">Text (Low Emphasis)</Button>
         </div>
-      </div>
-
-      {/* Size Floors & Touch Targets */}
-      <div className="flex flex-col gap-3">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-          Touch Floors (WCAG 2.2 SC 2.5.8 Compliant)
-        </h4>
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
+      }
+      sizeLadderSection={
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex flex-col items-center gap-1.5">
             <Button size="sm" colorRole="primary">Small (44px min)</Button>
+            <span className="font-mono text-[10px] text-on-surface-variant">sm: 44px</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-1.5">
             <Button size="md" colorRole="primary">Medium (48px floor)</Button>
+            <span className="font-mono text-[10px] text-on-surface-variant">md: 48px</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-1.5">
             <Button size="lg" colorRole="primary">Large (56px)</Button>
+            <span className="font-mono text-[10px] text-on-surface-variant">lg: 56px</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button size="icon" colorRole="primary" aria-label="Add item">
-              <Icon name="add" size="sm" />
+          <div className="flex flex-col items-center gap-1.5">
+            <Button size="icon" colorRole="primary" aria-label="Search records">
+              <Icon name="search" size="sm" />
             </Button>
+            <span className="font-mono text-[10px] text-on-surface-variant">icon: 48px</span>
           </div>
         </div>
-      </div>
-    </div>
+      }
+      iconPermutationsSection={
+        <div className="flex flex-wrap items-center gap-3">
+          <Button colorRole="primary">
+            <Icon name="add" size="xs" />
+            <span>Leading Icon</span>
+          </Button>
+          <Button variant="outline" colorRole="neutral">
+            <span>Trailing Icon</span>
+            <Icon name="arrow_forward" size="xs" />
+          </Button>
+          <Button size="icon" variant="tonal" colorRole="primary" aria-label="Record Audio">
+            <Icon name="mic" size="sm" />
+          </Button>
+        </div>
+      }
+      pinnedStatesSection={
+        <StateMatrix
+          items={[
+            {
+              label: 'Default',
+              element: <Button colorRole="primary">Default</Button>,
+            },
+            {
+              label: 'Hover',
+              element: <Button colorRole="primary" data-preview="hover">Hover</Button>,
+              note: 'data-preview="hover"',
+            },
+            {
+              label: 'Focus',
+              element: <Button colorRole="primary" data-preview="focus">Focused</Button>,
+              note: 'data-preview="focus"',
+            },
+            {
+              label: 'Active',
+              element: <Button colorRole="primary" data-preview="active">Active</Button>,
+              note: 'data-preview="active"',
+            },
+            {
+              label: 'Disabled',
+              element: <Button colorRole="primary" disabled>Disabled</Button>,
+              note: 'disabled',
+            },
+          ]}
+        />
+      }
+      edgeCasesSection={
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex flex-col gap-1">
+            <span className="font-heading text-xs font-bold text-on-surface">Label Truncation with Maximum Width</span>
+            <p className="font-sans text-xs text-on-surface-variant">Button labels with max-w-[220px] truncate gracefully without line breaks</p>
+            <div className="pt-1">
+              <Button colorRole="primary" className="max-w-[220px] truncate">
+                Very Long Clinical Action Label That Truncates Safely
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 pt-2 border-t border-outline-variant/40">
+            <span className="font-heading text-xs font-bold text-on-surface">Full-Width Responsive Button</span>
+            <p className="font-sans text-xs text-on-surface-variant">Stretches to container bounds for mobile action sheets or primary form submits</p>
+            <div className="pt-1 w-full max-w-sm">
+              <Button colorRole="primary" className="w-full">
+                Full Width Action
+              </Button>
+            </div>
+          </div>
+        </div>
+      }
+    />
   );
 };
 
