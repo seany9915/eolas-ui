@@ -587,6 +587,27 @@ They feature an asymmetric rectangular shape (`rounded-l-none rounded-r-default`
 - **Accessibility & Interactive Slots:** Implements dynamic ARIA live regions: `role="alert"` (`aria-live="assertive"`) for `error` to immediately announce critical failures, and `role="status"` (`aria-live="polite"`) for `warning`, `success`, and `neutral`. Supports an optional `onClose` dismiss trigger (accessible icon button with floating focus ring) and an optional inline `action` button slot.
 - **Anti-pattern guard (Never an Asymmetric Card):** Inline alerts use asymmetric rounding (`rounded-l-none rounded-r-default`) specifically to keep the 4px left accent border completely straight. Never apply a 4px left accent border to a fully rounded container (`rounded.lg`/`rounded.md`), which distorts corner geometry. For static educational tips, strategy guides, or exercise instructions, use the unboxed `<ClinicianTip />` pattern or Low-Prominence typography instead.
 
+### Semantic Spacing Ladder
+
+To eliminate arbitrary spacing utilities (`py-7`, `gap-5`, `space-y-3`), all layouts strictly adhere to this 4-tier vertical and structural spacing ladder:
+
+| Tier | Scale Range | Class Names | Usage & Purpose |
+| :--- | :--- | :--- | :--- |
+| **Tier 1: Internal Component Gaps** | 4px–8px | `gap-1` to `gap-2` | Spacing inside atomic controls: icon-to-label in buttons, clear trigger in inputs, badge insets. |
+| **Tier 2: Closely Related Items** | 8px–12px | `gap-2` to `gap-3` | Spacing between tightly coupled elements: label to input in `<Field>`, list rows in compact tables. |
+| **Tier 3: Distinct Content Groups** | 16px–24px | `gap-4` to `gap-6` | Spacing between modular sections inside a card, field rows in `<FieldGroup>`, toolbar action clusters. |
+| **Tier 4: Major Page Sections** | 48px–64px | `gap-12` to `gap-16` / `py-12` | Spacing between major layout regions: hero header to main content grid, footer separation. |
+
+### Component-to-Radius Mapping Table & Concentric Alignment
+
+| Radius Tier | Value | Canonical Components | Concentric Nested Alignment Law |
+| :--- | :--- | :--- | :--- |
+| **`none`** | 0px | Square corners, table outer cells, drill canvases | Used when $\text{padding} \ge R_{\text{outer}}$ to prevent optical corner bulge ($R_{\text{inner}} = 0$). |
+| **`sm`** | 4px (`0.25rem`) | Inner concentric items (`ToggleGroup.Item`), micro-accents, tooltip arrow pins, progress tracks | Follows $R_{\text{inner}} = R_{\text{outer}} - \text{padding}$. Inside a `rounded` (8px) container with `p-1` (4px padding), inner items take $8\text{px} - 4\text{px} = 4\text{px}$ (`rounded-sm`). |
+| **`DEFAULT` / `md`** | 8px (`0.5rem`) | Interactive controls (`Button`, `Input`, `Select` triggers, `Menu` popups), outer segmented control containers (`ToggleGroup`) | The core baseline for all Tier B interactive controls. Concentric right corners match asymmetric alerts (`rounded-r-default`). |
+| **`lg`** | 16px (`1rem`) | Standard content cards, `Dialog`, `Drawer`, `Sheet` modal surfaces | Outer elevation boundaries. Padded child elements with $\text{padding} \ge 16\text{px}$ use `rounded-none`. |
+| **`full`** | 9999px | Badges, pill chips, circular icon buttons, avatars | Complete circular/pill rounding. Passive `<Badge />` and interactive `<Chip />` both share `rounded-full`. |
+
 ### Badges, Chips & Tags
 
 This design system draws a strict architectural line between **passive labels** (`<Badge />`) and **interactive controls** (`<Chip />`):
