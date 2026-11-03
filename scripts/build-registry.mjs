@@ -379,6 +379,9 @@ if (fs.existsSync(BLOCKS_DIR)) {
     if (content.includes("from '@tanstack/react-table'") || content.includes('from "@tanstack/react-table"')) {
       npmDeps.push('@tanstack/react-table');
     }
+    if (content.includes("from 'recharts'") || content.includes('from "recharts"')) {
+      npmDeps.push('recharts');
+    }
 
     const item = {
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',

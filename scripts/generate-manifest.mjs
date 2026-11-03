@@ -39,6 +39,7 @@ const catMap = {
 
   // Blocks
   'approval-card': 'blocks', 'chat': 'blocks', 'data-table': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'metric-card': 'blocks', 'questionnaire': 'blocks', 'step-wizard': 'blocks',
+  'area-chart-card': 'blocks', 'bar-chart-card': 'blocks', 'line-chart-card': 'blocks', 'pie-chart-card': 'blocks', 'radial-chart-card': 'blocks', 'radar-chart-card': 'blocks',
 
   // Motion
   'number-roll': 'motion', 'spinning-counter': 'motion', 'number-pop-in': 'motion',

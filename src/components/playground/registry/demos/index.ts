@@ -112,12 +112,18 @@ import {
 
 import {
   ApprovalCardDemo,
+  AreaChartCardDemo,
+  BarChartCardDemo,
   ChatBlockDemo,
   DataTableDemo,
   DeleteConfirmationDialogDemo,
   FilterToolbarDemo,
+  LineChartCardDemo,
   MetricCardDemo,
+  PieChartCardDemo,
   QuestionnaireDemo,
+  RadarChartCardDemo,
+  RadialChartCardDemo,
 } from './BlocksDemos';
 
 import {
@@ -246,12 +252,18 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
 
   // Blocks
   'approval-card': ApprovalCardDemo,
+  'area-chart-card': AreaChartCardDemo,
+  'bar-chart-card': BarChartCardDemo,
   'chat': ChatBlockDemo,
   'data-table': DataTableDemo,
   'delete-confirmation-dialog': DeleteConfirmationDialogDemo,
   'filter-toolbar': FilterToolbarDemo,
+  'line-chart-card': LineChartCardDemo,
   'metric-card': MetricCardDemo,
+  'pie-chart-card': PieChartCardDemo,
   'questionnaire': QuestionnaireDemo,
+  'radar-chart-card': RadarChartCardDemo,
+  'radial-chart-card': RadialChartCardDemo,
 
   // Motion
   'number-roll': NumberRollDemo,

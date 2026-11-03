@@ -9,6 +9,7 @@ export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode;
     icon?: React.ComponentType;
+    avatar?: string;
   } & (
     | { color?: string; theme?: never }
     | { color?: never; theme: Record<keyof typeof THEMES, string> }
@@ -49,7 +50,7 @@ export const ChartContainer = React.forwardRef<
         data-chart={chartId}
         ref={ref}
         className={cn(
-          "@container flex aspect-video justify-center text-xs font-sans [&_.recharts-cartesian-axis-tick_text]:fill-on-surface-variant [&_.recharts-cartesian-grid_line]:stroke-outline-variant/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-outline-variant [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_line]:stroke-outline-variant/40 [&_.recharts-radial-bar-background-sector]:fill-surface-variant [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-surface-variant/40 [&_.recharts-reference-line_line]:stroke-outline-variant [&_.recharts-sector]:stroke-transparent [&_.recharts-surface]:outline-none",
+          "@container flex w-full min-w-0 aspect-video justify-center text-xs font-sans [&_.recharts-cartesian-axis-tick_text]:fill-on-surface-variant [&_.recharts-cartesian-grid_line]:stroke-outline-variant/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-outline-variant [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_line]:stroke-outline-variant/40 [&_.recharts-radial-bar-background-sector]:fill-surface-variant [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-surface-variant/40 [&_.recharts-reference-line_line]:stroke-outline-variant [&_.recharts-sector]:stroke-transparent [&_.recharts-surface]:outline-none",
           className
         )}
         {...props}
@@ -155,6 +156,7 @@ export interface ChartTooltipContentProps
   label?: string;
   labelFormatter?: (label: React.ReactNode, payload: ChartTooltipPayloadItem[]) => React.ReactNode;
   labelClassName?: string;
+  valueFormatter?: (value: number | string | Array<number | string>) => React.ReactNode;
   formatter?: (
     value: unknown,
     name: unknown,
@@ -165,6 +167,8 @@ export interface ChartTooltipContentProps
   color?: string;
   nameKey?: string;
   labelKey?: string;
+  showTotal?: boolean;
+  totalLabel?: string;
 }
 
 export const ChartTooltipContent = React.forwardRef<
@@ -182,10 +186,13 @@ export const ChartTooltipContent = React.forwardRef<
       label,
       labelFormatter,
       labelClassName,
+      valueFormatter,
       formatter,
       color,
       nameKey,
       labelKey,
+      showTotal = false,
+      totalLabel = 'Total',
     },
     ref
   ) => {
@@ -227,6 +234,14 @@ export const ChartTooltipContent = React.forwardRef<
       labelKey,
     ]);
 
+    const totalValue = React.useMemo(() => {
+      if (!showTotal || !payload?.length) return 0;
+      return payload.reduce((acc, curr) => {
+        const val = typeof curr.value === 'number' ? curr.value : Number(curr.value) || 0;
+        return acc + val;
+      }, 0);
+    }, [showTotal, payload]);
+
     if (!active || !payload?.length) {
       return null;
     }
@@ -260,8 +275,16 @@ export const ChartTooltipContent = React.forwardRef<
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
-                    {itemConfig?.icon ? (
-                      <itemConfig.icon />
+                    {itemConfig?.avatar ? (
+                      <img
+                        src={itemConfig.avatar}
+                        alt=""
+                        className="size-4 rounded-full object-cover shrink-0 ring-1 ring-outline-variant/40"
+                      />
+                    ) : itemConfig?.icon ? (
+                      <div className="shrink-0 [&>svg]:size-3.5 [&>svg]:text-on-surface-variant flex items-center justify-center">
+                        <itemConfig.icon />
+                      </div>
                     ) : (
                       !hideIndicator && (
                         <div
@@ -297,7 +320,11 @@ export const ChartTooltipContent = React.forwardRef<
                       </div>
                       {item.value !== undefined && (
                         <span className="font-mono text-on-surface font-semibold tabular-nums">
-                          {item.value.toLocaleString()}
+                          {valueFormatter
+                            ? valueFormatter(item.value)
+                            : typeof item.value === 'number'
+                            ? item.value.toLocaleString()
+                            : item.value}
                         </span>
                       )}
                     </div>
@@ -306,6 +333,17 @@ export const ChartTooltipContent = React.forwardRef<
               </div>
             );
           })}
+
+          {showTotal && payload.length > 1 && (
+            <div className="flex w-full items-center justify-between gap-2 border-t border-outline-variant/40 pt-1.5 mt-0.5 text-xs font-sans font-semibold text-on-surface">
+              <span className="text-on-surface-variant font-medium">{totalLabel}</span>
+              <span className="font-mono tabular-nums">
+                {valueFormatter
+                  ? valueFormatter(totalValue)
+                  : totalValue.toLocaleString()}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -357,8 +395,16 @@ export const ChartLegendContent = React.forwardRef<
                 'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-on-surface-variant'
               )}
             >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
+              {itemConfig?.avatar ? (
+                <img
+                  src={itemConfig.avatar}
+                  alt=""
+                  className="size-3.5 rounded-full object-cover shrink-0 ring-1 ring-outline-variant/40"
+                />
+              ) : itemConfig?.icon && !hideIcon ? (
+                <div className="shrink-0 [&>svg]:size-3.5 [&>svg]:text-on-surface-variant flex items-center justify-center">
+                  <itemConfig.icon />
+                </div>
               ) : (
                 <div
                   className="size-2 rounded-full shrink-0 border border-outline/30"

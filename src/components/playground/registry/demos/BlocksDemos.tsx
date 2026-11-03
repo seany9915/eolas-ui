@@ -8,6 +8,12 @@ import {
 } from '@/components/blocks/data-table';
 import { Badge } from '@/components/ui/badge';
 import { ApprovalCard } from '@/components/blocks/approval-card';
+import { AreaChartCard } from '@/components/blocks/area-chart-card';
+import { BarChartCard } from '@/components/blocks/bar-chart-card';
+import { LineChartCard } from '@/components/blocks/line-chart-card';
+import { PieChartCard } from '@/components/blocks/pie-chart-card';
+import { RadialChartCard } from '@/components/blocks/radial-chart-card';
+import { RadarChartCard } from '@/components/blocks/radar-chart-card';
 import {
   Questionnaire,
   QuestionnaireProgress,
@@ -429,6 +435,220 @@ export const DataTableDemo: React.FC<ComponentDemoProps> = () => {
         ]}
         pageSizeOptions={[5, 10, 20]}
         showSelectedCount
+      />
+    </div>
+  );
+};
+
+export const AreaChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const chartData = [
+    { month: 'Jan', intake: 186 },
+    { month: 'Feb', intake: 305 },
+    { month: 'Mar', intake: 237 },
+    { month: 'Apr', intake: 273 },
+    { month: 'May', intake: 309 },
+    { month: 'Jun', intake: 414 },
+  ];
+
+  const chartConfig = {
+    intake: {
+      label: 'Patient Intake',
+      color: 'var(--color-primary)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto py-6">
+      <AreaChartCard
+        title="Monthly Patient Intake"
+        description="Showing total intake admissions over the past 6 months"
+        data={chartData}
+        xAxisKey="month"
+        series={[{ dataKey: 'intake', label: 'Intake' }]}
+        config={chartConfig}
+        trend={{ value: '+14.2%', positive: true, label: 'vs previous period' }}
+        footer="Updated today at 09:00"
+      />
+    </div>
+  );
+};
+
+export const BarChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const chartData = [
+    { department: 'Speech', target: 80, actual: 95 },
+    { department: 'Occupational', target: 70, actual: 85 },
+    { department: 'Physical', target: 90, actual: 88 },
+    { department: 'Psychology', target: 65, actual: 72 },
+  ];
+
+  const chartConfig = {
+    target: {
+      label: 'Target',
+      color: 'var(--color-outline)',
+    },
+    actual: {
+      label: 'Actual',
+      color: 'var(--color-secondary)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto py-6">
+      <BarChartCard
+        title="Department Throughput"
+        description="Target versus actual session completions by therapy domain"
+        data={chartData}
+        xAxisKey="department"
+        series={[
+          { dataKey: 'target', label: 'Target' },
+          { dataKey: 'actual', label: 'Actual' },
+        ]}
+        config={chartConfig}
+        trend={{ value: '+8.4%', positive: true, label: 'above target' }}
+        footer="Q2 performance review"
+      />
+    </div>
+  );
+};
+
+export const LineChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const chartData = [
+    { week: 'W1', current: 62, benchmark: 70 },
+    { week: 'W2', current: 68, benchmark: 70 },
+    { week: 'W3', current: 74, benchmark: 71 },
+    { week: 'W4', current: 79, benchmark: 72 },
+    { week: 'W5', current: 85, benchmark: 72 },
+  ];
+
+  const chartConfig = {
+    current: {
+      label: 'Current Progress',
+      color: 'var(--color-primary)',
+    },
+    benchmark: {
+      label: 'Clinical Target',
+      color: 'var(--color-outline)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto py-6">
+      <LineChartCard
+        title="Clinical Recovery Benchmark"
+        description="Patient functional improvement tracked against benchmark target"
+        data={chartData}
+        xAxisKey="week"
+        series={[
+          { dataKey: 'current', label: 'Current Progress' },
+          { dataKey: 'benchmark', label: 'Clinical Target', strokeDasharray: '4 4' },
+        ]}
+        config={chartConfig}
+        trend={{ value: '+13 pts', positive: true, label: 'exceeding benchmark' }}
+        footer="Evaluated over 5 weeks"
+      />
+    </div>
+  );
+};
+
+export const PieChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const chartData = [
+    { name: 'Urgent', value: 275, fill: 'var(--color-error)' },
+    { name: 'Routine', value: 410, fill: 'var(--color-primary)' },
+    { name: 'Follow-up', value: 190, fill: 'var(--color-secondary)' },
+    { name: 'Discharged', value: 125, fill: 'var(--color-tertiary)' },
+  ];
+
+  const chartConfig = {
+    Urgent: {
+      label: 'Urgent',
+      color: 'var(--color-error)',
+    },
+    Routine: {
+      label: 'Routine',
+      color: 'var(--color-primary)',
+    },
+    'Follow-up': {
+      label: 'Follow-up',
+      color: 'var(--color-secondary)',
+    },
+    Discharged: {
+      label: 'Discharged',
+      color: 'var(--color-tertiary)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-md mx-auto py-6">
+      <PieChartCard
+        title="Caseload Distribution"
+        description="Active caseload broken down by clinical priority"
+        data={chartData}
+        config={chartConfig}
+        centerLabel={{ label: 'Total Cases', value: 1000 }}
+        footer={<span>Showing 1,000 active patient profiles</span>}
+      />
+    </div>
+  );
+};
+
+export const RadialChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const chartConfig = {
+    value: {
+      label: 'Capacity',
+      color: 'var(--color-warning)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-md mx-auto py-6">
+      <RadialChartCard
+        title="Ward Bed Capacity"
+        description="Real-time occupancy vs safety threshold limit"
+        value={84}
+        total={100}
+        unit="%"
+        status="warning"
+        statusLabel="84% Utilized"
+        config={chartConfig}
+        footer={<span>Alert threshold set at 85% occupancy</span>}
+      />
+    </div>
+  );
+};
+
+export const RadarChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const chartData = [
+    { pillar: 'Communication', baseline: 65, current: 85 },
+    { pillar: 'Motor Skills', baseline: 50, current: 75 },
+    { pillar: 'Independence', baseline: 70, current: 90 },
+    { pillar: 'Cognition', baseline: 60, current: 80 },
+    { pillar: 'Social Interaction', baseline: 55, current: 70 },
+  ];
+
+  const chartConfig = {
+    baseline: {
+      label: 'Baseline Assessment',
+      color: 'var(--color-outline)',
+    },
+    current: {
+      label: 'Current Follow-up',
+      color: 'var(--color-secondary)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-md mx-auto py-6">
+      <RadarChartCard
+        title="Functional Independence Profile"
+        description="Patient evaluation across 5 clinical core domains"
+        data={chartData}
+        angleKey="pillar"
+        series={[
+          { dataKey: 'baseline', label: 'Baseline', fillOpacity: 0.2 },
+          { dataKey: 'current', label: 'Current', fillOpacity: 0.4 },
+        ]}
+        config={chartConfig}
+        footer={<span>Evaluated over 12 weeks of therapy</span>}
       />
     </div>
   );

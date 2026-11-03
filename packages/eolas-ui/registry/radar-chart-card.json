@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "radar-chart-card",
+  "type": "registry:block",
+  "title": "Radar Chart Card",
+  "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes Card, Chart, and Legend primitives with polar grids, high-contrast polygons, and accessible tooltips.",
+  "dependencies": [
+    "@base-ui/react",
+    "clsx",
+    "tailwind-merge",
+    "recharts"
+  ],
+  "registryDependencies": [
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/card",
+    "@seany9915/eolas-ui/chart"
+  ],
+  "files": [
+    {
+      "path": "blocks/radar-chart-card.tsx",
+      "content": "/**\n * RadarChartCard block.\n *\n * Controlled presentational radar / spider card for multi-factor profile assessments,\n * clinical competency pillars, and benchmark polygon overlays.\n * Composes Card, Chart, and Legend primitives with polar grids, high-contrast polygons, and accessible tooltips.\n */\nimport * as React from 'react';\nimport { PolarAngleAxis, PolarGrid, Radar, RadarChart } from 'recharts';\nimport { Card } from '@/components/ui/card';\nimport {\n  ChartContainer,\n  ChartTooltip,\n  ChartTooltipContent,\n  ChartLegend,\n  ChartLegendContent,\n  type ChartConfig,\n} from '@/components/ui/chart';\nimport { cn } from '@/lib/utils';\n\nexport interface RadarChartSeries {\n  dataKey: string;\n  label?: string;\n  fillOpacity?: number;\n}\n\nexport interface RadarChartCardProps extends React.HTMLAttributes<HTMLDivElement> {\n  title: string;\n  description?: string;\n  data: Array<Record<string, unknown>>;\n  angleKey: string;\n  series: RadarChartSeries[];\n  config: ChartConfig;\n  showLegend?: boolean;\n  footer?: React.ReactNode;\n  action?: React.ReactNode;\n}\n\nexport const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardProps>(\n  (\n    {\n      title,\n      description,\n      data,\n      angleKey,\n      series,\n      config,\n      showLegend = true,\n      footer,\n      action,\n      className,\n      ...props\n    },\n    ref\n  ) => {\n    return (\n      <Card ref={ref} className={cn('w-full', className)} {...props}>\n        <Card.Header>\n          <div className=\"flex flex-col gap-1\">\n            <Card.Title className=\"text-base font-semibold text-on-surface\">\n              {title}\n            </Card.Title>\n            {description && (\n              <Card.Description className=\"text-xs text-on-surface-variant\">\n                {description}\n              </Card.Description>\n            )}\n          </div>\n          {action && (\n            <div data-slot=\"card-action\" className=\"col-start-2 row-start-1 self-start justify-self-end\">\n              {action}\n            </div>\n          )}\n        </Card.Header>\n\n        <Card.Content className=\"pt-2\">\n          <ChartContainer\n            config={config}\n            className=\"mx-auto aspect-square max-h-[260px] w-full\"\n          >\n            <RadarChart\n              data={data}\n              outerRadius=\"70%\"\n              margin={{ top: 16, right: 24, bottom: 16, left: 24 }}\n            >\n              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />\n              <PolarAngleAxis\n                dataKey={angleKey}\n                className=\"text-xs font-sans font-medium text-on-surface-variant\"\n              />\n              <PolarGrid className=\"stroke-outline-variant/40\" />\n              {series.map((item) => (\n                <Radar\n                  key={item.dataKey}\n                  dataKey={item.dataKey}\n                  stroke={`var(--color-${item.dataKey})`}\n                  fill={`var(--color-${item.dataKey})`}\n                  fillOpacity={item.fillOpacity ?? 0.3}\n                  strokeWidth={2}\n                />\n              ))}\n              {showLegend && series.length > 1 && (\n                <ChartLegend content={<ChartLegendContent />} />\n              )}\n            </RadarChart>\n          </ChartContainer>\n        </Card.Content>\n\n        {footer && (\n          <Card.Footer className=\"flex items-center justify-between gap-3 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3\">\n            {footer}\n          </Card.Footer>\n        )}\n      </Card>\n    );\n  }\n);\nRadarChartCard.displayName = 'RadarChartCard';\n",
+      "type": "registry:block",
+      "target": "@components/blocks/radar-chart-card.tsx"
+    }
+  ],
+  "docs": "RadarChartCard block.\nControlled presentational radar / spider card for multi-factor profile assessments,\nclinical competency pillars, and benchmark polygon overlays.\nComposes Card, Chart, and Legend primitives with polar grids, high-contrast polygons, and accessible tooltips."
+}

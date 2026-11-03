@@ -2173,6 +2173,40 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/approval-card"
   },
   {
+    "id": "area-chart-card",
+    "name": "area-chart-card",
+    "title": "Area Chart Card",
+    "description": "AreaChartCard block. Controlled presentational card for volume trends and intake velocity over time. Composes Card, Badge, Icon, and Chart primitives with smooth gradient fills and accessible tooltips.",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/area-chart-card.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "recharts"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/area-chart-card"
+  },
+  {
+    "id": "bar-chart-card",
+    "name": "bar-chart-card",
+    "title": "Bar Chart Card",
+    "description": "BarChartCard block. Controlled presentational card for categorical throughput, comparative performance, and multi-metric distribution. Composes Card, Badge, Icon, and Chart primitives with rounded bars, accessible tooltips, and legends.",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/bar-chart-card.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "recharts"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/bar-chart-card"
+  },
+  {
     "id": "chat",
     "name": "chat",
     "title": "Chat",
@@ -2252,6 +2286,23 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/filter-toolbar"
   },
   {
+    "id": "line-chart-card",
+    "name": "line-chart-card",
+    "title": "Line Chart Card",
+    "description": "LineChartCard block. Controlled presentational card for multi-series trajectories, baseline targets, and historical benchmark tracking. Composes Card, Badge, Icon, and Chart primitives with high-contrast lines, accessible tooltips, and legends.",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/line-chart-card.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "recharts"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/line-chart-card"
+  },
+  {
     "id": "metric-card",
     "name": "metric-card",
     "title": "Metric Card",
@@ -2266,6 +2317,23 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/metric-card"
+  },
+  {
+    "id": "pie-chart-card",
+    "name": "pie-chart-card",
+    "title": "Pie Chart Card",
+    "description": "PieChartCard block. Controlled presentational card for category distributions, status proportions, and caseload composition breakdowns. Composes Card, Chart, and Legend primitives with a centered aggregate KPI and accessible tooltips.",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/pie-chart-card.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "recharts"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/pie-chart-card"
   },
   {
     "id": "questionnaire",
@@ -2288,6 +2356,40 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/questionnaire"
+  },
+  {
+    "id": "radar-chart-card",
+    "name": "radar-chart-card",
+    "title": "Radar Chart Card",
+    "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes Card, Chart, and Legend primitives with polar grids, high-contrast polygons, and accessible tooltips.",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/radar-chart-card.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "recharts"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/radar-chart-card"
+  },
+  {
+    "id": "radial-chart-card",
+    "name": "radial-chart-card",
+    "title": "Radial Chart Card",
+    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. Composes Card, Badge, Icon, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/radial-chart-card.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "recharts"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/radial-chart-card"
   },
   {
     "id": "step-wizard",
