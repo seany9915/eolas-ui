@@ -339,8 +339,8 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
               aria-labelledby={label ? `${comboboxId}-label` : undefined}
               className={cn(
                 'w-full bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',
-                size === 'sm' && 'h-9 px-3 pr-16 min-h-[44px] text-xs',
-                size === 'md' && 'h-11 px-3.5 pr-16 min-h-[44px] text-sm',
+                size === 'sm' && 'h-11 px-3 pr-16 min-h-[44px] text-xs',
+                size === 'md' && 'h-12 px-3.5 pr-16 min-h-[48px] text-sm',
                 size === 'lg' && 'h-14 px-5 pr-20 min-h-[56px] text-base',
                 'disabled:cursor-not-allowed',
                 inputClassName
@@ -436,8 +436,8 @@ export const ComboboxInput = React.forwardRef<
     ref={ref}
     className={cn(
       'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 transition-colors',
-      size === 'sm' && 'h-9 px-3 min-h-[44px] text-xs',
-      size === 'md' && 'h-11 px-3.5 min-h-[44px] text-sm',
+      size === 'sm' && 'h-11 px-3 min-h-[44px] text-xs',
+      size === 'md' && 'h-12 px-3.5 min-h-[48px] text-sm',
       size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
       'hover:border-on-surface-variant/80',
       'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
@@ -469,7 +469,7 @@ export const ComboboxTrigger = React.forwardRef<
       tabIndex={hasChildren ? props.tabIndex : (props.tabIndex ?? -1)}
       className={cn(
         hasChildren
-          ? 'inline-flex items-center justify-between h-11 px-3.5 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
+          ? 'inline-flex items-center justify-between h-12 px-4 min-h-[48px] rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
           : 'size-7 min-w-[28px] min-h-[28px] rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
         className
       )}

@@ -65,9 +65,9 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
     const label = ariaLabel ?? ariaLabelProp;
 
     const sizeClasses = {
-      sm: 'relative h-9 px-2.5 min-w-[36px] text-xs gap-1.5 after:absolute after:-inset-1 after:content-[\'\']',
-      md: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-sm gap-2',
-      lg: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-base gap-2.5',
+      sm: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-xs gap-1.5',
+      md: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-sm gap-2',
+      lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5',
     }[effectiveSize];
 
     return (

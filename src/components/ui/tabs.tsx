@@ -203,11 +203,11 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
       effectiveVariant === 'pill';
     const hasSlidingIndicator = context.showIndicator;
 
-    // Size height tokens (enforcing min 44px hit-target for standard accessibility)
+    // Size height tokens (synchronized with 44px sm / 48px md / 56px lg scale across Button & Input)
     const sizeClasses = {
-      sm: isSegmented ? 'relative py-1.5 px-3 min-h-[36px] text-xs after:absolute after:-inset-1 after:content-[\'\']' : 'py-2 px-3.5 min-h-[44px] text-xs',
-      md: isSegmented ? 'py-2 px-3.5 min-h-[44px] text-sm' : 'py-2.5 px-4 min-h-[44px] text-sm',
-      lg: isSegmented ? 'py-2.5 px-4.5 min-h-[48px] text-base' : 'py-3.5 px-5 min-h-[48px] text-base',
+      sm: 'py-2 px-3.5 min-h-[44px] text-xs',
+      md: 'py-2.5 px-4 min-h-[48px] text-sm',
+      lg: 'py-3.5 px-5 min-h-[56px] text-base',
     }[effectiveSize];
 
     return (
