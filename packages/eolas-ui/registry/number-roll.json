@@ -10,9 +10,9 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "number-pop-in",
-    "spinning-counter"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/number-pop-in",
+    "@seany9915/eolas-ui/spinning-counter"
   ],
   "files": [
     {

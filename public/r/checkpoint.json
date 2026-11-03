@@ -10,11 +10,11 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "button",
-    "icon",
-    "badge",
-    "separator"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/badge",
+    "@seany9915/eolas-ui/separator"
   ],
   "files": [
     {

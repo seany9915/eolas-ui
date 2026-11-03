@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "message-scroller",
-    "chat-message",
-    "prompt-input",
-    "suggestion-chips",
-    "empty-state"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/message-scroller",
+    "@seany9915/eolas-ui/chat-message",
+    "@seany9915/eolas-ui/prompt-input",
+    "@seany9915/eolas-ui/suggestion-chips",
+    "@seany9915/eolas-ui/empty-state"
   ],
   "files": [
     {

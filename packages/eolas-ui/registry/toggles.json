@@ -10,9 +10,9 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "toggle",
-    "toggle-group"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/toggle",
+    "@seany9915/eolas-ui/toggle-group"
   ],
   "files": [
     {

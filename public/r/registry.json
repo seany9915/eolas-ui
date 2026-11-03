@@ -48,7 +48,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -69,9 +69,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "dialog"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/dialog"
       ]
     },
     {
@@ -85,8 +85,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button"
       ]
     },
     {
@@ -100,7 +100,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -121,7 +121,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -142,7 +142,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -170,7 +170,7 @@
         "bot-avatars"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -184,10 +184,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon",
-        "button",
-        "tooltip"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/tooltip"
       ]
     },
     {
@@ -201,7 +201,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -223,7 +223,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -247,7 +247,7 @@
         "react-day-picker"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -269,7 +269,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -284,9 +284,9 @@
         "embla-carousel-react"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -308,10 +308,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "trace",
-        "badge",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -335,7 +335,7 @@
         "recharts"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -349,7 +349,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -363,15 +363,15 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "avatar",
-        "bot-avatar",
-        "trace",
-        "reasoning",
-        "tooltip",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/avatar",
+        "@seany9915/eolas-ui/bot-avatar",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/reasoning",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -395,9 +395,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "checkbox",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/checkbox",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -419,8 +419,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -442,11 +442,11 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "badge",
-        "separator"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/separator"
       ],
       "meta": {
         "taxonomy": [
@@ -470,7 +470,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -496,8 +496,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -511,10 +511,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "tooltip"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip"
       ],
       "meta": {
         "taxonomy": [
@@ -535,7 +535,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -556,7 +556,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -579,8 +579,8 @@
         "cmdk"
       ],
       "registryDependencies": [
-        "utils",
-        "dialog"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/dialog"
       ],
       "meta": {
         "taxonomy": [
@@ -602,11 +602,11 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "badge",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -631,7 +631,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -645,7 +645,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -659,7 +659,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -681,8 +681,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button"
       ]
     },
     {
@@ -696,7 +696,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -710,7 +710,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -731,8 +731,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "empty"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/empty"
       ]
     },
     {
@@ -746,8 +746,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -775,7 +775,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -789,9 +789,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon",
-        "fieldset"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/fieldset"
       ],
       "meta": {
         "taxonomy": [
@@ -813,7 +813,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -834,7 +834,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -854,7 +854,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -868,8 +868,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -892,10 +892,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "carousel"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/carousel"
       ],
       "meta": {
         "taxonomy": [
@@ -920,9 +920,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "textarea"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/textarea"
       ],
       "meta": {
         "taxonomy": [
@@ -946,7 +946,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -971,7 +971,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -994,7 +994,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1016,7 +1016,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1030,8 +1030,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -1045,10 +1045,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "tooltip"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip"
       ],
       "meta": {
         "taxonomy": [
@@ -1073,7 +1073,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1094,10 +1094,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "select",
-        "icon",
-        "tooltip"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/select",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip"
       ],
       "meta": {
         "taxonomy": [
@@ -1120,8 +1120,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -1135,7 +1135,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1149,8 +1149,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1170,7 +1170,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1184,9 +1184,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "number-pop-in",
-        "spinning-counter"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/number-pop-in",
+        "@seany9915/eolas-ui/spinning-counter"
       ]
     },
     {
@@ -1200,8 +1200,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1222,9 +1222,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -1238,10 +1238,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "trace",
-        "progress",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/progress",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1262,7 +1262,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1276,7 +1276,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1290,7 +1290,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1312,8 +1312,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "skeleton"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/skeleton"
       ],
       "meta": {
         "taxonomy": [
@@ -1334,15 +1334,15 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "textarea",
-        "tooltip",
-        "attachment",
-        "menu",
-        "badge",
-        "input-group"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/textarea",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/attachment",
+        "@seany9915/eolas-ui/menu",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/input-group"
       ],
       "meta": {
         "taxonomy": [
@@ -1365,10 +1365,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "trace",
-        "icon",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1389,7 +1389,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1410,7 +1410,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1432,12 +1432,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "trace",
-        "shimmer-text",
-        "button",
-        "icon",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/shimmer-text",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1463,7 +1463,7 @@
         "react-resizable-panels"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1484,7 +1484,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1505,7 +1505,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1529,7 +1529,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1543,11 +1543,11 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "checkbox",
-        "checkbox-group",
-        "radio",
-        "switch"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/checkbox",
+        "@seany9915/eolas-ui/checkbox-group",
+        "@seany9915/eolas-ui/radio",
+        "@seany9915/eolas-ui/switch"
       ]
     },
     {
@@ -1561,7 +1561,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1582,7 +1582,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1596,13 +1596,13 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "tooltip",
-        "button",
-        "input",
-        "separator",
-        "skeleton",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/separator",
+        "@seany9915/eolas-ui/skeleton",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1624,7 +1624,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1638,7 +1638,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1659,12 +1659,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon",
-        "tooltip",
-        "button",
-        "chat-message-context",
-        "inline-citation"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chat-message-context",
+        "@seany9915/eolas-ui/inline-citation"
       ],
       "meta": {
         "taxonomy": [
@@ -1690,7 +1690,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1712,7 +1712,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1726,8 +1726,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "number-field"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/number-field"
       ]
     },
     {
@@ -1741,7 +1741,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1764,7 +1764,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1778,9 +1778,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1805,7 +1805,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1827,7 +1827,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1848,7 +1848,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1869,8 +1869,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -1894,10 +1894,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "trace",
-        "button",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -1920,7 +1920,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1942,7 +1942,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1956,7 +1956,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -1981,7 +1981,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -1996,7 +1996,7 @@
         "thinking-orbs"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -2010,8 +2010,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -2025,8 +2025,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -2049,7 +2049,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -2071,9 +2071,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "toggle",
-        "toggle-group"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/toggle",
+        "@seany9915/eolas-ui/toggle-group"
       ]
     },
     {
@@ -2087,12 +2087,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon",
-        "badge",
-        "code-block",
-        "inline-alert",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/code-block",
+        "@seany9915/eolas-ui/inline-alert",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -2116,8 +2116,8 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "tooltip"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/tooltip"
       ],
       "meta": {
         "taxonomy": [
@@ -2141,7 +2141,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ]
     },
     {
@@ -2155,10 +2155,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "icon",
-        "button",
-        "chat-message-context"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
         "taxonomy": [
@@ -2180,7 +2180,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils"
+        "@seany9915/eolas-ui/utils"
       ],
       "meta": {
         "taxonomy": [
@@ -2203,11 +2203,11 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon",
-        "radio",
-        "input"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/radio",
+        "@seany9915/eolas-ui/input"
       ]
     },
     {
@@ -2221,12 +2221,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "message-scroller",
-        "chat-message",
-        "prompt-input",
-        "suggestion-chips",
-        "empty-state"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/message-scroller",
+        "@seany9915/eolas-ui/chat-message",
+        "@seany9915/eolas-ui/prompt-input",
+        "@seany9915/eolas-ui/suggestion-chips",
+        "@seany9915/eolas-ui/empty-state"
       ],
       "meta": {
         "taxonomy": [
@@ -2251,15 +2251,15 @@
         "@tanstack/react-table"
       ],
       "registryDependencies": [
-        "utils",
-        "table",
-        "button",
-        "input",
-        "select",
-        "menu",
-        "checkbox",
-        "badge",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/table",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/select",
+        "@seany9915/eolas-ui/menu",
+        "@seany9915/eolas-ui/checkbox",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [
@@ -2281,10 +2281,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "alert-dialog",
-        "button",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/alert-dialog",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -2298,12 +2298,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "input",
-        "select",
-        "button",
-        "chip",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/select",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chip",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -2317,10 +2317,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "card",
-        "badge",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/card",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/icon"
       ]
     },
     {
@@ -2334,12 +2334,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "input",
-        "progress",
-        "icon",
-        "kbd"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/progress",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/kbd"
       ],
       "meta": {
         "taxonomy": [
@@ -2361,9 +2361,9 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "utils",
-        "button",
-        "icon"
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
       ],
       "meta": {
         "taxonomy": [

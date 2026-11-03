@@ -10,10 +10,10 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "trace",
-    "icon",
-    "chat-message-context"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/trace",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/chat-message-context"
   ],
   "files": [
     {

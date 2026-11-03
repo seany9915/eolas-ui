@@ -11,9 +11,9 @@
     "embla-carousel-react"
   ],
   "registryDependencies": [
-    "utils",
-    "button",
-    "icon"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon"
   ],
   "files": [
     {

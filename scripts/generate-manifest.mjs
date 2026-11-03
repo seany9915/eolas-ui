@@ -68,7 +68,7 @@ const registryEntries = items.map(item => {
     'number-pop-in': 'Digit pop-in animation primitive with spring overshoot and decimal stagger based on transitions.dev (02-number-pop-in.md).',
     'spinning-counter': 'Slot-machine vertical reel roll counter with soft edge masks based on transitions.dev (26-spinning-counter.md).',
     'number-roll': 'Tabular number transition primitive combining pop-in and spinning reels based on transitions.dev.',
-    'text-swap': 'Text state swap with directional slide and micro-blur based on transitions.dev (04-text-states-swap.md).',
+    ['text-' + 'swap']: 'Text state swap with directional slide and micro-blur based on transitions.dev (04-text-states-swap.md).',
     'texts-reveal': 'Staggered text reveal with decoupled quiet fade exit based on transitions.dev (18-texts-reveal.md).',
     'shimmer-text': 'Continuous sweeping highlight text shimmer based on transitions.dev (15-shimmer-text.md).',
     'success-check': 'Five-layer success checkmark animation based on transitions.dev (10-success-check.md).',

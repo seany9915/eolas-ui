@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "input",
-    "select",
-    "button",
-    "chip",
-    "icon"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/input",
+    "@seany9915/eolas-ui/select",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/chip",
+    "@seany9915/eolas-ui/icon"
   ],
   "files": [
     {

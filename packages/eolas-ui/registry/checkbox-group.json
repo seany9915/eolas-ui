@@ -10,9 +10,9 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "checkbox",
-    "icon"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/checkbox",
+    "@seany9915/eolas-ui/icon"
   ],
   "files": [
     {

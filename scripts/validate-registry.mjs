@@ -33,7 +33,7 @@ if (catalogErrors.length > 0) {
   console.error('❌ Catalog schema errors:');
   catalogErrors.forEach((e) => console.error(`  - ${e}`));
 } else {
-  console.log(`✅ Catalog schema valid (79 items, name: "${catalog.name}", homepage: "${catalog.homepage}")`);
+  console.log(`✅ Catalog schema valid (${catalog.items.length} items, name: "${catalog.name}", homepage: "${catalog.homepage}")`);
 }
 
 // 2. Validate Items against registry-item.json
@@ -112,6 +112,16 @@ for (const file of itemFiles) {
     }
   }
 
+  // Validate registryDependencies format: bare names are reserved for official shadcn items.
+  // Internal dependencies must use explicit namespace e.g. "@seany9915/eolas-ui/utils"
+  if (Array.isArray(item.registryDependencies)) {
+    for (const dep of item.registryDependencies) {
+      if (!dep.startsWith('@') && !dep.includes('/')) {
+        errs.push(`registryDependency "${dep}" is a bare name. Cross-component dependencies must use namespace (e.g. "@seany9915/eolas-ui/${dep}").`);
+      }
+    }
+  }
+
   if (errs.length > 0) {
     console.error(`❌ Item ${file} errors:`, errs);
     itemErrors++;
@@ -128,9 +138,23 @@ console.log('\n=== Target Path Analysis ===');
 console.log(`Placeholder targets (@ui/, @components/, @lib/, ~): ${placeholderTargetCount}`);
 console.log(`Hardcoded static targets (components/ui/..., lib/utils.ts, etc.): ${hardcodedTargetCount}`);
 
-// 3. Check for root registry.json (GitHub Registries feature)
+// 3. Check for modular root registry.json (GitHub Registries feature via include)
 const ROOT_REGISTRY = path.resolve(ROOT, 'registry.json');
+let modularCheckPassed = false;
+if (fs.existsSync(ROOT_REGISTRY)) {
+  const rootData = JSON.parse(fs.readFileSync(ROOT_REGISTRY, 'utf8'));
+  if (Array.isArray(rootData.include) && rootData.include.length > 0) {
+    const missingIncludes = rootData.include.filter((p) => !fs.existsSync(path.resolve(ROOT, p)));
+    if (missingIncludes.length === 0) {
+      modularCheckPassed = true;
+    } else {
+      console.error('❌ Root registry.json has missing includes:', missingIncludes);
+    }
+  }
+}
+
 console.log('\n=== Feature Parity Checks ===');
-console.log(`- Root registry.json for GitHub direct install: ${fs.existsSync(ROOT_REGISTRY) ? 'Present ✅' : 'Missing ⚠️'}`);
+console.log(`- Modular root registry.json via include: ${modularCheckPassed ? 'Present ✅' : 'Missing ⚠️'}`);
 console.log(`- MCP Server compatibility endpoint (public/r/registry.json): Present ✅`);
 console.log(`- Open in v0 URL support: Items served as individual flat JSON endpoints ✅`);
+console.log(`- Namespaced registryDependencies resolution: Enforced ✅`);

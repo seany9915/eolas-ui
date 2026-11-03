@@ -10,10 +10,10 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "select",
-    "icon",
-    "tooltip"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/select",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/tooltip"
   ],
   "files": [
     {

@@ -10,15 +10,15 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "button",
-    "icon",
-    "avatar",
-    "bot-avatar",
-    "trace",
-    "reasoning",
-    "tooltip",
-    "chat-message-context"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/avatar",
+    "@seany9915/eolas-ui/bot-avatar",
+    "@seany9915/eolas-ui/trace",
+    "@seany9915/eolas-ui/reasoning",
+    "@seany9915/eolas-ui/tooltip",
+    "@seany9915/eolas-ui/chat-message-context"
   ],
   "files": [
     {

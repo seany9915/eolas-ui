@@ -10,7 +10,7 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils"
+    "@seany9915/eolas-ui/utils"
   ],
   "files": [
     {

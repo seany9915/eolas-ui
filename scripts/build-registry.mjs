@@ -21,6 +21,8 @@ if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 }
 
+const formatRegistryDep = (dep) => (dep.startsWith('@') ? dep : `@seany9915/eolas-ui/${dep}`);
+
 function parseComponentDoc(content, name) {
   const humanTitle = name
     .split('-')
@@ -326,7 +328,7 @@ for (const file of files) {
     title: docMeta.title,
     description: docMeta.description,
     dependencies: npmDeps,
-    registryDependencies: [...new Set(['utils', ...internalDeps])],
+    registryDependencies: [...new Set(['utils', ...internalDeps])].map(formatRegistryDep),
     files: [
       {
         path: `ui/${file}`,
@@ -385,7 +387,7 @@ if (fs.existsSync(BLOCKS_DIR)) {
       title: docMeta.title,
       description: docMeta.description,
       dependencies: npmDeps,
-      registryDependencies: [...new Set(['utils', ...internalDeps])],
+      registryDependencies: [...new Set(['utils', ...internalDeps])].map(formatRegistryDep),
       files: [
         {
           path: `blocks/${file}`,
@@ -423,8 +425,7 @@ const registryCatalog = {
 };
 fs.writeFileSync(REGISTRY_CATALOG, JSON.stringify(registryCatalog, null, 2));
 
-// Generate root registry.json for GitHub direct repository installation
-// (e.g. npx shadcn add username/repo/item)
+// Generate modular source registries and root registry.json
 const ROOT_REGISTRY = path.resolve('registry.json');
 const rootItems = registryItems.map((item) => {
   const itemFile = path.join(OUT_DIR, `${item.name}.json`);
@@ -461,11 +462,64 @@ const rootItems = registryItems.map((item) => {
   };
 });
 
+// 1. Modular UI Primitives Registry (src/components/ui/registry.json)
+const uiRegistryItems = rootItems
+  .filter((i) => i.type === 'registry:ui')
+  .map((item) => ({
+    ...item,
+    files: item.files.map((f) => ({
+      path: path.basename(f.path),
+      type: f.type,
+      target: f.target,
+    })),
+  }));
+fs.writeFileSync(
+  path.resolve('src/components/ui/registry.json'),
+  JSON.stringify(
+    {
+      $schema: 'https://ui.shadcn.com/schema/registry.json',
+      name: '@seany9915/eolas-ui/ui',
+      items: uiRegistryItems,
+    },
+    null,
+    2
+  )
+);
+
+// 2. Modular Composite Blocks Registry (src/components/blocks/registry.json)
+const blockRegistryItems = rootItems
+  .filter((i) => i.type === 'registry:block')
+  .map((item) => ({
+    ...item,
+    files: item.files.map((f) => ({
+      path: path.basename(f.path),
+      type: f.type,
+      target: f.target,
+    })),
+  }));
+fs.writeFileSync(
+  path.resolve('src/components/blocks/registry.json'),
+  JSON.stringify(
+    {
+      $schema: 'https://ui.shadcn.com/schema/registry.json',
+      name: '@seany9915/eolas-ui/blocks',
+      items: blockRegistryItems,
+    },
+    null,
+    2
+  )
+);
+
+// 3. Modular Root Registry with includes (registry.json)
 const rootCatalog = {
   $schema: 'https://ui.shadcn.com/schema/registry.json',
   name: '@seany9915/eolas-ui',
   homepage: 'https://github.com/seany9915/eolas-ui',
-  items: rootItems,
+  include: [
+    'src/components/ui/registry.json',
+    'src/components/blocks/registry.json',
+  ],
+  items: rootItems.filter((i) => i.type !== 'registry:ui' && i.type !== 'registry:block'),
 };
 fs.writeFileSync(ROOT_REGISTRY, JSON.stringify(rootCatalog, null, 2));
 

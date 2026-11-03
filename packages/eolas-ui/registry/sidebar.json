@@ -10,13 +10,13 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "tooltip",
-    "button",
-    "input",
-    "separator",
-    "skeleton",
-    "icon"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/tooltip",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/input",
+    "@seany9915/eolas-ui/separator",
+    "@seany9915/eolas-ui/skeleton",
+    "@seany9915/eolas-ui/icon"
   ],
   "files": [
     {

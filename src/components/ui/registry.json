@@ -1,0 +1,2889 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "@seany9915/eolas-ui/ui",
+  "items": [
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Accordion primitive (@base-ui/react/accordion).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "accordion.tsx",
+          "type": "registry:ui",
+          "target": "@ui/accordion.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Accordion for vertically stacked disclosure panels where one or more sections can be expanded at a time.",
+          "Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert Dialog",
+      "description": "Eolas UI Alert Dialog component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/dialog"
+      ],
+      "files": [
+        {
+          "path": "alert-dialog.tsx",
+          "type": "registry:ui",
+          "target": "@ui/alert-dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "attachment",
+      "type": "registry:ui",
+      "title": "Attachment",
+      "description": "Attachment component system. Full API and feature parity with shadcn/ui Base Attachment specification: https://ui.shadcn.com/docs/components/base/attachment ANATOMY: AttachmentGroup └── Attachment ├── AttachmentMedia ├── AttachmentContent │   ├── AttachmentTitle │   └── AttachmentDescription ├── AttachmentActions │   └── AttachmentAction └── AttachmentTrigger FEATURES & CAPABILITIES: - Full compound composition with subcomponents for flexible media, layout, and metadata display. - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'. - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card). - Component sizes: 'default' | 'sm' | 'xs'. - Media variants: 'default' (file-type icons or container wash) and 'image' (aspect-square thumbnails). - Stretched interactive overlay (AttachmentTrigger) with isolated action button stacking (AttachmentActions). - Horizontally scrollable, snapping container (AttachmentGroup) with smooth edge fades. - Base UI polymorphic useRender support across all subcomponents. - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button"
+      ],
+      "files": [
+        {
+          "path": "attachment.tsx",
+          "type": "registry:ui",
+          "target": "@ui/attachment.tsx"
+        }
+      ]
+    },
+    {
+      "name": "autocomplete",
+      "type": "registry:ui",
+      "title": "Autocomplete",
+      "description": "Autocomplete primitive (@base-ui/react/autocomplete).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "autocomplete.tsx",
+          "type": "registry:ui",
+          "target": "@ui/autocomplete.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Autocomplete for freeform text search inputs with dynamic completion suggestions where the user can either select a suggestion or type their own custom query.",
+          "For selecting one or more values from a closed set where selections submit explicit item keys, use Combobox or Select instead.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "Avatar primitive (@base-ui/react/avatar).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "avatar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/avatar.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays a user's profile picture, initials, or fallback icon.",
+          "Supports image loading states (idle, loading, loaded, error) and delayed fallback rendering to prevent visual flashes during fast network loads.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
+        ]
+      }
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Badge primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/badge",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "badge.tsx",
+          "type": "registry:ui",
+          "target": "@ui/badge.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Badge for PASSIVE, non-interactive status indicators, counts, categories, or labels.",
+          "Do NOT use Badge for interactive filters, toggles, or removable tags (use Chip instead).",
+          "Implements DESIGN.md High-Contrast Accessible standards:",
+          "Pattern 1 (filled): Solid brand fill + high-contrast on-color text.",
+          "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+          "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+          "Never uses the banned triple-tint monochrome pattern (light tint + same-hue border + same-hue text).",
+          "Full WCAG 2.2 AA contrast compliance.",
+          "Polymorphic composition powered by Base UI's `useRender` hook."
+        ]
+      }
+    },
+    {
+      "name": "bot-avatar",
+      "type": "registry:ui",
+      "title": "Bot Avatar",
+      "description": "Eolas UI Bot Avatar component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "bot-avatars"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "bot-avatar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/bot-avatar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "Eolas UI Breadcrumb component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/tooltip"
+      ],
+      "files": [
+        {
+          "path": "breadcrumb.tsx",
+          "type": "registry:ui",
+          "target": "@ui/breadcrumb.tsx"
+        }
+      ]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "ButtonGroup primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/button-group",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "button-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/button-group.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A container to group related buttons, segmented actions, and inputs with fused borders and shared geometry.",
+          "Resolves double-border artifacts (-space-x-px / -space-y-px) while ensuring focus rings stay visible with proper stacking context (focus-visible:z-20).",
+          "Fuses concentric border radii: rounds outer corners while flattening adjacent internal edges.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 touch target compliance."
+        ]
+      }
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Button primitive (@base-ui/react/button).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/button.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Button for triggering immediate page/dialog actions, form submits, or opening popups.",
+          "Do NOT use Button for on/off toggles with persistent state (use Toggle instead).",
+          "Do NOT use Button for in-page panel navigation (use Tabs instead).",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded 8px / 0.5rem), floating 2px focus ring, active micro-motion scaling, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+          "Never uses Sunny Amber (tertiary) text on light surfaces without dark container background."
+        ]
+      }
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Calendar primitive (React DayPicker). Base UI Ecosystem Documentation: https://ui.shadcn.com/docs/components/base/calendar React DayPicker Documentation: https://daypicker.dev",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "react-day-picker"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "calendar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/calendar.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Calendar for date, multiple date, and date range selections.",
+          "Integrates with React DayPicker v9/v10 while maintaining complete shadcn/ui API compatibility.",
+          "Commonly paired with Popover and Button to form a DatePicker.",
+          "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast."
+        ]
+      }
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Eolas UI Card component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "card.tsx",
+          "type": "registry:ui",
+          "target": "@ui/card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "Carousel",
+      "description": "Carousel primitive built on embla-carousel-react and Base UI. Embla Carousel Documentation: https://www.embla-carousel.com/",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "embla-carousel-react"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "carousel.tsx",
+          "type": "registry:ui",
+          "target": "@ui/carousel.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Provides horizontal and vertical cyclic or bounded content carousels and sliders.",
+          "Supports touch/drag gestures, physics-based momentum, and keyboard navigation (Arrow keys).",
+          "Follows DESIGN.md Tier B tokens: hairline borders (outline-variant), floating 2px focus rings, motion restraint (duration-quick, ease-standard), and accessible 44px touch targets.",
+          "Supports Google-style paired bottom controls with progress bars or floating side navigation."
+        ]
+      }
+    },
+    {
+      "name": "chain-of-thought",
+      "type": "registry:ui",
+      "title": "Chain Of Thought",
+      "description": "ChainOfThought primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite and `Chip` design tokens. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/chain-of-thought",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "chain-of-thought.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chain-of-thought.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays an AI agent's multi-step execution summary (e.g. \"Researched in 4 steps\") that smoothly expands to reveal historical reasoning, search, and tool steps.",
+          "Follows the shadcn AI Elements migration specification: Rebuilt natively using Trace and Chip/Badge primitives.",
+          "Exports: ChainOfThought, ChainOfThoughtHeader, ChainOfThoughtTrigger, ChainOfThoughtContent, ChainOfThoughtStep.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on triggers.",
+          "Follows DESIGN.md tokens: floating 2px focus ring, semantic tokens, zero triple-tints."
+        ]
+      }
+    },
+    {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "Eolas UI Chart component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "recharts"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "chart.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-message-context",
+      "type": "registry:ui",
+      "title": "Chat Message Context",
+      "description": "Eolas UI Chat Message Context component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "chat-message-context.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chat-message-context.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-message",
+      "type": "registry:ui",
+      "title": "Chat Message",
+      "description": "ChatMessage primitive. Base UI Integration: Works seamlessly with Base UI Button and Icon primitives.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/avatar",
+        "@seany9915/eolas-ui/bot-avatar",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/reasoning",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "chat-message.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chat-message.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use ChatMessage to display conversational turns (user, assistant, system).",
+          "Follows DESIGN.md:",
+          "Assistant messages use neutral surface fill (`bg-surface`), outline-variant border, calibrated ambient elevation (`shadow-ambient`), and `rounded-2xl rounded-bl-xs`.",
+          "User messages use role container fill (`bg-primary-container text-on-primary-container`), `rounded-2xl rounded-br-xs`, and right alignment.",
+          "Actions (copy, bookmark, retry) maintain accessible 44x44px touch targets.",
+          "Numeric timestamps use `tabular-nums` and `font-mono`."
+        ]
+      }
+    },
+    {
+      "name": "checkbox-group",
+      "type": "registry:ui",
+      "title": "Checkbox Group",
+      "description": "CheckboxGroup primitive (@base-ui/react/checkbox-group).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/checkbox",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "checkbox-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/checkbox-group.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Provides shared state and keyboard management for a list of related checkboxes.",
+          "Supports `allValues` for parent indeterminate checkbox synchronization.",
+          "Supports both declarative `options` array and composable `children`.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "Checkbox primitive (@base-ui/react/checkbox).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "checkbox.tsx",
+          "type": "registry:ui",
+          "target": "@ui/checkbox.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Checkbox for multi-selection or binary on/off options within forms or lists.",
+          "Supports three states: unchecked, checked, and indeterminate (mixed).",
+          "Supports parent-child tree checkboxes via the `parent` prop.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded-xs / 4px on box, rounded 8px on row), floating 2px focus ring, flush primary fill on check, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "checkpoint",
+      "type": "registry:ui",
+      "title": "Checkpoint",
+      "description": "Checkpoint primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/separator"
+      ],
+      "files": [
+        {
+          "path": "checkpoint.tsx",
+          "type": "registry:ui",
+          "target": "@ui/checkpoint.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Checkpoint to mark specific points or milestone states in a conversation thread that a user or clinical agent can return to (e.g. before modifying a clinical plan).",
+          "Conforms to shadcn AI Elements Checkpoint specification and DESIGN.md:",
+          "Balanced horizontal divider with neutral surface wash.",
+          "Accessible 44x44px touch target on the Restore trigger.",
+          "Monospace tabular-nums for turn numbering and timestamps.",
+          "Single-ring floating 2px focus indicator."
+        ]
+      }
+    },
+    {
+      "name": "chip",
+      "type": "registry:ui",
+      "title": "Chip",
+      "description": "Chip primitive. Built on Base UI (@base-ui/react) interaction foundations.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "chip.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chip.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Chip for INTERACTIVE compact elements: 1. Filter chips: Toggleable selection filters with keyboard navigation (aria-pressed). 2. Input/Removable chips: Dismissible tags with accessible remove buttons (onRemove). 3. Action chips: Clickable compact triggers (onClick).",
+          "For PASSIVE, non-interactive status labels or counts, use Badge instead.",
+          "Implements DESIGN.md High-Contrast Accessible standards:",
+          "Pattern 1 (filled): Solid brand fill + high-contrast text.",
+          "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+          "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+          "Full WCAG 2.2 SC 2.5.8 touch target compliance (expands to 44px when interactive or removable).",
+          "Floating 2px focus ring (outline-offset: 2px) on keyboard focus."
+        ]
+      }
+    },
+    {
+      "name": "clinician-tip",
+      "type": "registry:ui",
+      "title": "Clinician Tip",
+      "description": "Eolas UI Clinician Tip component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "clinician-tip.tsx",
+          "type": "registry:ui",
+          "target": "@ui/clinician-tip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "code-block",
+      "type": "registry:ui",
+      "title": "Code Block",
+      "description": "CodeBlock primitive. Base UI Integration: Consumes Base UI Tooltip and Button primitives. Specification & Reference: - https://ui.shadcn.com/docs/components/base/code-block - https://ui.shadcn.com/docs/ai-elements",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip"
+      ],
+      "files": [
+        {
+          "path": "code-block.tsx",
+          "type": "registry:ui",
+          "target": "@ui/code-block.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays source code, JSON parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
+          "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
+        ]
+      }
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "Collapsible primitive (@base-ui/react/collapsible).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "collapsible.tsx",
+          "type": "registry:ui",
+          "target": "@ui/collapsible.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Collapsible for an interactive disclosure element that shows or hides a single panel.",
+          "Supports browser in-page search (hiddenUntilFound / hidden=\"until-found\").",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "Combobox primitive (@base-ui/react/combobox).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "combobox.tsx",
+          "type": "registry:ui",
+          "target": "@ui/combobox.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Combobox for selecting one or multiple values from a list of options with text filtering.",
+          "Supports multi-selection with inline chips (Combobox.Chips, Combobox.Chip, Combobox.ChipRemove).",
+          "For freeform text searches where custom unlisted queries are valid, use Autocomplete instead.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "Command primitive (cmdk + Base UI Dialog). cmdk Documentation: https://cmdk.paco.me",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "cmdk"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/dialog"
+      ],
+      "files": [
+        {
+          "path": "command.tsx",
+          "type": "registry:ui",
+          "target": "@ui/command.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Command for fast, accessible command palettes, spotlight search, and quick action menus.",
+          "Powered by cmdk for fuzzy searching, keyboard scoring, and grouped item filtering.",
+          "CommandDialog integrates Base UI Dialog (with screen-reader accessible DialogTitle and DialogDescription) while retaining complete shadcn Command API compatibility.",
+          "Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings, surface-container wash for item selection, and strict semantic tokens."
+        ]
+      }
+    },
+    {
+      "name": "confirmation",
+      "type": "registry:ui",
+      "title": "Confirmation",
+      "description": "Confirmation primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "confirmation.tsx",
+          "type": "registry:ui",
+          "target": "@ui/confirmation.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Dual-purpose component: 1. AI Tool Approval Gate: Conforms to shadcn AI Elements confirmation lifecycle (approval-requested -> approved / denied) for Human-in-the-Loop tool execution. 2. Clinical Decision Gate: Structured inline consent, prescription verification, order sign-off, or risk acknowledgment card in clinical workflows and dashboards.",
+          "Conforms to shadcn AI Elements Confirmation specification and DESIGN.md:",
+          "High-contrast visual structure with calm clinical amber/neutral tokens.",
+          "Clear distinction between pending, approved, and denied states.",
+          "WCAG 2.2 compliant 44x44px touch targets on decision buttons.",
+          "Floating 2px focus rings (`outline-offset: 2px`).",
+          "Concentric radius hierarchy (`rounded-xl` container with `rounded` buttons)."
+        ]
+      }
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context Menu",
+      "description": "Eolas UI Context Menu component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "context-menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/context-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "csp-provider",
+      "type": "registry:ui",
+      "title": "Csp Provider",
+      "description": "Eolas UI Csp Provider component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "csp-provider.tsx",
+          "type": "registry:ui",
+          "target": "@ui/csp-provider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "deferred-view",
+      "type": "registry:ui",
+      "title": "Deferred View",
+      "description": "DeferredView primitive. Platform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "deferred-view.tsx",
+          "type": "registry:ui",
+          "target": "@ui/deferred-view.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Defers layout and paint computations for offscreen or below-the-fold content using CSS `content-visibility: auto`.",
+          "Pairs with `contain-intrinsic-size` to prevent layout shifts and scrollbar jumping.",
+          "Supports 'hidden' mode for instantaneous view toggling without destroying component DOM state.",
+          "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Eolas UI Dialog component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button"
+      ],
+      "files": [
+        {
+          "path": "dialog.tsx",
+          "type": "registry:ui",
+          "target": "@ui/dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "direction-provider",
+      "type": "registry:ui",
+      "title": "Direction Provider",
+      "description": "Eolas UI Direction Provider component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "direction-provider.tsx",
+          "type": "registry:ui",
+          "target": "@ui/direction-provider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "Drawer primitive (@base-ui/react/drawer).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "drawer.tsx",
+          "type": "registry:ui",
+          "target": "@ui/drawer.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures, snap points, and background indent effects.",
+          "For focused modal dialogs without swipe gestures, use Dialog instead.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:ui",
+      "title": "Empty State",
+      "description": "EmptyState primitive (backward-compatibility alias for Empty). Canonical primitive resides at @/components/ui/empty. Conforms to https://ui.shadcn.com/docs/components/base/empty",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/empty"
+      ],
+      "files": [
+        {
+          "path": "empty-state.tsx",
+          "type": "registry:ui",
+          "target": "@ui/empty-state.tsx"
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "Empty primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/empty",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "empty.tsx",
+          "type": "registry:ui",
+          "target": "@ui/empty.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Empty to display empty states when collections, search results, or tables have no items.",
+          "Composable compound architecture:",
+          "Empty (Root container)",
+          "EmptyHeader (Group wrapper for media, title, and description)",
+          "EmptyMedia (Icon / Avatar / Graphic tile with variant=\"default\" | \"icon\")",
+          "EmptyTitle (Headline typography in Atkinson Hyperlegible Next)",
+          "EmptyDescription (Body typography in Lexend with accessible link styling)",
+          "EmptyContent (Actions and button container)",
+          "Also supports monolithic convenience props (icon, title, description, action) for backward compatibility.",
+          "Follows DESIGN.md: concentric border radius, semantic high-contrast colors, and text-balance / text-pretty."
+        ]
+      }
+    },
+    {
+      "name": "error-shake",
+      "type": "registry:ui",
+      "title": "Error Shake",
+      "description": "ErrorShake Horizontal form micro-shake wrapper based on transitions.dev (12-error-state-shake.md). Platform Reference: https://transitions.dev/detail.html?t=error-state-shake Shakes invalid form inputs or blocked actions using a decaying overshoot curve: 0% -> 20% (-6px) -> 40% (+4px) -> 60% (-2px) -> 80% (+1px) -> 100% (0) Synchronized with the 300ms animate-error-shake keyframe in src/globals.css. Supports coordinated error message reveals and auto-revert timers. Complies with WCAG 2.2 and motion-reduce:animate-none.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "error-shake.tsx",
+          "type": "registry:ui",
+          "target": "@ui/error-shake.tsx"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Field primitive (@base-ui/react/field).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/fieldset"
+      ],
+      "files": [
+        {
+          "path": "field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/field.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Field to group a form control with its label, description, and error message.",
+          "Supports automatic validation (onSubmit, onBlur, onChange), validation debouncing, and accessibility attribute wiring (id, aria-labelledby, aria-describedby, aria-invalid).",
+          "Supports vertical (default) and horizontal layouts (for Switch, Checkbox, Radio).",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+        ]
+      }
+    },
+    {
+      "name": "fieldset",
+      "type": "registry:ui",
+      "title": "Fieldset",
+      "description": "Fieldset primitive (@base-ui/react/fieldset).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "fieldset.tsx",
+          "type": "registry:ui",
+          "target": "@ui/fieldset.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Fieldset to group related form controls with a shared legend and description.",
+          "Cascades disabled state natively to all nested interactive form controls.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+        ]
+      }
+    },
+    {
+      "name": "form",
+      "type": "registry:ui",
+      "title": "Form",
+      "description": "Form primitive (@base-ui/react/form).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "form.tsx",
+          "type": "registry:ui",
+          "target": "@ui/form.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A native form element with consolidated error handling, field registration, imperative validate actions, and external error state integration.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+        ]
+      }
+    },
+    {
+      "name": "icon",
+      "type": "registry:ui",
+      "title": "Icon",
+      "description": "Eolas UI Icon component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "icon.tsx",
+          "type": "registry:ui",
+          "target": "@ui/icon.tsx"
+        }
+      ]
+    },
+    {
+      "name": "inline-alert",
+      "type": "registry:ui",
+      "title": "Inline Alert",
+      "description": "InlineAlert primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/alert",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "inline-alert.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inline-alert.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use InlineAlert for high-visibility system event or validation banners (neutral, warning, error, success).",
+          "Implements a mathematically straight 4px vertical accent bar, ambient elevation, and accessible live regions.",
+          "Supports both monolithic props (title, action, onClose) and compound subcomponents (InlineAlert.Title, InlineAlert.Description, InlineAlert.Action, InlineAlert.Close).",
+          "Distinct from ClinicianTip (which is low-prominence instructional micro-guidance) and AlertDialog (modal interrupt).",
+          "Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles."
+        ]
+      }
+    },
+    {
+      "name": "inline-citation",
+      "type": "registry:ui",
+      "title": "Inline Citation",
+      "description": "Inline Citation primitive. Base UI Integration: Built on Base UI PreviewCard (@base-ui/react/preview-card), Button (UnstyledButton), and Carousel primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/inline-citation",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/carousel"
+      ],
+      "files": [
+        {
+          "path": "inline-citation.tsx",
+          "type": "registry:ui",
+          "target": "@ui/inline-citation.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use InlineCitation to embed source references, RAG grounding passages, and web search literature directly inside prose or assistant messages.",
+          "Conforms to DESIGN.md:",
+          "Pattern 2 high-contrast citation pill (neutral surface fill, outline-secondary border, Rich Emerald text).",
+          "WCAG 2.2 SC 2.5.8 compliant 44x44px touch target on interactive triggers.",
+          "Floating 2px focus ring with 2px offset (outline-primary).",
+          "Single-source preview or multi-source Carousel with tabular navigation.",
+          "Full keyboard accessibility and prefers-reduced-motion safety."
+        ]
+      }
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group ANATOMY: InputGroup ├── InputGroupInput (or InputGroupTextarea) └── InputGroupAddon (align=\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\") ├── InputGroupButton └── InputGroupText",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/textarea"
+      ],
+      "files": [
+        {
+          "path": "input-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/input-group.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use InputGroup to attach icons, buttons, text prefixes, suffixes, and action toolbars to input fields and textareas.",
+          "Bridges single-line search/URL fields and multi-line AI chat prompt inputs under a single visual boundary.",
+          "Eliminates double-border and double-focus ring artifacts by delegating focus exclusively to InputGroup.",
+          "Integrates seamlessly with Base UI Field (<Field.Control>) for accessible label and error wiring.",
+          "Supports polymorphic composition via Base UI's `useRender` hook across all sub-components.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
+        ]
+      }
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Input primitive (@base-ui/react/input). shadcn Base Input Documentation: https://ui.shadcn.com/docs/components/base/input ANATOMY: Input (or BaseInput / InputPrimitive)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/input.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A native input element that automatically works with Base UI Field context (<Field.Root>).",
+          "Implements Modern Web Guidance (MWG: html) tri-token contract for autocomplete, inputMode, enterKeyHint.",
+          "Follows DESIGN.md Tier B interactive controls:",
+          "0.5rem corner radius (rounded-lg) matching Buttons as the primary form control.",
+          "Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary) for WCAG 2.4.13 contrast and Windows High Contrast Mode (forced-colors: active) compatibility.",
+          "WCAG 2.2 SC 2.5.8 compliant hit target sizes: sm (44px), md (48px), lg (56px).",
+          "For complex input layouts with toolbars, prefixes, suffixes, or multiple buttons, compose with <InputGroup> (@/components/ui/input-group)."
+        ]
+      }
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "Item layout primitive (Content Row / Media Object). Full API reference and feature parity with shadcn/ui Base Item specification: https://ui.shadcn.com/docs/components/base/item ANATOMY: ItemGroup └── Item ├── ItemHeader ├── ItemMedia ├── ItemContent │   ├── ItemTitle │   └── ItemDescription ├── ItemActions ├── ItemFooter └── ItemSeparator",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "item.tsx",
+          "type": "registry:ui",
+          "target": "@ui/item.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Item and ItemGroup for structured list rows, activity feeds, patient directories, notification trays, and settings rows.",
+          "Composes [Media] + [Content (Title, Description)] + [Actions] without custom flex boilerplate.",
+          "Directly eliminates the \"Card inside Card\" anti-pattern by providing a clean, non-elevated content row for lists inside cards and dialogs.",
+          "Supports polymorphic composition via Base UI's `useRender` hook across ALL subcomponents.",
+          "Follows DESIGN.md tokens: Lexend body/description font, Lexend label headers, floating 2px focus ring, and strict semantic tokens with zero artificial elevation on list rows."
+        ]
+      }
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Keyboard key primitive (Kbd). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/kbd",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "kbd.tsx",
+          "type": "registry:ui",
+          "target": "@ui/kbd.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Kbd to visually represent keyboard keys, hotkeys, and shortcut combinations (e.g. ⌘K, Ctrl+B).",
+          "Use KbdGroup to compose multiple keycaps together without line breaks.",
+          "Ideal for embedding in buttons, command palettes, menus, and tooltips.",
+          "Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container wash, subtle outline-variant border, and strict semantic tokens."
+        ]
+      }
+    },
+    {
+      "name": "menu",
+      "type": "registry:ui",
+      "title": "Menu",
+      "description": "Eolas UI Menu component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "menubar",
+      "type": "registry:ui",
+      "title": "Menubar",
+      "description": "Eolas UI Menubar component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "menubar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/menubar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "message-scroller",
+      "type": "registry:ui",
+      "title": "Message Scroller",
+      "description": "MessageScroller primitive suite. Base UI Integration: Consumes Base UI Button and Tooltip primitives. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/components/base/message-scroller",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip"
+      ],
+      "files": [
+        {
+          "path": "message-scroller.tsx",
+          "type": "registry:ui",
+          "target": "@ui/message-scroller.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "The foundational viewport engine for conversational AI interfaces, live transcripts, and clinical chat.",
+          "Handles smart auto-scrolling: follows incoming streamed tokens when the user is at the live edge, without hijacking the scroll position if the clinician scrolled up to review clinical history.",
+          "Turn Anchoring (`scrollAnchor`): Pins new prompt turns near the top with `scrollPreviousItemPeek` visible.",
+          "Jump-to-Latest Control: Smooth floating button to return to the live response edge with unread indicators.",
+          "Preserves scroll position on historical message prepends (`preserveScrollOnPrepend`).",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
+          "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic colors, zero triple-tints."
+        ]
+      }
+    },
+    {
+      "name": "meter",
+      "type": "registry:ui",
+      "title": "Meter",
+      "description": "Meter primitive (@base-ui/react/meter).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "meter.tsx",
+          "type": "registry:ui",
+          "target": "@ui/meter.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays a graphical meter representing a scalar value within a known range (e.g. disk space, battery level, audio volume).",
+          "For task progress towards completion, use Progress instead.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "model-selector",
+      "type": "registry:ui",
+      "title": "Model Selector",
+      "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select primitive and Icon primitive.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/select",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip"
+      ],
+      "files": [
+        {
+          "path": "model-selector.tsx",
+          "type": "registry:ui",
+          "target": "@ui/model-selector.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use ModelSelector in chat headers, sidebar toolbars, or prompt input footers to let users dynamically switch the active language model and adjust reasoning/thinking effort.",
+          "Conforms to shadcn AI Elements ModelSelector specification and DESIGN.md:",
+          "Compact, high-precision layout with 44x44px accessible touch bounds.",
+          "Clear distinction between model family (Gemini, Claude, GPT, Med-PaLM) and thinking depth.",
+          "Concentric radius, floating 2px focus ring (`outline-offset: 2px`)."
+        ]
+      }
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:ui",
+      "title": "Navigation Menu",
+      "description": "Eolas UI Navigation Menu component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "navigation-menu.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "notification-badge",
+      "type": "registry:ui",
+      "title": "Notification Badge",
+      "description": "NotificationBadge Isolated diagonal slide-in and scale-pop badge based on transitions.dev (03-notification-badge.md). Platform Reference: https://transitions.dev/detail.html?t=notification-badge Anchors absolutely onto trigger elements (e.g. action buttons, navigation icons) without displacing trigger layout or causing parent jitter. Adheres to Pattern 1 (High-contrast solid fill) with WCAG AAA foreground contrast. Automatically disables motion under prefers-reduced-motion.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "notification-badge.tsx",
+          "type": "registry:ui",
+          "target": "@ui/notification-badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "number-field",
+      "type": "registry:ui",
+      "title": "Number Field",
+      "description": "NumberField primitive (@base-ui/react/number-field).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "number-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/number-field.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use NumberField for numerical inputs with step buttons, keyboard scrubbing, wheel scrubbing, and localized formatting.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "number-pop-in",
+      "type": "registry:ui",
+      "title": "Number Pop In",
+      "description": "NumberPopIn Digit pop-in animation primitive based strictly on transitions.dev (02-number-pop-in.md). Platform Reference: https://transitions.dev/detail.html?t=number-pop-in Decomposes numeric strings into individual character spans. When updated, each digit pops into place with 8px vertical travel, 2px micro-blur, and spring overshoot (cubic-bezier(0.34, 1.45, 0.64, 1)). Trailing decimal digits stagger by 70ms so updates feel alive without looking chaotic. Tabular numerals prevent layout jitter. Complies with WCAG 2.2 and motion-reduce:animate-none.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "number-pop-in.tsx",
+          "type": "registry:ui",
+          "target": "@ui/number-pop-in.tsx"
+        }
+      ]
+    },
+    {
+      "name": "number-roll",
+      "type": "registry:ui",
+      "title": "Number Roll",
+      "description": "NumberRoll Tabular number transition primitive based strictly on transitions.dev. Platform Reference: https://transitions.dev/library.html Supports: - 'pop-in' (default): Individual digit pop-in with spring overshoot and decimal stagger (02-number-pop-in.md). - 'spinning': Slot-machine vertical reel roll with soft edge masks (26-spinning-counter.md). Tabular numerals prevent layout jitter across all variants. Strictly adheres to Roboto Mono typography and prefers-reduced-motion.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/number-pop-in",
+        "@seany9915/eolas-ui/spinning-counter"
+      ],
+      "files": [
+        {
+          "path": "number-roll.tsx",
+          "type": "registry:ui",
+          "target": "@ui/number-roll.tsx"
+        }
+      ]
+    },
+    {
+      "name": "otp-field",
+      "type": "registry:ui",
+      "title": "Otp Field",
+      "description": "OTPField primitive (@base-ui/react/otp-field).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "otp-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/otp-field.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.",
+          "Supports automatic focus advancement, paste distribution, character masking, and validation types.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "Eolas UI Pagination component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "pagination.tsx",
+          "type": "registry:ui",
+          "target": "@ui/pagination.tsx"
+        }
+      ]
+    },
+    {
+      "name": "plan",
+      "type": "registry:ui",
+      "title": "Plan",
+      "description": "Plan composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/progress",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "plan.tsx",
+          "type": "registry:ui",
+          "target": "@ui/plan.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays an AI agent's multi-step plan determined up-front before execution (e.g., a 4-stage minimal pair therapy drill, clinical phonological assessment plan).",
+          "Tracks progress with a progress bar and completion counter (e.g. \"2 of 4 done\"). <Plan title=\"...\" steps={[...]} /> and declarative compound composition: <Plan defaultOpen> <PlanHeader> <PlanTitle>Assessment Plan</PlanTitle> <PlanDescription>2 of 4 done</PlanDescription> <PlanTrigger /> </PlanHeader> <PlanContent>...</PlanContent> </Plan>",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
+        ]
+      }
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Eolas UI Popover component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "popover.tsx",
+          "type": "registry:ui",
+          "target": "@ui/popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "preview-card",
+      "type": "registry:ui",
+      "title": "Preview Card",
+      "description": "Eolas UI Preview Card component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "preview-card.tsx",
+          "type": "registry:ui",
+          "target": "@ui/preview-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "progress-ring",
+      "type": "registry:ui",
+      "title": "Progress Ring",
+      "description": "ProgressRing primitive (@base-ui/react/progress).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "progress-ring.tsx",
+          "type": "registry:ui",
+          "target": "@ui/progress-ring.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A circular progress indicator built on Base UI's headless Progress state machine.",
+          "Manages accessibility roles (role=\"progressbar\", aria-valuenow, aria-valuemin, aria-valuemax) and internationalized number formatting headlessly.",
+          "Renders a hardware-accelerated SVG conic ring with concentric stroke geometry.",
+          "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "Progress primitive (@base-ui/react/progress).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/skeleton"
+      ],
+      "files": [
+        {
+          "path": "progress.tsx",
+          "type": "registry:ui",
+          "target": "@ui/progress.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays the completion status of a task or process.",
+          "Supports determinate values as well as indeterminate loading state (value=null/undefined).",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "prompt-input",
+      "type": "registry:ui",
+      "title": "Prompt Input",
+      "description": "PromptInput primitive. Base UI Integration: Consumes Base UI Button, Textarea primitive, Menu primitive, and Tooltip primitive. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/textarea",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/attachment",
+        "@seany9915/eolas-ui/menu",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/input-group"
+      ],
+      "files": [
+        {
+          "path": "prompt-input.tsx",
+          "type": "registry:ui",
+          "target": "@ui/prompt-input.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use PromptInput for conversational AI prompts, multi-turn clinical query inputs, and structured message composition.",
+          "Supports Model Selection (PromptInputModelSelect) and Reasoning Effort (PromptInputEffort) in the bottom-left action bar, alongside file attachments and tool toggles.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+          "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
+          "Supports Enter to submit and Shift+Enter for newline insertion."
+        ]
+      }
+    },
+    {
+      "name": "queue",
+      "type": "registry:ui",
+      "title": "Queue",
+      "description": "Queue composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "queue.tsx",
+          "type": "registry:ui",
+          "target": "@ui/queue.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays an AI agent's dynamic queue / to-do list, cleanly partitioned into remaining tasks ('To do') and finished tasks ('Completed').",
+          "As the agent works, tasks transition across sections. <Queue items={[...]} /> and declarative compound composition: <Queue> <Queue.Section title=\"2 to do\" status=\"pending\"> <Queue.Item title=\"Task 1\" status=\"pending\" /> </Queue.Section> </Queue>",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
+        ]
+      }
+    },
+    {
+      "name": "radio",
+      "type": "registry:ui",
+      "title": "Radio",
+      "description": "Radio & RadioGroup primitives (@base-ui/react/radio, @base-ui/react/radio-group).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "radio.tsx",
+          "type": "registry:ui",
+          "target": "@ui/radio.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use RadioGroup for selecting a single option from a visible list of 2-7 mutually exclusive choices.",
+          "Supports roving tabindex arrow key navigation.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "reading-progress",
+      "type": "registry:ui",
+      "title": "Reading Progress",
+      "description": "ReadingProgress primitive (@base-ui/react/progress). Platform Reference: Modern Web Guidance (MWG: scrollytelling / scroll-driven animations)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "reading-progress.tsx",
+          "type": "registry:ui",
+          "target": "@ui/reading-progress.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Pinned reading/scroll progress indicator built on Base UI's headless Progress state machine.",
+          "Manages accessibility roles (role=\"progressbar\", aria-valuenow, aria-valuemin, aria-valuemax) headlessly.",
+          "Uses compositor-driven CSS scroll-driven animations (animation-timeline: scroll()) on supported browsers with an automatic, lightweight requestAnimationFrame scroll listener fallback for Safari and Firefox.",
+          "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "reasoning",
+      "type": "registry:ui",
+      "title": "Reasoning",
+      "description": "Reasoning primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/reasoning",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/shimmer-text",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "reasoning.tsx",
+          "type": "registry:ui",
+          "target": "@ui/reasoning.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays an AI agent's live or historical thinking process as it streams or settles.",
+          "Supports both declarative compound composition: <Reasoning isStreaming={isStreaming}> <ReasoningTrigger /> <ReasoningContent>{reasoningText}</ReasoningContent> </Reasoning> and shorthand invocation: <Reasoning duration=\"1.8s\">{reasoningText}</Reasoning>",
+          "Manages the dynamic transition:",
+          "While streaming: active spinning indicator, \"Thinking...\", auto-expanded to show thought stream.",
+          "When complete: psychology icon, \"Thought\", formatted elapsed duration badge, auto-collapsed.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on disclosure triggers.",
+          "Follows DESIGN.md tokens: floating 2px focus ring, semantic colors, and zero triple-tints."
+        ]
+      }
+    },
+    {
+      "name": "resizable",
+      "type": "registry:ui",
+      "title": "Resizable",
+      "description": "Resizable component primitive built on react-resizable-panels. React Resizable Panels Documentation: https://github.com/bvaughn/react-resizable-panels",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "react-resizable-panels"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "resizable.tsx",
+          "type": "registry:ui",
+          "target": "@ui/resizable.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Provides accessible, draggable multi-pane layouts (split views, sidebars, inspection panels).",
+          "Supports keyboard navigation (Arrow keys, Home, End), touch targets, and min/max constraints.",
+          "Follows DESIGN.md Tier B tokens: hairline 1px track (outline-variant), 12px touch-safe hit area, refined capsule pill drag handle (rounded-full, bg-surface, primary hover/active feedback), and floating 2px focus ring."
+        ]
+      }
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll Area",
+      "description": "ScrollArea primitive (@base-ui/react/scroll-area).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "scroll-area.tsx",
+          "type": "registry:ui",
+          "target": "@ui/scroll-area.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Augments native browser scrolling with custom-styled, accessible scrollbars.",
+          "Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "scrollspy",
+      "type": "registry:ui",
+      "title": "Scrollspy",
+      "description": "Scrollspy primitive. Platform Reference: Modern Web Guidance (MWG: scrollspy)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "scrollspy.tsx",
+          "type": "registry:ui",
+          "target": "@ui/scrollspy.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "In-page table of contents and section navigation primitive.",
+          "Synchronizes active reading position in navigation links with visible page sections.",
+          "Uses compositor-driven `scroll-target-group: auto` (Chrome/Edge 140+) with an accessible `IntersectionObserver` fallback for Safari and Firefox.",
+          "Sets explicit `aria-current=\"true\"` on the active link for screen reader synchronicity.",
+          "Adheres to WCAG 2.2 SC 2.5.8 (44x44px minimum touch targets) and WCAG 1.4.1 (non-color active cues).",
+          "Complies with DESIGN.md and anti-patterns.md: symmetrical rounded-md geometry without asymmetric single-sided card borders."
+        ]
+      }
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Eolas UI Select component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "select.tsx",
+          "type": "registry:ui",
+          "target": "@ui/select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "selection-controls",
+      "type": "registry:ui",
+      "title": "Selection Controls",
+      "description": "Re-exports selection control primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/checkbox - @/components/ui/checkbox-group - @/components/ui/radio - @/components/ui/switch",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/checkbox",
+        "@seany9915/eolas-ui/checkbox-group",
+        "@seany9915/eolas-ui/radio",
+        "@seany9915/eolas-ui/switch"
+      ],
+      "files": [
+        {
+          "path": "selection-controls.tsx",
+          "type": "registry:ui",
+          "target": "@ui/selection-controls.tsx"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Separator primitive (@base-ui/react/separator).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "separator.tsx",
+          "type": "registry:ui",
+          "target": "@ui/separator.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A visual or semantic separator between sections of content.",
+          "Supports horizontal and vertical orientations with accessible role/aria-hidden attributes.",
+          "Follows DESIGN.md Tier B tokens: border-outline-variant."
+        ]
+      }
+    },
+    {
+      "name": "shimmer-text",
+      "type": "registry:ui",
+      "title": "Shimmer Text",
+      "description": "ShimmerText Ambient streaming text shimmer based on transitions.dev (15-shimmer-text.md). Platform Reference: https://transitions.dev/detail.html?t=shimmer-text Sweeps a subtle brand highlight across muted text on a continuous loop to communicate live AI reasoning, clinical transcription, or background sync. Completely CSP-compliant with zero runtime inline <style> injection. Automatically suppresses animation and settles into high-contrast text when prefers-reduced-motion is active.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "shimmer-text.tsx",
+          "type": "registry:ui",
+          "target": "@ui/shimmer-text.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture). Shadcn UI Reference: https://ui.shadcn.com/docs/components/base/sidebar",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/separator",
+        "@seany9915/eolas-ui/skeleton",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "sidebar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sidebar.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Composable, mobile-responsive application navigation shell and collapsible rail.",
+          "On desktop viewports (>= md), renders a stationary or collapsible `<aside>` navigation bar (supporting icon-rail, off-canvas, floating, and inset variants).",
+          "On mobile/tablet viewports (< md), automatically delegates to a touch-friendly Base UI modal Drawer with swipe dismissal and backdrop blur.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets (min 44x44px), and calibrated motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "Eolas UI Skeleton component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "skeleton.tsx",
+          "type": "registry:ui",
+          "target": "@ui/skeleton.tsx"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "Slider primitive (@base-ui/react/slider).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "slider.tsx",
+          "type": "registry:ui",
+          "target": "@ui/slider.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Allows users to make selections from a range of values along a horizontal or vertical track.",
+          "Supports single-value or multi-thumb range selections with collision behaviors ('push', 'swap', 'none').",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "sources",
+      "type": "registry:ui",
+      "title": "Sources",
+      "description": "Sources primitive. Base UI Integration: Works with Base UI Collapsible and Tooltip primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/sources",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chat-message-context",
+        "@seany9915/eolas-ui/inline-citation"
+      ],
+      "files": [
+        {
+          "path": "sources.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sources.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Sources to render grounded clinical citations, evidence base references, and trial literature.",
+          "Follows DESIGN.md:",
+          "Pattern 2 chip styling (neutral surface fill, outline-variant border, high-contrast text).",
+          "Never uses triple-tint monochrome styling.",
+          "Prevents Overcontainment & Card-within-card: supports `variant=\"ghost\"` for clean, unbordered display within chat message bubbles, preventing \"pill rain\" or nested boxes.",
+          "Never uses hand-rolled native browser tooltips (`title` attribute); all citations and inline footnote markers consume the Base UI Tooltip primitive for full keyboard and touch accessibility.",
+          "All clickable citations maintain WCAG 2.2 SC 2.5.8 compliant 44px touch targets.",
+          "Floating focus rings on links and triggers."
+        ]
+      }
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "Spinner primitive. Base UI Integration: Companion status & loading indicator. Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "spinner.tsx",
+          "type": "registry:ui",
+          "target": "@ui/spinner.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Lightweight, accessible loading indicator showing asynchronous operations.",
+          "Suitable for standalone loading states, form submission feedback, and inline button indicators.",
+          "Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.",
+          "Automatically inherits currentColor for flawless integration across buttons, badges, and text."
+        ]
+      }
+    },
+    {
+      "name": "spinning-counter",
+      "type": "registry:ui",
+      "title": "Spinning Counter",
+      "description": "SpinningCounter Slot-machine reel counter based strictly on transitions.dev (26-spinning-counter.md). Platform Reference: https://transitions.dev/detail.html?t=spinning-counter Each numeric character is a clipped vertical reel column that smoothly spins to the target digit with a 90ms per-column stagger and vertical edge soft-masks so numbers never hard-crop at bounding edges. Perfect for celebration milestones, dashboard KPIs, and gamified progress. Complies with WCAG 2.2 and motion-reduce:transition-none.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "spinning-counter.tsx",
+          "type": "registry:ui",
+          "target": "@ui/spinning-counter.tsx"
+        }
+      ]
+    },
+    {
+      "name": "steppers",
+      "type": "registry:ui",
+      "title": "Steppers",
+      "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/number-field"
+      ],
+      "files": [
+        {
+          "path": "steppers.tsx",
+          "type": "registry:ui",
+          "target": "@ui/steppers.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sticky-container",
+      "type": "registry:ui",
+      "title": "Sticky Container",
+      "description": "StickyContainer primitive. Platform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "sticky-container.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sticky-container.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A state-aware sticky header and toolbar container.",
+          "Dynamically elevates (gains ambient box-shadow, surface wash, and border) when stuck to the viewport edge.",
+          "Uses compositor-driven CSS Container Scroll-State queries (`container-type: scroll-state`) with zero main-thread scroll listeners in Chrome 133+ and Edge 133+.",
+          "Features an accessible zero-height sentinel and IntersectionObserver fallback for Safari and Firefox.",
+          "Prevents layout-shift oscillations by strictly constraining state transitions to non-layout-shifting properties (background-color, border-color, box-shadow, and backdrop-blur)."
+        ]
+      }
+    },
+    {
+      "name": "success-check",
+      "type": "registry:ui",
+      "title": "Success Check",
+      "description": "SuccessCheck Celebratory checkmark entrance transition based strictly on transitions.dev (10-success-check.md). Platform Reference: https://transitions.dev/detail.html?t=success-check Composes 5 synchronized layers in parallel: 1. Opacity fade (0 -> 1 over 500ms) 2. 80deg rotational upright spin (80deg -> 0deg over 500ms) 3. Optical blur settle (10px -> 0px over 500ms) 4. Y-bob spring overshoot (translateY 40px -> 0 with cubic-bezier(0.34, 1.35, 0.64, 1)) 5. SVG stroke-draw (delayed 80ms stroke-dashoffset transition) Complies strictly with WCAG 2.2 and motion-reduce:transition-none.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "success-check.tsx",
+          "type": "registry:ui",
+          "target": "@ui/success-check.tsx"
+        }
+      ]
+    },
+    {
+      "name": "suggestion-chips",
+      "type": "registry:ui",
+      "title": "Suggestion Chips",
+      "description": "SuggestionChips primitive. Base UI Integration: Uses Base UI Button foundation.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "suggestion-chips.tsx",
+          "type": "registry:ui",
+          "target": "@ui/suggestion-chips.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use SuggestionChips to surface starter queries, recommended clinical questions, and protocol exploration prompts.",
+          "Follows DESIGN.md:",
+          "Pattern 2 chip styling (neutral surface fill, outline-variant border, hover secondary-container/40).",
+          "Never uses triple-tint monochrome styling.",
+          "WCAG 2.2 SC 2.5.8 compliant 44px minimum touch target.",
+          "Floating 2px focus ring with 2px offset.",
+          "Strictly adheres to the 5-item stagger cap if animated."
+        ]
+      }
+    },
+    {
+      "name": "swipe-reveal",
+      "type": "registry:ui",
+      "title": "Swipe Reveal",
+      "description": "SwipeReveal primitive. Platform Reference: Modern Web Guidance (MWG: swipe-to-reveal)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "swipe-reveal.tsx",
+          "type": "registry:ui",
+          "target": "@ui/swipe-reveal.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A compositor-driven swipe-to-reveal action row built on CSS scroll-snap and `overscroll-behavior: chain`.",
+          "Avoids main-thread pointermove/touchmove JS listener bottlenecks for sub-50ms INP responsiveness.",
+          "Handles keyboard focus gracefully by snapping content back when tabbing with :focus-visible.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit-targets, and floating 2px focus rings."
+        ]
+      }
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "Switch primitive (@base-ui/react/switch).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "switch.tsx",
+          "type": "registry:ui",
+          "target": "@ui/switch.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Switch for standalone binary settings that take effect immediately (e.g. Dark Mode, Notifications).",
+          "Do NOT use Switch for in-group option selections (use Checkbox or ToggleGroup instead).",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary track fill, smooth thumb sliding, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "table.tsx",
+          "type": "registry:ui",
+          "target": "@ui/table.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Dual-mode data table primitive supporting: 1. Atomic compound composition (<Table>, <Table.Header>, <Table.Body>, <Table.Row>, <Table.Head>, <Table.Cell>, <Table.Footer>, <Table.Caption>). 2. Declarative data-driven mode (<Table columns={...} data={...} keyExtractor={...} responsive=\"stack\" />) with automatic container-query card stacking (@container).",
+          "Implements explicit column header semantics (scope=\"col\"), 56px minimum row heights for OS text zoom adaptability, and automatic tabular-nums on numeric columns.",
+          "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabs primitive (@base-ui/react/tabs).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "tabs.tsx",
+          "type": "registry:ui",
+          "target": "@ui/tabs.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role=\"tablist\", role=\"tab\", role=\"tabpanel\").",
+          "Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).",
+          "Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).",
+          "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+          "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
+          "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
+        ]
+      }
+    },
+    {
+      "name": "task",
+      "type": "registry:ui",
+      "title": "Task",
+      "description": "Task primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/task",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/trace",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "task.tsx",
+          "type": "registry:ui",
+          "target": "@ui/task.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays dynamic steps an AI agent takes sequentially as it executes work (e.g., reading files, running queries, making edits).",
+          "Unlike `Plan` (which renders predetermined future steps), `Task` visualizes real-time execution where each new step is discovered as previous ones finish.",
+          "Exports: Task, TaskTrigger, TaskContent, TaskItem.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on interactive elements.",
+          "Follows DESIGN.md tokens: floating 2px focus ring, semantic tokens, zero triple-tints."
+        ]
+      }
+    },
+    {
+      "name": "text-highlight",
+      "type": "registry:ui",
+      "title": "Text Highlight",
+      "description": "TextHighlight primitive. Platform Reference: Modern Web Guidance (MWG: highlight-text-ranges)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "text-highlight.tsx",
+          "type": "registry:ui",
+          "target": "@ui/text-highlight.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "A declarative text-search and keyword highlight container powered by the CSS Custom Highlight API (`::highlight()`).",
+          "Highlights search matches on the GPU compositor without mutating the DOM tree, splitting strings, or fragmenting screen reader announcements.",
+          "Adheres to WCAG 4.1.3 (Status Messages) by synchronizing visual highlights with an `aria-live=\"polite\"` screen reader match announcer.",
+          "Styles matches using tokenized secondary container palette in globals.css: `::highlight(search-results) { background-color: var(--secondary-container); color: var(--on-secondary-container); }`"
+        ]
+      }
+    },
+    {
+      "name": "text-swap",
+      "type": "registry:ui",
+      "title": "Text Swap",
+      "description": "TextSwap Micro-transition for in-place text state changes based strictly on transitions.dev (04-text-states-swap.md). Platform Reference: https://transitions.dev/detail.html?t=text-states-swap Implements the 3-phase sequence: 1. .is-exit: Old text slides up 4px with 2px micro-blur and fades to 0 over 150ms. 2. .is-enter-start: Text swaps and jumps below (+4px) without transition. 3. Forced reflow -> .is-enter: New text rises smoothly back to rest (0) over 150ms. Prevents layout thrashing inside buttons, chips, and status badges. Complies with WCAG 2.2 and motion-reduce:transition-none.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "text-swap.tsx",
+          "type": "registry:ui",
+          "target": "@ui/text-swap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "Textarea primitive. Base UI Integration: Works seamlessly with Base UI Field context (<Field.Control> or <Field>).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "textarea.tsx",
+          "type": "registry:ui",
+          "target": "@ui/textarea.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Textarea for multi-line freeform text input and notes.",
+          "Supports modern CSS `field-sizing: content` via `autoGrow` prop for zero-layout-shift auto-expansion.",
+          "Follows DESIGN.md Tier B interactive controls:",
+          "0.5rem corner radius (rounded-lg) matching Button and Input as primary form controls.",
+          "Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary).",
+          "WCAG 2.2 SC 2.5.8 touch target compliance.",
+          "For complex multi-line prompt composers with attachment toolbars, compose with <InputGroup> (@/components/ui/input-group) or <PromptInput> (@/components/ui/prompt-input)."
+        ]
+      }
+    },
+    {
+      "name": "texts-reveal",
+      "type": "registry:ui",
+      "title": "Texts Reveal",
+      "description": "TextsReveal Staggered text entrance container based strictly on transitions.dev (18-texts-reveal.md). Platform Reference: https://transitions.dev/detail.html?t=texts-reveal Features: - Entrance: Lines enter with 12px upward rise, 3px blur, and 40ms stagger. - Decoupled Exit: Single quiet 200ms opacity fade in-place without replaying the stagger in reverse. - Enforces the 5-item stagger cap (max 200ms cumulative delay). - Complies with prefers-reduced-motion.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "texts-reveal.tsx",
+          "type": "registry:ui",
+          "target": "@ui/texts-reveal.tsx"
+        }
+      ]
+    },
+    {
+      "name": "thinking-orb",
+      "type": "registry:ui",
+      "title": "Thinking Orb",
+      "description": "Eolas UI Thinking Orb component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "thinking-orbs"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "thinking-orb.tsx",
+          "type": "registry:ui",
+          "target": "@ui/thinking-orb.tsx"
+        }
+      ]
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "Eolas UI Toast component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "toast.tsx",
+          "type": "registry:ui",
+          "target": "@ui/toast.tsx"
+        }
+      ]
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle Group",
+      "description": "ToggleGroup primitive (@base-ui/react/toggle-group).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "toggle-group.tsx",
+          "type": "registry:ui",
+          "target": "@ui/toggle-group.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use ToggleGroup for mutually exclusive or multi-select option switches (e.g. text align, view mode grid/list, filter tags) where selection updates state/data in-place without switching or hiding full views or panels.",
+          "Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").",
+          "Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").",
+          "Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+          "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
+        ]
+      }
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "Toggle primitive (@base-ui/react/toggle).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "toggle.tsx",
+          "type": "registry:ui",
+          "target": "@ui/toggle.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.",
+          "For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.",
+          "For form on/off switches that submit form values, use Switch instead.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+        ]
+      }
+    },
+    {
+      "name": "toggles",
+      "type": "registry:ui",
+      "title": "Toggles",
+      "description": "Re-exports toggle primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/toggle - @/components/ui/toggle-group",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/toggle",
+        "@seany9915/eolas-ui/toggle-group"
+      ],
+      "files": [
+        {
+          "path": "toggles.tsx",
+          "type": "registry:ui",
+          "target": "@ui/toggles.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tool",
+      "type": "registry:ui",
+      "title": "Tool",
+      "description": "Tool primitive (ToolCall). Base UI Integration: Consumes Base UI Collapsible primitive, Button primitive, and Icon primitive.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/code-block",
+        "@seany9915/eolas-ui/inline-alert",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "tool.tsx",
+          "type": "registry:ui",
+          "target": "@ui/tool.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Tool to represent an agent tool invocation from input parameters to returned output, supporting live execution states ('calling', 'complete', 'error').",
+          "Conforms to shadcn AI Elements Tool specification and DESIGN.md:",
+          "High-contrast visual hierarchy with calm neutral container fill.",
+          "Monospace font for tool function names and JSON argument inspection.",
+          "Accessible Collapsible disclosure with rotation chevron and keyboard navigation.",
+          "Integrates seamlessly with CodeBlock for syntax-highlighted parameters."
+        ]
+      }
+    },
+    {
+      "name": "toolbar",
+      "type": "registry:ui",
+      "title": "Toolbar",
+      "description": "Toolbar primitive (@base-ui/react/toolbar). WAI-ARIA Role: role=\"toolbar\" Primary Purpose: Group of controls navigable with arrow keys under a SINGLE tab stop.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/tooltip"
+      ],
+      "files": [
+        {
+          "path": "toolbar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/toolbar.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "USE THIS: In rich-text formatting strips, media audio/playback bars, or canvas editing palettes where controls remain permanently visible and interactive under roving keyboard focus.",
+          "DO NOT USE:",
+          "For hierarchical application command menus (File, Edit, View) -> Use <Menubar>.",
+          "For site navigation links -> Use <NavigationMenu>.",
+          "For standalone action dropdowns -> Use <Menu>.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "Eolas UI Tooltip component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "tooltip.tsx",
+          "type": "registry:ui",
+          "target": "@ui/tooltip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "trace",
+      "type": "registry:ui",
+      "title": "Trace",
+      "description": "Trace primitive suite. Base UI Integration: Consumes `@base-ui/react/collapsible` for headless accessible disclosures. Specification & Reference: - https://ui.shadcn.com/docs/components/base/trace - https://ui.shadcn.com/docs/ai-elements",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chat-message-context"
+      ],
+      "files": [
+        {
+          "path": "trace.tsx",
+          "type": "registry:ui",
+          "target": "@ui/trace.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Universal primitive for AI agent execution lifecycle: step-by-step reasoning, tool calls, multi-stage task plans, error stack traces, and agent activity logs.",
+          "Replaces monolithic steppers with a flexible, composable compound architecture.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
+          "Strictly follows DESIGN.md tokens: floating 2px focus ring (outline-offset: 2px), concentric radius, and semantic high-contrast colors without monochrome triple-tints."
+        ]
+      }
+    },
+    {
+      "name": "view-transition",
+      "type": "registry:ui",
+      "title": "View Transition",
+      "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "view-transition.tsx",
+          "type": "registry:ui",
+          "target": "@ui/view-transition.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
+          "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
+          "Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.",
+          "Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
+        ]
+      }
+    }
+  ]
+}

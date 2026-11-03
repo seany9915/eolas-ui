@@ -10,15 +10,15 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "button",
-    "icon",
-    "textarea",
-    "tooltip",
-    "attachment",
-    "menu",
-    "badge",
-    "input-group"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/textarea",
+    "@seany9915/eolas-ui/tooltip",
+    "@seany9915/eolas-ui/attachment",
+    "@seany9915/eolas-ui/menu",
+    "@seany9915/eolas-ui/badge",
+    "@seany9915/eolas-ui/input-group"
   ],
   "files": [
     {

@@ -10,8 +10,8 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "button"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button"
   ],
   "files": [
     {

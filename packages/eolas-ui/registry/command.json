@@ -11,8 +11,8 @@
     "cmdk"
   ],
   "registryDependencies": [
-    "utils",
-    "dialog"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/dialog"
   ],
   "files": [
     {

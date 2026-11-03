@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Card } from '@/components/ui/card';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { Icon } from '@/components/ui/icon';
+import { ColorPair, InteractiveColorPairChecker } from './ColorPair';
 
 export const ColorTokensExplorer: React.FC = () => {
   const tokenGroups = [
@@ -212,6 +211,9 @@ export const ColorTokensExplorer: React.FC = () => {
         </p>
       </InlineAlert>
 
+      {/* Live WCAG Luminance Contrast Workbench */}
+      <InteractiveColorPairChecker />
+
       {/* Token Groups */}
       {tokenGroups.map((group) => (
         <div key={group.category} className="space-y-4">
@@ -221,27 +223,19 @@ export const ColorTokensExplorer: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {group.tokens.map((tok) => (
-              <Card key={tok.name} variant="default" className="h-full">
-                <div className="h-full flex flex-col justify-between space-y-4">
-                  <div className="space-y-3">
-                    <div className={`h-14 px-4 rounded ${tok.bgClass} flex items-center justify-between font-mono text-xs shadow-xs`}>
-                      <span className="font-bold truncate pr-2">{tok.name}</span>
-                      <span className="shrink-0">{tok.hex}</span>
-                    </div>
-                    <p className="font-sans text-xs text-on-surface leading-relaxed">
-                      {tok.usage}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-xs font-label text-on-surface-variant border-t border-outline-variant/60 pt-2 shrink-0">
-                    <span>WCAG 2.2 AA Verified</span>
-                    <span className="text-success font-semibold flex items-center gap-1">
-                      <Icon name="check_circle" size="xs" /> Pass
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
+            {group.tokens.map((tok) => {
+              const bgHex = tok.hex.includes('/') ? tok.hex.split('/')[0].trim() : tok.hex;
+              return (
+                <ColorPair
+                  key={tok.name}
+                  name={tok.name}
+                  background={bgHex}
+                  foreground={tok.textHex}
+                  bgClass={tok.bgClass}
+                  usage={tok.usage}
+                />
+              );
+            })}
           </div>
         </div>
       ))}

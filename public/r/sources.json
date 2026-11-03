@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "icon",
-    "tooltip",
-    "button",
-    "chat-message-context",
-    "inline-citation"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/tooltip",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/chat-message-context",
+    "@seany9915/eolas-ui/inline-citation"
   ],
   "files": [
     {

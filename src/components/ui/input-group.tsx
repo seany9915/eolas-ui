@@ -154,7 +154,7 @@ export const InputGroupInput = React.forwardRef<HTMLInputElement, InputGroupInpu
         className={cn(
           'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
           size === 'sm' ? 'text-sm' : 'text-base',
-          '[data-slot=input-group-addon]+&:pl-1.5',
+          '[[data-slot=input-group-addon]+&]:pl-1.5',
           '[&:has(+[data-slot=input-group-addon])]:pr-1.5',
           'placeholder:text-on-surface-variant/80',
           'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',

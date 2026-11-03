@@ -10,10 +10,10 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "alert-dialog",
-    "button",
-    "icon"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/alert-dialog",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon"
   ],
   "files": [
     {

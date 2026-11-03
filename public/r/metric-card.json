@@ -10,10 +10,10 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "card",
-    "badge",
-    "icon"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/card",
+    "@seany9915/eolas-ui/badge",
+    "@seany9915/eolas-ui/icon"
   ],
   "files": [
     {

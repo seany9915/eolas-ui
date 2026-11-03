@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "npm run build:registry && tsc && vite build",
     "build:registry": "node scripts/build-registry.mjs && node scripts/generate-manifest.mjs",
-    "registry:validate": "node scripts/validate-registry.mjs && npx --yes shadcn@latest registry validate",
+    "registry:validate": "node scripts/validate-registry.mjs && node scripts/showcase-coverage.mjs && npx --yes shadcn@latest registry validate",
+    "check:coverage": "node scripts/showcase-coverage.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

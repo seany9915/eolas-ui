@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "icon",
-    "badge",
-    "code-block",
-    "inline-alert",
-    "chat-message-context"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/badge",
+    "@seany9915/eolas-ui/code-block",
+    "@seany9915/eolas-ui/inline-alert",
+    "@seany9915/eolas-ui/chat-message-context"
   ],
   "files": [
     {

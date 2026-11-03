@@ -1,0 +1,244 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "@seany9915/eolas-ui/blocks",
+  "items": [
+    {
+      "name": "approval-card",
+      "type": "registry:block",
+      "title": "Approval Card",
+      "description": "Eolas UI Approval Card component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/radio",
+        "@seany9915/eolas-ui/input"
+      ],
+      "files": [
+        {
+          "path": "approval-card.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/approval-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat",
+      "type": "registry:block",
+      "title": "Chat",
+      "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `EmptyState` (`src/components/ui/empty-state.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/message-scroller",
+        "@seany9915/eolas-ui/chat-message",
+        "@seany9915/eolas-ui/prompt-input",
+        "@seany9915/eolas-ui/suggestion-chips",
+        "@seany9915/eolas-ui/empty-state"
+      ],
+      "files": [
+        {
+          "path": "chat.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/chat.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Controlled presentational chat workspace assembling the streaming viewport engine, assistant/user messages, suggestion prompts, and message composer.",
+          "Supports both Docked (pinned bottom) and Floating Island (centered, floating) prompt positioning.",
+          "Supports Model Selection, Reasoning Effort, and Tool Toggles.",
+          "Pure UI: receives items via props, emits intents via callbacks. Zero direct fetch or auth.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive elements.",
+          "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic high-contrast colors, concentric radius, zero triple-tints."
+        ]
+      }
+    },
+    {
+      "name": "data-table",
+      "type": "registry:block",
+      "title": "Data Table",
+      "description": "DataTable composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens: - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`) - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Select` (`src/components/ui/select.tsx`) - `Menu` (`src/components/ui/menu.tsx`) - `Checkbox` (`src/components/ui/checkbox.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `@tanstack/react-table`",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/table",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/select",
+        "@seany9915/eolas-ui/menu",
+        "@seany9915/eolas-ui/checkbox",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "data-table.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/data-table.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Enterprise-grade, accessible data table composite block conforming to shadcn/ui Data Table specification.",
+          "Powers complex data exploration with column sorting, global & column text filtering, faceted category filtering, row selection, dynamic column visibility toggling, loading/empty states, and accessible pagination.",
+          "Conforms to DESIGN.md Table rules: 56px minimum row height, right-aligned numeric columns with tabular-nums and font-mono, concentric geometry, floating focus rings, and container-query responsiveness (@container).",
+          "Exports both all-in-one <DataTable /> and composable subcomponents: DataTableColumnHeader, DataTablePagination, DataTableViewOptions, DataTableFacetedFilter, DataTableToolbar, DataTableRowActions, createSelectColumn, createActionsColumn."
+        ]
+      }
+    },
+    {
+      "name": "delete-confirmation-dialog",
+      "type": "registry:block",
+      "title": "Delete Confirmation Dialog",
+      "description": "DeleteConfirmationDialog block. Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/alert-dialog",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "delete-confirmation-dialog.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/delete-confirmation-dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "filter-toolbar",
+      "type": "registry:block",
+      "title": "Filter Toolbar",
+      "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/select",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/chip",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "filter-toolbar.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/filter-toolbar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "metric-card",
+      "type": "registry:block",
+      "title": "Metric Card",
+      "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/card",
+        "@seany9915/eolas-ui/badge",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "metric-card.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/metric-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "questionnaire",
+      "type": "registry:block",
+      "title": "Questionnaire",
+      "description": "Questionnaire composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Kbd` (`src/components/ui/kbd.tsx`)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/input",
+        "@seany9915/eolas-ui/progress",
+        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/kbd"
+      ],
+      "files": [
+        {
+          "path": "questionnaire.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/questionnaire.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Multi-step guided question primitive and flow engine for intake forms, clinical assessments, onboarding sequences, configuration wizards, and conversational agent clarification prompts.",
+          "Conforms to shadcn/ui Questionnaire specification with full parity across compound subcomponents and flat exports: Root, Progress, Item, Title, Description, Choices, Choice, ChoiceInput, ChoiceLabel, ChoiceShortcut, Input, Error, Actions, Previous, Skip, Next, and Submit.",
+          "Supports single-choice, multiple-choice, freeform text entry, keyboard shortcuts (A-Z, 1-9), roving tabindex arrow key navigation, form validation, draft restoration, and native FormData serialization.",
+          "Accessible: WCAG 2.2 SC 2.5.8 compliant (min-h-11 touch targets), floating 2px focus indicators, fieldset/legend semantics, inert inactive items, live error regions, and container-query responsiveness (@container)."
+        ]
+      }
+    },
+    {
+      "name": "step-wizard",
+      "type": "registry:block",
+      "title": "Step Wizard",
+      "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "step-wizard.tsx",
+          "type": "registry:block",
+          "target": "@components/blocks/step-wizard.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Controlled multi-step workflow container for guided clinical intake, onboarding, assessment flows, and multi-stage form sequences.",
+          "Pure UI: receives step data via props, manages directional slide transitions, and emits progression intents via callbacks (`onStepChange`, `onComplete`).",
+          "Accessible: WCAG 2.2 SC 2.5.8 compliant (44x44px minimum touch targets on all interactive step markers and buttons), floating 2px focus indicators (`outline-offset: 2px`), and live regions (`aria-live=\"polite\"`).",
+          "Modern HTML integration: supports `hiddenUntilFound` with `hidden=\"until-found\"` and `beforematch` event listener so browser search (<kbd>Ctrl+F</kbd>) finds inactive step content."
+        ]
+      }
+    }
+  ]
+}

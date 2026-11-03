@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "trace",
-    "shimmer-text",
-    "button",
-    "icon",
-    "chat-message-context"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/trace",
+    "@seany9915/eolas-ui/shimmer-text",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/chat-message-context"
   ],
   "files": [
     {

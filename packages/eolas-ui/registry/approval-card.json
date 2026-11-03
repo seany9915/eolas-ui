@@ -10,11 +10,11 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "button",
-    "icon",
-    "radio",
-    "input"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/radio",
+    "@seany9915/eolas-ui/input"
   ],
   "files": [
     {

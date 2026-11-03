@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "utils",
-    "button",
-    "input",
-    "progress",
-    "icon",
-    "kbd"
+    "@seany9915/eolas-ui/utils",
+    "@seany9915/eolas-ui/button",
+    "@seany9915/eolas-ui/input",
+    "@seany9915/eolas-ui/progress",
+    "@seany9915/eolas-ui/icon",
+    "@seany9915/eolas-ui/kbd"
   ],
   "files": [
     {
