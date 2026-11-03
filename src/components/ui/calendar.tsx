@@ -69,7 +69,7 @@ export function Calendar({
           'pointer-events-auto h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         button_next:
           'pointer-events-auto h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
-        month_grid: 'w-full border-collapse space-y-1',
+        month_grid: 'w-full border-collapse',
         weekdays: 'flex',
         weekday: 'text-on-surface-variant rounded-md w-9 font-normal text-xs text-center font-sans select-none',
         weeks: 'flex flex-col gap-1',
@@ -78,14 +78,15 @@ export function Calendar({
         day_button:
           'h-9 w-9 p-0 font-normal rounded-md inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
         selected:
-          'bg-primary text-on-primary rounded-md [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold',
+          'bg-primary text-on-primary rounded-md [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_start:
-          'rounded-l-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold',
+          'rounded-l-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_end:
-          'rounded-r-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold',
+          'rounded-r-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_middle:
-          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface',
-        today: '[&>button]:font-bold [&>button]:border [&>button]:border-primary',
+          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-surface-container-high',
+        today:
+          '[&>button]:font-bold [&>button]:relative [&>button]:after:content-[""] [&>button]:after:absolute [&>button]:after:bottom-1 [&>button]:after:left-1/2 [&>button]:after:-translate-x-1/2 [&>button]:after:size-1 [&>button]:after:rounded-full [&>button]:after:bg-primary',
         outside:
           'text-on-surface-variant/40 opacity-50 [&>button]:text-on-surface-variant/40',
         disabled:

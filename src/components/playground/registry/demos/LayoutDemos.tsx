@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
 import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemSeparator } from '@/components/ui/item';
+import { BlockDemoShell } from '../BlockDemoShell';
 import { ComponentDemoProps } from '../types';
 
 export const CardDemo: React.FC<ComponentDemoProps> = () => {
@@ -291,45 +292,61 @@ export const IconDemo: React.FC<ComponentDemoProps> = () => {
 
 export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-6">
-      {/* 1. Composable Compound Attachment with Trigger and Actions */}
-      <div className="flex flex-col gap-2">
-        <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
-          Compound File Attachment
-        </span>
-        <Attachment state="done" className="max-w-md">
-          <Attachment.Media className="bg-primary-container text-on-primary-container">
-            <Icon name="description" size="md" aria-hidden="true" />
-          </Attachment.Media>
-          <Attachment.Content>
-            <Attachment.Title>Clinical_Summary_Q3.pdf</Attachment.Title>
-            <Attachment.Description>PDF · 3.4 MB · Ready</Attachment.Description>
-          </Attachment.Content>
-          <Attachment.Actions>
-            <Attachment.Action aria-label="Download document">
-              <Icon name="download" size="sm" aria-hidden="true" />
-            </Attachment.Action>
-            <Attachment.Action aria-label="Remove document">
-              <Icon name="close" size="sm" aria-hidden="true" />
-            </Attachment.Action>
-          </Attachment.Actions>
-          <Attachment.Trigger href="#preview" aria-label="Open Clinical Summary preview" />
-        </Attachment>
-      </div>
+    <BlockDemoShell
+      name="File Attachment"
+      badge="Tier A Compound Primitive"
+      description="Composable file and media preview primitive supporting upload lifecycle states, image thumbnails, horizontal chips, vertical cards, and scrollable groups."
+      whenToUse="Displaying uploaded clinical documents, speech audio recordings, radiology scans, or pending uploads with progress feedback, download actions, and removal triggers."
+      typicalExample={
+        <div className="w-full max-w-md">
+          <Attachment state="done">
+            <Attachment.Media className="bg-primary-container text-on-primary-container">
+              <Icon name="description" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Clinical_Summary_Q3.pdf</Attachment.Title>
+              <Attachment.Description>PDF · 3.4 MB · Ready</Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Download document">
+                <Icon name="download" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+              <Attachment.Action aria-label="Remove document">
+                <Icon name="close" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+            <Attachment.Trigger href="#preview" aria-label="Open Clinical Summary preview" />
+          </Attachment>
+        </div>
+      }
+      variantsSection={
+        <div className="flex flex-col gap-3 w-full max-w-md">
+          {/* Ready / Done state */}
+          <Attachment state="done">
+            <Attachment.Media className="bg-primary-container text-on-primary-container">
+              <Icon name="description" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Care_Plan_V2.pdf</Attachment.Title>
+              <Attachment.Description>PDF · 2.1 MB · Synced</Attachment.Description>
+            </Attachment.Content>
+            <Attachment.Actions>
+              <Attachment.Action aria-label="Download Care Plan">
+                <Icon name="download" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+              <Attachment.Action aria-label="Remove Care Plan">
+                <Icon name="close" size="sm" aria-hidden="true" />
+              </Attachment.Action>
+            </Attachment.Actions>
+          </Attachment>
 
-      {/* 2. Scrollable Attachment Group with States and Image Previews */}
-      <div className="flex flex-col gap-2">
-        <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
-          Attachment Group (Scrollable Row)
-        </span>
-        <Attachment.Group>
-          {/* Active upload state */}
-          <Attachment state="uploading" className="w-72">
+          {/* Uploading state with progress */}
+          <Attachment state="uploading">
             <Attachment.Media className="bg-secondary-container text-on-secondary-container">
               <Icon name="mic" size="md" aria-hidden="true" />
             </Attachment.Media>
             <Attachment.Content>
-              <Attachment.Title>Dictation_Recording.wav</Attachment.Title>
+              <Attachment.Title>Vocalic_Drill_Session.wav</Attachment.Title>
               <Attachment.Description className="text-primary font-medium">
                 Uploading (68%)
               </Attachment.Description>
@@ -341,35 +358,33 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
             </Attachment.Actions>
           </Attachment>
 
-          {/* Image thumbnail preview */}
-          <Attachment state="done" className="w-72">
-            <Attachment.Media variant="image">
-              <img
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=120&auto=format&fit=crop&q=80"
-                alt="Radiology scan thumbnail"
-              />
+          {/* Processing state */}
+          <Attachment state="processing">
+            <Attachment.Media className="bg-surface-container text-on-surface-variant">
+              <Icon name="hourglass_empty" size="md" aria-hidden="true" />
             </Attachment.Media>
             <Attachment.Content>
-              <Attachment.Title>Chest_XRay_Lateral.jpg</Attachment.Title>
-              <Attachment.Description>Image · 1.8 MB</Attachment.Description>
+              <Attachment.Title>Acoustic_Formant_Analysis.csv</Attachment.Title>
+              <Attachment.Description className="text-secondary font-medium">
+                Extracting pitch contours...
+              </Attachment.Description>
             </Attachment.Content>
             <Attachment.Actions>
-              <Attachment.Action aria-label="Download image">
-                <Icon name="download" size="sm" aria-hidden="true" />
+              <Attachment.Action aria-label="Cancel processing">
+                <Icon name="close" size="sm" aria-hidden="true" />
               </Attachment.Action>
             </Attachment.Actions>
-            <Attachment.Trigger href="#preview-xray" aria-label="View chest X-ray image" />
           </Attachment>
 
           {/* Error state */}
-          <Attachment state="error" className="w-72">
+          <Attachment state="error">
             <Attachment.Media className="bg-error-container text-on-error-container">
               <Icon name="error" size="md" aria-hidden="true" />
             </Attachment.Media>
             <Attachment.Content>
-              <Attachment.Title>Patient_Chart_Corrupt.dat</Attachment.Title>
+              <Attachment.Title>Corrupted_Audio_Log.raw</Attachment.Title>
               <Attachment.Description className="text-error font-medium">
-                File format not supported
+                File format not recognized
               </Attachment.Description>
             </Attachment.Content>
             <Attachment.Actions>
@@ -378,47 +393,255 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
               </Attachment.Action>
             </Attachment.Actions>
           </Attachment>
-        </Attachment.Group>
-      </div>
+        </div>
+      }
+      sizeLadderSection={
+        <div className="flex flex-col gap-4 w-full max-w-md">
+          {/* Default / standard */}
+          <div className="flex flex-col gap-1.5">
+            <span className="font-heading text-xs font-bold text-on-surface">Standard Tier (48px Floor)</span>
+            <Attachment size="default" state="done">
+              <Attachment.Media className="bg-primary-container text-on-primary-container">
+                <Icon name="description" size="md" aria-hidden="true" />
+              </Attachment.Media>
+              <Attachment.Content>
+                <Attachment.Title>Diagnostic_Report.pdf</Attachment.Title>
+                <Attachment.Description>PDF · 3.4 MB</Attachment.Description>
+              </Attachment.Content>
+              <Attachment.Actions>
+                <Attachment.Action aria-label="Download">
+                  <Icon name="download" size="sm" aria-hidden="true" />
+                </Attachment.Action>
+              </Attachment.Actions>
+            </Attachment>
+          </div>
 
-      {/* 3. Compact Horizontal & Vertical Stacked Attachments */}
-      <div className="flex flex-col gap-2">
-        <span className="text-xs font-semibold text-on-surface-variant font-sans uppercase tracking-wider">
-          Compact & Stacked Layouts
-        </span>
-        <div className="flex flex-wrap gap-3 max-w-lg">
-          <Attachment size="sm" state="done">
-            <Attachment.Media className="bg-primary-container text-on-primary-container size-7">
-              <Icon name="description" size="xs" aria-hidden="true" />
+          {/* Compact sm */}
+          <div className="flex flex-col gap-1.5">
+            <span className="font-heading text-xs font-bold text-on-surface">Compact Tier (36px Chip)</span>
+            <Attachment size="sm" state="done">
+              <Attachment.Media className="bg-secondary-container text-on-secondary-container">
+                <Icon name="mic" size="xs" aria-hidden="true" />
+              </Attachment.Media>
+              <Attachment.Content>
+                <Attachment.Title className="text-xs">Syllable_Drill.wav</Attachment.Title>
+                <Attachment.Description className="text-[10px]">Audio · 480 KB</Attachment.Description>
+              </Attachment.Content>
+              <Attachment.Actions>
+                <Attachment.Action aria-label="Remove">
+                  <Icon name="close" size="xs" aria-hidden="true" />
+                </Attachment.Action>
+              </Attachment.Actions>
+            </Attachment>
+          </div>
+
+          {/* Micro xs */}
+          <div className="flex flex-col gap-1.5">
+            <span className="font-heading text-xs font-bold text-on-surface">Micro Tier (28px Inline Citation)</span>
+            <Attachment size="xs" state="done">
+              <Attachment.Media className="bg-surface-container text-on-surface">
+                <Icon name="attach_file" size="xs" className="text-[12px]" aria-hidden="true" />
+              </Attachment.Media>
+              <Attachment.Content>
+                <Attachment.Title className="text-[11px]">Consent_Form.pdf</Attachment.Title>
+              </Attachment.Content>
+              <Attachment.Actions>
+                <Attachment.Action aria-label="Download">
+                  <Icon name="download" size="xs" className="text-[11px]" aria-hidden="true" />
+                </Attachment.Action>
+              </Attachment.Actions>
+            </Attachment>
+          </div>
+        </div>
+      }
+      iconPermutationsSection={
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
+          {/* Document attachment */}
+          <Attachment state="done" className="w-full">
+            <Attachment.Media className="bg-primary-container text-on-primary-container">
+              <Icon name="description" size="md" aria-hidden="true" />
             </Attachment.Media>
             <Attachment.Content>
-              <Attachment.Title className="text-xs">Care_Plan_V2.pdf</Attachment.Title>
-              <Attachment.Description className="text-[10px]">1.2 MB</Attachment.Description>
+              <Attachment.Title>Therapist_Notes.pdf</Attachment.Title>
+              <Attachment.Description>Document</Attachment.Description>
             </Attachment.Content>
-            <Attachment.Actions>
-              <Attachment.Action aria-label="Remove Care Plan">
-                <Icon name="close" size="xs" aria-hidden="true" />
-              </Attachment.Action>
-            </Attachment.Actions>
           </Attachment>
 
-          <Attachment orientation="vertical" state="uploading">
-            <Attachment.Media className="bg-secondary-container text-on-secondary-container">
-              <Icon name="mic" size="md" aria-hidden="true" />
+          {/* Image thumbnail preview */}
+          <Attachment state="done" className="w-full">
+            <Attachment.Media variant="image">
+              <img
+                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=120&auto=format&fit=crop&q=80"
+                alt="Radiology scan thumbnail"
+              />
             </Attachment.Media>
             <Attachment.Content>
-              <Attachment.Title>Session_Audio.wav</Attachment.Title>
-              <Attachment.Description className="text-primary font-medium">Uploading (45%)</Attachment.Description>
+              <Attachment.Title>Chest_XRay.jpg</Attachment.Title>
+              <Attachment.Description>Image · 1.8 MB</Attachment.Description>
             </Attachment.Content>
-            <Attachment.Actions>
-              <Attachment.Action aria-label="Cancel upload">
-                <Icon name="close" size="sm" aria-hidden="true" />
-              </Attachment.Action>
-            </Attachment.Actions>
           </Attachment>
         </div>
-      </div>
-    </div>
+      }
+      pinnedStatesSection={
+        <div className="flex flex-col gap-3 w-full max-w-md">
+          {/* Normal State */}
+          <Attachment state="done">
+            <Attachment.Media className="bg-surface-container text-on-surface">
+              <Icon name="description" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Default Resting State</Attachment.Title>
+              <Attachment.Description>border-outline-variant</Attachment.Description>
+            </Attachment.Content>
+          </Attachment>
+
+          {/* Active Uploading State */}
+          <Attachment state="uploading">
+            <Attachment.Media className="bg-primary-container text-on-primary-container">
+              <Icon name="upload" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Active Upload State</Attachment.Title>
+              <Attachment.Description className="text-primary font-medium">border-primary wash</Attachment.Description>
+            </Attachment.Content>
+          </Attachment>
+
+          {/* Error State */}
+          <Attachment state="error">
+            <Attachment.Media className="bg-error-container text-on-error-container">
+              <Icon name="error" size="md" aria-hidden="true" />
+            </Attachment.Media>
+            <Attachment.Content>
+              <Attachment.Title>Error State</Attachment.Title>
+              <Attachment.Description className="text-error font-medium">border-error</Attachment.Description>
+            </Attachment.Content>
+          </Attachment>
+        </div>
+      }
+      edgeCasesSection={
+        <div className="flex flex-col gap-6 w-full max-w-lg">
+          {/* Edge Case 1: Long Filename Truncation */}
+          <div className="flex flex-col gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">
+              1. Extreme Filename Truncation (60+ characters)
+            </span>
+            <Attachment state="done" className="w-full max-w-md">
+              <Attachment.Media className="bg-primary-container text-on-primary-container">
+                <Icon name="description" size="md" aria-hidden="true" />
+              </Attachment.Media>
+              <Attachment.Content>
+                <Attachment.Title>
+                  Pediatric_Speech_Evaluation_Comprehensive_Session_Record_Final_Signed_2026_Q3_V2.pdf
+                </Attachment.Title>
+                <Attachment.Description>PDF · 12.8 MB</Attachment.Description>
+              </Attachment.Content>
+              <Attachment.Actions>
+                <Attachment.Action aria-label="Download">
+                  <Icon name="download" size="sm" aria-hidden="true" />
+                </Attachment.Action>
+                <Attachment.Action aria-label="Remove">
+                  <Icon name="close" size="sm" aria-hidden="true" />
+                </Attachment.Action>
+              </Attachment.Actions>
+            </Attachment>
+          </div>
+
+          {/* Edge Case 2: Vertical Card with Pinned Top-Right Action */}
+          <div className="flex flex-col gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">
+              2. Vertical Card Anatomy (`orientation="vertical"`)
+            </span>
+            <div className="flex gap-4">
+              <Attachment orientation="vertical" state="done" className="w-48">
+                <Attachment.Media className="bg-secondary-container text-on-secondary-container">
+                  <Icon name="mic" size="md" aria-hidden="true" />
+                </Attachment.Media>
+                <Attachment.Content>
+                  <Attachment.Title>Session_Audio.wav</Attachment.Title>
+                  <Attachment.Description>Audio · 2.4 MB</Attachment.Description>
+                </Attachment.Content>
+                <Attachment.Actions>
+                  <Attachment.Action aria-label="Remove audio">
+                    <Icon name="close" size="sm" aria-hidden="true" />
+                  </Attachment.Action>
+                </Attachment.Actions>
+              </Attachment>
+
+              <Attachment orientation="vertical" state="uploading" className="w-48">
+                <Attachment.Media variant="image" className="w-full h-24">
+                  <img
+                    src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=240&auto=format&fit=crop&q=80"
+                    alt="Radiology preview"
+                  />
+                </Attachment.Media>
+                <Attachment.Content>
+                  <Attachment.Title>XRay_Lateral.jpg</Attachment.Title>
+                  <Attachment.Description className="text-primary font-medium">Uploading (45%)</Attachment.Description>
+                </Attachment.Content>
+                <Attachment.Actions>
+                  <Attachment.Action aria-label="Cancel upload">
+                    <Icon name="close" size="sm" aria-hidden="true" />
+                  </Attachment.Action>
+                </Attachment.Actions>
+              </Attachment>
+            </div>
+          </div>
+
+          {/* Edge Case 3: Horizontally Scrollable Snapping Group */}
+          <div className="flex flex-col gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">
+              3. Horizontal Snapping Attachment Group (`Attachment.Group`)
+            </span>
+            <Attachment.Group className="max-w-md">
+              <Attachment state="done" className="w-64">
+                <Attachment.Media className="bg-primary-container text-on-primary-container">
+                  <Icon name="description" size="md" aria-hidden="true" />
+                </Attachment.Media>
+                <Attachment.Content>
+                  <Attachment.Title>Chart_1.pdf</Attachment.Title>
+                  <Attachment.Description>PDF · 1.1 MB</Attachment.Description>
+                </Attachment.Content>
+                <Attachment.Actions>
+                  <Attachment.Action aria-label="Remove">
+                    <Icon name="close" size="sm" aria-hidden="true" />
+                  </Attachment.Action>
+                </Attachment.Actions>
+              </Attachment>
+
+              <Attachment state="uploading" className="w-64">
+                <Attachment.Media className="bg-secondary-container text-on-secondary-container">
+                  <Icon name="mic" size="md" aria-hidden="true" />
+                </Attachment.Media>
+                <Attachment.Content>
+                  <Attachment.Title>Recording_2.wav</Attachment.Title>
+                  <Attachment.Description className="text-primary font-medium">Uploading (72%)</Attachment.Description>
+                </Attachment.Content>
+                <Attachment.Actions>
+                  <Attachment.Action aria-label="Cancel">
+                    <Icon name="close" size="sm" aria-hidden="true" />
+                  </Attachment.Action>
+                </Attachment.Actions>
+              </Attachment>
+
+              <Attachment state="done" className="w-64">
+                <Attachment.Media className="bg-surface-container text-on-surface">
+                  <Icon name="analytics" size="md" aria-hidden="true" />
+                </Attachment.Media>
+                <Attachment.Content>
+                  <Attachment.Title>Metrics_3.csv</Attachment.Title>
+                  <Attachment.Description>Data · 340 KB</Attachment.Description>
+                </Attachment.Content>
+                <Attachment.Actions>
+                  <Attachment.Action aria-label="Remove">
+                    <Icon name="close" size="sm" aria-hidden="true" />
+                  </Attachment.Action>
+                </Attachment.Actions>
+              </Attachment>
+            </Attachment.Group>
+          </div>
+        </div>
+      }
+    />
   );
 };
 

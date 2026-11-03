@@ -684,80 +684,218 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4">
-      {/* Mode Selector */}
-      <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
-        <div className="text-left flex flex-col gap-0.5">
-          <p className="font-heading text-sm font-semibold text-on-surface">
-            Calendar & Date Selection
-          </p>
-          <p className="font-sans text-xs text-on-surface-variant">
-            Built on react-day-picker and styled with high-contrast clinical tokens.
-          </p>
-        </div>
-        <div className="flex items-center gap-1 p-1 rounded-md bg-surface-container">
-          <Button
-            size="sm"
-            variant={mode === 'single' ? 'filled' : 'unstyled'}
-            colorRole={mode === 'single' ? 'primary' : 'neutral'}
-            onClick={() => setMode('single')}
-            className={mode === 'single' ? '' : 'text-xs text-on-surface-variant hover:text-on-surface px-2.5 py-1'}
-          >
-            Single Date
-          </Button>
-          <Button
-            size="sm"
-            variant={mode === 'range' ? 'filled' : 'unstyled'}
-            colorRole={mode === 'range' ? 'primary' : 'neutral'}
-            onClick={() => setMode('range')}
-            className={mode === 'range' ? '' : 'text-xs text-on-surface-variant hover:text-on-surface px-2.5 py-1'}
-          >
-            Date Range
-          </Button>
-        </div>
-      </div>
+    <BlockDemoShell
+      name="Calendar"
+      badge="Tier 2 Field Primitive"
+      description="Accessible date and range selection calendar powered by React DayPicker. Features high-contrast clinical tokens, distinct neutral today indicators, and floating focus rings."
+      whenToUse="Scheduling clinician consultations, selecting speech session date ranges, or reviewing patient milestones. Commonly paired with Popover to build a full DatePicker."
+      typicalExample={
+        <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+          <div className="flex items-center justify-between w-full pb-2 border-b border-outline-variant/60">
+            <span className="font-heading text-xs font-bold text-on-surface">Selection Mode</span>
+            <ToggleGroup
+              type="single"
+              value={mode}
+              onValueChange={(val) => {
+                if (val) setMode(val as 'single' | 'range');
+              }}
+              variant="segmented"
+              size="sm"
+            >
+              <ToggleGroup.Item value="single">Single Date</ToggleGroup.Item>
+              <ToggleGroup.Item value="range">Date Range</ToggleGroup.Item>
+            </ToggleGroup>
+          </div>
 
-      {/* Interactive Calendar Card */}
-      <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-surface border border-outline-variant shadow-ambient">
-        {mode === 'single' ? (
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="rounded-lg"
-          />
-        ) : (
-          <Calendar
-            mode="range"
-            selected={dateRange}
-            onSelect={setDateRange}
-            className="rounded-lg"
-          />
-        )}
-
-        <div className="mt-4 pt-4 border-t border-outline-variant/60 w-full text-center">
-          <p className="font-sans text-xs text-on-surface-variant">
+          <div className="w-full flex justify-center">
             {mode === 'single' ? (
-              selectedDate ? (
-                <span>Selected consultation date: <strong className="text-on-surface">{formatDate(selectedDate)}</strong></span>
-              ) : (
-                <span>Please select a date on the calendar.</span>
-              )
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="rounded-lg shadow-ambient"
+              />
             ) : (
-              dateRange?.from ? (
-                dateRange.to ? (
-                  <span>Selected range: <strong className="text-on-surface">{formatDate(dateRange.from)}</strong> to <strong className="text-on-surface">{formatDate(dateRange.to)}</strong></span>
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={setDateRange}
+                className="rounded-lg shadow-ambient"
+              />
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-outline-variant/60 w-full text-center">
+            <p className="font-sans text-xs text-on-surface-variant">
+              {mode === 'single' ? (
+                selectedDate ? (
+                  <span>
+                    Selected consultation date:{' '}
+                    <strong className="text-on-surface font-semibold">{formatDate(selectedDate)}</strong>
+                  </span>
                 ) : (
-                  <span>Selected start: <strong className="text-on-surface">{formatDate(dateRange.from)}</strong> (choose end date)</span>
+                  <span>Please select a date on the calendar.</span>
+                )
+              ) : dateRange?.from ? (
+                dateRange.to ? (
+                  <span>
+                    Selected range:{' '}
+                    <strong className="text-on-surface font-semibold">{formatDate(dateRange.from)}</strong> to{' '}
+                    <strong className="text-on-surface font-semibold">{formatDate(dateRange.to)}</strong>
+                  </span>
+                ) : (
+                  <span>
+                    Selected start:{' '}
+                    <strong className="text-on-surface font-semibold">{formatDate(dateRange.from)}</strong> (choose end date)
+                  </span>
                 )
               ) : (
                 <span>Please select a start and end date.</span>
-              )
-            )}
-          </p>
+              )}
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
+      }
+      variantsSection={
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+          {/* Single Date Selection */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">Single Date Selection</span>
+            <Calendar
+              mode="single"
+              selected={new Date(2026, 10, 12)}
+              defaultMonth={new Date(2026, 10)}
+              className="rounded-lg shadow-ambient"
+            />
+          </div>
+
+          {/* Date Range Selection */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">Date Range Selection</span>
+            <Calendar
+              mode="range"
+              selected={{
+                from: new Date(2026, 10, 9),
+                to: new Date(2026, 10, 14),
+              }}
+              defaultMonth={new Date(2026, 10)}
+              className="rounded-lg shadow-ambient"
+            />
+          </div>
+        </div>
+      }
+      sizeLadderSection={
+        <div className="flex flex-col items-center gap-4 w-full">
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-heading text-xs font-bold text-on-surface">Multi-Month Range Planning (2 Months)</span>
+            <span className="font-sans text-xs text-on-surface-variant">Recommended for scheduling multi-week therapy treatment plans</span>
+          </div>
+          <Calendar
+            mode="range"
+            numberOfMonths={2}
+            defaultMonth={new Date(2026, 10)}
+            selected={{
+              from: new Date(2026, 10, 20),
+              to: new Date(2026, 11, 4),
+            }}
+            className="rounded-lg shadow-ambient"
+          />
+        </div>
+      }
+      iconPermutationsSection={
+        <div className="flex flex-col items-center gap-3 w-full max-w-sm">
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-heading text-xs font-bold text-on-surface">Month & Year Fast Dropdowns</span>
+            <span className="font-sans text-xs text-on-surface-variant">captionLayout="dropdown" for historical charts</span>
+          </div>
+          <Calendar
+            mode="single"
+            captionLayout="dropdown"
+            startMonth={new Date(2020, 0)}
+            endMonth={new Date(2030, 11)}
+            defaultMonth={new Date(2026, 10)}
+            className="rounded-lg shadow-ambient"
+          />
+        </div>
+      }
+      pinnedStatesSection={
+        <div className="flex flex-col gap-3 w-full max-w-md">
+          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container/40 text-xs">
+            <div className="flex items-center gap-3">
+              <span className="size-8 rounded-md bg-surface text-on-surface font-bold relative inline-flex items-center justify-center font-sans border border-outline-variant/60 after:absolute after:bottom-1 after:size-1 after:rounded-full after:bg-primary">
+                3
+              </span>
+              <div className="flex flex-col">
+                <strong className="text-on-surface font-semibold">Today Indicator (Unselected)</strong>
+                <span className="text-on-surface-variant text-[11px]">Bold text + centered blue accent dot below (no blue font, zero selection clash)</span>
+              </div>
+            </div>
+            <span className="font-mono text-[11px] text-outline">today</span>
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container/40 text-xs">
+            <div className="flex items-center gap-3">
+              <span className="size-8 rounded-md bg-primary text-on-primary font-semibold inline-flex items-center justify-center font-sans">
+                10
+              </span>
+              <div className="flex flex-col">
+                <strong className="text-on-surface font-semibold">Active Selection</strong>
+                <span className="text-on-surface-variant text-[11px]">Solid primary fill with hover brightness retention</span>
+              </div>
+            </div>
+            <span className="font-mono text-[11px] text-outline">selected</span>
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container/40 text-xs">
+            <div className="flex items-center gap-3">
+              <span className="size-8 rounded-md text-on-surface-variant/30 font-normal inline-flex items-center justify-center font-sans">
+                28
+              </span>
+              <div className="flex flex-col">
+                <strong className="text-on-surface font-semibold">Disabled / Outside Days</strong>
+                <span className="text-on-surface-variant text-[11px]">Reduced opacity, pointer-events-none, unclickable</span>
+              </div>
+            </div>
+            <span className="font-mono text-[11px] text-outline">disabled / outside</span>
+          </div>
+        </div>
+      }
+      edgeCasesSection={
+        <div className="flex flex-col gap-6 w-full max-w-md">
+          {/* Edge Case 1: Today Selected */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">
+              1. Today when Selected (Zero Ring Clash)
+            </span>
+            <span className="font-sans text-xs text-on-surface-variant text-center">
+              When today is selected, solid primary overrides the neutral outline border cleanly.
+            </span>
+            <Calendar
+              mode="single"
+              selected={new Date()}
+              defaultMonth={new Date()}
+              className="rounded-lg shadow-ambient"
+            />
+          </div>
+
+          {/* Edge Case 2: Past Date Disablement */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-heading text-xs font-bold text-on-surface">
+              2. Appointment Booking (Past Dates Disabled)
+            </span>
+            <span className="font-sans text-xs text-on-surface-variant text-center">
+              Dates before today are disabled with pointer-events-none and low contrast.
+            </span>
+            <Calendar
+              mode="single"
+              disabled={{ before: new Date() }}
+              defaultMonth={new Date()}
+              className="rounded-lg shadow-ambient"
+            />
+          </div>
+        </div>
+      }
+    />
   );
 };
 

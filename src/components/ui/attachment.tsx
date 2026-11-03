@@ -77,7 +77,7 @@ export const AttachmentGroup = React.forwardRef<HTMLDivElement, AttachmentGroupP
         className: cn(
           'flex gap-2 max-w-full',
           scrollable
-            ? 'overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory scroll-smooth [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)]'
+            ? 'overflow-x-auto px-1 py-1 pr-4 scrollbar-none snap-x snap-mandatory scroll-smooth [mask-image:linear-gradient(to_right,black_calc(100%-12px),transparent)]'
             : 'flex-wrap items-center',
           className
         ),
@@ -134,8 +134,11 @@ export const AttachmentRoot = React.forwardRef<HTMLDivElement, AttachmentProps>(
     );
 
     // Root styling conforming to DESIGN.md tokens & WCAG AA requirements
+    // Note: Do NOT add `@container` here. In CSS Containment Level 3, `container-type: inline-size`
+    // enforces inline-size containment, which causes intrinsically sized containers (`w-fit`, `inline-flex`)
+    // to calculate their width as if they have no children (collapsing down to just padding/border).
     const rootClasses = cn(
-      '@container group relative flex rounded-lg border text-on-surface transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+      'group relative rounded-lg border text-on-surface transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
       isError
         ? 'border-error bg-surface hover:border-error has-[:focus-visible]:border-error'
         : isUploading || isProcessing
@@ -143,9 +146,11 @@ export const AttachmentRoot = React.forwardRef<HTMLDivElement, AttachmentProps>(
         : 'border-outline-variant hover:border-outline bg-surface has-[:focus-visible]:border-outline',
       orientation === 'horizontal'
         ? isCompact
-          ? 'items-center gap-2 px-2.5 py-1 min-h-[36px] max-w-[280px] shrink-0'
-          : 'items-center gap-3 p-3 w-full max-w-md shrink-0'
-        : 'flex-col gap-2.5 p-3 w-48 shrink-0',
+          ? size === 'xs'
+            ? 'inline-flex items-center gap-1.5 px-2 py-0.5 min-h-[28px] w-fit max-w-[240px] shrink-0 self-start'
+            : 'inline-flex items-center gap-2 px-2.5 py-1 min-h-[36px] w-fit max-w-[280px] shrink-0 self-start'
+          : 'flex items-center gap-3 p-3 w-full max-w-md shrink-0'
+        : 'flex flex-col gap-2.5 p-3 w-48 shrink-0',
       className
     );
 
@@ -190,7 +195,16 @@ export interface AttachmentMediaProps extends React.HTMLAttributes<HTMLDivElemen
 
 export const AttachmentMedia = React.forwardRef<HTMLDivElement, AttachmentMediaProps>(
   ({ className, variant = 'default', render, children, ...props }, ref) => {
+    const { size } = useAttachment();
     const isImage = variant === 'image';
+    const isMicro = size === 'xs';
+    const isCompact = size === 'sm';
+
+    const sizeClasses = isMicro
+      ? 'size-5 rounded'
+      : isCompact
+      ? 'size-7 rounded'
+      : 'size-10 rounded-md';
 
     return useRender({
       render,
@@ -202,9 +216,10 @@ export const AttachmentMedia = React.forwardRef<HTMLDivElement, AttachmentMediaP
         'aria-hidden': 'true',
         className: cn(
           'flex shrink-0 items-center justify-center select-none overflow-hidden',
+          sizeClasses,
           isImage
-            ? 'size-10 rounded-md bg-surface-container object-cover [&>img]:size-full [&>img]:object-cover [&>img]:rounded-md'
-            : 'size-10 rounded-md bg-surface-container text-on-surface-variant',
+            ? 'bg-surface-container object-cover [&>img]:size-full [&>img]:object-cover [&>img]:rounded-[inherit]'
+            : 'bg-surface-container text-on-surface-variant',
           className
         ),
         children,
@@ -231,7 +246,7 @@ export const AttachmentContent = React.forwardRef<HTMLDivElement, AttachmentCont
       defaultTagName: 'div',
       props: {
         'data-slot': 'attachment-content',
-        className: cn('flex min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden', className),
+        className: cn('flex min-w-0 flex-1 basis-auto flex-col justify-center gap-0.5 overflow-hidden', className),
         children,
         ...props,
       },
@@ -314,13 +329,20 @@ export interface AttachmentActionsProps extends React.HTMLAttributes<HTMLDivElem
 
 export const AttachmentActions = React.forwardRef<HTMLDivElement, AttachmentActionsProps>(
   ({ className, render, children, ...props }, ref) => {
+    const { orientation } = useAttachment();
+    const isVertical = orientation === 'vertical';
+
     return useRender({
       render,
       ref,
       defaultTagName: 'div',
       props: {
         'data-slot': 'attachment-actions',
-        className: cn('relative z-10 flex items-center gap-1 shrink-0 ml-auto', className),
+        className: cn(
+          'relative z-10 flex items-center gap-1 shrink-0',
+          isVertical ? 'absolute top-2.5 right-2.5' : 'ml-auto',
+          className
+        ),
         children,
         ...props,
       },
@@ -350,6 +372,9 @@ export const AttachmentAction = React.forwardRef<HTMLButtonElement, AttachmentAc
     },
     ref
   ) => {
+    const { size: attachmentSize } = useAttachment();
+    const isMicro = attachmentSize === 'xs';
+
     return (
       <Button
         ref={ref}
@@ -364,7 +389,8 @@ export const AttachmentAction = React.forwardRef<HTMLButtonElement, AttachmentAc
           onClick?.(e);
         }}
         className={cn(
-          'size-7 min-h-[28px] min-w-[28px] p-0 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container/70',
+          'p-0 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container/70 shrink-0 inline-flex items-center justify-center',
+          isMicro ? 'size-5 min-h-[20px] min-w-[20px]' : 'size-7 min-h-[28px] min-w-[28px]',
           className
         )}
         {...props}
