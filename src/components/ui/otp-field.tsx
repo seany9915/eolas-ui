@@ -179,11 +179,12 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
               <BaseOTPField.Input
                 pattern={pattern}
                 className={cn(
-                  'w-11 min-w-[44px] @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded',
+                  'w-11 min-w-[44px] @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded-lg',
                   'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
-                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  'border-outline hover:border-on-surface-variant/80',
+                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
                   'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-                  error ? 'border-error focus-visible:border-error focus-visible:outline-error' : 'border-outline-variant hover:border-outline'
+                  error && 'border-error focus-visible:border-error focus-visible:outline-error'
                 )}
               />
             </React.Fragment>

@@ -32,10 +32,18 @@ export interface MessageScrollerContextValue {
   setAutoScroll: (enabled: boolean) => void;
   scrollToBottom: (behavior?: ScrollBehavior) => void;
   scrollToTop: (behavior?: ScrollBehavior) => void;
+  scrollToEnd: (behavior?: ScrollBehavior) => void;
+  scrollToStart: (behavior?: ScrollBehavior) => void;
+  scrollToMessage: (id: string, behavior?: ScrollBehavior) => boolean;
+  registerItem: (id: string, node: HTMLElement | null) => () => void;
   viewportRef: React.RefObject<HTMLDivElement | null>;
   contentRef: React.RefObject<HTMLDivElement | null>;
   unreadCount: number;
   scrollPreviousItemPeek: number;
+  scrollable: { start: boolean; end: boolean };
+  visibleMessageIds: string[];
+  currentAnchorId: string | null;
+  pendingScroll: boolean;
 }
 
 const MessageScrollerContext = React.createContext<MessageScrollerContextValue | null>(null);
@@ -46,6 +54,16 @@ export function useMessageScroller() {
     throw new Error('MessageScroller compound subcomponents must be used within a <MessageScrollerProvider>.');
   }
   return ctx;
+}
+
+export function useMessageScrollerScrollable() {
+  const { scrollable } = useMessageScroller();
+  return scrollable;
+}
+
+export function useMessageScrollerVisibility() {
+  const { currentAnchorId, visibleMessageIds } = useMessageScroller();
+  return { currentAnchorId, visibleMessageIds };
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -73,10 +91,26 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
   const [isAtBottom, setIsAtBottom] = React.useState(defaultScrollPosition !== 'start');
   const [autoScroll, setAutoScroll] = React.useState(defaultAutoScroll);
   const [unreadCount, setUnreadCount] = React.useState(0);
+  const [scrollable, setScrollable] = React.useState({ start: false, end: false });
+  const [visibleMessageIds, setVisibleMessageIds] = React.useState<string[]>([]);
+  const [currentAnchorId, setCurrentAnchorId] = React.useState<string | null>(null);
+  const [pendingScroll, setPendingScroll] = React.useState(defaultScrollPosition !== 'start');
 
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
   const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const itemsRef = React.useRef<Map<string, HTMLElement>>(new Map());
   const prevHeightRef = React.useRef<number>(0);
+
+  const registerItem = React.useCallback((id: string, node: HTMLElement | null) => {
+    if (node) {
+      itemsRef.current.set(id, node);
+    } else {
+      itemsRef.current.delete(id);
+    }
+    return () => {
+      itemsRef.current.delete(id);
+    };
+  }, []);
 
   const scrollToBottom = React.useCallback(
     (behavior: ScrollBehavior = 'smooth') => {
@@ -88,6 +122,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       });
       setIsAtBottom(true);
       setUnreadCount(0);
+      setPendingScroll(false);
     },
     []
   );
@@ -100,9 +135,46 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
         top: 0,
         behavior,
       });
+      setPendingScroll(false);
     },
     []
   );
+
+  const scrollToMessage = React.useCallback(
+    (id: string, behavior: ScrollBehavior = 'smooth') => {
+      const vp = viewportRef.current;
+      const el = itemsRef.current.get(id);
+      if (!vp || !el) return false;
+      const targetTop = Math.max(0, el.offsetTop - scrollPreviousItemPeek);
+      vp.scrollTo({
+        top: targetTop,
+        behavior,
+      });
+      return true;
+    },
+    [scrollPreviousItemPeek]
+  );
+
+  // Initial scroll position resolution
+  React.useEffect(() => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+
+    if (defaultScrollPosition === 'end') {
+      vp.scrollTop = vp.scrollHeight;
+      setIsAtBottom(true);
+      setPendingScroll(false);
+    } else if (defaultScrollPosition === 'last-anchor') {
+      const anchorNodes = Array.from(vp.querySelectorAll<HTMLElement>('[data-scroll-anchor]'));
+      const lastAnchor = anchorNodes[anchorNodes.length - 1];
+      if (lastAnchor) {
+        vp.scrollTop = Math.max(0, lastAnchor.offsetTop - scrollPreviousItemPeek);
+      }
+      setPendingScroll(false);
+    } else {
+      setPendingScroll(false);
+    }
+  }, [defaultScrollPosition, scrollPreviousItemPeek]);
 
   // ResizeObserver on content container to track incoming streamed tokens or expanding disclosures
   React.useEffect(() => {
@@ -121,28 +193,78 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
         }
         prevHeightRef.current = newHeight;
       }
+
+      // Update scroll boundaries
+      const vp = viewportRef.current;
+      if (vp) {
+        const canScrollUp = vp.scrollTop > edgeThreshold;
+        const canScrollDown = vp.scrollHeight - vp.scrollTop - vp.clientHeight > edgeThreshold;
+        setScrollable({ start: canScrollUp, end: canScrollDown });
+      }
     });
 
     ro.observe(content);
     return () => ro.disconnect();
-  }, [autoScroll, isAtBottom, scrollToBottom]);
+  }, [autoScroll, isAtBottom, scrollToBottom, edgeThreshold]);
 
-  // Handle scroll events on viewport
+  // Handle scroll events and boundary state on viewport
   React.useEffect(() => {
     const vp = viewportRef.current;
     if (!vp) return;
 
     const handleScroll = () => {
-      const atBottom = vp.scrollHeight - vp.scrollTop - vp.clientHeight <= edgeThreshold;
+      const canScrollUp = vp.scrollTop > edgeThreshold;
+      const canScrollDown = vp.scrollHeight - vp.scrollTop - vp.clientHeight > edgeThreshold;
+      const atBottom = !canScrollDown;
+
       setIsAtBottom(atBottom);
+      setScrollable({ start: canScrollUp, end: canScrollDown });
+
       if (atBottom) {
         setUnreadCount(0);
       }
     };
 
+    // Initial boundary check
+    handleScroll();
+
     vp.addEventListener('scroll', handleScroll, { passive: true });
     return () => vp.removeEventListener('scroll', handleScroll);
   }, [edgeThreshold]);
+
+  // IntersectionObserver for visibility and current anchor tracking
+  React.useEffect(() => {
+    const vp = viewportRef.current;
+    if (!vp || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        setVisibleMessageIds((prev) => {
+          const next = new Set(prev);
+          for (const entry of entries) {
+            const target = entry.target as HTMLElement;
+            const messageId = target.dataset.messageId;
+            if (!messageId) continue;
+
+            if (entry.isIntersecting) {
+              next.add(messageId);
+              if (target.dataset.scrollAnchor !== undefined) {
+                setCurrentAnchorId(messageId);
+              }
+            } else {
+              next.delete(messageId);
+            }
+          }
+          return Array.from(next);
+        });
+      },
+      { root: vp, threshold: 0.1 }
+    );
+
+    itemsRef.current.forEach((node) => observer.observe(node));
+
+    return () => observer.disconnect();
+  });
 
   return (
     <MessageScrollerContext.Provider
@@ -152,10 +274,18 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
         setAutoScroll,
         scrollToBottom,
         scrollToTop,
+        scrollToEnd: scrollToBottom,
+        scrollToStart: scrollToTop,
+        scrollToMessage,
+        registerItem,
         viewportRef,
         contentRef,
         unreadCount,
         scrollPreviousItemPeek,
+        scrollable,
+        visibleMessageIds,
+        currentAnchorId,
+        pendingScroll,
       }}
     >
       {children}
@@ -169,12 +299,32 @@ MessageScrollerProvider.displayName = 'MessageScrollerProvider';
  * -----------------------------------------------------------------------------------------------*/
 export interface MessageScrollerProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'container' | 'canvas';
+  autoScroll?: boolean;
+  defaultScrollPosition?: 'start' | 'end' | 'last-anchor';
+  scrollPreviousItemPeek?: number;
+  scrollEdgeThreshold?: number;
+  scrollMargin?: number;
+  threshold?: number;
   children?: React.ReactNode;
   className?: string;
 }
 
-const MessageScrollerRoot = React.forwardRef<HTMLDivElement, MessageScrollerProps>(
-  ({ variant = 'default', children, className, ...props }, ref) => {
+const MessageScrollerContainer = React.forwardRef<HTMLDivElement, MessageScrollerProps>(
+  (
+    {
+      variant = 'default',
+      children,
+      className,
+      autoScroll: _autoScroll,
+      defaultScrollPosition: _defaultScrollPosition,
+      scrollPreviousItemPeek: _scrollPreviousItemPeek,
+      scrollEdgeThreshold: _scrollEdgeThreshold,
+      scrollMargin: _scrollMargin,
+      threshold: _threshold,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <div
         ref={ref}
@@ -192,6 +342,41 @@ const MessageScrollerRoot = React.forwardRef<HTMLDivElement, MessageScrollerProp
     );
   }
 );
+MessageScrollerContainer.displayName = 'MessageScrollerContainer';
+
+const MessageScrollerRoot = React.forwardRef<HTMLDivElement, MessageScrollerProps>((props, ref) => {
+  const hasOuterContext = React.useContext(MessageScrollerContext) !== null;
+
+  if (hasOuterContext) {
+    return <MessageScrollerContainer ref={ref} {...props} />;
+  }
+
+  const {
+    autoScroll,
+    defaultScrollPosition,
+    scrollPreviousItemPeek,
+    scrollEdgeThreshold,
+    scrollMargin,
+    threshold,
+    children,
+    ...containerProps
+  } = props;
+
+  return (
+    <MessageScrollerProvider
+      autoScroll={autoScroll}
+      defaultScrollPosition={defaultScrollPosition}
+      scrollPreviousItemPeek={scrollPreviousItemPeek}
+      scrollEdgeThreshold={scrollEdgeThreshold}
+      scrollMargin={scrollMargin}
+      threshold={threshold}
+    >
+      <MessageScrollerContainer ref={ref} {...containerProps}>
+        {children}
+      </MessageScrollerContainer>
+    </MessageScrollerProvider>
+  );
+});
 MessageScrollerRoot.displayName = 'MessageScroller';
 
 /* -------------------------------------------------------------------------------------------------
@@ -214,7 +399,7 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
     },
     ref
   ) => {
-    const { viewportRef } = useMessageScroller();
+    const { viewportRef, pendingScroll } = useMessageScroller();
     const prevScrollHeightRef = React.useRef<number>(0);
 
     // Track scroll height to support prepending older messages without jumping
@@ -237,6 +422,7 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
           else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
         }}
         data-slot="message-scroller-viewport"
+        data-pending-scroll={pendingScroll ? '' : undefined}
         aria-label={ariaLabel}
         className={cn(
           'flex-1 w-full overflow-y-auto overscroll-contain focus-visible:outline-none',
@@ -273,7 +459,7 @@ export const MessageScrollerContent = React.forwardRef<HTMLDivElement, MessageSc
           else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
         }}
         data-slot="message-scroller-content"
-        className={cn('flex flex-col space-y-4 p-4 min-h-full justify-start', className)}
+        className={cn('flex flex-col gap-4 p-4 min-h-full justify-start', className)}
         {...props}
       >
         {children}
@@ -296,7 +482,7 @@ export interface MessageScrollerItemProps extends React.HTMLAttributes<HTMLDivEl
 export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrollerItemProps>(
   ({ messageId, scrollAnchor = false, children, className, ...props }, ref) => {
     const itemRef = React.useRef<HTMLDivElement | null>(null);
-    const { viewportRef, scrollPreviousItemPeek } = useMessageScroller();
+    const { viewportRef, scrollPreviousItemPeek, registerItem } = useMessageScroller();
 
     React.useEffect(() => {
       if (scrollAnchor && itemRef.current && viewportRef.current) {
@@ -307,6 +493,11 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
         vp.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
       }
     }, [scrollAnchor, scrollPreviousItemPeek, viewportRef]);
+
+    React.useEffect(() => {
+      if (!messageId || !itemRef.current) return;
+      return registerItem(messageId, itemRef.current);
+    }, [messageId, registerItem]);
 
     return (
       <div
