@@ -202,7 +202,7 @@ const SourcesList = React.forwardRef<HTMLDivElement, SourcesListProps>(
       <div
         ref={inPanel ? undefined : ref}
         data-slot="sources-content"
-        className={cn('flex flex-wrap items-center gap-2 pt-1', className)}
+        className={cn('flex flex-wrap items-center gap-2', inPanel ? 'pt-3' : 'pt-1', className)}
         {...props}
       >
         {children}
@@ -468,7 +468,7 @@ const SourcesComponent: React.FC<SourcesProps> = ({
   if (isCompound) {
     return (
       <Collapsible.Root defaultOpen={defaultOpen} className={cn('w-full', className)}>
-        <SourcesRoot variant={resolvedVariant}>
+        <SourcesRoot variant={resolvedVariant} className="gap-0">
           <SourcesPanelContext.Provider value>{children}</SourcesPanelContext.Provider>
         </SourcesRoot>
       </Collapsible.Root>
@@ -478,12 +478,12 @@ const SourcesComponent: React.FC<SourcesProps> = ({
   if (collapsible) {
     return (
       <Collapsible.Root defaultOpen={defaultOpen} className={cn('w-full', className)}>
-        <SourcesRoot variant={resolvedVariant}>
+        <SourcesRoot variant={resolvedVariant} className="gap-0">
           <SourcesTrigger count={count} label={label} />
           <Collapsible.Panel
             className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-quick ease-standard motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
           >
-            <SourcesList>
+            <SourcesList className="pt-3">
               {children ||
                 normalizedSources?.map((item, idx) => (
                   <SourcesItem key={item.id || item.url || idx} citation={item} index={idx} />

@@ -217,11 +217,11 @@ export const CollapsibleDemo: React.FC<ComponentDemoProps> = () => {
   const [open, setOpen] = React.useState(false);
   return (
     <div className="w-full max-w-md mx-auto py-4">
-      <Collapsible.Root open={open} onOpenChange={setOpen} className="rounded-xl border border-outline-variant bg-surface p-4 flex flex-col gap-3">
+      <Collapsible.Root open={open} onOpenChange={setOpen} className="rounded-xl border border-outline-variant bg-surface p-4">
         <Collapsible.Trigger>
           <span>Articulation Exercise Instructions</span>
         </Collapsible.Trigger>
-        <Collapsible.Panel contentClassName="text-xs font-sans text-on-surface-variant pt-2 border-t border-outline-variant/60 leading-relaxed">
+        <Collapsible.Panel contentClassName="text-xs font-sans text-on-surface-variant pt-3 border-t border-outline-variant/60 leading-relaxed">
           Repeat each word three times with audio feedback. Pause 2 seconds between repetitions.
         </Collapsible.Panel>
       </Collapsible.Root>

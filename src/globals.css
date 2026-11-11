@@ -4,6 +4,7 @@
 @custom-variant focus-visible (&:focus-visible, &[data-preview~="focus"]);
 @custom-variant active (&:active, &[data-preview~="active"]);
 @custom-variant hover (&:hover, &[data-preview~="hover"]);
+@custom-variant short (@media (max-height: 480px));
 
 @theme {
   --font-heading: "Atkinson Hyperlegible Next", sans-serif;
@@ -124,7 +125,6 @@
 :root {
   color-scheme: light;
   accent-color: var(--primary);
-  interpolate-size: allow-keywords;
   scrollbar-gutter: stable;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
@@ -1396,6 +1396,12 @@ form[data-tool-active] {
   position: relative;
   z-index: 1;
 }
+
+/* Opt-in keyword size interpolation (kept off :root so JS-measured Base UI panels do not interpolate auto <-> px) */
+@utility interpolate-keywords {
+  interpolate-size: allow-keywords;
+}
+
 
 
 
