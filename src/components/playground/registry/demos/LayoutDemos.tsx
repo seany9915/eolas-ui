@@ -65,6 +65,45 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
           <Button size="sm" variant="outline" colorRole="neutral">View Progress</Button>
         </Card.Footer>
       </Card>
+
+      {/* Divided Stat Strip inside a single Card (preferred over MetricCard grids) */}
+      <Card className="@container md:col-span-2">
+        <Card.Header>
+          <Card.Title>Weekly summary</Card.Title>
+          <Card.Description>Key practice numbers grouped in a single surface</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <dl className="grid grid-cols-1 @md:grid-cols-3 divide-y @md:divide-y-0 @md:divide-x divide-outline-variant">
+            <div className="flex flex-col gap-1 pb-4 @md:pb-0 @md:pr-5">
+              <dt className="font-sans text-sm font-medium text-on-surface-variant">Active sessions</dt>
+              <dd className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-headline-md font-bold text-on-surface tabular-nums">142</span>
+                <Badge variant="outline" colorRole="success" size="sm" icon="trending_up">
+                  +8%
+                </Badge>
+              </dd>
+            </div>
+            <div className="flex flex-col gap-1 py-4 @md:py-0 @md:px-5">
+              <dt className="font-sans text-sm font-medium text-on-surface-variant">Daily goals</dt>
+              <dd className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-headline-md font-bold text-on-surface tabular-nums">92%</span>
+                <Badge variant="outline" colorRole="success" size="sm" icon="trending_up">
+                  +4%
+                </Badge>
+              </dd>
+            </div>
+            <div className="flex flex-col gap-1 pt-4 @md:pt-0 @md:pl-5">
+              <dt className="font-sans text-sm font-medium text-on-surface-variant">Session length</dt>
+              <dd className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-headline-md font-bold text-on-surface tabular-nums">14 min</span>
+                <Badge variant="outline" colorRole="neutral" size="sm" icon="trending_flat">
+                  Steady
+                </Badge>
+              </dd>
+            </div>
+          </dl>
+        </Card.Content>
+      </Card>
     </div>
   );
 };

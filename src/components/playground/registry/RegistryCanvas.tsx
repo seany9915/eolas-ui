@@ -103,7 +103,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   colorRole="warning"
                   size="sm"
                   icon="warning"
-                >Legacy Re-export</Badge>
+                >{entry.tier === 'block' ? 'Deprecated' : 'Legacy Re-export'}</Badge>
               )}
             </div>
 
@@ -142,7 +142,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
           <div className="mt-4">
             <InlineAlert
               role="warning"
-              title="Legacy Drift & Retirement Notice"
+              title={entry.tier === 'block' ? 'Deprecated Block Notice' : 'Legacy Drift & Retirement Notice'}
             >
               {entry.deprecatedNote || 'This omnibus re-export exists for backward compatibility. Please migrate to direct primitives.'}
             </InlineAlert>

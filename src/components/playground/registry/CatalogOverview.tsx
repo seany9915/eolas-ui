@@ -231,11 +231,20 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                       <h3 className="font-heading text-base font-bold text-on-surface group-hover:text-primary transition-colors truncate">
                         {entry.title}
                       </h3>
-                      <Badge
-                        variant="soft"
-                        colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
-                        size="sm"
-                      >{entry.tier === 'block' ? 'Block' : 'Primitive'}</Badge>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {entry.isDeprecated && (
+                          <Badge
+                            variant="soft"
+                            colorRole="warning"
+                            size="sm"
+                          >{entry.tier === 'block' ? 'Deprecated' : 'Legacy'}</Badge>
+                        )}
+                        <Badge
+                          variant="soft"
+                          colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
+                          size="sm"
+                        >{entry.tier === 'block' ? 'Block' : 'Primitive'}</Badge>
+                      </div>
                     </div>
 
                     <p className="font-sans text-sm text-on-surface-variant line-clamp-2 leading-relaxed">

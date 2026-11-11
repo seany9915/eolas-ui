@@ -244,10 +244,10 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
                                 <span className="truncate">{entry.title}</span>
                                 {entry.isDeprecated && (
                                   <span
-                                    title="Legacy re-export"
+                                    title={entry.tier === 'block' ? 'Deprecated block' : 'Legacy re-export'}
                                     className="font-mono text-[10px] px-1 py-0.5 rounded bg-warning-container text-on-warning-container font-medium shrink-0"
                                   >
-                                    legacy
+                                    {entry.tier === 'block' ? 'deprecated' : 'legacy'}
                                   </span>
                                 )}
                                 {entry.tier === 'block' && (

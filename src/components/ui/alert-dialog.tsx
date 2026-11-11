@@ -136,9 +136,13 @@ function AlertDialogComponent<Payload = unknown>({
                 </div>
                 {typeof children === 'function' ? children(renderProps) : children}
                 <div className="flex items-center justify-end gap-3 pt-3 border-t border-outline-variant">
-                  <BaseAlertDialog.Close className="inline-flex items-center justify-center font-label text-sm font-semibold rounded-md h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                    {cancelLabel}
-                  </BaseAlertDialog.Close>
+                  <BaseAlertDialog.Close
+                    render={
+                      <Button variant="outline" colorRole="neutral" size="md">
+                        {cancelLabel}
+                      </Button>
+                    }
+                  />
                   {closeOnConfirm ? (
                     <BaseAlertDialog.Close
                       render={

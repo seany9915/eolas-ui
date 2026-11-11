@@ -2273,7 +2273,7 @@
       "name": "area-chart-card",
       "type": "registry:block",
       "title": "Area Chart Card",
-      "description": "AreaChartCard block. Controlled presentational card for volume trends and intake velocity over time. Composes Card, Badge, Icon, and Chart primitives with smooth gradient fills and accessible tooltips.",
+      "description": "AreaChartCard block. Controlled presentational card for volume trends and intake velocity over time. Composes ChartCard and Chart primitives with smooth gradient fills and accessible tooltips.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2282,9 +2282,7 @@
       ],
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/chart-card",
         "@seany9915/eolas-ui/chart"
       ]
     },
@@ -2292,7 +2290,7 @@
       "name": "bar-chart-card",
       "type": "registry:block",
       "title": "Bar Chart Card",
-      "description": "BarChartCard block. Controlled presentational card for categorical throughput, comparative performance, and multi-metric distribution. Composes Card, Badge, Icon, and Chart primitives with rounded bars, accessible tooltips, and legends.",
+      "description": "BarChartCard block. Controlled presentational card for categorical throughput, comparative performance, and multi-metric distribution. Composes ChartCard and Chart primitives with rounded bars, accessible tooltips, and legends.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2301,10 +2299,26 @@
       ],
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/chart-card",
+        "@seany9915/eolas-ui/chart"
+      ]
+    },
+    {
+      "name": "chart-card",
+      "type": "registry:block",
+      "title": "Chart Card",
+      "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row alignment, and trend badges.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
         "@seany9915/eolas-ui/card",
         "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon",
-        "@seany9915/eolas-ui/chart"
+        "@seany9915/eolas-ui/skeleton",
+        "@seany9915/eolas-ui/empty"
       ]
     },
     {
@@ -2371,7 +2385,7 @@
       "name": "delete-confirmation-dialog",
       "type": "registry:block",
       "title": "Delete Confirmation Dialog",
-      "description": "DeleteConfirmationDialog block. Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
+      "description": "DeleteConfirmationDialog block. @deprecated Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2407,7 +2421,7 @@
       "name": "line-chart-card",
       "type": "registry:block",
       "title": "Line Chart Card",
-      "description": "LineChartCard block. Controlled presentational card for multi-series trajectories, baseline targets, and historical benchmark tracking. Composes Card, Badge, Icon, and Chart primitives with high-contrast lines, accessible tooltips, and legends.",
+      "description": "LineChartCard block. Controlled presentational card for multi-series trajectories, baseline targets, and historical benchmark tracking. Composes ChartCard and Chart primitives with high-contrast lines, accessible tooltips, and legends.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2416,9 +2430,7 @@
       ],
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/chart-card",
         "@seany9915/eolas-ui/chart"
       ]
     },
@@ -2459,7 +2471,7 @@
       "name": "metric-card",
       "type": "registry:block",
       "title": "Metric Card",
-      "description": "MetricCard block. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
+      "description": "MetricCard block. @deprecated Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2476,7 +2488,7 @@
       "name": "pie-chart-card",
       "type": "registry:block",
       "title": "Pie Chart Card",
-      "description": "PieChartCard block. Controlled presentational card for category distributions, status proportions, and caseload composition breakdowns. Composes Card, Chart, and Legend primitives with a centered aggregate KPI and accessible tooltips.",
+      "description": "PieChartCard block. Controlled presentational card for category distributions, status proportions, and caseload composition breakdowns. Composes ChartCard and Chart primitives with a centered aggregate KPI and accessible tooltips.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2485,7 +2497,7 @@
       ],
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
+        "@seany9915/eolas-ui/chart-card",
         "@seany9915/eolas-ui/chart"
       ]
     },
@@ -2520,7 +2532,7 @@
       "name": "radar-chart-card",
       "type": "registry:block",
       "title": "Radar Chart Card",
-      "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes Card, Chart, and Legend primitives with polar grids, high-contrast polygons, and accessible tooltips.",
+      "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids, high-contrast polygons, and accessible tooltips.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2529,7 +2541,7 @@
       ],
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
+        "@seany9915/eolas-ui/chart-card",
         "@seany9915/eolas-ui/chart"
       ]
     },
@@ -2537,7 +2549,7 @@
       "name": "radial-chart-card",
       "type": "registry:block",
       "title": "Radial Chart Card",
-      "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary color. Composes Card, Badge, Icon, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
+      "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary color. Composes ChartCard, Badge, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -2546,9 +2558,8 @@
       ],
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
+        "@seany9915/eolas-ui/chart-card",
         "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon",
         "@seany9915/eolas-ui/chart"
       ]
     },

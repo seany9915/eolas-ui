@@ -54,6 +54,8 @@ export const DialogDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const AlertDialogDemo: React.FC<ComponentDemoProps> = () => {
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <AlertDialog
@@ -68,6 +70,45 @@ export const AlertDialogDemo: React.FC<ComponentDemoProps> = () => {
         confirmLabel="Reset Key Now"
         cancelLabel="Keep Active"
       />
+
+      <Button variant="outline" colorRole="error" onClick={() => setDeleteOpen(true)}>
+        <Icon name="delete" size="xs" />
+        Delete Session Notes
+      </Button>
+
+      <AlertDialog.Root open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialog.Content size="md">
+          <div className="flex items-start gap-3.5">
+            <div className="flex items-center justify-center size-11 rounded-full bg-error-container text-on-error-container shrink-0">
+              <Icon name="delete" size="lg" aria-hidden="true" />
+            </div>
+            <div className="flex flex-col gap-1 pt-1 text-left">
+              <AlertDialog.Title>Delete note</AlertDialog.Title>
+              <AlertDialog.Description>
+                Delete &ldquo;Session Notes (Draft)&rdquo;? This cannot be undone.
+              </AlertDialog.Description>
+            </div>
+          </div>
+          <AlertDialog.Footer className="mt-4">
+            <Button
+              variant="outline"
+              colorRole="neutral"
+              size="md"
+              onClick={() => setDeleteOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="filled"
+              colorRole="error"
+              size="md"
+              onClick={() => setDeleteOpen(false)}
+            >
+              Delete
+            </Button>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </div>
   );
 };

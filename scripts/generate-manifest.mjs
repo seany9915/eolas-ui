@@ -95,7 +95,13 @@ const registryEntries = items.map(item => {
     ? 'https://developer.chrome.com'
     : undefined;
 
-  const isDeprecated = item.name === 'selection-controls' || item.name === 'toggles' || item.name === 'steppers' || item.name === 'empty-state';
+  const isDeprecated =
+    item.name === 'selection-controls' ||
+    item.name === 'toggles' ||
+    item.name === 'steppers' ||
+    item.name === 'empty-state' ||
+    item.name === 'metric-card' ||
+    item.name === 'delete-confirmation-dialog';
   const deprecatedNote = item.name === 'selection-controls'
     ? 'Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/checkbox, radio, switch.'
     : item.name === 'toggles'
@@ -104,6 +110,10 @@ const registryEntries = items.map(item => {
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.'
     : item.name === 'empty-state'
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/empty.'
+    : item.name === 'metric-card'
+    ? 'Deprecated block. Compose Card (divided <dl> stat strip), Item.Group, RadialChartCard, or Table (numeric) directly instead of metric card grids.'
+    : item.name === 'delete-confirmation-dialog'
+    ? 'Deprecated wrapper block. Use AlertDialog (@/components/ui/alert-dialog) directly with controlled open state and closeOnConfirm={false} for async flows.'
     : undefined;
   const replacedBy = item.name === 'selection-controls'
     ? 'checkbox, radio, switch'
@@ -113,6 +123,10 @@ const registryEntries = items.map(item => {
     ? 'number-field'
     : item.name === 'empty-state'
     ? 'empty'
+    : item.name === 'metric-card'
+    ? 'card, item, radial-chart-card, table'
+    : item.name === 'delete-confirmation-dialog'
+    ? 'alert-dialog'
     : undefined;
 
   const category = catMap[item.name] || (isBlock ? 'blocks' : 'layout');

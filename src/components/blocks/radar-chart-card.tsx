@@ -3,11 +3,11 @@
  *
  * Controlled presentational radar / spider card for multi-factor profile assessments,
  * clinical competency pillars, and benchmark polygon overlays.
- * Composes Card, Chart, and Legend primitives with polar grids, high-contrast polygons, and accessible tooltips.
+ * Composes ChartCard and Chart primitives with polar grids, high-contrast polygons, and accessible tooltips.
  */
 import * as React from 'react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from 'recharts';
-import { Card } from '@/components/ui/card';
+import { ChartCard, type ChartCardProps } from '@/components/blocks/chart-card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -17,7 +17,6 @@ import {
   applySeriesOverrides,
   type ChartConfig,
 } from '@/components/ui/chart';
-import { cn } from '@/lib/utils';
 
 export interface RadarChartSeries {
   dataKey: string;
@@ -25,7 +24,11 @@ export interface RadarChartSeries {
   fillOpacity?: number;
 }
 
-export interface RadarChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface RadarChartCardProps
+  extends Omit<
+    ChartCardProps,
+    'children' | 'title' | 'titleBadge' | 'trend' | 'contentClassName' | 'skeletonShape'
+  > {
   title: string;
   description?: string;
   data: Array<Record<string, unknown>>;
@@ -33,8 +36,8 @@ export interface RadarChartCardProps extends React.HTMLAttributes<HTMLDivElement
   series: RadarChartSeries[];
   config: ChartConfig;
   showLegend?: boolean;
-  footer?: React.ReactNode;
-  action?: React.ReactNode;
+  /** Accessible chart summary announced to screen readers. Defaults to `title`. */
+  chartLabel?: string;
 }
 
 export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardProps>(
@@ -49,73 +52,67 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
       showLegend,
       footer,
       action,
+      loading,
+      isEmpty,
+      emptyTitle,
+      emptyDescription,
+      chartLabel,
       className,
       ...props
     },
     ref
   ) => {
     const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
+    const resolvedEmpty = isEmpty ?? (!data || data.length === 0 || series.length === 0);
+
     return (
-      <Card ref={ref} className={cn('w-full', className)} {...props}>
-        <Card.Header>
-          <div className="flex flex-col gap-1">
-            <Card.Title>
-              {title}
-            </Card.Title>
-            {description && (
-              <Card.Description>
-                {description}
-              </Card.Description>
-            )}
-          </div>
-          {action && (
-            <div data-slot="card-action" className="col-start-2 row-start-1 self-start justify-self-end">
-              {action}
-            </div>
-          )}
-        </Card.Header>
-
-        <Card.Content className="pt-2">
-          <ChartContainer
-            config={resolvedConfig}
-            className="mx-auto aspect-square max-h-64 w-full"
+      <ChartCard
+        ref={ref}
+        title={title}
+        description={description}
+        action={action}
+        footer={footer}
+        loading={loading}
+        isEmpty={resolvedEmpty}
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+        contentClassName="h-56 @xs:h-64 w-full"
+        className={className}
+        {...props}
+      >
+        <ChartContainer
+          role="img"
+          aria-label={chartLabel ?? title}
+          config={resolvedConfig}
+          className="aspect-auto h-full w-full"
+        >
+          <RadarChart
+            data={data}
+            outerRadius="70%"
+            margin={{ top: 16, right: 24, bottom: 16, left: 24 }}
           >
-            <RadarChart
-              data={data}
-              outerRadius="70%"
-              margin={{ top: 16, right: 24, bottom: 16, left: 24 }}
-            >
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <PolarAngleAxis
-                dataKey={angleKey}
-                className="text-xs font-sans font-medium text-on-surface-variant"
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <PolarAngleAxis
+              dataKey={angleKey}
+              className="text-xs font-sans font-medium text-on-surface-variant"
+            />
+            <PolarGrid className="stroke-outline-variant/40" />
+            {series.map((item) => (
+              <Radar
+                key={item.dataKey}
+                dataKey={item.dataKey}
+                stroke={`var(--color-${item.dataKey})`}
+                fill={`var(--color-${item.dataKey})`}
+                fillOpacity={item.fillOpacity ?? 0.3}
+                strokeWidth={2}
               />
-              <PolarGrid className="stroke-outline-variant/40" />
-              {series.map((item) => (
-                <Radar
-                  key={item.dataKey}
-                  dataKey={item.dataKey}
-                  stroke={`var(--color-${item.dataKey})`}
-                  fill={`var(--color-${item.dataKey})`}
-                  fillOpacity={item.fillOpacity ?? 0.3}
-                  strokeWidth={2}
-                />
-              ))}
-              {(showLegend ?? series.length > 1) && (
-                <ChartLegend content={<ChartLegendContent />} />
-              )}
-            </RadarChart>
-          </ChartContainer>
-        </Card.Content>
-
-        {footer && (
-          <Card.Footer>
-            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
-              {footer}
-            </div>
-          </Card.Footer>
-        )}
-      </Card>
+            ))}
+            {(showLegend ?? series.length > 1) && (
+              <ChartLegend content={<ChartLegendContent />} />
+            )}
+          </RadarChart>
+        </ChartContainer>
+      </ChartCard>
     );
   }
 );

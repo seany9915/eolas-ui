@@ -1,6 +1,9 @@
 /**
  * MetricCard block.
  *
+ * @deprecated Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`,
+ * `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids.
+ *
  * Presentational metric card for clinical analytics, caseload overviews, and progress monitoring.
  * Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation,
  * and high-contrast clinical status tokens.
@@ -11,6 +14,9 @@ import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
+/**
+ * @deprecated Compose `Card`, `Item.Group`, `RadialChartCard`, or `Table` directly instead.
+ */
 export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string | number;
@@ -21,6 +27,9 @@ export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   badge?: React.ReactNode;
 }
 
+/**
+ * @deprecated Compose `Card`, `Item.Group`, `RadialChartCard`, or `Table` directly instead.
+ */
 export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
   (
     {

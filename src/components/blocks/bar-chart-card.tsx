@@ -3,13 +3,11 @@
  *
  * Controlled presentational card for categorical throughput, comparative performance,
  * and multi-metric distribution.
- * Composes Card, Badge, Icon, and Chart primitives with rounded bars, accessible tooltips, and legends.
+ * Composes ChartCard and Chart primitives with rounded bars, accessible tooltips, and legends.
  */
 import * as React from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Icon } from '@/components/ui/icon';
+import { ChartCard, type ChartCardProps, type ChartCardTrend } from '@/components/blocks/chart-card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -19,7 +17,6 @@ import {
   applySeriesOverrides,
   type ChartConfig,
 } from '@/components/ui/chart';
-import { cn } from '@/lib/utils';
 
 export interface BarChartSeries {
   dataKey: string;
@@ -27,7 +24,11 @@ export interface BarChartSeries {
   stackId?: string;
 }
 
-export interface BarChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface BarChartCardProps
+  extends Omit<
+    ChartCardProps,
+    'children' | 'title' | 'titleBadge' | 'contentClassName' | 'skeletonShape'
+  > {
   title: string;
   description?: string;
   data: Array<Record<string, unknown>>;
@@ -37,13 +38,9 @@ export interface BarChartCardProps extends React.HTMLAttributes<HTMLDivElement> 
   layout?: 'horizontal' | 'vertical';
   yAxisWidth?: number;
   showLegend?: boolean;
-  trend?: {
-    value: string;
-    positive?: boolean;
-    label?: string;
-  };
-  footer?: React.ReactNode;
-  action?: React.ReactNode;
+  trend?: ChartCardTrend;
+  /** Accessible chart summary announced to screen readers. Defaults to `title`. */
+  chartLabel?: string;
 }
 
 export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
@@ -61,6 +58,11 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       trend,
       footer,
       action,
+      loading,
+      isEmpty,
+      emptyTitle,
+      emptyDescription,
+      chartLabel,
       className,
       ...props
     },
@@ -73,120 +75,95 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       series.forEach((item, index) => item.stackId && map.set(item.stackId, index));
       return map;
     }, [series]);
+    const resolvedEmpty = isEmpty ?? (!data || data.length === 0 || series.length === 0);
 
     return (
-      <Card ref={ref} className={cn('w-full', className)} {...props}>
-        <Card.Header>
-          <div className="flex flex-col gap-1">
-            <Card.Title>
-              {title}
-            </Card.Title>
-            {description && (
-              <Card.Description>
-                {description}
-              </Card.Description>
+      <ChartCard
+        ref={ref}
+        title={title}
+        description={description}
+        action={action}
+        trend={trend}
+        footer={footer}
+        loading={loading}
+        isEmpty={resolvedEmpty}
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+        contentClassName="h-64 w-full"
+        className={className}
+        {...props}
+      >
+        <ChartContainer
+          role="img"
+          aria-label={chartLabel ?? title}
+          config={resolvedConfig}
+          className="aspect-auto h-full w-full"
+        >
+          <BarChart
+            data={data}
+            layout={isVerticalLayout ? 'vertical' : 'horizontal'}
+            margin={
+              isVerticalLayout
+                ? { left: 0, right: 16, top: 12, bottom: 0 }
+                : { left: 12, right: 12, top: 12, bottom: 0 }
+            }
+          >
+            <CartesianGrid vertical={isVerticalLayout} horizontal={!isVerticalLayout} />
+            {isVerticalLayout ? (
+              <>
+                <YAxis
+                  dataKey={xAxisKey}
+                  type="category"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  width={yAxisWidth}
+                  className="text-xs text-on-surface-variant"
+                />
+                <XAxis type="number" hide />
+              </>
+            ) : (
+              <>
+                <XAxis
+                  dataKey={xAxisKey}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={16}
+                  className="text-xs text-on-surface-variant"
+                />
+                <YAxis hide />
+              </>
             )}
-          </div>
-          {action && (
-            <div data-slot="card-action" className="col-start-2 row-start-1 self-start justify-self-end">
-              {action}
-            </div>
-          )}
-        </Card.Header>
+            <ChartTooltip
+              cursor={{ fill: 'var(--color-surface-container)' }}
+              content={<ChartTooltipContent indicator="dot" />}
+            />
+            {(showLegend ?? series.length > 1) && (
+              <ChartLegend content={<ChartLegendContent />} />
+            )}
+            {series.map((item, index) => {
+              // Only the last series of each stack gets rounded corners
+              const isStacked = !!item.stackId && lastIndexByStack.get(item.stackId) !== index;
+              const radius: [number, number, number, number] = isStacked
+                ? [0, 0, 0, 0]
+                : isVerticalLayout
+                ? [0, 4, 4, 0]
+                : [4, 4, 0, 0];
 
-        <Card.Content className="pt-2">
-          <ChartContainer config={resolvedConfig} className="aspect-auto h-64 w-full">
-            <BarChart
-              data={data}
-              layout={isVerticalLayout ? 'vertical' : 'horizontal'}
-              margin={
-                isVerticalLayout
-                  ? { left: 0, right: 16, top: 12, bottom: 0 }
-                  : { left: 12, right: 12, top: 12, bottom: 0 }
-              }
-            >
-              <CartesianGrid vertical={isVerticalLayout} horizontal={!isVerticalLayout} />
-              {isVerticalLayout ? (
-                <>
-                  <YAxis
-                    dataKey={xAxisKey}
-                    type="category"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    width={yAxisWidth}
-                    className="text-xs text-on-surface-variant"
-                  />
-                  <XAxis type="number" hide />
-                </>
-              ) : (
-                <>
-                  <XAxis
-                    dataKey={xAxisKey}
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    minTickGap={16}
-                    className="text-xs text-on-surface-variant"
-                  />
-                  <YAxis hide />
-                </>
-              )}
-              <ChartTooltip
-                cursor={{ fill: 'var(--color-surface-container)' }}
-                content={<ChartTooltipContent indicator="dot" />}
-              />
-              {(showLegend ?? series.length > 1) && (
-                <ChartLegend content={<ChartLegendContent />} />
-              )}
-              {series.map((item, index) => {
-                // Only the last series of each stack gets rounded corners
-                const isStacked = !!item.stackId && lastIndexByStack.get(item.stackId) !== index;
-                const radius: [number, number, number, number] = isStacked
-                  ? [0, 0, 0, 0]
-                  : isVerticalLayout
-                  ? [0, 4, 4, 0]
-                  : [4, 4, 0, 0];
-
-                return (
-                  <Bar
-                    key={item.dataKey}
-                    dataKey={item.dataKey}
-                    fill={`var(--color-${item.dataKey})`}
-                    stackId={item.stackId}
-                    radius={radius}
-                  />
-                );
-              })}
-            </BarChart>
-          </ChartContainer>
-        </Card.Content>
-
-        {(trend || footer) && (
-          <Card.Footer>
-            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
-              <div className="flex items-center gap-2">
-                {trend && (
-                  <Badge
-                    variant="outline"
-                    colorRole={trend.positive !== false ? 'success' : 'error'}
-                    size="sm"
-                  >
-                    <Icon
-                      name={trend.positive !== false ? 'trending_up' : 'trending_down'}
-                      size="xs"
-                      aria-hidden="true"
-                    />
-                    <span>{trend.value}</span>
-                  </Badge>
-                )}
-                {trend?.label && <span>{trend.label}</span>}
-              </div>
-              {footer && <div>{footer}</div>}
-            </div>
-          </Card.Footer>
-        )}
-      </Card>
+              return (
+                <Bar
+                  key={item.dataKey}
+                  dataKey={item.dataKey}
+                  fill={`var(--color-${item.dataKey})`}
+                  stackId={item.stackId}
+                  radius={radius}
+                />
+              );
+            })}
+          </BarChart>
+        </ChartContainer>
+      </ChartCard>
     );
   }
 );

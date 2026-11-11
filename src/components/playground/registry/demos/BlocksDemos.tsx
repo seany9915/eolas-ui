@@ -8,6 +8,7 @@ import {
 } from '@/components/blocks/data-table';
 import { Badge } from '@/components/ui/badge';
 import { ApprovalCard } from '@/components/blocks/approval-card';
+import { ChartCard } from '@/components/blocks/chart-card';
 import { AreaChartCard } from '@/components/blocks/area-chart-card';
 import { BarChartCard } from '@/components/blocks/bar-chart-card';
 import { LineChartCard } from '@/components/blocks/line-chart-card';
@@ -47,6 +48,8 @@ import { Tabs } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup } from '@/components/ui/toggle-group';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { Sidebar } from '@/components/ui/sidebar';
 import { ComponentDemoProps } from '../types';
 import { cn } from '@/lib/utils';
@@ -452,6 +455,91 @@ export const DataTableDemo: React.FC<ComponentDemoProps> = () => {
         pageSizeOptions={[5, 10, 20]}
         showSelectedCount
       />
+    </div>
+  );
+};
+
+export const ChartCardDemo: React.FC<ComponentDemoProps> = () => {
+  const [viewState, setViewState] = React.useState<'ready' | 'loading' | 'empty'>('ready');
+
+  const chartData = [
+    { day: 'Mon', sessions: 28 },
+    { day: 'Tue', sessions: 34 },
+    { day: 'Wed', sessions: 31 },
+    { day: 'Thu', sessions: 42 },
+    { day: 'Fri', sessions: 38 },
+  ];
+
+  const chartConfig = {
+    sessions: {
+      label: 'Sessions',
+      color: 'var(--color-primary)',
+    },
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto py-6 flex flex-col gap-4">
+      <div className="flex items-center justify-end">
+        <ToggleGroup
+          type="single"
+          size="sm"
+          value={viewState}
+          onValueChange={(val) => {
+            if (val === 'ready' || val === 'loading' || val === 'empty') {
+              setViewState(val);
+            }
+          }}
+          aria-label="Chart card state"
+        >
+          <ToggleGroup.Item value="ready">Ready</ToggleGroup.Item>
+          <ToggleGroup.Item value="loading">Loading</ToggleGroup.Item>
+          <ToggleGroup.Item value="empty">Empty</ToggleGroup.Item>
+        </ToggleGroup>
+      </div>
+
+      <ChartCard
+        title="Weekly Practice"
+        titleBadge={
+          <Badge variant="outline" colorRole="secondary" size="sm">
+            5 days
+          </Badge>
+        }
+        description="Completed speech drills per day"
+        loading={viewState === 'loading'}
+        isEmpty={viewState === 'empty'}
+        emptyTitle="No sessions recorded"
+        emptyDescription="Completed drills will show up here."
+        contentClassName="h-64 w-full"
+        trend={{ value: '+12%', positive: true, label: 'vs last week' }}
+        footer="Updated today"
+      >
+        <ChartContainer
+          role="img"
+          aria-label="Weekly Practice"
+          config={chartConfig}
+          className="aspect-auto h-full w-full"
+        >
+          <AreaChart data={chartData} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="day"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              className="text-xs text-on-surface-variant"
+            />
+            <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+            <Area
+              type="monotone"
+              dataKey="sessions"
+              stroke="var(--color-sessions)"
+              strokeWidth={2}
+              fill="var(--color-sessions)"
+              fillOpacity={0.18}
+            />
+          </AreaChart>
+        </ChartContainer>
+      </ChartCard>
     </div>
   );
 };

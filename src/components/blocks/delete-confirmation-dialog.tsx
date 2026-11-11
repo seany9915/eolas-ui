@@ -1,6 +1,9 @@
 /**
  * DeleteConfirmationDialog block.
  *
+ * @deprecated Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}`
+ * with controlled `open` state for async deletion flows).
+ *
  * Presentational composite modal for destructive confirmation workflows.
  * Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping,
  * 44px minimum touch targets, and high-contrast error styling.
@@ -10,6 +13,9 @@ import { AlertDialog } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 
+/**
+ * @deprecated Use `AlertDialogProps` from `@/components/ui/alert-dialog` directly instead.
+ */
 export interface DeleteConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -26,6 +32,9 @@ export interface DeleteConfirmationDialogProps {
   isLoading?: boolean;
 }
 
+/**
+ * @deprecated Use `AlertDialog` from `@/components/ui/alert-dialog` directly instead.
+ */
 export const DeleteConfirmationDialog = React.forwardRef<
   HTMLDivElement,
   DeleteConfirmationDialogProps
@@ -56,7 +65,7 @@ export const DeleteConfirmationDialog = React.forwardRef<
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Content ref={ref} size="md">
         <div className="flex items-start gap-3.5">
-          <div className="flex items-center justify-center w-11 h-11 min-w-11 min-h-11 rounded-full bg-error-container text-on-error-container shrink-0">
+          <div className="flex items-center justify-center size-11 rounded-full bg-error-container text-on-error-container shrink-0">
             <Icon name="delete" size="lg" aria-hidden="true" />
           </div>
           <div className="flex flex-col gap-1 pt-1 text-left">
@@ -72,7 +81,7 @@ export const DeleteConfirmationDialog = React.forwardRef<
 
         <AlertDialog.Footer className="mt-6">
           <Button
-            variant="outlined"
+            variant="outline"
             colorRole="neutral"
             disabled={isLoading}
             onClick={() => onOpenChange(false)}
