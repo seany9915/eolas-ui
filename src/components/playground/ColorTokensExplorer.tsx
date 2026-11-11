@@ -181,7 +181,7 @@ export const ColorTokensExplorer: React.FC = () => {
       tokens: [
         {
           name: 'Outline (Default Control Boundaries)',
-          hex: '#737688',
+          hex: '#6B6E80',
           textHex: '#1a1c1e',
           bgClass: 'border-2 border-outline bg-surface text-on-surface font-semibold',
           usage: '1px resting border for interactive form controls (Input, Checkbox, Radio).',

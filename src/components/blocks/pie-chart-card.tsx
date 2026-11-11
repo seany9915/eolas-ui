@@ -19,6 +19,11 @@ import {
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
 
+// Used when a slice has no ill and no usable config entry
+const FALLBACK_SLICE_COLORS = ['primary', 'secondary', 'tertiary', 'success', 'warning', 'error'].map(
+  (token) => `var(--color-${token})`
+);
+
 export interface PieChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
@@ -31,7 +36,9 @@ export interface PieChartCardProps extends React.HTMLAttributes<HTMLDivElement> 
     label?: string;
   };
   interactive?: boolean;
-  activeIndex?: number;
+  /** Controlled active slice. Pass 
+ull to control with no active slice; leave undefined for internal hover state. */
+  activeIndex?: number | null;
   onActiveIndexChange?: (index: number | undefined) => void;
   showLegend?: boolean;
   footer?: React.ReactNode;
@@ -60,18 +67,21 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
     ref
   ) => {
     const [internalActiveIndex, setInternalActiveIndex] = React.useState<number | undefined>(undefined);
-    const currentActiveIndex = activeIndex !== undefined ? activeIndex : internalActiveIndex;
+    const isControlled = activeIndex !== undefined;
+    const currentActiveIndex = isControlled ? (activeIndex ?? undefined) : internalActiveIndex;
 
     // Normalize data so each slice defaults to var(--color-key) if item.fill is omitted
     const normalizedData = React.useMemo<Array<Record<string, unknown>>>(() => {
-      return data.map((item) => {
-        const key = String(item[nameKey] || '');
+      return data.map((item, index) => {
+        const key = String(item[nameKey] ?? '');
+        // Only config keys that are valid CSS identifiers resolve to a chart color variable
+        const hasConfigColor = /^[\w-]+$/.test(key) && key in config;
         return {
-          fill: `var(--color-${key})`,
+          fill: hasConfigColor ? `var(--color-${key})` : FALLBACK_SLICE_COLORS[index % FALLBACK_SLICE_COLORS.length],
           ...item,
         };
       });
-    }, [data, nameKey]);
+    }, [data, nameKey, config]);
 
     // Calculate total sum across data items
     const totalSum = React.useMemo(() => {
@@ -95,18 +105,18 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
       : totalSum.toLocaleString();
 
     const displayLabel = activeItem
-      ? `${String(activeItem[nameKey])} (${activePercentage})`
+      ? `${String(activeItem[nameKey])}${activePercentage ? ` (${activePercentage})` : ''}`
       : centerLabel?.label || 'Total';
 
     return (
       <Card ref={ref} className={cn('w-full', className)} {...props}>
         <Card.Header>
           <div className="flex flex-col gap-1">
-            <Card.Title className="text-base font-semibold text-on-surface">
+            <Card.Title>
               {title}
             </Card.Title>
             {description && (
-              <Card.Description className="text-xs text-on-surface-variant">
+              <Card.Description>
                 {description}
               </Card.Description>
             )}
@@ -121,7 +131,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
         <Card.Content className="pt-2">
           <ChartContainer
             config={config}
-            className="mx-auto aspect-square max-h-[250px] w-full"
+            className="mx-auto aspect-square max-h-64 w-full"
           >
             <PieChart>
               <ChartTooltip
@@ -142,14 +152,14 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                     <Sector
                       {...props}
                       outerRadius={(props.outerRadius || 85) + (isHovered ? 6 : 0)}
-                      className="transition-all duration-150 cursor-pointer"
+                      className={cn(interactive && 'transition-all duration-150 cursor-pointer')}
                     />
                   );
                 }}
                 onMouseEnter={
                   interactive
                     ? (_, index) => {
-                        setInternalActiveIndex(index);
+                        if (!isControlled) setInternalActiveIndex(index);
                         onActiveIndexChange?.(index);
                       }
                     : undefined
@@ -157,7 +167,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                 onMouseLeave={
                   interactive
                     ? () => {
-                        setInternalActiveIndex(undefined);
+                        if (!isControlled) setInternalActiveIndex(undefined);
                         onActiveIndexChange?.(undefined);
                       }
                     : undefined
@@ -199,7 +209,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                   content={
                     <ChartLegendContent
                       nameKey={nameKey}
-                      className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                      className="-translate-y-2 flex-wrap [&>*]:basis-1/4 [&>*]:justify-center"
                     />
                   }
                 />
@@ -209,8 +219,10 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
         </Card.Content>
 
         {footer && (
-          <Card.Footer className="flex items-center justify-between gap-3 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3">
-            {footer}
+          <Card.Footer>
+            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
+              {footer}
+            </div>
           </Card.Footer>
         )}
       </Card>

@@ -164,7 +164,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "description": "Eolas UI Breadcrumb component built on Base UI and DESIGN.md design tokens.",
     "category": "navigation",
     "tier": "primitive",
-    "basePrimitive": "DESIGN.md Token Primitive",
+    "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/breadcrumb.tsx",
     "dependencies": [
       "@base-ui/react",
@@ -2345,8 +2345,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/questionnaire.tsx",
     "taxonomy": [
-      "Multi-step guided question primitive and flow engine for intake forms, clinical assessments, onboarding sequences, configuration wizards, and conversational agent clarification prompts.",
-      "Conforms to shadcn/ui Questionnaire specification with full parity across compound subcomponents and flat exports: Root, Progress, Item, Title, Description, Choices, Choice, ChoiceInput, ChoiceLabel, ChoiceShortcut, Input, Error, Actions, Previous, Skip, Next, and Submit.",
+      "Multi-step guided question primitive and flow engine for intake forms, assessments, onboarding sequences, configuration wizards, and conversational agent clarification prompts.",
+      "Follows the shadcn/ui Questionnaire part structure and API: Root, Progress, Item, Title, Description, Choices, Choice, ChoiceInput, ChoiceLabel, ChoiceShortcut, Input, Error, Actions, Previous, Skip, Next, and Submit. Items take `multiple` (the legacy `type=\"multiple\"` still works) and answers serialize to FormData with one repeated entry per selected value (`FormData.getAll(name)`). Choices are role-based rather than native radio/checkbox inputs.",
       "Supports single-choice, multiple-choice, freeform text entry, keyboard shortcuts (A-Z, 1-9), roving tabindex arrow key navigation, form validation, draft restoration, and native FormData serialization.",
       "Accessible: WCAG 2.2 SC 2.5.8 compliant (min-h-11 touch targets), floating 2px focus indicators, fieldset/legend semantics, inert inactive items, live error regions, and container-query responsiveness (@container)."
     ],
@@ -2378,7 +2378,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "radial-chart-card",
     "name": "radial-chart-card",
     "title": "Radial Chart Card",
-    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. Composes Card, Badge, Icon, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
+    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary color. Composes Card, Badge, Icon, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2401,7 +2401,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/step-wizard.tsx",
     "taxonomy": [
-      "Controlled multi-step workflow container for guided clinical intake, onboarding, assessment flows, and multi-stage form sequences.",
+      "Controlled multi-step workflow container for guided intake, onboarding, assessment flows, and multi-stage form sequences.",
       "Pure UI: receives step data via props, manages directional slide transitions, and emits progression intents via callbacks (`onStepChange`, `onComplete`).",
       "Accessible: WCAG 2.2 SC 2.5.8 compliant (44x44px minimum touch targets on all interactive step markers and buttons), floating 2px focus indicators (`outline-offset: 2px`), and live regions (`aria-live=\"polite\"`).",
       "Modern HTML integration: supports `hiddenUntilFound` with `hidden=\"until-found\"` and `beforematch` event listener so browser search (<kbd>Ctrl+F</kbd>) finds inactive step content."

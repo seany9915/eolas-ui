@@ -67,6 +67,7 @@ function addComponents(componentNames, overwrite = false) {
   const queue = [...componentNames];
   const processed = new Set();
   const installedFiles = [];
+  const missing = [];
 
   while (queue.length > 0) {
     const name = queue.shift();
@@ -75,7 +76,8 @@ function addComponents(componentNames, overwrite = false) {
 
     const compFile = path.join(REGISTRY_DIR, `${name}.json`);
     if (!fs.existsSync(compFile)) {
-      console.warn(`Warning: Item ${name} not found in Eolas UI registry. Skipping.`);
+      console.error(`Error: Item ${name} not found in Eolas UI registry.`);
+      missing.push(name);
       continue;
     }
 
@@ -84,8 +86,8 @@ function addComponents(componentNames, overwrite = false) {
     // Queue internal registry dependencies
     if (data.registryDependencies && Array.isArray(data.registryDependencies)) {
       for (const dep of data.registryDependencies) {
-        if (!processed.has(dep)) {
-          queue.push(dep);
+        if (!processed.has(dep.replace(/^@seany9915\/eolas-ui\//, ''))) {
+          queue.push(dep.replace(/^@seany9915\/eolas-ui\//, ''));
         }
       }
     }
@@ -160,6 +162,11 @@ function addComponents(componentNames, overwrite = false) {
         installedFiles.push(file.target);
       }
     }
+  }
+
+  if (missing.length > 0) {
+    console.error(`\nFailed: could not resolve ${missing.join(', ')}.`);
+    process.exit(1);
   }
 
   console.log(`\nSuccessfully processed ${processed.size} items/dependencies.`);

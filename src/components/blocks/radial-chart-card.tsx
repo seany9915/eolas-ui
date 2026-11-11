@@ -3,6 +3,7 @@
  *
  * Controlled presentational semicircle gauge card for capacity monitoring,
  * threshold alerts, and target achievement.
+ * The arc color comes from the `value` entry in `config`; without one it falls back to the primary color.
  * Composes Card, Badge, Icon, and Chart primitives with a 180° radial arc and high-contrast status tokens.
  */
 import * as React from 'react';
@@ -26,6 +27,8 @@ export interface RadialChartCardProps extends React.HTMLAttributes<HTMLDivElemen
   value: number;
   total?: number;
   unit?: string;
+  /** Text under the value. Defaults to `of <total><unit>`, e.g. "of 100%" or "of 40 sessions". */
+  caption?: string;
   status?: RadialChartStatus;
   statusLabel?: string;
   config: ChartConfig;
@@ -53,6 +56,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
       value,
       total = 100,
       unit = '%',
+  caption,
       status = 'normal',
       statusLabel,
       config,
@@ -63,7 +67,8 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
     },
     ref
   ) => {
-    const chartData = React.useMemo(() => [{ value, fill: 'var(--color-value)' }], [value]);
+    const arcColor = 'value' in config ? 'var(--color-value)' : 'var(--color-primary)';
+    const chartData = React.useMemo(() => [{ value, fill: arcColor }], [value, arcColor]);
     const displayValue = `${value}${unit}`;
 
     return (
@@ -71,7 +76,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
         <Card.Header>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Card.Title className="text-base font-semibold text-on-surface">
+              <Card.Title>
                 {title}
               </Card.Title>
               <Badge
@@ -88,7 +93,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
               </Badge>
             </div>
             {description && (
-              <Card.Description className="text-xs text-on-surface-variant">
+              <Card.Description>
                 {description}
               </Card.Description>
             )}
@@ -103,7 +108,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
         <Card.Content className="pt-2">
           <ChartContainer
             config={config}
-            className="mx-auto aspect-square max-h-[220px] w-full"
+            className="mx-auto aspect-square max-h-56 w-full"
           >
             <RadialBarChart
               data={chartData}
@@ -141,7 +146,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
                             y={(viewBox.cy || 0) + 12}
                             className="fill-on-surface-variant text-xs font-sans font-medium"
                           >
-                            of {total}{unit} capacity
+                            {caption ?? `of ${total}${unit}`}
                           </tspan>
                         </text>
                       );
@@ -153,7 +158,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
               <RadialBar
                 dataKey="value"
                 angleAxisId={0}
-                fill="var(--color-value)"
+                fill={arcColor}
                 background={{ fill: 'var(--color-surface-container)' }}
                 cornerRadius={6}
               />
@@ -162,8 +167,10 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
         </Card.Content>
 
         {footer && (
-          <Card.Footer className="flex items-center justify-between gap-3 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3">
-            {footer}
+          <Card.Footer>
+            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
+              {footer}
+            </div>
           </Card.Footer>
         )}
       </Card>

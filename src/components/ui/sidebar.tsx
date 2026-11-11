@@ -16,6 +16,7 @@
 import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
 import { Button as BaseButton } from '@base-ui/react/button';
+import { useRender } from '@base-ui/react/use-render';
 import { Tooltip, TooltipProvider, type TooltipProps } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,23 +26,6 @@ import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
 type SidebarButtonClassName = React.ComponentPropsWithoutRef<typeof BaseButton>['className'];
-type ClonedChildProps = React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<unknown> };
-
-/** Merges sidebar classes, ref and props onto the single child used by the `asChild` pattern. */
-function cloneAsChild(
-  child: React.ReactElement,
-  classes: string,
-  ref: React.Ref<unknown>,
-  props: object
-) {
-  const element = child as React.ReactElement<ClonedChildProps>;
-  const childRef = (element as unknown as { ref?: React.Ref<unknown> }).ref;
-  return React.cloneElement(element, {
-    ref: ref || childRef,
-    className: cn(classes, element.props.className),
-    ...props,
-  } as ClonedChildProps);
-}
 
 // Constants exported for SSR hydration and custom layout sizing
 export const SIDEBAR_COOKIE_NAME = 'sidebar_state';
@@ -614,11 +598,11 @@ export const SidebarGroup = React.forwardRef<
 SidebarGroup.displayName = 'SidebarGroup';
 
 export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElement> {
-  asChild?: boolean;
+  render?: useRender.RenderProp;
 }
 
 export const SidebarGroupLabel = React.forwardRef<HTMLDivElement, SidebarGroupLabelProps>(
-  ({ className, asChild = false, children, ...props }, ref) => {
+  ({ className, render, ...props }, ref) => {
     const classes = cn(
       'duration-[var(--duration-fast)] flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-bold font-label text-on-surface-variant select-none outline-none transition-[margin,opacity] ease-[var(--ease-standard)] motion-reduce:transition-none',
       '[&>svg]:size-4 [&>svg]:shrink-0 [&>.material-symbols-outlined]:text-base [&>.material-symbols-outlined]:shrink-0',
@@ -626,52 +610,45 @@ export const SidebarGroupLabel = React.forwardRef<HTMLDivElement, SidebarGroupLa
       className
     );
 
-    if (asChild && React.isValidElement(children)) {
-      return cloneAsChild(children, classes, ref, props);
-    }
-
-    return (
-      <div
-        ref={ref}
-        data-slot="sidebar-group-label"
-        data-sidebar="group-label"
-        className={classes}
-        {...props}
-      >
-        {children}
-      </div>
-    );
+    return useRender({
+      render,
+      ref,
+      defaultTagName: 'div',
+      props: {
+        'data-slot': 'sidebar-group-label',
+        'data-sidebar': 'group-label',
+        className: classes,
+        ...props,
+      },
+    });
   }
 );
 SidebarGroupLabel.displayName = 'SidebarGroupLabel';
 
 export interface SidebarGroupActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  asChild?: boolean;
+  render?: useRender.RenderProp;
 }
 
 export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGroupActionProps>(
-  ({ className, asChild = false, children, ...props }, ref) => {
+  ({ className, render, ...props }, ref) => {
     const classes = cn(
       'absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'group-data-[collapsible=icon]:hidden',
       className
     );
 
-    if (asChild && React.isValidElement(children)) {
-      return cloneAsChild(children, classes, ref, props);
-    }
-
-    return (
-      <BaseButton
-        ref={ref}
-        data-slot="sidebar-group-action"
-        data-sidebar="group-action"
-        className={classes}
-        {...props}
-      >
-        {children}
-      </BaseButton>
-    );
+    return useRender({
+      render,
+      ref,
+      defaultTagName: 'button',
+      props: {
+        type: 'button',
+        'data-slot': 'sidebar-group-action',
+        'data-sidebar': 'group-action',
+        className: classes,
+        ...props,
+      },
+    });
   }
 );
 SidebarGroupAction.displayName = 'SidebarGroupAction';
@@ -779,7 +756,6 @@ export function sidebarMenuButtonVariants({
 
 export interface SidebarMenuButtonProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'size' | 'className'> {
-  asChild?: boolean;
   isActive?: boolean;
   tooltip?: string | (Omit<Partial<TooltipProps>, 'children'> & { children?: React.ReactNode });
   variant?: 'default' | 'outline';
@@ -790,7 +766,6 @@ export interface SidebarMenuButtonProps
 export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
   (
     {
-      asChild = false,
       isActive = false,
       variant = 'default',
       size = 'default',
@@ -814,9 +789,6 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
         ? (buttonState: Parameters<typeof className>[0]) => cn(baseVariantClasses, className(buttonState))
         : cn(baseVariantClasses, className);
 
-    // Support both asChild and polymorphic Base UI render prop
-    const effectiveRender = asChild && React.isValidElement(children) ? children : render;
-
     const buttonElement = (
       <BaseButton
         ref={ref}
@@ -824,11 +796,11 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
-        render={effectiveRender}
+        render={render}
         className={computedClassName}
         {...props}
       >
-        {!asChild ? children : undefined}
+        {children}
       </BaseButton>
     );
 
@@ -856,12 +828,11 @@ SidebarMenuButton.displayName = 'SidebarMenuButton';
 
 export interface SidebarMenuActionProps
   extends React.ComponentPropsWithoutRef<typeof BaseButton> {
-  asChild?: boolean;
   showOnHover?: boolean;
 }
 
 export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
-  ({ className, asChild = false, showOnHover = false, children, ...props }, ref) => {
+  ({ className, showOnHover = false, children, ...props }, ref) => {
     const classes = cn(
       'absolute right-1 top-2 flex aspect-square w-7 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'after:absolute after:-inset-2 md:after:hidden',
@@ -873,10 +844,6 @@ export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenu
         'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0 transition-opacity',
       className
     );
-
-    if (asChild && React.isValidElement(children)) {
-      return cloneAsChild(children, classes, ref, props);
-    }
 
     return (
       <BaseButton
@@ -977,7 +944,6 @@ SidebarMenuSubItem.displayName = 'SidebarMenuSubItem';
 
 export interface SidebarMenuSubButtonProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'size' | 'className'> {
-  asChild?: boolean;
   size?: 'sm' | 'md';
   isActive?: boolean;
   className?: SidebarButtonClassName;
@@ -989,7 +955,6 @@ export const SidebarMenuSubButton = React.forwardRef<
 >(
   (
     {
-      asChild = false,
       size = 'md',
       isActive = false,
       className,
@@ -1019,8 +984,6 @@ export const SidebarMenuSubButton = React.forwardRef<
         ? (buttonState: Parameters<typeof className>[0]) => cn(baseClasses, className(buttonState))
         : cn(baseClasses, className);
 
-    const effectiveRender = asChild && React.isValidElement(children) ? children : render;
-
     return (
       <BaseButton
         ref={ref}
@@ -1028,11 +991,11 @@ export const SidebarMenuSubButton = React.forwardRef<
         data-sidebar="menu-sub-button"
         data-size={size}
         data-active={isActive}
-        render={effectiveRender}
+        render={render}
         className={computedClassName}
         {...props}
       >
-        {!asChild ? children : undefined}
+        {children}
       </BaseButton>
     );
   }

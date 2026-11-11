@@ -84,7 +84,7 @@ export function Calendar({
         range_end:
           'rounded-r-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_middle:
-          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-surface-container-high',
+          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-surface-variant',
         today:
           '[&>button]:font-bold [&>button]:relative [&>button]:after:content-[""] [&>button]:after:absolute [&>button]:after:bottom-1 [&>button]:after:left-1/2 [&>button]:after:-translate-x-1/2 [&>button]:after:size-1 [&>button]:after:rounded-full [&>button]:after:bg-primary',
         outside:

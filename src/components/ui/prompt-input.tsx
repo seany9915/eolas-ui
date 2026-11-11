@@ -843,7 +843,7 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
       onValueChange,
       onSubmit,
       onStop,
-      placeholder = 'Type a message or clinical prompt...',
+      placeholder = 'Type a message...',
       isLoading = false,
       disabled = false,
       variant,
@@ -920,6 +920,7 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
           onSubmit={onSubmit}
           onFilesPasted={onFilesSelected}
           placeholder={placeholder}
+          aria-label={placeholder || 'Message'}
           disabled={disabled || isLoading}
           minRows={minRows}
           maxHeight={maxHeight}

@@ -98,7 +98,7 @@ export const eolasLintPreset = [
                 spacing:
                   "Button controls its own padding and touch floors (44px min). Use size='sm'|'md'|'lg'|'icon', or apply margin/parent gap.",
                 color:
-                  "Button controls its own colors to guarantee WCAG AA contrast. Use variant='filled'|'tonal'|'outlined'|'text' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'.",
+                  "Button controls its own colors to guarantee WCAG AA contrast. Use variant='filled'|'soft'|'outline'|'text' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'.",
                 shape:
                   "Button enforces standard design-system border radius. Do not override rounded-*.",
                 typography:
@@ -113,7 +113,7 @@ export const eolasLintPreset = [
               deny: ["bg-*", "text-*", "border-*", "rounded-*", "uppercase"],
               message: {
                 default:
-                  "Chip enforces high-contrast clinical status rules. Use variant='status'|'filter'|'assist'|'input' and tone='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'. Do not apply ad-hoc background/border color overrides (triple-tint anti-pattern).",
+                  "Chip enforces high-contrast clinical status rules. Use variant='filled'|'soft'|'outline' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'. Do not apply ad-hoc background/border color overrides (triple-tint anti-pattern).",
                 typography:
                   "All-caps styling (uppercase) is strictly banned on chips/badges per DESIGN.md.",
               },

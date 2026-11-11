@@ -10,11 +10,13 @@
  *             - `Kbd` (`src/components/ui/kbd.tsx`)
  *
  * TAXONOMY & USAGE:
- * - Multi-step guided question primitive and flow engine for intake forms, clinical assessments,
+ * - Multi-step guided question primitive and flow engine for intake forms, assessments,
  *   onboarding sequences, configuration wizards, and conversational agent clarification prompts.
- * - Conforms to shadcn/ui Questionnaire specification with full parity across compound subcomponents
- *   and flat exports: Root, Progress, Item, Title, Description, Choices, Choice, ChoiceInput,
- *   ChoiceLabel, ChoiceShortcut, Input, Error, Actions, Previous, Skip, Next, and Submit.
+ * - Follows the shadcn/ui Questionnaire part structure and API: Root, Progress, Item, Title,
+ *   Description, Choices, Choice, ChoiceInput, ChoiceLabel, ChoiceShortcut, Input, Error, Actions,
+ *   Previous, Skip, Next, and Submit. Items take `multiple` (the legacy `type="multiple"` still works)
+ *   and answers serialize to FormData with one repeated entry per selected value
+ *   (`FormData.getAll(name)`). Choices are role-based rather than native radio/checkbox inputs.
  * - Supports single-choice, multiple-choice, freeform text entry, keyboard shortcuts (A-Z, 1-9),
  *   roving tabindex arrow key navigation, form validation, draft restoration, and native FormData serialization.
  * - Accessible: WCAG 2.2 SC 2.5.8 compliant (min-h-11 touch targets), floating 2px focus indicators,
@@ -46,6 +48,9 @@ export interface QuestionnaireItemDef {
   title?: React.ReactNode;
   description?: React.ReactNode;
   required?: boolean;
+  /** Accept more than one fixed answer */
+  multiple?: boolean;
+  /** @deprecated Use `multiple` */
   type?: 'single' | 'multiple';
   choices?: QuestionnaireChoiceDef[];
   input?: {
@@ -72,6 +77,11 @@ export interface QuestionnaireItemMeta {
   type?: 'single' | 'multiple';
 }
 
+function resolveItemType(multiple?: boolean, type?: 'single' | 'multiple'): 'single' | 'multiple' {
+  if (multiple !== undefined) return multiple ? 'multiple' : 'single';
+  return type ?? 'single';
+}
+
 export interface RegisteredChoice {
   value: string;
   shortcut?: string;
@@ -87,6 +97,8 @@ export interface QuestionnaireContextValue {
   registerItem: (name: string, meta?: QuestionnaireItemMeta) => () => void;
   updateItemMeta: (name: string, meta: QuestionnaireItemMeta) => void;
   getItemMeta: (name: string) => QuestionnaireItemMeta | undefined;
+  registerInput: (itemName: string, fieldName: string) => void;
+  getInputNames: (itemName: string) => string[];
   activeItem: string;
   setActiveItem: (name: string) => void;
   direction: 'forward' | 'backward';
@@ -134,6 +146,7 @@ export interface QuestionnaireItemContextValue {
   choices: RegisteredChoice[];
   getShortcutForChoice: (choiceValue: string, explicitShortcut?: string) => string | undefined;
   error?: string;
+  titleId: string;
   hiddenUntilFound?: boolean;
 }
 
@@ -264,7 +277,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       const map = new Map<string, QuestionnaireItemMeta>();
       if (items) {
         for (const it of items) {
-          map.set(it.name, { required: it.required, type: it.type });
+          map.set(it.name, { required: it.required, type: resolveItemType(it.multiple, it.type) });
         }
       }
       return map;
@@ -312,6 +325,26 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
         return itemMap.get(name);
       },
       [itemMap]
+    );
+
+    // Free-text field names per item; kept across unmounts so inactive steps still serialize and validate
+    const inputNamesRef = React.useRef<Map<string, Set<string>>>(new Map());
+
+    const registerInput = React.useCallback((itemName: string, fieldName: string) => {
+      const set = inputNamesRef.current.get(itemName) ?? new Set<string>();
+      set.add(fieldName);
+      inputNamesRef.current.set(itemName, set);
+    }, []);
+
+    const getInputNames = React.useCallback(
+      (itemName: string): string[] => {
+        const names = new Set<string>([`${itemName}_text`]);
+        const declared = items?.find((i) => i.name === itemName)?.input?.name;
+        if (declared) names.add(declared);
+        inputNamesRef.current.get(itemName)?.forEach((n) => names.add(n));
+        return Array.from(names);
+      },
+      [items]
     );
 
     // Active item navigation state
@@ -393,15 +426,17 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       const meta = getItemMeta(activeItem);
       if (meta?.required) {
         const answer = values[activeItem];
-        const textAnswer = values[`${activeItem}_text`];
         const hasChoice =
           Array.isArray(answer) ? answer.length > 0 : answer !== undefined && answer !== null && answer !== '';
-        const hasText = textAnswer !== undefined && textAnswer !== null && String(textAnswer).trim().length > 0;
+        const hasText = getInputNames(activeItem).some((fieldName) => {
+          const textAnswer = values[fieldName];
+          return textAnswer !== undefined && textAnswer !== null && String(textAnswer).trim().length > 0;
+        });
 
         return Boolean(hasChoice || hasText);
       }
       return true;
-    }, [activeItem, getItemMeta, values]);
+    }, [activeItem, getItemMeta, getInputNames, values]);
 
     // Validation for current step on user actions (e.g. Next, Submit)
     const validateCurrent = React.useCallback((): boolean => {
@@ -512,6 +547,10 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       if (onSubmit) {
         onSubmit(e);
       }
+      // Without an `action`, a native submit would reload the page and discard the flow
+      if (!props.action && !e.defaultPrevented) {
+        e.preventDefault();
+      }
     };
 
     const contextValue: QuestionnaireContextValue = {
@@ -519,6 +558,8 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       registerItem,
       updateItemMeta,
       getItemMeta,
+      registerInput,
+      getInputNames,
       activeItem,
       setActiveItem: (name) => changeActiveItem(name, 'forward'),
       direction,
@@ -553,6 +594,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
               key={itemDef.name}
               name={itemDef.name}
               required={itemDef.required}
+              multiple={itemDef.multiple}
               type={itemDef.type}
             >
               <QuestionnaireTitle>{itemDef.prompt ?? itemDef.title}</QuestionnaireTitle>
@@ -679,6 +721,9 @@ QuestionnaireProgress.displayName = 'QuestionnaireProgress';
 export interface QuestionnaireItemProps extends React.HTMLAttributes<HTMLFieldSetElement> {
   name: string;
   required?: boolean;
+  /** Accept more than one fixed answer */
+  multiple?: boolean;
+  /** @deprecated Use `multiple` */
   type?: 'single' | 'multiple';
   hiddenUntilFound?: boolean;
 }
@@ -689,16 +734,20 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       className,
       name,
       required = false,
-      type = 'single',
+      multiple,
+      type: typeProp,
       hiddenUntilFound: itemHiddenUntilFound,
       children,
       ...props
     },
     ref
   ) => {
+    const type = resolveItemType(multiple, typeProp);
+    const titleId = React.useId();
     const {
       registerItem,
       updateItemMeta,
+      getInputNames,
       activeItem,
       setActiveItem,
       direction,
@@ -819,17 +868,21 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       if (!isActive || !shortcuts) return;
 
       const handleKeyDown = (event: KeyboardEvent) => {
-        // Ignore typing in interactive form fields
-        const target = event.target as HTMLElement | null;
-        if (
-          target &&
-          (target.tagName === 'INPUT' ||
-            target.tagName === 'TEXTAREA' ||
-            target.isContentEditable)
-        ) {
-          return;
-        }
+        if (event.defaultPrevented) return;
 
+        // Only react to keys pressed inside this questionnaire or with nothing focused,
+        // and never while a native control (text entry, button, link, select) has focus
+        const target = event.target as HTMLElement | null;
+        const form = fieldsetRef.current?.closest('form');
+        if (target && target !== document.body) {
+          if (!form?.contains(target)) return;
+          if (
+            target.isContentEditable ||
+            target.closest('input, textarea, select, button, a[href], summary')
+          ) {
+            return;
+          }
+        }
         if (event.metaKey || event.ctrlKey || event.altKey) {
           return;
         }
@@ -868,8 +921,26 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       choices,
       getShortcutForChoice,
       error: errors[name],
+      titleId,
       hiddenUntilFound: shouldHiddenUntilFound,
     };
+
+    // One entry per selected value, matching FormData.getAll(name)
+    const hiddenInputs =
+      type === 'multiple'
+        ? (Array.isArray(values[name]) ? values[name] : []).map((val: string) => (
+            <Input key={val} type="hidden" name={name} value={val} />
+          ))
+        : values[name] !== undefined && (
+            <Input type="hidden" name={name} value={String(values[name])} />
+          );
+
+    // Free-text inputs unmount with inactive items, so keep their answers in the form
+    const inactiveTextInputs = getInputNames(name)
+      .filter((fieldName) => values[fieldName] !== undefined && values[fieldName] !== '')
+      .map((fieldName) => (
+        <Input key={fieldName} type="hidden" name={fieldName} value={String(values[fieldName])} />
+      ));
 
     if (!isActive && !shouldHiddenUntilFound) {
       return (
@@ -883,15 +954,8 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
           {...props}
         >
           {/* Synchronize form data for native FormData submissions */}
-          {type === 'multiple'
-            ? (Array.isArray(values[name]) ? values[name] : []).map(
-                (val: string, idx: number) => (
-                  <Input key={idx} type="hidden" name={`${name}[]`} value={val} />
-                )
-              )
-            : values[name] !== undefined && (
-                <Input type="hidden" name={name} value={String(values[name])} />
-              )}
+          {hiddenInputs}
+          {inactiveTextInputs}
         </fieldset>
       );
     }
@@ -918,15 +982,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
           {...props}
         >
           {/* Hidden inputs to guarantee standard FormData serialization */}
-          {type === 'multiple'
-            ? (Array.isArray(values[name]) ? values[name] : []).map(
-                (val: string, idx: number) => (
-                  <Input key={idx} type="hidden" name={`${name}[]`} value={val} />
-                )
-              )
-            : values[name] !== undefined && (
-                <Input type="hidden" name={name} value={String(values[name])} />
-              )}
+          {hiddenInputs}
           {children}
         </fieldset>
       </QuestionnaireItemContext.Provider>
@@ -943,9 +999,11 @@ export interface QuestionnaireTitleProps extends React.HTMLAttributes<HTMLLegend
 
 export const QuestionnaireTitle = React.forwardRef<HTMLLegendElement, QuestionnaireTitleProps>(
   ({ className, children, ...props }, ref) => {
+    const itemContext = useQuestionnaireItem();
     return (
       <legend
         ref={ref}
+        id={itemContext?.titleId}
         className={cn(
           'font-heading font-semibold text-xl @md:text-2xl text-on-surface mb-2 p-0 w-full leading-tight text-balance',
           className
@@ -999,6 +1057,7 @@ export const QuestionnaireChoices = React.forwardRef<HTMLDivElement, Questionnai
       <div
         ref={ref}
         role={isMultiple ? 'group' : 'radiogroup'}
+        aria-labelledby={itemContext?.titleId}
         className={cn(
           'w-full',
           columns === 1 && 'flex flex-col gap-2.5',
@@ -1051,11 +1110,10 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
     const choices = itemContext?.choices ?? [];
 
     // Register with item
+    const registerChoice = itemContext?.registerChoice;
     React.useEffect(() => {
-      if (itemContext) {
-        return itemContext.registerChoice({ value, shortcut, disabled });
-      }
-    }, [itemContext, value, shortcut, disabled]);
+      return registerChoice?.({ value, shortcut, disabled });
+    }, [registerChoice, value, shortcut, disabled]);
 
     // Current selection state
     const currentAnswer = rootContext.values[itemName];
@@ -1097,26 +1155,21 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
         return;
       }
 
-      // Arrow keys roving tabindex navigation in single-choice mode
-      if (!isMultiple && choices.length > 1) {
-        const currentIdx = choices.findIndex((c) => c.value === value);
-        if (currentIdx >= 0) {
-          if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-            e.preventDefault();
-            const nextIdx = (currentIdx + 1) % choices.length;
-            const nextChoice = choices[nextIdx];
-            if (nextChoice && !nextChoice.disabled) {
-              rootContext.setAnswer(itemName, nextChoice.value, itemName);
-            }
-          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-            e.preventDefault();
-            const prevIdx = (currentIdx - 1 + choices.length) % choices.length;
-            const prevChoice = choices[prevIdx];
-            if (prevChoice && !prevChoice.disabled) {
-              rootContext.setAnswer(itemName, prevChoice.value, itemName);
-            }
-          }
-        }
+      // WAI-ARIA radio pattern: arrows move focus to the next enabled radio (wrapping) and select it
+      if (!isMultiple) {
+        const step =
+          e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+        if (step === 0) return;
+        e.preventDefault();
+        const group = e.currentTarget.closest('[role="radiogroup"]');
+        const radios = Array.from(
+          group?.querySelectorAll<HTMLElement>('[role="radio"]:not([aria-disabled="true"])') ?? []
+        );
+        const currentIdx = radios.indexOf(e.currentTarget);
+        if (currentIdx < 0 || radios.length < 2) return;
+        const next = radios[(currentIdx + step + radios.length) % radios.length];
+        next.focus();
+        next.click();
       }
     };
 
@@ -1309,6 +1362,14 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
   const itemContext = useQuestionnaireItem();
   const rootContext = useQuestionnaire();
   const fieldName = name || (itemContext ? `${itemContext.name}_text` : 'custom_input');
+  const generatedId = React.useId();
+  const inputId = props.id ?? generatedId;
+  const registerInput = rootContext.registerInput;
+  const itemName = itemContext?.name;
+
+  React.useEffect(() => {
+    if (itemName) registerInput(itemName, fieldName);
+  }, [registerInput, itemName, fieldName]);
 
   const textValue = (value !== undefined ? value : rootContext?.values[fieldName]) ?? '';
 
@@ -1324,17 +1385,22 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
   return (
     <div className={cn('w-full mt-3', className)}>
       {label && (
-        <span className="block font-sans text-xs font-medium text-on-surface-variant mb-1.5 select-none">
+        <label
+          htmlFor={inputId}
+          className="block font-sans text-xs font-medium text-on-surface-variant mb-1.5 select-none"
+        >
           {label}
-        </span>
+        </label>
       )}
       <Input
         name={fieldName}
+        aria-label={label ? undefined : 'Another answer'}
         value={textValue}
         onChange={handleChange}
         placeholder={placeholder}
         className="w-full"
         {...props}
+        id={inputId}
       />
     </div>
   );

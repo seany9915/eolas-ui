@@ -14,6 +14,7 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  applySeriesOverrides,
   type ChartConfig,
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
@@ -45,7 +46,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
       angleKey,
       series,
       config,
-      showLegend = true,
+      showLegend,
       footer,
       action,
       className,
@@ -53,15 +54,16 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
     },
     ref
   ) => {
+    const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
     return (
       <Card ref={ref} className={cn('w-full', className)} {...props}>
         <Card.Header>
           <div className="flex flex-col gap-1">
-            <Card.Title className="text-base font-semibold text-on-surface">
+            <Card.Title>
               {title}
             </Card.Title>
             {description && (
-              <Card.Description className="text-xs text-on-surface-variant">
+              <Card.Description>
                 {description}
               </Card.Description>
             )}
@@ -75,8 +77,8 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
 
         <Card.Content className="pt-2">
           <ChartContainer
-            config={config}
-            className="mx-auto aspect-square max-h-[260px] w-full"
+            config={resolvedConfig}
+            className="mx-auto aspect-square max-h-64 w-full"
           >
             <RadarChart
               data={data}
@@ -99,7 +101,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
                   strokeWidth={2}
                 />
               ))}
-              {showLegend && series.length > 1 && (
+              {(showLegend ?? series.length > 1) && (
                 <ChartLegend content={<ChartLegendContent />} />
               )}
             </RadarChart>
@@ -107,8 +109,10 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
         </Card.Content>
 
         {footer && (
-          <Card.Footer className="flex items-center justify-between gap-3 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3">
-            {footer}
+          <Card.Footer>
+            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
+              {footer}
+            </div>
           </Card.Footer>
         )}
       </Card>

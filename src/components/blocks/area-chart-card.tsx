@@ -15,6 +15,7 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  applySeriesOverrides,
   type ChartConfig,
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
@@ -63,16 +64,17 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
   ) => {
     const gradientIdPrefix = React.useId().replace(/:/g, '');
     const shouldShowLegend = showLegend ?? (series.length > 1);
+    const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
 
     return (
       <Card ref={ref} className={cn('w-full', className)} {...props}>
         <Card.Header>
           <div className="flex flex-col gap-1">
-            <Card.Title className="text-base font-semibold text-on-surface">
+            <Card.Title>
               {title}
             </Card.Title>
             {description && (
-              <Card.Description className="text-xs text-on-surface-variant">
+              <Card.Description>
                 {description}
               </Card.Description>
             )}
@@ -85,7 +87,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
         </Card.Header>
 
         <Card.Content className="pt-2">
-          <ChartContainer config={config} className="aspect-auto h-[250px] w-full">
+          <ChartContainer config={resolvedConfig} className="aspect-auto h-64 w-full">
             <AreaChart data={data} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
               <defs>
                 {series.map((item) => (
@@ -146,25 +148,27 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
         </Card.Content>
 
         {(trend || footer) && (
-          <Card.Footer className="flex items-center justify-between gap-3 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3">
-            <div className="flex items-center gap-2">
-              {trend && (
-                <Badge
-                  variant="outline"
-                  colorRole={trend.positive !== false ? 'success' : 'error'}
-                  size="sm"
-                >
-                  <Icon
-                    name={trend.positive !== false ? 'trending_up' : 'trending_down'}
-                    size="xs"
-                    aria-hidden="true"
-                  />
-                  <span>{trend.value}</span>
-                </Badge>
-              )}
-              {trend?.label && <span>{trend.label}</span>}
+          <Card.Footer>
+            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
+              <div className="flex items-center gap-2">
+                {trend && (
+                  <Badge
+                    variant="outline"
+                    colorRole={trend.positive !== false ? 'success' : 'error'}
+                    size="sm"
+                  >
+                    <Icon
+                      name={trend.positive !== false ? 'trending_up' : 'trending_down'}
+                      size="xs"
+                      aria-hidden="true"
+                    />
+                    <span>{trend.value}</span>
+                  </Badge>
+                )}
+                {trend?.label && <span>{trend.label}</span>}
+              </div>
+              {footer && <div>{footer}</div>}
             </div>
-            {footer && <div>{footer}</div>}
           </Card.Footer>
         )}
       </Card>

@@ -5,6 +5,9 @@ import { Icon } from '@/components/ui/icon';
 import { RadioGroup, Radio } from '@/components/ui/radio';
 import { Input } from '@/components/ui/input';
 
+/** Reserved id for the built-in free-text option. Options using it are ignored. */
+export const APPROVAL_CARD_CUSTOM_OPTION_ID = '__custom__';
+
 export interface ApprovalCardOption {
   id: string;
   label: string;
@@ -15,8 +18,10 @@ export interface ApprovalCardProps extends React.HTMLAttributes<HTMLDivElement> 
   title: string;
   description?: string;
   options?: ApprovalCardOption[];
+  /** Controlled selection. When omitted, the card tracks the selection itself. */
   selectedOptionId?: string;
   onSelectOption?: (id: string) => void;
+  /** Adds a free-text answer. With no options, only the text input is shown. */
   allowCustomInput?: boolean;
   customInputValue?: string;
   onCustomInputChange?: (val: string) => void;
@@ -58,6 +63,20 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
     },
     ref
   ) => {
+    const [internalSelectedId, setInternalSelectedId] = React.useState<string | undefined>();
+    const selectedId = selectedOptionId ?? internalSelectedId;
+    const choices = options.filter((opt) => opt.id !== APPROVAL_CARD_CUSTOM_OPTION_ID);
+    const customInput = (
+      <Input
+        type="text"
+        value={customInputValue}
+        onChange={(e) => onCustomInputChange?.(e.target.value)}
+        placeholder={customInputPlaceholder}
+        aria-label="Custom answer"
+        className="w-full"
+      />
+    );
+
     return (
       <div
         ref={ref}
@@ -83,24 +102,28 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
           </div>
 
           {/* Options Choice Set using shared RadioGroup primitive */}
-          {options.length > 0 && (
+          {choices.length === 0 && allowCustomInput && <div className="mt-1">{customInput}</div>}
+          {choices.length > 0 && (
             <RadioGroup
-              value={selectedOptionId}
-              onValueChange={(val) => onSelectOption?.(val)}
+              value={selectedId ?? ''}
+              onValueChange={(val) => {
+                setInternalSelectedId(val);
+                onSelectOption?.(val);
+              }}
               ariaLabel={title}
               className="mt-1"
             >
-              {options.map((opt) => {
-                const isSelected = selectedOptionId === opt.id;
+              {choices.map((opt) => {
+                const isSelected = selectedId === opt.id;
                 return (
                   <label
                     key={opt.id}
                     className={cn(
-                      'flex items-start gap-3 p-3 rounded-md border text-left transition-colors duration-quick motion-reduce:transition-none cursor-pointer select-none',
+                      'flex items-start gap-3 p-3 rounded-md border-2 text-left transition-colors duration-quick motion-reduce:transition-none cursor-pointer select-none',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       isSelected
                         ? 'border-primary bg-primary-container text-on-surface'
-                        : 'border-outline-variant bg-surface hover:bg-surface-container text-on-surface'
+                        : 'border-transparent bg-surface hover:border-outline-variant/50 hover:bg-surface-container text-on-surface'
                     )}
                   >
                     <Radio value={opt.id} className="mt-0.5" />
@@ -122,30 +145,19 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 <div className="flex flex-col gap-2">
                   <label
                     className={cn(
-                      'flex items-center gap-3 p-3 rounded-md border transition-colors duration-quick motion-reduce:transition-none cursor-pointer',
+                      'flex items-center gap-3 p-3 rounded-md border-2 transition-colors duration-quick motion-reduce:transition-none cursor-pointer',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
-                      selectedOptionId === '__custom__'
+                      selectedId === APPROVAL_CARD_CUSTOM_OPTION_ID
                         ? 'border-primary bg-primary-container text-on-surface'
-                        : 'border-outline-variant bg-surface hover:bg-surface-container text-on-surface'
+                        : 'border-transparent bg-surface hover:border-outline-variant/50 hover:bg-surface-container text-on-surface'
                     )}
                   >
-                    <Radio value="__custom__" className="shrink-0" />
+                    <Radio value={APPROVAL_CARD_CUSTOM_OPTION_ID} className="shrink-0" />
                     <span className="font-sans text-sm font-medium leading-tight text-on-surface">
                       {customInputPlaceholder || 'Other (specify)'}
                     </span>
                   </label>
-                  {selectedOptionId === '__custom__' && (
-                    <div className="pl-7">
-                      <Input
-                        type="text"
-                        value={customInputValue}
-                        onChange={(e) => onCustomInputChange?.(e.target.value)}
-                        placeholder={customInputPlaceholder}
-                        aria-label="Custom answer"
-                        className="w-full"
-                      />
-                    </div>
-                  )}
+                  {selectedId === APPROVAL_CARD_CUSTOM_OPTION_ID && <div className="pl-7">{customInput}</div>}
                 </div>
               )}
             </RadioGroup>
