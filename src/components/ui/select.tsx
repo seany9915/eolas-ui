@@ -238,9 +238,9 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+            'inline-flex items-center justify-between gap-2 w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
             'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
-            'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+            'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
             size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
             size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
             size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
@@ -249,7 +249,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           )}
         >
           <BaseSelect.Value placeholder={placeholder} className="truncate font-sans text-sm" />
-          <BaseSelect.Icon className="ml-2 shrink-0 text-on-surface-variant">
+          <BaseSelect.Icon className="shrink-0 text-on-surface-variant">
             <span className="material-symbols-outlined text-lg" aria-hidden="true">
               unfold_more
             </span>
@@ -287,7 +287,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
               {showScrollArrows && <SelectScrollUpArrow />}
               <BaseSelect.List
                 className={cn(
-                  'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 space-y-0.5 outline-none [scrollbar-width:thin]',
+                  'relative flex flex-col gap-0.5 max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
                   showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                   listClassName
                 )}
@@ -382,12 +382,12 @@ export const SelectTrigger = React.forwardRef<
       data-slot="select-trigger"
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-between w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+        'inline-flex items-center justify-between gap-2 w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
         'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
         size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
         size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
         size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-        'focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
         error && 'border-error focus-visible:outline-error',
         className
@@ -396,7 +396,7 @@ export const SelectTrigger = React.forwardRef<
     >
       {children}
       {showIcon && !hasIconChild && (
-        <BaseSelect.Icon className="ml-2 shrink-0 text-on-surface-variant">
+        <BaseSelect.Icon className="shrink-0 text-on-surface-variant">
           {icon ?? (
             <span className="material-symbols-outlined text-lg" aria-hidden="true">
               unfold_more
@@ -501,7 +501,7 @@ export const SelectList = React.forwardRef<
   <BaseSelect.List
     ref={ref}
     className={cn(
-      'relative max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 space-y-0.5 outline-none [scrollbar-width:thin]',
+      'relative flex flex-col gap-0.5 max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
       className
     )}
     {...props}
@@ -600,8 +600,8 @@ export const SelectItem = React.forwardRef<
     className={cn(
       'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
       'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-      'data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:font-semibold',
-      'data-[selected]:data-[highlighted]:bg-primary-container/80 data-[selected]:data-[highlighted]:ring-1 data-[selected]:data-[highlighted]:ring-inset data-[selected]:data-[highlighted]:ring-primary/40',
+      'data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
+      'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-primary data-[selected]:data-[highlighted]:ring-1 data-[selected]:data-[highlighted]:ring-inset data-[selected]:data-[highlighted]:ring-primary/40',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
       className
@@ -610,7 +610,7 @@ export const SelectItem = React.forwardRef<
   >
     <BaseSelect.ItemText className="truncate">{children}</BaseSelect.ItemText>
     {showIndicator && (
-      <BaseSelect.ItemIndicator className="shrink-0 text-on-primary-container flex items-center justify-center">
+      <BaseSelect.ItemIndicator className="shrink-0 text-primary flex items-center justify-center">
         {indicator ?? (
           <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
             check

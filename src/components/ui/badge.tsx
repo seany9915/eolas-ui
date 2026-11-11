@@ -23,7 +23,10 @@ export type BadgeVariant =
   | 'filled'
   | 'outline'
   | 'soft'
-  | 'tonal' // backwards-compatible alias for soft
+  /** @deprecated Use `'soft'` instead. Kept for backwards compatibility. */
+  | 'tonal'
+  /** @deprecated Use `'outline'` instead. Kept for backwards compatibility. */
+  | 'outlined'
   | 'default' // shadcn alias for filled
   | 'secondary' // shadcn alias for outline
   | 'destructive'; // shadcn alias for error

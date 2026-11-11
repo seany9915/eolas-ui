@@ -483,17 +483,29 @@ const rootItems = registryItems.map((item) => {
   };
 });
 
+const isInsideDir = (dir, filePath) => {
+  const rel = path.relative(dir, path.resolve(filePath));
+  return !rel.startsWith('..') && !path.isAbsolute(rel);
+};
+
 // 1. Modular UI Primitives Registry (src/components/ui/registry.json)
+// shadcn CLI rejects `..` parent traversal inside sub-registries, so multi-directory UI items
+// (that bundle src/lib/* helpers) are declared in the root registry.json instead.
+const UI_REGISTRY_DIR = path.resolve('src/components/ui');
+const uiLocalNames = new Set();
 const uiRegistryItems = rootItems
-  .filter((i) => i.type === 'registry:ui')
-  .map((item) => ({
-    ...item,
-    files: item.files.map((f) => ({
-      path: path.basename(f.path),
-      type: f.type,
-      target: f.target,
-    })),
-  }));
+  .filter((i) => i.type === 'registry:ui' && i.files.every((f) => isInsideDir(UI_REGISTRY_DIR, f.path)))
+  .map((item) => {
+    uiLocalNames.add(item.name);
+    return {
+      ...item,
+      files: item.files.map((f) => ({
+        path: path.relative(UI_REGISTRY_DIR, path.resolve(f.path)).replace(/\\/g, '/'),
+        type: f.type,
+        target: f.target,
+      })),
+    };
+  });
 fs.writeFileSync(
   path.resolve('src/components/ui/registry.json'),
   JSON.stringify(
@@ -508,16 +520,21 @@ fs.writeFileSync(
 );
 
 // 2. Modular Composite Blocks Registry (src/components/blocks/registry.json)
+const BLOCKS_REGISTRY_DIR = path.resolve('src/components/blocks');
+const blockLocalNames = new Set();
 const blockRegistryItems = rootItems
-  .filter((i) => i.type === 'registry:block')
-  .map((item) => ({
-    ...item,
-    files: item.files.map((f) => ({
-      path: path.basename(f.path),
-      type: f.type,
-      target: f.target,
-    })),
-  }));
+  .filter((i) => i.type === 'registry:block' && i.files.every((f) => isInsideDir(BLOCKS_REGISTRY_DIR, f.path)))
+  .map((item) => {
+    blockLocalNames.add(item.name);
+    return {
+      ...item,
+      files: item.files.map((f) => ({
+        path: path.relative(BLOCKS_REGISTRY_DIR, path.resolve(f.path)).replace(/\\/g, '/'),
+        type: f.type,
+        target: f.target,
+      })),
+    };
+  });
 fs.writeFileSync(
   path.resolve('src/components/blocks/registry.json'),
   JSON.stringify(
@@ -540,7 +557,7 @@ const rootCatalog = {
     'src/components/ui/registry.json',
     'src/components/blocks/registry.json',
   ],
-  items: rootItems.filter((i) => i.type !== 'registry:ui' && i.type !== 'registry:block'),
+  items: rootItems.filter((i) => !uiLocalNames.has(i.name) && !blockLocalNames.has(i.name)),
 };
 fs.writeFileSync(ROOT_REGISTRY, JSON.stringify(rootCatalog, null, 2));
 

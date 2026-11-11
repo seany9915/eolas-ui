@@ -22,7 +22,7 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLElement> {
  * Complies with DESIGN.md line 566 (surface-variant toned pulse, never generic gray).
  * Supports Base UI polymorphic composition via the `render` prop.
  */
-export const Skeleton = React.forwardRef<HTMLElement, SkeletonProps>(
+const SkeletonRoot = React.forwardRef<HTMLElement, SkeletonProps>(
   ({ as: Component = 'div', render, className, ...props }, ref) => {
     return useRender({
       render,
@@ -43,7 +43,7 @@ export const Skeleton = React.forwardRef<HTMLElement, SkeletonProps>(
   }
 );
 
-Skeleton.displayName = 'Skeleton';
+SkeletonRoot.displayName = 'Skeleton';
 
 export interface SkeletonRevealProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: useRender.RenderProp;
@@ -78,12 +78,36 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
       duration = 400,
       render,
       className,
+      style,
       ...props
     },
     ref
   ) => {
-    const id = React.useId().replace(/:/g, '');
-    const containerClass = `skel-reveal-${id}`;
+    const prevLoadingRef = React.useRef(loading);
+    const [isTransitioning, setIsTransitioning] = React.useState(false);
+
+    React.useEffect(() => {
+      if (prevLoadingRef.current === loading) return;
+      prevLoadingRef.current = loading;
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ) {
+        setIsTransitioning(false);
+        return;
+      }
+      setIsTransitioning(true);
+      const timer = window.setTimeout(() => setIsTransitioning(false), duration);
+      return () => window.clearTimeout(timer);
+    }, [loading, duration]);
+
+    const revealStyle: React.CSSProperties | undefined =
+      duration !== 400 || style
+        ? ({
+            ...style,
+            ...(duration !== 400 ? { '--reveal-dur': `${duration}ms` } : undefined),
+          } as React.CSSProperties)
+        : undefined;
 
     return useRender({
       render,
@@ -91,7 +115,9 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
       defaultTagName: 'div',
       props: {
         'data-slot': 'skeleton-reveal',
-        className: cn('relative w-full', containerClass, className),
+        style: revealStyle,
+        // Clip only while cross-fading so focus rings on settled loaded content never clip.
+        className: cn('relative w-full', (loading || isTransitioning) && 'overflow-hidden', className),
         children: (
           <>
             {/* Skeleton Layer */}
@@ -99,10 +125,10 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
               aria-hidden={!loading}
               {...(!loading ? INERT_PROPS : undefined)}
               className={cn(
-                'w-full transition-[opacity,filter] duration-[var(--duration-slow)] ease-[var(--ease-in-out)] motion-reduce:transition-none',
+                'w-full transition-[opacity,filter] duration-[var(--reveal-dur,var(--duration-slow))] ease-[var(--ease-in-out)] motion-reduce:transition-none',
                 loading
                   ? 'opacity-100 filter-none pointer-events-auto'
-                  : 'absolute inset-0 opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
+                  : 'absolute inset-0 overflow-hidden opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
               )}
             >
               {skeleton}
@@ -113,9 +139,9 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
               aria-hidden={loading}
               {...(loading ? INERT_PROPS : undefined)}
               className={cn(
-                'w-full transition-[opacity,filter] duration-[var(--duration-slow)] ease-[var(--ease-in-out)] motion-reduce:transition-none',
+                'w-full transition-[opacity,filter] duration-[var(--reveal-dur,var(--duration-slow))] ease-[var(--ease-in-out)] motion-reduce:transition-none',
                 loading
-                  ? 'absolute inset-0 opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
+                  ? 'absolute inset-0 overflow-hidden opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
                   : 'opacity-100 filter-none pointer-events-auto'
               )}
             >
@@ -131,6 +157,8 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
 
 SkeletonReveal.displayName = 'SkeletonReveal';
 
-export default Object.assign(Skeleton, {
+export const Skeleton = Object.assign(SkeletonRoot, {
   Reveal: SkeletonReveal,
 });
+
+export default Skeleton;

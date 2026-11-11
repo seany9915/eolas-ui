@@ -62,7 +62,7 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
           </p>
         </Card.Content>
         <Card.Footer>
-          <Button size="sm" variant="outlined" colorRole="neutral">View Progress</Button>
+          <Button size="sm" variant="outline" colorRole="neutral">View Progress</Button>
         </Card.Footer>
       </Card>
     </div>
@@ -728,13 +728,13 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
       </SwipeReveal>
 
       <div className="flex items-center justify-center gap-2 pt-1">
-        <Button size="sm" variant="outlined" onClick={handleRevealLeading}>
+        <Button size="sm" variant="outline" onClick={handleRevealLeading}>
           Peek Archive (Right)
         </Button>
-        <Button size="sm" variant="outlined" onClick={handleRevealTrailing}>
+        <Button size="sm" variant="outline" onClick={handleRevealTrailing}>
           Peek Review (Left)
         </Button>
-        <Button size="sm" variant="tonal" onClick={handleReset}>
+        <Button size="sm" variant="soft" onClick={handleReset}>
           Reset
         </Button>
       </div>
@@ -940,7 +940,7 @@ export const ItemDemo: React.FC<ComponentDemoProps> = () => {
               </ItemDescription>
             </ItemContent>
             <ItemActions>
-              <Button size="sm" variant="outlined" colorRole="neutral">Review</Button>
+              <Button size="sm" variant="outline" colorRole="neutral">Review</Button>
             </ItemActions>
           </Item>
 
@@ -974,7 +974,7 @@ export const ItemDemo: React.FC<ComponentDemoProps> = () => {
               </ItemDescription>
             </ItemContent>
             <ItemActions>
-              <Button size="sm" variant="outlined" colorRole="neutral">Details</Button>
+              <Button size="sm" variant="outline" colorRole="neutral">Details</Button>
             </ItemActions>
           </Item>
         </ItemGroup>

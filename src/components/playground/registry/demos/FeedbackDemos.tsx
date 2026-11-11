@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Chip } from '@/components/ui/chip';
 import { NotificationBadge } from '@/components/ui/notification-badge';
 import { Meter } from '@/components/ui/meter';
-import { Progress, Skeleton } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { Empty } from '@/components/ui/empty';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -211,7 +212,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
 
           <Button
             size="sm"
-            variant="outlined"
+            variant="outline"
             colorRole="neutral"
             onClick={() =>
               toast.warning('Audio Level Low', 'Please verify your microphone before recording.')
@@ -223,7 +224,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
 
           <Button
             size="sm"
-            variant="outlined"
+            variant="outline"
             colorRole="neutral"
             onClick={() =>
               toast.error('Sync Interrupted', 'Could not establish connection to the care portal.')
@@ -235,7 +236,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
 
           <Button
             size="sm"
-            variant="outlined"
+            variant="outline"
             colorRole="neutral"
             onClick={() =>
               toast.neutral('New Update', 'Clinical guideline v3 is now active.')
@@ -255,7 +256,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
-            variant="tonal"
+            variant="soft"
             colorRole="primary"
             onClick={triggerPromiseToast}
           >
@@ -265,7 +266,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
 
           <Button
             size="sm"
-            variant="outlined"
+            variant="outline"
             colorRole="neutral"
             onClick={triggerActionToast}
           >
@@ -377,7 +378,7 @@ export const NotificationBadgeDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-8 py-8">
       <div className="relative inline-block">
-        <Button variant="outlined" size="md">
+        <Button variant="outline" size="md">
           <Icon name="mail" size="xs" />
           Messages
         </Button>
@@ -385,7 +386,7 @@ export const NotificationBadgeDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       <div className="relative inline-block">
-        <Button variant="outlined" size="md">
+        <Button variant="outline" size="md">
           <Icon name="notifications" size="xs" />
           Notifications
         </Button>
@@ -456,7 +457,7 @@ export const EmptyDemo: React.FC<ComponentDemoProps> = () => {
             <Icon name="add" size="xs" />
             <span>New Appointment</span>
           </Button>
-          <Button variant="outlined" colorRole="neutral" size="sm">
+          <Button variant="outline" colorRole="neutral" size="sm">
             <span>Review Records</span>
           </Button>
         </Empty.Content>
@@ -558,7 +559,7 @@ export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
           </Button>
 
           <Button
-            variant="outlined"
+            variant="outline"
             colorRole="neutral"
             size="md"
             disabled
@@ -573,16 +574,51 @@ export const SpinnerDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const SkeletonDemo: React.FC<ComponentDemoProps> = () => {
-  return (
-    <div className="w-full max-w-md mx-auto flex flex-col gap-3 p-4 rounded-xl bg-surface border border-outline-variant">
+  const [loading, setLoading] = React.useState(true);
+
+  const placeholderCard = (
+    <div className="flex flex-col gap-3 p-4 rounded-xl bg-surface border border-outline-variant">
       <div className="flex items-center gap-3">
-        <Skeleton className="size-10 rounded-full" />
-        <div className="gap-1.5 flex-1">
+        <Skeleton className="size-10 rounded-full shrink-0" />
+        <div className="flex flex-col gap-1.5 flex-1">
           <Skeleton className="h-4 w-3/4 rounded" />
           <Skeleton className="h-3 w-1/2 rounded" />
         </div>
       </div>
       <Skeleton className="h-16 w-full rounded-lg" />
+    </div>
+  );
+
+  return (
+    <div className="w-full max-w-md mx-auto flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <span className="font-heading text-xs font-bold text-on-surface">Session Notes</span>
+        <Button
+          size="sm"
+          variant="outline"
+          colorRole="neutral"
+          onClick={() => setLoading((prev) => !prev)}
+        >
+          {loading ? 'Show Content' : 'Show Loading'}
+        </Button>
+      </div>
+
+      <Skeleton.Reveal loading={loading} skeleton={placeholderCard}>
+        <div className="flex flex-col gap-3 p-4 rounded-xl bg-surface border border-outline-variant">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-full shrink-0 bg-primary-container text-on-primary-container flex items-center justify-center font-heading text-sm font-bold">
+              AR
+            </div>
+            <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+              <span className="font-heading text-sm font-bold text-on-surface truncate">Alex Rivera</span>
+              <span className="font-sans text-xs text-on-surface-variant truncate">12 prompts completed today</span>
+            </div>
+          </div>
+          <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
+            Initial consonant accuracy improved to 94% during guided reading practice.
+          </p>
+        </div>
+      </Skeleton.Reveal>
     </div>
   );
 };

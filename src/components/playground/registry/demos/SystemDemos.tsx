@@ -10,7 +10,7 @@ export const DirectionProviderDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-md mx-auto py-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="font-heading text-xs font-bold text-on-surface">Direction Context Provider</span>
-        <Button size="sm" variant="outlined" onClick={() => setDir(dir === 'ltr' ? 'rtl' : 'ltr')}>
+        <Button size="sm" variant="outline" onClick={() => setDir(dir === 'ltr' ? 'rtl' : 'ltr')}>
           Toggle ({dir.toUpperCase()})
         </Button>
       </div>

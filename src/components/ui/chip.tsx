@@ -24,8 +24,10 @@ export type ChipVariant =
   | 'filled'
   | 'outline'
   | 'soft'
-  | 'tonal' // backwards-compatible alias for soft
-  | 'outlined'; // backwards-compatible alias for outline
+  /** @deprecated Use `'soft'` instead. Kept for backwards compatibility. */
+  | 'tonal'
+  /** @deprecated Use `'outline'` instead. Kept for backwards compatibility. */
+  | 'outlined';
 
 export type ChipColorRole =
   | 'primary'

@@ -18,13 +18,15 @@ import { cn } from '@/lib/utils';
 export type ButtonVariant =
   | 'filled'
   | 'outline'
-  | 'outlined'
   | 'text'
   | 'soft'
-  | 'tonal'
   | 'ghost'
   | 'default'
-  | 'unstyled';
+  | 'unstyled'
+  /** @deprecated Use `'outline'` instead. Kept for backwards compatibility. */
+  | 'outlined'
+  /** @deprecated Use `'soft'` instead. Kept for backwards compatibility. */
+  | 'tonal';
 
 export type ButtonColorRole =
   | 'primary'
@@ -40,6 +42,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 export interface ButtonProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'color' | 'className'> {
   className?: string;
+  /** Button style variant. Prefer `'filled' | 'outline' | 'soft' | 'text'`; `'outlined'` and `'tonal'` are deprecated aliases. */
   variant?: ButtonVariant;
   colorRole?: ButtonColorRole;
   /** Button form type. Unlike native HTML buttons, Base UI defaults to 'button' rather than 'submit'. */

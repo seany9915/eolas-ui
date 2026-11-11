@@ -14,7 +14,7 @@ import { CodeBlock } from '@/components/ui/code-block';
 import { Sources } from '@/components/ui/sources';
 import { InlineCitation } from '@/components/ui/inline-citation';
 import { SuggestionChips } from '@/components/ui/suggestion-chips';
-import { ModelSelector, type ThinkingEffort } from '@/components/ui/model-selector';
+import { ModelSelector, type ModelItem, type ThinkingEffort } from '@/components/ui/model-selector';
 import { Tool } from '@/components/ui/tool';
 import { Checkpoint } from '@/components/ui/checkpoint';
 import { Icon } from '@/components/ui/icon';
@@ -289,13 +289,31 @@ export const SuggestionChipsDemo: React.FC<ComponentDemoProps> = () => {
   );
 };
 
+const DEMO_MODELS: ModelItem[] = [
+  {
+    value: 'standard',
+    label: 'Standard',
+    description: 'Balanced speed and clinical reasoning',
+  },
+  {
+    value: 'fast',
+    label: 'Fast',
+    description: 'Quick drafts and brief session summaries',
+  },
+  {
+    value: 'reasoning',
+    label: 'Deep Reasoning',
+    description: 'Detailed assessment notes and planning',
+  },
+];
+
 export const ModelSelectorDemo: React.FC<ComponentDemoProps> = () => {
-  const [model, setModel] = React.useState('gemini-2.5-pro');
+  const [model, setModel] = React.useState('standard');
   const [effort, setEffort] = React.useState<ThinkingEffort>('medium');
   return (
     <div className="w-full max-w-sm mx-auto py-4 flex justify-center">
       <ModelSelector.Root>
-        <ModelSelector.Model value={model} onValueChange={setModel} />
+        <ModelSelector.Model models={DEMO_MODELS} value={model} onValueChange={setModel} />
         <ModelSelector.Effort value={effort} onValueChange={setEffort} />
       </ModelSelector.Root>
     </div>

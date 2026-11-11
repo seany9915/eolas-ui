@@ -1056,7 +1056,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "model-selector",
     "name": "model-selector",
     "title": "Model Selector",
-    "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select primitive and Icon primitive.",
+    "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select and Tooltip primitives. Specification & Reference: https://ui.shadcn.com/docs/ai-elements/base/model-selector",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1065,7 +1065,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Use ModelSelector in chat headers, sidebar toolbars, or prompt input footers to let users dynamically switch the active language model and adjust reasoning/thinking effort.",
       "Conforms to shadcn AI Elements ModelSelector specification and DESIGN.md:",
       "Compact, high-precision layout with 44x44px accessible touch bounds.",
-      "Clear distinction between model family (Gemini, Claude, GPT, Med-PaLM) and thinking depth.",
+      "Clear separation between consumer-provided model items and thinking depth controls.",
       "Concentric radius, floating 2px focus ring (`outline-offset: 2px`)."
     ],
     "dependencies": [

@@ -1,19 +1,19 @@
 /**
  * ModelSelector primitive.
  *
- * Base UI Integration: Consumes Base UI Select primitive and Icon primitive.
+ * Base UI Integration: Consumes Base UI Select and Tooltip primitives.
+ * Specification & Reference: https://ui.shadcn.com/docs/ai-elements/base/model-selector
  *
  * TAXONOMY & USAGE:
  * - Use ModelSelector in chat headers, sidebar toolbars, or prompt input footers to let
  *   users dynamically switch the active language model and adjust reasoning/thinking effort.
  * - Conforms to shadcn AI Elements ModelSelector specification and DESIGN.md:
  *   - Compact, high-precision layout with 44x44px accessible touch bounds.
- *   - Clear distinction between model family (Gemini, Claude, GPT, Med-PaLM) and thinking depth.
+ *   - Clear separation between consumer-provided model items and thinking depth controls.
  *   - Concentric radius, floating 2px focus ring (`outline-offset: 2px`).
  */
 import * as React from 'react';
 import { Select, type SelectOption } from './select';
-import { Icon } from './icon';
 import { Tooltip } from './tooltip';
 import { cn } from '@/lib/utils';
 
@@ -46,34 +46,6 @@ const ModelSelectorRoot = React.forwardRef<HTMLDivElement, ModelSelectorRootProp
 );
 ModelSelectorRoot.displayName = 'ModelSelector.Root';
 
-export const DEFAULT_MODELS: ModelItem[] = [
-  {
-    value: 'gemini-2.5-pro',
-    label: 'Gemini 2.5 Pro',
-    description: 'High-reasoning multimodal clinical analysis',
-    badge: 'Recommended',
-    icon: 'neurology',
-  },
-  {
-    value: 'claude-3-7-sonnet',
-    label: 'Claude 3.7 Sonnet',
-    description: 'Extended thinking and articulate clinical reports',
-    icon: 'psychology',
-  },
-  {
-    value: 'gpt-4o',
-    label: 'GPT-4o',
-    description: 'Fast versatile multimodal assistant',
-    icon: 'smart_toy',
-  },
-  {
-    value: 'med-palm-2',
-    label: 'Med-PaLM 2',
-    description: 'Specialized clinical knowledge retrieval',
-    icon: 'clinical_notes',
-  },
-];
-
 export const EFFORT_OPTIONS: SelectOption[] = [
   { value: 'off', label: 'Thinking: Off' },
   { value: 'low', label: 'Thinking: Low' },
@@ -94,31 +66,31 @@ export interface ModelSelectorModelProps {
 
 const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   value: valueProp,
-  defaultValue = 'gemini-2.5-pro',
+  defaultValue,
   onValueChange,
-  models = DEFAULT_MODELS,
+  models = [],
   disabled = false,
   size = 'sm',
   placeholder = 'Select model',
   className,
 }) => {
-  const [internalValue, setInternalValue] = React.useState(defaultValue);
-  const value = valueProp ?? internalValue;
+  const hasModels = models.length > 0;
+
   return (
     <div className={cn('min-w-[140px] @sm:min-w-[160px]', className)}>
       <Select
         options={models}
-        value={value}
+        value={valueProp}
+        defaultValue={defaultValue ?? null}
         onValueChange={(val) => {
           if (val && typeof val === 'string') {
-            setInternalValue(val);
             onValueChange?.(val);
           }
         }}
-        disabled={disabled}
+        disabled={disabled || !hasModels}
         size={size}
         aria-label="Select model"
-        placeholder={placeholder}
+        placeholder={hasModels ? placeholder : 'No models available'}
       />
     </div>
   );
@@ -146,18 +118,17 @@ const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
   placeholder = 'Thinking',
   className,
 }) => {
-  const [internalValue, setInternalValue] = React.useState<ThinkingEffort>(defaultValue);
-  const value = valueProp ?? internalValue;
   return (
     <div className={cn('min-w-[110px] @sm:min-w-[130px]', className)}>
       <Tooltip content="Adjust depth of model reasoning steps">
-        <div>
+        {/* Wrapper keeps TooltipTrigger's data-popup-open and id off SelectTrigger */}
+        <div className="w-full">
           <Select
             options={options}
-            value={value}
+            value={valueProp}
+            defaultValue={defaultValue}
             onValueChange={(val) => {
               if (val && typeof val === 'string') {
-                setInternalValue(val as ThinkingEffort);
                 onValueChange?.(val as ThinkingEffort);
               }
             }}
@@ -196,7 +167,7 @@ const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorPro
       model,
       defaultModel,
       onModelChange,
-      models = DEFAULT_MODELS,
+      models = [],
       effort,
       defaultEffort,
       onEffortChange,

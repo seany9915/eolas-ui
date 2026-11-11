@@ -270,80 +270,85 @@ button,
   }
 }
 
-/* Accessible high-visibility focus ring compatible with forced-colors mode (zero specificity via :where) */
-:where(*:focus-visible) {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
+@layer base {
+  /* Accessible high-visibility focus ring compatible with forced-colors mode (zero specificity via :where) */
+  :where(*:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 
-/* Suppress UA default black focus outline on mouse/pointer clicks while preserving WCAG keyboard focus */
-:focus:not(:focus-visible) {
-  outline: none;
-}
+  /* Suppress UA default black focus outline on mouse/pointer clicks while preserving WCAG keyboard focus */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 
-/* 1. Standard Form Controls (flush 2px focus ring fallback with zero specificity via :where) */
-:where(input:focus-visible, select:focus-visible, textarea:focus-visible),
-[data-slot="select-trigger"]:focus-visible,
-[data-slot="combobox-input-group"]:has(input:focus-visible),
-[data-slot="autocomplete-input-group"]:has(input:focus-visible),
-[data-slot="number-field-group"]:has(input:focus-visible),
-[data-slot="input-group"]:has(input:focus-visible, textarea:focus-visible),
-[data-slot="prompt-input"]:has(textarea:focus-visible, input:focus-visible) {
-  border-color: var(--primary);
-  outline: 2px solid var(--primary);
-  outline-offset: -1px;
-}
+  /* 1. Standard Form Controls (flush 2px focus ring fallback inside @layer base so utilities override cleanly) */
+  :where(input:focus-visible, select:focus-visible, textarea:focus-visible),
+  [data-slot="select-trigger"]:focus-visible,
+  [data-slot="combobox-input-group"]:has(input:focus-visible),
+  [data-slot="autocomplete-input-group"]:has(input:focus-visible),
+  [data-slot="number-field-group"]:has(:focus-visible),
+  [data-slot="input-group"]:has(input:focus-visible, textarea:focus-visible),
+  [data-slot="prompt-input"]:has(textarea:focus-visible, input:focus-visible) {
+    border-color: var(--primary);
+    outline: 2px solid var(--primary);
+    outline-offset: -1px;
+  }
 
-/* 2. InputGroup & PromptInput inner controls: suppress redundant inner focus ring & border */
-[data-slot="input-group"] :where(input, textarea),
-[data-slot="prompt-input"] :where(input, textarea),
-[data-slot="combobox-input-group"] :where(input),
-[data-slot="autocomplete-input-group"] :where(input) {
-  outline: none;
-  box-shadow: none;
-}
-[data-slot="input-group"] :where(input, textarea):focus,
-[data-slot="input-group"] :where(input, textarea):focus-visible,
-[data-slot="prompt-input"] :where(input, textarea):focus,
-[data-slot="prompt-input"] :where(input, textarea):focus-visible,
-[data-slot="combobox-input-group"] :where(input):focus,
-[data-slot="combobox-input-group"] :where(input):focus-visible,
-[data-slot="autocomplete-input-group"] :where(input):focus,
-[data-slot="autocomplete-input-group"] :where(input):focus-visible {
-  outline: none;
-  box-shadow: none;
-}
+  /* 2. Composite Group inner controls: suppress redundant inner focus ring & border */
+  [data-slot="input-group"] :where(input, textarea),
+  [data-slot="prompt-input"] :where(input, textarea),
+  [data-slot="combobox-input-group"] :where(input),
+  [data-slot="autocomplete-input-group"] :where(input),
+  [data-slot="number-field-group"] :where(input, button) {
+    outline: none;
+    box-shadow: none;
+  }
+  [data-slot="input-group"] :where(input, textarea):focus,
+  [data-slot="input-group"] :where(input, textarea):focus-visible,
+  [data-slot="prompt-input"] :where(input, textarea):focus,
+  [data-slot="prompt-input"] :where(input, textarea):focus-visible,
+  [data-slot="combobox-input-group"] :where(input):focus,
+  [data-slot="combobox-input-group"] :where(input):focus-visible,
+  [data-slot="autocomplete-input-group"] :where(input):focus,
+  [data-slot="autocomplete-input-group"] :where(input):focus-visible,
+  [data-slot="number-field-group"] :where(input, button):focus,
+  [data-slot="number-field-group"] :where(input, button):focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
 
-/* 3. Invalid / Error Form Controls (Overrides via cascade) */
-:where(
-  input:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
-  select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
-  textarea:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible
-),
-[data-slot="select-trigger"]:is([aria-invalid="true"], [data-invalid], .border-error):focus-visible,
-[data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
-[data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
-[data-slot="number-field-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
-[data-slot="input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible, textarea:focus-visible),
-[data-slot="prompt-input"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(textarea:focus-visible, input:focus-visible) {
-  border-color: var(--error);
-  outline: 2px solid var(--error);
-  outline-offset: -1px;
-}
+  /* 3. Invalid / Error Form Controls (Overrides via cascade) */
+  :where(
+    input:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+    select:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible,
+    textarea:is([aria-invalid="true"], :user-invalid, [data-invalid], .border-error):focus-visible
+  ),
+  [data-slot="select-trigger"]:is([aria-invalid="true"], [data-invalid], .border-error):focus-visible,
+  [data-slot="combobox-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
+  [data-slot="autocomplete-input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible),
+  [data-slot="number-field-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(:focus-visible),
+  [data-slot="input-group"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(input:focus-visible, textarea:focus-visible),
+  [data-slot="prompt-input"]:is([data-invalid], .border-error, :has(:is([aria-invalid="true"], :user-invalid, [data-invalid]))):has(textarea:focus-visible, input:focus-visible) {
+    border-color: var(--error);
+    outline: 2px solid var(--error);
+    outline-offset: -1px;
+  }
 
-/* 3. Discrete Buttons maintain floating 2px ring */
-button:focus-visible:not([data-slot="select-trigger"]) {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
+  /* 4. Discrete Buttons maintain floating 2px ring unless overridden by utilities or NumberField group */
+  :where(button:focus-visible:not([data-slot="select-trigger"])) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 
-/* 4. Dropdown / Menu / Listbox Items: Inset outline for Windows High Contrast mode, prevents overflow clipping */
-[role="option"]:focus-visible,
-[role="menuitem"]:focus-visible,
-[role="menuitemcheckbox"]:focus-visible,
-[role="menuitemradio"]:focus-visible {
-  outline: 2px solid transparent;
-  outline-offset: -2px;
+  /* 5. Dropdown / Menu / Listbox Items: Inset outline for Windows High Contrast mode, prevents overflow clipping */
+  [role="option"]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="menuitemcheckbox"]:focus-visible,
+  [role="menuitemradio"]:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+  }
 }
 
 /* Autofill Credential Highlighting: maintains calibrated surface tokens and typography on browser autofill */

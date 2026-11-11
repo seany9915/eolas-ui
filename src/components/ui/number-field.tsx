@@ -70,8 +70,8 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
 }, ref) => {
   const generatedId = React.useId();
   const inputId = id || generatedId;
-  const descriptionId = description ? `{inputId}-description` : undefined;
-  const errorId = error ? `{inputId}-error` : undefined;
+  const descriptionId = description ? `${inputId}-description` : undefined;
+  const errorId = error ? `${inputId}-error` : undefined;
   const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
 
   // Composable compound usage
@@ -153,7 +153,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           'transition-[border-color,box-shadow]',
           'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
           'disabled:opacity-50 disabled:bg-surface-variant/30 disabled:pointer-events-none',
-          error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline-variant hover:border-outline'
+          error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline hover:border-on-surface-variant/80'
         )}
       >
         <BaseNumberField.Decrement

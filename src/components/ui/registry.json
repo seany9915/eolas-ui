@@ -1403,7 +1403,7 @@
       "name": "model-selector",
       "type": "registry:ui",
       "title": "Model Selector",
-      "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select primitive and Icon primitive.",
+      "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select and Tooltip primitives. Specification & Reference: https://ui.shadcn.com/docs/ai-elements/base/model-selector",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1412,7 +1412,6 @@
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
         "@seany9915/eolas-ui/select",
-        "@seany9915/eolas-ui/icon",
         "@seany9915/eolas-ui/tooltip"
       ],
       "files": [
@@ -1427,7 +1426,7 @@
           "Use ModelSelector in chat headers, sidebar toolbars, or prompt input footers to let users dynamically switch the active language model and adjust reasoning/thinking effort.",
           "Conforms to shadcn AI Elements ModelSelector specification and DESIGN.md:",
           "Compact, high-precision layout with 44x44px accessible touch bounds.",
-          "Clear distinction between model family (Gemini, Claude, GPT, Med-PaLM) and thinking depth.",
+          "Clear separation between consumer-provided model items and thinking depth controls.",
           "Concentric radius, floating 2px focus ring (`outline-offset: 2px`)."
         ]
       }
@@ -1582,40 +1581,6 @@
           "target": "@ui/number-roll.tsx"
         }
       ]
-    },
-    {
-      "name": "otp-field",
-      "type": "registry:ui",
-      "title": "Otp Field",
-      "description": "OTPField primitive (@base-ui/react/otp-field).",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/icon"
-      ],
-      "files": [
-        {
-          "path": "otp-field.tsx",
-          "type": "registry:ui",
-          "target": "@ui/otp-field.tsx"
-        },
-        {
-          "path": "use-web-otp.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-web-otp.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.",
-          "Supports automatic focus advancement, paste distribution, character masking, and validation types.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
-        ]
-      }
     },
     {
       "name": "pagination",
@@ -2548,40 +2513,6 @@
       }
     },
     {
-      "name": "text-highlight",
-      "type": "registry:ui",
-      "title": "Text Highlight",
-      "description": "TextHighlight primitive. Platform Reference: Modern Web Guidance (MWG: highlight-text-ranges)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "@seany9915/eolas-ui/utils"
-      ],
-      "files": [
-        {
-          "path": "text-highlight.tsx",
-          "type": "registry:ui",
-          "target": "@ui/text-highlight.tsx"
-        },
-        {
-          "path": "use-text-highlight.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-text-highlight.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "A declarative text-search and keyword highlight container powered by the CSS Custom Highlight API (`::highlight()`).",
-          "Highlights search matches on the GPU compositor without mutating the DOM tree, splitting strings, or fragmenting screen reader announcements.",
-          "Adheres to WCAG 4.1.3 (Status Messages) by synchronizing visual highlights with an `aria-live=\"polite\"` screen reader match announcer.",
-          "Styles matches using tokenized secondary container palette in globals.css: `::highlight(search-results) { background-color: var(--secondary-container); color: var(--on-secondary-container); }`"
-        ]
-      }
-    },
-    {
       "name": "text-swap",
       "type": "registry:ui",
       "title": "Text Swap",
@@ -2901,41 +2832,6 @@
           "Replaces monolithic steppers with a flexible, composable compound architecture.",
           "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
           "Strictly follows DESIGN.md tokens: floating 2px focus ring (outline-offset: 2px), concentric radius, and semantic high-contrast colors without monochrome triple-tints."
-        ]
-      }
-    },
-    {
-      "name": "view-transition",
-      "type": "registry:ui",
-      "title": "View Transition",
-      "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "@seany9915/eolas-ui/utils"
-      ],
-      "files": [
-        {
-          "path": "view-transition.tsx",
-          "type": "registry:ui",
-          "target": "@ui/view-transition.tsx"
-        },
-        {
-          "path": "view-transitions.ts",
-          "type": "registry:lib",
-          "target": "@lib/view-transitions.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
-          "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
-          "Degrades gracefully on unsupported browsers (feature-detected) by running the state update immediately without errors.",
-          "Bypasses the animation under prefers-reduced-motion and offers opt-in focus routing (focusTarget) to prevent screen reader disorientation.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
         ]
       }
     }

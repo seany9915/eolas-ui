@@ -177,13 +177,23 @@ export const TooltipArrow = React.forwardRef<HTMLDivElement, TooltipArrowProps>(
     <BaseTooltip.Arrow
       ref={ref}
       className={cn(
-        'text-on-surface z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-5px] data-[side=right]:left-[-5px]',
+        'text-on-surface z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
         'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
         className
       )}
       {...props}
     >
-      {children}
+      {children ?? (
+        <svg
+          width="10"
+          height="5"
+          viewBox="0 0 10 5"
+          className="fill-current block"
+          aria-hidden="true"
+        >
+          <path d="M0 5 L5 0 L10 5 Z" />
+        </svg>
+      )}
     </BaseTooltip.Arrow>
   )
 );

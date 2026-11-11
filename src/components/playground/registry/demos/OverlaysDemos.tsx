@@ -80,7 +80,7 @@ export const DrawerDemo: React.FC<ComponentDemoProps> = () => {
         description="Practice history and recent audio recordings."
         swipeDirection="right"
         trigger={
-          <Button variant="outlined" colorRole="secondary">
+          <Button variant="outline" colorRole="secondary">
             <Icon name="menu_open" size="xs" />
             Open Profile Drawer
           </Button>
@@ -105,7 +105,7 @@ export const PopoverDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Popover.Root>
-        <Popover.Trigger render={<Button variant="outlined">Practice Scoring Rules</Button>} />
+        <Popover.Trigger render={<Button variant="outline">Practice Scoring Rules</Button>} />
         <Popover.Portal>
           <Popover.Positioner side="bottom" sideOffset={8}>
             <Popover.Popup className="p-4 max-w-sm rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2">
@@ -127,7 +127,7 @@ export const MenuDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Menu.Root>
-        <Menu.Trigger render={<Button variant="tonal">Actions Menu <Icon name="expand_more" size="xs" /></Button>} />
+        <Menu.Trigger render={<Button variant="soft">Actions Menu <Icon name="expand_more" size="xs" /></Button>} />
         <Menu.Portal>
           <Menu.Positioner sideOffset={4}>
             <Menu.Popup className="p-1 min-w-48 rounded-xl bg-surface border border-outline-variant shadow-ambient">
@@ -313,7 +313,7 @@ export const TooltipDemo: React.FC<ComponentDemoProps> = () => {
       {/* 1. Canonical Compound Base UI Tooltip with explicit Tooltip.Arrow */}
       <Tooltip.Provider>
         <Tooltip.Root>
-          <Tooltip.Trigger render={<Button variant="outlined" size="sm">Compound Tooltip (with Arrow)</Button>} />
+          <Tooltip.Trigger render={<Button variant="outline" size="sm">Compound Tooltip (with Arrow)</Button>} />
           <Tooltip.Portal>
             <Tooltip.Positioner side="top" sideOffset={8}>
               <Tooltip.Popup className="relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient">
@@ -331,7 +331,7 @@ export const TooltipDemo: React.FC<ComponentDemoProps> = () => {
         showArrow
         side="bottom"
       >
-        <Button variant="tonal" size="sm">
+        <Button variant="soft" size="sm">
           Shorthand Tooltip
         </Button>
       </Tooltip>
@@ -437,7 +437,7 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
         </div>
         <Button
           colorRole="primary"
-          variant="outlined"
+          variant="outline"
           onClick={() => setOpen(true)}
           className="shrink-0"
         >

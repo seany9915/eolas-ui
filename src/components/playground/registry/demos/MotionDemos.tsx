@@ -23,7 +23,7 @@ export const NumberRollDemo: React.FC<ComponentDemoProps> = () => {
         <NumberRoll value={val} suffix=" words" />
       </div>
       <div className="flex items-center gap-2">
-        <Button size="sm" variant="outlined" onClick={() => setVal((v) => v - 10)}>
+        <Button size="sm" variant="outline" onClick={() => setVal((v) => v - 10)}>
           -10 words
         </Button>
         <Button size="sm" variant="filled" onClick={() => setVal((v) => v + 10)}>
@@ -55,7 +55,7 @@ export const NumberPopInDemo: React.FC<ComponentDemoProps> = () => {
       <div className="font-mono text-3xl font-bold text-success">
         <NumberPopIn value={val} suffix="%" />
       </div>
-      <Button size="sm" variant="outlined" onClick={() => setVal((v) => (v === 98 ? 94 : 98))}>
+      <Button size="sm" variant="outline" onClick={() => setVal((v) => (v === 98 ? 94 : 98))}>
         Simulate Score Change
       </Button>
     </div>
@@ -70,7 +70,7 @@ export const TextSwapDemo: React.FC<ComponentDemoProps> = () => {
       <div className="font-heading text-lg font-bold text-on-surface">
         <TextSwap>{states[idx]}</TextSwap>
       </div>
-      <Button size="sm" variant="tonal" onClick={() => setIdx((i) => (i + 1) % states.length)}>
+      <Button size="sm" variant="soft" onClick={() => setIdx((i) => (i + 1) % states.length)}>
         Cycle Status State
       </Button>
     </div>
@@ -91,7 +91,7 @@ export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-md mx-auto py-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="font-heading text-xs font-bold text-on-surface">Articulation Exercise Steps</span>
-        <Button size="sm" variant="tonal" onClick={handleReplay}>
+        <Button size="sm" variant="soft" onClick={handleReplay}>
           Replay Sequence
         </Button>
       </div>
@@ -124,7 +124,7 @@ export const SuccessCheckDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-col items-center justify-center gap-4 py-8">
       <SuccessCheck trigger={active} size={48} />
       <span className="font-label text-xs font-bold text-success">Practice Plan Verified</span>
-      <Button size="sm" variant="outlined" onClick={() => setActive(!active)}>
+      <Button size="sm" variant="outline" onClick={() => setActive(!active)}>
         Re-trigger Animation
       </Button>
     </div>
@@ -184,7 +184,7 @@ export const ErrorShakeDemo: React.FC<ComponentDemoProps> = () => {
         </Button>
         <Button
           size="sm"
-          variant="outlined"
+          variant="outline"
           colorRole="neutral"
           onClick={() => {
             setDuration('20');

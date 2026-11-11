@@ -38,7 +38,11 @@ function DefaultChevron({
 
   return (
     <span
-      className={cn('material-symbols-outlined text-lg leading-none select-none', className)}
+      className={cn(
+        'material-symbols-outlined leading-none select-none',
+        orientation === 'down' || orientation === 'up' ? 'text-base' : 'text-lg',
+        className
+      )}
       aria-hidden="true"
       {...props}
     >
@@ -62,13 +66,13 @@ export function Calendar({
         root: 'p-1',
         months: 'relative flex flex-col sm:flex-row gap-4',
         month: 'flex flex-col gap-4',
-        month_caption: 'flex justify-center items-center h-9 relative',
-        caption_label: 'text-sm font-semibold font-label text-on-surface',
+        month_caption: 'flex justify-center items-center h-9 px-9 relative',
+        caption_label: 'inline-flex items-center gap-0.5 text-sm font-semibold font-label text-on-surface whitespace-nowrap select-none pointer-events-none',
         nav: 'absolute inset-x-0 top-0 flex items-center justify-between h-9 px-1 pointer-events-none z-10',
         button_previous:
-          'pointer-events-auto relative after:absolute after:-inset-1.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         button_next:
-          'pointer-events-auto relative after:absolute after:-inset-1.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
         weekday: 'text-on-surface-variant rounded-md w-9 font-normal text-xs text-center font-sans select-none',
@@ -92,14 +96,13 @@ export function Calendar({
         disabled:
           'text-on-surface-variant/30 opacity-30 cursor-not-allowed pointer-events-none [&>button]:cursor-not-allowed [&>button]:pointer-events-none',
         hidden: 'invisible',
-        dropdowns: 'flex items-center gap-2 justify-center',
+        dropdowns: 'flex items-center gap-1.5 justify-center text-sm font-semibold font-label text-on-surface',
         dropdown:
-          'text-sm font-label font-semibold text-on-surface bg-surface border border-outline-variant rounded-md px-2 py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary',
-        dropdown_root: 'relative inline-flex items-center',
-        months_dropdown:
-          'text-sm font-label text-on-surface bg-surface border border-outline-variant rounded-md px-2 py-1',
-        years_dropdown:
-          'text-sm font-label text-on-surface bg-surface border border-outline-variant rounded-md px-2 py-1',
+          'absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none z-[5] focus-visible:outline-none',
+        dropdown_root:
+          'relative inline-flex items-center rounded-md border border-outline-variant bg-surface px-1.5 h-8 hover:bg-surface-container transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
+        months_dropdown: '',
+        years_dropdown: '',
         ...classNames,
       }}
       components={{

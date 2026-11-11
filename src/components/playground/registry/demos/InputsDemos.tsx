@@ -51,7 +51,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
           <Button variant="outline" colorRole="neutral">
             Cancel
           </Button>
-          <Button variant="tonal" colorRole="secondary">
+          <Button variant="soft" colorRole="secondary">
             <Icon name="ios_share" size="xs" />
             <span>Export Summary</span>
           </Button>
@@ -59,11 +59,10 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
       }
       variantsSection={
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="filled" colorRole="primary">Filled (High Emphasis)</Button>
-          <Button variant="outlined" colorRole="primary">Outlined (Secondary)</Button>
-          <Button variant="tonal" colorRole="primary">Tonal (Medium)</Button>
-          <Button variant="soft" colorRole="primary">Soft Wash</Button>
-          <Button variant="text" colorRole="primary">Text (Low Emphasis)</Button>
+          <Button variant="filled" colorRole="primary">Filled</Button>
+          <Button variant="outline" colorRole="primary">Outline</Button>
+          <Button variant="soft" colorRole="primary">Soft</Button>
+          <Button variant="text" colorRole="primary">Text</Button>
         </div>
       }
       sizeLadderSection={
@@ -98,7 +97,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
             <span>Trailing Icon</span>
             <Icon name="arrow_forward" size="xs" />
           </Button>
-          <Button size="icon" variant="tonal" colorRole="primary" aria-label="Record Audio">
+          <Button size="icon" variant="soft" colorRole="primary" aria-label="Record Audio">
             <Icon name="mic" size="sm" />
           </Button>
         </div>
@@ -350,7 +349,13 @@ export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
       <label htmlFor="practice-exercise-search" className="font-label text-xs font-bold text-on-surface block">Practice Exercise Search</label>
       <Autocomplete.Root openOnInputClick items={['Word Repetition', 'Picture Naming', 'Minimal Pairs', 'Sentence Reading']}>
-        <Autocomplete.Input id="practice-exercise-search" placeholder="Type exercise name..." className="w-full" />
+        <Autocomplete.InputGroup>
+          <Autocomplete.Input id="practice-exercise-search" placeholder="Type exercise name..." />
+          <div className="flex items-center gap-1.5 pr-2 shrink-0">
+            <Autocomplete.Clear />
+            <Autocomplete.Trigger />
+          </div>
+        </Autocomplete.InputGroup>
         <Autocomplete.Portal>
           <Autocomplete.Positioner sideOffset={4}>
             <Autocomplete.Popup>
@@ -925,15 +930,15 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
           Segmented Navigation with Hairline Separator
         </h4>
         <ButtonGroup>
-          <Button variant="outlined" colorRole="neutral" size="sm">
+          <Button variant="outline" colorRole="neutral" size="sm">
             <Icon name="chevron_left" size="xs" />
             <span>Previous</span>
           </Button>
-          <Button variant="outlined" colorRole="neutral" size="sm">
+          <Button variant="outline" colorRole="neutral" size="sm">
             <span>Today</span>
           </Button>
           <ButtonGroup.Separator />
-          <Button variant="outlined" colorRole="neutral" size="sm">
+          <Button variant="outline" colorRole="neutral" size="sm">
             <span>Next</span>
             <Icon name="chevron_right" size="xs" />
           </Button>

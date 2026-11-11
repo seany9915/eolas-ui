@@ -105,10 +105,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
           onClear?.();
         }}
         className={cn(
-          'rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none',
+          'rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none',
           size === 'sm'
-            ? 'relative size-9 min-w-[36px] min-h-[36px] after:absolute after:-inset-1 after:content-[\'\']'
-            : 'size-11 min-w-[44px] min-h-[44px]'
+            ? 'relative size-7 min-w-[28px] min-h-[28px] after:absolute after:-inset-2 after:content-[\'\']'
+            : 'relative size-8 min-w-[32px] min-h-[32px] after:absolute after:-inset-1.5 after:content-[\'\']'
         )}
       >
         <span className="material-symbols-outlined text-base leading-none select-none" aria-hidden="true">
@@ -202,7 +202,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
               'absolute flex items-center z-10',
               size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl',
               trailingAction || showClear
-                ? 'right-1 text-on-surface'
+                ? 'right-2 text-on-surface'
                 : size === 'sm'
                 ? 'right-3 text-on-surface-variant pointer-events-none select-none'
                 : size === 'lg'
