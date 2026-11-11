@@ -42,6 +42,10 @@ export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   popupClassName?: string;
 }
 
+type DrawerSwipeDirection = 'right' | 'left' | 'down' | 'up';
+
+const DrawerDirectionContext = React.createContext<DrawerSwipeDirection>('right');
+
 export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right: 'fixed inset-y-0 right-0 z-50 flex max-w-full justify-end',
   left: 'fixed inset-y-0 left-0 z-50 flex max-w-full justify-start',
@@ -51,13 +55,13 @@ export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', str
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   left:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   down:
-    'w-full max-h-[88vh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88vh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   up:
-    'w-full max-h-[88vh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88vh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
 };
 
 // Visual grab handle pill
@@ -105,7 +109,7 @@ DrawerCloseButton.displayName = 'DrawerCloseButton';
 
 // Standard layout slots
 export const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-1.5 text-left mb-4', className)} {...props} />
+  <div className={cn('flex flex-col gap-1.5 text-left mb-4', className)} {...props} />
 );
 DrawerHeader.displayName = 'DrawerHeader';
 
@@ -150,7 +154,7 @@ export const DrawerBackdrop = React.forwardRef<
   <BaseDrawer.Backdrop
     ref={ref}
     className={cn(
-      'fixed inset-0 bg-on-surface/40 z-50 transition-opacity duration-[var(--duration-slow)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]',
+      'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-slow)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]',
       className
     )}
     {...props}
@@ -163,33 +167,39 @@ export const DrawerOverlay = DrawerBackdrop;
 export const DrawerViewport = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseDrawer.Viewport> & {
-    swipeDirection?: 'right' | 'left' | 'down' | 'up';
+    swipeDirection?: DrawerSwipeDirection;
   }
->(({ className, swipeDirection = 'right', ...props }, ref) => (
-  <BaseDrawer.Viewport
-    ref={ref}
-    className={cn(drawerViewportClasses[swipeDirection], className)}
-    {...props}
-  />
-));
+>(({ className, swipeDirection, ...props }, ref) => {
+  const contextDirection = React.useContext(DrawerDirectionContext);
+  return (
+    <BaseDrawer.Viewport
+      ref={ref}
+      className={cn(drawerViewportClasses[swipeDirection ?? contextDirection], className)}
+      {...props}
+    />
+  );
+});
 DrawerViewport.displayName = 'DrawerViewport';
 
 export const DrawerPopup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseDrawer.Popup> & {
-    swipeDirection?: 'right' | 'left' | 'down' | 'up';
+    swipeDirection?: DrawerSwipeDirection;
   }
->(({ className, swipeDirection = 'right', ...props }, ref) => (
-  <BaseDrawer.Popup
-    ref={ref}
-    className={cn(
-      'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto will-change-[transform]',
-      drawerPopupClasses[swipeDirection],
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, swipeDirection, ...props }, ref) => {
+  const contextDirection = React.useContext(DrawerDirectionContext);
+  return (
+    <BaseDrawer.Popup
+      ref={ref}
+      className={cn(
+        'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto will-change-[transform]',
+        drawerPopupClasses[swipeDirection ?? contextDirection],
+        className
+      )}
+      {...props}
+    />
+  );
+});
 DrawerPopup.displayName = 'DrawerPopup';
 
 export const DrawerContent = React.forwardRef<
@@ -207,7 +217,7 @@ DrawerContent.displayName = 'DrawerContent';
 // Composable Panel wrapper combining Portal, Backdrop, Viewport, and Popup
 export interface DrawerPanelProps {
   children: React.ReactNode;
-  swipeDirection?: 'right' | 'left' | 'down' | 'up';
+  swipeDirection?: DrawerSwipeDirection;
   showHandle?: boolean;
   className?: string;
   backdropClassName?: string;
@@ -215,11 +225,14 @@ export interface DrawerPanelProps {
 
 export const DrawerPanel: React.FC<DrawerPanelProps> = ({
   children,
-  swipeDirection = 'right',
+  swipeDirection: swipeDirectionProp,
   showHandle = true,
   className,
   backdropClassName,
-}) => (
+}) => {
+  const contextDirection = React.useContext(DrawerDirectionContext);
+  const swipeDirection = swipeDirectionProp ?? contextDirection;
+  return (
   <BaseDrawer.Portal>
     <DrawerBackdrop className={backdropClassName} />
     <DrawerViewport swipeDirection={swipeDirection}>
@@ -231,8 +244,15 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
       </DrawerPopup>
     </DrawerViewport>
   </BaseDrawer.Portal>
-);
+  );
+};
 DrawerPanel.displayName = 'DrawerPanel';
+
+export const DrawerRoot: typeof BaseDrawer.Root = ({ swipeDirection = 'right', ...props }) => (
+  <DrawerDirectionContext.Provider value={swipeDirection}>
+    <BaseDrawer.Root swipeDirection={swipeDirection} {...props} />
+  </DrawerDirectionContext.Provider>
+);
 
 const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
   open,
@@ -265,7 +285,7 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
   // If used as pure headless compound root without shorthand config
   if (!title && !description && !trigger && !footer) {
     return (
-      <BaseDrawer.Root
+      <DrawerRoot
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
@@ -284,12 +304,12 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
         defaultTriggerId={defaultTriggerId}
       >
         {children}
-      </BaseDrawer.Root>
+      </DrawerRoot>
     );
   }
 
   return (
-    <BaseDrawer.Root
+    <DrawerRoot
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
@@ -328,7 +348,7 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
               <div className="shrink-0">
                 {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
                 <div className="flex items-center justify-between mb-4">
-                  {title && <DrawerTitle>{title}</DrawerTitle>}
+                  <DrawerTitle className={cn(!title && 'sr-only')}>{title || 'Panel'}</DrawerTitle>
                   {showCloseButton && (
                     <DrawerCloseButton aria-label="Close drawer panel" />
                   )}
@@ -351,14 +371,14 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
           </DrawerPopup>
         </DrawerViewport>
       </BaseDrawer.Portal>
-    </BaseDrawer.Root>
+    </DrawerRoot>
   );
 });
 DrawerComponent.displayName = 'Drawer';
 
 // Compound export mapping Base UI primitives
 export const Drawer = Object.assign(DrawerComponent, {
-  Root: BaseDrawer.Root,
+  Root: DrawerRoot,
   Trigger: BaseDrawer.Trigger,
   Portal: BaseDrawer.Portal,
   Backdrop: DrawerBackdrop,
@@ -386,7 +406,7 @@ export const Drawer = Object.assign(DrawerComponent, {
 
 // Re-export Base UI primitives for compound composition
 export { BaseDrawer };
-export const DrawerRoot = BaseDrawer.Root;
+
 export const DrawerTrigger = BaseDrawer.Trigger;
 export const DrawerPortal = BaseDrawer.Portal;
 export const DrawerSwipeArea = BaseDrawer.SwipeArea;

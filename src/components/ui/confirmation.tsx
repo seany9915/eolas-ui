@@ -32,19 +32,31 @@ export type ConfirmationStatus =
   | 'output-available'
   | 'output-denied';
 
+function resolveApproved(status: ConfirmationStatus, approved?: boolean) {
+  if (status === 'approval-responded') return approved === true;
+  return status === 'approved' || status === 'output-available';
+}
+
+function resolveDenied(status: ConfirmationStatus, approved?: boolean) {
+  if (status === 'approval-responded') return approved === false;
+  return status === 'denied' || status === 'output-denied';
+}
+
 export interface ConfirmationRootProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: ConfirmationStatus;
+  /** Decision for pproval-responded; without it the response is shown as neither approved nor denied. */
+  approved?: boolean;
   variant?: 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>(
-  ({ status = 'pending', variant, children, className, ...props }, ref) => {
+  ({ status = 'pending', approved, variant, children, className, ...props }, ref) => {
     const chatContext = useChatMessageContext();
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'card');
-    const isApproved = status === 'approved' || status === 'approval-responded' || status === 'output-available';
-    const isDenied = status === 'denied' || status === 'output-denied';
+    const isApproved = resolveApproved(status, approved);
+    const isDenied = resolveDenied(status, approved);
 
     return (
       <div
@@ -74,6 +86,7 @@ ConfirmationRoot.displayName = 'Confirmation.Root';
 
 export interface ConfirmationMediaProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: ConfirmationStatus;
+  approved?: boolean;
   variant?: 'badge' | 'ghost';
   children?: React.ReactNode;
   className?: string;
@@ -81,13 +94,14 @@ export interface ConfirmationMediaProps extends React.HTMLAttributes<HTMLDivElem
 
 const ConfirmationMedia: React.FC<ConfirmationMediaProps> = ({
   status = 'pending',
+  approved,
   variant = 'badge',
   children,
   className,
   ...props
 }) => {
-  const isApproved = status === 'approved' || status === 'approval-responded' || status === 'output-available';
-  const isDenied = status === 'denied' || status === 'output-denied';
+  const isApproved = resolveApproved(status, approved);
+  const isDenied = resolveDenied(status, approved);
 
   return (
     <div
@@ -224,7 +238,7 @@ export interface ConfirmationChangesProps extends React.HTMLAttributes<HTMLDivEl
 const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, children, className, ...props }) => {
   if (children) {
     return (
-      <div className={cn('mt-2 text-xs font-mono space-y-1', className)} {...props}>
+      <div className={cn('mt-2 text-xs font-mono flex flex-col gap-1', className)} {...props}>
         {children}
       </div>
     );
@@ -237,7 +251,7 @@ const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, chil
     : Object.entries(changes).map(([key, val]) => ({ label: key, from: val.from, to: val.to }));
 
   return (
-    <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container/60 font-mono text-xs space-y-1.5', className)} {...props}>
+    <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container/60 font-mono text-xs flex flex-col gap-1.5', className)} {...props}>
       {items.map((item, idx) => (
         <div key={idx} className="flex items-center justify-between gap-2 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
           <span className="text-on-surface-variant font-semibold">{item.label}:</span>
@@ -382,6 +396,7 @@ export interface ConfirmationProps {
   details?: React.ReactNode;
   riskLevel?: 'low' | 'medium' | 'high';
   status?: ConfirmationStatus;
+  approved?: boolean;
   variant?: 'card' | 'embedded' | 'ghost' | 'unboxed';
   onApprove?: () => void;
   onDeny?: () => void;
@@ -400,6 +415,7 @@ const ConfirmationComponent = React.forwardRef<HTMLDivElement, ConfirmationProps
       details,
       riskLevel = 'medium',
       status = 'pending',
+      approved,
       variant,
       onApprove,
       onDeny,
@@ -414,19 +430,19 @@ const ConfirmationComponent = React.forwardRef<HTMLDivElement, ConfirmationProps
   ) => {
     const chatContext = useChatMessageContext();
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'card');
-    const isApproved = status === 'approved' || status === 'approval-responded' || status === 'output-available';
-    const isDenied = status === 'denied' || status === 'output-denied';
+    const isApproved = resolveApproved(status, approved);
+    const isDenied = resolveDenied(status, approved);
     const isPending = !isApproved && !isDenied;
 
     return (
-      <ConfirmationRoot ref={ref} status={status} variant={resolvedVariant} className={className} {...props}>
+      <ConfirmationRoot ref={ref} status={status} approved={approved} variant={resolvedVariant} className={className} {...props}>
         {children ? (
           children
         ) : (
           <>
             <ConfirmationHeader>
               <div className="flex items-start gap-2.5 min-w-0">
-                <ConfirmationMedia status={status} />
+                <ConfirmationMedia status={status} approved={approved} />
                 <div className="min-w-0">
                   <ConfirmationTitle>{title}</ConfirmationTitle>
                   {description && <ConfirmationDescription>{description}</ConfirmationDescription>}

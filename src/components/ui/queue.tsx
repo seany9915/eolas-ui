@@ -98,17 +98,19 @@ QueueTitle.displayName = 'QueueTitle';
 /* -------------------------------------------------------------------------------------------------
  * QueueItemComponent
  * -----------------------------------------------------------------------------------------------*/
-export interface QueueItemComponentProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface QueueItemComponentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   title: string;
   description?: string;
   status?: TraceStatus;
   duration?: string | number;
   icon?: string;
+  /** Extra detail rendered beneath the title and description */
+  content?: React.ReactNode;
   className?: string;
 }
 
 export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComponentProps>(
-  ({ title, description, status = 'pending', duration, icon, className, ...props }, ref) => {
+  ({ title, description, status = 'pending', duration, icon, content, className, ...props }, ref) => {
     const isCompleted = status === 'complete';
     const isRunning = status === 'running';
     const formattedDuration =
@@ -128,7 +130,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
         <span
           className={cn(
             'flex size-5 shrink-0 items-center justify-center text-xs select-none',
-            isRunning && 'text-primary animate-spin',
+            isRunning && 'text-primary animate-spin motion-reduce:animate-none',
             isCompleted && 'text-success',
             status === 'pending' && 'text-outline/70',
             description && 'mt-0.5'
@@ -156,11 +158,13 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
           >
             {title}
           </span>
+          <span className="sr-only">{isRunning ? 'Running' : isCompleted ? 'Completed' : 'Pending'}</span>
           {description && (
             <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
               {description}
             </span>
           )}
+          {content && <div className="mt-1.5 font-sans text-xs text-on-surface-variant">{content}</div>}
         </div>
         {formattedDuration && (
           <TraceDescription className="ml-auto shrink-0 pl-2">
@@ -325,6 +329,7 @@ export const QueueRoot: React.FC<QueueProps> = ({
                       description={item.description}
                       status={status}
                       duration={item.duration}
+                      content={item.content}
                     />
                   );
                 })}
@@ -346,6 +351,7 @@ export const QueueRoot: React.FC<QueueProps> = ({
                     description={item.description}
                     status="complete"
                     duration={item.duration}
+                    content={item.content}
                   />
                 ))}
               </QueueSection>

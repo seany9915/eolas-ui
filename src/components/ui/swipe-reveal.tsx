@@ -131,7 +131,6 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
             block: 'nearest',
             inline: 'start',
           });
-          onOpenChange?.(false);
         }
       };
 
@@ -143,6 +142,23 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
 
     const hasLeading = Boolean(leadingActions);
     const hasTrailing = Boolean(actions);
+
+    // Report real open/closed state as the user swipes the content away from its resting position
+    const isOpenRef = React.useRef(false);
+    React.useEffect(() => {
+      const scroller = scrollerRef.current;
+      const content = contentRef.current;
+      if (!scroller || !content) return;
+      const handleScroll = () => {
+        const open = Math.abs(scroller.scrollLeft - content.offsetLeft) > 8;
+        if (open !== isOpenRef.current) {
+          isOpenRef.current = open;
+          onOpenChange?.(open);
+        }
+      };
+      scroller.addEventListener('scroll', handleScroll, { passive: true });
+      return () => scroller.removeEventListener('scroll', handleScroll);
+    }, [onOpenChange]);
 
     // Initial mount: ensure content pane is snapped into view when leading actions exist
     React.useEffect(() => {
@@ -169,7 +185,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
           // overscroll-behavior: chain prevents local rubber-band bounce while allowing parent scroll chaining
           '[overscroll-behavior:auto] [overscroll-behavior:chain]',
           gridColumns,
-          disabled && 'overflow-x-hidden pointer-events-none',
+          disabled && 'overflow-x-hidden',
           'rounded-md border border-outline-variant/50 shadow-ambient',
           className
         )}

@@ -78,7 +78,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
         orientation={orientation}
         name={name}
         disabled={disabled}
-        className={cn('flex flex-col gap-2 w-full', className)}
+        className={cn('flex flex-col gap-2 w-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40', className)}
         {...props}
       >
         {children}
@@ -103,7 +103,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
       orientation={orientation}
       name={name}
       disabled={disabled}
-      className={cn('flex flex-col gap-2 w-full', className)}
+      className={cn('flex flex-col gap-2 w-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40', className)}
       {...props}
     >
       {(label || value !== undefined) && (
@@ -125,19 +125,19 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
         </span>
       )}
 
-      <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer">
-        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-variant border border-outline">
-          <BaseSlider.Indicator className="h-full rounded-full bg-primary" />
+      <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
+        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-variant border border-outline data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
+          <BaseSlider.Indicator className="rounded-full bg-primary data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
           {isRange ? (
             <>
               <BaseSlider.Thumb
                 index={0}
-                aria-label="Minimum value"
+                aria-label={typeof label === 'string' ? ` minimum` : 'Minimum value'}
                 className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
               <BaseSlider.Thumb
                 index={1}
-                aria-label="Maximum value"
+                aria-label={typeof label === 'string' ? ` maximum` : 'Maximum value'}
                 className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
             </>

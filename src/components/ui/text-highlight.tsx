@@ -47,7 +47,7 @@ export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps
       return el;
     });
 
-    const { matchCount } = useTextHighlight(internalRef, query, {
+    const { matchCount, isSupported } = useTextHighlight(internalRef, query, {
       highlightName,
       caseSensitive,
     });
@@ -55,8 +55,8 @@ export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps
     return (
       <div ref={internalRef} className={cn('relative', className)} {...props}>
         {/* Accessible screen reader live-region announcement */}
-        {announceMatches && query.trim() && (
-          <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {announceMatches && isSupported && query.trim() && (
+          <span data-text-highlight-status className="sr-only" aria-live="polite" aria-atomic="true">
             {matchCount > 0 ? `${matchCount} search matches found` : 'No matches found'}
           </span>
         )}

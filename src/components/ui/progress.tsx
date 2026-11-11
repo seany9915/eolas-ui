@@ -65,7 +65,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
           min={min}
           format={format}
           locale={locale}
-          aria-valuetext={ariaValueText}
+          {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
           getAriaValueText={getAriaValueText}
           aria-label={props['aria-label'] || label || (children ? undefined : 'Progress')}
           className={cn('flex flex-col gap-1.5 w-full', className)}
@@ -89,7 +89,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
         min={min}
         format={format}
         locale={locale}
-        aria-valuetext={ariaValueText}
+        {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
         getAriaValueText={getAriaValueText}
         aria-label={props['aria-label'] || label || 'Progress'}
         className={cn('flex flex-col gap-1.5 w-full', className)}

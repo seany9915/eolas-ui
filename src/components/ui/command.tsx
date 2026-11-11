@@ -110,7 +110,7 @@ export const CommandInput = React.forwardRef<
 >(({ className, icon, wrapperClassName, ...props }, ref) => (
   <div
     data-slot="command-input-wrapper"
-    className={cn('flex items-center border-b border-outline-variant px-3', wrapperClassName)}
+    className={cn('flex items-center border-b border-outline-variant px-3 focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary', wrapperClassName)}
     cmdk-input-wrapper=""
   >
     {icon ?? (
@@ -198,7 +198,7 @@ export const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[40px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] data-[disabled=true]:pointer-events-none data-[selected=true]:bg-surface-container data-[selected=true]:text-on-surface aria-selected:bg-surface-container aria-selected:text-on-surface data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
+      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] data-[disabled=true]:pointer-events-none data-[selected=true]:bg-surface-container data-[selected=true]:text-on-surface aria-selected:bg-surface-container aria-selected:text-on-surface data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
       className
     )}
     {...props}

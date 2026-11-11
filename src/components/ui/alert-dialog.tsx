@@ -113,7 +113,7 @@ function AlertDialogComponent<Payload = unknown>({
                 initialFocus={initialFocus}
                 finalFocus={finalFocus}
                 className={cn(
-                  '@container w-full p-6 rounded-xl bg-surface border border-outline-variant shadow-modal space-y-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+                  '@container w-full p-6 rounded-xl bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
                   isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
                   sizeClasses[size] || sizeClasses.md,
                   className
@@ -124,11 +124,9 @@ function AlertDialogComponent<Payload = unknown>({
                     warning
                   </span>
                   <div>
-                    {title && (
-                      <BaseAlertDialog.Title className="font-heading text-lg font-bold text-on-surface">
-                        {title}
-                      </BaseAlertDialog.Title>
-                    )}
+                    <BaseAlertDialog.Title className={cn('font-heading text-lg font-bold text-on-surface', !title && 'sr-only')}>
+                      {title || 'Alert'}
+                    </BaseAlertDialog.Title>
                     {description && (
                       <BaseAlertDialog.Description className="font-sans text-sm text-on-surface-variant mt-1 leading-relaxed">
                         {description}
@@ -210,7 +208,7 @@ export const AlertDialogContent = React.forwardRef<HTMLDivElement, AlertDialogCo
           <BaseAlertDialog.Popup
             ref={ref}
             className={cn(
-              '@container w-full p-6 rounded-xl bg-surface border border-outline-variant shadow-modal space-y-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+              '@container w-full p-6 rounded-xl bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
               sizeClasses[size] || sizeClasses.md,
               className
@@ -227,7 +225,7 @@ export const AlertDialogContent = React.forwardRef<HTMLDivElement, AlertDialogCo
 AlertDialogContent.displayName = 'AlertDialogContent';
 
 export const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-2 text-left', className)} {...props} />
+  <div className={cn('flex flex-col gap-2 text-left', className)} {...props} />
 );
 AlertDialogHeader.displayName = 'AlertDialogHeader';
 

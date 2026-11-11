@@ -76,6 +76,10 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
   ) => {
     const generatedId = React.useId();
     const switchId = id || generatedId;
+    const descriptionId = `-description`;
+    const errorId = `-error`;
+    const hasErrorText = typeof error === 'string' && !!error;
+    const describedBy = [label && description ? descriptionId : null, label && hasErrorText ? errorId : null].filter(Boolean).join(' ') || undefined;
     const currentSize = sizeConfig[size] || sizeConfig.md;
 
     const switchNode = (
@@ -95,6 +99,8 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         nativeButton={nativeButton}
         aria-label={!label ? ariaLabel || 'Switch' : ariaLabel}
         aria-labelledby={ariaLabelBy}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
         className={cn(
           'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
           'bg-surface-variant',
@@ -135,12 +141,12 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         >
           <span>{label}</span>
           {description && (
-            <span className="font-sans text-sm text-on-surface-variant font-normal mt-0.5">
+            <span id={descriptionId} className="font-sans text-sm text-on-surface-variant font-normal mt-0.5">
               {description}
             </span>
           )}
-          {typeof error === 'string' && error && (
-            <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
+          {hasErrorText && (
+            <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
               <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
                 error
               </span>

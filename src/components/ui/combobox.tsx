@@ -167,52 +167,10 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
       onChange?.(val);
     };
 
-    // If children are provided, this is a compositional/compound Combobox
-    if (children) {
-      return (
-        <BaseCombobox.Root
-          items={items}
-          value={value}
-          defaultValue={defaultValue}
-          onValueChange={handleValueChange}
-          inputValue={inputValue}
-          defaultInputValue={defaultInputValue}
-          onInputValueChange={onInputValueChange}
-          open={open}
-          defaultOpen={defaultOpen}
-          onOpenChange={onOpenChange}
-          onOpenChangeComplete={onOpenChangeComplete}
-          multiple={multiple}
-          disabled={disabled}
-          readOnly={readOnly}
-          required={required}
-          name={name}
-          id={id}
-          form={form}
-          autoComplete={autoComplete}
-          autoHighlight={autoHighlight}
-          highlightItemOnHover={highlightItemOnHover}
-          loopFocus={loopFocus}
-          openOnInputClick={openOnInputClick}
-          modal={modal}
-          actionsRef={actionsRef}
-          inputRef={inputRef}
-          itemToStringLabel={itemToStringLabel}
-          itemToStringValue={itemToStringValue}
-          isItemEqualToValue={isItemEqualToValue}
-          filter={filter}
-          filteredItems={filteredItems}
-          limit={limit}
-        >
-          {children}
-        </BaseCombobox.Root>
-      );
-    }
-
     const generatedId = React.useId();
     const comboboxId = id || `combobox-${generatedId}`;
     const descriptionId = description ? `${comboboxId}-desc` : undefined;
-    const errorId = error ? `${comboboxId}-error` : undefined;
+    const errorId = typeof error === 'string' && error ? `${comboboxId}-error` : undefined;
     const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
 
     // Normalize flat options
@@ -267,6 +225,48 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
       }
       return items;
     }, [normalizedOptions, normalizedGroups, items]);
+
+    // If children are provided, this is a compositional/compound Combobox
+    if (children) {
+      return (
+        <BaseCombobox.Root
+          items={items}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={handleValueChange}
+          inputValue={inputValue}
+          defaultInputValue={defaultInputValue}
+          onInputValueChange={onInputValueChange}
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          onOpenChangeComplete={onOpenChangeComplete}
+          multiple={multiple}
+          disabled={disabled}
+          readOnly={readOnly}
+          required={required}
+          name={name}
+          id={id}
+          form={form}
+          autoComplete={autoComplete}
+          autoHighlight={autoHighlight}
+          highlightItemOnHover={highlightItemOnHover}
+          loopFocus={loopFocus}
+          openOnInputClick={openOnInputClick}
+          modal={modal}
+          actionsRef={actionsRef}
+          inputRef={inputRef}
+          itemToStringLabel={itemToStringLabel}
+          itemToStringValue={itemToStringValue}
+          isItemEqualToValue={isItemEqualToValue}
+          filter={filter}
+          filteredItems={filteredItems}
+          limit={limit}
+        >
+          {children}
+        </BaseCombobox.Root>
+      );
+    }
 
     return (
       <div ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
@@ -467,10 +467,11 @@ export const ComboboxTrigger = React.forwardRef<
     <BaseCombobox.Trigger
       ref={ref}
       tabIndex={hasChildren ? props.tabIndex : (props.tabIndex ?? -1)}
+      aria-label={hasChildren ? undefined : 'Toggle options'}
       className={cn(
         hasChildren
           ? 'inline-flex items-center justify-between h-12 px-4 min-h-[48px] rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
-          : 'size-7 min-w-[28px] min-h-[28px] rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
+          : 'relative size-7 min-w-[28px] min-h-[28px] rounded-md flex items-center justify-center after:absolute after:-inset-2 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
         className
       )}
       {...props}
@@ -620,7 +621,7 @@ export const ComboboxClear = React.forwardRef<
   <BaseCombobox.Clear
     ref={ref}
     className={cn(
-      'size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
+      'relative size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center after:absolute after:-inset-2 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
       className
     )}
     aria-label="Clear selection"
@@ -660,7 +661,7 @@ export const ComboboxList = React.forwardRef<
   <BaseCombobox.List
     ref={ref}
     className={cn(
-      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none data-[empty]:p-0',
+      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 flex flex-col gap-0.5 outline-none data-[empty]:p-0',
       className
     )}
     {...props}
@@ -699,7 +700,7 @@ export const ComboboxInputGroup = React.forwardRef<
     data-slot="combobox-input-group"
     ref={ref}
     className={cn(
-      'relative flex items-center w-full rounded-md border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20 focus-within:border-primary focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary transition-[border-color,box-shadow]',
+      'relative flex items-center w-full rounded-md border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 data-[popup-open]:border-primary focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary transition-[border-color,box-shadow]',
       className
     )}
     {...props}

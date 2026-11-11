@@ -175,7 +175,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-variant={variant ?? resolvedRole}
       data-role={resolvedRole}
       className={cn(
-        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default bg-surface border-none shadow-ambient overflow-hidden text-left',
+        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default bg-surface border-none overflow-hidden text-left',
         className
       )}
       {...props}

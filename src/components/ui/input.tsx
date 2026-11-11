@@ -68,12 +68,24 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
       error,
       value,
       disabled,
+      onChange,
       ...props
     },
     ref
   ) => {
+    const innerRef = React.useRef<HTMLInputElement | null>(null);
+    const mergedRef = React.useCallback(
+      (node: HTMLInputElement | null) => {
+        innerRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
+      },
+      [ref]
+    );
+    const isControlled = value !== undefined;
+    const [uncontrolledHasValue, setUncontrolledHasValue] = React.useState(Boolean(props.defaultValue));
     const hasLeading = Boolean(leadingIcon);
-    const showClear = clearable && (value === undefined || Boolean(value));
+    const showClear = clearable && (isControlled ? Boolean(value) : uncontrolledHasValue);
 
     const clearButton = showClear ? (
       <BaseButton
@@ -82,11 +94,21 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
         disabled={disabled}
         onClick={(e) => {
           e.preventDefault();
+          const input = innerRef.current;
+          if (!isControlled && input) {
+            // Uncontrolled inputs own their value, so clear it through the native setter and notify React.
+            const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+            setter?.call(input, '');
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          input?.focus();
           onClear?.();
         }}
         className={cn(
           'rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none',
-          size === 'sm' ? 'size-9 min-w-[36px] min-h-[36px]' : 'size-11 min-w-[44px] min-h-[44px]'
+          size === 'sm'
+            ? 'relative size-9 min-w-[36px] min-h-[36px] after:absolute after:-inset-1 after:content-[\'\']'
+            : 'size-11 min-w-[44px] min-h-[44px]'
         )}
       >
         <span className="material-symbols-outlined text-base leading-none select-none" aria-hidden="true">
@@ -142,11 +164,16 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
 
     const inputElement = (
       <BaseInput
-        ref={ref}
+        ref={mergedRef}
         value={value}
         disabled={disabled}
+        aria-invalid={error ? true : undefined}
         data-slot="input"
         className={inputClasses}
+        onChange={(e) => {
+          if (!isControlled) setUncontrolledHasValue(e.target.value !== '');
+          onChange?.(e);
+        }}
         {...props}
       />
     );

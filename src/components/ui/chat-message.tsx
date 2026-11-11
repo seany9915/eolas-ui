@@ -89,6 +89,7 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
   botType,
   children,
   className,
+  ...props
 }) => {
   const defaultName = role === 'user' ? 'You' : role === 'assistant' ? 'Clinical Assistant' : 'System';
   const displayName = authorName || defaultName;
@@ -104,6 +105,7 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
 
   return (
     <div
+      {...props}
       className={cn(
         'flex items-center gap-2 px-1 text-xs font-label text-on-surface-variant select-none',
         role === 'user' ? 'flex-row-reverse' : 'flex-row',
@@ -260,9 +262,10 @@ export interface ChatMessageActionsProps extends React.HTMLAttributes<HTMLDivEle
   className?: string;
 }
 
-const ChatMessageActions: React.FC<ChatMessageActionsProps> = ({ children, className }) => {
+const ChatMessageActions: React.FC<ChatMessageActionsProps> = ({ children, className, ...props }) => {
   return (
     <div
+      {...props}
       className={cn(
         'flex items-center gap-1 mt-1 px-1 text-on-surface-variant',
         className
@@ -291,7 +294,7 @@ export interface ChatMessageProps {
   attachments?: React.ReactNode;
   isBookmarked?: boolean;
   onBookmark?: () => void;
-  onCopy?: () => void;
+  onCopy?: () => void | Promise<void>;
   onRetry?: () => void;
   extraActions?: React.ReactNode;
   className?: string;
@@ -325,11 +328,15 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
   ) => {
     const [copied, setCopied] = React.useState(false);
 
-    const handleCopy = () => {
-      if (onCopy) {
-        onCopy();
-      } else if (typeof content === 'string') {
-        navigator.clipboard?.writeText(content);
+    const handleCopy = async () => {
+      try {
+        if (onCopy) {
+          await onCopy();
+        } else if (typeof content === 'string') {
+          await navigator.clipboard.writeText(content);
+        }
+      } catch {
+        return;
       }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

@@ -35,7 +35,7 @@ export interface OTPFieldProps
   /**
    * Official Base UI callback fired when all OTP slots are complete.
    */
-  onValueComplete?: (value: string, eventDetails: BaseOTPField.Root.CompleteEventDetails) => void;
+  onValueComplete?: (value: string, eventDetails?: BaseOTPField.Root.CompleteEventDetails) => void;
   /**
    * Callback fired when entered text contains characters rejected by validation or normalization.
    */
@@ -64,6 +64,12 @@ export interface OTPFieldProps
   children?: React.ReactNode;
   className?: string;
 }
+
+const OTP_PATTERNS: Record<string, RegExp | undefined> = {
+  numeric: /^\d+$/,
+  alpha: /^[\p{L}]+$/u,
+  alphanumeric: /^[\p{L}\d]+$/u,
+};
 
 const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   id,
@@ -102,18 +108,26 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   const sepIndex = separatorIndex ?? Math.floor(length / 2);
 
   const handleValueComplete = React.useCallback(
-    (val: string, eventDetails: BaseOTPField.Root.CompleteEventDetails) => {
+    (val: string, eventDetails?: BaseOTPField.Root.CompleteEventDetails) => {
       onComplete?.(val, eventDetails);
       onValueComplete?.(val, eventDetails);
     },
     [onComplete, onValueComplete]
   );
 
+  const [internalValue, setInternalValue] = React.useState(defaultValue ?? '');
+  const isControlled = value !== undefined;
+
   useWebOtp({
     enabled: Boolean(autoExtractSmsOtp && !disabled && !readOnly),
     onCodeReceived: (receivedCode) => {
-      onValueChange?.(receivedCode);
-      onComplete?.(receivedCode);
+      const stripped = receivedCode.replace(/\s/g, '');
+      const normalized = normalizeValue ? normalizeValue(stripped) : stripped;
+      const pattern = OTP_PATTERNS[validationType];
+      if (normalized.length !== length || (pattern && !pattern.test(normalized))) return;
+      if (!isControlled) setInternalValue(normalized);
+      onValueChange?.(normalized);
+      handleValueComplete(normalized);
     },
   });
 
@@ -142,9 +156,11 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         ref={ref}
         id={id}
         length={length}
-        value={value}
-        defaultValue={defaultValue}
-        onValueChange={onValueChange}
+        value={isControlled ? value : internalValue}
+        onValueChange={(next, details) => {
+          if (!isControlled) setInternalValue(next);
+          onValueChange?.(next, details);
+        }}
         onValueComplete={handleValueComplete}
         onValueInvalid={onValueInvalid}
         normalizeValue={normalizeValue}
@@ -178,8 +194,9 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
               )}
               <BaseOTPField.Input
                 pattern={pattern}
+                aria-label={`Character ${idx + 1} of ${length}`}
                 className={cn(
-                  'w-11 min-w-[44px] @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded-lg',
+                  'w-10 min-w-10 @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded-lg',
                   'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
                   'border-outline hover:border-on-surface-variant/80',
                   'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',

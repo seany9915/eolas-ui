@@ -66,6 +66,7 @@ const RadioGroupComponent = React.forwardRef<HTMLDivElement, RadioGroupProps<any
         form={form}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
+        aria-invalid={error ? true : undefined}
         className={cn(
           'flex w-full',
           orientation === 'horizontal' ? 'flex-row flex-wrap gap-4' : 'flex-col gap-1',
@@ -119,6 +120,10 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
   ) => {
     const generatedId = React.useId();
     const radioId = id || generatedId;
+    const descriptionId = `-description`;
+    const errorId = `-error`;
+    const hasErrorText = typeof error === 'string' && !!error;
+    const describedBy = [label && description ? descriptionId : null, label && hasErrorText ? errorId : null].filter(Boolean).join(' ') || undefined;
 
     const radioNode = (
       <BaseRadio.Root
@@ -129,6 +134,8 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
         readOnly={readOnly}
         required={required}
         inputRef={inputRef}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
         className={cn(
           'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
           'data-[checked]:border-2 data-[checked]:border-primary',
@@ -170,12 +177,12 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
             {label}
           </span>
           {description && (
-            <span className="font-sans text-sm text-on-surface-variant select-none mt-0.5">
+            <span id={descriptionId} className="font-sans text-sm text-on-surface-variant select-none mt-0.5">
               {description}
             </span>
           )}
-          {typeof error === 'string' && error && (
-            <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
+          {hasErrorText && (
+            <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
               <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
                 error
               </span>

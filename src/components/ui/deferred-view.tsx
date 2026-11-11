@@ -48,8 +48,8 @@ export const DeferredView = React.forwardRef<HTMLDivElement, DeferredViewProps>(
 
     const dynamicStyle: React.CSSProperties = {
       ...style,
-      ...(intrinsicHeight
-        ? { containIntrinsicSize: `auto ${intrinsicWidth ?? 'none'} auto ${intrinsicHeight}` }
+      ...(intrinsicHeight || intrinsicWidth
+        ? { containIntrinsicSize: `auto ${intrinsicWidth ?? 'none'} auto ${intrinsicHeight ?? 'none'}` }
         : {}),
     };
 

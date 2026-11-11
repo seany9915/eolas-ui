@@ -83,6 +83,7 @@ export const EFFORT_OPTIONS: SelectOption[] = [
 
 export interface ModelSelectorModelProps {
   value?: string;
+  defaultValue?: string;
   onValueChange?: (model: string) => void;
   models?: ModelItem[];
   disabled?: boolean;
@@ -92,7 +93,8 @@ export interface ModelSelectorModelProps {
 }
 
 const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
-  value = 'gemini-2.5-pro',
+  value: valueProp,
+  defaultValue = 'gemini-2.5-pro',
   onValueChange,
   models = DEFAULT_MODELS,
   disabled = false,
@@ -100,6 +102,8 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   placeholder = 'Select model',
   className,
 }) => {
+  const [internalValue, setInternalValue] = React.useState(defaultValue);
+  const value = valueProp ?? internalValue;
   return (
     <div className={cn('min-w-[140px] @sm:min-w-[160px]', className)}>
       <Select
@@ -107,6 +111,7 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
         value={value}
         onValueChange={(val) => {
           if (val && typeof val === 'string') {
+            setInternalValue(val);
             onValueChange?.(val);
           }
         }}
@@ -122,6 +127,7 @@ ModelSelectorModel.displayName = 'ModelSelector.Model';
 
 export interface ModelSelectorEffortProps {
   value?: ThinkingEffort;
+  defaultValue?: ThinkingEffort;
   onValueChange?: (effort: ThinkingEffort) => void;
   options?: SelectOption[];
   disabled?: boolean;
@@ -131,7 +137,8 @@ export interface ModelSelectorEffortProps {
 }
 
 const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
-  value = 'medium',
+  value: valueProp,
+  defaultValue = 'medium',
   onValueChange,
   options = EFFORT_OPTIONS,
   disabled = false,
@@ -139,6 +146,8 @@ const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
   placeholder = 'Thinking',
   className,
 }) => {
+  const [internalValue, setInternalValue] = React.useState<ThinkingEffort>(defaultValue);
+  const value = valueProp ?? internalValue;
   return (
     <div className={cn('min-w-[110px] @sm:min-w-[130px]', className)}>
       <Tooltip content="Adjust depth of model reasoning steps">
@@ -148,6 +157,7 @@ const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
             value={value}
             onValueChange={(val) => {
               if (val && typeof val === 'string') {
+                setInternalValue(val as ThinkingEffort);
                 onValueChange?.(val as ThinkingEffort);
               }
             }}
@@ -168,9 +178,11 @@ ModelSelectorEffort.displayName = 'ModelSelector.Effort';
  * -----------------------------------------------------------------------------------------------*/
 export interface ModelSelectorProps {
   model?: string;
+  defaultModel?: string;
   onModelChange?: (model: string) => void;
   models?: ModelItem[];
   effort?: ThinkingEffort;
+  defaultEffort?: ThinkingEffort;
   onEffortChange?: (effort: ThinkingEffort) => void;
   showEffort?: boolean;
   disabled?: boolean;
@@ -181,10 +193,12 @@ export interface ModelSelectorProps {
 const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorProps>(
   (
     {
-      model = 'gemini-2.5-pro',
+      model,
+      defaultModel,
       onModelChange,
       models = DEFAULT_MODELS,
-      effort = 'medium',
+      effort,
+      defaultEffort,
       onEffortChange,
       showEffort = true,
       disabled = false,
@@ -198,6 +212,7 @@ const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorPro
       <ModelSelectorRoot ref={ref} className={className} {...props}>
         <ModelSelectorModel
           value={model}
+          defaultValue={defaultModel}
           onValueChange={onModelChange}
           models={models}
           disabled={disabled}
@@ -206,6 +221,7 @@ const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorPro
         {showEffort && (
           <ModelSelectorEffort
             value={effort}
+            defaultValue={defaultEffort}
             onValueChange={onEffortChange}
             disabled={disabled}
             size={size}

@@ -399,19 +399,11 @@ export const MeterDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-col gap-6 w-full max-w-md mx-auto py-4">
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs font-mono">
-          <span className="font-bold text-on-surface">Weekly Practice Goal</span>
-          <span className="text-primary font-bold">82%</span>
-        </div>
-        <Meter value={82} colorRole="primary" />
+        <Meter value={82} label="Weekly Practice Goal" colorRole="primary" />
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs font-mono">
-          <span className="font-bold text-on-surface">Storage Used</span>
-          <span className="text-warning font-bold">68%</span>
-        </div>
-        <Meter value={68} colorRole="warning" />
+        <Meter value={68} label="Storage Used" colorRole="warning" />
       </div>
     </div>
   );

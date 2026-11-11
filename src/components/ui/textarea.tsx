@@ -34,6 +34,7 @@ const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     <textarea
       ref={ref}
       data-slot="textarea"
+      aria-invalid={error ? true : undefined}
       className={cn(
         'w-full font-sans text-base',
         variant === 'default' && [

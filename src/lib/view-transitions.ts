@@ -4,10 +4,11 @@
  * Platform Reference: Modern Web Guidance (MWG: same-document-transitions)
  *
  * Provides a strongly typed wrapper around document.startViewTransition()
- * with progressive enhancement fallback, reduced motion support, and
- * accessibility focus routing.
+ * with progressive enhancement fallback, reduced motion bypass, and
+ * opt-in accessibility focus routing (via the focusTarget option).
  */
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 
 interface ViewTransition {
   ready: Promise<void>;
@@ -60,7 +61,11 @@ export function useViewTransition(): UseViewTransitionReturn {
     ): Promise<void> => {
       const { focusTarget, transitionName, targetElement } = options || {};
 
-      // If transitionName is specified on a target element, assign it prior to transition
+      // Preserve any existing inline name so it can be restored afterwards
+      const previousName =
+        transitionName && targetElement
+          ? targetElement.style.getPropertyValue('view-transition-name')
+          : '';
       if (transitionName && targetElement) {
         targetElement.style.setProperty('view-transition-name', transitionName);
       }
@@ -70,8 +75,10 @@ export function useViewTransition(): UseViewTransitionReturn {
         const resolved =
           'current' in focusTarget ? focusTarget.current : focusTarget;
         if (resolved) {
-          if (!resolved.hasAttribute('tabindex')) {
+          // Only make natively non-focusable targets programmatically focusable, and undo it on blur
+          if (resolved.tabIndex < 0 && !resolved.hasAttribute('tabindex')) {
             resolved.setAttribute('tabindex', '-1');
+            resolved.addEventListener('blur', () => resolved.removeAttribute('tabindex'), { once: true });
           }
           resolved.focus({ preventScroll: true });
         }
@@ -79,12 +86,30 @@ export function useViewTransition(): UseViewTransitionReturn {
 
       const cleanupName = () => {
         if (transitionName && targetElement) {
-          targetElement.style.removeProperty('view-transition-name');
+          if (previousName) {
+            targetElement.style.setProperty('view-transition-name', previousName);
+          } else {
+            targetElement.style.removeProperty('view-transition-name');
+          }
         }
       };
 
+      // Commit React state updates synchronously so the new DOM is captured
+      const runUpdate = async () => {
+        let result: void | Promise<void> = undefined;
+        flushSync(() => {
+          result = updateFn();
+        });
+        await result;
+      };
+
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
       // Fallback for browsers without View Transitions support
-      if (!isSupported || !document.startViewTransition) {
+      if (!isSupported || !document.startViewTransition || prefersReducedMotion) {
         try {
           await updateFn();
           routeFocus();
@@ -97,17 +122,16 @@ export function useViewTransition(): UseViewTransitionReturn {
       setIsTransitioning(true);
 
       try {
-        const transition = document.startViewTransition(async () => {
-          await updateFn();
-        });
+        const transition = document.startViewTransition(runUpdate);
+        transition.ready.catch(() => {});
 
-        // Clean up temporary transition name and route accessibility focus on finish
+        // Rejects if the update callback throws, so failures reach the caller
         await transition.finished;
         routeFocus();
       } catch (err: unknown) {
-        // If transition is aborted or fails, continue gracefully
+        // A skipped transition is not a failure; any other error propagates
         if (!(err instanceof DOMException && err.name === 'AbortError')) {
-          console.warn('View transition completed with warning:', err);
+          throw err;
         }
       } finally {
         cleanupName();

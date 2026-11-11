@@ -55,6 +55,25 @@ export function useCarousel() {
   return context;
 }
 
+const ARROW_KEY_WIDGET_SELECTOR = [
+  'input',
+  'textarea',
+  'select',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[role="slider"]',
+  '[role="radio"]',
+  '[role="radiogroup"]',
+  '[role="tablist"]',
+  '[role="listbox"]',
+  '[role="menu"]',
+  '[role="menubar"]',
+  '[role="combobox"]',
+  '[role="spinbutton"]',
+  '[role="textbox"]',
+  '[role="tree"]',
+  '[role="grid"]',
+].join(',');
+
 const CarouselComponent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & CarouselProps
@@ -67,6 +86,7 @@ const CarouselComponent = React.forwardRef<
       plugins,
       className,
       children,
+      onKeyDown,
       ...props
     },
     ref
@@ -108,6 +128,9 @@ const CarouselComponent = React.forwardRef<
 
     const handleKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented) return;
+
         // Guard: Do not intercept arrow keys if focus is within an interactive form control
         const target = event.target as HTMLElement | null;
         if (
@@ -116,8 +139,7 @@ const CarouselComponent = React.forwardRef<
             target.tagName === 'TEXTAREA' ||
             target.tagName === 'SELECT' ||
             target.isContentEditable ||
-            target.getAttribute('role') === 'slider' ||
-            target.getAttribute('role') === 'radio')
+            target.closest(ARROW_KEY_WIDGET_SELECTOR))
         ) {
           return;
         }
@@ -140,7 +162,7 @@ const CarouselComponent = React.forwardRef<
           }
         }
       },
-      [orientation, scrollPrev, scrollNext]
+      [onKeyDown, orientation, scrollPrev, scrollNext]
     );
 
     React.useEffect(() => {
@@ -151,14 +173,19 @@ const CarouselComponent = React.forwardRef<
     React.useEffect(() => {
       if (!api) return;
 
-      setScrollSnaps(api.scrollSnapList());
-      onSelect(api);
-      api.on('reInit', onSelect);
+      const onReInit = (emblaApi: EmblaCarouselType) => {
+        if (!emblaApi) return;
+        setScrollSnaps(emblaApi.scrollSnapList());
+        onSelect(emblaApi);
+      };
+
+      onReInit(api);
+      api.on('reInit', onReInit);
       api.on('select', onSelect);
 
       return () => {
         api.off('select', onSelect);
-        api.off('reInit', onSelect);
+        api.off('reInit', onReInit);
       };
     }, [api, onSelect]);
 
@@ -181,12 +208,12 @@ const CarouselComponent = React.forwardRef<
       >
         <div
           ref={ref}
-          onKeyDown={handleKeyDown}
           className={cn('@container relative', className)}
           role="region"
           aria-roledescription="carousel"
-          aria-label={props['aria-label'] || 'Carousel'}
           {...props}
+          aria-label={props['aria-label'] || 'Carousel'}
+          onKeyDown={handleKeyDown}
         >
           {children}
         </div>

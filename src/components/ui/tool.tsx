@@ -117,7 +117,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
             <Icon
               name={defaultIcon}
               size="xs"
-              className={status === 'calling' ? 'animate-spin' : undefined}
+              className={status === 'calling' ? 'animate-spin motion-reduce:animate-none' : undefined}
             />
           </span>
 
@@ -187,7 +187,7 @@ const ToolContent = React.forwardRef<HTMLDivElement, ToolContentProps>(
       >
         <div
           className={cn(
-            'p-3.5 pt-1 space-y-3 text-sm font-sans text-on-surface-variant',
+            'flex flex-col gap-3 p-3.5 pt-1 text-sm font-sans text-on-surface-variant',
             isGhost ? 'px-0 border-t border-outline-variant/30' : 'border-t border-outline-variant/40'
           )}
         >
@@ -220,7 +220,7 @@ const ToolInput: React.FC<ToolInputProps> = ({
   }, [input]);
 
   return (
-    <div className={cn('space-y-1.5', className)} {...props}>
+    <div className={cn('flex flex-col gap-1.5', className)} {...props}>
       <span className="font-label text-xs font-semibold text-on-surface-variant">
         {title}
       </span>
@@ -263,7 +263,7 @@ const ToolOutput: React.FC<ToolOutputProps> = ({
   }, [output]);
 
   return (
-    <div className={cn('space-y-1.5', className)} {...props}>
+    <div className={cn('flex flex-col gap-1.5', className)} {...props}>
       <span className="font-label text-xs font-semibold text-on-surface-variant">
         {title}
       </span>
@@ -349,13 +349,19 @@ const ToolComponent = React.forwardRef<HTMLDivElement, ToolProps>(
   ) => {
     const chatContext = useChatMessageContext();
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'default');
+    const [open, setOpen] = React.useState(defaultOpen || status === 'error');
+
+    React.useEffect(() => {
+      if (status === 'error') setOpen(true);
+    }, [status]);
 
     return (
       <ToolRoot
         ref={ref}
         status={status}
         variant={resolvedVariant}
-        defaultOpen={defaultOpen || status === 'error'}
+        open={open}
+        onOpenChange={setOpen}
         className={className}
         {...props}
       >

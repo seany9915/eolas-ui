@@ -21,6 +21,7 @@ import * as React from 'react';
 import { PreviewCard as BasePreviewCard } from '@base-ui/react/preview-card';
 import { UnstyledButton, Button } from './button';
 import { Icon } from './icon';
+import { Skeleton } from './skeleton';
 import {
   Carousel,
   CarouselContent,
@@ -120,34 +121,49 @@ export interface InlineCitationCardTriggerProps {
   label?: string;
   delay?: number;
   closeDelay?: number;
+  /** Source URL. When set, the trigger is a real link so keyboard and screen-reader users can reach the source without the hover card. */
+  href?: string;
   className?: string;
 }
 
 const InlineCitationCardTrigger = React.forwardRef<
   HTMLButtonElement,
   InlineCitationCardTriggerProps & React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ children, index, label, delay: propDelay, closeDelay: propCloseDelay, className, ...props }, ref) => {
+>(({ children, index, label, href, delay: propDelay, closeDelay: propCloseDelay, className, ...props }, ref) => {
   const context = useInlineCitation();
   const delay = propDelay ?? context?.delay ?? 200;
   const closeDelay = propCloseDelay ?? context?.closeDelay ?? 150;
   const defaultLabel = label || (index !== undefined ? `Citation [${index}]` : 'Citation');
+
+  const triggerClassName = cn(
+    'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+    className
+  );
 
   return (
     <BasePreviewCard.Trigger
       delay={delay}
       closeDelay={closeDelay}
       render={
-        <UnstyledButton
-          ref={ref}
-          expandedTouchTarget
-          aria-label={defaultLabel}
-          className={cn(
-            'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer',
-            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-            className
-          )}
-          {...props}
-        />
+        href ? (
+          <a
+            ref={ref as unknown as React.Ref<HTMLAnchorElement>}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={defaultLabel}
+            className={triggerClassName}
+          />
+        ) : (
+          <UnstyledButton
+            ref={ref}
+            expandedTouchTarget
+            aria-label={defaultLabel}
+            className={triggerClassName}
+            {...props}
+          />
+        )
       }
     >
       {children || (
@@ -350,10 +366,10 @@ export interface InlineCitationSkeletonProps extends React.HTMLAttributes<HTMLDi
 }
 
 const InlineCitationSkeleton: React.FC<InlineCitationSkeletonProps> = ({ className, ...props }) => (
-  <div className={cn('animate-pulse space-y-2 p-1', className)} {...props}>
-    <div className="h-4 w-3/4 rounded bg-surface-variant" />
-    <div className="h-3 w-1/2 rounded bg-surface-variant/70" />
-    <div className="h-10 w-full rounded bg-surface-container" />
+  <div className={cn('flex flex-col gap-2 p-1', className)} {...props}>
+    <Skeleton className="h-4 w-3/4" />
+    <Skeleton className="h-3 w-1/2" />
+    <Skeleton className="h-10 w-full" />
   </div>
 );
 InlineCitationSkeleton.displayName = 'InlineCitationSkeleton';
@@ -491,7 +507,7 @@ export const InlineCitationBadge: React.FC<InlineCitationBadgeProps> = ({
     const single = items[0];
     return (
       <InlineCitationRoot>
-        <InlineCitationCardTrigger index={index} label={label || single.title} className={className} />
+        <InlineCitationCardTrigger index={index} label={label || single.title} href={single.url} className={className} />
         <InlineCitationCard>
           <InlineCitationCardBody>
             <InlineCitationSource

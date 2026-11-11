@@ -323,10 +323,10 @@ export const SelectDemo: React.FC<ComponentDemoProps> = () => {
 export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
-      <label className="font-label text-xs font-bold text-on-surface block">Sound Library Search</label>
+      <label htmlFor="sound-library-search" className="font-label text-xs font-bold text-on-surface block">Sound Library Search</label>
       <Combobox.Root items={['/r/ Vocalic Sounds', '/s/ Initial Blends', '/th/ Voiced Pairs', '/ch/ Affricates']}>
         <Combobox.InputGroup className="w-full">
-          <Combobox.Input placeholder="Search target sounds..." />
+          <Combobox.Input id="sound-library-search" placeholder="Search target sounds..." />
           <Combobox.Clear />
           <Combobox.Trigger />
         </Combobox.InputGroup>
@@ -348,9 +348,9 @@ export const ComboboxDemo: React.FC<ComponentDemoProps> = () => {
 export const AutocompleteDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
-      <label className="font-label text-xs font-bold text-on-surface block">Practice Exercise Search</label>
+      <label htmlFor="practice-exercise-search" className="font-label text-xs font-bold text-on-surface block">Practice Exercise Search</label>
       <Autocomplete.Root openOnInputClick items={['Word Repetition', 'Picture Naming', 'Minimal Pairs', 'Sentence Reading']}>
-        <Autocomplete.Input placeholder="Type exercise name..." className="w-full" />
+        <Autocomplete.Input id="practice-exercise-search" placeholder="Type exercise name..." className="w-full" />
         <Autocomplete.Portal>
           <Autocomplete.Positioner sideOffset={4}>
             <Autocomplete.Popup>

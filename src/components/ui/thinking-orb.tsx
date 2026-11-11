@@ -60,7 +60,7 @@ export interface ThinkingOrbProps extends React.HTMLAttributes<HTMLDivElement> {
   paused?: boolean;
   /** Multiplier for animation speed */
   speed?: number;
-  /** Whether to pause or dampen animations automatically when prefers-reduced-motion is detected */
+  /** @deprecated Reduced motion is mandatory and always honored; this prop has no effect. */
   respectReducedMotion?: boolean;
 }
 
@@ -82,14 +82,14 @@ export const ThinkingOrb = React.forwardRef<HTMLDivElement, ThinkingOrbProps>(
       color,
       paused: explicitPaused,
       speed = 1,
-      respectReducedMotion = true,
+      respectReducedMotion: _respectReducedMotion,
       className,
       ...props
     },
     ref
   ) => {
     const prefersReducedMotion = usePrefersReducedMotion();
-    const isPaused = explicitPaused ?? (respectReducedMotion && prefersReducedMotion);
+    const isPaused = prefersReducedMotion || explicitPaused === true;
 
     // Resolve pixel size
     const pixelSize: OrbSize = typeof size === 'string' ? SIZE_MAP[size] : size;
@@ -118,9 +118,12 @@ export const ThinkingOrb = React.forwardRef<HTMLDivElement, ThinkingOrbProps>(
         />
 
         {label ? (
-          <span className="text-base font-sans text-on-surface leading-snug">
-            {label}
-          </span>
+          <>
+            <span className="text-base font-sans text-on-surface leading-snug">
+              {label}
+            </span>
+            {statusText && <span className="sr-only">{statusText}</span>}
+          </>
         ) : (
           <span className="sr-only">{announcedText}</span>
         )}

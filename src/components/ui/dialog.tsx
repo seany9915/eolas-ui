@@ -36,7 +36,7 @@ const sizeClasses: Record<string, string> = {
   sm: 'max-w-sm',
   md: 'max-w-lg',
   lg: 'max-w-2xl',
-  xl: 'max-w-xl',
+  xl: 'max-w-3xl',
   '2xl': 'max-w-2xl',
   '3xl': 'max-w-3xl',
   '4xl': 'max-w-4xl',
@@ -136,8 +136,8 @@ function DialogComponent<Payload = unknown>({
                 )}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <BaseDialog.Title className="font-heading text-xl font-bold text-on-surface text-balance">
-                    {title}
+                  <BaseDialog.Title className={cn('font-heading text-xl font-bold text-on-surface text-balance', !title && 'sr-only')}>
+                    {title || 'Dialog'}
                   </BaseDialog.Title>
                   <BaseDialog.Close
                     className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -246,7 +246,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
 DialogContent.displayName = 'DialogContent';
 
 export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-1.5 text-left mb-4', className)} {...props} />
+  <div className={cn('flex flex-col gap-1.5 text-left mb-4', className)} {...props} />
 );
 DialogHeader.displayName = 'DialogHeader';
 

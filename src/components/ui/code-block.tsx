@@ -152,9 +152,13 @@ export const CodeBlockCopyButton: React.FC<CodeBlockCopyButtonProps> = ({
 }) => {
   const [copied, setCopied] = React.useState(false);
 
-  const handleCopy = (e: React.MouseEvent) => {
+  const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard?.writeText(value);
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      return;
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

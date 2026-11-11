@@ -83,6 +83,9 @@ export const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = 'Chart';
 
+const escapeSelectorValue = (value: string) =>
+  value.replace(/[\\"]/g, '\\$&').replace(/</g, '\\3c ');
+
 export const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -98,7 +101,7 @@ export const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) 
         __html: Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+${prefix} [data-chart="${escapeSelectorValue(id)}"] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =

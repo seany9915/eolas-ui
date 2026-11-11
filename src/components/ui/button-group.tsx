@@ -13,6 +13,7 @@
  *   and WCAG 2.2 touch target compliance.
  */
 import * as React from 'react';
+import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
 
 export interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -100,31 +101,25 @@ ButtonGroupSeparator.displayName = 'ButtonGroupSeparator';
  * ButtonGroupText
  * -----------------------------------------------------------------------------------------------*/
 export interface ButtonGroupTextProps extends React.HTMLAttributes<HTMLDivElement> {
-  render?: React.ReactElement;
+  render?: useRender.RenderProp;
 }
 
 export const ButtonGroupText = React.forwardRef<HTMLDivElement, ButtonGroupTextProps>(
-  ({ className, render, children, ...props }, ref) => {
-    const baseClasses = cn(
-      'flex items-center justify-center px-3 text-xs font-label font-medium text-on-surface-variant bg-surface-container/60 border border-outline-variant select-none min-h-11',
-      className
-    );
-
-    if (render && React.isValidElement(render)) {
-      const element = render as React.ReactElement<{ className?: string }>;
-      return React.cloneElement(element, {
-        ref,
-        className: cn(baseClasses, element.props.className),
+  ({ className, render, children, ...props }, ref) =>
+    useRender({
+      render,
+      ref,
+      defaultTagName: 'div',
+      props: {
+        'data-slot': 'button-group-text',
+        className: cn(
+          'flex items-center justify-center px-3 text-xs font-label font-medium text-on-surface-variant bg-surface-container/60 border border-outline-variant select-none min-h-11',
+          className
+        ),
+        children,
         ...props,
-      } as React.HTMLAttributes<HTMLElement>);
-    }
-
-    return (
-      <div ref={ref} data-slot="button-group-text" className={baseClasses} {...props}>
-        {children}
-      </div>
-    );
-  }
+      },
+    })
 );
 ButtonGroupText.displayName = 'ButtonGroupText';
 

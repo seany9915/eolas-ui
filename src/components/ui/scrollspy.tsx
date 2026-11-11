@@ -57,6 +57,15 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
     },
     ref
   ) => {
+    const navRef = React.useRef<HTMLElement | null>(null);
+    const setRefs = React.useCallback(
+      (node: HTMLElement | null) => {
+        navRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+      },
+      [ref]
+    );
     const [internalActiveId, setInternalActiveId] = React.useState<string>(
       items[0]?.id ?? ''
     );
@@ -86,9 +95,7 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
 
       if (supportsScrollTargetGroup) {
         const syncCurrent = () => {
-          const currentLink = document.querySelector<HTMLAnchorElement>(
-            'nav.scrollspy-nav a:target-current'
-          );
+          const currentLink = navRef.current?.querySelector<HTMLAnchorElement>('a:target-current');
           if (currentLink) {
             const href = currentLink.getAttribute('href');
             const targetId = href?.startsWith('#') ? href.slice(1) : href;
@@ -134,13 +141,13 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
 
     return (
       <nav
-        ref={ref}
+        ref={setRefs}
         aria-label={ariaLabel}
         className={cn(
           'scrollspy-nav text-sm font-sans',
           isHorizontal
             ? 'flex items-center gap-1 overflow-x-auto border-b border-outline-variant/40'
-            : 'flex flex-col space-y-1',
+            : 'flex flex-col gap-1',
           className
         )}
         {...props}

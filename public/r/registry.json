@@ -895,6 +895,7 @@
         "@seany9915/eolas-ui/utils",
         "@seany9915/eolas-ui/button",
         "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/skeleton",
         "@seany9915/eolas-ui/carousel"
       ],
       "meta": {
@@ -1661,6 +1662,7 @@
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
         "@seany9915/eolas-ui/icon",
+        "@seany9915/eolas-ui/skeleton",
         "@seany9915/eolas-ui/tooltip",
         "@seany9915/eolas-ui/button",
         "@seany9915/eolas-ui/chat-message-context",
@@ -2186,8 +2188,8 @@
         "taxonomy": [
           "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
           "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
-          "Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.",
-          "Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.",
+          "Degrades gracefully on unsupported browsers (feature-detected) by running the state update immediately without errors.",
+          "Bypasses the animation under prefers-reduced-motion and offers opt-in focus routing (focusTarget) to prevent screen reader disorientation.",
           "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
         ]
       }

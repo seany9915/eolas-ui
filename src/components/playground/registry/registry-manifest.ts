@@ -180,7 +180,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "description": "ButtonGroup primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/button-group",
     "category": "inputs",
     "tier": "primitive",
-    "basePrimitive": "DESIGN.md Token Primitive",
+    "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/button-group.tsx",
     "taxonomy": [
       "A container to group related buttons, segmented actions, and inputs with fused borders and shared geometry.",
@@ -2145,8 +2145,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "taxonomy": [
       "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
       "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
-      "Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.",
-      "Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.",
+      "Degrades gracefully on unsupported browsers (feature-detected) by running the state update immediately without errors.",
+      "Bypasses the animation under prefers-reduced-motion and offers opt-in focus routing (focusTarget) to prevent screen reader disorientation.",
       "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
     ],
     "dependencies": [

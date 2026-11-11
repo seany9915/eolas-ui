@@ -45,39 +45,43 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
   ) => {
     const [isShaking, setIsShaking] = React.useState(false);
     const [hasActiveError, setHasActiveError] = React.useState(Boolean(shake));
-    const prevShakeRef = React.useRef(shake);
+    const onShakeEndRef = React.useRef(onShakeEnd);
+    const onRevertRef = React.useRef(onRevert);
+    React.useEffect(() => {
+      onShakeEndRef.current = onShakeEnd;
+      onRevertRef.current = onRevert;
+    });
 
     React.useEffect(() => {
-      if (shake && shake !== prevShakeRef.current) {
-        setIsShaking(true);
-        setHasActiveError(true);
-        prevShakeRef.current = shake;
-
-        // Shake animation timer synchronized with 300ms animate-error-shake keyframe
-        const shakeTimer = setTimeout(() => {
-          setIsShaking(false);
-          onShakeEnd?.();
-        }, 300);
-
-        // Optional auto-revert timer (3000ms hold from transitions.dev)
-        let revertTimer: NodeJS.Timeout | undefined;
-        if (autoRevert) {
-          revertTimer = setTimeout(() => {
-            setHasActiveError(false);
-            onRevert?.();
-          }, revertHoldMs);
-        }
-
-        return () => {
-          clearTimeout(shakeTimer);
-          if (revertTimer) clearTimeout(revertTimer);
-        };
-      } else if (!shake) {
+      if (!shake) {
         setHasActiveError(false);
         setIsShaking(false);
+        return;
       }
-      prevShakeRef.current = shake;
-    }, [shake, autoRevert, revertHoldMs, onShakeEnd, onRevert]);
+
+      setIsShaking(true);
+      setHasActiveError(true);
+
+      // Shake animation timer synchronized with 300ms animate-error-shake keyframe
+      const shakeTimer = setTimeout(() => {
+        setIsShaking(false);
+        onShakeEndRef.current?.();
+      }, 300);
+
+      // Optional auto-revert timer (3000ms hold from transitions.dev)
+      let revertTimer: ReturnType<typeof setTimeout> | undefined;
+      if (autoRevert) {
+        revertTimer = setTimeout(() => {
+          setHasActiveError(false);
+          onRevertRef.current?.();
+        }, revertHoldMs);
+      }
+
+      return () => {
+        clearTimeout(shakeTimer);
+        if (revertTimer) clearTimeout(revertTimer);
+      };
+    }, [shake, autoRevert, revertHoldMs]);
 
     return (
       <div

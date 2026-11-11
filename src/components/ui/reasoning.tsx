@@ -112,9 +112,13 @@ export interface ReasoningCopyButtonProps {
 
 export const ReasoningCopyButton: React.FC<ReasoningCopyButtonProps> = ({ value, className }) => {
   const [copied, setCopied] = React.useState(false);
-  const handleCopy = (e: React.MouseEvent) => {
+  const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard?.writeText(value);
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      return;
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -148,7 +152,7 @@ export const ReasoningContent = React.forwardRef<HTMLDivElement, ReasoningConten
     return (
       <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
         <div className="px-3.5 py-3">
-          <div className="border-l-2 border-outline-variant/40 pl-3.5 ml-1 my-0.5 space-y-2 whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
+          <div className="border-l-2 border-outline-variant/40 pl-3.5 ml-1 my-0.5 flex flex-col gap-2 whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
             {children}
           </div>
         </div>
@@ -209,6 +213,14 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
 
     // By default, open while streaming so the clinician can see live reasoning, collapse when complete
     const resolvedDefaultOpen = defaultOpen ?? isRunning;
+    const [internalOpen, setInternalOpen] = React.useState(resolvedDefaultOpen);
+    const wasRunningRef = React.useRef(isRunning);
+    React.useEffect(() => {
+      if (wasRunningRef.current !== isRunning && defaultOpen === undefined) {
+        setInternalOpen(isRunning);
+      }
+      wasRunningRef.current = isRunning;
+    }, [isRunning, defaultOpen]);
 
     const isCompound = React.Children.toArray(children).some(
       (child) =>
@@ -231,9 +243,11 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
         <div ref={ref} data-slot="reasoning" className={cn('w-full', className)}>
           <Trace variant={resolvedVariant}>
             <TraceCollapsible
-              defaultOpen={resolvedDefaultOpen}
-              open={open}
-              onOpenChange={onOpenChange}
+              open={open ?? internalOpen}
+              onOpenChange={(next: boolean) => {
+                setInternalOpen(next);
+                onOpenChange?.(next);
+              }}
             >
               {isCompound ? (
                 children

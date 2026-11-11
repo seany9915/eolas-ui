@@ -55,7 +55,7 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
           (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed') &&
             'rounded-none border-none bg-transparent divide-y divide-outline-variant/30',
           resolvedVariant === 'timeline' &&
-            'relative flex flex-col space-y-2.5 pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-outline-variant',
+            'relative flex flex-col gap-2.5 pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-outline-variant',
           className
         )}
         {...props}
@@ -164,7 +164,7 @@ export const TraceIcon: React.FC<TraceIconProps> = ({
           {stepNumber}
         </span>
       ) : status === 'running' ? (
-        <Icon name="progress_activity" size="xs" className="animate-spin inline-flex items-center justify-center" />
+        <Icon name="progress_activity" size="xs" className="animate-spin motion-reduce:animate-none inline-flex items-center justify-center" />
       ) : name ? (
         <Icon name={name} size="xs" className="inline-flex items-center justify-center" />
       ) : status === 'complete' ? (

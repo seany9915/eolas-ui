@@ -51,6 +51,8 @@ export function useWebOtp({
   const [isListening, setIsListening] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
+  const onCodeReceivedRef = React.useRef(onCodeReceived);
+  onCodeReceivedRef.current = onCodeReceived;
 
   const isSupported = React.useMemo(() => {
     return (
@@ -90,7 +92,7 @@ export function useWebOtp({
         const credential = await navigator.credentials.get(options);
 
         if (isOTPCredential(credential)) {
-          onCodeReceived?.(credential.code);
+          onCodeReceivedRef.current?.(credential.code);
         }
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') {
@@ -107,7 +109,7 @@ export function useWebOtp({
     return () => {
       cancel();
     };
-  }, [enabled, isSupported, cancel, onCodeReceived]);
+  }, [enabled, isSupported, cancel]);
 
   return {
     isSupported,

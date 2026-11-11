@@ -173,7 +173,7 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
       <span
         ref={ref}
         className={cn('material-symbols-outlined select-none inline-block align-middle leading-none', sizeClasses[size], className)}
-        aria-hidden={isDecorative ? 'true' : undefined}
+        aria-hidden={isDecorative || srLabel ? 'true' : undefined}
         aria-label={props['aria-label']}
         {...props}
       >
@@ -270,21 +270,33 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
 }, ref) => {
   const [currentName, setCurrentName] = React.useState(name);
   const [prevName, setPrevName] = React.useState<string | null>(null);
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [entered, setEntered] = React.useState(true);
+
+  // Stage the swap during render so the timer effect below is not torn down by its own state updates.
+  if (name !== currentName) {
+    setPrevName(currentName);
+    setCurrentName(name);
+    setEntered(false);
+  }
+
+  // Mount both icons in their start state, then flip on the next frames so the transition runs.
+  React.useEffect(() => {
+    if (entered) return;
+    let raf2 = 0;
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => setEntered(true));
+    });
+    return () => {
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+    };
+  }, [entered, currentName]);
 
   React.useEffect(() => {
-    if (name !== currentName) {
-      setPrevName(currentName);
-      setCurrentName(name);
-      setIsTransitioning(true);
-      const timer = window.setTimeout(() => {
-        setIsTransitioning(false);
-        setPrevName(null);
-      }, 250); // Matches --duration-fast (250ms)
-      return () => window.clearTimeout(timer);
-    }
-  }, [name, currentName]);
-
+    if (!prevName) return;
+    const timer = window.setTimeout(() => setPrevName(null), 250); // Matches --duration-fast (250ms)
+    return () => window.clearTimeout(timer);
+  }, [prevName]);
   const isDecorative = !srLabel && !props['aria-label'];
 
   return (
@@ -295,11 +307,14 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
       aria-label={props['aria-label']}
       {...props}
     >
-      {prevName && isTransitioning && (
+      {prevName && (
         <BaseIcon
           name={prevName}
           size={size}
-          className="col-start-1 row-start-1 opacity-0 scale-[0.25] blur-[var(--blur-small)] transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] pointer-events-none motion-reduce:transition-none"
+          className={cn(
+            'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] pointer-events-none motion-reduce:transition-none',
+            entered ? 'opacity-0 scale-[0.25] blur-[var(--blur-small)]' : 'opacity-100 scale-100 blur-none'
+          )}
         />
       )}
       <BaseIcon
@@ -307,7 +322,7 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
         size={size}
         className={cn(
           'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-          isTransitioning ? 'opacity-100 scale-100 blur-none' : 'opacity-100 scale-100 blur-none'
+          entered ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[var(--blur-small)]'
         )}
       />
       {srLabel && <span className="sr-only">{srLabel}</span>}
