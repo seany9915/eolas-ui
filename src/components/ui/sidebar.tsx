@@ -42,6 +42,7 @@ export interface SidebarContext {
   openMobile: boolean;
   setOpenMobile: (open: boolean | ((value: boolean) => boolean)) => void;
   isMobile: boolean;
+  mobileBreakpoint: number;
   isEmbedded: boolean;
   toggleSidebar: () => void;
 }
@@ -79,6 +80,8 @@ export interface SidebarProviderProps extends React.HTMLAttributes<HTMLDivElemen
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Viewport pixel breakpoint below which non-embedded sidebars render as a mobile Drawer. Defaults to 768. */
+  mobileBreakpoint?: number;
   embedded?: boolean;
 }
 
@@ -88,6 +91,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
       defaultOpen = true,
       open: openProp,
       onOpenChange: setOpenProp,
+      mobileBreakpoint = 768,
       embedded = false,
       className,
       style,
@@ -96,7 +100,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     },
     ref
   ) => {
-    const isMobile = useIsMobile();
+    const isMobile = useIsMobile(mobileBreakpoint);
     const [openMobile, setOpenMobile] = React.useState(false);
     const isEmbedded = embedded;
 
@@ -134,10 +138,10 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     );
 
     const toggleSidebar = React.useCallback(() => {
-      return isMobile
+      return isMobile && !isEmbedded
         ? setOpenMobile((prev) => !prev)
         : setOpen((prev) => !prev);
-    }, [isMobile, setOpen, setOpenMobile]);
+    }, [isMobile, isEmbedded, setOpen, setOpenMobile]);
 
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -162,12 +166,13 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
         open,
         setOpen,
         isMobile,
+        mobileBreakpoint,
         isEmbedded,
         openMobile,
         setOpenMobile,
         toggleSidebar,
       }),
-      [state, open, setOpen, isMobile, isEmbedded, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, isMobile, mobileBreakpoint, isEmbedded, openMobile, setOpenMobile, toggleSidebar]
     );
 
     return (
@@ -223,7 +228,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile, isEmbedded: contextEmbedded } = useSidebar();
+    const { isMobile, mobileBreakpoint, state, openMobile, setOpenMobile, isEmbedded: contextEmbedded } = useSidebar();
     const isEmbedded =
       embedded ??
       contextEmbedded ??
@@ -231,6 +236,8 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
       className?.includes('relative') ??
       className?.includes('absolute') ??
       false;
+    const desktopVisibleClass = mobileBreakpoint <= 640 ? 'hidden sm:block' : 'hidden md:block';
+    const desktopFlexClass = mobileBreakpoint <= 640 ? 'hidden sm:flex' : 'hidden md:flex';
 
     if (collapsible === 'none') {
       return (
@@ -307,7 +314,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
         data-slot="sidebar-container"
         className={cn(
           'group peer text-on-surface select-none',
-          isEmbedded ? 'relative h-full shrink-0 block' : 'hidden md:block'
+          isEmbedded ? 'relative h-full shrink-0 block' : desktopVisibleClass
         )}
         data-state={state}
         data-collapsible={state === 'collapsed' ? collapsible : ''}
@@ -345,7 +352,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
             isEmbedded
               ? 'absolute inset-y-0 left-0 z-20 h-full w-[var(--sidebar-width)] flex flex-col'
-              : 'fixed inset-y-0 z-20 hidden md:flex flex-col h-svh w-[var(--sidebar-width)]'
+              : cn('fixed inset-y-0 z-20 flex-col h-svh w-[var(--sidebar-width)]', desktopFlexClass)
           )}
           {...props}
         >
@@ -376,8 +383,8 @@ export interface SidebarTriggerProps extends React.ComponentPropsWithoutRef<type
 
 export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
   ({ className, onClick, icon, children, ...props }, ref) => {
-    const { toggleSidebar, state, isMobile, openMobile } = useSidebar();
-    const isOpen = isMobile ? openMobile : state === 'expanded';
+    const { toggleSidebar, state, isMobile, isEmbedded, openMobile } = useSidebar();
+    const isOpen = isMobile && !isEmbedded ? openMobile : state === 'expanded';
 
     return (
       <Tooltip content="Toggle Sidebar (Ctrl+B)">
@@ -444,28 +451,32 @@ SidebarRail.displayName = 'SidebarRail';
 /* -------------------------------------------------------------------------------------------------
  * SidebarInset
  * -----------------------------------------------------------------------------------------------*/
-export interface SidebarInsetProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SidebarInsetProps extends React.HTMLAttributes<HTMLElement> {
   embedded?: boolean;
+  /** Polymorphic Base UI render prop (defaults to `<main>`). */
+  render?: useRender.RenderProp;
 }
 
-export const SidebarInset = React.forwardRef<HTMLDivElement, SidebarInsetProps>(
-  ({ className, embedded, ...props }, ref) => {
+export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
+  ({ className, embedded, render, ...props }, ref) => {
     const context = React.useContext(SidebarContext);
     const isEmbedded = embedded ?? context?.isEmbedded ?? className?.includes('h-full') ?? false;
 
-    return (
-      <main
-        ref={ref}
-        data-slot="sidebar-inset"
-        className={cn(
+    return useRender({
+      render,
+      ref,
+      defaultTagName: 'main',
+      props: {
+        'data-slot': 'sidebar-inset',
+        className: cn(
           'relative flex flex-1 flex-col bg-surface',
           isEmbedded ? 'min-h-0 h-full' : 'min-h-svh',
           'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
           className
-        )}
-        {...props}
-      />
-    );
+        ),
+        ...props,
+      },
+    });
   }
 );
 SidebarInset.displayName = 'SidebarInset';
@@ -505,7 +516,7 @@ export const SidebarHeader = React.forwardRef<
       data-slot="sidebar-header"
       data-sidebar="header"
       className={cn(
-        'flex flex-col gap-2 p-2 shrink-0 border-b border-outline-variant/60 bg-surface group-data-[collapsible=icon]:p-1.5 group-data-[collapsible=icon]:items-center',
+        'flex flex-col gap-2 px-2 py-1.5 short:py-1 shrink-0 border-b border-outline-variant bg-surface group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:items-center',
         className
       )}
       {...props}
@@ -566,7 +577,7 @@ export const SidebarContent = React.forwardRef<
       data-sidebar="content"
       className={cn(
         'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin',
-        'group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:items-center',
+        'group-data-[collapsible=icon]:overflow-y-auto group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center',
         className
       )}
       {...props}
@@ -749,6 +760,7 @@ export function sidebarMenuButtonVariants({
     'group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-h-[44px] group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center',
     '[&>span:last-child]:truncate [&>span:last-child]:group-data-[collapsible=icon]:hidden',
     sizeClasses,
+    'has-[+[data-slot=sidebar-menu-badge]]:pr-9 group-data-[collapsible=icon]:has-[+[data-slot=sidebar-menu-badge]]:pr-0',
     variantClasses,
     className
   );
@@ -789,6 +801,11 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
         ? (buttonState: Parameters<typeof className>[0]) => cn(baseVariantClasses, className(buttonState))
         : cn(baseVariantClasses, className);
 
+    const {
+      ['aria-current']: ariaCurrent,
+      ...restProps
+    } = props;
+
     const buttonElement = (
       <BaseButton
         ref={ref}
@@ -796,9 +813,10 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
+        aria-current={ariaCurrent ?? (isActive ? 'page' : undefined)}
         render={render}
         className={computedClassName}
-        {...props}
+        {...restProps}
       >
         {children}
       </BaseButton>

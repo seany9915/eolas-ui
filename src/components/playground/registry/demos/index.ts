@@ -67,6 +67,7 @@ import {
   SteppersLegacyDemo,
   ScrollAreaDemo,
   ScrollspyDemo,
+  NavigationBarDemo,
 } from './NavigationDemos';
 
 import {
@@ -124,6 +125,9 @@ import {
   QuestionnaireDemo,
   RadarChartCardDemo,
   RadialChartCardDemo,
+  AppShellDemo,
+  ListDetailBlockDemo,
+  SupportingPaneBlockDemo,
 } from './BlocksDemos';
 
 import {
@@ -208,6 +212,7 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'steppers': SteppersLegacyDemo,
   'scroll-area': ScrollAreaDemo,
   'scrollspy': ScrollspyDemo,
+  'navigation-bar': NavigationBarDemo,
 
   // Layout
   'card': CardDemo,
@@ -264,6 +269,9 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'questionnaire': QuestionnaireDemo,
   'radar-chart-card': RadarChartCardDemo,
   'radial-chart-card': RadialChartCardDemo,
+  'app-shell': AppShellDemo,
+  'list-detail-block': ListDetailBlockDemo,
+  'supporting-pane-block': SupportingPaneBlockDemo,
 
   // Motion
   'number-roll': NumberRollDemo,

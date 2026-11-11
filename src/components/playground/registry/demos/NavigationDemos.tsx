@@ -26,6 +26,7 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { InlineAlert } from '@/components/ui/inline-alert';
+import { NavigationBar } from '@/components/ui/navigation-bar';
 import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
 
@@ -73,7 +74,7 @@ export const TabsDemo: React.FC<ComponentDemoProps> = () => {
             Activity View Switcher (Segmented Variant)
           </h4>
           <p className="font-sans text-xs text-on-surface-variant">
-            Elevated surface pill indicator against container track
+            White surface indicator with crisp outline border on container track
           </p>
         </div>
         <Tabs.Root defaultValue="summary" variant="segmented">
@@ -631,6 +632,53 @@ export const ScrollspyDemo: React.FC<ComponentDemoProps> = () => {
         <Button size="sm" variant={active === 'sec-4' ? 'filled' : 'outlined'} onClick={() => setActive('sec-4')}>
           Sec 4
         </Button>
+      </div>
+    </div>
+  );
+};
+
+export const NavigationBarDemo: React.FC<ComponentDemoProps> = () => {
+  const [tab, setTab] = React.useState('exercises');
+
+  return (
+    <div className="w-full max-w-sm mx-auto flex flex-col gap-4 py-4">
+      <div className="flex flex-col gap-1">
+        <h4 className="font-heading text-base font-semibold text-on-surface">
+          Bottom Navigation Bar
+        </h4>
+        <p className="font-sans text-base text-on-surface-variant">
+          Switch sections cleanly from the bottom of a narrow screen.
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-outline-variant overflow-hidden bg-background">
+        <div className="p-6 text-center font-sans text-base text-on-surface-variant">
+          Active section:{' '}
+          <span className="font-semibold text-on-surface capitalize">{tab}</span>
+        </div>
+        <NavigationBar value={tab} onValueChange={setTab} fixed={false}>
+          <NavigationBar.Item
+            value="exercises"
+            icon={<Icon name="assignment" size="sm" />}
+            label="Exercises"
+          />
+          <NavigationBar.Item
+            value="notes"
+            icon={<Icon name="description" size="sm" />}
+            label="Notes"
+            badge={2}
+          />
+          <NavigationBar.Item
+            value="progress"
+            icon={<Icon name="trending_up" size="sm" />}
+            label="Progress"
+          />
+          <NavigationBar.Item
+            value="settings"
+            icon={<Icon name="settings" size="sm" />}
+            label="Settings"
+          />
+        </NavigationBar>
       </div>
     </div>
   );

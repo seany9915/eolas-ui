@@ -150,7 +150,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
         )}
 
         {/* Canvas Toolbar & Tabs via Base UI Tabs and ToggleGroup */}
-        <div className="mt-5 pt-4 border-t border-outline-variant flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className="mt-5 pt-4 border-t border-outline-variant flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
           {/* Base UI Tabs List */}
           <TabsRoot
             value={activeTab}
@@ -160,22 +160,22 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
           >
             <TabsList>
               <Tab value="preview">
-                <Icon name="visibility" size="xs" className="mr-1.5" />
+                <Icon name="visibility" size="xs" />
                 Preview & Sandbox
               </Tab>
               <Tab value="code">
-                <Icon name="code" size="xs" className="mr-1.5" />
+                <Icon name="code" size="xs" />
                 Code & Usage
               </Tab>
               <Tab value="contract">
-                <Icon name="verified" size="xs" className="mr-1.5" />
+                <Icon name="verified" size="xs" />
                 Contract & A11y
               </Tab>
             </TabsList>
           </TabsRoot>
 
           {/* Viewport & Direction Controls via Base UI ToggleGroup */}
-          <div className="flex items-center gap-3 self-end sm:self-auto">
+          <div className="flex flex-wrap items-center gap-3 self-start sm:self-end xl:self-auto max-w-full">
             {/* Viewport Switcher */}
             <ToggleGroup
               type="single"
@@ -183,7 +183,6 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               onValueChange={(val) => {
                 if (val) onViewportChange(val as ViewportMode);
               }}
-              variant="segmented"
               size="sm"
               aria-label="Responsive viewport mode"
             >
@@ -204,12 +203,13 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             {/* Direction Toggle */}
             <Button
               size="sm"
-              variant="outlined"
+              variant="outline"
+              colorRole="neutral"
               onClick={onDirectionToggle}
-              className="h-8 px-2.5 text-xs font-mono"
+              className="font-mono"
               title="Toggle LTR / RTL text direction"
             >
-              <Icon name="swap_horiz" size="xs" className="mr-1" />
+              <Icon name="swap_horiz" size="xs" />
               {direction.toUpperCase()}
             </Button>
           </div>

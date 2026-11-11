@@ -125,7 +125,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
       )}
     >
       {/* Sidebar Header & Search */}
-      <SidebarHeader className="p-3.5 border-b border-outline-variant space-y-3">
+      <SidebarHeader className="p-3 border-b border-outline-variant flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-heading text-sm font-bold text-on-surface">Registry</span>
@@ -169,20 +169,20 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
           size="sm"
           className="w-full"
         >
-          <ToggleGroupItem value="all" className="flex-1 text-xs py-1">
-            All ({totalCount})
+          <ToggleGroupItem value="all" className="flex-1 text-xs px-2 py-1">
+            All
           </ToggleGroupItem>
-          <ToggleGroupItem value="primitive" className="flex-1 text-xs py-1">
-            Primitives ({primitiveCount})
+          <ToggleGroupItem value="primitive" className="flex-1 text-xs px-2 py-1">
+            Primitives
           </ToggleGroupItem>
-          <ToggleGroupItem value="block" className="flex-1 text-xs py-1">
-            Blocks ({blockCount})
+          <ToggleGroupItem value="block" className="flex-1 text-xs px-2 py-1">
+            Blocks
           </ToggleGroupItem>
         </ToggleGroup>
       </SidebarHeader>
 
       {/* Category List & Items */}
-      <SidebarContent className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+      <SidebarContent className="flex-1 overflow-y-auto px-2 py-3 flex flex-col gap-1">
         {REGISTRY_CATEGORIES.map((category) => {
           const categoryEntries = entriesByCategory[category.id] || [];
           if (categoryEntries.length === 0 && searchQuery) {

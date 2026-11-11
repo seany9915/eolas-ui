@@ -1433,6 +1433,42 @@
       }
     },
     {
+      "name": "navigation-bar",
+      "type": "registry:ui",
+      "title": "Navigation Bar",
+      "description": "NavigationBar primitive (@base-ui/react/button + semantic `<nav>`).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/badge"
+      ],
+      "files": [
+        {
+          "path": "navigation-bar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/navigation-bar.tsx"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "High-frequency mobile bottom navigation bar (3 to 5 primary destinations).",
+          "Placed at the bottom edge of mobile and compact viewports for ergonomic thumb reach.",
+          "Conforms to DESIGN.md Tier B interactive controls:",
+          "44x44px minimum touch target per destination (WCAG 2.2 SC 2.5.8).",
+          "Active indicator: soft `bg-primary-container` pill wash with `text-on-primary-container` ink.",
+          "Inactive items: `text-on-surface-variant` with hover lift to `text-on-surface`.",
+          "Floating 2px focus ring (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`).",
+          "Semantic navigation status: `aria-current=\"page\"` on the active destination.",
+          "Explicit property transitions (never `transition-all`).",
+          "Mandatory `prefers-reduced-motion: reduce` dampening."
+        ]
+      }
+    },
+    {
       "name": "navigation-menu",
       "type": "registry:ui",
       "title": "Navigation Menu",
@@ -2690,6 +2726,7 @@
           "Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").",
           "Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").",
           "Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+          "Outer track uses `bg-surface-container` with `border-outline-variant`. Pressed items adapt by mode: single-select uses `bg-surface text-on-surface border-outline`, multi-select uses `bg-primary-container text-on-primary-container border-primary`.",
           "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
         ]
       }
@@ -2719,7 +2756,7 @@
           "Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.",
           "For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.",
           "For form on/off switches that submit form values, use Switch instead.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+          "Follows DESIGN.md Tier B interactive controls: floating 2px focus ring, 2px `outline` resting border -> 2px `primary` border + `primary-container` pressed state, zero box-shadow, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
         ]
       }
     },

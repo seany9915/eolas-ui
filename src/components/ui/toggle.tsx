@@ -7,8 +7,9 @@
  * - Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.
  * - For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.
  * - For form on/off switches that submit form values, use Switch instead.
- * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
- *   flush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.
+ * - Follows DESIGN.md Tier B interactive controls: floating 2px focus ring,
+ *   2px `outline` resting border -> 2px `primary` border + `primary-container` pressed state,
+ *   zero box-shadow, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.
  */
 import * as React from 'react';
 import { Toggle as BaseToggle } from '@base-ui/react/toggle';
@@ -32,19 +33,19 @@ export interface ToggleProps<Value extends string = string>
 
 const variantStyles: Record<ToggleVariant, string> = {
   default: cn(
-    'bg-surface border-2 border-outline-variant text-on-surface hover:bg-surface-container/70',
-    'data-[pressed]:bg-primary data-[pressed]:text-on-primary data-[pressed]:border-primary'
+    'bg-surface border-2 border-outline text-on-surface hover:bg-surface-container/70',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
   outline: cn(
-    'bg-transparent border-2 border-outline-variant text-on-surface hover:bg-surface-container/60 hover:border-outline',
-    'data-[pressed]:bg-surface data-[pressed]:text-primary data-[pressed]:border-primary'
+    'bg-transparent border-2 border-outline text-on-surface hover:bg-surface-container/60',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
   ghost: cn(
     'bg-transparent border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
-    'data-[pressed]:bg-surface-variant data-[pressed]:text-on-surface data-[pressed]:border-transparent'
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
   ),
   subtle: cn(
-    'bg-surface border-2 border-outline-variant/60 text-on-surface-variant hover:bg-surface-container/40 hover:text-on-surface',
+    'bg-surface border-2 border-outline-variant text-on-surface-variant hover:bg-surface-container/40 hover:text-on-surface hover:border-outline',
     'data-[pressed]:bg-surface-container data-[pressed]:text-on-surface data-[pressed]:border-outline'
   ),
 };
@@ -84,16 +85,18 @@ const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<string>>
         onPressedChange={onPressedChange}
         aria-label={label}
         disabled={disabled}
-        className={cn(
-          'inline-flex items-center justify-center font-label font-semibold cursor-pointer select-none',
-          'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-          'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
-          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
-          variantStyles[variant],
-          sizeStyles[size],
-          className
-        )}
+        className={(state) =>
+          cn(
+            'inline-flex items-center justify-center font-label font-semibold cursor-pointer select-none',
+            'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+            'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
+            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+            variantStyles[variant],
+            sizeStyles[size],
+            typeof className === 'function' ? className(state) : className
+          )
+        }
         {...props}
       >
         {children}
@@ -110,4 +113,5 @@ export const Toggle = Object.assign(ToggleComponent, {
 
 export { BaseToggle };
 export const ToggleRoot = BaseToggle;
+export const TogglePrimitive = BaseToggle;
 export default Toggle;

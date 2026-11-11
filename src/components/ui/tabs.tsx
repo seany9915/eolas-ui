@@ -81,11 +81,13 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
           defaultValue={defaultValue}
           onValueChange={onValueChange}
           orientation={orientation}
-          className={cn(
-            'flex',
-            orientation === 'vertical' ? 'flex-row gap-6 items-start' : 'flex-col',
-            className
-          )}
+          className={(state) =>
+            cn(
+              'flex',
+              orientation === 'vertical' ? 'flex-row gap-6 items-start' : 'flex-col',
+              typeof className === 'function' ? className(state) : className
+            )
+          }
           {...props}
         >
           {children}
@@ -141,19 +143,21 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
           ref={ref}
           activateOnFocus={activateOnFocus}
           loopFocus={loopFocus}
-          className={cn(
-            'relative flex items-center',
-            effectiveVariant === 'unstyled'
-              ? ''
-              : isSegmented
-                ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
-                : cn(
-                    'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden scrollbar-none select-none',
-                    'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
-                    'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
-                  ),
-            className
-          )}
+          className={(state) =>
+            cn(
+              'relative flex items-center',
+              effectiveVariant === 'unstyled'
+                ? ''
+                : isSegmented
+                  ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                  : cn(
+                      'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
+                      'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
+                      'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                    ),
+              typeof className === 'function' ? className(state) : className
+            )
+          }
           {...props}
         >
           {children}
@@ -161,7 +165,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             isSegmented ? (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute rounded-sm bg-surface shadow-ambient border border-outline-variant/60 z-0 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'absolute rounded-sm bg-surface border border-outline z-0 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
                   'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-1',
                   'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-1',
                   indicatorClassName
@@ -215,47 +219,49 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         ref={ref}
         value={value}
         disabled={disabled}
-        className={cn(
-          // Retain font-semibold across both active and inactive to prevent layout shift
-          'inline-flex items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
-          sizeClasses,
-          effectiveVariant === 'unstyled'
-            ? ''
-            : isSegmented
-              ? cn(
-                  'rounded-sm text-on-surface-variant hover:text-on-surface z-10',
-                  hasSlidingIndicator
-                    ? cn(
-                        'bg-transparent',
-                        'data-[active]:text-on-surface',
-                        'data-[selected]:text-on-surface',
-                        'aria-selected:text-on-surface font-semibold'
-                      )
-                    : cn(
-                        'hover:bg-surface-variant/30',
-                        'data-[active]:bg-surface data-[active]:text-on-surface data-[active]:shadow-ambient data-[active]:border-outline-variant/60',
-                        'data-[selected]:bg-surface data-[selected]:text-on-surface data-[selected]:shadow-ambient data-[selected]:border-outline-variant/60',
-                        'aria-selected:bg-surface aria-selected:text-on-surface aria-selected:shadow-ambient aria-selected:border-outline-variant/60'
-                      )
-                )
-              : cn(
-                  'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 border-b-2 border-transparent',
-                  hasSlidingIndicator
-                    ? cn(
-                        'data-[active]:text-primary',
-                        'data-[selected]:text-primary',
-                        'aria-selected:text-primary'
-                      )
-                    : cn(
-                        'data-[active]:text-primary data-[active]:border-primary -mb-px',
-                        'data-[selected]:text-primary data-[selected]:border-primary',
-                        'aria-selected:text-primary aria-selected:border-primary'
-                      )
-                ),
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-20',
-          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
-          className
-        )}
+        className={(state) =>
+          cn(
+            // Retain font-semibold across both active and inactive to prevent layout shift
+            'inline-flex items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
+            sizeClasses,
+            effectiveVariant === 'unstyled'
+              ? ''
+              : isSegmented
+                ? cn(
+                    'rounded-sm text-on-surface-variant hover:text-on-surface z-10 border border-transparent',
+                    hasSlidingIndicator
+                      ? cn(
+                          'bg-transparent',
+                          'data-[active]:text-on-surface',
+                          'data-[selected]:text-on-surface',
+                          'aria-selected:text-on-surface font-semibold'
+                        )
+                      : cn(
+                          'hover:bg-surface-variant/30',
+                          'data-[active]:bg-surface data-[active]:text-on-surface data-[active]:border-outline',
+                          'data-[selected]:bg-surface data-[selected]:text-on-surface data-[selected]:border-outline',
+                          'aria-selected:bg-surface aria-selected:text-on-surface aria-selected:border-outline'
+                        )
+                  )
+                : cn(
+                    'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 border-b-2 border-transparent',
+                    hasSlidingIndicator
+                      ? cn(
+                          'data-[active]:text-primary',
+                          'data-[selected]:text-primary',
+                          'aria-selected:text-primary'
+                        )
+                      : cn(
+                          'data-[active]:text-primary data-[active]:border-primary -mb-px',
+                          'data-[selected]:text-primary data-[selected]:border-primary',
+                          'aria-selected:text-primary aria-selected:border-primary'
+                        )
+                  ),
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-20',
+            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+            typeof className === 'function' ? className(state) : className
+          )
+        }
         {...props}
       >
         {icon && (
@@ -337,11 +343,13 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
         }}
         value={value}
         keepMounted={resolvedKeepMounted}
-        className={cn(
-          'py-4 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-          '[&[hidden]:not([hidden="until-found"])]:hidden',
-          className
-        )}
+        className={(state) =>
+          cn(
+            'py-4 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+            '[&[hidden]:not([hidden="until-found"])]:hidden',
+            typeof className === 'function' ? className(state) : className
+          )
+        }
         {...props}
       >
         {children}
@@ -424,7 +432,7 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
         size={size}
         showIndicator={showIndicator}
         className={cn(
-          inline || isSegmented ? 'w-max items-start' : 'w-full',
+          inline || isSegmented ? 'w-max max-w-full items-start' : 'w-full',
           className
         )}
         {...props}

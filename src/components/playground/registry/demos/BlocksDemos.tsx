@@ -33,9 +33,23 @@ import {
 import { MetricCard } from '@/components/blocks/metric-card';
 import { DeleteConfirmationDialog } from '@/components/blocks/delete-confirmation-dialog';
 import { FilterToolbar } from '@/components/blocks/filter-toolbar';
+import { ListDetailBlock, type ListDetailItem } from '@/components/blocks/list-detail-block';
+import { SupportingPaneBlock } from '@/components/blocks/supporting-pane-block';
+import { AppShell } from '@/components/blocks/app-shell';
 import { Button } from '@/components/ui/button';
+import { Chip } from '@/components/ui/chip';
+import { Empty } from '@/components/ui/empty';
+import { Field } from '@/components/ui/field';
 import { Icon } from '@/components/ui/icon';
+import { Item } from '@/components/ui/item';
+import { ClinicianTip } from '@/components/ui/clinician-tip';
+import { Tabs } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
+import { ToggleGroup } from '@/components/ui/toggle-group';
+import { Sidebar } from '@/components/ui/sidebar';
 import { ComponentDemoProps } from '../types';
+import { cn } from '@/lib/utils';
 
 export const ApprovalCardDemo: React.FC<ComponentDemoProps> = () => {
   const [selected, setSelected] = React.useState('opt-1');
@@ -653,6 +667,574 @@ export const RadarChartCardDemo: React.FC<ComponentDemoProps> = () => {
         config={chartConfig}
         footer={<span>Evaluated over 12 weeks of therapy</span>}
       />
+    </div>
+  );
+};
+
+export const ListDetailBlockDemo: React.FC<ComponentDemoProps> = () => {
+  const [selected, setSelected] = React.useState<string | null>('p-1');
+
+  const demoItems: ListDetailItem[] = [
+    {
+      id: 'p-1',
+      title: 'Liam O’Connor',
+      subtitle: 'Speech Articulation • Age 7',
+      meta: 'Drill 4',
+      badge: 'Active',
+      badgeColorRole: 'primary',
+      icon: 'record_voice_over',
+    },
+    {
+      id: 'p-2',
+      title: 'Siobhan Kelly',
+      subtitle: 'Phonology & Rhythm • Age 9',
+      meta: 'Drill 2',
+      badge: 'Review',
+      badgeColorRole: 'warning',
+      icon: 'spatial_audio',
+    },
+    {
+      id: 'p-3',
+      title: 'Ciaran Murphy',
+      subtitle: 'Fluency Training • Age 12',
+      meta: 'Complete',
+      badge: 'Saved',
+      badgeColorRole: 'success',
+      icon: 'check_circle',
+    },
+    {
+      id: 'p-4',
+      title: 'Aoife Walsh',
+      subtitle: 'Articulation & Lisps • Age 6',
+      meta: 'Drill 1',
+      badge: 'Active',
+      badgeColorRole: 'primary',
+      icon: 'record_voice_over',
+    },
+    {
+      id: 'p-5',
+      title: 'Conor Byrne',
+      subtitle: 'R-Controlled Vowels • Age 10',
+      meta: 'Evaluation',
+      badge: 'Scheduled',
+      badgeColorRole: 'neutral',
+      icon: 'event',
+    },
+  ];
+
+  const patientDetails: Record<
+    string,
+    {
+      targets: string;
+      progress: number;
+      nextSession: string;
+      clinician: string;
+      notes: string;
+      sessions: Array<{ date: string; duration: string; accuracy: string; status: string }>;
+    }
+  > = {
+    'p-1': {
+      targets: 'Focus on vocalic /r/ and s-blend pronunciation drills with real-time waveform feedback.',
+      progress: 78,
+      nextSession: 'Tomorrow, 10:00 AM',
+      clinician: 'Dr. Sarah Adams',
+      notes: 'Responds well to visual mouth shape cues. Focus on tongue tip elevation.',
+      sessions: [
+        { date: 'Yesterday, 2:30 PM', duration: '15 mins', accuracy: '92%', status: 'Completed' },
+        { date: 'Nov 4, 11:00 AM', duration: '20 mins', accuracy: '86%', status: 'Completed' },
+        { date: 'Nov 1, 3:15 PM', duration: '15 mins', accuracy: '78%', status: 'Completed' },
+      ],
+    },
+    'p-2': {
+      targets: 'Multisyllabic rhythm cadence and front vowel precision drills.',
+      progress: 54,
+      nextSession: 'Thursday, 2:00 PM',
+      clinician: 'Dr. Sarah Adams',
+      notes: 'Slight lateralization on final /s/ blends. Slow down pacing tempo.',
+      sessions: [
+        { date: 'Nov 6, 10:00 AM', duration: '15 mins', accuracy: '84%', status: 'Needs Review' },
+        { date: 'Nov 3, 2:00 PM', duration: '15 mins', accuracy: '80%', status: 'Completed' },
+      ],
+    },
+    'p-3': {
+      targets: 'Gentle phonatory onset and controlled breath support exercises.',
+      progress: 100,
+      nextSession: 'Discharged / Maintenance',
+      clinician: 'Dr. Michael Ryan',
+      notes: 'Met all weekly fluency goals over 6 consecutive sessions.',
+      sessions: [
+        { date: 'Nov 5, 4:00 PM', duration: '20 mins', accuracy: '98%', status: 'Completed' },
+        { date: 'Oct 29, 4:00 PM', duration: '20 mins', accuracy: '95%', status: 'Completed' },
+      ],
+    },
+    'p-4': {
+      targets: 'Interdental lisp correction for /s/ and /z/ in syllable-initial positions.',
+      progress: 42,
+      nextSession: 'Friday, 9:30 AM',
+      clinician: 'Dr. Sarah Adams',
+      notes: 'Enjoys picture flash cards. Use auditory discrimination audio models.',
+      sessions: [
+        { date: 'Nov 7, 9:30 AM', duration: '10 mins', accuracy: '74%', status: 'Completed' },
+      ],
+    },
+    'p-5': {
+      targets: 'Baseline acoustic evaluation for /ɑr/ (car) and /ɔr/ (door).',
+      progress: 15,
+      nextSession: 'Monday, 11:30 AM',
+      clinician: 'Dr. Michael Ryan',
+      notes: 'Initial clinical assessment and sound inventory scheduled.',
+      sessions: [],
+    },
+  };
+
+  return (
+    <div className="w-full py-4">
+      <ListDetailBlock
+          items={demoItems}
+          selectedId={selected}
+          onSelectId={setSelected}
+          title="Patients"
+          searchPlaceholder="Search patients by name..."
+          detailActions={
+            <>
+              <Button variant="outline" colorRole="neutral" size="icon" aria-label="Edit plan">
+                <Icon name="edit" size="md" />
+              </Button>
+              <Button variant="soft" colorRole="primary" size="sm">
+                <Icon name="calendar_today" size="sm" />
+                Schedule
+              </Button>
+            </>
+          }
+          renderDetail={(item) => {
+            const detail = patientDetails[item.id];
+            if (!detail) return null;
+
+            return (
+              <Tabs.Root defaultValue="plan" variant="line">
+                <Tabs.List>
+                  <Tabs.Tab value="plan" icon="assignment">
+                    Practice plan
+                  </Tabs.Tab>
+                  <Tabs.Tab value="history" icon="history">
+                    Sessions ({detail.sessions.length})
+                  </Tabs.Tab>
+                </Tabs.List>
+
+                {/* Plan Panel */}
+                <Tabs.Panel value="plan" className="flex flex-col gap-4">
+                  {/* Practice Target Summary */}
+                  <div className="p-4 rounded-md bg-surface-container flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="font-heading text-sm font-semibold text-on-surface">
+                        Practice target
+                      </h4>
+                      <span className="text-sm font-sans text-on-surface-variant">
+                        Assigned by {detail.clinician}
+                      </span>
+                    </div>
+                    <p className="font-sans text-base text-on-surface-variant leading-relaxed">
+                      {detail.targets}
+                    </p>
+                  </div>
+
+                  {/* Weekly Goal Progress */}
+                  <div className="py-3 border-y border-outline-variant/60 flex flex-col gap-2">
+                    <Progress
+                      value={detail.progress}
+                      label="Weekly goal progress"
+                      showValue
+                      size="md"
+                    />
+                    <span className="text-sm font-sans text-on-surface-variant">
+                      Target: 15 minutes daily practice with audio review
+                    </span>
+                  </div>
+
+                  {/* Next Check-in */}
+                  <div className="flex items-center justify-between gap-3 py-1 text-sm font-sans">
+                    <div className="flex items-center gap-2 text-on-surface-variant">
+                      <Icon name="event" size="sm" className="text-primary" />
+                      <span>Next check-in</span>
+                    </div>
+                    <span className="font-medium text-on-surface">{detail.nextSession}</span>
+                  </div>
+
+                  {/* Clinician Observation */}
+                  <ClinicianTip variant="unboxed" icon="lightbulb" label="Clinician note">
+                    {detail.notes}
+                  </ClinicianTip>
+                </Tabs.Panel>
+
+                {/* Session History Panel */}
+                <Tabs.Panel value="history" className="flex flex-col gap-3">
+                  {detail.sessions.length === 0 ? (
+                    <Empty
+                      variant="unboxed"
+                      icon="history"
+                      title="No sessions yet"
+                      description="No previous session records found for this patient."
+                    />
+                  ) : (
+                    <Item.Group divided>
+                      {detail.sessions.map((sess) => (
+                        <Item key={sess.date} variant="ghost" size="md">
+                          <Item.Media variant="icon">
+                            <Icon name="mic" size="sm" />
+                          </Item.Media>
+                          <Item.Content>
+                            <Item.Title>{sess.date}</Item.Title>
+                            <Item.Description>{sess.duration}</Item.Description>
+                          </Item.Content>
+                          <Item.Actions>
+                            <span className="font-mono text-sm font-medium text-on-surface">
+                              {sess.accuracy}
+                            </span>
+                            <Badge
+                              variant="soft"
+                              colorRole={sess.status === 'Completed' ? 'success' : 'warning'}
+                              size="sm"
+                            >
+                              {sess.status}
+                            </Badge>
+                          </Item.Actions>
+                        </Item>
+                      ))}
+                    </Item.Group>
+                  )}
+                </Tabs.Panel>
+              </Tabs.Root>
+            );
+          }}
+        />
+    </div>
+  );
+};
+
+export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [recordingSeconds, setRecordingSeconds] = React.useState(8);
+  const [isPlayingExample, setIsPlayingExample] = React.useState(false);
+  const [targetWord, setTargetWord] = React.useState('Rabbit');
+  const [notes, setNotes] = React.useState('Patient is retracting tongue with good initial effort.');
+  const playTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Simulated live recording timer
+  React.useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
+    if (isRecording) {
+      timer = setInterval(() => {
+        setRecordingSeconds((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isRecording]);
+
+  React.useEffect(() => {
+    return () => {
+      if (playTimerRef.current) {
+        clearTimeout(playTimerRef.current);
+      }
+    };
+  }, []);
+
+  const toggleRecording = () => {
+    if (!isRecording) {
+      setRecordingSeconds(0);
+      setIsRecording(true);
+    } else {
+      setIsRecording(false);
+    }
+  };
+
+  const handlePlayExample = () => {
+    if (playTimerRef.current) {
+      clearTimeout(playTimerRef.current);
+    }
+    setIsPlayingExample(true);
+    playTimerRef.current = setTimeout(() => {
+      setIsPlayingExample(false);
+      playTimerRef.current = null;
+    }, 1800);
+  };
+
+  const addObservationTag = (tag: string) => {
+    setNotes((prev) => (prev ? `${prev} • ${tag}` : tag));
+  };
+
+  const formattedTime = `00:${recordingSeconds < 10 ? `0${recordingSeconds}` : recordingSeconds}`;
+
+  const targetWords = ['Rabbit', 'Road', 'River'];
+
+  return (
+    <div className="w-full rounded-lg border border-outline-variant overflow-hidden bg-surface flex flex-col min-h-136">
+      <SupportingPaneBlock
+          title="Pronunciation Practice"
+          supportingTitle="Guidance"
+          supportingBadge="Vocalic /r/"
+          supportingBadgeColorRole="primary"
+          className="flex-1"
+          canvasToolbar={
+            <div className="flex items-center justify-between gap-2 w-full">
+              <div className="flex items-center gap-2 min-w-0">
+                <Badge
+                  variant={isRecording ? 'filled' : 'soft'}
+                  colorRole={isRecording ? 'error' : 'neutral'}
+                  size="sm"
+                >
+                  {isRecording ? 'Recording' : 'Ready'}
+                </Badge>
+                <span className="text-sm font-sans text-on-surface-variant hidden @sm:inline truncate">
+                  Word: {targetWord}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Icon name="timer" size="xs" className="text-on-surface-variant" />
+                <span className="text-sm font-mono tabular-nums text-on-surface font-medium">
+                  {formattedTime}
+                </span>
+              </div>
+            </div>
+          }
+          supportingContent={
+            <div className="flex flex-col gap-4">
+              <Tabs.Root defaultValue="guidance" variant="segmented" size="sm" className="w-full">
+                <Tabs.List className="w-full">
+                  <Tabs.Tab value="guidance" className="flex-1">
+                    Cues
+                  </Tabs.Tab>
+                  <Tabs.Tab value="targets" className="flex-1">
+                    Words
+                  </Tabs.Tab>
+                  <Tabs.Tab value="notes" className="flex-1">
+                    Notes
+                  </Tabs.Tab>
+                </Tabs.List>
+
+                {/* Tab 1: Clinical Guidance */}
+                <Tabs.Panel value="guidance" className="pt-4 flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <h4 className="font-heading text-base font-semibold text-on-surface">
+                      Tongue placement
+                    </h4>
+                    <p className="font-sans text-base text-on-surface-variant leading-relaxed">
+                      Ask the learner to pull the tongue blade back toward the roof of the mouth while bracing the sides against the upper back teeth.
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-outline-variant/60">
+                    <ClinicianTip variant="unboxed" icon="hearing" label="Listening cue">
+                      Listen for a darker, resonant /r/ sound when the third formant drops below 2,000 Hz.
+                    </ClinicianTip>
+                  </div>
+                </Tabs.Panel>
+
+                {/* Tab 2: Word Selector */}
+                <Tabs.Panel value="targets" className="pt-4 flex flex-col gap-3">
+                  <span className="text-base font-sans text-on-surface-variant">
+                    Choose a practice word:
+                  </span>
+                  <ToggleGroup
+                    type="single"
+                    size="sm"
+                    ariaLabel="Target words"
+                    value={targetWord}
+                    onValueChange={(val) => {
+                      if (val) setTargetWord(val);
+                    }}
+                  >
+                    {targetWords.map((word) => (
+                      <ToggleGroup.Item key={word} value={word}>
+                        {word}
+                      </ToggleGroup.Item>
+                    ))}
+                  </ToggleGroup>
+                  <div className="p-3 rounded-md bg-surface border border-outline-variant text-base text-on-surface-variant leading-relaxed">
+                    Selected prompt:{' '}
+                    <span className="font-medium text-on-surface font-heading">
+                      “Red {targetWord.toLowerCase()}s run rapidly”
+                    </span>
+                  </div>
+                </Tabs.Panel>
+
+                {/* Tab 3: Session Notes */}
+                <Tabs.Panel value="notes" className="pt-4 flex flex-col gap-3">
+                  <Field.Root>
+                    <Field.Label>Session notes</Field.Label>
+                    <Field.Control
+                      render={
+                        <Textarea
+                          autoGrow
+                          value={notes}
+                          onChange={(e) => setNotes(e.target.value)}
+                          placeholder="Write quick observations during practice..."
+                        />
+                      }
+                    />
+                  </Field.Root>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-base font-sans text-on-surface-variant">
+                      Quick tags:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Chip
+                        size="sm"
+                        variant="soft"
+                        colorRole="neutral"
+                        onClick={() => addObservationTag('Good tongue elevation')}
+                      >
+                        Good lift
+                      </Chip>
+                      <Chip
+                        size="sm"
+                        variant="soft"
+                        colorRole="neutral"
+                        onClick={() => addObservationTag('Clear acoustic onset')}
+                      >
+                        Clear onset
+                      </Chip>
+                      <Chip
+                        size="sm"
+                        variant="soft"
+                        colorRole="neutral"
+                        onClick={() => addObservationTag('Needs slower pacing')}
+                      >
+                        Slower pace
+                      </Chip>
+                    </div>
+                  </div>
+                </Tabs.Panel>
+              </Tabs.Root>
+            </div>
+          }
+        >
+          {/* Main Primary Task Canvas */}
+          <div className="flex flex-col gap-6 items-center justify-center p-4 @md:p-8 text-center my-auto min-h-80">
+            {/* Target Phrase Callout */}
+            <div className="w-full max-w-lg p-6 rounded-lg bg-surface-container flex flex-col gap-2">
+              <span className="text-sm font-sans font-semibold text-primary">
+                Practice sentence
+              </span>
+              <p className="font-heading text-headline-sm @md:text-headline-md font-semibold text-on-surface">
+                “Red {targetWord.toLowerCase()}s run rapidly down the rocky road.”
+              </p>
+              <span className="text-sm font-sans text-on-surface-variant">
+                Focus on smooth initial /r/ tongue retraction
+              </span>
+            </div>
+
+            {/* Simulated Live Audio Waveform */}
+            <div
+              aria-hidden="true"
+              className="flex items-center justify-center gap-1.5 h-12 px-5 rounded-lg bg-surface-container w-full max-w-xs"
+            >
+              {[12, 22, 34, 18, 28, 36, 24, 30, 16, 26].map((barHeight, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    'w-1.5 rounded-full transition-[height] duration-micro ease-standard motion-reduce:transition-none motion-reduce:animate-none',
+                    isRecording
+                      ? 'bg-primary animate-pulse'
+                      : 'bg-outline/50 h-2'
+                  )}
+                  style={{
+                    height: isRecording ? `${barHeight}px` : undefined,
+                    animationDelay: `${(idx % 5) * 40}ms`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Interaction Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                colorRole="neutral"
+                size="md"
+                onClick={handlePlayExample}
+                disabled={isRecording}
+              >
+                <Icon name="volume_up" size="sm" />
+                <span>{isPlayingExample ? 'Playing example...' : 'Play example'}</span>
+              </Button>
+
+              <Button
+                variant="filled"
+                colorRole={isRecording ? 'error' : 'primary'}
+                size="md"
+                onClick={toggleRecording}
+              >
+                <Icon.Toggle
+                  active={isRecording}
+                  onName="stop"
+                  offName="mic"
+                  size="sm"
+                />
+                <span>{isRecording ? 'Stop recording' : 'Start recording'}</span>
+              </Button>
+            </div>
+
+            {/* Live Audio Feedback Badge */}
+            {isRecording ? (
+              <Badge variant="soft" colorRole="error" size="md" dot>
+                Listening...
+              </Badge>
+            ) : (
+              <Badge variant="soft" colorRole="success" size="md" icon="verified">
+                92% accuracy • Clear onset
+              </Badge>
+            )}
+          </div>
+        </SupportingPaneBlock>
+    </div>
+  );
+};
+
+export const AppShellDemo: React.FC<ComponentDemoProps> = () => {
+  const [activeNav, setActiveNav] = React.useState('exercises');
+
+  const destinations = [
+    { id: 'exercises', label: 'Exercises', icon: 'assignment' },
+    { id: 'notes', label: 'Notes', icon: 'description', badge: 3 },
+    { id: 'progress', label: 'Progress', icon: 'trending_up' },
+    { id: 'caseload', label: 'Patients', icon: 'groups' },
+  ];
+  const activeDestination = destinations.find((d) => d.id === activeNav) ?? destinations[0];
+
+  return (
+    <div className="w-full max-w-4xl mx-auto rounded-lg border border-outline-variant overflow-hidden h-120 flex flex-col relative bg-surface">
+      <AppShell
+        embedded
+        title="Eolas Speech Portal"
+        destinations={destinations}
+        activeDestinationId={activeNav}
+        onDestinationChange={setActiveNav}
+        topBarActions={
+          <Button variant="outline" colorRole="neutral" size="sm">
+            <Icon name="add" size="sm" />
+            <span>New</span>
+          </Button>
+        }
+        sidebarHeader={
+          <div className="flex items-center gap-2">
+            <div className="size-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+              <Icon name="record_voice_over" size="sm" />
+            </div>
+            <span className="font-heading font-bold text-sm text-on-surface group-data-[collapsible=icon]:hidden">
+              Eolas Speech
+            </span>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-2">
+          <h2 className="font-heading text-headline-sm font-semibold text-on-surface">
+            {activeDestination.label}
+          </h2>
+          <p className="font-sans text-base text-on-surface-variant leading-relaxed">
+            Switch sections with the side rail on larger screens or the bottom bar on narrow screens.
+          </p>
+        </div>
+      </AppShell>
     </div>
   );
 };

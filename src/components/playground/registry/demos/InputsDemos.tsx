@@ -528,7 +528,6 @@ export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
           value={viewMode}
           onValueChange={(v) => v && setViewMode(v)}
           aria-label="Layout view mode"
-          variant="segmented"
           className="inline-flex justify-center"
         >
           <ToggleGroup.Item value="grid" icon="grid_view">
@@ -554,7 +553,6 @@ export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
           onValueChange={setActiveFilters}
           aria-label="Filter exercise types"
           items={filterItems}
-          variant="outline"
           className="inline-flex justify-center"
         />
       </div>

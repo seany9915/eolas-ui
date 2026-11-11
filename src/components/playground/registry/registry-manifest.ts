@@ -1076,6 +1076,34 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/model-selector"
   },
   {
+    "id": "navigation-bar",
+    "name": "navigation-bar",
+    "title": "Navigation Bar",
+    "description": "NavigationBar primitive (@base-ui/react/button + semantic `<nav>`).",
+    "category": "navigation",
+    "tier": "primitive",
+    "basePrimitive": "@base-ui/react/button",
+    "sourcePath": "src/components/ui/navigation-bar.tsx",
+    "taxonomy": [
+      "High-frequency mobile bottom navigation bar (3 to 5 primary destinations).",
+      "Placed at the bottom edge of mobile and compact viewports for ergonomic thumb reach.",
+      "Conforms to DESIGN.md Tier B interactive controls:",
+      "44x44px minimum touch target per destination (WCAG 2.2 SC 2.5.8).",
+      "Active indicator: soft `bg-primary-container` pill wash with `text-on-primary-container` ink.",
+      "Inactive items: `text-on-surface-variant` with hover lift to `text-on-surface`.",
+      "Floating 2px focus ring (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`).",
+      "Semantic navigation status: `aria-current=\"page\"` on the active destination.",
+      "Explicit property transitions (never `transition-all`).",
+      "Mandatory `prefers-reduced-motion: reduce` dampening."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/navigation-bar"
+  },
+  {
     "id": "navigation-menu",
     "name": "navigation-menu",
     "title": "Navigation Menu",
@@ -1996,6 +2024,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").",
       "Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").",
       "Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+      "Outer track uses `bg-surface-container` with `border-outline-variant`. Pressed items adapt by mode: single-select uses `bg-surface text-on-surface border-outline`, multi-select uses `bg-primary-container text-on-primary-container border-primary`.",
       "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
     ],
     "dependencies": [
@@ -2018,7 +2047,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Use Toggle for standalone two-state buttons (e.g. Star, Bookmark, Pin, Mute) using `aria-pressed`.",
       "For groups of mutually exclusive or multi-select toggles, use ToggleGroup instead.",
       "For form on/off switches that submit form values, use Switch instead.",
-      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush surface/primary active state, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
+      "Follows DESIGN.md Tier B interactive controls: floating 2px focus ring, 2px `outline` resting border -> 2px `primary` border + `primary-container` pressed state, zero box-shadow, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
       "@base-ui/react",
@@ -2155,6 +2184,31 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/view-transition"
+  },
+  {
+    "id": "app-shell",
+    "name": "app-shell",
+    "title": "App Shell",
+    "description": "AppShell composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Sidebar` compound primitives (`Sidebar.Provider`, `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Footer`, `Sidebar.Trigger`, `Sidebar.Rail`, `Sidebar.Inset`, `Sidebar.Menu`, `Sidebar.MenuItem`, `Sidebar.MenuButton`, `Sidebar.MenuBadge`) (`src/components/ui/sidebar.tsx`) - `NavigationBar`, `NavigationBar.Item` (`src/components/ui/navigation-bar.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/app-shell.tsx",
+    "taxonomy": [
+      "Coordinated application layout shell managing navigation across breakpoints and height classes.",
+      "Morphing Navigation Pipeline:",
+      "Mobile (<640px): Thumb-accessible Bottom Navigation Bar + compact top bar.",
+      "Tablet / Foldable (640px–1023px): Automatic icon-rail sidebar (56px) preserving reading width; bottom bar hidden.",
+      "Desktop (1024px+): Full persistent sidebar (256px) with expandable groups and actions.",
+      "Compact Height (`short:` / `<480px`): Top bar compresses to 56px (h-14); bottom bar hides to preserve vertical canvas.",
+      "Zero direct `<button>` tags outside primitives."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/app-shell"
   },
   {
     "id": "approval-card",
@@ -2303,6 +2357,32 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/line-chart-card"
   },
   {
+    "id": "list-detail-block",
+    "name": "list-detail-block",
+    "title": "List Detail Block",
+    "description": "ListDetailBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Field` (`Field.Root`, `Field.Label`) (`src/components/ui/field.tsx`) - `InputGroup` (`InputGroup.Addon`, `InputGroup.Input`, `InputGroup.Button`) (`src/components/ui/input-group.tsx`) - `Item` (`Item.Group`, `Item.Media`, `Item.Content`, `Item.Title`, `Item.Description`, `Item.Actions`) (`src/components/ui/item.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Empty` (`src/components/ui/empty.tsx`)",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/list-detail-block.tsx",
+    "taxonomy": [
+      "Canonical master-detail multi-pane block for data-dense workflows (caseload, exercises, session notes).",
+      "Implements responsive container queries (`@container`):",
+      "On large containers (`@2xl:` / `>=672px`): Side-by-side two-pane split with selectable list and detail view.",
+      "On compact containers (`<672px`): Stack navigation. Renders list full-width; pushes detail view with an accessible back button when an item is selected.",
+      "Active selection: 2px flush primary border + primary-container wash (`Item variant=\"selected\"`).",
+      "Touch targets: All list items maintain >=56px height (`Item size=\"lg\"`, WCAG 2.2 SC 2.5.8).",
+      "Accessible keyboard navigation: Listbox roving focus via ArrowDown / ArrowUp / Home / End, selection via Enter / Space / click, and Escape to return on compact views.",
+      "Zero direct `<button>` or `<input>` tags outside primitives."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/list-detail-block"
+  },
+  {
     "id": "metric-card",
     "name": "metric-card",
     "title": "Metric Card",
@@ -2412,6 +2492,32 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge"
     ],
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/step-wizard"
+  },
+  {
+    "id": "supporting-pane-block",
+    "name": "supporting-pane-block",
+    "title": "Supporting Pane Block",
+    "description": "SupportingPaneBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Badge` (`src/components/ui/badge.tsx`)",
+    "category": "blocks",
+    "tier": "block",
+    "basePrimitive": "Composite Block",
+    "sourcePath": "src/components/blocks/supporting-pane-block.tsx",
+    "taxonomy": [
+      "Canonical supporting pane layout for focused tasks (audio drill canvas, exercise workspace) paired with an auxiliary side inspector (clinician tips, phonetic targets, session notes).",
+      "Implements responsive container queries (`@container`):",
+      "On large containers (`@3xl:` / `>=768px`): Side-by-side layout with docked pane (left or right).",
+      "On compact containers (`<768px`): Full-width stacked layout below the primary workspace.",
+      "On compact height (`short:`): Tightens top bar height while preserving 44px touch target focus rings.",
+      "Targeted opacity transition (`duration-quick`, zero `transition-all`) with reduced-motion fallback.",
+      "Restores keyboard focus cleanly when closed from inside the pane and marks closed panes inert.",
+      "Zero direct `<button>` tags outside primitives."
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/supporting-pane-block"
   }
 ];
 

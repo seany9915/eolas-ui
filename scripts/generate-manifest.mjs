@@ -21,7 +21,7 @@ const catMap = {
 
   // Navigation
   'tabs': 'navigation', 'accordion': 'navigation', 'breadcrumb': 'navigation', 'pagination': 'navigation',
-  'navigation-menu': 'navigation', 'sidebar': 'navigation', 'steppers': 'navigation',
+  'navigation-menu': 'navigation', 'sidebar': 'navigation', 'navigation-bar': 'navigation', 'steppers': 'navigation',
   'scroll-area': 'navigation', 'scrollspy': 'navigation',
 
   // Data & Layout
@@ -38,7 +38,7 @@ const catMap = {
   'checkpoint': 'clinical-ai', 'confirmation': 'clinical-ai', 'reasoning': 'clinical-ai', 'trace': 'clinical-ai', 'bot-avatar': 'clinical-ai', 'thinking-orb': 'clinical-ai',
 
   // Blocks
-  'approval-card': 'blocks', 'chat': 'blocks', 'data-table': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'metric-card': 'blocks', 'questionnaire': 'blocks', 'step-wizard': 'blocks',
+  'app-shell': 'blocks', 'approval-card': 'blocks', 'chat': 'blocks', 'data-table': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'list-detail-block': 'blocks', 'metric-card': 'blocks', 'questionnaire': 'blocks', 'step-wizard': 'blocks', 'supporting-pane-block': 'blocks',
   'area-chart-card': 'blocks', 'bar-chart-card': 'blocks', 'line-chart-card': 'blocks', 'pie-chart-card': 'blocks', 'radial-chart-card': 'blocks', 'radar-chart-card': 'blocks',
 
   // Motion
@@ -115,7 +115,7 @@ const registryEntries = items.map(item => {
     ? 'empty'
     : undefined;
 
-  const category = catMap[item.name] || 'layout';
+  const category = catMap[item.name] || (isBlock ? 'blocks' : 'layout');
   const tier = isBlock ? 'block' : (isDeprecated || isLib ? 'utility' : 'primitive');
 
   const title = item.title || item.name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');

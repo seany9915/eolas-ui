@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 // Types & Styles
 // ============================================================================
 
-export type ItemVariant = 'default' | 'outline' | 'muted' | 'ghost';
+export type ItemVariant = 'default' | 'outline' | 'muted' | 'ghost' | 'selected';
 export type ItemSize = 'default' | 'xs' | 'sm' | 'md' | 'lg';
 
 export interface ItemVariantsProps {
@@ -47,10 +47,11 @@ export interface ItemVariantsProps {
 }
 
 const variantStyles: Record<ItemVariant, string> = {
-  default: 'bg-transparent text-on-surface',
+  default: 'bg-transparent text-on-surface border-2 border-transparent',
   outline: 'bg-surface text-on-surface border border-outline-variant',
-  muted: 'bg-surface-container text-on-surface border border-transparent',
-  ghost: 'bg-transparent text-on-surface hover:bg-surface-container/60',
+  muted: 'bg-surface-container text-on-surface border-2 border-transparent',
+  ghost: 'bg-transparent text-on-surface border-2 border-transparent hover:bg-surface-container/60',
+  selected: 'bg-primary-container text-on-primary-container border-2 border-primary hover:bg-primary-container/90',
 };
 
 const sizeStyles: Record<ItemSize, string> = {
@@ -58,7 +59,7 @@ const sizeStyles: Record<ItemSize, string> = {
   sm: 'py-2 px-2.5 gap-2.5 min-h-[36px]',
   default: 'py-3 px-3 gap-3 min-h-[44px]',
   md: 'py-3 px-3 gap-3 min-h-[44px]',
-  lg: 'py-4 px-4 gap-4 min-h-[52px]',
+  lg: 'py-4 px-4 gap-4 min-h-14',
 };
 
 export function itemVariants({
@@ -68,11 +69,15 @@ export function itemVariants({
   className,
 }: ItemVariantsProps = {}): string {
   return cn(
-    'relative flex items-center rounded-md text-left transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
+    'group/item relative flex items-center rounded-md text-left transition-[background-color,border-color,color,transform] duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
     variantStyles[variant] ?? variantStyles.default,
     sizeStyles[size] ?? sizeStyles.default,
+    'aria-disabled:opacity-50 aria-disabled:pointer-events-none',
     interactive &&
-      'cursor-pointer select-none hover:bg-surface-container/70 active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100 motion-reduce:transition-none',
+      cn(
+        'cursor-pointer select-none active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100 motion-reduce:transition-none',
+        variant !== 'selected' && 'hover:bg-surface-container/70'
+      ),
     className
   );
 }
@@ -131,6 +136,8 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
       defaultTagName: 'div',
       props: {
         'data-slot': 'item',
+        'data-variant': variant,
+        'data-size': size,
         className: computedClass,
         children,
         onClick,
@@ -215,7 +222,7 @@ export interface ItemMediaProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const mediaVariantStyles: Record<ItemMediaVariant, string> = {
-  icon: 'size-9 rounded-md bg-surface-container text-on-surface-variant flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl',
+  icon: 'size-9 rounded-md bg-surface-container text-on-surface-variant group-data-[variant=selected]/item:bg-surface group-data-[variant=selected]/item:text-primary flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
   avatar: 'size-10 rounded-full overflow-hidden flex items-center justify-center shrink-0',
   image: 'size-12 rounded-md overflow-hidden object-cover flex items-center justify-center shrink-0',
 };
@@ -282,7 +289,7 @@ export const ItemTitle = React.forwardRef<HTMLHeadingElement, ItemTitleProps>(
       props: {
         'data-slot': 'item-title',
         className: cn(
-          'font-label text-sm font-semibold text-on-surface truncate leading-snug',
+          'font-label text-sm group-data-[size=lg]/item:text-base font-semibold text-on-surface truncate leading-snug',
           className
         ),
         children,
@@ -310,7 +317,7 @@ export const ItemDescription = React.forwardRef<HTMLParagraphElement, ItemDescri
       props: {
         'data-slot': 'item-description',
         className: cn(
-          'font-sans text-xs text-on-surface-variant leading-relaxed text-pretty',
+          'font-sans text-xs group-data-[size=lg]/item:text-sm text-on-surface-variant group-data-[variant=selected]/item:text-on-primary-container leading-relaxed text-pretty',
           className
         ),
         children,

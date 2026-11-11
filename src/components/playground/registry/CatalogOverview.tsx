@@ -147,7 +147,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
         </div>
 
         {/* Filter Toolbar: Search Input + Tier ToggleGroup */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-1">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 pt-1 flex-wrap">
           <Input
             type="search"
             value={search}
@@ -156,18 +156,17 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             leadingIcon={<Icon name="search" size="sm" className="text-on-surface-variant" />}
             clearable={!!search}
             onClear={() => setSearch('')}
-            className="w-full sm:w-80 md:w-96 text-sm bg-surface"
+            className="w-full lg:w-96 text-sm bg-surface"
             aria-label="Search across components"
           />
 
-          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+          <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 max-w-full">
             <ToggleGroup
               type="single"
               value={selectedTier}
               onValueChange={(val) => {
                 if (val) handleTierSelect(val as ComponentTier | 'all');
               }}
-              variant="segmented"
               size="sm"
             >
               <ToggleGroupItem value="all" className="text-xs px-3">
