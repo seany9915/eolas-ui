@@ -37,6 +37,7 @@ import { FilterToolbar } from '@/components/blocks/filter-toolbar';
 import { ListDetailBlock, type ListDetailItem } from '@/components/blocks/list-detail-block';
 import { SupportingPaneBlock } from '@/components/blocks/supporting-pane-block';
 import { AppShell } from '@/components/blocks/app-shell';
+import { Chat, type ChatMessageData } from '@/components/blocks/chat';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { Empty } from '@/components/ui/empty';
@@ -293,25 +294,111 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
   );
 };
 
+const INITIAL_DEMO_MESSAGES: ChatMessageData[] = [
+  {
+    id: 'msg-1',
+    role: 'user',
+    content: 'Can you summarize Marcus Chen’s progress over the last 4 speech therapy sessions?',
+    timestamp: '10:14 AM',
+  },
+  {
+    id: 'msg-2',
+    role: 'assistant',
+    content: 'Marcus has shown steady progress across all targeted phonemes. In session 4, his /r/ articulation accuracy reached 88%, up from 72% in baseline testing. Clinician notes indicate high engagement when using auditory feedback cues.',
+    timestamp: '10:15 AM',
+    reasoning: 'Reviewing session transcripts REC-101 through REC-104 for target phoneme milestones and clinician notes.',
+    reasoningDuration: '1.2s',
+  },
+];
+
 export const ChatBlockDemo: React.FC<ComponentDemoProps> = () => {
+  const [messages, setMessages] = React.useState<ChatMessageData[]>(INITIAL_DEMO_MESSAGES);
+  const [inputValue, setInputValue] = React.useState('');
+  const [isFloating, setIsFloating] = React.useState(false);
+  const [model, setModel] = React.useState('gemini-pro');
+
+  const handleSend = (text: string) => {
+    const userMsg: ChatMessageData = {
+      id: `msg-${Date.now()}`,
+      role: 'user',
+      content: text,
+      timestamp: 'Just now',
+    };
+    const botReply: ChatMessageData = {
+      id: `msg-${Date.now() + 1}`,
+      role: 'assistant',
+      content: `Received query: "${text}". Analysis generated according to current clinical guidelines.`,
+      timestamp: 'Just now',
+    };
+    setMessages((prev) => [...prev, userMsg, botReply]);
+    setInputValue('');
+  };
+
+  const handleReset = () => {
+    setMessages(INITIAL_DEMO_MESSAGES);
+    setInputValue('');
+  };
+
   return (
-    <div className="w-full max-w-2xl mx-auto py-4">
-      <div className="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col gap-4">
-        <div className="flex items-center justify-between border-b border-outline-variant pb-3">
-          <div className="flex items-center gap-2">
-            <Icon name="chat" size="sm" className="text-primary" />
-            <span className="font-heading text-sm font-bold text-on-surface">Assistant Chat Workspace</span>
-          </div>
-          <span className="font-mono text-xs px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-bold">
-            Composite Block
-          </span>
+    <div className="w-full max-w-3xl mx-auto py-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <Icon name="chat" size="sm" className="text-primary" />
+          <span className="font-heading text-sm font-semibold text-on-surface">Interactive Chat Block</span>
         </div>
-        <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-          The <code>Chat</code> block assembles <code>MessageScroller</code>, <code>ChatMessage</code>, <code>PromptInput</code>, and <code>SuggestionChips</code> into an interactive chat workspace.
-        </p>
-        <div className="bg-surface-container rounded-lg p-3 font-mono text-xs border border-outline-variant">
-          import &#123; Chat &#125; from '@/components/blocks/chat';
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            colorRole="neutral"
+            size="sm"
+            onClick={() => setIsFloating((f) => !f)}
+          >
+            {isFloating ? 'Switch to Docked' : 'Switch to Floating'}
+          </Button>
+          <Button
+            variant="ghost"
+            colorRole="neutral"
+            size="sm"
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
         </div>
+      </div>
+
+      <div className="h-[520px] w-full rounded-2xl shadow-ambient overflow-hidden">
+        <Chat
+          variant="unboxed"
+          className="h-full"
+          messages={messages}
+          inputValue={inputValue}
+          onInputChange={setInputValue}
+          onSubmitMessage={handleSend}
+          position={isFloating ? 'floating' : 'docked'}
+          model={model}
+          onModelChange={setModel}
+          models={[
+            { id: 'gemini-pro', name: 'Gemini 2.5 Flash' },
+            { id: 'gemini-exp', name: 'Gemini 3.8 Pro' },
+          ]}
+          suggestions={[
+            'Review Marcus’s homework completion',
+            'Compare session 3 and session 4 accuracy',
+            'Draft next week’s target exercise plan',
+          ]}
+          suggestionsLabel="Suggested Follow-ups"
+          header={
+            <Chat.Header
+              title="Marcus Chen • Session Review"
+              subtitle="Dr. Sarah Jenkins • Speech & Language Pathology"
+              actions={
+                <Badge variant="soft" colorRole="secondary" size="sm">
+                  Active Thread
+                </Badge>
+              }
+            />
+          }
+        />
       </div>
     </div>
   );

@@ -3,7 +3,10 @@
  *
  * Layer: Composite Block (`src/components/blocks/`)
  * Foundation: Built strictly from Base UI primitives and design tokens:
+ *             - `Card` (`Card.Header`, `Card.Title`, `Card.Description`, `Card.Content`, `Card.Footer`) (`src/components/ui/card.tsx`)
  *             - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`)
+ *             - `Separator` (`src/components/ui/separator.tsx`)
+ *             - `Progress` (`src/components/ui/progress.tsx`)
  *             - `Icon` (`src/components/ui/icon.tsx`)
  *
  * TAXONOMY & USAGE:
@@ -18,7 +21,9 @@
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 import { Button, UnstyledButton } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { Icon } from '@/components/ui/icon';
 import { Progress } from '@/components/ui/progress';
 
@@ -43,7 +48,7 @@ export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   indicator?: 'numbered' | 'progress';
   /** Lets users jump to upcoming steps from the step indicators. Completed steps are always clickable. */
   allowStepClick?: boolean;
-  /** When true, keeps wizard steps in the DOM with hidden="until-found" so browser search (Ctrl+F) can find them. Only completed steps (or all steps when llowStepClick is set) are searchable, so find-in-page cannot skip guarded progression. */
+  /** When true, keeps wizard steps in the DOM with hidden="until-found" so browser search (Ctrl+F) can find them. Only completed steps (or all steps when allowStepClick is set) are searchable, so find-in-page cannot skip guarded progression. */
   hiddenUntilFound?: boolean;
 }
 
@@ -82,7 +87,7 @@ const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, canReveal, dire
     <div
       ref={panelRef}
       className={cn(
-        'w-full [&[hidden]:not([hidden="until-found"])]:hidden',
+        'w-full px-1 [&[hidden]:not([hidden="until-found"])]:hidden',
         isSelected
           ? direction === 'forward'
             ? 'animate-step-forward'
@@ -116,119 +121,111 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
     },
     ref
   ) => {
-    const prevStepRef = React.useRef(currentStepIndex);
-    const direction = currentStepIndex >= prevStepRef.current ? 'forward' : 'backward';
+    const totalSteps = steps.length;
+    const safeIndex = totalSteps > 0 ? Math.min(Math.max(0, currentStepIndex), totalSteps - 1) : 0;
+
+    const prevStepRef = React.useRef(safeIndex);
+    const direction = safeIndex >= prevStepRef.current ? 'forward' : 'backward';
 
     React.useEffect(() => {
-      prevStepRef.current = currentStepIndex;
-    }, [currentStepIndex]);
+      prevStepRef.current = safeIndex;
+    }, [safeIndex]);
 
-    const isFirstStep = currentStepIndex === 0;
-    const isLastStep = currentStepIndex === steps.length - 1;
-    const currentStep = steps[currentStepIndex];
+    if (totalSteps === 0) {
+      return null;
+    }
+
+    const isFirstStep = safeIndex === 0;
+    const isLastStep = safeIndex === totalSteps - 1;
+    const currentStep = steps[safeIndex];
 
     const handleNext = () => {
       if (isLastStep) {
         onComplete?.();
       } else {
-        onStepChange?.(currentStepIndex + 1);
+        onStepChange?.(safeIndex + 1);
       }
     };
 
     const handlePrevious = () => {
       if (!isFirstStep) {
-        onStepChange?.(currentStepIndex - 1);
+        onStepChange?.(safeIndex - 1);
       }
     };
 
-    return (
-      <div
-        ref={ref}
-        role="region"
-        aria-label={`Step ${currentStepIndex + 1} of ${steps.length}: ${currentStep?.title}`}
-        className={cn(
-          '@container flex flex-col w-full mx-auto',
-          variant === 'card'
-            ? 'rounded-lg bg-surface shadow-ambient overflow-hidden'
-            : 'bg-transparent overflow-hidden',
-          className
-        )}
-        {...props}
-      >
+    const wizardContent = (
+      <>
         {/* Step Wizard Header / Navigation Indicator */}
-        <div
-          className={cn(
-            'flex flex-col gap-3 p-5 @sm:p-6 border-b border-outline-variant',
-            variant === 'card' ? 'bg-surface-container/50' : 'bg-surface-container/20 rounded-t-lg'
-          )}
-        >
+        <Card.Header>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <div className="flex flex-col min-w-0">
               <span className="font-mono text-xs font-semibold text-primary tabular-nums">
-                Step {currentStepIndex + 1} of {steps.length}
+                Step {safeIndex + 1} of {totalSteps}
               </span>
-              <h3 className="font-heading text-headline-sm font-semibold text-on-surface truncate text-balance">
-                {currentStep?.title}
-              </h3>
+              <Card.Title as="h3">
+                {currentStep.title}
+              </Card.Title>
             </div>
             {indicator === 'numbered' && (
-            <nav aria-label="Wizard Steps Progress" className="flex flex-wrap items-center gap-1 -mr-2">
-              {steps.map((s, idx) => {
-                const isSelected = idx === currentStepIndex;
-                const isPast = idx < currentStepIndex;
-                const canNavigate = allowStepClick || isPast;
+              <nav aria-label="Wizard Steps Progress" className="flex flex-wrap items-center gap-1">
+                {steps.map((s, idx) => {
+                  const isSelected = idx === safeIndex;
+                  const isPast = idx < safeIndex;
+                  const canNavigate = allowStepClick || isPast;
 
-                return (
-                  <UnstyledButton
-                    key={s.id}
-                    type="button"
-                    onClick={() => canNavigate && onStepChange?.(idx)}
-                    disabled={!canNavigate && !isSelected}
-                    aria-label={`Step ${idx + 1}: ${s.title}${isPast ? ' (completed)' : isSelected ? ' (current)' : ''}`}
-                    aria-current={isSelected ? 'step' : undefined}
-                    className="flex min-w-11 min-h-11 items-center justify-center cursor-pointer disabled:cursor-not-allowed disabled:pointer-events-none"
-                  >
-                    <span
-                      className={cn(
-                        'size-7 rounded-full flex items-center justify-center font-mono text-xs font-bold tabular-nums transition-colors duration-quick ease-standard select-none',
-                        isSelected
-                          ? 'bg-primary text-on-primary shadow-ambient'
-                          : isPast
-                          ? 'bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary'
-                          : 'border border-outline-variant text-on-surface-variant/60 bg-surface'
-                      )}
+                  return (
+                    <UnstyledButton
+                      key={s.id}
+                      type="button"
+                      onClick={() => canNavigate && onStepChange?.(idx)}
+                      disabled={!canNavigate && !isSelected}
+                      aria-label={`Step ${idx + 1}: ${s.title}${isPast ? ' (completed)' : isSelected ? ' (current)' : ''}`}
+                      aria-current={isSelected ? 'step' : undefined}
+                      className="flex min-w-11 min-h-11 items-center justify-center cursor-pointer disabled:cursor-not-allowed disabled:pointer-events-none"
                     >
-                      {isPast ? (
-                        <Icon name="check" size="xs" />
-                      ) : (
-                        idx + 1
-                      )}
-                    </span>
-                  </UnstyledButton>
-                );
-              })}
-            </nav>
+                      <span
+                        className={cn(
+                          'size-7 rounded-full flex items-center justify-center font-mono text-xs font-bold tabular-nums transition-colors duration-quick ease-standard select-none',
+                          isSelected
+                            ? 'bg-primary text-on-primary shadow-ambient'
+                            : isPast
+                            ? 'bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary'
+                            : 'border border-outline-variant text-on-surface-variant/60 bg-surface'
+                        )}
+                      >
+                        {isPast ? (
+                          <Icon name="check" size="xs" aria-hidden="true" />
+                        ) : (
+                          idx + 1
+                        )}
+                      </span>
+                    </UnstyledButton>
+                  );
+                })}
+              </nav>
             )}
           </div>
           {indicator === 'progress' && (
             <Progress
-              value={currentStepIndex + 1}
-              max={steps.length}
+              value={safeIndex + 1}
+              max={totalSteps}
               size="sm"
               aria-label="Wizard progress"
-              aria-valuetext={`Step ${currentStepIndex + 1} of ${steps.length}`}
+              aria-valuetext={`Step ${safeIndex + 1} of ${totalSteps}`}
             />
           )}
-          {currentStep?.description && (
-            <p className="font-sans text-body-md text-on-surface-variant text-pretty">
+          {currentStep.description && (
+            <Card.Description>
               {currentStep.description}
-            </p>
+            </Card.Description>
           )}
-        </div>
+        </Card.Header>
+
+        <Separator className="mt-4 mb-0" />
 
         {/* Directional Sliding Step Viewport */}
-        <div
-          className="relative min-h-50 overflow-hidden p-5 @sm:p-6"
+        <Card.Content
+          className="relative min-h-50 pt-4 pb-1 overflow-x-clip"
           aria-live="polite"
         >
           {hiddenUntilFound ? (
@@ -236,61 +233,85 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
               <StepPanel
                 key={s.id}
                 step={s}
-                isSelected={idx === currentStepIndex}
-                canReveal={idx < currentStepIndex || allowStepClick}
+                isSelected={idx === safeIndex}
+                canReveal={idx < safeIndex || allowStepClick}
                 direction={direction}
                 onSelect={() => onStepChange?.(idx)}
               />
             ))
           ) : (
             <div
-              key={currentStep?.id || currentStepIndex}
+              key={currentStep.id || safeIndex}
               className={cn(
-                'w-full',
+                'w-full px-1',
                 direction === 'forward'
                   ? 'animate-step-forward'
                   : 'animate-step-backward',
                 'motion-reduce:animate-none'
               )}
             >
-              {currentStep?.content}
+              {currentStep.content}
             </div>
           )}
-        </div>
+        </Card.Content>
 
         {/* Footer Navigation Controls */}
         {showNavigationButtons && (
-          <div
-            className={cn(
-              'flex items-center justify-between gap-4 px-5 py-4 border-t border-outline-variant',
-              variant === 'card' ? 'bg-surface-container' : 'bg-surface-container/20 rounded-b-lg'
-            )}
-          >
-            <div className={cn('flex items-center', isFirstStep && 'invisible')}>
+          <>
+            <Separator className="mt-4 mb-0" />
+            <Card.Footer className="justify-between">
+              <div className={cn('flex items-center', isFirstStep && 'invisible')}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  colorRole="neutral"
+                  size="md"
+                  onClick={handlePrevious}
+                  disabled={isFirstStep}
+                >
+                  <Icon name="chevron_left" size="sm" aria-hidden="true" />
+                  <span>{previousLabel}</span>
+                </Button>
+              </div>
               <Button
                 type="button"
-                variant="outlined"
-                colorRole="neutral"
+                variant="filled"
                 size="md"
-                onClick={handlePrevious}
-                disabled={isFirstStep}
+                onClick={handleNext}
               >
-                <Icon name="chevron_left" size="sm" />
-                <span>{previousLabel}</span>
+                <span>{isLastStep ? completeLabel : nextLabel}</span>
+                {!isLastStep && <Icon name="chevron_right" size="sm" aria-hidden="true" />}
               </Button>
-            </div>
-            <Button
-              type="button"
-              variant="filled"
-              size="md"
-              onClick={handleNext}
-            >
-              <span>{isLastStep ? completeLabel : nextLabel}</span>
-              {!isLastStep && <Icon name="chevron_right" size="sm" />}
-            </Button>
-          </div>
+            </Card.Footer>
+          </>
         )}
-      </div>
+      </>
+    );
+
+    if (variant === 'embedded') {
+      return (
+        <div
+          ref={ref}
+          role="region"
+          aria-label={`Step ${safeIndex + 1} of ${totalSteps}: ${currentStep.title}`}
+          className={cn('@container flex flex-col w-full mx-auto bg-transparent', className)}
+          {...props}
+        >
+          {wizardContent}
+        </div>
+      );
+    }
+
+    return (
+      <Card
+        ref={ref}
+        role="region"
+        aria-label={`Step ${safeIndex + 1} of ${totalSteps}: ${currentStep.title}`}
+        className={cn('@container flex flex-col w-full mx-auto', className)}
+        {...props}
+      >
+        {wizardContent}
+      </Card>
     );
   }
 );

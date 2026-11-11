@@ -100,6 +100,7 @@ const registryEntries = items.map(item => {
     item.name === 'toggles' ||
     item.name === 'steppers' ||
     item.name === 'empty-state' ||
+    item.name === 'approval-card' ||
     item.name === 'metric-card' ||
     item.name === 'delete-confirmation-dialog';
   const deprecatedNote = item.name === 'selection-controls'
@@ -110,6 +111,8 @@ const registryEntries = items.map(item => {
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.'
     : item.name === 'empty-state'
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/empty.'
+    : item.name === 'approval-card'
+    ? 'Deprecated block. Use Confirmation (@/components/ui/confirmation) for [Approve] / [Deny] AI tool approval gates, or Questionnaire (@/components/blocks/questionnaire) with declarative items for choice and clarification prompts.'
     : item.name === 'metric-card'
     ? 'Deprecated block. Compose Card (divided <dl> stat strip), Item.Group, RadialChartCard, or Table (numeric) directly instead of metric card grids.'
     : item.name === 'delete-confirmation-dialog'
@@ -123,6 +126,8 @@ const registryEntries = items.map(item => {
     ? 'number-field'
     : item.name === 'empty-state'
     ? 'empty'
+    : item.name === 'approval-card'
+    ? 'confirmation, questionnaire'
     : item.name === 'metric-card'
     ? 'card, item, radial-chart-card, table'
     : item.name === 'delete-confirmation-dialog'

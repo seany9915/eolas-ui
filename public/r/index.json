@@ -2251,7 +2251,7 @@
     "name": "approval-card",
     "type": "registry:block",
     "title": "Approval Card",
-    "description": "Eolas UI Approval Card component built on Base UI and DESIGN.md design tokens.",
+    "description": "ApprovalCard block. @deprecated Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with declarative `items`) for single-step or multi-step choice and free-text clarification prompts.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -2260,6 +2260,7 @@
     "registryDependencies": [
       "@seany9915/eolas-ui/utils",
       "@seany9915/eolas-ui/button",
+      "@seany9915/eolas-ui/field",
       "@seany9915/eolas-ui/icon",
       "@seany9915/eolas-ui/radio",
       "@seany9915/eolas-ui/input"
@@ -2331,6 +2332,7 @@
       "@seany9915/eolas-ui/utils",
       "@seany9915/eolas-ui/message-scroller",
       "@seany9915/eolas-ui/chat-message",
+      "@seany9915/eolas-ui/reasoning",
       "@seany9915/eolas-ui/prompt-input",
       "@seany9915/eolas-ui/suggestion-chips",
       "@seany9915/eolas-ui/empty-state"
@@ -2398,7 +2400,7 @@
     "name": "filter-toolbar",
     "type": "registry:block",
     "title": "Filter Toolbar",
-    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
+    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -2406,6 +2408,7 @@
     ],
     "registryDependencies": [
       "@seany9915/eolas-ui/utils",
+      "@seany9915/eolas-ui/field",
       "@seany9915/eolas-ui/input",
       "@seany9915/eolas-ui/select",
       "@seany9915/eolas-ui/button",
@@ -2563,7 +2566,7 @@
     "name": "step-wizard",
     "type": "registry:block",
     "title": "Step Wizard",
-    "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+    "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Card` (`Card.Header`, `Card.Title`, `Card.Description`, `Card.Content`, `Card.Footer`) (`src/components/ui/card.tsx`) - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Separator` (`src/components/ui/separator.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -2571,7 +2574,9 @@
     ],
     "registryDependencies": [
       "@seany9915/eolas-ui/utils",
+      "@seany9915/eolas-ui/card",
       "@seany9915/eolas-ui/button",
+      "@seany9915/eolas-ui/separator",
       "@seany9915/eolas-ui/icon",
       "@seany9915/eolas-ui/progress"
     ],

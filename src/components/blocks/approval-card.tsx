@@ -1,19 +1,36 @@
+/**
+ * ApprovalCard block.
+ *
+ * @deprecated Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]`
+ * AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire`
+ * with declarative `items`) for single-step or multi-step choice and free-text clarification prompts.
+ */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
 import { Icon } from '@/components/ui/icon';
 import { RadioGroup, Radio } from '@/components/ui/radio';
 import { Input } from '@/components/ui/input';
 
-/** Reserved id for the built-in free-text option. Options using it are ignored. */
+/**
+ * Reserved id for the built-in free-text option. Options using it are ignored.
+ * @deprecated Use `Confirmation` or `Questionnaire` instead.
+ */
 export const APPROVAL_CARD_CUSTOM_OPTION_ID = '__custom__';
 
+/**
+ * @deprecated Use `Confirmation` or `QuestionnaireItemDef` instead.
+ */
 export interface ApprovalCardOption {
   id: string;
   label: string;
   description?: string;
 }
 
+/**
+ * @deprecated Use `ConfirmationProps` (`@/components/ui/confirmation`) or `QuestionnaireProps` (`@/components/blocks/questionnaire`) instead.
+ */
 export interface ApprovalCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
@@ -37,6 +54,9 @@ export interface ApprovalCardProps extends React.HTMLAttributes<HTMLDivElement> 
   isConfirmDisabled?: boolean;
 }
 
+/**
+ * @deprecated Use `Confirmation` (`@/components/ui/confirmation`) or `Questionnaire` (`@/components/blocks/questionnaire`) instead.
+ */
 export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
   (
     {
@@ -67,14 +87,16 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
     const selectedId = selectedOptionId ?? internalSelectedId;
     const choices = options.filter((opt) => opt.id !== APPROVAL_CARD_CUSTOM_OPTION_ID);
     const customInput = (
-      <Input
-        type="text"
-        value={customInputValue}
-        onChange={(e) => onCustomInputChange?.(e.target.value)}
-        placeholder={customInputPlaceholder}
-        aria-label="Custom answer"
-        className="w-full"
-      />
+      <Field.Root>
+        <Field.Label className="sr-only">Custom answer</Field.Label>
+        <Input
+          type="text"
+          value={customInputValue}
+          onChange={(e) => onCustomInputChange?.(e.target.value)}
+          placeholder={customInputPlaceholder}
+          className="w-full"
+        />
+      </Field.Root>
     );
 
     return (
@@ -202,7 +224,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
 
           <div className="flex items-center gap-2">
             {onSkip && (
-              <Button type="button" variant="outlined" colorRole="neutral" size="sm" onClick={onSkip}>
+              <Button type="button" variant="outline" colorRole="neutral" size="sm" onClick={onSkip}>
                 {skipLabel}
               </Button>
             )}

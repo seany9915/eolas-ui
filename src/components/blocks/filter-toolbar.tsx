@@ -2,10 +2,11 @@
  * FilterToolbar block.
  *
  * Controlled composite toolbar for data tables, caseload lists, and exercise libraries.
- * Composes Input, Select, Button, and Chip primitives with responsive container queries (@container),
+ * Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container),
  * 44px minimum touch targets, and accessible filter clearing.
  */
 import * as React from 'react';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, type SelectOption } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ export interface ActiveFilterTag {
 export interface FilterToolbarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  searchLabel?: string;
   searchPlaceholder?: string;
   filterGroups?: FilterOptionGroup[];
   onFilterChange?: (groupId: string, value: string) => void;
@@ -44,6 +46,7 @@ export interface FilterToolbarProps {
 export function FilterToolbar({
   searchQuery,
   onSearchChange,
+  searchLabel = 'Search',
   searchPlaceholder = 'Search...',
   filterGroups = [],
   onFilterChange,
@@ -61,22 +64,25 @@ export function FilterToolbar({
   return (
     <div className={cn('@container flex w-full flex-col gap-3', className)}>
       <div className="flex flex-col @md:flex-row items-stretch @md:items-center justify-between gap-3">
-        {/* Search input with functional icon */}
-        <div className="flex-1 min-w-50">
+        {/* Search input with accessible Field label and native-safe clear trigger */}
+        <Field.Root className="w-full min-w-0 @md:flex-1 @md:min-w-48">
+          <Field.Label className="sr-only">{searchLabel}</Field.Label>
           <Input
+            type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={searchPlaceholder}
             leadingIcon={<Icon name="search" size="md" aria-hidden="true" />}
+            clearable
+            onClear={() => onSearchChange('')}
             className="w-full"
-            aria-label={searchPlaceholder}
           />
-        </div>
+        </Field.Root>
 
         {/* Filter dropdowns and actions */}
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 w-full @md:w-auto">
           {filterGroups.map((group) => (
-            <div key={group.id} className="min-w-36">
+            <div key={group.id} className="w-full @xs:w-auto @xs:min-w-36">
               <Select
                 value={group.value}
                 onValueChange={(val) => {
@@ -93,7 +99,7 @@ export function FilterToolbar({
 
           {hasActiveFilters && onReset && (
             <Button
-              variant="outlined"
+              variant="outline"
               colorRole="neutral"
               onClick={onReset}
             >
@@ -109,7 +115,7 @@ export function FilterToolbar({
       {/* Active Filter Chips */}
       {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="font-label text-xs font-semibold text-on-surface-variant mr-1">
+          <span className="font-sans text-label-sm text-on-surface-variant">
             Active filters:
           </span>
           {activeFilters.map((filter) => (

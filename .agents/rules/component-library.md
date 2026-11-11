@@ -51,7 +51,7 @@ To prevent AI hallucination, circular dependencies, and directory pollution, cod
 The most common failure mode in this workspace is an agent writing a bespoke component instead of checking whether one already exists. Follow this sequence every time before writing a new interactive UI element:
 
 - **Base UI ships as primitives for:** Accordion, Alert Dialog, Autocomplete, Avatar, Button, Checkbox, Checkbox Group, Collapsible, Combobox, Context Menu, Dialog, Drawer, Field, Fieldset, Form, Input, Menu, Menubar, Meter, Navigation Menu, Number Field, OTP Field, Popover, Preview Card, Progress, Radio, Scroll Area, Select, Separator, Slider, Switch, Tabs, Toast, Toggle, Toggle Group, Toolbar, Tooltip. Check https://base-ui.com/llms.txt for updates.
-- **Custom primitives built on Base UI or accessible HTML in `src/components/ui/`:** Card, Badge, Chip, InlineAlert, Icon, ClinicianTip, ThinkingOrb, BotAvatar, AvatarButton (Avatar.Button), Breadcrumb, Pagination, EmptyState, Resizable, Attachment, ThinkingTrace, InputGroup, Field, Fieldset, ApprovalCard, and shared motion primitives (Skeleton, TextSwap, NotificationBadge, TextsReveal, NumberRoll, NumberPopIn, SpinningCounter, ShimmerText, ErrorShake, SuccessCheck).
+- **Custom primitives built on Base UI or accessible HTML in `src/components/ui/`:** Card, Badge, Chip, InlineAlert, Icon, ClinicianTip, ThinkingOrb, BotAvatar, AvatarButton (Avatar.Button), Breadcrumb, Pagination, EmptyState, Resizable, Attachment, ThinkingTrace, InputGroup, Field, Fieldset, Confirmation, and shared motion primitives (Skeleton, TextSwap, NotificationBadge, TextsReveal, NumberRoll, NumberPopIn, SpinningCounter, ShimmerText, ErrorShake, SuccessCheck).
 
 1. **Inventory first.** List `src/components/ui/` and `src/components/blocks/` before writing anything.
 2. **Match against the inventory.** If a component or block already covers this need, use it directly or extend it with props.
@@ -87,9 +87,9 @@ Never guess between navigation, action, and selection components. Strictly follo
 | **`Tabs`** | `@base-ui/react/tabs` | `role="tablist"` / `tab` / `tabpanel` | Mutually exclusive content views on same page | Tab click unhides paired `tabpanel`; 1 active panel at a time | Switching between views/sections of a card, dashboard, or profile | **Not** for executing commands (e.g. "Export" is not a tab) or multi-select filters (use `ToggleGroup`) |
 | **`ToggleGroup`** | `@base-ui/react/toggle-group` | `role="group"` with `aria-pressed` | Mode/filter selection without view panels | Toggles boolean states (single 1-of-N or multi N-of-M) | Segmented controls, filter bars, layout toggles (Grid/List), text formatting buttons inside a Toolbar | **Not** for switching entire DOM content panels (use `Tabs`) or routing to new URLs (use `NavigationMenu`) |
 
-### AI Chat & Agent UX (<Trace>, <ApprovalCard>)
+### AI Chat & Agent UX (<Trace>, <Confirmation>)
 
-- **Pending Approvals Outside <Trace>:** Interactive confirmation controls (`[Approve] / [Deny]`) must never be nested inside an expandable or collapsed <Trace> row. Render actionable decisions as standalone prominent `<ApprovalCard>` blocks in the chat stream, and transition them into collapsed audit lines inside the trace only after the user resolves them.
+- **Pending Approvals Outside <Trace>:** Interactive confirmation controls (`[Approve] / [Deny]`) must never be nested inside an expandable or collapsed <Trace> row. Render actionable decisions as standalone prominent `<Confirmation>` blocks in the chat stream (and use `<Questionnaire>` for clarification choice prompts), and transition them into collapsed audit lines inside the trace only after the user resolves them.
 - **"Behavior Wraps the Line":** Triggers must always retain semantic button behaviors and ARIA roles (e.g. `<TraceCollapsibleTrigger>` renders a true `<button>`). Never use Base UI `render` props to replace interactive elements with non-focusable `<span>` or `<div>` elements.
 
 ## Styling Base UI primitives
@@ -147,7 +147,7 @@ To maintain modularity and avoid sprawling unorganized registries, all 112 compo
 | **Tier 3** | **Composed** | `src/components/ui/` & `blocks/` | Structural containers & data displays: `Card`, `Table`, `Avatar`, `InlineAlert`, `EmptyState`, `Accordion`, `Collapsible`, `Toast`, `Chart`, `ClinicianTip`. |
 | **Tier 4** | **Overlays** | `src/components/ui/` | Layered top-layer popups: `Dialog`, `AlertDialog`, `Drawer`, `Sheet`, `Popover`, `Tooltip`, `Menu`, `ContextMenu`, `PreviewCard`. |
 | **Tier 5** | **Shell** | `src/components/ui/` | Application layout chrome: `Sidebar`, `Breadcrumb`, `Pagination`, `NavigationMenu`, `Toolbar`. |
-| **Tier 6** | **Clinical AI & Conversation** | `src/components/ui/` & `blocks/` | Conversational & diagnostic primitives: `ChatMessage`, `Trace`, `Reasoning`, `ThinkingOrb`, `ApprovalCard`, `Attachment`, `Sources`, `Checkpoint`. |
+| **Tier 6** | **Clinical AI & Conversation** | `src/components/ui/` & `blocks/` | Conversational & diagnostic primitives: `ChatMessage`, `Trace`, `Reasoning`, `ThinkingOrb`, `Confirmation`, `Attachment`, `Sources`, `Checkpoint`. |
 
 ## Known Component Traps & Edge-Case Guardrails
 

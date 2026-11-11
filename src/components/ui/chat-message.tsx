@@ -143,13 +143,13 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
         className={cn(
           'p-4 text-base font-sans leading-relaxed transition-colors',
           role === 'user' &&
-            'bg-primary-container text-on-primary-container rounded-lg rounded-br-xs',
+            'bg-primary-container text-on-primary-container rounded-2xl rounded-br-xs',
           role === 'assistant' &&
             (variant === 'ghost'
               ? 'bg-transparent text-on-surface border-0 p-0 rounded-none'
-              : 'bg-surface text-on-surface border border-outline-variant rounded-lg rounded-bl-xs'),
+              : 'bg-surface text-on-surface border border-outline-variant shadow-ambient rounded-2xl rounded-bl-xs'),
           role === 'system' &&
-            'bg-surface-container text-on-surface-variant rounded-lg text-sm font-medium',
+            'bg-surface-container text-on-surface-variant rounded-xl text-sm font-medium',
           className
         )}
         {...props}
