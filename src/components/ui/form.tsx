@@ -69,7 +69,7 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
         actionsRef={actionsRef}
         onFormSubmit={onFormSubmit}
         onSubmit={onSubmit}
-        className={cn('space-y-4 w-full transition-colors duration-quick', className)}
+        className={cn('flex flex-col gap-4 w-full transition-colors duration-quick', className)}
         {...webMcpProps}
         {...props}
       >

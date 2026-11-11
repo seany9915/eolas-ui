@@ -238,15 +238,15 @@ button,
 }
 
 /* Border Width Token Utility Classes */
-.border-default {
+@utility border-default {
   border-width: 1px;
 }
 
-.border-emphasis {
+@utility border-emphasis {
   border-width: 2px;
 }
 
-.border-accent {
+@utility border-accent {
   border-width: 4px;
 }
 

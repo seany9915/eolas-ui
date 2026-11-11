@@ -49,8 +49,8 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
   defaultValue,
   onValueChange,
   onValueCommitted,
-  min = 0,
-  max = 100,
+  min,
+  max,
   step = 1,
   smallStep = 0.1,
   largeStep = 10,
@@ -70,6 +70,9 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
 }, ref) => {
   const generatedId = React.useId();
   const inputId = id || generatedId;
+  const descriptionId = description ? `{inputId}-description` : undefined;
+  const errorId = error ? `{inputId}-error` : undefined;
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
 
   // Composable compound usage
   if (children) {
@@ -138,7 +141,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       )}
 
       {description && (
-        <span className="font-sans text-sm text-on-surface-variant">
+        <span id={descriptionId} className="font-sans text-sm text-on-surface-variant">
           {description}
         </span>
       )}
@@ -161,6 +164,8 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
         </BaseNumberField.Decrement>
         <BaseNumberField.Input
           data-slot="number-field-input"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           className="h-11 w-14 min-w-[3.5rem] px-1 text-center font-mono text-base font-bold text-on-surface tabular-nums bg-transparent outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
         />
         <BaseNumberField.Increment
@@ -172,8 +177,8 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       </BaseNumberField.Group>
 
       {error && (
-        <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none">
-          <Icon name="error" size="sm" className="shrink-0" />
+        <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none">
+          <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </span>
       )}

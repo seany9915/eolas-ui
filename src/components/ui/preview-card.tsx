@@ -60,7 +60,7 @@ export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopu
     <BasePreviewCard.Popup
       ref={ref}
       className={cn(
-        'w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient space-y-2',
+        'w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2',
         'transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)]',
         'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
         'motion-reduce:transition-none motion-reduce:transform-none',

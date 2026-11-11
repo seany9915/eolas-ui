@@ -321,6 +321,23 @@ for (const file of files) {
     npmDeps.push('react-day-picker');
   }
 
+  // Bundle helper modules from src/lib (other than utils, which is its own item)
+  const libFiles = [];
+  const libRegex = /from\s+['"]@\/lib\/([^'"]+)['"]/g;
+  let lm;
+  while ((lm = libRegex.exec(content)) !== null) {
+    const libName = lm[1];
+    const libPath = path.join(LIB_DIR, `${libName}.ts`);
+    if (libName !== 'utils' && fs.existsSync(libPath)) {
+      libFiles.push({
+        path: `lib/${libName}.ts`,
+        content: fs.readFileSync(libPath, 'utf8'),
+        type: 'registry:lib',
+        target: `@lib/${libName}.ts`,
+      });
+    }
+  }
+
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name,
@@ -336,6 +353,7 @@ for (const file of files) {
         type: 'registry:ui',
         target: `@ui/${file}`,
       },
+      ...libFiles,
     ],
     ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
     ...(docMeta.docs ? { docs: docMeta.docs } : {}),

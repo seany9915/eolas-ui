@@ -169,6 +169,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         data,
         keyExtractor,
         className,
+        containerClassName,
         responsive = 'scroll',
       } = props as DataDrivenTableProps<any>;
       const isStack = responsive === 'stack';
@@ -179,10 +180,10 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
           className={cn(
             'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
             isStack && '@container',
-            className
+            containerClassName
           )}
         >
-          <table ref={ref} data-slot="table" className="w-full text-left border-collapse font-sans text-sm">
+          <table ref={ref} data-slot="table" className={cn('w-full text-left border-collapse font-sans text-sm', className)}>
             <thead className={cn(isStack && '@max-sm:hidden')}>
               <tr className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
                 {columns.map((col, idx) => {

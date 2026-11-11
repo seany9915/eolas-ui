@@ -55,8 +55,6 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
       return (
         <div
           ref={ref}
-          role="status"
-          aria-label={title || 'No data available'}
           data-slot="empty"
           className={cn(
             'flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
@@ -75,8 +73,6 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
     return (
       <div
         ref={ref}
-        role="status"
-        aria-label={title || 'No data available'}
         data-slot="empty"
         className={cn(
           'flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',

@@ -72,11 +72,13 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
         className={cn('w-full', className)}
         {...props}
       >
-        {label && (
-          <div className="space-y-0.5 mb-2.5">
-            <span id={labelId} className="font-label text-sm font-bold text-on-surface block">
-              {label}
-            </span>
+        {(label || description) && (
+          <div className="flex flex-col gap-0.5 mb-2.5">
+            {label && (
+              <span id={labelId} className="font-label text-sm font-bold text-on-surface block">
+                {label}
+              </span>
+            )}
             {description && (
               <span id={descId} className="font-sans text-sm text-on-surface-variant block">
                 {description}

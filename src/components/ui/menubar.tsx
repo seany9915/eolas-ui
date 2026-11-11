@@ -79,7 +79,7 @@ export const MenubarContent = React.forwardRef<HTMLDivElement, MenubarContentPro
         <BaseMenu.Popup
           ref={ref}
           className={cn(
-            'min-w-[220px] p-1 rounded-lg bg-surface border border-outline-variant shadow-modal outline-none',
+            'min-w-[220px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
             'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
             'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
             'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)]',

@@ -92,6 +92,14 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
             ) : (
               children
             )}
+            {href && (
+              <a
+                href={href}
+                className="mt-1.5 inline-flex min-h-[44px] items-center text-secondary underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+              >
+                Open link
+              </a>
+            )}
           </TraceCollapsibleContent>
         </TraceCollapsible>
       );

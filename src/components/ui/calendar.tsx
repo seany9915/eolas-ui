@@ -66,9 +66,9 @@ export function Calendar({
         caption_label: 'text-sm font-semibold font-label text-on-surface',
         nav: 'absolute inset-x-0 top-0 flex items-center justify-between h-9 px-1 pointer-events-none z-10',
         button_previous:
-          'pointer-events-auto h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-1.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         button_next:
-          'pointer-events-auto h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-1.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
         weekday: 'text-on-surface-variant rounded-md w-9 font-normal text-xs text-center font-sans select-none',

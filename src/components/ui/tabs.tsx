@@ -146,7 +146,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             effectiveVariant === 'unstyled'
               ? ''
               : isSegmented
-                ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none'
+                ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                 : cn(
                     'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden scrollbar-none select-none',
                     'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
@@ -461,7 +461,7 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
             {hasContent &&
               tabList?.map((tab) => {
                 const tabKey = (tab.value ?? tab.id) as string;
-                if (!tab.content) return null;
+                if (tab.content === undefined || tab.content === null || tab.content === false) return null;
                 return (
                   <TabsPanel
                     key={tabKey}

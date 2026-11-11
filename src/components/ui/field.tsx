@@ -231,6 +231,12 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
   ) => {
     const helperText = description ?? hint;
 
+    // Forward `required` to a single direct control child so native validation matches the label.
+    const control =
+      required && React.isValidElement<{ required?: boolean }>(children) && children.props.required === undefined
+        ? React.cloneElement(children, { required: true })
+        : children;
+
     return (
       <FieldRoot
         ref={ref}
@@ -259,7 +265,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
                 {helperText && <FieldDescription>{helperText}</FieldDescription>}
               </FieldContent>
             )}
-            {children}
+            {control}
           </>
         ) : (
           <>
@@ -272,7 +278,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
               </FieldLabel>
             )}
             {helperText && <FieldDescription>{helperText}</FieldDescription>}
-            {children}
+            {control}
           </>
         )}
 

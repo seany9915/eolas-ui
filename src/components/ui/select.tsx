@@ -142,6 +142,23 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
     }
   };
 
+  const generatedId = React.useId();
+  const selectId = id || `select-${generatedId}`;
+  const descriptionId = description ? `${selectId}-desc` : undefined;
+  const errorId = error ? `${selectId}-error` : undefined;
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+
+  const resolvedItems = React.useMemo(() => {
+    if (options) {
+      return options.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        disabled: opt.disabled,
+      }));
+    }
+    return items;
+  }, [options, items]);
+
   // If children are provided, this is a compound Select (e.g. <Select><SelectTrigger/><SelectContent/></Select>)
   if (children) {
     return (
@@ -173,23 +190,6 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
       </BaseSelect.Root>
     );
   }
-
-  const generatedId = React.useId();
-  const selectId = id || `select-${generatedId}`;
-  const descriptionId = description ? `${selectId}-desc` : undefined;
-  const errorId = error ? `${selectId}-error` : undefined;
-  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
-
-  const resolvedItems = React.useMemo(() => {
-    if (options) {
-      return options.map((opt) => ({
-        value: opt.value,
-        label: opt.label,
-        disabled: opt.disabled,
-      }));
-    }
-    return items;
-  }, [options, items]);
 
   const isItemAligned = alignItemWithTrigger ?? (position === 'item-aligned');
   const showScrollArrows = withScrollArrows ?? isItemAligned;
@@ -319,6 +319,18 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
                       disabled={opt.disabled}
                     >
                       {opt.label}
+                    </SelectItem>
+                  ))
+                ) : Array.isArray(items) ? (
+                  (items as Array<{ value: Value; label?: React.ReactNode; disabled?: boolean }>).map((item) => (
+                    <SelectItem key={String(item.value)} value={item.value} disabled={item.disabled}>
+                      {item.label ?? String(item.value)}
+                    </SelectItem>
+                  ))
+                ) : items ? (
+                  Object.entries(items as Record<string, React.ReactNode>).map(([itemValue, itemLabel]) => (
+                    <SelectItem key={itemValue} value={itemValue as Value}>
+                      {itemLabel}
                     </SelectItem>
                   ))
                 ) : null}

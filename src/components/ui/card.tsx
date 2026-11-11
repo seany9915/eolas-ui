@@ -129,19 +129,21 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     affordanceStyles = '';
   }
 
+  const { onKeyDown, ...restProps } = props;
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(e);
+    if (e.defaultPrevented || e.target !== e.currentTarget) return;
     if (isSelectable && (e.key === ' ' || e.key === 'Enter')) {
       e.preventDefault();
       e.currentTarget.click();
     }
-    props.onKeyDown?.(e);
   };
 
   const isRadio = props.role === 'radio';
   const role = isSelectable ? (props.role ?? 'button') : props.role;
   const ariaPressed = isSelectable && !isRadio ? (props['aria-pressed'] ?? selected) : props['aria-pressed'];
   const ariaChecked = isRadio ? (props['aria-checked'] ?? selected) : props['aria-checked'];
-  const tabIndex = props.tabIndex !== undefined ? props.tabIndex : (isSelectable || isActionable ? 0 : undefined);
+  const tabIndex = props.tabIndex !== undefined ? props.tabIndex : (isSelectable ? 0 : undefined);
 
   return (
     <div
@@ -152,7 +154,6 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
       data-size={size}
       aria-pressed={ariaPressed}
       aria-checked={ariaChecked}
-      onKeyDown={handleKeyDown}
       style={{
         '--card-spacing': size === 'sm' ? '1rem' : '1.5rem',
         ...props.style,
@@ -164,7 +165,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
         subgrid && 'card-subgrid',
         className
       )}
-      {...props}
+      {...restProps}
+      onKeyDown={handleKeyDown}
     >
       {children}
     </div>

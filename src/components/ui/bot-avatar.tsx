@@ -65,7 +65,7 @@ export interface BotAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   interactive?: boolean;
   /** Manual animation freeze */
   paused?: boolean;
-  /** Automatically respect OS prefers-reduced-motion */
+  /** @deprecated Reduced motion is mandatory and always honored; this prop has no effect. */
   respectReducedMotion?: boolean;
   /** Optional visual pill badge indicating this is an automated digital assistant, not a clinician */
   showDisclaimerBadge?: boolean;
@@ -95,7 +95,7 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
       speed = 1,
       interactive = true,
       paused: explicitPaused,
-      respectReducedMotion = true,
+      respectReducedMotion: _respectReducedMotion,
       showDisclaimerBadge = false,
       disclaimerText = 'Digital Assistant',
       className,
@@ -104,7 +104,7 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
     ref
   ) => {
     const prefersReducedMotion = usePrefersReducedMotion();
-    const isPaused = explicitPaused ?? (respectReducedMotion && prefersReducedMotion);
+    const isPaused = prefersReducedMotion || explicitPaused === true;
 
     // Resolve pixel size
     const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;

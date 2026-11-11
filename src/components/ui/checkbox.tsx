@@ -53,6 +53,11 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
     const generatedId = React.useId();
     const checkboxId = id || generatedId;
 
+    const descriptionId = description ? `${checkboxId}-description` : undefined;
+    const errorText = typeof error === 'string' && error ? error : undefined;
+    const errorId = errorText ? `${checkboxId}-error` : undefined;
+    const describedBy = [props['aria-describedby'], descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+
     const isIndeterminate = indeterminate ?? (checked === 'indeterminate');
     const isChecked = checked === 'indeterminate' ? false : checked;
 
@@ -82,8 +87,10 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           !label && className
         )}
         {...props}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={describedBy}
       >
-        <BaseCheckbox.Indicator
+        {children ?? <BaseCheckbox.Indicator
           render={(indicatorProps, state) => (
             <span
               {...indicatorProps}
@@ -96,12 +103,31 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
               />
             </span>
           )}
-        />
+        />}
       </BaseCheckbox.Root>
     );
 
+    const descriptionNode = description && (
+      <span id={descriptionId} className="font-sans text-sm text-on-surface-variant mt-0.5">
+        {description}
+      </span>
+    );
+    const errorNode = errorText && (
+      <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1">
+        <Icon name="error" size="sm" className="shrink-0" />
+        <span>{errorText}</span>
+      </span>
+    );
+
     if (!label) {
-      return checkboxNode;
+      if (!descriptionNode && !errorNode) return checkboxNode;
+      return (
+        <div className={cn('flex flex-col', className)}>
+          {checkboxNode}
+          {descriptionNode}
+          {errorNode}
+        </div>
+      );
     }
 
     return (
@@ -123,17 +149,8 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           <span className="font-sans text-sm font-medium text-on-surface select-none group-disabled:text-on-surface-variant">
             {label}
           </span>
-          {description && (
-            <span className="font-sans text-sm text-on-surface-variant select-none mt-0.5">
-              {description}
-            </span>
-          )}
-          {typeof error === 'string' && error && (
-            <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
-              <Icon name="error" size="sm" className="shrink-0" />
-              <span>{error}</span>
-            </span>
-          )}
+          {descriptionNode}
+          {errorNode}
         </div>
       </label>
     );

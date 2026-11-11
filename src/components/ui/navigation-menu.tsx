@@ -155,7 +155,7 @@ export const NavigationMenuPopup = React.forwardRef<
     ref={ref}
     className={cn(
       'relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)]',
-      'rounded-xl bg-surface border border-outline-variant shadow-modal outline-none',
+      'rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
       'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
       'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
       'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)]',

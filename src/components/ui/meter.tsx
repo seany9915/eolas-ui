@@ -30,7 +30,7 @@ export interface MeterProps {
 const colorRoleClasses: Record<'primary' | 'secondary' | 'tertiary' | 'warning' | 'error' | 'success', string> = {
   primary: 'bg-primary',
   secondary: 'bg-secondary',
-  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  tertiary: 'bg-tertiary',
   warning: 'bg-warning',
   error: 'bg-error',
   success: 'bg-success',
@@ -61,9 +61,9 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
         max={max}
         format={format}
         locale={locale}
-        aria-valuetext={ariaValueText}
+        {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
         getAriaValueText={getAriaValueText}
-        className={cn('space-y-1.5 w-full', className)}
+        className={cn('flex flex-col gap-1.5 w-full', className)}
         {...props}
       >
         {children}
@@ -79,9 +79,9 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
       max={max}
       format={format}
       locale={locale}
-      aria-valuetext={ariaValueText}
+      {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
       getAriaValueText={getAriaValueText}
-      className={cn('space-y-1.5 w-full', className)}
+      className={cn('flex flex-col gap-1.5 w-full', className)}
       {...props}
     >
       {(label || value !== undefined) && (

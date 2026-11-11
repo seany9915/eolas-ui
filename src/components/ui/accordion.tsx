@@ -161,7 +161,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
   onValueChange,
   multiple,
   type,
-  collapsible: _collapsible,
+  collapsible,
   orientation,
   loopFocus,
   disabled,
@@ -187,6 +187,11 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
 
   const handleValueChange = React.useCallback(
     (val: string[], eventDetails: BaseAccordion.Root.ChangeEventDetails) => {
+      // Base UI accordions always allow closing; honor collapsible={false} by cancelling the close.
+      if (!isMultiple && collapsible === false && val.length === 0) {
+        eventDetails.cancel();
+        return;
+      }
       if (onValueChange) {
         if (!isMultiple && type === 'single') {
           onValueChange(val[val.length - 1] ?? '', eventDetails);
@@ -195,7 +200,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
         }
       }
     },
-    [onValueChange, isMultiple, type]
+    [onValueChange, isMultiple, type, collapsible]
   );
 
   return (

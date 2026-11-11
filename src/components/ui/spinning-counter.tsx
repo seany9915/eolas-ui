@@ -67,7 +67,7 @@ const ReelColumn: React.FC<ReelColumnProps> = ({ char, columnIndex, cellHeight, 
           transform: `translateY(-${targetDigit * cellHeight}px)`,
           transition: `transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${staggerDelay}ms`,
         }}
-        className="flex flex-col will-change-transform motion-reduce:transition-none motion-reduce:transform-none"
+        className="flex flex-col will-change-transform motion-reduce:transition-none!"
       >
         {DIGITS.map((d) => (
           <span

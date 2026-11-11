@@ -78,7 +78,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
     }, [topOffset, onStuckChange]);
 
     return (
-      <div className="w-full">
+      <div className="contents">
         {/* Invisible 0px sentinel placed immediately before the sticky container */}
         <div
           ref={sentinelRef}

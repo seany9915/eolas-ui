@@ -102,7 +102,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
       ? { label: suggestion, prompt: suggestion }
       : suggestion;
 
-  const itemLabel = item.label || '';
+  const itemLabel = item.label || (typeof children === 'string' ? children : '');
   const itemPrompt = item.prompt || itemLabel;
   const itemIcon = item.icon;
   const accessibleLabel =

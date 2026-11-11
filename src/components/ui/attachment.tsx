@@ -213,7 +213,8 @@ export const AttachmentMedia = React.forwardRef<HTMLDivElement, AttachmentMediaP
       props: {
         'data-slot': 'attachment-media',
         'data-variant': variant,
-        'aria-hidden': 'true',
+        // Icons are decorative; image media keeps its lt text available to assistive tech.
+        'aria-hidden': isImage ? undefined : 'true',
         className: cn(
           'flex shrink-0 items-center justify-center select-none overflow-hidden',
           sizeClasses,

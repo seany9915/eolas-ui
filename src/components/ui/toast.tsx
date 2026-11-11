@@ -219,7 +219,9 @@ toast.error = (
   description?: React.ReactNode,
   options?: Omit<ToastOptions, 'title' | 'description' | 'type'>
 ) => {
+  // Errors persist until dismissed (timeout: 0); callers may still override.
   return toast.add({
+    timeout: 0,
     ...options,
     title,
     description,
@@ -378,7 +380,7 @@ const ActiveToastItem: React.FC<{
           className={cn(
             'shrink-0 mt-0.5 select-none',
             currentIcon.color,
-            toastType === 'loading' && 'animate-spin'
+            toastType === 'loading' && 'animate-spin motion-reduce:animate-none'
           )}
           aria-hidden="true"
         />

@@ -167,29 +167,29 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       onValueChange?.(val, eventDetails);
       onChange?.(val);
 
-      if (onSelect) {
+      // Typing is not a selection; only commits (item press, clear, etc.) report through onSelect.
+      if (onSelect && eventDetails.reason !== 'input-change') {
         const trimmed = (val ?? '').trim();
         if (!trimmed) {
           onSelect(null);
           return;
         }
-        if (normalizedOptions.length > 0) {
-          const matched = normalizedOptions.find(
-            (opt) =>
-              opt.label.toLowerCase() === trimmed.toLowerCase() ||
-              opt.value.toLowerCase() === trimmed.toLowerCase()
-          );
-          onSelect(matched ?? val);
-        } else {
-          onSelect(val);
-        }
+        const candidates = normalizedGroups?.length
+          ? normalizedGroups.flatMap((g) => g.items)
+          : normalizedOptions;
+        const matched = candidates.find(
+          (opt) =>
+            opt.label.toLowerCase() === trimmed.toLowerCase() ||
+            opt.value.toLowerCase() === trimmed.toLowerCase()
+        );
+        onSelect(matched ?? val);
       }
     };
 
     const generatedId = React.useId();
     const autocompleteId = id || `autocomplete-${generatedId}`;
     const descriptionId = description ? `${autocompleteId}-desc` : undefined;
-    const errorId = error ? `${autocompleteId}-error` : undefined;
+    const errorId = typeof error === 'string' && error ? `${autocompleteId}-error` : undefined;
     const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
 
     // Normalize flat options
@@ -438,7 +438,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
 
     if (normalizedGroups && normalizedGroups.length > 0) {
       return (
-        <div ref={ref} className={cn('space-y-1.5 w-full', className)} {...props}>
+        <div ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
           <BaseAutocomplete.Root
             items={normalizedGroups}
             itemToStringValue={itemToStringValue ?? defaultItemToStringValue}
@@ -485,7 +485,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
     }
 
     return (
-      <div ref={ref} className={cn('space-y-1.5 w-full', className)} {...props}>
+      <div ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
         <BaseAutocomplete.Root
           items={normalizedOptions}
           filteredItems={filteredItems}
@@ -748,7 +748,7 @@ export const AutocompleteList = React.forwardRef<
   <BaseAutocomplete.List
     ref={ref}
     className={cn(
-      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 space-y-0.5 outline-none data-[empty]:p-0',
+      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 flex flex-col gap-0.5 outline-none data-[empty]:p-0',
       className
     )}
     {...props}

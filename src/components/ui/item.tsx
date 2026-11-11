@@ -101,6 +101,7 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
       render,
       children,
       onClick,
+      onKeyDown,
       ...props
     },
     ref
@@ -109,11 +110,12 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
     const isInteractive = interactive ?? Boolean(onClick || render);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(e);
+      if (e.defaultPrevented || e.target !== e.currentTarget) return;
       if (isInteractive && !render && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault();
         e.currentTarget.click();
       }
-      props.onKeyDown?.(e);
     };
 
     const computedClass = itemVariants({
@@ -226,7 +228,8 @@ export const ItemMedia = React.forwardRef<HTMLDivElement, ItemMediaProps>(
       defaultTagName: 'div',
       props: {
         'data-slot': 'item-media',
-        'aria-hidden': 'true',
+        // Icons are decorative; image and avatar media may carry meaningful alt text.
+        'aria-hidden': variant === 'icon' ? 'true' : undefined,
         className: cn('shrink-0 select-none', mediaVariantStyles[variant], className),
         children,
         ...props,

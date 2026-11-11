@@ -22,6 +22,7 @@
 import * as React from 'react';
 import { Collapsible } from '@base-ui/react/collapsible';
 import { Icon } from './icon';
+import { Skeleton } from './skeleton';
 import { Tooltip } from './tooltip';
 import { UnstyledButton } from './button';
 import { useChatMessageContext } from './chat-message-context';
@@ -148,9 +149,12 @@ export interface SourcesTriggerProps extends React.ButtonHTMLAttributes<HTMLButt
 
 const SourcesTrigger: React.FC<SourcesTriggerProps> = ({
   count,
+  open: _open,
+  onOpenChange: _onOpenChange,
   label = 'Evidence Base & Sources',
   children,
   className,
+  ...props
 }) => {
   return (
     <Collapsible.Trigger
@@ -160,6 +164,7 @@ const SourcesTrigger: React.FC<SourcesTriggerProps> = ({
         'cursor-pointer transition-[color] duration-quick ease-standard motion-reduce:transition-none',
         className
       )}
+      {...props}
     >
       <div className="flex items-center gap-1.5">
         {children ? (
@@ -187,17 +192,30 @@ export interface SourcesListProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
+// Set when the list is composed inside a compound collapsible Sources tree so it renders as the disclosure panel.
+const SourcesPanelContext = React.createContext(false);
+
 const SourcesList = React.forwardRef<HTMLDivElement, SourcesListProps>(
   ({ children, className, ...props }, ref) => {
-    return (
+    const inPanel = React.useContext(SourcesPanelContext);
+    const list = (
       <div
-        ref={ref}
+        ref={inPanel ? undefined : ref}
         data-slot="sources-content"
         className={cn('flex flex-wrap items-center gap-2 pt-1', className)}
         {...props}
       >
         {children}
       </div>
+    );
+    if (!inPanel) return list;
+    return (
+      <Collapsible.Panel
+        ref={ref}
+        className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-quick ease-standard motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
+      >
+        {list}
+      </Collapsible.Panel>
     );
   }
 );
@@ -444,6 +462,19 @@ const SourcesComponent: React.FC<SourcesProps> = ({
   const count = normalizedSources ? normalizedSources.length : React.Children.count(children);
   if (count === 0 && !children) return null;
 
+  const isCompound = React.Children.toArray(children).some(
+    (child) => React.isValidElement(child) && child.type === SourcesTrigger
+  );
+  if (isCompound) {
+    return (
+      <Collapsible.Root defaultOpen={defaultOpen} className={cn('w-full', className)}>
+        <SourcesRoot variant={resolvedVariant}>
+          <SourcesPanelContext.Provider value>{children}</SourcesPanelContext.Provider>
+        </SourcesRoot>
+      </Collapsible.Root>
+    );
+  }
+
   if (collapsible) {
     return (
       <Collapsible.Root defaultOpen={defaultOpen} className={cn('w-full', className)}>
@@ -489,9 +520,9 @@ export interface SourcesSkeletonProps extends React.HTMLAttributes<HTMLDivElemen
 }
 
 const SourcesSkeleton: React.FC<SourcesSkeletonProps> = ({ className, ...props }) => (
-  <div className={cn('animate-pulse flex items-center gap-2 py-1', className)} {...props}>
-    <div className="h-4 w-28 rounded bg-surface-variant" />
-    <div className="h-5 w-6 rounded-full bg-surface-variant/70" />
+  <div className={cn('flex items-center gap-2 py-1', className)} {...props}>
+    <Skeleton className="h-4 w-28" />
+    <Skeleton className="h-5 w-6 rounded-full" />
   </div>
 );
 SourcesSkeleton.displayName = 'SourcesSkeleton';

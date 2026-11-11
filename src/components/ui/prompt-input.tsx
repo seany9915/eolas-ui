@@ -171,13 +171,14 @@ export interface PromptInputTextareaProps
  */
 const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTextareaProps>(
   ({ className, onSubmit, onFilesPasted, onKeyDown, onPaste, minRows = 3, maxHeight = '12rem', ...props }, ref) => {
+    const generatedId = React.useId();
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      // Respect IME composition: do not submit while selecting characters in Asian input methods
-      if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-        e.preventDefault();
-        onSubmit?.();
-      }
       onKeyDown?.(e);
+      // Respect IME composition: do not submit while selecting characters in Asian input methods
+      if (onSubmit && !e.defaultPrevented && e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+        e.preventDefault();
+        onSubmit();
+      }
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -191,7 +192,7 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
     return (
       <Textarea
         ref={ref}
-        id={props.id || 'prompt-textarea'}
+        id={props.id || generatedId}
         name={props.name || 'prompt'}
         data-slot="prompt-input-textarea"
         variant="unstyled"
@@ -917,7 +918,7 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
           ref={ref}
           value={value}
           onChange={(e) => onValueChange?.(e.target.value)}
-          onSubmit={onSubmit}
+          onSubmit={isSubmitDisabled ? undefined : onSubmit}
           onFilesPasted={onFilesSelected}
           placeholder={placeholder}
           aria-label={placeholder || 'Message'}

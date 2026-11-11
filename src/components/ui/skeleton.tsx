@@ -66,6 +66,9 @@ export interface SkeletonRevealProps extends React.HTMLAttributes<HTMLDivElement
  * When loading completes, smoothly cross-fades the skeleton to content with a 2px
  * micro-blur to eliminate layout snap.
  */
+// React 18 has no typed inert; an empty-string attribute removes the layer from focus and the a11y tree.
+const INERT_PROPS = { inert: '' } as React.HTMLAttributes<HTMLDivElement>;
+
 export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealProps>(
   (
     {
@@ -94,6 +97,7 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
             {/* Skeleton Layer */}
             <div
               aria-hidden={!loading}
+              {...(!loading ? INERT_PROPS : undefined)}
               className={cn(
                 'w-full transition-[opacity,filter] duration-[var(--duration-slow)] ease-[var(--ease-in-out)] motion-reduce:transition-none',
                 loading
@@ -107,6 +111,7 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
             {/* Content Layer */}
             <div
               aria-hidden={loading}
+              {...(loading ? INERT_PROPS : undefined)}
               className={cn(
                 'w-full transition-[opacity,filter] duration-[var(--duration-slow)] ease-[var(--ease-in-out)] motion-reduce:transition-none',
                 loading

@@ -175,7 +175,7 @@ export const PlanContent = React.forwardRef<HTMLDivElement, PlanContentProps>(
       <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
         <div>
           {/* Progress Track */}
-          <div className="px-3.5 py-2.5 bg-surface-container/20 border-b border-outline-variant/30 space-y-1.5">
+          <div className="px-3.5 py-2.5 bg-surface-container/20 border-b border-outline-variant/30 flex flex-col gap-1.5">
             <div className="flex items-center justify-between text-xs font-sans text-on-surface-variant">
               <span className="font-medium">Plan Progress</span>
               <span className="font-mono tabular-nums font-semibold">{progressPercent}%</span>
@@ -270,6 +270,20 @@ export interface PlanProps {
   className?: string;
 }
 
+// Declarative Plan.Step children also count toward progress when no steps prop is given.
+function collectStepStatuses(children: React.ReactNode): TraceStatus[] {
+  const statuses: TraceStatus[] = [];
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement<{ status?: TraceStatus; children?: React.ReactNode }>(child)) return;
+    if (child.type === PlanStep) {
+      statuses.push(child.props.status ?? 'pending');
+    } else if (child.props.children) {
+      statuses.push(...collectStepStatuses(child.props.children));
+    }
+  });
+  return statuses;
+}
+
 export const PlanRoot: React.FC<PlanProps> = ({
   title = 'Execution Plan',
   description,
@@ -283,9 +297,10 @@ export const PlanRoot: React.FC<PlanProps> = ({
 }) => {
   const chatContext = useChatMessageContext();
   const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
-  const completedCount = steps.filter((s) => s.status === 'complete').length;
-  const runningCount = steps.filter((s) => s.status === 'running').length;
-  const totalCount = steps.length;
+  const statuses = steps.length > 0 ? steps.map((s) => s.status) : collectStepStatuses(children);
+  const completedCount = statuses.filter((s) => s === 'complete').length;
+  const runningCount = statuses.filter((s) => s === 'running').length;
+  const totalCount = statuses.length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const overallStatus: TraceStatus =

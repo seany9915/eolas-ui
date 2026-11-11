@@ -37,6 +37,7 @@ export type InputGroupVariant = 'default' | 'card' | 'ghost' | 'unboxed' | 'floa
 export type InputGroupSize = 'sm' | 'md' | 'lg';
 
 interface InputGroupContextValue {
+  disabled?: boolean;
   size: InputGroupSize;
 }
 
@@ -90,7 +91,7 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
       'has-[textarea]:flex-col has-[textarea]:items-stretch has-[input]:flex-row has-[input]:items-center',
       sizeMinHeight,
       isGhost
-        ? 'bg-transparent border-0 rounded-none p-0 focus-within:outline-none'
+        ? 'bg-transparent border-0 rounded-none p-0 has-[input:focus-visible,textarea:focus-visible]:outline-2 has-[input:focus-visible,textarea:focus-visible]:-outline-offset-2 has-[input:focus-visible,textarea:focus-visible]:outline-primary'
         : cn(
             'border bg-surface text-on-surface',
             roundedClass,
@@ -112,7 +113,7 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
     );
 
     return (
-      <InputGroupContext.Provider value={{ size }}>
+      <InputGroupContext.Provider value={{ size, disabled }}>
         {useRender({
           render,
           ref,
@@ -143,14 +144,14 @@ export interface InputGroupInputProps
 
 export const InputGroupInput = React.forwardRef<HTMLInputElement, InputGroupInputProps>(
   ({ className, disabled, ...props }, ref) => {
-    const { size } = React.useContext(InputGroupContext);
+    const { size, disabled: groupDisabled } = React.useContext(InputGroupContext);
 
     return (
       <BaseInput
         ref={ref}
         data-slot="input-group-input"
         data-slot-control="true"
-        disabled={disabled}
+        disabled={disabled ?? groupDisabled}
         className={cn(
           'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
           size === 'sm' ? 'text-sm' : 'text-base',
@@ -192,16 +193,23 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
       maxHeight = '12rem',
       render,
       disabled,
+      style,
       ...props
     },
     ref
   ) => {
+    const { disabled: groupDisabled } = React.useContext(InputGroupContext);
+    const isDisabled = disabled ?? groupDisabled;
+
+    // Enter inserts a newline unless the caller opts into submit-on-Enter via onSubmit.
+    // The caller's onKeyDown runs first and can cancel submission with preventDefault().
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      onKeyDown?.(e);
+      if (e.defaultPrevented || !onSubmit) return;
       if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
         e.preventDefault();
-        onSubmit?.();
+        onSubmit();
       }
-      onKeyDown?.(e);
     };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -212,6 +220,36 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
       onPaste?.(e);
     };
 
+    const textareaClassName = cn(
+      'w-full flex-1 bg-transparent border-0 px-3 py-2 text-base font-sans text-on-surface leading-relaxed',
+      'placeholder:text-on-surface-variant/80 resize-none min-h-[64px] outline-none focus:outline-none focus:ring-0 focus-visible:outline-none border-none shadow-none',
+      'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
+      className
+    );
+    const textareaStyle = {
+      maxHeight: typeof maxHeight === 'number' ? `px` : maxHeight,
+      ...style,
+    };
+
+    const renderedTextarea = useRender({
+      enabled: Boolean(render),
+      render,
+      ref,
+      defaultTagName: 'textarea',
+      props: {
+        'data-slot': 'input-group-textarea',
+        'data-slot-control': 'true',
+        rows: minRows,
+        disabled: isDisabled,
+        onKeyDown: handleKeyDown,
+        onPaste: handlePaste,
+        className: cn('[field-sizing:content] h-auto', textareaClassName),
+        style: textareaStyle,
+        ...props,
+      },
+    });
+
+    if (render) return renderedTextarea;
     return (
       <BaseTextareaPrimitive
         ref={ref}
@@ -220,25 +258,16 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
         variant="unstyled"
         rows={minRows}
         autoGrow={true}
-        disabled={disabled}
+        disabled={isDisabled}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
-        className={cn(
-          'w-full flex-1 bg-transparent border-0 px-3 py-2 text-base font-sans text-on-surface leading-relaxed',
-          'placeholder:text-on-surface-variant/80 resize-none min-h-[64px] outline-none focus:outline-none focus:ring-0 focus-visible:outline-none border-none shadow-none',
-          'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
-          className
-        )}
-        style={{
-          maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
-          ...props.style,
-        }}
+        className={textareaClassName}
+        style={textareaStyle}
         {...props}
       />
     );
   }
-);
-InputGroupTextarea.displayName = 'InputGroupTextarea';
+);InputGroupTextarea.displayName = 'InputGroupTextarea';
 
 // ============================================================================
 // InputGroupAddon

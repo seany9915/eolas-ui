@@ -6,8 +6,8 @@
  * TAXONOMY & USAGE:
  * - Declarative container and trigger components for the View Transitions API (document.startViewTransition).
  * - Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).
- * - Degrades gracefully on unsupported browsers (Safari/Firefox) by running the state update immediately without errors.
- * - Enforces mandatory reduced-motion bypass and accessible focus routing to prevent screen reader disorientation.
+ * - Degrades gracefully on unsupported browsers (feature-detected) by running the state update immediately without errors.
+ * - Bypasses the animation under prefers-reduced-motion and offers opt-in focus routing (focusTarget) to prevent screen reader disorientation.
  * - Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring.
  */
 import * as React from 'react';
@@ -57,7 +57,7 @@ export interface ViewTransitionTriggerProps
 }
 
 /**
- * Interactive trigger button/anchor wrapper executing updates inside a View Transition.
+ * Interactive button executing updates inside a View Transition.
  */
 export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTransitionTriggerProps>(
   (
@@ -65,6 +65,7 @@ export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTra
       onTransition,
       transitionOptions,
       onClick,
+      disabled,
       className,
       children,
       ...props
@@ -76,21 +77,25 @@ export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTra
     const handleClick: React.ComponentPropsWithoutRef<typeof BaseButton>['onClick'] = (e) => {
       onClick?.(e);
       if (onTransition && !e.defaultPrevented) {
-        startTransition(onTransition, transitionOptions);
+        startTransition(onTransition, transitionOptions).catch((error) => {
+          console.error('View transition update failed:', error);
+        });
       }
     };
 
     return (
       <BaseButton
         ref={ref}
+        {...props}
         onClick={handleClick}
-        disabled={isTransitioning || props.disabled}
+        disabled={disabled || isTransitioning}
+        focusableWhenDisabled
+        aria-busy={isTransitioning || undefined}
         className={cn(
           'inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md font-label text-sm font-semibold transition-colors cursor-pointer select-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           className
         )}
-        {...props}
       >
         {children}
       </BaseButton>
