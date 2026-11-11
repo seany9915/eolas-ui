@@ -7,7 +7,7 @@
  *             - `Icon` (`src/components/ui/icon.tsx`)
  *
  * TAXONOMY & USAGE:
- * - Controlled multi-step workflow container for guided clinical intake, onboarding,
+ * - Controlled multi-step workflow container for guided intake, onboarding,
  *   assessment flows, and multi-stage form sequences.
  * - Pure UI: receives step data via props, manages directional slide transitions,
  *   and emits progression intents via callbacks (`onStepChange`, `onComplete`).
@@ -20,6 +20,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button, UnstyledButton } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { Progress } from '@/components/ui/progress';
 
 export interface StepWizardStep {
   id: string;
@@ -38,29 +39,33 @@ export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   previousLabel?: string;
   showNavigationButtons?: boolean;
   variant?: 'card' | 'embedded';
+  /** "numbered" shows a clickable circle per step. "progress" shows a slim progress bar, which suits longer flows. */
+  indicator?: 'numbered' | 'progress';
+  /** Lets users jump to upcoming steps from the step indicators. Completed steps are always clickable. */
   allowStepClick?: boolean;
-  /** When true, keeps all wizard steps in the DOM with hidden="until-found" so browser search (Ctrl+F) can find inactive step content */
+  /** When true, keeps wizard steps in the DOM with hidden="until-found" so browser search (Ctrl+F) can find them. Only completed steps (or all steps when llowStepClick is set) are searchable, so find-in-page cannot skip guarded progression. */
   hiddenUntilFound?: boolean;
 }
 
 interface StepPanelProps {
   step: StepWizardStep;
   isSelected: boolean;
+  canReveal: boolean;
   direction: 'forward' | 'backward';
   onSelect: () => void;
 }
 
-const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, direction, onSelect }) => {
+const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, canReveal, direction, onSelect }) => {
   const panelRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const el = panelRef.current;
     if (!el) return;
 
-    if (!isSelected) {
-      el.setAttribute('hidden', 'until-found');
-    } else {
+    if (isSelected) {
       el.removeAttribute('hidden');
+    } else {
+      el.setAttribute('hidden', canReveal ? 'until-found' : '');
     }
 
     const handleBeforeMatch = () => {
@@ -71,7 +76,7 @@ const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, direction, onSe
     return () => {
       el.removeEventListener('beforematch', handleBeforeMatch);
     };
-  }, [isSelected, onSelect]);
+  }, [isSelected, canReveal, onSelect]);
 
   return (
     <div
@@ -104,6 +109,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
       previousLabel = 'Back',
       showNavigationButtons = true,
       variant = 'card',
+      indicator = 'numbered',
       allowStepClick = false,
       hiddenUntilFound = false,
       ...props
@@ -156,7 +162,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
             variant === 'card' ? 'bg-surface-container/50' : 'bg-surface-container/20 rounded-t-lg'
           )}
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <div className="flex flex-col min-w-0">
               <span className="font-mono text-xs font-semibold text-primary tabular-nums">
                 Step {currentStepIndex + 1} of {steps.length}
@@ -165,7 +171,8 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 {currentStep?.title}
               </h3>
             </div>
-            <nav aria-label="Wizard Steps Progress" className="flex items-center gap-1 shrink-0 -mr-2">
+            {indicator === 'numbered' && (
+            <nav aria-label="Wizard Steps Progress" className="flex flex-wrap items-center gap-1 -mr-2">
               {steps.map((s, idx) => {
                 const isSelected = idx === currentStepIndex;
                 const isPast = idx < currentStepIndex;
@@ -201,7 +208,17 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 );
               })}
             </nav>
+            )}
           </div>
+          {indicator === 'progress' && (
+            <Progress
+              value={currentStepIndex + 1}
+              max={steps.length}
+              size="sm"
+              aria-label="Wizard progress"
+              aria-valuetext={`Step ${currentStepIndex + 1} of ${steps.length}`}
+            />
+          )}
           {currentStep?.description && (
             <p className="font-sans text-body-md text-on-surface-variant text-pretty">
               {currentStep.description}
@@ -220,6 +237,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 key={s.id}
                 step={s}
                 isSelected={idx === currentStepIndex}
+                canReveal={idx < currentStepIndex || allowStepClick}
                 direction={direction}
                 onSelect={() => onStepChange?.(idx)}
               />

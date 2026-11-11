@@ -13,6 +13,7 @@ if (!fs.existsSync(CATALOG_PATH)) {
 }
 
 const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8'));
+let failed = false;
 
 // 1. Validate Catalog (registry.json)
 const catalogErrors = [];
@@ -30,6 +31,7 @@ if (!Array.isArray(catalog.items)) {
 }
 
 if (catalogErrors.length > 0) {
+  failed = true;
   console.error('❌ Catalog schema errors:');
   catalogErrors.forEach((e) => console.error(`  - ${e}`));
 } else {
@@ -128,10 +130,11 @@ for (const file of itemFiles) {
   }
 }
 
+if (itemErrors > 0) failed = true;
 if (itemErrors === 0) {
   console.log(`✅ All ${itemFiles.length} item files conform strictly to registry-item.json schema!`);
 } else {
-  console.error(`❌ ${itemErrors} items had errors.`);
+XX
 }
 
 console.log('\n=== Target Path Analysis ===');
@@ -158,3 +161,25 @@ console.log(`- Modular root registry.json via include: ${modularCheckPassed ? 'P
 console.log(`- MCP Server compatibility endpoint (public/r/registry.json): Present ✅`);
 console.log(`- Open in v0 URL support: Items served as individual flat JSON endpoints ✅`);
 console.log(`- Namespaced registryDependencies resolution: Enforced ✅`);
+
+// 4. Every source path declared by the root registry must exist, otherwise the shadcn CLI cannot build it.
+if (fs.existsSync(ROOT_REGISTRY)) {
+  const rootData = JSON.parse(fs.readFileSync(ROOT_REGISTRY, 'utf8'));
+  const missingSources = [];
+  for (const item of rootData.items ?? []) {
+    for (const f of item.files ?? []) {
+      if (f.path && !fs.existsSync(path.resolve(ROOT, f.path))) {
+        missingSources.push(`${item.name}: ${f.path}`);
+      }
+    }
+  }
+  if (missingSources.length > 0) {
+    failed = true;
+    console.error('\nRoot registry.json references source files that do not exist:');
+    missingSources.forEach((m) => console.error(`  - ${m}`));
+  }
+}
+
+if (failed) {
+  process.exit(1);
+}

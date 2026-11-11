@@ -199,11 +199,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
               className="w-full"
             >
               <SidebarGroup className="p-0 mb-1">
-                <SidebarGroupLabel asChild className="p-0 h-auto">
-                  <Collapsible.Trigger
-                    hideChevron
-                    className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left hover:bg-surface-container transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1 group/cat-trigger cursor-pointer select-none min-h-[36px]"
-                  >
+                <SidebarGroupLabel className="p-0 h-auto" render={(triggerProps) => (<Collapsible.Trigger {...triggerProps} hideChevron className={cn(triggerProps.className, "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left hover:bg-surface-container transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1 group/cat-trigger cursor-pointer select-none min-h-[36px]")}>{triggerProps.children}</Collapsible.Trigger>)}>
                     <div className="flex items-center gap-2 min-w-0">
                       <Icon
                         name={category.icon}
@@ -224,9 +220,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
                         size="xs"
                         aria-hidden="true"
                       />
-                    </div>
-                  </Collapsible.Trigger>
-                </SidebarGroupLabel>
+                    </div></SidebarGroupLabel>
 
                 <Collapsible.Panel unstyled className="overflow-hidden">
                   <SidebarGroupContent className="pt-1">

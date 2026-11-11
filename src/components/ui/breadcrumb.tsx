@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
 import { UnstyledButton } from './button';
@@ -48,45 +49,23 @@ export const BreadcrumbItem = React.forwardRef<
 BreadcrumbItem.displayName = 'BreadcrumbItem';
 
 export interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<'a'> {
-  asChild?: boolean;
-  render?: React.ReactElement | ((props: Record<string, unknown>) => React.ReactElement);
+  render?: useRender.RenderProp;
 }
 
 export const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
-  ({ className, asChild = false, render, children, ...props }, ref) => {
-    const baseClasses =
-      'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none';
-
-    if (asChild && React.isValidElement(children)) {
-      const child = children as React.ReactElement<any>;
-      return React.cloneElement(child, {
-        ref: ref || child.props.ref,
-        className: cn(baseClasses, className, child.props.className),
+  ({ className, render, ...props }, ref) =>
+    useRender({
+      render,
+      ref,
+      defaultTagName: 'a',
+      props: {
+        className: cn(
+          'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none',
+          className
+        ),
         ...props,
-      });
-    }
-
-    if (render) {
-      return typeof render === 'function'
-        ? render({ ref, className: cn(baseClasses, className), ...props, children })
-        : React.cloneElement(render, {
-            ref: ref || (render as any).props?.ref,
-            className: cn(baseClasses, className, (render as any).props?.className),
-            ...props,
-            children,
-          });
-    }
-
-    return (
-      <a
-        ref={ref}
-        className={cn(baseClasses, className)}
-        {...props}
-      >
-        {children}
-      </a>
-    );
-  }
+      },
+    })
 );
 BreadcrumbLink.displayName = 'BreadcrumbLink';
 

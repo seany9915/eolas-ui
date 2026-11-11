@@ -525,7 +525,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
   ];
 
   return (
-    <div className="w-full max-w-xl mx-auto py-4">
+    <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-6">
       <StepWizard
         steps={steps}
         currentStepIndex={currentStep}
@@ -533,6 +533,14 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
         onComplete={() => setIsCompleted(true)}
         completeLabel="Save Plan"
         allowStepClick
+      />
+      <StepWizard
+        steps={steps}
+        currentStepIndex={currentStep}
+        onStepChange={setCurrentStep}
+        onComplete={() => setIsCompleted(true)}
+        completeLabel="Save Plan"
+        indicator="progress"
       />
     </div>
   );

@@ -45,7 +45,7 @@ export const DESIGN_SYSTEM_COLORS = [
   { name: 'warning-container', hex: '#FDE3B8', label: 'warning-container (Soft Orange)' },
   { name: 'success', hex: '#157331', label: 'success (Deep Green)' },
   { name: 'success-container', hex: '#C8F5CE', label: 'success-container (Soft Green)' },
-  { name: 'outline', hex: '#737688', label: 'outline (Control Border)' },
+  { name: 'outline', hex: '#6B6E80', label: 'outline (Control Border)' },
   { name: 'outline-variant', hex: '#BEC6D6', label: 'outline-variant (Subtle Border)' },
 ];
 

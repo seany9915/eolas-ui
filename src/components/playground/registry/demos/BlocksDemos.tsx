@@ -115,12 +115,14 @@ export const FilterToolbarDemo: React.FC<ComponentDemoProps> = () => {
       <FilterToolbar
         searchQuery={q}
         onSearchChange={setQ}
+        onReset={() => setQ('')}
         searchPlaceholder="Filter learners by name or ID..."
         filterGroups={[
           {
             id: 'status',
             label: 'Status',
             value: 'all',
+            defaultValue: 'all',
             options: [
               { value: 'all', label: 'All Statuses' },
               { value: 'review', label: 'Needs Review' },
@@ -198,7 +200,7 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
             />
           </QuestionnaireChoices>
 
-          <QuestionnaireInput placeholder="Type another direction or specific request…" />
+          <QuestionnaireInput label="Another direction" placeholder="Type another direction or specific request…" />
           <QuestionnaireError />
         </QuestionnaireItem>
 
@@ -609,6 +611,7 @@ export const RadialChartCardDemo: React.FC<ComponentDemoProps> = () => {
         unit="%"
         status="warning"
         statusLabel="84% Utilized"
+        caption="of 100% capacity"
         config={chartConfig}
         footer={<span>Alert threshold set at 85% occupancy</span>}
       />

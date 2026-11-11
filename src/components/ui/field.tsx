@@ -126,9 +126,7 @@ export const FieldSeparator = React.forwardRef<HTMLHRElement, React.HTMLAttribut
 );
 FieldSeparator.displayName = 'FieldSeparator';
 
-export interface FieldControlProps extends React.ComponentPropsWithoutRef<typeof BaseField.Control> {
-  asChild?: boolean;
-}
+export type FieldControlProps = React.ComponentPropsWithoutRef<typeof BaseField.Control>;
 
 export const FieldControl = React.forwardRef<HTMLInputElement, FieldControlProps>(
   ({ children, render, ...props }, ref) => {

@@ -285,25 +285,21 @@ export function DataTableColumnHeader<TData, TValue>({
           </Button>
         }
       >
-        <Menu.Item onClick={() => column.toggleSorting(false)}>
-          <Icon name="arrow_upward" size="xs" className="mr-2" aria-hidden="true" />
+        <Menu.Item icon="arrow_upward" onClick={() => column.toggleSorting(false)}>
           <span>Asc</span>
         </Menu.Item>
-        <Menu.Item onClick={() => column.toggleSorting(true)}>
-          <Icon name="arrow_downward" size="xs" className="mr-2" aria-hidden="true" />
+        <Menu.Item icon="arrow_downward" onClick={() => column.toggleSorting(true)}>
           <span>Desc</span>
         </Menu.Item>
         {column.getIsSorted() && (
-          <Menu.Item onClick={() => column.clearSorting()}>
-            <Icon name="clear" size="xs" className="mr-2" aria-hidden="true" />
+          <Menu.Item icon="clear" onClick={() => column.clearSorting()}>
             <span>Clear sort</span>
           </Menu.Item>
         )}
         {column.getCanHide() && (
           <>
             <Menu.Separator />
-            <Menu.Item onClick={() => column.toggleVisibility(false)}>
-              <Icon name="visibility_off" size="xs" className="mr-2" aria-hidden="true" />
+            <Menu.Item icon="visibility_off" onClick={() => column.toggleVisibility(false)}>
               <span>Hide</span>
             </Menu.Item>
           </>
@@ -369,6 +365,20 @@ export function DataTableViewOptions<TData>({
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Faceted filter function
+ * -----------------------------------------------------------------------------------------------*/
+/**
+ * Membership filter for multi-select facets: a row matches when its cell value is one of the selected values.
+ * `DataTable` applies it automatically to columns listed in `facetedFilters` that have no `filterFn` of their own;
+ * set it manually (`filterFn: facetedFilterFn`) when composing the table yourself.
+ */
+export const facetedFilterFn: FilterFn<any> = (row, columnId, filterValue: string[]) => {
+  if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+  return filterValue.includes(String(row.getValue(columnId)));
+};
+facetedFilterFn.autoRemove = (value) => !Array.isArray(value) || value.length === 0;
 
 /* -------------------------------------------------------------------------------------------------
  * DataTableFacetedFilter
@@ -502,6 +512,7 @@ export function DataTableToolbar<TData>({
             type="search"
             enterKeyHint="search"
             clearable
+            aria-label={searchPlaceholder}
             placeholder={searchPlaceholder}
             value={searchVal}
             onChange={(event) => targetColumn.setFilterValue(event.target.value)}
@@ -515,6 +526,7 @@ export function DataTableToolbar<TData>({
             type="search"
             enterKeyHint="search"
             clearable
+            aria-label={searchPlaceholder}
             placeholder={searchPlaceholder}
             value={globalVal}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
@@ -576,6 +588,7 @@ export function DataTablePagination<TData>({
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
+  const pageSizeId = React.useId();
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
   const totalCount = table.getFilteredRowModel().rows.length;
 
@@ -594,10 +607,11 @@ export function DataTablePagination<TData>({
       )}
       <div className="flex flex-wrap items-center gap-4 @lg:gap-8 ml-auto">
         <div className="flex items-center gap-2">
-          <span className="font-sans text-xs text-on-surface-variant select-none">
+          <label htmlFor={pageSizeId} className="font-sans text-xs text-on-surface-variant select-none">
             Rows per page
-          </span>
+          </label>
           <Select
+            id={pageSizeId}
             options={pageSizeOptions.map((size) => ({
               label: String(size),
               value: String(size),
@@ -718,9 +732,11 @@ export interface DataTableProps<TData, TValue = unknown> {
   globalFilter?: string;
   /** Controlled global filter change callback */
   onGlobalFilterChange?: OnChangeFn<string>;
-  /** Callback emitted whenever selected rows change */
+  /** Callback emitted whenever selected rows change. Includes selected rows hidden by active filters. */
   onSelectionChange?: (selectedRows: TData[]) => void;
-  /** Callback emitted when clicking a table row */
+  /** Stable unique id per row. Set it for server-paginated or reordered data so selection follows records, not indices. */
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  /** Callback emitted when activating a table row by click, or Enter/Space when the row itself has focus */
   onRowClick?: (row: TData) => void;
   /** Displays a loading state with spinner in the table body */
   loading?: boolean;
@@ -758,6 +774,7 @@ export function DataTable<TData, TValue>({
   globalFilter: globalFilterProp,
   onGlobalFilterChange: onGlobalFilterChangeProp,
   onSelectionChange,
+  getRowId,
   onRowClick,
   loading = false,
   emptyMessage = 'No records found.',
@@ -779,14 +796,60 @@ export function DataTable<TData, TValue>({
   const pagination = paginationProp ?? internalPagination;
   const globalFilter = globalFilterProp ?? internalGlobalFilter;
 
-  const setSorting = onSortingChangeProp ?? setInternalSorting;
-  const setColumnFilters = onColumnFiltersChangeProp ?? setInternalColumnFilters;
-  const setPagination = onPaginationChangeProp ?? setInternalPagination;
-  const setGlobalFilter = onGlobalFilterChangeProp ?? setInternalGlobalFilter;
+  // Always keep internal state in sync when the value is uncontrolled, and notify the callback either way
+  function createChangeHandler<T>(
+    controlled: T | undefined,
+    current: T,
+    setInternal: React.Dispatch<React.SetStateAction<T>>,
+    onChange?: OnChangeFn<T>
+  ): OnChangeFn<T> {
+    return (updater) => {
+      if (controlled === undefined) setInternal(updater as React.SetStateAction<T>);
+      onChange?.(updater instanceof Function ? updater(current) : updater);
+    };
+  }
+
+  const setSorting = createChangeHandler(sortingProp, sorting, setInternalSorting, onSortingChangeProp);
+  const setColumnFilters = createChangeHandler(
+    columnFiltersProp,
+    columnFilters,
+    setInternalColumnFilters,
+    onColumnFiltersChangeProp
+  );
+  const setPagination = createChangeHandler(
+    paginationProp,
+    pagination,
+    setInternalPagination,
+    onPaginationChangeProp
+  );
+  const setGlobalFilter = createChangeHandler(
+    globalFilterProp,
+    globalFilter,
+    setInternalGlobalFilter,
+    onGlobalFilterChangeProp
+  );
+
+  const facetedColumnIds = React.useMemo(
+    () => new Set(facetedFilters?.map((f) => f.columnId)),
+    [facetedFilters]
+  );
+  const resolvedColumns = React.useMemo(
+    () =>
+      facetedColumnIds.size === 0
+        ? columns
+        : columns.map((col) => {
+            const id = col.id ?? (col as { accessorKey?: string }).accessorKey;
+            return id && facetedColumnIds.has(id) && !col.filterFn
+              ? { ...col, filterFn: facetedFilterFn }
+              : col;
+          }),
+    [columns, facetedColumnIds]
+  );
 
   const internalTable = useReactTable({
     data,
-    columns,
+    columns: resolvedColumns,
+    getRowId,
     pageCount,
     manualPagination,
     manualSorting,
@@ -815,15 +878,19 @@ export function DataTable<TData, TValue>({
   });
 
   const table = propTable ?? internalTable;
-  const colSpanCount = table.getAllColumns()?.length || columns.length || 1;
+  const colSpanCount = table.getVisibleLeafColumns().length || columns.length || 1;
 
-  // Emit row selection callback
+  // Read selection from the table so externally supplied tables are covered too
+  const rowSelectionState = table.getState().rowSelection;
+  const tableData = table.options.data;
+  const onSelectionChangeRef = React.useRef(onSelectionChange);
   React.useEffect(() => {
-    if (onSelectionChange) {
-      const selected = table.getFilteredSelectedRowModel().rows.map((r) => r.original);
-      onSelectionChange(selected);
-    }
-  }, [internalRowSelection, table, onSelectionChange]);
+    onSelectionChangeRef.current = onSelectionChange;
+  });
+
+  React.useEffect(() => {
+    onSelectionChangeRef.current?.(table.getSelectedRowModel().rows.map((r) => r.original));
+  }, [rowSelectionState, tableData, table]);
 
   return (
     <div className={cn('w-full flex flex-col gap-4 @container', className)}>
@@ -861,6 +928,15 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
+                      aria-sort={
+                        header.column.getCanSort()
+                          ? header.column.getIsSorted() === 'asc'
+                            ? 'ascending'
+                            : header.column.getIsSorted() === 'desc'
+                              ? 'descending'
+                              : 'none'
+                          : undefined
+                      }
                       className={cn(
                         isNumeric && 'text-right',
                         isCentered && 'text-center'
@@ -902,7 +978,29 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={isSelected ? 'selected' : undefined}
-                    onClick={() => onRowClick?.(row.original)}
+                    tabIndex={onRowClick ? 0 : undefined}
+                    onClick={
+                      onRowClick
+                        ? (event) => {
+                            // Ignore clicks from controls inside the row and events bubbling out of portals (menus)
+                            const target = event.target as HTMLElement;
+                            if (!event.currentTarget.contains(target)) return;
+                            if (target.closest('button, a, input, select, textarea, label, [role="checkbox"], [role="menuitem"]')) return;
+                            onRowClick(row.original);
+                          }
+                        : undefined
+                    }
+                    onKeyDown={
+                      onRowClick
+                        ? (event) => {
+                            if (event.target !== event.currentTarget) return;
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              onRowClick(row.original);
+                            }
+                          }
+                        : undefined
+                    }
                     className={cn(
                       onRowClick && 'cursor-pointer'
                     )}

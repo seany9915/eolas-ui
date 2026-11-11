@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  applySeriesOverrides,
   type ChartConfig,
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
@@ -56,7 +57,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       config,
       layout = 'horizontal',
       yAxisWidth = 80,
-      showLegend = true,
+      showLegend,
       trend,
       footer,
       action,
@@ -66,16 +67,22 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
     ref
   ) => {
     const isVerticalLayout = layout === 'vertical';
+    const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
+    const lastIndexByStack = React.useMemo(() => {
+      const map = new Map<string, number>();
+      series.forEach((item, index) => item.stackId && map.set(item.stackId, index));
+      return map;
+    }, [series]);
 
     return (
       <Card ref={ref} className={cn('w-full', className)} {...props}>
         <Card.Header>
           <div className="flex flex-col gap-1">
-            <Card.Title className="text-base font-semibold text-on-surface">
+            <Card.Title>
               {title}
             </Card.Title>
             {description && (
-              <Card.Description className="text-xs text-on-surface-variant">
+              <Card.Description>
                 {description}
               </Card.Description>
             )}
@@ -88,7 +95,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
         </Card.Header>
 
         <Card.Content className="pt-2">
-          <ChartContainer config={config} className="aspect-auto h-[250px] w-full">
+          <ChartContainer config={resolvedConfig} className="aspect-auto h-64 w-full">
             <BarChart
               data={data}
               layout={isVerticalLayout ? 'vertical' : 'horizontal'}
@@ -119,7 +126,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
-                    interval={0}
+                    minTickGap={16}
                     className="text-xs text-on-surface-variant"
                   />
                   <YAxis hide />
@@ -129,15 +136,16 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
                 cursor={{ fill: 'var(--color-surface-container)' }}
                 content={<ChartTooltipContent indicator="dot" />}
               />
-              {showLegend && series.length > 1 && (
+              {(showLegend ?? series.length > 1) && (
                 <ChartLegend content={<ChartLegendContent />} />
               )}
               {series.map((item, index) => {
-                const isLast = index === series.length - 1;
-                const radius: [number, number, number, number] = isVerticalLayout
-                  ? [0, 4, 4, 0]
-                  : item.stackId && !isLast
+                // Only the last series of each stack gets rounded corners
+                const isStacked = !!item.stackId && lastIndexByStack.get(item.stackId) !== index;
+                const radius: [number, number, number, number] = isStacked
                   ? [0, 0, 0, 0]
+                  : isVerticalLayout
+                  ? [0, 4, 4, 0]
                   : [4, 4, 0, 0];
 
                 return (
@@ -155,25 +163,27 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
         </Card.Content>
 
         {(trend || footer) && (
-          <Card.Footer className="flex items-center justify-between gap-3 text-xs text-on-surface-variant border-t border-outline-variant/30 pt-3">
-            <div className="flex items-center gap-2">
-              {trend && (
-                <Badge
-                  variant="outline"
-                  colorRole={trend.positive !== false ? 'success' : 'error'}
-                  size="sm"
-                >
-                  <Icon
-                    name={trend.positive !== false ? 'trending_up' : 'trending_down'}
-                    size="xs"
-                    aria-hidden="true"
-                  />
-                  <span>{trend.value}</span>
-                </Badge>
-              )}
-              {trend?.label && <span>{trend.label}</span>}
+          <Card.Footer>
+            <div className="flex w-full items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
+              <div className="flex items-center gap-2">
+                {trend && (
+                  <Badge
+                    variant="outline"
+                    colorRole={trend.positive !== false ? 'success' : 'error'}
+                    size="sm"
+                  >
+                    <Icon
+                      name={trend.positive !== false ? 'trending_up' : 'trending_down'}
+                      size="xs"
+                      aria-hidden="true"
+                    />
+                    <span>{trend.value}</span>
+                  </Badge>
+                )}
+                {trend?.label && <span>{trend.label}</span>}
+              </div>
+              {footer && <div>{footer}</div>}
             </div>
-            {footer && <div>{footer}</div>}
           </Card.Footer>
         )}
       </Card>

@@ -17,6 +17,8 @@ export interface FilterOptionGroup {
   id: string;
   label: string;
   value: string;
+  /** Value meaning "no filter" (for example an "all" option). Defaults to an empty string. */
+  defaultValue?: string;
   options: SelectOption[];
 }
 
@@ -51,10 +53,13 @@ export function FilterToolbar({
   actions,
   className,
 }: FilterToolbarProps) {
-  const hasActiveFilters = searchQuery.trim().length > 0 || activeFilters.length > 0;
+  const hasActiveFilters =
+    searchQuery.trim().length > 0 ||
+    activeFilters.length > 0 ||
+    filterGroups.some((group) => group.value !== (group.defaultValue ?? ''));
 
   return (
-    <div className={cn('@container w-full space-y-3', className)}>
+    <div className={cn('@container flex w-full flex-col gap-3', className)}>
       <div className="flex flex-col @md:flex-row items-stretch @md:items-center justify-between gap-3">
         {/* Search input with functional icon */}
         <div className="flex-1 min-w-50">
@@ -81,6 +86,7 @@ export function FilterToolbar({
                 }}
                 options={group.options}
                 placeholder={group.label}
+                aria-label={group.label}
               />
             </div>
           ))}
@@ -89,7 +95,6 @@ export function FilterToolbar({
             <Button
               variant="outlined"
               colorRole="neutral"
-              size="sm"
               onClick={onReset}
             >
               <Icon name="restart_alt" size="sm" aria-hidden="true" />
@@ -113,6 +118,7 @@ export function FilterToolbar({
               variant="outline"
               colorRole="primary"
               onRemove={onRemoveFilter ? () => onRemoveFilter(filter.id) : undefined}
+              removeLabel={`Remove ${filter.label} filter: ${filter.valueLabel}`}
             >
               <span className="font-medium opacity-80">{filter.label}:</span>{' '}
               <span className="font-semibold">{filter.valueLabel}</span>

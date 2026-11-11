@@ -16,6 +16,24 @@ export type ChartConfig = {
   );
 };
 
+/** Merges per-series `label` / `strokeColor` overrides into a chart config so block series props are honored. */
+export function applySeriesOverrides(
+  config: ChartConfig,
+  series: ReadonlyArray<{ dataKey: string; label?: string; strokeColor?: string }>
+): ChartConfig {
+  const next: ChartConfig = { ...config };
+  for (const { dataKey, label, strokeColor } of series) {
+    if (!label && !strokeColor) continue;
+    const base = next[dataKey] ?? {};
+    next[dataKey] = {
+      ...base,
+      ...(label ? { label } : {}),
+      ...(strokeColor ? { color: strokeColor, theme: undefined } : {}),
+    } as ChartConfig[string];
+  }
+  return next;
+}
+
 interface ChartContextProps {
   config: ChartConfig;
 }

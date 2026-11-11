@@ -210,7 +210,7 @@ const ChatRoot: React.FC<ChatProps> = ({
   children,
   variant = 'card',
   messages = [],
-  inputValue = '',
+  inputValue,
   onInputChange,
   onSubmitMessage,
   onStop,
@@ -218,9 +218,9 @@ const ChatRoot: React.FC<ChatProps> = ({
   disabled = false,
   suggestions = [],
   onSelectSuggestion,
-  placeholder = 'Type a message or clinical prompt...',
-  emptyStateTitle = 'Clinical Consultation Workspace',
-  emptyStateDescription = 'Ask clinical questions, review speech therapy plans, or verify acoustic norms.',
+  placeholder = 'Type a message...',
+  emptyStateTitle = 'Start a conversation',
+  emptyStateDescription = 'Send a message to get started.',
   header,
   footerHint,
   position = 'docked',
@@ -237,6 +237,8 @@ const ChatRoot: React.FC<ChatProps> = ({
   className,
 }) => {
   const isUnboxed = variant === 'canvas' || variant === 'ghost' || variant === 'unboxed';
+  // Hooks must run before the compound-mode early return so the instance can switch modes safely
+  const [internalValue, setInternalValue] = React.useState('');
 
   // If children are supplied, support declarative compound usage!
   if (children) {
@@ -255,18 +257,19 @@ const ChatRoot: React.FC<ChatProps> = ({
       </MessageScrollerProvider>
     );
   }
-  const [internalValue, setInternalValue] = React.useState('');
-  const currentValue = onInputChange ? inputValue : internalValue;
+  // Controlled only when inputValue is supplied; onInputChange alone just observes changes
+  const isControlled = inputValue !== undefined;
+  const currentValue = isControlled ? inputValue : internalValue;
 
   const handleValueChange = (val: string) => {
-    setInternalValue(val);
+    if (!isControlled) setInternalValue(val);
     onInputChange?.(val);
   };
 
   const handleSend = () => {
     if (!currentValue.trim() || isLoading) return;
     onSubmitMessage?.(currentValue.trim());
-    if (!onInputChange) {
+    if (!isControlled) {
       setInternalValue('');
     }
   };
@@ -307,7 +310,7 @@ const ChatRoot: React.FC<ChatProps> = ({
     <div
       data-slot="chat"
       className={cn(
-        'relative flex flex-col w-full h-150 max-h-full overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
+        '@container relative flex flex-col w-full h-150 max-h-full overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
         isUnboxed ? 'rounded-none border-0 bg-transparent' : 'rounded-lg border border-outline-variant bg-surface',
         className
       )}

@@ -51,7 +51,10 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
     return (
       <Card ref={ref} className={cn('w-full', className)} {...props}>
         <Card.Header>
-          <span className="font-label text-xs font-semibold text-on-surface-variant truncate self-center">
+          <span
+            title={typeof title === 'string' ? title : undefined}
+            className="font-label text-xs font-semibold text-on-surface-variant truncate self-center"
+          >
             {title}
           </span>
           {icon && (
@@ -64,8 +67,8 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
           )}
         </Card.Header>
 
-        <Card.Content className="space-y-2 mt-3.5 pt-0">
-          <div className="flex items-baseline justify-between gap-3">
+        <Card.Content className="flex flex-col gap-2 mt-3.5 pt-0">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <span className="font-heading font-bold text-3xl text-on-surface tabular-nums tracking-tight">
               {value}
             </span>

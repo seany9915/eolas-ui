@@ -118,8 +118,10 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
         aria-live="polite"
         {...props}
       >
+        <span className="sr-only">{`${prefix}${formattedText}${suffix}`}</span>
         {prefix && (
           <span
+            aria-hidden="true"
             style={{ height: `${cellHeight}px`, lineHeight: `${cellHeight}px` }}
             className="mr-0.5 inline-flex items-center"
           >
@@ -127,7 +129,7 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
           </span>
         )}
 
-        <span className="inline-flex items-center">
+        <span aria-hidden="true" className="inline-flex items-center">
           {chars.map((char, idx) => (
             <ReelColumn
               key={idx}
@@ -141,6 +143,7 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
 
         {suffix && (
           <span
+            aria-hidden="true"
             style={{ height: `${cellHeight}px`, lineHeight: `${cellHeight}px` }}
             className="ml-0.5 inline-flex items-center"
           >

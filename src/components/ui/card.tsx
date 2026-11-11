@@ -125,10 +125,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
       lift ? 'card-lift shadow-none' : 'hover:shadow-ambient-hover'
     );
   } else {
-    // Static: retains standard ambient hover if default, but no pointer cursor or focus ring
-    affordanceStyles = resolvedProminence === 'default'
-      ? (lift ? 'card-lift shadow-none' : 'hover:shadow-ambient-hover')
-      : '';
+    // Static cards are passive: no hover lift, cursor or focus ring.
+    affordanceStyles = '';
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

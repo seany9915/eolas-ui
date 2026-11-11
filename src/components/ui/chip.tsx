@@ -50,6 +50,8 @@ export interface ChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   onSelect?: (selected: boolean) => void;
   /** Callback invoked when the chip's dismiss button is clicked (Removable mode) */
   onRemove?: () => void;
+  /** Accessible name for the remove button. Defaults to "Remove <text>" when children is a string. */
+  removeLabel?: string;
   /** Disables interaction and reduces opacity */
   disabled?: boolean;
   className?: string;
@@ -106,6 +108,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       selected,
       onSelect,
       onRemove,
+  removeLabel,
       disabled = false,
       onClick,
       onKeyDown,
@@ -134,18 +137,14 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
           : outlineStyles[colorRole];
 
     if (isCurrentlySelected) {
-      patternClass = cn(filledStyles[colorRole], 'shadow-ambient font-semibold');
+      patternClass = cn(filledStyles[colorRole], 'font-semibold');
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (disabled) return;
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        if (onSelect) {
-          onSelect(!selected);
-        } else if (onClick) {
-          onClick(e as unknown as React.MouseEvent<HTMLDivElement>);
-        }
+        e.currentTarget.click();
       }
       onKeyDown?.(e);
     };
@@ -220,7 +219,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
             }}
             disabled={disabled}
             className="ml-1 -mr-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
-            aria-label={labelText ? `Remove ${labelText}` : 'Remove'}
+            aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
           >
             <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">
               close
