@@ -153,7 +153,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
           {children}
 
           <span
-            className="flex items-center justify-center size-5 ml-1 text-on-surface-variant/80 shrink-0 group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
+            className="flex items-center justify-center size-5 text-on-surface-variant/80 shrink-0 group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none"
             aria-hidden="true"
           >
             <Icon name="expand_more" size="xs" />

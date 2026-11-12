@@ -107,11 +107,11 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
           data-slot="trace"
           aria-label={accessibleLabel}
           className={cn(
-            '@container w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+            '@container w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
             (resolvedVariant === 'default' || resolvedVariant === 'card') &&
-              'rounded-2xl border border-outline-variant bg-surface overflow-hidden divide-y divide-outline-variant/40 shadow-sm',
+              'rounded-lg border border-outline-variant bg-surface overflow-hidden divide-y divide-outline-variant/40',
             resolvedVariant === 'embedded' &&
-              'rounded-2xl border border-outline-variant/60 bg-surface-container/30 overflow-hidden divide-y divide-outline-variant/30',
+              'rounded-lg border border-outline-variant/60 bg-surface-container/30 overflow-hidden divide-y divide-outline-variant/30',
             (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed') &&
               'rounded-none border-none bg-transparent divide-y divide-outline-variant/30',
             resolvedVariant === 'timeline' &&

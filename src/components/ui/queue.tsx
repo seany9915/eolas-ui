@@ -220,7 +220,7 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
           open={open}
           onOpenChange={onOpenChange}
         >
-          <TraceCollapsibleTrigger className="bg-surface-container/30 hover:bg-surface-container/50 py-2 min-h-[40px]">
+          <TraceCollapsibleTrigger className="bg-surface-container/30 hover:bg-surface-container/50 py-2 min-h-[44px]">
             <div className="flex items-center gap-2.5 w-full">
               <span
                 className={cn(

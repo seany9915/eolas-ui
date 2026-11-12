@@ -240,7 +240,7 @@ const SourceIcon: React.FC<SourceIconProps> = ({
 }) => {
   if (src) {
     return (
-      <span className={cn('size-4 inline-flex items-center justify-center shrink-0 rounded-xs overflow-hidden', className)} {...props}>
+      <span className={cn('size-4 inline-flex items-center justify-center shrink-0 rounded-sm overflow-hidden', className)} {...props}>
         <img src={src} alt={alt} className="size-full object-contain" />
       </span>
     );
@@ -338,7 +338,7 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
         {...props}
       >
         {typeof index === 'number' && (
-          <span className="w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container font-mono text-xs tabular-nums font-bold flex items-center justify-center shrink-0">
+          <span className="size-5 rounded-full bg-secondary-container text-on-secondary-container font-mono text-xs tabular-nums font-bold flex items-center justify-center shrink-0">
             {index + 1}
           </span>
         )}

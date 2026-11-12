@@ -371,7 +371,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
             <MenuGroup key={provider || 'default'}>
               {provider && <MenuGroupLabel>{provider}</MenuGroupLabel>}
               {items.map((item) => (
-                <MenuRadioItem key={item.id} value={item.id} className="min-h-10 py-1.5">
+                <MenuRadioItem key={item.id} value={item.id} className="min-h-11 py-1.5">
                   <div className="flex flex-col min-w-0 pr-2">
                     <div className="flex items-center gap-1.5">
                       <span className="font-heading font-semibold text-xs text-on-surface">{item.name}</span>
@@ -511,7 +511,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
           <MenuGroup>
             <MenuGroupLabel>{label}</MenuGroupLabel>
             {options.map((opt) => (
-              <MenuRadioItem key={opt.id} value={opt.id} className="min-h-9 py-1 text-xs">
+              <MenuRadioItem key={opt.id} value={opt.id} className="min-h-11 py-1 text-xs">
                 <div className="flex flex-col min-w-0 pr-2">
                   <span className="font-heading font-semibold text-xs text-on-surface">{opt.label}</span>
                   {opt.description && (
@@ -723,7 +723,7 @@ export const PromptInputStop: React.FC<PromptInputStopProps> = ({
         className
       )}
     >
-      <span className="size-3 rounded-xs bg-current shrink-0" aria-hidden="true" />
+      <span className="size-3 rounded-sm bg-current shrink-0" aria-hidden="true" />
     </Button>
   </Tooltip>
 );

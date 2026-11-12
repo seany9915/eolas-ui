@@ -1097,7 +1097,9 @@
       "registryDependencies": [
         "@seany9915/eolas-ui/utils",
         "@seany9915/eolas-ui/select",
-        "@seany9915/eolas-ui/tooltip"
+        "@seany9915/eolas-ui/combobox",
+        "@seany9915/eolas-ui/tooltip",
+        "@seany9915/eolas-ui/badge"
       ],
       "meta": {
         "taxonomy": [

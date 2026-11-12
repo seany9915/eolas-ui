@@ -107,7 +107,7 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
     <div
       {...props}
       className={cn(
-        'flex items-center gap-2 px-1 text-xs font-label text-on-surface-variant select-none',
+        'flex items-center gap-2 text-xs font-label text-on-surface-variant select-none',
         role === 'user' ? 'flex-row-reverse' : 'flex-row',
         className
       )}
@@ -135,21 +135,23 @@ export interface ChatMessageBubbleProps extends React.HTMLAttributes<HTMLDivElem
 }
 
 const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProps>(
-  ({ role, variant = 'card', children, className, ...props }, ref) => {
+  ({ role, variant, children, className, ...props }, ref) => {
+    const resolvedVariant = variant ?? (role === 'assistant' ? 'ghost' : 'card');
     return (
       <div
         ref={ref}
         data-role={role}
+        data-variant={resolvedVariant}
         className={cn(
           'p-4 text-base font-sans leading-relaxed transition-colors',
           role === 'user' &&
-            'bg-primary-container text-on-primary-container rounded-2xl rounded-br-xs',
+            'bg-primary-container text-on-primary-container rounded-lg rounded-ee-sm',
           role === 'assistant' &&
-            (variant === 'ghost'
-              ? 'bg-transparent text-on-surface border-0 p-0 rounded-none'
-              : 'bg-surface text-on-surface border border-outline-variant shadow-ambient rounded-2xl rounded-bl-xs'),
+            (resolvedVariant === 'ghost'
+              ? 'w-full bg-transparent text-on-surface border-0 px-0 py-1 rounded-none'
+              : 'bg-surface text-on-surface border border-outline-variant shadow-ambient rounded-lg rounded-es-sm'),
           role === 'system' &&
-            'bg-surface-container text-on-surface-variant rounded-xl text-sm font-medium',
+            'bg-surface-container text-on-surface-variant rounded-md text-sm font-medium',
           className
         )}
         {...props}
@@ -278,8 +280,10 @@ const ChatMessageActions: React.FC<ChatMessageActionsProps> = ({ children, class
 ChatMessageActions.displayName = 'ChatMessage.Actions';
 
 export interface ChatMessageProps {
-  role: ChatRole;
-  content: React.ReactNode;
+  role?: ChatRole;
+  align?: 'start' | 'end';
+  content?: React.ReactNode;
+  children?: React.ReactNode;
   variant?: 'card' | 'ghost';
   authorName?: string;
   timestamp?: number | string;
@@ -303,9 +307,11 @@ export interface ChatMessageProps {
 export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
   (
     {
-      role,
+      role: roleProp,
+      align,
       content,
-      variant = 'card',
+      children,
+      variant,
       authorName,
       timestamp,
       botType,
@@ -326,7 +332,17 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
     },
     ref
   ) => {
+    const role: ChatRole = roleProp ?? (align === 'end' ? 'user' : 'assistant');
+    const resolvedVariant = variant ?? (role === 'assistant' ? 'ghost' : 'card');
     const [copied, setCopied] = React.useState(false);
+
+    if (children !== undefined && content === undefined) {
+      return (
+        <ChatMessageRoot ref={ref} role={role} align={align} className={className}>
+          {children}
+        </ChatMessageRoot>
+      );
+    }
 
     const handleCopy = async () => {
       try {
@@ -343,7 +359,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
     };
 
     return (
-      <ChatMessageRoot ref={ref} role={role} className={className}>
+      <ChatMessageRoot ref={ref} role={role} align={align} className={className}>
         <ChatMessageHeader
           role={role}
           authorName={authorName}
@@ -351,7 +367,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
           botType={botType}
         />
 
-        <ChatMessageBubble role={role} variant={variant}>
+        <ChatMessageBubble role={role} variant={resolvedVariant}>
           {attachments && (
             <ChatMessageAttachments>{attachments}</ChatMessageAttachments>
           )}
@@ -526,7 +542,7 @@ export const ChatMessageCompound = Object.assign(ChatMessage, {
   Root: ChatMessageRoot,
   Header: ChatMessageHeader,
   Bubble: ChatMessageBubble,
-  Content: ChatMessageBubble,
+  Content: ChatMessageContentWrapper,
   ContentWrapper: ChatMessageContentWrapper,
   Attachments: ChatMessageAttachments,
   Actions: ChatMessageActions,

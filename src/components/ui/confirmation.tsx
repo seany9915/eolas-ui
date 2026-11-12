@@ -64,11 +64,11 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
         data-slot="confirmation-root"
         data-status={status}
         className={cn(
-          'w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+          'w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
             ? 'rounded-none border-none bg-transparent p-0'
             : cn(
-                'rounded-xl border p-4 shadow-xs',
+                'rounded-lg border p-4',
                 !isApproved && !isDenied && 'bg-surface border-outline-variant/80',
                 isApproved && 'bg-surface-container/30 border-outline-variant/80',
                 isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80'

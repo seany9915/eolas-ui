@@ -39,7 +39,7 @@ const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
         {...props}
       >
         <Separator orientation="horizontal" className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-outline-variant/60 my-0" />
-        <div className="relative z-10 flex items-center gap-2 px-3 py-1 bg-surface border border-outline-variant/80 rounded-full text-xs text-on-surface-variant">
+        <div className="relative flex items-center gap-2 px-3 py-1 bg-surface border border-outline-variant/80 rounded-full text-xs text-on-surface-variant">
           {children}
         </div>
       </div>

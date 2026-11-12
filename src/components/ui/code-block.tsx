@@ -39,9 +39,10 @@ const CodeBlockRoot = React.forwardRef<HTMLDivElement, CodeBlockProps>(
         data-language={language}
         className={cn(
           '@container relative w-full font-mono text-xs overflow-hidden',
-          'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+          'transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           variant === 'default' && 'rounded-lg border border-outline-variant bg-surface-container/60',
-          (variant === 'flush' || variant === 'ghost') && 'rounded-sm border-none bg-surface-container/60',
+          variant === 'flush' && 'rounded-sm border-none bg-surface-container/60',
+          variant === 'ghost' && 'rounded-sm border-none bg-transparent',
           className
         )}
         {...props}
@@ -122,7 +123,7 @@ export const CodeBlockActions = React.forwardRef<HTMLDivElement, CodeBlockAction
         data-floating={floating ? '' : undefined}
         className={cn(
           'flex items-center gap-1.5 shrink-0',
-          floating ? 'absolute top-2 right-2 z-10' : 'ml-auto',
+          floating ? 'absolute top-2 right-2' : 'ml-auto',
           className
         )}
         {...props}
@@ -230,7 +231,7 @@ export const CodeBlockLine = React.forwardRef<HTMLDivElement, CodeBlockLineProps
       <div
         ref={ref}
         data-slot="code-block-line"
-        className={cn('flex items-baseline gap-3 min-w-max hover:bg-surface-variant/30 px-1 rounded-xs', className)}
+        className={cn('flex items-baseline gap-3 min-w-max hover:bg-surface-variant/30 px-1 rounded-sm', className)}
         {...props}
       >
         {lineNumber !== undefined && (

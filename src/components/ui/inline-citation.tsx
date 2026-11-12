@@ -255,7 +255,7 @@ const InlineCitationIcon: React.FC<InlineCitationIconProps> = ({
 }) => {
   if (src) {
     return (
-      <span className={cn('size-3.5 inline-flex items-center justify-center shrink-0 rounded-xs overflow-hidden', className)} {...props}>
+      <span className={cn('size-3.5 inline-flex items-center justify-center shrink-0 rounded-sm overflow-hidden', className)} {...props}>
         <img src={src} alt={alt} className="size-full object-contain" />
       </span>
     );
@@ -453,7 +453,7 @@ const InlineCitationCarouselPrev: React.FC<InlineCitationCarouselNavProps> = ({ 
       onClick={scrollPrev}
       expandedTouchTarget
       aria-label="Previous citation"
-      className={cn('h-6 w-6 p-0 rounded-full', className)}
+      className={cn('size-6 p-0 rounded-full', className)}
     >
       <Icon name="chevron_left" size="xs" aria-hidden="true" />
     </Button>
@@ -473,7 +473,7 @@ const InlineCitationCarouselNext: React.FC<InlineCitationCarouselNavProps> = ({ 
       onClick={scrollNext}
       expandedTouchTarget
       aria-label="Next citation"
-      className={cn('h-6 w-6 p-0 rounded-full', className)}
+      className={cn('size-6 p-0 rounded-full', className)}
     >
       <Icon name="chevron_right" size="xs" aria-hidden="true" />
     </Button>

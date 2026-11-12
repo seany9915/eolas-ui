@@ -14,7 +14,21 @@
  */
 import * as React from 'react';
 import { Select, type SelectOption } from './select';
+import {
+  Combobox,
+  ComboboxTrigger,
+  ComboboxValue,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxEmpty,
+  ComboboxList,
+  ComboboxItem,
+  ComboboxGroup,
+  ComboboxGroupLabel,
+  ComboboxSeparator,
+} from './combobox';
 import { Tooltip } from './tooltip';
+import { Badge } from './badge';
 import { cn } from '@/lib/utils';
 
 export interface ModelItem extends SelectOption {
@@ -36,7 +50,7 @@ const ModelSelectorRoot = React.forwardRef<HTMLDivElement, ModelSelectorRootProp
       <div
         ref={ref}
         data-slot="model-selector-root"
-        className={cn('inline-flex items-center gap-1.5 p-1 rounded-lg bg-surface-container/40 border border-outline-variant/60 shadow-ambient', className)}
+        className={cn('inline-flex items-center gap-2', className)}
         {...props}
       >
         {children}
@@ -75,11 +89,15 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   className,
 }) => {
   const hasModels = models.length > 0;
+  const selectedModel = React.useMemo(
+    () => models.find((m) => m.value === valueProp),
+    [models, valueProp]
+  );
 
   return (
-    <div className={cn('min-w-[140px] @sm:min-w-[160px]', className)}>
-      <Select
-        options={models}
+    <div className={cn('min-w-36 @sm:min-w-44', className)}>
+      <Combobox
+        items={models}
         value={valueProp}
         defaultValue={defaultValue ?? null}
         onValueChange={(val) => {
@@ -88,10 +106,49 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
           }
         }}
         disabled={disabled || !hasModels}
-        size={size}
-        aria-label="Select model"
-        placeholder={hasModels ? placeholder : 'No models available'}
-      />
+      >
+        <ComboboxTrigger
+          aria-label="Select model"
+          className={cn(
+            'w-full',
+            size === 'sm' ? 'h-11 min-h-[44px] px-3.5 text-xs' : 'h-12 min-h-[48px] px-4 text-sm'
+          )}
+        >
+          <ComboboxValue placeholder={hasModels ? placeholder : 'No models available'}>
+            {(val) => {
+              const match = models.find((m) => m.value === val) ?? selectedModel;
+              return match ? match.label : hasModels ? placeholder : 'No models available';
+            }}
+          </ComboboxValue>
+        </ComboboxTrigger>
+        <ComboboxContent className="w-72 max-w-[calc(100vw-2rem)]">
+          <div className="p-1.5 border-b border-outline-variant/60">
+            <ComboboxInput placeholder="Search models..." size="sm" />
+          </div>
+          <ComboboxEmpty>No models found.</ComboboxEmpty>
+          <ComboboxList>
+            {(item: ModelItem) => (
+              <ComboboxItem key={item.value} value={item.value} disabled={item.disabled}>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate font-medium text-on-surface">{item.label}</span>
+                    {item.badge && (
+                      <Badge size="sm" variant="soft" colorRole="secondary">
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </div>
+                  {item.description && (
+                    <span className="text-xs text-on-surface-variant truncate">
+                      {item.description}
+                    </span>
+                  )}
+                </div>
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
     </div>
   );
 };
@@ -211,12 +268,32 @@ export const ModelSelector = Object.assign(ModelSelectorComponent, {
   Root: ModelSelectorRoot,
   Model: ModelSelectorModel,
   Effort: ModelSelectorEffort,
+  Trigger: ComboboxTrigger,
+  Value: ComboboxValue,
+  Content: ComboboxContent,
+  Input: ComboboxInput,
+  Empty: ComboboxEmpty,
+  List: ComboboxList,
+  Item: ComboboxItem,
+  Group: ComboboxGroup,
+  GroupLabel: ComboboxGroupLabel,
+  Separator: ComboboxSeparator,
 });
 
 export {
   ModelSelectorRoot,
   ModelSelectorModel,
   ModelSelectorEffort,
+  ComboboxTrigger as ModelSelectorTrigger,
+  ComboboxValue as ModelSelectorValue,
+  ComboboxContent as ModelSelectorContent,
+  ComboboxInput as ModelSelectorInput,
+  ComboboxEmpty as ModelSelectorEmpty,
+  ComboboxList as ModelSelectorList,
+  ComboboxItem as ModelSelectorItem,
+  ComboboxGroup as ModelSelectorGroup,
+  ComboboxGroupLabel as ModelSelectorGroupLabel,
+  ComboboxSeparator as ModelSelectorSeparator,
 };
 
 export default ModelSelector;

@@ -143,7 +143,7 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
                 {totalCount > 0 && (
                   <span className="w-12 h-1.5 bg-surface-container rounded-full overflow-hidden inline-flex" aria-hidden="true">
                     <span
-                      className="h-full bg-primary rounded-full transition-[width] duration-quick ease-standard"
+                      className="h-full bg-primary rounded-full transition-[width] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </span>
