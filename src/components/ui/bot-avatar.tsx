@@ -118,7 +118,7 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
     const effectiveInteractive = isCalm ? false : interactive;
 
     const accessibleLabel =
-      label || `Eolas Paediatric Digital Helper (${type} character, ${state} state)`;
+      label || `Digital Assistant (${type} character, ${state} state)`;
 
     return (
       <div

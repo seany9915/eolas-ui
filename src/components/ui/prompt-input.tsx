@@ -202,7 +202,7 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
         onPaste={handlePaste}
         className={cn(
           'w-full bg-transparent px-1.5 py-1 text-base font-sans text-on-surface leading-relaxed',
-          'placeholder:text-on-surface-variant/80 resize-none min-h-[64px]',
+          'placeholder:text-on-surface-variant/80 resize-none',
           'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
           className
         )}
@@ -328,7 +328,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
           className
         )}
       >
-        <Icon name={currentModel?.icon || 'neurology'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
+        <Icon name={currentModel?.icon || 'smart_toy'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
         <span className="truncate max-w-[120px]">{displayName}</span>
       </Button>
     );
@@ -359,7 +359,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
             className
           )}
         >
-          <Icon name={currentModel?.icon || 'neurology'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
+          <Icon name={currentModel?.icon || 'smart_toy'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
           <span className="truncate max-w-[120px]">{displayName}</span>
           <Icon name="expand_more" size="xs" className="text-on-surface-variant/70 shrink-0" aria-hidden="true" />
         </Button>

@@ -27,7 +27,7 @@ export interface BarChartSeries {
 export interface BarChartCardProps
   extends Omit<
     ChartCardProps,
-    'children' | 'title' | 'titleBadge' | 'contentClassName' | 'skeletonShape'
+    'children' | 'title' | 'titleBadge' | 'skeletonShape'
   > {
   title: string;
   description?: string;
@@ -63,6 +63,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       emptyTitle,
       emptyDescription,
       chartLabel,
+      contentClassName = 'h-64 w-full',
       className,
       ...props
     },
@@ -89,7 +90,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName="h-64 w-full"
+        contentClassName={contentClassName}
         className={className}
         {...props}
       >

@@ -69,7 +69,7 @@ export const CodeBlockHeader = React.forwardRef<HTMLDivElement, CodeBlockHeaderP
         ref={ref}
         data-slot="code-block-header"
         className={cn(
-          'flex items-center justify-between px-3.5 py-2 border-b border-outline-variant/40 bg-surface-container min-h-[38px]',
+          'flex items-center justify-between px-3.5 py-2 border-b border-outline-variant/40 bg-surface-container min-h-10',
           className
         )}
         {...props}

@@ -15,10 +15,10 @@ const SIZE_MAP: Record<'sm' | 'md' | 'lg', OrbSize> = {
 const DEFAULT_STATE_LABELS: Record<OrbState, string> = {
   working: 'Working...',
   searching: 'Searching knowledge base...',
-  solving: 'Calculating clinical recommendation...',
+  solving: 'Thinking...',
   listening: 'Listening...',
-  connecting: 'Connecting to clinical services...',
-  weaving: 'Synthesising notes...',
+  connecting: 'Connecting...',
+  weaving: 'Synthesising...',
   composing: 'Drafting response...',
   breathing: 'Ready',
   shaping: 'Formatting output...',

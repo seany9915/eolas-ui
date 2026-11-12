@@ -446,7 +446,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                     colorRole="neutral"
                     size="sm"
                     onClick={() => handleBackToList(selectedItem.id)}
-                    aria-label="Back to items list"
+                    aria-label={title ? `Back to ${title}` : 'Back to list'}
                   >
                     <Icon name="arrow_back" size="sm" />
                     <span>Back</span>

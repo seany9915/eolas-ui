@@ -31,7 +31,7 @@ const FALLBACK_SLICE_COLORS = [
 export interface PieChartCardProps
   extends Omit<
     ChartCardProps,
-    'children' | 'title' | 'titleBadge' | 'trend' | 'contentClassName' | 'skeletonShape'
+    'children' | 'title' | 'titleBadge' | 'trend' | 'skeletonShape'
   > {
   title: string;
   description?: string;
@@ -48,8 +48,10 @@ export interface PieChartCardProps
   activeIndex?: number | null;
   onActiveIndexChange?: (index: number | undefined) => void;
   showLegend?: boolean;
-  /** Optional slice cap; extra slices collapse into an "Other" category. */
+  /** Optional slice cap; extra slices collapse into an aggregated category. */
   maxSlices?: number;
+  /** Label for collapsed slices when `maxSlices` is exceeded. Defaults to 'Other'. */
+  otherLabel?: string;
   /** Accessible chart summary announced to screen readers. Defaults to `title`. */
   chartLabel?: string;
 }
@@ -69,6 +71,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
       onActiveIndexChange,
       showLegend = true,
       maxSlices,
+      otherLabel = 'Other',
       footer,
       action,
       loading,
@@ -76,6 +79,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
       emptyTitle,
       emptyDescription,
       chartLabel,
+      contentClassName = 'h-56 @xs:h-64 w-full',
       className,
       ...props
     },
@@ -99,20 +103,20 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
       return [
         ...head,
         {
-          [nameKey]: 'Other',
+          [nameKey]: otherLabel,
           [dataKey]: otherValue,
         },
       ];
-    }, [data, dataKey, nameKey, maxSlices]);
+    }, [data, dataKey, nameKey, maxSlices, otherLabel]);
 
     const resolvedConfig = React.useMemo<ChartConfig>(() => {
-      if (!maxSlices || maxSlices < 2 || data.length <= maxSlices || 'Other' in config) {
+      if (!maxSlices || maxSlices < 2 || data.length <= maxSlices || otherLabel in config) {
         return config;
       }
       return {
         ...config,
-        Other: {
-          label: 'Other',
+        [otherLabel]: {
+          label: otherLabel,
           color: 'var(--color-outline)',
         },
       };
@@ -193,7 +197,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName="h-56 @xs:h-64 w-full"
+        contentClassName={contentClassName}
         skeletonShape="circle"
         className={className}
         {...props}

@@ -27,7 +27,7 @@ export interface AreaChartSeries {
 export interface AreaChartCardProps
   extends Omit<
     ChartCardProps,
-    'children' | 'title' | 'titleBadge' | 'contentClassName' | 'skeletonShape'
+    'children' | 'title' | 'titleBadge' | 'skeletonShape'
   > {
   title: string;
   description?: string;
@@ -59,6 +59,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
       emptyTitle,
       emptyDescription,
       chartLabel,
+      contentClassName = 'h-64 w-full',
       className,
       ...props
     },
@@ -81,7 +82,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName="h-64 w-full"
+        contentClassName={contentClassName}
         className={className}
         {...props}
       >

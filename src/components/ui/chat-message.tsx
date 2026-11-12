@@ -91,7 +91,7 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
   className,
   ...props
 }) => {
-  const defaultName = role === 'user' ? 'You' : role === 'assistant' ? 'Clinical Assistant' : 'System';
+  const defaultName = role === 'user' ? 'You' : role === 'assistant' ? 'Assistant' : 'System';
   const displayName = authorName || defaultName;
 
   const formattedTime = React.useMemo(() => {
@@ -407,7 +407,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                       <Trace.Line status="complete">
                         <Trace.Icon name="checklist" status="complete" />
                         <Trace.Title>
-                          Clinical Reasoning ({thoughtSteps!.length} step{thoughtSteps!.length > 1 ? 's' : ''})
+                          Reasoning ({thoughtSteps!.length} step{thoughtSteps!.length > 1 ? 's' : ''})
                         </Trace.Title>
                       </Trace.Line>
                     </Trace.CollapsibleTrigger>
@@ -463,7 +463,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
               <Tooltip
                 content={
                   isBookmarked
-                    ? 'Saved to clinical library'
+                    ? 'Saved to library'
                     : 'Save response to library'
                 }
               >
@@ -475,7 +475,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   expandedTouchTarget
                   aria-label={
                     isBookmarked
-                      ? 'Saved to clinical library'
+                      ? 'Saved to library'
                       : 'Save response to library'
                   }
                   className="text-xs gap-1 h-8 px-2"

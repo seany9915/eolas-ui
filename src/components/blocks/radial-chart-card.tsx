@@ -22,7 +22,7 @@ export type RadialChartStatus = 'normal' | 'warning' | 'critical';
 export interface RadialChartCardProps
   extends Omit<
     ChartCardProps,
-    'children' | 'title' | 'titleBadge' | 'trend' | 'contentClassName' | 'skeletonShape'
+    'children' | 'title' | 'titleBadge' | 'trend' | 'skeletonShape'
   > {
   title: string;
   description?: string;
@@ -75,6 +75,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
       emptyTitle,
       emptyDescription,
       chartLabel,
+      contentClassName = 'h-48 @xs:h-56 w-full',
       className,
       ...props
     },
@@ -108,7 +109,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName="h-48 @xs:h-56 w-full"
+        contentClassName={contentClassName}
         skeletonShape="gauge"
         className={className}
         {...props}

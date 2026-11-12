@@ -1,7 +1,7 @@
 /**
  * Queue composite block.
  *
- * Layer: Composite Block (`src/components/blocks/`)
+ * Layer: Primitive (`src/components/ui/`)
  * Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`).
  *
  * Specification & Reference:

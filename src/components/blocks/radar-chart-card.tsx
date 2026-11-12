@@ -27,7 +27,7 @@ export interface RadarChartSeries {
 export interface RadarChartCardProps
   extends Omit<
     ChartCardProps,
-    'children' | 'title' | 'titleBadge' | 'trend' | 'contentClassName' | 'skeletonShape'
+    'children' | 'title' | 'titleBadge' | 'trend' | 'skeletonShape'
   > {
   title: string;
   description?: string;
@@ -57,6 +57,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
       emptyTitle,
       emptyDescription,
       chartLabel,
+      contentClassName = 'h-56 @xs:h-64 w-full',
       className,
       ...props
     },
@@ -76,7 +77,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName="h-56 @xs:h-64 w-full"
+        contentClassName={contentClassName}
         className={className}
         {...props}
       >

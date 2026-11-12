@@ -495,7 +495,7 @@ export const MenuList = React.forwardRef<HTMLDivElement, MenuListProps>(
   ({ className, ...props }, ref) => (
     <BaseMenu.List
       ref={ref}
-      className={cn('overflow-y-auto max-h-[300px] outline-none', className)}
+      className={cn('overflow-y-auto max-h-[min(300px,var(--available-height))] outline-none', className)}
       {...props}
     />
   )

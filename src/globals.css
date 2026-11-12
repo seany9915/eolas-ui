@@ -76,6 +76,8 @@
 /* `static` always emits these to :root so inline styles and raw CSS can use var(--shadow-*), var(--duration-*) etc. */
 @theme static {
   /* Layered Ambient & Modal Shadows (Umbra + Penumbra) */
+  --shadow-card: 0 1px 3px rgba(26, 28, 30, 0.06), 0 1px 2px rgba(26, 28, 30, 0.04);
+  --shadow-toggle: 0 1px 2px rgba(26, 28, 30, 0.08);
   --shadow-ambient: 0 1px 3px rgba(26, 28, 30, 0.04), 0 4px 12px rgba(26, 28, 30, 0.06);
   --shadow-ambient-hover: 0 2px 4px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.08);
   --shadow-modal: 0 2px 6px rgba(26, 28, 30, 0.04), 0 8px 20px rgba(26, 28, 30, 0.06), 0 20px 48px rgba(26, 28, 30, 0.12);

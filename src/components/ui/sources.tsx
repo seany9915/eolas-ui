@@ -151,7 +151,7 @@ const SourcesTrigger: React.FC<SourcesTriggerProps> = ({
   count,
   open: _open,
   onOpenChange: _onOpenChange,
-  label = 'Evidence Base & Sources',
+  label = 'Sources',
   children,
   className,
   ...props
@@ -440,7 +440,7 @@ const SourcesComponent: React.FC<SourcesProps> = ({
   children,
   collapsible = true,
   defaultOpen = false,
-  label = 'Evidence Base & Sources',
+  label = 'Sources',
   variant,
   dedupe = true,
   className,

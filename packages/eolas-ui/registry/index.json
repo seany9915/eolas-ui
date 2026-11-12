@@ -1258,7 +1258,7 @@
     "name": "plan",
     "type": "registry:ui",
     "title": "Plan",
-    "description": "Plan composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
+    "description": "Plan composite block. Layer: Primitive (`src/components/ui/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
     "dependencies": [
       "@base-ui/react",
       "clsx",
@@ -1385,7 +1385,7 @@
     "name": "queue",
     "type": "registry:ui",
     "title": "Queue",
-    "description": "Queue composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
+    "description": "Queue composite block. Layer: Primitive (`src/components/ui/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
     "dependencies": [
       "@base-ui/react",
       "clsx",

@@ -103,9 +103,9 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
       <div
         ref={ref}
         role="region"
-        aria-label={`AI agent approval: ${title}`}
+        aria-label={`Approval: ${title}`}
         className={cn(
-          '@container relative flex flex-col rounded-lg bg-surface shadow-ambient overflow-hidden max-w-md w-full',
+          '@container relative flex flex-col rounded-lg bg-surface shadow-ambient overflow-hidden w-full',
           className
         )}
         {...props}
@@ -197,7 +197,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   size="icon"
                   onClick={onPreviousStep}
                   disabled={stepCurrent <= 1}
-                  aria-label="Previous question"
+                  aria-label="Previous step"
                 >
                   <Icon name="chevron_left" size="sm" />
                 </Button>
@@ -212,7 +212,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   size="icon"
                   onClick={onNextStep}
                   disabled={stepCurrent >= stepTotal}
-                  aria-label="Next question"
+                  aria-label="Next step"
                 >
                   <Icon name="chevron_right" size="sm" />
                 </Button>

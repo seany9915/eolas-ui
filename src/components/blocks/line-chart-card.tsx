@@ -28,7 +28,7 @@ export interface LineChartSeries {
 export interface LineChartCardProps
   extends Omit<
     ChartCardProps,
-    'children' | 'title' | 'titleBadge' | 'contentClassName' | 'skeletonShape'
+    'children' | 'title' | 'titleBadge' | 'skeletonShape'
   > {
   title: string;
   description?: string;
@@ -60,6 +60,7 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
       emptyTitle,
       emptyDescription,
       chartLabel,
+      contentClassName = 'h-64 w-full',
       className,
       ...props
     },
@@ -80,7 +81,7 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName="h-64 w-full"
+        contentClassName={contentClassName}
         className={className}
         {...props}
       >

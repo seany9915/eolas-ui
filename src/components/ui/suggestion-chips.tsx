@@ -240,7 +240,7 @@ export interface SuggestionChipsProps {
 const SuggestionChipsComponent: React.FC<SuggestionChipsProps> = ({
   suggestions,
   onSelect = () => {},
-  label = 'Suggested Clinical Questions',
+  label = 'Suggested prompts',
   layout = 'wrap',
   variant = 'compact',
   className,
