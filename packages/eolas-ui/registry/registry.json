@@ -2189,6 +2189,7 @@
         "@seany9915/eolas-ui/utils",
         "@seany9915/eolas-ui/icon",
         "@seany9915/eolas-ui/button",
+        "@seany9915/eolas-ui/shimmer-text",
         "@seany9915/eolas-ui/chat-message-context"
       ],
       "meta": {
@@ -2196,7 +2197,7 @@
           "Universal primitive for AI agent execution lifecycle: step-by-step reasoning, tool calls, multi-stage task plans, error stack traces, and agent activity logs.",
           "Replaces monolithic steppers with a flexible, composable compound architecture.",
           "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
-          "Strictly follows DESIGN.md tokens: floating 2px focus ring (outline-offset: 2px), concentric radius, and semantic high-contrast colors without monochrome triple-tints."
+          "Strictly follows DESIGN.md tokens: floating 2px focus ring (outline-offset: 2px), concentric radius (rounded-2xl containers), and semantic high-contrast colors without monochrome triple-tints."
         ]
       }
     },

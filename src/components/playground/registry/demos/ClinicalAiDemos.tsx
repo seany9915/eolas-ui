@@ -61,17 +61,67 @@ export const BotAvatarDemo: React.FC<ComponentDemoProps> = () => {
 export const TraceDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
-      <Trace>
-        <Trace.Line status="complete">
-          <Trace.Icon status="complete" />
-          <Trace.Title>Loaded articulation drill set for /r/ vocalic sounds</Trace.Title>
-          <Trace.Badge status="complete">200 OK</Trace.Badge>
+      <Trace variant="default">
+        {/* Collapsible execution step with nested details */}
+        <Trace.Collapsible defaultOpen>
+          <Trace.CollapsibleTrigger>
+            <Trace.Line status="complete">
+              <Trace.Icon name="search" />
+              <Trace.Title>Searched speech exercise library</Trace.Title>
+              <Trace.Description>1.2s</Trace.Description>
+              <Trace.Badge>4 found</Trace.Badge>
+            </Trace.Line>
+          </Trace.CollapsibleTrigger>
+          <Trace.CollapsibleContent>
+            <div className="flex flex-col gap-1.5 pl-6 font-mono text-xs text-on-surface-variant">
+              <div className="flex items-center gap-2">
+                <span className="size-1 rounded-full bg-success" />
+                <span>Found word cards: /r/ sound exercises</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="size-1 rounded-full bg-success" />
+                <span>Checked difficulty level (Level 2)</span>
+              </div>
+            </div>
+          </Trace.CollapsibleContent>
+        </Trace.Collapsible>
+
+        {/* Active running step with auto-shimmering title */}
+        <Trace.Line status="running">
+          <Trace.Icon />
+          <Trace.Title>Creating personalized exercise plan</Trace.Title>
+          <Trace.Description>In progress</Trace.Description>
         </Trace.Line>
+
+        {/* Completed step with timing and badge */}
         <Trace.Line status="complete">
-          <Trace.Icon status="complete" />
-          <Trace.Title>Retrieved practice history (accuracy 88%, 5-day streak)</Trace.Title>
-          <Trace.Badge status="complete">Done</Trace.Badge>
+          <Trace.Icon />
+          <Trace.Title>Loaded past audio practice records</Trace.Title>
+          <Trace.Description>0.4s</Trace.Description>
+          <Trace.Badge>Done</Trace.Badge>
         </Trace.Line>
+
+        {/* Pending step awaiting previous actions */}
+        <Trace.Line status="pending">
+          <Trace.Icon />
+          <Trace.Title>Score speech clarity</Trace.Title>
+          <Trace.Description>Next</Trace.Description>
+        </Trace.Line>
+
+        {/* Outbound reference link with trailing arrow icon */}
+        <a
+          href="#reference-materials"
+          className="block hover:bg-surface-container/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-none"
+        >
+          <Trace.Line>
+            <Trace.Icon name="menu_book" />
+            <Trace.Title>
+              Speech Practice Guide (R-Sounds)
+              <span className="sr-only">(opens external resource)</span>
+            </Trace.Title>
+            <Trace.Icon name="arrow_outward" />
+          </Trace.Line>
+        </a>
       </Trace>
     </div>
   );
