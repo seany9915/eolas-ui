@@ -91,8 +91,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   const invertedStyles = 'bg-on-surface text-surface border-none shadow-ambient';
 
   const prominenceStyles: Record<CardProminence, string> = {
-    default: 'bg-surface border-none text-on-surface shadow-ambient',
-    accent: 'bg-surface border-none text-on-surface shadow-ambient', // @deprecated: falls back to default borderless card
+    default: 'bg-surface border border-transparent text-on-surface shadow-[0_1px_3px_rgba(26,28,30,0.06),0_1px_2px_rgba(26,28,30,0.04)]',
+    accent: 'bg-surface border border-transparent text-on-surface shadow-[0_1px_3px_rgba(26,28,30,0.06),0_1px_2px_rgba(26,28,30,0.04)]', // @deprecated: falls back to default borderless card
     filled: colorRole === 'secondary'
       ? 'bg-secondary text-on-secondary border-none shadow-ambient'
       : colorRole === 'tertiary'

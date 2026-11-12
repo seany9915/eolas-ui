@@ -374,10 +374,10 @@ export const ToolDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4">
       <Tool.Root status="complete">
-        <Tool.Header name="Speech_Library_Lookup" iconName="database" status="complete" duration="1.2s" />
+        <Tool.Header name="Speech exercise library" iconName="menu_book" status="complete" duration="1.2s" />
         <Tool.Content>
           <div className="p-3 text-xs font-mono bg-surface-container rounded-b-lg border-t border-outline-variant/60">
-            Lookup status: 200 OK | Learner: P-2024-819 | Plan: Active
+            Speech cards loaded: 24 sound pairs | Level: Grade 2 | Status: Ready
           </div>
         </Tool.Content>
       </Tool.Root>

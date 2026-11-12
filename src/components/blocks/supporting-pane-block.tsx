@@ -82,47 +82,9 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
     const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
     const paneId = React.useId();
     const supportingHeadingId = React.useId();
-    const toggleButtonRef = React.useRef<HTMLButtonElement | null>(null);
     const asideRef = React.useRef<HTMLElement | null>(null);
-    const rootRef = React.useRef<HTMLDivElement | null>(null);
-    const [isWideContainer, setIsWideContainer] = React.useState(false);
     const isControlled = controlledOpen !== undefined;
     const isOpen = isControlled ? controlledOpen : uncontrolledOpen;
-
-    const assignRootRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        rootRef.current = node;
-        if (typeof ref === 'function') {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
-
-    // Match DOM and visual reading order at the @3xl (768px) breakpoint when side="left"
-    // so desktop Tab order flows left-to-right while compact layouts keep canvas first.
-    React.useEffect(() => {
-      if (side !== 'left') {
-        setIsWideContainer(false);
-        return;
-      }
-      const node = rootRef.current;
-      if (!node) return;
-      const updateWidth = (width: number) => {
-        setIsWideContainer(width >= 768);
-      };
-      updateWidth(node.getBoundingClientRect().width);
-      if (typeof ResizeObserver === 'undefined') return;
-      const observer = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          updateWidth(entry.contentRect.width);
-        }
-      });
-      observer.observe(node);
-      return () => observer.disconnect();
-    }, [side]);
 
     React.useEffect(() => {
       if (asideRef.current) {
@@ -141,14 +103,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       updateOpen(!isOpen);
     };
 
-    const handleCloseFromPane = () => {
-      // Return focus to the header toggle before the pane becomes inert/hidden.
-      toggleButtonRef.current?.focus();
-      updateOpen(false);
-    };
-
     const SupportingHeadingTag = title ? 'h3' : 'h2';
-    const shouldRenderAsideFirst = side === 'left' && isWideContainer;
 
     const primaryCanvas = (
       <section
@@ -179,17 +134,18 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         aria-labelledby={supportingTitle ? supportingHeadingId : undefined}
         aria-label={!supportingTitle ? 'Supporting details' : undefined}
         className={cn(
-          'flex flex-col bg-surface-container shrink-0 min-w-0 overflow-hidden transition-opacity duration-quick ease-standard motion-reduce:transition-none',
+          'flex flex-col bg-surface-container shrink-0 min-w-0 overflow-hidden transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+          side === 'left' && '@3xl:order-first',
           isOpen
             ? cn(
-                // Compact (<768px) stacked panel sizes naturally so content is not truncated in a fixed mini-drawer
-                'w-full h-auto border-t border-outline-variant opacity-100',
+                // Compact (<768px) stacked panel caps height so primary canvas remains usable
+                'w-full h-auto max-h-[45vh] @3xl:max-h-none border-t border-outline-variant opacity-100',
                 // Wide (@3xl+) full-height side panel
                 paneWidthClassName,
                 '@3xl:h-full @3xl:border-t-0',
                 side === 'left'
-                  ? '@3xl:border-r @3xl:border-outline-variant'
-                  : '@3xl:border-l @3xl:border-outline-variant'
+                  ? '@3xl:border-e @3xl:border-outline-variant'
+                  : '@3xl:border-s @3xl:border-outline-variant'
               )
             : 'w-full h-0 border-t-0 @3xl:w-0 @3xl:h-full @3xl:border-0 opacity-0 invisible pointer-events-none'
         )}
@@ -217,25 +173,9 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
               )}
             </div>
 
-            {(supportingActions || isOpen) && (
-              <div
-                className={cn(
-                  'flex items-center gap-1 shrink-0',
-                  !supportingActions && '@3xl:hidden'
-                )}
-              >
+            {supportingActions && (
+              <div className="flex items-center gap-1 shrink-0">
                 {supportingActions}
-                <div className="@3xl:hidden">
-                  <Button
-                    variant="text"
-                    colorRole="neutral"
-                    size="icon"
-                    onClick={handleCloseFromPane}
-                    aria-label="Close details"
-                  >
-                    <Icon name="close" size="sm" />
-                  </Button>
-                </div>
               </div>
             )}
           </div>
@@ -250,7 +190,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
 
     return (
       <div
-        ref={assignRootRef}
+        ref={ref}
         data-slot="supporting-pane-block"
         className={cn(
           '@container w-full h-full bg-surface flex flex-col min-w-0',
@@ -271,7 +211,6 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
           <div className="flex items-center gap-2 shrink-0">
             {actions}
             <Button
-              ref={toggleButtonRef}
               variant={isOpen ? 'soft' : 'outline'}
               colorRole={isOpen ? 'primary' : 'neutral'}
               size="sm"
@@ -295,7 +234,8 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
 
         {/* Main Container Split: Primary Canvas + Supporting Pane */}
         <div className="flex-1 flex flex-col @3xl:flex-row min-h-0 overflow-hidden relative">
-          {shouldRenderAsideFirst ? [supportingAside, primaryCanvas] : [primaryCanvas, supportingAside]}
+          {primaryCanvas}
+          {supportingAside}
         </div>
       </div>
     );

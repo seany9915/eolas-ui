@@ -62,6 +62,14 @@ export const useTraceLineContext = () => React.useContext(TraceLineContext);
  * Trace (Root Container)
  * -----------------------------------------------------------------------------------------------*/
 export interface TraceRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Visual presentation variant of the trace container.
+   * - `default`: Standard contained surface with 1px outline-variant border.
+   * - `embedded`: Subtle surface-container wash for grouped field contexts.
+   * - `timeline`: Vertical connected-rail timeline layout.
+   * - `ghost`: Transparent unboxed container for chat message turns and nested traces.
+   * @deprecated Use `variant="ghost"` instead of `unboxed`.
+   */
   variant?: 'default' | 'card' | 'embedded' | 'timeline' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
   className?: string;
@@ -71,35 +79,37 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
   ({ variant, children, className, role, ...props }, ref) => {
     const chatContext = useChatMessageContext();
     const parentTrace = useTraceContext();
+    const isNested = parentTrace.isNested;
 
-    // If explicitly provided, respect it; if inside another trace or collapsible content, default to 'unboxed' / 'ghost';
+    // If explicitly provided, respect it; if inside another trace or collapsible content, default to 'ghost';
     // if inside chat message, default to 'ghost'; otherwise default to 'default'.
     const resolvedVariant =
       variant ??
-      (parentTrace.isNested
-        ? 'unboxed'
+      (isNested
+        ? 'ghost'
         : chatContext?.inMessage
         ? 'ghost'
         : 'default');
 
-    const defaultRole = role ?? 'region';
+    // Only emit landmark region and label when explicitly requested or at top-level with an explicit role;
+    // avoids landmark bloat and orphaned aria-label on generic containers.
+    const computedRole = isNested ? undefined : role;
     const accessibleLabel =
-      props['aria-label'] ??
-      (props['aria-labelledby'] ? undefined : 'Execution trace');
+      !isNested && computedRole
+        ? props['aria-label'] ?? (props['aria-labelledby'] ? undefined : 'Execution trace')
+        : undefined;
 
     return (
       <TraceContext.Provider value={{ isNested: true, variant: resolvedVariant }}>
         <div
           ref={ref}
-          role={defaultRole}
+          role={computedRole}
           data-slot="trace"
           aria-label={accessibleLabel}
           className={cn(
             '@container w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-            resolvedVariant === 'default' &&
+            (resolvedVariant === 'default' || resolvedVariant === 'card') &&
               'rounded-2xl border border-outline-variant bg-surface overflow-hidden divide-y divide-outline-variant/40 shadow-sm',
-            resolvedVariant === 'card' &&
-              'rounded-2xl bg-surface overflow-hidden shadow-ambient divide-y divide-outline-variant/40',
             resolvedVariant === 'embedded' &&
               'rounded-2xl border border-outline-variant/60 bg-surface-container/30 overflow-hidden divide-y divide-outline-variant/30',
             (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed') &&
@@ -202,9 +212,9 @@ export const TraceIcon = React.forwardRef<HTMLSpanElement, TraceIconProps>(
             ? cn(
                 'size-6 rounded-full text-xs font-medium',
                 stepNumber !== undefined &&
-                  'border border-outline-variant/60 bg-surface-container text-on-surface font-mono text-[11px] font-semibold',
+                  'border border-outline-variant/60 bg-surface-container text-on-surface font-mono text-xs font-semibold leading-none',
                 stepNumber === undefined && isComplete && 'bg-success-container text-on-success-container font-bold',
-                stepNumber === undefined && resolvedStatus === 'running' && 'bg-secondary-container text-on-secondary-container',
+                stepNumber === undefined && resolvedStatus === 'running' && 'bg-surface-container text-on-surface-variant',
                 stepNumber === undefined && resolvedStatus === 'warning' && 'bg-warning-container text-on-warning-container font-bold',
                 stepNumber === undefined && resolvedStatus === 'error' && 'bg-error-container text-on-error-container font-bold',
                 stepNumber === undefined && resolvedStatus === 'pending' && 'bg-surface-container text-on-surface-variant/90 border border-outline/40',
@@ -214,7 +224,7 @@ export const TraceIcon = React.forwardRef<HTMLSpanElement, TraceIconProps>(
             : cn(
                 'size-5 text-xs',
                 isComplete && 'text-success',
-                resolvedStatus === 'running' && 'text-primary',
+                resolvedStatus === 'running' && 'text-on-surface-variant',
                 resolvedStatus === 'warning' && 'text-warning',
                 resolvedStatus === 'error' && 'text-error',
                 resolvedStatus === 'pending' && 'text-outline/70',
@@ -229,7 +239,7 @@ export const TraceIcon = React.forwardRef<HTMLSpanElement, TraceIconProps>(
         {children ? (
           children
         ) : stepNumber !== undefined ? (
-          <span className="font-mono text-[11px] font-semibold tabular-nums leading-none">
+          <span className="font-mono text-xs font-semibold tabular-nums leading-none">
             {stepNumber}
           </span>
         ) : resolvedStatus === 'running' ? (

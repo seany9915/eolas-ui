@@ -130,7 +130,7 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
             <div className="flex flex-col min-w-0 flex-1 text-left leading-tight">
               <TraceTitle className="truncate">{title}</TraceTitle>
               {description && (
-                <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+                <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
                   {description}
                 </span>
               )}
@@ -353,7 +353,7 @@ export const PlanRoot: React.FC<PlanProps> = ({
                         <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
                           <TraceTitle className="truncate">{step.title}</TraceTitle>
                           {step.description && (
-                            <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+                            <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
                               {step.description}
                             </span>
                           )}

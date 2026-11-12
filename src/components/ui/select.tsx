@@ -239,7 +239,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           aria-describedby={describedBy}
           className={cn(
             'inline-flex items-center justify-between gap-2 w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
-            'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+            'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
             'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
             size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
             size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
@@ -383,7 +383,7 @@ export const SelectTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         'inline-flex items-center justify-between gap-2 w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
-        'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+        'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
         size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
         size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
         size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
@@ -601,7 +601,7 @@ export const SelectItem = React.forwardRef<
       'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
       'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
       'data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
-      'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-primary data-[selected]:data-[highlighted]:ring-1 data-[selected]:data-[highlighted]:ring-inset data-[selected]:data-[highlighted]:ring-primary/40',
+      'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
       className

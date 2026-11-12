@@ -127,6 +127,13 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
     success: 'bg-success',
   };
 
+  const surfaceWashBg: Record<InlineAlertRole, string> = {
+    neutral: 'bg-surface-variant/50',
+    warning: 'bg-warning-container/40',
+    error: 'bg-error-container/40',
+    success: 'bg-success-container/40',
+  };
+
   const iconColorClasses: Record<InlineAlertRole, string> = {
     neutral: 'text-on-surface',
     warning: 'text-warning',
@@ -175,7 +182,8 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-variant={variant ?? resolvedRole}
       data-role={resolvedRole}
       className={cn(
-        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default bg-surface border-none overflow-hidden text-left',
+        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default border-none overflow-hidden text-left',
+        surfaceWashBg[resolvedRole],
         className
       )}
       {...props}

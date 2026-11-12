@@ -321,7 +321,7 @@ const ConfirmationApprove: React.FC<ConfirmationApproveProps> = ({
       className={cn('min-h-[44px] px-3.5 text-xs font-semibold gap-1.5', className)}
     >
       {isLoading ? (
-        <Icon name="progress_activity" size="xs" className="animate-spin" aria-hidden="true" />
+        <Icon name="progress_activity" size="xs" className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
       ) : (
         <Icon name="check" size="xs" aria-hidden="true" />
       )}

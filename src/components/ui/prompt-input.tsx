@@ -82,11 +82,11 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
     const isGhost = variant === 'ghost' || variant === 'unboxed';
     const isFloating = floating || variant === 'floating';
     const rootClasses = cn(
-      '@container relative flex flex-col w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+      '@container relative flex flex-col w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
       isGhost
         ? 'bg-transparent border-0 rounded-none p-0 focus-within:outline-none'
         : cn(
-            'border rounded-2xl p-2.5 bg-surface text-on-surface',
+            'border rounded-lg p-2.5 bg-surface text-on-surface',
             'border-outline has-[input:focus-visible,textarea:focus-visible]:border-primary has-[input:focus-visible,textarea:focus-visible]:outline-2 has-[input:focus-visible,textarea:focus-visible]:-outline-offset-1 has-[input:focus-visible,textarea:focus-visible]:outline-primary',
             'has-[:invalid]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
             'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
@@ -376,13 +376,13 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
                     <div className="flex items-center gap-1.5">
                       <span className="font-heading font-semibold text-xs text-on-surface">{item.name}</span>
                       {item.badge && (
-                        <Badge size="sm" variant="soft" colorRole="secondary" className="text-[10px] h-4 py-0 px-1">
+                        <Badge size="sm" variant="soft" colorRole="secondary" className="text-xs leading-none h-4.5 py-0 px-1.5">
                           {item.badge}
                         </Badge>
                       )}
                     </div>
                     {item.description && (
-                      <span className="text-[11px] font-sans text-on-surface-variant truncate">
+                      <span className="text-xs font-sans text-on-surface-variant truncate">
                         {item.description}
                       </span>
                     )}
@@ -515,7 +515,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
                 <div className="flex flex-col min-w-0 pr-2">
                   <span className="font-heading font-semibold text-xs text-on-surface">{opt.label}</span>
                   {opt.description && (
-                    <span className="text-[11px] font-sans text-on-surface-variant truncate">
+                    <span className="text-xs font-sans text-on-surface-variant truncate">
                       {opt.description}
                     </span>
                   )}
@@ -686,7 +686,7 @@ export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
         <Icon
           name={isRecording ? 'mic' : 'mic_none'}
           size="xs"
-          className={cn(isRecording && 'text-error animate-pulse')}
+          className={cn(isRecording && 'text-error animate-pulse motion-reduce:animate-none')}
           aria-hidden="true"
         />
         <span className="hidden @sm:inline">{isRecording ? 'Listening...' : 'Voice'}</span>

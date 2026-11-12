@@ -130,7 +130,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
         <span
           className={cn(
             'flex size-5 shrink-0 items-center justify-center text-xs select-none',
-            isRunning && 'text-primary animate-spin motion-reduce:animate-none',
+            isRunning && 'text-on-surface-variant animate-spin motion-reduce:animate-none',
             isCompleted && 'text-success',
             status === 'pending' && 'text-outline/70',
             description && 'mt-0.5'
@@ -160,7 +160,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
           </span>
           <span className="sr-only">{isRunning ? 'Running' : isCompleted ? 'Completed' : 'Pending'}</span>
           {description && (
-            <span className="font-sans text-[11px] text-on-surface-variant truncate mt-0.5">
+            <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
               {description}
             </span>
           )}
@@ -236,7 +236,7 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
               </span>
               {countLabel && (
                 <TraceDescription>
-                  <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80">
+                  <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
                     {countLabel}
                   </span>
                 </TraceDescription>

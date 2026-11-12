@@ -558,8 +558,8 @@ export const AutocompleteInputGroup = React.forwardRef<
     data-slot="autocomplete-input-group"
     ref={ref}
     className={cn(
-      'relative flex items-center w-full rounded-md border border-outline bg-surface transition-[border-color,box-shadow]',
-      'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+      'relative flex items-center w-full rounded-md border border-outline bg-surface transition-[border-color,outline-color]',
+      'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
       'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
       'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
       'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',

@@ -108,8 +108,8 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
           <span
             className={cn(
               'flex size-5 shrink-0 items-center justify-center text-xs select-none transition-colors',
-              status === 'calling' && 'text-primary',
-              status === 'complete' && 'text-secondary',
+              status === 'calling' && 'text-on-surface-variant',
+              status === 'complete' && 'text-success',
               status === 'error' && 'text-error'
             )}
             aria-hidden="true"
@@ -129,7 +129,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
           </span>
 
           {formattedDuration && (
-            <span className="font-mono text-[11px] tabular-nums text-on-surface-variant/80 hidden @sm:inline">
+            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80 hidden @sm:inline">
               {formattedDuration}
             </span>
           )}
@@ -137,15 +137,15 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
 
         <div className="flex items-center gap-2 shrink-0">
           {status === 'calling' ? (
-            <Badge size="sm" variant="outline" colorRole="primary" className="text-[10px] h-5 py-0">
+            <Badge size="sm" variant="outline" colorRole="neutral" className="text-xs leading-none h-5 py-0.5 px-2">
               Running
             </Badge>
           ) : status === 'error' ? (
-            <Badge size="sm" variant="filled" colorRole="error" className="text-[10px] h-5 py-0">
+            <Badge size="sm" variant="filled" colorRole="error" className="text-xs leading-none h-5 py-0.5 px-2">
               Failed
             </Badge>
           ) : (
-            <Badge size="sm" variant="outline" colorRole="success" className="text-[10px] h-5 py-0">
+            <Badge size="sm" variant="outline" colorRole="success" className="text-xs leading-none h-5 py-0.5 px-2">
               Complete
             </Badge>
           )}

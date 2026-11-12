@@ -470,7 +470,7 @@ export const ComboboxTrigger = React.forwardRef<
       aria-label={hasChildren ? undefined : 'Toggle options'}
       className={cn(
         hasChildren
-          ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
+          ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
           : 'relative size-7 min-w-[28px] min-h-[28px] rounded-md flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
         className
       )}
@@ -512,7 +512,7 @@ export const ComboboxItem = React.forwardRef<
         'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
         'hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
         'data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
-        'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-primary data-[selected]:data-[highlighted]:ring-1 data-[selected]:data-[highlighted]:ring-inset data-[selected]:data-[highlighted]:ring-primary/40',
+        'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
         className
@@ -700,8 +700,8 @@ export const ComboboxInputGroup = React.forwardRef<
     data-slot="combobox-input-group"
     ref={ref}
     className={cn(
-      'relative flex items-center w-full rounded-md border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,box-shadow]',
-      'data-[popup-open]:border-primary data-[popup-open]:ring-2 data-[popup-open]:ring-primary/20',
+      'relative flex items-center w-full rounded-md border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,outline-color]',
+      'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
       'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
       'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
       'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',

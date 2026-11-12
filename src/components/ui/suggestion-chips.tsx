@@ -144,7 +144,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         <Icon
           name="arrow_forward"
           size="xs"
-          className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
+          className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
           aria-hidden="true"
         />
       </Button>
@@ -181,7 +181,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
           <Icon
             name="arrow_forward"
             size="xs"
-            className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
+            className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
             aria-hidden="true"
           />
         )}
@@ -207,7 +207,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         <Icon
           name={itemIcon}
           size="xs"
-          className="text-primary group-hover:scale-105 transition-transform shrink-0"
+          className="text-primary group-hover:scale-105 transition-transform motion-reduce:transform-none shrink-0"
           aria-hidden="true"
         />
       )}
@@ -218,7 +218,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         <Icon
           name="arrow_forward"
           size="xs"
-          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] shrink-0"
+          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
           aria-hidden="true"
         />
       )}

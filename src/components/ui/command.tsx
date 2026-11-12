@@ -80,7 +80,7 @@ export function CommandDialog({
             initialFocus={initialFocus}
             finalFocus={finalFocus}
             className={cn(
-              'w-full max-w-xl overflow-hidden p-0 rounded-xl bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+              'w-full max-w-xl overflow-hidden p-0 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               className
             )}
           >
@@ -110,12 +110,12 @@ export const CommandInput = React.forwardRef<
 >(({ className, icon, wrapperClassName, ...props }, ref) => (
   <div
     data-slot="command-input-wrapper"
-    className={cn('flex items-center border-b border-outline-variant px-3 focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary', wrapperClassName)}
+    className={cn('flex items-center gap-2 rounded-t-[inherit] border-b border-outline-variant px-3 focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary', wrapperClassName)}
     cmdk-input-wrapper=""
   >
     {icon ?? (
       <span
-        className="material-symbols-outlined mr-2 shrink-0 text-lg text-on-surface-variant select-none"
+        className="material-symbols-outlined shrink-0 text-lg text-on-surface-variant select-none"
         aria-hidden="true"
       >
         search
@@ -168,7 +168,7 @@ export const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden p-1 text-on-surface [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-label [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-on-surface-variant',
+      'text-on-surface [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-label [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-on-surface-variant',
       className
     )}
     {...props}
@@ -198,7 +198,7 @@ export const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] data-[disabled=true]:pointer-events-none data-[selected=true]:bg-surface-container data-[selected=true]:text-on-surface aria-selected:bg-surface-container aria-selected:text-on-surface data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
+      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container/60 data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container/60 aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
       className
     )}
     {...props}

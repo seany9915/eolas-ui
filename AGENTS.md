@@ -1,21 +1,24 @@
 # AGENTS.md
 
-> **Cross-tool Compatibility:** Antigravity 2.0 auto-loads `AGENTS.md` as a root directory rule, and also indexes modular rules with YAML frontmatter in `.agents/rules/*.md`. This root file mirrors `00-core-contract.md` for tools following the [agents.md](https://agents.md) open standard (Cursor, Copilot, Codex CLI). Keep `00-core-contract.md` as the single source of truth.
+> Mirrors `.agents/rules/00-core-contract.md` (single source of truth) for tools following the [agents.md](https://agents.md) standard.
 
-## Core contract (mirrors `.agents/rules/00-core-contract.md`)
+## Core Contract
 
 1. **Component library:** Base UI (`@base-ui/react`), not Radix. Full detail: `.agents/rules/component-library.md`.
-2. **Architectural Layers & Primitive-Check-First:**
-   - **Primitives (`src/components/ui/`):** Pure Base UI wrappers and design tokens. Zero business logic. Never import from blocks or features.
-   - **Composite Blocks (`src/components/blocks/`):** Reusable, controlled UI compositions built strictly from primitives and design tokens. Pure UI assemblies (receive props, emit callbacks, zero network or auth coupling). Never import from features.
-   - **Feature Views (`src/features/` or `src/views/`):** Domain-specific screens & workflows. Owns state, queries, and auth. Decoupled from the shared component registry.
-   - **Direct Tag Ban:** Direct `<button>`, `<input>`, `<select>`, `<textarea>`, and native `<dialog>` tags outside `components/ui/` are strictly banned (enforced via ESLint AST selectors). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, and `<Dialog>` from `@/components/ui/` (for unstyled triggers like card stretched-links or table sort headers, use `<UnstyledButton>` or `<Button variant="unstyled">`).
-3. **API preservation:** Visual styling, bug fixes, or token updates must NEVER erode component API surface, strip Base UI polymorphic `render` / slot props, drop compound subcomponents, or downgrade primitives to plain HTML `<div>`s or `<button>`s.
-4. **Anti-pattern gate:** Re-check `.agents/rules/anti-patterns.md` before finishing any UI task. Highest priority: no emerald cancel buttons (secondary actions use outline neutral), no triple-tint monochrome chips, no focus vs. selection ambiguity, no raw interactive HTML tags, no `space-y-*`/`space-x-*` child-margin hacks (use `flex gap-*`), no manual icon margins (`mr-*`/`ml-*` inside buttons/menus), no raw unlabelled form inputs (mandate `<FieldGroup>` + `<Field>`), no manual absolute buttons in inputs (use `<InputGroup>`), no titleless overlays, no ad-hoc shimmer keyframes (use `<ShimmerText>` or `<Skeleton>`), enforce `size-*` and `truncate` shorthands, no trigger downgrades (`render={<span />}`), no registry bloat, and plain-English UI copy only (max 2 nouns per label; describe user outcomes, never dev/database/CSS mechanics).
-5. **Design system:** Full structural/color/typography/a11y rules live in `.agents/rules/design-system.md` and the project root `DESIGN.md` — treat `DESIGN.md` as the single source of truth for tokens, never invent hex codes.
-6. **Routing index:** See the table in `.agents/rules/00-core-contract.md` for which skill/rule/MCP to use for design, components, copywriting, accessibility auditing, and Firebase work.
-
----
+2. **Architectural Layers & Direct Tag Ban:**
+   - **Primitives (`src/components/ui/`):** Pure Base UI wrappers, tokens, and controlled AI primitives (`PromptInput`, `ChatMessage`, `MessageScroller`, `ModelSelector`, `Trace`, `Tool`). Zero network/DB/auth logic; never import from `blocks` or `features`.
+   - **Composite Blocks (`src/components/blocks/`):** Controlled UI compositions built from `ui/` and tokens (props/callbacks only; zero network/auth coupling). Never import from `features/` or `views/`.
+   - **Feature Views (`src/features/` or `src/views/`):** Owns state, queries, auth, and routing.
+   - **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `components/ui/` are banned (ESLint `no-restricted-syntax`). Use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">`.
+3. **API preservation:** Never erode component APIs, strip `ref` / `render` props, drop compound subcomponents, or downgrade primitives to `<div>`/`<button>`.
+4. **Always-on guardrails (see `.agents/rules/anti-patterns.md`):**
+   - No triple-tint chips; use `*-container` + ultra-dark `on-*-container` on pills, `#1a1c1e` on callouts/cards.
+   - Focus (`outline-offset: 2px`) vs. selection (flush `2px` border + surface wash).
+   - No `space-y-*`/`space-x-*` (use `flex gap-*` / `grid gap-*`); no `mr-*`/`ml-*` on `<Icon>`; use `size-*` and `truncate`.
+   - Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>`; use `<InputGroup>` instead of absolute input buttons.
+   - Always include accessible overlay titles (`DialogTitle`/`DrawerTitle`/`SheetTitle`); no manual `z-index`.
+   - Never downgrade triggers (`render={<span />}`), never use `transition-all` or ad-hoc shimmer keyframes (`<ShimmerText>`/`<Skeleton>`), no registry bloat, and plain-English UI copy only (1–2 nouns; no dev/DB/CSS jargon).
+5. **Design system & routing:** See `DESIGN.md`, `.agents/rules/design-system.md`, and `.agents/rules/00-core-contract.md`.
 
 ## Framework Architecture: Vite + React SPA
-This project is a high-performance Single Page Application built on **Vite + React 18**. Do not import or generate Next.js server components, App Router files (`page.tsx`, `layout.tsx`, `route.ts`), or `next/*` modules. Application routes and state follow client-side SPA conventions with Tailwind CSS v4 and Base UI primitives.
+Client-side **Vite + React 18** SPA with Tailwind CSS v4 and Base UI. Never generate Next.js server components, App Router files (`page.tsx`, `layout.tsx`, `route.ts`), or `next/*` imports.

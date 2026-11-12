@@ -70,13 +70,8 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
     const isGhost = variant === 'ghost' || variant === 'unboxed';
     const isFloating = floating || variant === 'floating';
 
-    // Corner radius: standard single-line form inputs match Button/Input 8px (rounded-lg);
-    // multi-line / floating AI prompt containers use rounded-2xl.
-    const roundedClass = isGhost
-      ? 'rounded-none'
-      : isFloating || variant === 'card'
-      ? 'rounded-2xl'
-      : 'rounded-lg';
+    // Corner radius: standard form containers use 16px (rounded-lg) per DESIGN.md
+    const roundedClass = isGhost ? 'rounded-none' : 'rounded-lg';
 
     // Height sizing for horizontal single-line input controls (DESIGN.md lines 368-372)
     const sizeMinHeight = {
@@ -86,7 +81,7 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
     }[size];
 
     const rootClasses = cn(
-      '@container group/input-group relative flex w-full transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+      '@container group/input-group relative flex w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
       // Default to row layout for input, switch to column layout if a textarea is present
       'has-[textarea]:flex-col has-[textarea]:items-stretch has-[input]:flex-row has-[input]:items-center',
       sizeMinHeight,
@@ -227,7 +222,7 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
       className
     );
     const textareaStyle = {
-      maxHeight: typeof maxHeight === 'number' ? `px` : maxHeight,
+      maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
       ...style,
     };
 
