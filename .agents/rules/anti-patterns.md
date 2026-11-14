@@ -21,7 +21,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Focus vs. selection ambiguity** (`outline-offset: 0` on borderless/selectable containers) → **Use:** Floating `outline-offset: 2px` for focus; flush `2px` border + surface wash for selection.
 
 ## Structural & Layout
-- **Banned: `space-y-*` / `space-x-*` child-margin hacks** → **Use:** `flex flex-col gap-*` or `grid gap-*`.
+- **Banned: `space-y-*` / `space-x-*` child-margin hacks, `1fr`/`flex` overflow traps, or `order-*` on interactive controls** → **Use:** `flex flex-col gap-*` or `grid gap-*` (with $\ge 2\times$ gap between groups vs. within), `minmax(0, 1fr)` / `min-w-0`, and DOM order matching tab order.
 - **Banned: Verbose `w-* h-*` or multi-class truncation** → **Use:** `size-*` (`size-4`, `size-10`) and `truncate`.
 - **Banned: Unstructured cards** (raw `<h3>`/`<p>` dumped in `<Card>`) → **Use:** `<Card.Header>`, `<Card.Title>`, `<Card.Description>`, `<Card.Action>`, `<Card.Content>`, `<Card.Footer>` (media/game canvases exempt).
 - **Banned: Hardcoded Lorem Ipsum / missing zero-state** → **Use:** Loading, empty, and realistic populated states.

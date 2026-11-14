@@ -244,7 +244,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
             size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
             size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
             size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-            'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+            'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
             error && 'border-error focus-visible:outline-error'
           )}
         >
@@ -388,7 +388,7 @@ export const SelectTrigger = React.forwardRef<
         size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
         size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
         'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-        'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
         error && 'border-error focus-visible:outline-error',
         className
       )}
@@ -600,7 +600,7 @@ export const SelectItem = React.forwardRef<
     className={cn(
       'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
       'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-      'data-[selected]:bg-surface-variant data-[selected]:text-primary data-[selected]:font-semibold',
+      'data-[selected]:bg-surface-container data-[selected]:text-primary data-[selected]:font-semibold',
       'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',

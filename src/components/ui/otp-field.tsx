@@ -200,7 +200,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
                   'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
                   'border-outline hover:border-on-surface-variant/80',
                   'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-                  'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+                  'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
                   error && 'border-error focus-visible:border-error focus-visible:outline-error'
                 )}
               />

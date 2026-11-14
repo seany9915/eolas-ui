@@ -41,7 +41,7 @@ const TextareaComponent = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           'min-h-[80px] p-3 rounded-lg',
           'bg-surface text-on-surface transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
           'border border-outline focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-          'disabled:bg-surface-variant/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+          'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
           'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
           'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
           error && 'border-error focus-visible:border-error focus-visible:outline-error',

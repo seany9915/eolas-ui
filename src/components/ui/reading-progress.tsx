@@ -39,11 +39,11 @@ export interface ReadingProgressProps
 }
 
 const colorStyles: Record<ReadingProgressColor, { indicator: string; track: string }> = {
-  primary: { indicator: 'bg-primary', track: 'bg-surface-container/40' },
-  secondary: { indicator: 'bg-secondary', track: 'bg-surface-container/40' },
-  success: { indicator: 'bg-success', track: 'bg-surface-container/40' },
-  warning: { indicator: 'bg-warning', track: 'bg-surface-container/40' },
-  error: { indicator: 'bg-error', track: 'bg-surface-container/40' },
+  primary: { indicator: 'bg-primary', track: 'bg-surface-container-high' },
+  secondary: { indicator: 'bg-secondary', track: 'bg-surface-container-high' },
+  success: { indicator: 'bg-success', track: 'bg-surface-container-high' },
+  warning: { indicator: 'bg-warning', track: 'bg-surface-container-high' },
+  error: { indicator: 'bg-error', track: 'bg-surface-container-high' },
 };
 
 const heightClasses: Record<ReadingProgressHeight, string> = {

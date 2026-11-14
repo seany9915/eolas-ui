@@ -30,11 +30,21 @@ export interface TabItemData<Value extends TabValue = string> {
 
 export type TabItem<Value extends TabValue = string> = TabItemData<Value>;
 
-export type TabsVariant = 'line' | 'underline' | 'segmented' | 'segment' | 'pills' | 'pill' | 'unstyled';
+export type TabsVariant =
+  | 'line'
+  | 'underline'
+  | 'pills'
+  | 'pill'
+  | 'contained'
+  | 'segmented'
+  | 'segment'
+  | 'unstyled';
+export type TabsColorRole = 'primary' | 'secondary';
 export type TabsSize = 'sm' | 'md' | 'lg';
 
 interface TabsContextValue {
   variant: TabsVariant;
+  colorRole: TabsColorRole;
   size: TabsSize;
   orientation: 'horizontal' | 'vertical';
   showIndicator: boolean;
@@ -42,6 +52,7 @@ interface TabsContextValue {
 
 const TabsContext = React.createContext<TabsContextValue>({
   variant: 'line',
+  colorRole: 'primary',
   size: 'md',
   orientation: 'horizontal',
   showIndicator: true,
@@ -54,6 +65,7 @@ export interface TabsRootProps<Value extends TabValue = TabValue>
   onValueChange?: (value: Value, eventDetails: BaseTabs.Root.ChangeEventDetails) => void;
   orientation?: 'horizontal' | 'vertical';
   variant?: TabsVariant;
+  colorRole?: TabsColorRole;
   size?: TabsSize;
   showIndicator?: boolean;
 }
@@ -62,6 +74,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
   (
     {
       variant = 'line',
+      colorRole = 'primary',
       size = 'md',
       orientation = 'horizontal',
       showIndicator = true,
@@ -75,7 +88,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
     ref
   ) => {
     return (
-      <TabsContext.Provider value={{ variant, size, orientation, showIndicator }}>
+      <TabsContext.Provider value={{ variant, colorRole, size, orientation, showIndicator }}>
         <BaseTabs.Root
           ref={ref}
           value={value}
@@ -101,6 +114,7 @@ TabsRoot.displayName = 'TabsRoot';
 
 export interface TabsListProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.List> {
   variant?: TabsVariant;
+  colorRole?: TabsColorRole;
   size?: TabsSize;
   showIndicator?: boolean;
   indicatorClassName?: string;
@@ -113,6 +127,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       activateOnFocus = false,
       loopFocus = true,
       variant,
+      colorRole,
       size,
       showIndicator,
       indicatorClassName,
@@ -123,15 +138,16 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
   ) => {
     const parentContext = React.useContext(TabsContext);
     const effectiveVariant = variant ?? parentContext.variant ?? 'line';
+    const effectiveColorRole = colorRole ?? parentContext.colorRole ?? 'primary';
     const effectiveSize = size ?? parentContext.size ?? 'md';
     const effectiveShowIndicator = showIndicator ?? parentContext.showIndicator ?? true;
-    const isSegmented =
+    const isPills = effectiveVariant === 'pills' || effectiveVariant === 'pill';
+    const isContained =
+      effectiveVariant === 'contained' ||
       effectiveVariant === 'segmented' ||
-      effectiveVariant === 'segment' ||
-      effectiveVariant === 'pills' ||
-      effectiveVariant === 'pill';
+      effectiveVariant === 'segment';
     const enableScrollFade =
-      effectiveVariant !== 'unstyled' && !isSegmented && parentContext.orientation === 'horizontal';
+      effectiveVariant !== 'unstyled' && !isPills && !isContained && parentContext.orientation === 'horizontal';
     const { ref: listRef } = useHorizontalScrollFade<HTMLDivElement>(ref, {
       disabled: !enableScrollFade,
     });
@@ -152,6 +168,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       <TabsContext.Provider
         value={{
           variant: effectiveVariant,
+          colorRole: effectiveColorRole,
           size: effectiveSize,
           orientation: parentContext.orientation,
           showIndicator: effectiveShowIndicator,
@@ -166,14 +183,16 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               'relative flex items-center',
               effectiveVariant === 'unstyled'
                 ? ''
-                : isSegmented
-                  ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
-                  : cn(
-                      'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
-                      enableScrollFade && 'scroll-fade-x',
-                      'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
-                      'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
-                    ),
+                : isContained
+                  ? 'p-1 rounded bg-surface-container-high border border-outline-variant gap-1 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                  : isPills
+                    ? 'gap-1.5 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                    : cn(
+                        'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
+                        enableScrollFade && 'scroll-fade-x',
+                        'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
+                        'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                      ),
               typeof className === 'function' ? className(state) : className
             )
           }
@@ -181,10 +200,11 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
         >
           {children}
           {effectiveShowIndicator && effectiveVariant !== 'unstyled' && (
-            isSegmented ? (
+            isContained ? (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute rounded-sm bg-surface border border-outline z-0 pointer-events-none motion-reduce:transition-none',
+                  'absolute rounded-sm z-0 pointer-events-none motion-reduce:transition-none',
+                  effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
                   indicatorReady
                     ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
                     : 'transition-none',
@@ -193,10 +213,24 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                   indicatorClassName
                 )}
               />
+            ) : isPills ? (
+              <BaseTabs.Indicator
+                className={cn(
+                  'absolute rounded-md z-0 pointer-events-none motion-reduce:transition-none',
+                  effectiveColorRole === 'secondary' ? 'bg-secondary-container' : 'bg-primary-container',
+                  indicatorReady
+                    ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
+                    : 'transition-none',
+                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-0',
+                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-0',
+                  indicatorClassName
+                )}
+              />
             ) : (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute bg-primary rounded-none z-10 pointer-events-none motion-reduce:transition-none',
+                  'absolute rounded-none z-10 pointer-events-none motion-reduce:transition-none',
+                  effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
                   indicatorReady
                     ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
                     : 'transition-none',
@@ -217,19 +251,21 @@ TabsList.displayName = 'TabsList';
 export interface TabProps extends React.ComponentPropsWithoutRef<typeof BaseTabs.Tab> {
   icon?: string;
   variant?: TabsVariant;
+  colorRole?: TabsColorRole;
   size?: TabsSize;
 }
 
 export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
-  ({ value, children, icon, disabled, variant, size, className, ...props }, ref) => {
+  ({ value, children, icon, disabled, variant, colorRole, size, className, ...props }, ref) => {
     const context = React.useContext(TabsContext);
     const effectiveVariant = variant ?? context.variant ?? 'line';
+    const effectiveColorRole = colorRole ?? context.colorRole ?? 'primary';
     const effectiveSize = size ?? context.size ?? 'md';
-    const isSegmented =
+    const isPills = effectiveVariant === 'pills' || effectiveVariant === 'pill';
+    const isContained =
+      effectiveVariant === 'contained' ||
       effectiveVariant === 'segmented' ||
-      effectiveVariant === 'segment' ||
-      effectiveVariant === 'pills' ||
-      effectiveVariant === 'pill';
+      effectiveVariant === 'segment';
     const hasSlidingIndicator = context.showIndicator;
 
     // Size height tokens (synchronized with 44px sm / 48px md / 56px lg scale across Button & Input)
@@ -251,25 +287,74 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
             sizeClasses,
             effectiveVariant === 'unstyled'
               ? ''
-              : isSegmented
+              : isContained
                 ? cn(
                     'rounded-sm text-on-surface-variant hover:text-on-surface z-10 border border-transparent',
                     hasSlidingIndicator
                       ? cn(
-                          'bg-transparent',
-                          'data-[active]:text-on-surface',
-                          'data-[selected]:text-on-surface',
-                          'aria-selected:text-on-surface font-semibold'
+                          'bg-transparent hover:bg-state-hover',
+                          effectiveColorRole === 'secondary'
+                            ? cn(
+                                'data-[active]:delay-[60ms] data-[active]:text-on-secondary data-[active]:hover:bg-transparent data-[active]:hover:text-on-secondary',
+                                'data-[selected]:delay-[60ms] data-[selected]:text-on-secondary data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-secondary',
+                                'aria-selected:delay-[60ms] aria-selected:text-on-secondary aria-selected:hover:bg-transparent aria-selected:hover:text-on-secondary font-semibold'
+                              )
+                            : cn(
+                                'data-[active]:delay-[60ms] data-[active]:text-on-primary data-[active]:hover:bg-transparent data-[active]:hover:text-on-primary',
+                                'data-[selected]:delay-[60ms] data-[selected]:text-on-primary data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-primary',
+                                'aria-selected:delay-[60ms] aria-selected:text-on-primary aria-selected:hover:bg-transparent aria-selected:hover:text-on-primary font-semibold'
+                              )
                         )
                       : cn(
-                          'hover:bg-surface-variant/30',
-                          'data-[active]:bg-surface data-[active]:text-on-surface data-[active]:border-outline',
-                          'data-[selected]:bg-surface data-[selected]:text-on-surface data-[selected]:border-outline',
-                          'aria-selected:bg-surface aria-selected:text-on-surface aria-selected:border-outline'
+                          'hover:bg-state-hover',
+                          effectiveColorRole === 'secondary'
+                            ? cn(
+                                'data-[active]:bg-secondary data-[active]:text-on-secondary data-[active]:hover:text-on-secondary',
+                                'data-[selected]:bg-secondary data-[selected]:text-on-secondary data-[selected]:hover:text-on-secondary',
+                                'aria-selected:bg-secondary aria-selected:text-on-secondary aria-selected:hover:text-on-secondary'
+                              )
+                            : cn(
+                                'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:hover:text-on-primary',
+                                'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:hover:text-on-primary',
+                                'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:hover:text-on-primary'
+                              )
                         )
                   )
+                : isPills
+                  ? cn(
+                      'rounded-md text-on-surface-variant hover:text-on-surface z-10 border border-transparent',
+                      hasSlidingIndicator
+                        ? cn(
+                            'bg-transparent hover:bg-state-hover',
+                            effectiveColorRole === 'secondary'
+                              ? cn(
+                                  'data-[active]:text-on-secondary-container data-[active]:hover:bg-transparent data-[active]:hover:text-on-secondary-container',
+                                  'data-[selected]:text-on-secondary-container data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-secondary-container',
+                                  'aria-selected:text-on-secondary-container aria-selected:hover:bg-transparent aria-selected:hover:text-on-secondary-container font-semibold'
+                                )
+                              : cn(
+                                  'data-[active]:text-on-primary-container data-[active]:hover:bg-transparent data-[active]:hover:text-on-primary-container',
+                                  'data-[selected]:text-on-primary-container data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-primary-container',
+                                  'aria-selected:text-on-primary-container aria-selected:hover:bg-transparent aria-selected:hover:text-on-primary-container font-semibold'
+                                )
+                          )
+                        : cn(
+                            'hover:bg-state-hover',
+                            effectiveColorRole === 'secondary'
+                              ? cn(
+                                  'data-[active]:bg-secondary-container data-[active]:text-on-secondary-container data-[active]:hover:text-on-secondary-container',
+                                  'data-[selected]:bg-secondary-container data-[selected]:text-on-secondary-container data-[selected]:hover:text-on-secondary-container',
+                                  'aria-selected:bg-secondary-container aria-selected:text-on-secondary-container aria-selected:hover:text-on-secondary-container'
+                                )
+                              : cn(
+                                  'data-[active]:bg-primary-container data-[active]:text-on-primary-container data-[active]:hover:text-on-primary-container',
+                                  'data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:hover:text-on-primary-container',
+                                  'aria-selected:bg-primary-container aria-selected:text-on-primary-container aria-selected:hover:text-on-primary-container'
+                                )
+                          )
+                    )
                 : cn(
-                    'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 border-b-2 border-transparent',
+                    'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-state-hover border-b-2 border-transparent',
                     hasSlidingIndicator
                       ? cn(
                           'data-[active]:text-primary',
@@ -395,6 +480,7 @@ export interface TabsProps<Value extends TabValue = string> {
   activateOnFocus?: boolean;
   loopFocus?: boolean;
   variant?: TabsVariant;
+  colorRole?: TabsColorRole;
   size?: TabsSize;
   showIndicator?: boolean;
   indicatorClassName?: string;
@@ -420,6 +506,7 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
       activateOnFocus = false,
       loopFocus = true,
       variant = 'line',
+      colorRole = 'primary',
       size = 'md',
       showIndicator = true,
       indicatorClassName,
@@ -440,7 +527,8 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
         ? (tabList[0]?.value ?? tabList[0]?.id)
         : undefined);
     const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
-    const isSegmented =
+    const isPillOrContained =
+      variant === 'contained' ||
       variant === 'segmented' ||
       variant === 'segment' ||
       variant === 'pills' ||
@@ -454,10 +542,11 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
         onValueChange={onValueChange}
         orientation={orientation}
         variant={variant}
+        colorRole={colorRole}
         size={size}
         showIndicator={showIndicator}
         className={cn(
-          inline || isSegmented ? 'w-max max-w-full items-start' : 'w-full',
+          inline || isPillOrContained ? 'w-max max-w-full items-start' : 'w-full',
           className
         )}
         {...props}

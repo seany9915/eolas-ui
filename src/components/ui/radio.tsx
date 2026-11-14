@@ -140,7 +140,7 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
           'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
           'data-[checked]:border-2 data-[checked]:border-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-primary',
-          'data-[disabled]:border-outline-variant data-[disabled]:bg-surface-variant/30 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
+          'data-[disabled]:border-outline-variant data-[disabled]:bg-surface-container/30 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
           error ? 'border-error focus-visible:outline-error' : 'border-outline',
           !label && className
         )}
@@ -164,7 +164,7 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
           'flex items-start gap-3 cursor-pointer group rounded transition-colors',
           compact
             ? 'p-1'
-            : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-variant/30',
+            : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-container/30',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
           className
         )}

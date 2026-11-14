@@ -102,8 +102,8 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
               ? 'shadow-ambient bg-surface/95 backdrop-blur-xs [&:not(:focus-within)]:hover:border-outline'
               : '[&:not(:focus-within)]:hover:border-outline/80'
           ),
-      disabled && 'opacity-60 bg-surface-variant/30 border-outline-variant cursor-not-allowed',
-      'has-[:disabled]:opacity-60 has-[:disabled]:bg-surface-variant/30 has-[:disabled]:border-outline-variant has-[:disabled]:cursor-not-allowed',
+      disabled && 'opacity-60 bg-surface-container/30 border-outline-variant cursor-not-allowed',
+      'has-[:disabled]:opacity-60 has-[:disabled]:bg-surface-container/30 has-[:disabled]:border-outline-variant has-[:disabled]:cursor-not-allowed',
       className
     );
 

@@ -67,18 +67,52 @@ export const TabsDemo: React.FC<ComponentDemoProps> = () => {
         </Tabs.Root>
       </div>
 
-      {/* 2. Segmented Pill Tabs Variant */}
+      {/* 2. Trackless Pills Tabs Variant */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-0.5">
           <h4 className="font-heading text-sm font-semibold text-on-surface">
-            Activity View Switcher (Segmented Variant)
+            Guidance Switcher (Pills Variant)
           </h4>
           <p className="font-sans text-xs text-on-surface-variant">
-            White surface indicator with crisp outline border on container track
+            Trackless floating pills with primary-container wash for cards and supporting panes
           </p>
         </div>
-        <Tabs.Root defaultValue="summary" variant="segmented">
-          <Tabs.List variant="segmented">
+        <Tabs.Root defaultValue="cues" variant="pills">
+          <Tabs.List>
+            <Tabs.Tab value="cues" icon="tips_and_updates">
+              Cues
+            </Tabs.Tab>
+            <Tabs.Tab value="words" icon="record_voice_over">
+              Words
+            </Tabs.Tab>
+            <Tabs.Tab value="notes" icon="edit_note">
+              Notes
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="cues" className="pt-3 font-sans text-base text-on-surface-variant leading-relaxed">
+            Keep the tongue tip slightly raised and relaxed behind the ridge while voicing the /r/ onset.
+          </Tabs.Panel>
+          <Tabs.Panel value="words" className="pt-3 font-sans text-base text-on-surface-variant leading-relaxed">
+            Practice words: Rabbit, Road, River, and Red.
+          </Tabs.Panel>
+          <Tabs.Panel value="notes" className="pt-3 font-sans text-base text-on-surface-variant leading-relaxed">
+            Learner maintained steady voicing across 8 of 10 repetitions.
+          </Tabs.Panel>
+        </Tabs.Root>
+      </div>
+
+      {/* 3. Contained Tabs Variant */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h4 className="font-heading text-sm font-semibold text-on-surface">
+            Activity View Switcher (Contained Variant)
+          </h4>
+          <p className="font-sans text-xs text-on-surface-variant">
+            Solid brand indicator inside a recessed surface-container-high track for top-level views
+          </p>
+        </div>
+        <Tabs.Root defaultValue="summary" variant="contained">
+          <Tabs.List>
             <Tabs.Tab value="summary" icon="table_chart">
               Summary
             </Tabs.Tab>

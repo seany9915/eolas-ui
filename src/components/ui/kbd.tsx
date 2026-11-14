@@ -25,7 +25,7 @@ export interface KbdVariantsProps {
 }
 
 const variantStyles: Record<KbdVariant, string> = {
-  default: 'bg-surface-container text-on-surface-variant border border-outline-variant shadow-ambient',
+  default: 'bg-surface-container-high text-on-surface-variant border border-outline-variant shadow-ambient',
   outline: 'bg-surface text-on-surface border border-outline shadow-ambient',
   ghost: 'bg-transparent text-on-surface-variant border-transparent',
 };

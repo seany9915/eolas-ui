@@ -126,7 +126,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
       )}
 
       <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
-        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-variant border border-outline data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
+        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-container-high border border-outline data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
           <BaseSlider.Indicator className="rounded-full bg-primary data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
           {isRange ? (
             <>

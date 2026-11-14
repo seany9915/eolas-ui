@@ -81,7 +81,7 @@ export function App() {
               <span className="font-label text-sm font-bold text-on-surface">Eolas Design System & Registry</span>
             </div>
             <p className="font-sans text-xs text-on-surface-variant text-center sm:text-right">
-              Engineered with Base UI primitives (<code className="bg-surface-variant px-1.5 py-0.5 rounded text-primary font-mono">@base-ui/react</code>), WCAG 2.2 AA contrast compliance, and Material Symbols.
+              Engineered with Base UI primitives (<code className="bg-surface-container px-1.5 py-0.5 rounded text-primary font-mono">@base-ui/react</code>), WCAG 2.2 AA contrast compliance, and Material Symbols.
             </p>
           </div>
         </footer>

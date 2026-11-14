@@ -9,32 +9,32 @@ export const ColorTokensExplorer: React.FC = () => {
       description: 'Every screen uses exactly three containment levels. Pick the lowest level that solves the grouping.',
       tokens: [
         {
-          name: 'background (Canvas L1)',
-          hex: '#EFF2F7',
+          name: 'background (Canvas)',
+          hex: '#F2F4F8',
           textHex: '#1a1c1e',
           bgClass: 'bg-background text-on-background border border-outline-variant',
-          usage: 'Viewport default for page-level layout. Rely on whitespace + typography alone.',
+          usage: 'Viewport default for page-level layout (oklch(0.965 0.004 260)).',
         },
         {
-          name: 'surface-container (Grouped Fill L2)',
-          hex: '#EBF0F8',
-          textHex: '#1a1c1e',
-          bgClass: 'bg-surface-container text-on-surface border border-outline-variant',
-          usage: 'Flat, borderless grouping of input clusters or section backgrounds without implying a distinct interactive object.',
-        },
-        {
-          name: 'surface (Surface / Card L3)',
+          name: 'surface (Elevated Card / Pane)',
           hex: '#ffffff',
           textHex: '#1a1c1e',
           bgClass: 'bg-surface text-on-surface border border-outline-variant shadow-xs',
           usage: 'High-focus encapsulation for distinct, interactive entities (modals, dialogs, primary cards).',
         },
         {
-          name: 'surface-variant (Component Internal Fill)',
-          hex: '#DDE1EB',
-          textHex: '#434656',
-          bgClass: 'bg-surface-variant text-on-surface-variant border border-outline-variant',
-          usage: 'Decorative fill for atomic components: chips, progress tracks, avatar fallbacks, selected menu rows.',
+          name: 'surface-container-low (Inset Pane / Reading Box)',
+          hex: '#F2F4F8',
+          textHex: '#1a1c1e',
+          bgClass: 'bg-surface-container-low text-on-surface border border-outline-variant',
+          usage: 'Airy inset panes and reading boxes sitting inside surface cards (oklch(0.965 0.004 260)).',
+        },
+        {
+          name: 'surface-container-high (Recessed Control Track)',
+          hex: '#E3E6EC',
+          textHex: '#1a1c1e',
+          bgClass: 'bg-surface-container-high text-on-surface border border-outline-variant',
+          usage: 'Small recessed control tracks, progress bars, and skeletons (oklch(0.925 0.005 260)).',
         },
       ],
     },
@@ -198,7 +198,7 @@ export const ColorTokensExplorer: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="flex flex-col gap-10">
       {/* Intro Banner */}
       <InlineAlert
         title="Color System & Hierarchy"
@@ -216,7 +216,7 @@ export const ColorTokensExplorer: React.FC = () => {
 
       {/* Token Groups */}
       {tokenGroups.map((group) => (
-        <div key={group.category} className="space-y-4">
+        <div key={group.category} className="flex flex-col gap-4">
           <div>
             <h3 className="font-heading text-lg font-bold text-on-surface">{group.category}</h3>
             <p className="font-sans text-xs text-on-surface-variant">{group.description}</p>

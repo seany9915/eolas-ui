@@ -64,7 +64,7 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
         style={dynamicStyle}
         className={cn(
           'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
-          'bg-surface-variant text-on-surface-variant font-label font-bold border border-outline-variant',
+          'bg-surface-container-high text-on-surface-variant font-label font-bold border border-outline-variant',
           customColor && 'contrast-auto',
           sizeClasses[size],
           className

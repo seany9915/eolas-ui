@@ -16,10 +16,10 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLElement> {
 /**
  * Skeleton
  *
- * Accessible loading placeholder styled with the design system's surface-variant token.
+ * Accessible loading placeholder styled with the design system's surface-container token.
  * Uses a calm, subtle opacity pulse to communicate asynchronous state without jarring flicker.
  *
- * Complies with DESIGN.md line 566 (surface-variant toned pulse, never generic gray).
+ * Complies with DESIGN.md line 566 (surface-container toned pulse, never generic gray).
  * Supports Base UI polymorphic composition via the `render` prop.
  */
 const SkeletonRoot = React.forwardRef<HTMLElement, SkeletonProps>(
@@ -32,8 +32,8 @@ const SkeletonRoot = React.forwardRef<HTMLElement, SkeletonProps>(
         'data-slot': 'skeleton',
         'aria-hidden': 'true',
         className: cn(
-          'animate-pulse rounded bg-surface-variant',
-          'motion-reduce:animate-none motion-reduce:bg-surface-variant motion-reduce:border motion-reduce:border-outline-variant/60',
+          'animate-pulse rounded bg-surface-container-high',
+          'motion-reduce:animate-none motion-reduce:bg-surface-container-high motion-reduce:border motion-reduce:border-outline-variant/60',
           Component === 'span' && 'inline-block align-middle',
           className
         ),

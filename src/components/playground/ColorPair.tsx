@@ -27,10 +27,10 @@ export interface WcagRating {
  * Standard Eolas UI design tokens for contrast testing.
  */
 export const DESIGN_SYSTEM_COLORS = [
-  { name: 'surface', hex: '#FFFFFF', label: 'surface (White L3)' },
-  { name: 'background', hex: '#EFF2F7', label: 'background (Canvas L1)' },
-  { name: 'surface-container', hex: '#EBF0F8', label: 'surface-container (Grouped Fill L2)' },
-  { name: 'surface-variant', hex: '#DDE1EB', label: 'surface-variant (Chip/Row Fill)' },
+  { name: 'surface', hex: '#FFFFFF', label: 'surface (Elevated Card / Pane)' },
+  { name: 'background', hex: '#F2F4F8', label: 'background (Canvas)' },
+  { name: 'surface-container-low', hex: '#F2F4F8', label: 'surface-container-low (Inset Pane / Reading Box)' },
+  { name: 'surface-container-high', hex: '#E3E6EC', label: 'surface-container-high (Recessed Track / Fill)' },
   { name: 'on-surface', hex: '#1A1C1E', label: 'on-surface (Charcoal Ink)' },
   { name: 'on-surface-variant', hex: '#434656', label: 'on-surface-variant (Secondary Ink)' },
   { name: 'primary', hex: '#0052FF', label: 'primary (Electric Blue)' },

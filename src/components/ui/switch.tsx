@@ -103,7 +103,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         aria-describedby={describedBy}
         className={cn(
           'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
-          'bg-surface-variant',
+          'bg-surface-container-high',
           error ? 'border-error focus-visible:outline-error' : 'border-outline',
           'data-[checked]:bg-primary data-[checked]:border-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
@@ -130,7 +130,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
     return (
       <div
         className={cn(
-          'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors hover:bg-surface-variant/30',
+          'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors hover:bg-surface-container/30',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
           className
         )}

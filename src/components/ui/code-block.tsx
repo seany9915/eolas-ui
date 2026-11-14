@@ -231,7 +231,7 @@ export const CodeBlockLine = React.forwardRef<HTMLDivElement, CodeBlockLineProps
       <div
         ref={ref}
         data-slot="code-block-line"
-        className={cn('flex items-baseline gap-3 min-w-max hover:bg-surface-variant/30 px-1 rounded-sm', className)}
+        className={cn('flex items-baseline gap-3 min-w-max hover:bg-surface-container/30 px-1 rounded-sm', className)}
         {...props}
       >
         {lineNumber !== undefined && (

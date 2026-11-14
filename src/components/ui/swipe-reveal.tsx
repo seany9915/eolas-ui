@@ -80,7 +80,7 @@ export const SwipeRevealAction = React.forwardRef<HTMLButtonElement, SwipeReveal
       primary: 'bg-primary text-on-primary hover:bg-primary/90',
       secondary: 'bg-secondary text-on-secondary hover:bg-secondary/90',
       error: 'bg-error text-on-error hover:bg-error/90',
-      surface: 'bg-surface-container text-on-surface hover:bg-surface-variant',
+      surface: 'bg-surface-container text-on-surface hover:bg-surface-container',
     };
 
     return (

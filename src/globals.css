@@ -27,9 +27,11 @@
   --color-on-surface: var(--on-surface);
   --color-on-surface-variant: var(--on-surface-variant);
   --color-surface-container: var(--surface-container);
-  --color-surface-variant: var(--surface-variant);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-high: var(--surface-container-high);
   --color-outline: var(--outline);
   --color-outline-variant: var(--outline-variant);
+  --color-state-hover: var(--state-hover);
 
   --color-primary: var(--primary);
   --color-on-primary: var(--on-primary);
@@ -149,15 +151,17 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
-  --background: #EFF2F7;
+  --background: oklch(0.965 0.004 260);
   --on-background: #1a1c1e;
   --surface: #ffffff;
   --on-surface: #1a1c1e;
   --on-surface-variant: #434656;
-  --surface-container: #EBF0F8;
-  --surface-variant: #DDE1EB;
+  --surface-container-low: oklch(0.965 0.004 260);
+  --surface-container-high: oklch(0.925 0.005 260);
+  --surface-container: var(--surface-container-low);
   --outline: #6B6E80;
   --outline-variant: #BEC6D6;
+  --state-hover: color-mix(in oklch, var(--on-surface) 8%, transparent);
   --primary: #0052FF;
   --on-primary: #ffffff;
   --primary-container: #dce6ff;
@@ -945,6 +949,7 @@ p, li {
   font-size: var(--typeset-size);
   line-height: var(--typeset-leading);
   color: var(--on-surface);
+  overflow-wrap: break-word;
 }
 
 /* Prevent top margin leak on first child in articles, dialogs, or chat bubbles */
@@ -965,6 +970,7 @@ p, li {
   margin-top: calc(var(--typeset-flow) * 1.2);
   margin-bottom: calc(var(--typeset-flow) * 0.5);
   color: var(--on-surface);
+  overflow-wrap: break-word;
   text-wrap: balance;
 }
 
@@ -998,6 +1004,7 @@ p, li {
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
   color: var(--on-surface);
+  overflow-wrap: break-word;
   text-wrap: pretty;
 }
 
@@ -1008,6 +1015,7 @@ p, li {
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
   color: var(--on-surface);
+  overflow-wrap: break-word;
 }
 
 .typeset ol {
@@ -1016,6 +1024,7 @@ p, li {
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
   color: var(--on-surface);
+  overflow-wrap: break-word;
 }
 
 .typeset li {
@@ -1040,9 +1049,12 @@ p, li {
 /* Inline Code & Code Blocks (wired to --typeset-font-mono) */
 .typeset code {
   font-family: var(--typeset-font-mono);
+  direction: ltr;
+  unicode-bidi: isolate;
   font-size: 0.875em;
   background-color: var(--surface-container);
   color: var(--on-surface);
+  overflow-wrap: break-word;
   padding: 0.15em 0.35em;
   border-radius: var(--radius-sm);
   border: 1px solid var(--outline-variant);
@@ -1050,13 +1062,17 @@ p, li {
 
 .typeset pre {
   font-family: var(--typeset-font-mono);
+  direction: ltr;
+  unicode-bidi: isolate;
   font-size: 0.875em;
   background-color: var(--surface-container);
   color: var(--on-surface);
+  overflow-wrap: break-word;
   padding: 1em 1.25em;
   border-radius: var(--radius-md);
   border: 1px solid var(--outline-variant);
   overflow-x: auto;
+  text-align: left;
   margin-top: 0;
   margin-bottom: var(--typeset-flow);
 }
@@ -1077,7 +1093,7 @@ p, li {
   padding-inline-start: 1em;
   border-inline-start: 3px solid var(--primary);
   color: var(--on-surface-variant);
-  font-style: italic;
+
 }
 
 .typeset blockquote > p:last-child {
@@ -1088,7 +1104,8 @@ p, li {
 .typeset a {
   color: var(--primary);
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: from-font;
   transition: color var(--duration-quick) var(--ease-standard);
 }
 
@@ -1115,6 +1132,7 @@ p, li {
 .typeset th {
   font-weight: 600;
   color: var(--on-surface);
+  overflow-wrap: break-word;
   background-color: color-mix(in srgb, var(--surface-container) 50%, transparent);
 }
 
@@ -1252,7 +1270,7 @@ form[data-tool-active] {
 .scrollspy-link.\:target-current {
   color: var(--primary);
   font-weight: 600;
-  border-left-color: var(--primary);
+  border-inline-start-color: var(--primary);
 }
 
 /* Container clipping boundary offset allowing floating focus rings and ambient drop-shadows to bleed unclipped (MWG: overflow-clipping-control) */

@@ -18,6 +18,7 @@ import { Icon } from '@/components/ui/icon';
 
 export type InlineAlertRole = 'neutral' | 'warning' | 'error' | 'success';
 export type InlineAlertVariant = 'default' | 'destructive' | InlineAlertRole;
+export type InlineAlertAppearance = 'wash' | 'surface';
 
 export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Optional title for monolithic usage. Omit when using `<InlineAlert.Title>` */
@@ -29,6 +30,8 @@ export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   role?: InlineAlertRole;
   /** Ergonomic alias matching shadcn alert API ('default' -> 'neutral', 'destructive' -> 'error') */
   variant?: InlineAlertVariant;
+  /** Visual backdrop style: 'wash' (default, best inside white cards) or 'surface' (white card fill for alerts on the page canvas) */
+  appearance?: InlineAlertAppearance;
   /** Material Symbol icon name, React icon element, or null/'none' to omit */
   icon?: React.ReactNode;
   /** Action slot for buttons/links in monolithic usage */
@@ -109,6 +112,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   children,
   role,
   variant,
+  appearance = 'wash',
   icon,
   action,
   onClose,
@@ -128,10 +132,10 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   };
 
   const surfaceWashBg: Record<InlineAlertRole, string> = {
-    neutral: 'bg-surface-variant/50',
-    warning: 'bg-warning-container/40',
-    error: 'bg-error-container/40',
-    success: 'bg-success-container/40',
+    neutral: 'bg-surface-container',
+    warning: 'bg-warning-container/60',
+    error: 'bg-error-container/60',
+    success: 'bg-success-container/60',
   };
 
   const iconColorClasses: Record<InlineAlertRole, string> = {
@@ -181,9 +185,12 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-slot="inline-alert"
       data-variant={variant ?? resolvedRole}
       data-role={resolvedRole}
+      data-appearance={appearance}
       className={cn(
-        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default border-none overflow-hidden text-left',
-        surfaceWashBg[resolvedRole],
+        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default overflow-hidden text-left',
+        appearance === 'surface'
+          ? 'bg-surface border border-outline-variant shadow-card'
+          : cn('border-none', surfaceWashBg[resolvedRole]),
         className
       )}
       {...props}

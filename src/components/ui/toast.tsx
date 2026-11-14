@@ -90,7 +90,7 @@ const ToastComponent: React.FC<ToastProps> = ({
           {onClose && (
             <BaseToast.Close
               onClick={onClose}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 active:bg-surface-variant transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
               aria-label="Dismiss toast"
             >
               <Icon name="close" size="sm" aria-hidden="true" />
@@ -401,7 +401,7 @@ const ActiveToastItem: React.FC<{
 
         {/* Action button rendered via BaseToast.Action (returns null automatically if no actionProps/children) */}
         <BaseToast.Action
-          className="font-label text-xs font-semibold px-2.5 py-1 rounded-sm text-primary hover:bg-surface-variant hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0"
+          className="font-label text-xs font-semibold px-2.5 py-1 rounded-sm text-primary hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0"
           onClick={
             actionOption && isActionConfig(actionOption)
               ? actionOption.onClick
@@ -415,7 +415,7 @@ const ActiveToastItem: React.FC<{
 
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close
-          className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 active:bg-surface-variant transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+          className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
           aria-label="Dismiss toast"
         >
           <Icon name="close" size="sm" aria-hidden="true" />
@@ -480,7 +480,7 @@ const ToasterViewportContent: React.FC<{
       {/* High z-index z-[60] so toasts float above modal dialogs and sheets (z-50) */}
       <BaseToast.Viewport
         className={cn(
-          'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 focus:outline-none',
+          'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] focus:outline-none',
           positionClasses[position],
           className
         )}

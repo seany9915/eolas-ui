@@ -152,13 +152,13 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           'inline-flex w-max items-center rounded border bg-surface overflow-hidden',
           'transition-[border-color,box-shadow]',
           'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
-          'disabled:opacity-50 disabled:bg-surface-variant/30 disabled:pointer-events-none',
+          'disabled:opacity-50 disabled:bg-surface-container/30 disabled:pointer-events-none',
           error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline hover:border-on-surface-variant/80'
         )}
       >
         <BaseNumberField.Decrement
           aria-label="Decrease value"
-          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-variant/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-r border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-r border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
         >
           <Icon name="remove" size="sm" />
         </BaseNumberField.Decrement>
@@ -170,7 +170,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
         />
         <BaseNumberField.Increment
           aria-label="Increase value"
-          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-variant/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-l border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 border-l border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
         >
           <Icon name="add" size="sm" />
         </BaseNumberField.Increment>

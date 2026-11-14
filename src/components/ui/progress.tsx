@@ -107,7 +107,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
         )}
         <BaseProgress.Track
           className={cn(
-            'relative w-full rounded-full bg-surface-variant overflow-hidden border border-outline-variant/30',
+            'relative w-full rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/30',
             sizeClasses[size],
             trackClassName
           )}

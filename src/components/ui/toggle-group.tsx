@@ -84,9 +84,9 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
       'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
       'active:scale-[var(--scale-tiny)] motion-reduce:transform-none motion-reduce:transition-none',
       sizeClasses,
-      'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40 border border-transparent',
+      'text-on-surface-variant hover:text-on-surface hover:bg-state-hover border border-transparent',
       groupContext.multiple
-        ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container forced-colors:data-[pressed]:border-Highlight'
+        ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary forced-colors:data-[pressed]:border-Highlight'
         : 'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:shadow-toggle forced-colors:data-[pressed]:border-Highlight',
       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
@@ -246,7 +246,7 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
           aria-label={label}
           className={(state) =>
             cn(
-              'inline-flex w-fit max-w-full flex-wrap p-1 rounded gap-1 select-none bg-surface-variant/70 border border-outline-variant',
+              'inline-flex w-fit max-w-full flex-wrap p-1 rounded gap-1 select-none bg-surface-container-high border border-outline-variant',
               orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
               typeof className === 'function' ? className(state) : className
             )

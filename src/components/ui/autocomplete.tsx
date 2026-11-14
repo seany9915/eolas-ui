@@ -344,7 +344,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       <AutocompleteInputGroup
         className={cn(
           error && 'border-error focus-within:border-error focus-within:outline-error',
-          disabled && 'bg-surface-variant/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
+          disabled && 'bg-surface-container/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
           inputGroupClassName
         )}
       >
@@ -561,7 +561,7 @@ export const AutocompleteInputGroup = React.forwardRef<
       'relative flex items-center w-full rounded-md border border-outline bg-surface transition-[border-color,outline-color]',
       'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
       'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
-      'data-[disabled]:bg-surface-variant/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+      'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
       'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
       className
     )}
