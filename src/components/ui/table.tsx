@@ -16,6 +16,9 @@
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { useHorizontalScrollFade } from '@/lib/use-horizontal-scroll-fade';
+
+export type TableDensity = 'compact' | 'comfortable' | 'spacious';
 
 /* -------------------------------------------------------------------------------------------------
  * Data-Driven Types
@@ -39,6 +42,8 @@ export interface DataDrivenTableProps<T> {
   containerClassName?: string;
   /** Responsive layout behavior. 'scroll' preserves tabular overflow-x; 'stack' wraps into cards on narrow screens */
   responsive?: 'scroll' | 'stack';
+  /** Density mode ('compact' | 'comfortable' | 'spacious'). Also inherits `--density` via CSS container style queries. */
+  density?: TableDensity;
 }
 
 export type TableProps<T = unknown> =
@@ -47,6 +52,7 @@ export type TableProps<T = unknown> =
       data?: never;
       containerClassName?: string;
       responsive?: 'scroll' | 'stack';
+      density?: TableDensity;
     })
   | DataDrivenTableProps<T>;
 
@@ -162,30 +168,40 @@ TableCaption.displayName = 'TableCaption';
  * -----------------------------------------------------------------------------------------------*/
 export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>>(
   (props, ref) => {
+    const isDataDriven = 'columns' in props && Array.isArray(props.columns) && Array.isArray(props.data);
+    const responsive = props.responsive ?? 'scroll';
+    const density = props.density;
+    const isStack = responsive === 'stack';
+    const { ref: scrollFadeRef } = useHorizontalScrollFade<HTMLDivElement>(undefined, {
+      disabled: isStack,
+    });
+
     // Declarative data-driven mode
-    if ('columns' in props && Array.isArray(props.columns) && Array.isArray(props.data)) {
+    if (isDataDriven) {
       const {
         columns,
         data,
         keyExtractor,
         className,
         containerClassName,
-        responsive = 'scroll',
       } = props as DataDrivenTableProps<any>;
-      const isStack = responsive === 'stack';
 
       return (
         <div
+          ref={scrollFadeRef}
           data-slot="table-container"
+          data-density={density}
+          style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
           className={cn(
             'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+            !isStack && 'scroll-fade-x',
             isStack && '@container',
             containerClassName
           )}
         >
           <table ref={ref} data-slot="table" className={cn('w-full text-left border-collapse font-sans text-sm', className)}>
             <thead className={cn(isStack && '@max-sm:hidden')}>
-              <tr className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
+              <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
                 {columns.map((col, idx) => {
                   const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
                   const alignClass =
@@ -200,6 +216,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                     <th
                       key={idx}
                       scope="col"
+                      data-slot="table-head"
                       className={cn('px-6 py-4 font-semibold', alignClass, numericClass, col.className)}
                     >
                       {col.header}
@@ -217,6 +234,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
               {data.map((row) => (
                 <tr
                   key={keyExtractor(row)}
+                  data-slot="table-row"
                   className={cn(
                     'min-h-14 hover:bg-surface-container/30 transition-colors',
                     isStack &&
@@ -236,6 +254,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                     return (
                       <td
                         key={cIdx}
+                        data-slot="table-cell"
                         className={cn(
                           'px-6 py-4 text-on-surface',
                           alignClass,
@@ -267,18 +286,22 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
     }
 
     // Composable compound mode (shadcn standard anatomy)
-    const { className, containerClassName, children, responsive = 'scroll', ...tableProps } =
+    const { className, containerClassName, children, responsive: _responsive, density: _density, ...tableProps } =
       props as React.HTMLAttributes<HTMLTableElement> & {
         containerClassName?: string;
         responsive?: 'scroll' | 'stack';
+        density?: TableDensity;
       };
-    const isStack = responsive === 'stack';
 
     return (
       <div
+        ref={scrollFadeRef}
         data-slot="table-container"
+        data-density={density}
+        style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
         className={cn(
           'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+          !isStack && 'scroll-fade-x',
           isStack && '@container',
           containerClassName
         )}

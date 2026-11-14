@@ -147,6 +147,8 @@ export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name: AppIconName;
   size?: IconSize;
   srLabel?: string;
+  /** Mirrors directional icons (arrows, chevrons, undo/redo, speaker waves) in RTL layouts. */
+  directional?: boolean;
   className?: string;
 }
 
@@ -163,6 +165,7 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
   name,
   size = 'lg',
   srLabel,
+  directional = false,
   className,
   ...props
 }, ref) => {
@@ -172,7 +175,12 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
     <>
       <span
         ref={ref}
-        className={cn('material-symbols-outlined select-none inline-block align-middle leading-none', sizeClasses[size], className)}
+        className={cn(
+          'material-symbols-outlined select-none inline-block align-middle leading-none',
+          sizeClasses[size],
+          directional && 'icon-directional',
+          className
+        )}
         aria-hidden={isDecorative || srLabel ? 'true' : undefined}
         aria-label={props['aria-label']}
         {...props}

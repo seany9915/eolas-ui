@@ -15,6 +15,7 @@ import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
+import { useHorizontalScrollFade } from '@/lib/use-horizontal-scroll-fade';
 
 export type TabValue = string | number | null;
 
@@ -129,6 +130,23 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       effectiveVariant === 'segment' ||
       effectiveVariant === 'pills' ||
       effectiveVariant === 'pill';
+    const enableScrollFade =
+      effectiveVariant !== 'unstyled' && !isSegmented && parentContext.orientation === 'horizontal';
+    const { ref: listRef } = useHorizontalScrollFade<HTMLDivElement>(ref, {
+      disabled: !enableScrollFade,
+    });
+    const [indicatorReady, setIndicatorReady] = React.useState(false);
+
+    React.useEffect(() => {
+      let raf2 = 0;
+      const raf1 = window.requestAnimationFrame(() => {
+        raf2 = window.requestAnimationFrame(() => setIndicatorReady(true));
+      });
+      return () => {
+        window.cancelAnimationFrame(raf1);
+        window.cancelAnimationFrame(raf2);
+      };
+    }, []);
 
     return (
       <TabsContext.Provider
@@ -140,7 +158,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
         }}
       >
         <BaseTabs.List
-          ref={ref}
+          ref={listRef}
           activateOnFocus={activateOnFocus}
           loopFocus={loopFocus}
           className={(state) =>
@@ -152,6 +170,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                   ? 'p-1 rounded bg-surface-container border border-outline-variant gap-1 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                   : cn(
                       'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
+                      enableScrollFade && 'scroll-fade-x',
                       'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
                       'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                     ),
@@ -165,7 +184,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             isSegmented ? (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute rounded-sm bg-surface border border-outline z-0 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'absolute rounded-sm bg-surface border border-outline z-0 pointer-events-none motion-reduce:transition-none',
+                  indicatorReady
+                    ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
+                    : 'transition-none',
                   'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-1',
                   'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-1',
                   indicatorClassName
@@ -174,7 +196,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             ) : (
               <BaseTabs.Indicator
                 className={cn(
-                  'absolute bg-primary rounded-none z-10 pointer-events-none transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                  'absolute bg-primary rounded-none z-10 pointer-events-none motion-reduce:transition-none',
+                  indicatorReady
+                    ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
+                    : 'transition-none',
                   'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2px]',
                   'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2px]',
                   indicatorClassName

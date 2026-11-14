@@ -65,16 +65,16 @@ export interface ButtonProps
 const baseStyles = cn(
   'inline-flex items-center justify-center gap-2 font-label text-sm font-semibold rounded cursor-pointer select-none touch-manipulation shrink-0 whitespace-nowrap',
   'transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-  'active:scale-[var(--scale-large)] motion-reduce:active:scale-100 motion-reduce:transition-none',
+  'motion-reduce:active:scale-100 motion-reduce:transition-none',
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
   'disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100',
   'data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:active:scale-100'
 );
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'h-11 px-3.5 min-h-[44px]', // Compact floor 44px (matches Input/Select sm)
-  md: 'h-12 px-5 min-h-[48px]', // Button standard floor 48px (matches Input/Select md)
-  lg: 'h-14 px-6 min-h-[56px]', // Prominent hero floor 56px (matches Input/Select lg)
+  sm: 'h-11 px-3.5 min-h-[44px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:pl-3 has-[>svg:first-child:not(:only-child)]:pl-3 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pr-3 has-[>svg:last-child:not(:only-child)]:pr-3', // Compact floor 44px; optical -2px on icon side
+  md: 'h-12 px-5 min-h-[48px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:pl-4 has-[>svg:first-child:not(:only-child)]:pl-4 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pr-4 has-[>svg:last-child:not(:only-child)]:pr-4', // Button standard floor 48px; optical -4px on icon side
+  lg: 'h-14 px-6 min-h-[56px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:pl-5 has-[>svg:first-child:not(:only-child)]:pl-5 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pr-5 has-[>svg:last-child:not(:only-child)]:pr-5', // Prominent hero floor 56px; optical -4px on icon side
   icon: 'h-11 w-11 min-h-[44px] min-w-[44px] p-0 shrink-0 inline-flex items-center justify-center',
 };
 
@@ -173,6 +173,7 @@ export function buttonVariants({
   return cn(
     baseStyles,
     sizeStyles[size] || sizeStyles.md,
+    safeVariant !== 'text' && (size === 'icon' ? 'active:scale-[var(--scale-large)]' : 'active:scale-[var(--scale-small)]'),
     variantClass,
     expandedTouchTarget && 'touch-target-expanded',
     className

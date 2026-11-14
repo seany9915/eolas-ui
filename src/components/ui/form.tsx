@@ -35,6 +35,11 @@ export interface FormProps<FormValues extends Record<string, any> = Record<strin
    * queries automatically upon field population without requiring modal user confirmation.
    */
   toolautosubmit?: boolean;
+  /**
+   * WCAG 2.2 / UX: Automatically focuses the first invalid field when form validation fails on submit.
+   * @default true
+   */
+  focusFirstInvalid?: boolean;
 }
 
 const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
@@ -42,9 +47,11 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
     {
       onSubmit,
       onFormSubmit,
+      onInvalidCapture,
       validationMode = 'onSubmit',
       errors,
       actionsRef,
+      focusFirstInvalid = true,
       children,
       className,
       toolname,
@@ -54,6 +61,33 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
     },
     ref
   ) => {
+    const internalRef = React.useRef<HTMLFormElement | null>(null);
+    const mergedRef = React.useCallback(
+      (node: HTMLFormElement | null) => {
+        internalRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) (ref as React.MutableRefObject<HTMLFormElement | null>).current = node;
+      },
+      [ref]
+    );
+
+    const handleInvalidCapture = React.useCallback(
+      (event: Parameters<NonNullable<BaseForm.Props<any>['onInvalidCapture']>>[0]) => {
+        onInvalidCapture?.(event);
+        if (!focusFirstInvalid || event.defaultPrevented) return;
+        window.requestAnimationFrame(() => {
+          const formEl = internalRef.current;
+          if (!formEl) return;
+          const active = document.activeElement;
+          if (active && formEl.contains(active) && active.matches('[aria-invalid="true"], :invalid')) {
+            return;
+          }
+          formEl.querySelector<HTMLElement>('[aria-invalid="true"], :invalid')?.focus();
+        });
+      },
+      [focusFirstInvalid, onInvalidCapture]
+    );
+
     // Declarative WebMCP attributes for client-side AI agent tool discovery
     const webMcpProps: Record<string, string> = {};
     if (toolname) webMcpProps.toolname = toolname;
@@ -62,13 +96,14 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
 
     return (
       <BaseForm
-        ref={ref}
+        ref={mergedRef}
         data-slot="form"
         validationMode={validationMode}
         errors={errors}
         actionsRef={actionsRef}
         onFormSubmit={onFormSubmit}
         onSubmit={onSubmit}
+        onInvalidCapture={handleInvalidCapture}
         className={cn('flex flex-col gap-4 w-full transition-colors duration-quick', className)}
         {...webMcpProps}
         {...props}

@@ -1,0 +1,53 @@
+{
+  "design-contract-reminder": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node ./scripts/pre-invocation-reminder.mjs",
+        "timeout": 5
+      }
+    ]
+  },
+  "secret-scanning-gate": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./scripts/check-secrets.mjs",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
+  "anti-pattern-gate": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./scripts/check-anti-patterns.mjs",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
+  "primitive-check-reminder": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./scripts/check-primitive-inventory.mjs",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

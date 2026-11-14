@@ -264,7 +264,7 @@ For rendered long-form content (guides, chat messages, leaflets), map shadcn Typ
   * `md` (`20px` / `1.25rem`): Form leading icons, standard buttons, menu rows.
   * `lg` (`24px` / `1.5rem`): Alert headers, toast indicators, section titles.
   * `xl` (`32px` / `2rem`): Hero cards, milestones, victory dialogs.
-- **Accessibility & Swaps:** `aria-hidden="true"` on decorative icons; `.sr-only` or `aria-label` on standalone interactive icons (never convey text solely via CSS `content` without alt text per WCAG F87). Use `<Icon.Toggle onName="..." offName="..." active={...} />` or `<Icon.CrossFade name={...} />` for dual-state swaps (`150ms` `--duration-quick`, `--ease-standard`, `--blur-small`, instantaneous in `prefers-reduced-motion`).
+- **Accessibility, RTL & Swaps:** `aria-hidden="true"` on decorative icons; `.sr-only` or `aria-label` on standalone interactive icons (never convey text solely via CSS `content` without alt text per WCAG F87). Pass `directional` (`icon-directional`) on arrows, chevrons, undo/redo, and speaker waves so RTL layouts mirror them (`scale: -1 1`), while never flipping checkmarks, clocks, or media playback icons. Use `<Icon.Toggle onName="..." offName="..." active={...} />` or `<Icon.CrossFade name={...} />` for dual-state swaps (`150ms` `--duration-quick`, `--ease-standard`, `--blur-small`, instantaneous in `prefers-reduced-motion`).
 
 ## Layout & Spacing
 
@@ -285,7 +285,7 @@ Fluid grid on an `0.5rem` (8px) baseline:
   - `shadow-modal`: Tier A blocking dialogs and drawers over backdrop scrims.
   - *Zero-Shadow Baseline:* Header/Nav (except sticky nav via `@container scroll-state(stuck: top)`), Toolbars, Buttons, Inputs, Chips, and InlineAlerts have zero box-shadow.
 - **Physical Borders Over Faux Shadow Rings:** Never use `box-shadow: 0 0 0 1px ...` in place of a real border (stripped in `forced-colors: active`). Overlays keep real `1px` `outline-variant` borders; form controls keep `1px` `outline` (`#6B6E80`) borders for 3:1 non-text contrast (WCAG 1.4.11).
-- **Control Height Synchrony:** Side-by-side `<Input />`, `<Select />`, `<Textarea />`, and `<Button />` must share identical heights (`sm`: `44px` `h-11`, `md`: `48px` `h-12`, `lg`: `56px` `h-14`). Buttons in flex rows declare `shrink-0 whitespace-nowrap`. Match icon padding on both sides of leading icons (`pl-12` on `md` inputs = `14px` inset + `20px` icon + `14px` gap).
+- **Control Height Synchrony & Optical Padding:** Side-by-side `<Input />`, `<Select />`, `<Textarea />`, and `<Button />` must share identical heights (`sm`: `44px` `h-11`, `md`: `48px` `h-12`, `lg`: `56px` `h-14`). Buttons in flex rows declare `shrink-0 whitespace-nowrap`, and icon+text buttons shave `2px–4px` off the icon-side padding (`icon-side = text-side - 2px–4px`) to balance glyph whitespace. Match icon padding on both sides of leading icons (`pl-12` on `md` inputs = `14px` inset + `20px` icon + `14px` gap).
 - **Floating Container Tiers:**
   - **Tier A — Modal (Dialog, Drawer):** `shadow-modal` + scrim. `Dialog` uses `rounded.lg` (`16px`) + `1px` `outline-variant` border. Full-height `Drawer` uses `rounded-none` + single dividing `2px` border.
   - **Tier B — Anchored (Popover, Menu, Select, Combobox):** `rounded.DEFAULT` (`8px`), `1px` `outline-variant` border, `shadow-ambient`.
@@ -314,7 +314,8 @@ Never use `transition-all`. Target explicit properties:
 - Micro-swaps/Skeletons: `transition-[opacity,transform,filter]`
 
 Pairings:
-- **Dialog / Popover / Menu / Select / Dropdown:** open `250ms` (`--duration-fast`), close `150ms` (`--duration-quick`).
+- **Dialog / Popover / Menu / Select / Dropdown:** open `250ms` (`--duration-fast`), close `150ms` (`--duration-quick`). Anchored popups (`Popover`, `Menu`, `Select`, `Combobox`, `Tooltip`) scale from `origin-[var(--transform-origin)]`; centered modals (`Dialog`, `AlertDialog`) scale from center.
+- **Hover Gating & Tab Indicators:** Gate hover transforms/lifts behind `@media (hover: hover) and (pointer: fine)` to avoid sticky touch hovers, and guard sliding tab indicators with `transition-none` on first paint before enabling `transition-[left,width,top,height]`.
 - **Drawer / Toast:** open `250ms` (`--duration-fast`), close `150ms`–`200ms` (canonical `150ms` / `--duration-quick`) with `--ease-standard` (`cubic-bezier(0.22, 1, 0.36, 1)`). Toast dismiss buttons: `min-w-[44px] min-h-[44px]` (WCAG 2.2 SC 2.5.5).
 - **Accordion:** `250ms` (`--duration-fast`) + `--ease-standard` on panel height and chevron.
 - **Emphasis-only (`500ms` / `--duration-emphasis`):** Reserved for milestones (`SuccessCheck`); high-frequency controls (Checkbox/Switch) use crisp `150ms` micro-transitions.

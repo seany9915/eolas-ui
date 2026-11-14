@@ -74,13 +74,13 @@ export function CommandDialog({
       disablePointerDismissal={disablePointerDismissal}
     >
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
+        <Dialog.Backdrop className="fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-0 data-[ending-style]:duration-100 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
         <Dialog.Viewport className={cn('fixed inset-0 z-50 p-4 flex items-center justify-center', containerClassName)}>
           <Dialog.Popup
             initialFocus={initialFocus}
             finalFocus={finalFocus}
             className={cn(
-              'w-full max-w-xl overflow-hidden p-0 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+              'w-full max-w-xl overflow-hidden p-0 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-0 data-[ending-style]:duration-100 data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               className
             )}
           >

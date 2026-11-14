@@ -19,6 +19,7 @@
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
+import { getContrastInk } from '@/lib/contrast';
 
 export type ChipVariant =
   | 'filled'
@@ -56,6 +57,8 @@ export interface ChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   removeLabel?: string;
   /** Disables interaction and reduces opacity */
   disabled?: boolean;
+  /** Optional user-supplied background color for dynamic tags; computes accessible foreground contrast automatically. */
+  customColor?: string;
   className?: string;
   children?: React.ReactNode;
 }
@@ -112,9 +115,11 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       onRemove,
   removeLabel,
       disabled = false,
+      customColor,
       onClick,
       onKeyDown,
       className,
+      style,
       tabIndex,
       role,
       children,
@@ -173,6 +178,16 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
     const resolvedRole = role ?? (isFilter ? 'button' : isInteractive ? 'button' : undefined);
     const resolvedTabIndex = tabIndex ?? (isInteractive && !disabled ? 0 : undefined);
 
+    const dynamicStyle = customColor
+      ? ({
+          '--dynamic-bg': customColor,
+          backgroundColor: customColor,
+          borderColor: customColor,
+          color: getContrastInk(customColor),
+          ...style,
+        } as unknown as React.CSSProperties)
+      : style;
+
     return (
       <div
         ref={ref}
@@ -183,6 +198,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
         tabIndex={resolvedTabIndex}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
+        style={dynamicStyle}
         className={cn(
           'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
           'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
@@ -190,6 +206,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
           sizeStyles[size],
           touchTargetClass,
           patternClass,
+          customColor && 'contrast-auto',
           isInteractive && !disabled && 'cursor-pointer hover:brightness-95 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
           className

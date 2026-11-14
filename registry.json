@@ -95,6 +95,77 @@
       ]
     },
     {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "Avatar primitive (@base-ui/react/avatar).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui",
+          "target": "@ui/avatar.tsx"
+        },
+        {
+          "path": "src/lib/contrast.ts",
+          "type": "registry:lib",
+          "target": "@lib/contrast.ts"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays a user's profile picture, initials, or fallback icon.",
+          "Supports image loading states (idle, loading, loaded, error) and delayed fallback rendering to prevent visual flashes during fast network loads.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
+        ]
+      }
+    },
+    {
+      "name": "chip",
+      "type": "registry:ui",
+      "title": "Chip",
+      "description": "Chip primitive. Built on Base UI (@base-ui/react) interaction foundations.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/chip.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chip.tsx"
+        },
+        {
+          "path": "src/lib/contrast.ts",
+          "type": "registry:lib",
+          "target": "@lib/contrast.ts"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Chip for INTERACTIVE compact elements: 1. Filter chips: Toggleable selection filters with keyboard navigation (aria-pressed). 2. Input/Removable chips: Dismissible tags with accessible remove buttons (onRemove). 3. Action chips: Clickable compact triggers (onClick).",
+          "For PASSIVE, non-interactive status labels or counts, use Badge instead.",
+          "Implements DESIGN.md High-Contrast Accessible standards:",
+          "Pattern 1 (filled): Solid brand fill + high-contrast text.",
+          "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
+          "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
+          "Full WCAG 2.2 SC 2.5.8 touch target compliance (expands to 44px when interactive or removable).",
+          "Floating 2px focus ring (outline-offset: 2px) on keyboard focus."
+        ]
+      }
+    },
+    {
       "name": "otp-field",
       "type": "registry:ui",
       "title": "Otp Field",
@@ -125,6 +196,76 @@
           "Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.",
           "Supports automatic focus advancement, paste distribution, character masking, and validation types.",
           "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/table.tsx",
+          "type": "registry:ui",
+          "target": "@ui/table.tsx"
+        },
+        {
+          "path": "src/lib/use-horizontal-scroll-fade.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-horizontal-scroll-fade.ts"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Dual-mode data table primitive supporting: 1. Atomic compound composition (<Table>, <Table.Header>, <Table.Body>, <Table.Row>, <Table.Head>, <Table.Cell>, <Table.Footer>, <Table.Caption>). 2. Declarative data-driven mode (<Table columns={...} data={...} keyExtractor={...} responsive=\"stack\" />) with automatic container-query card stacking (@container).",
+          "Implements explicit column header semantics (scope=\"col\"), 56px minimum row heights for OS text zoom adaptability, and automatic tabular-nums on numeric columns.",
+          "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
+        ]
+      }
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabs primitive (@base-ui/react/tabs).",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils",
+        "@seany9915/eolas-ui/icon"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui",
+          "target": "@ui/tabs.tsx"
+        },
+        {
+          "path": "src/lib/use-horizontal-scroll-fade.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-horizontal-scroll-fade.ts"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role=\"tablist\", role=\"tab\", role=\"tabpanel\").",
+          "Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).",
+          "Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).",
+          "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
+          "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
+          "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
         ]
       }
     },

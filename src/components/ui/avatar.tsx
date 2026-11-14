@@ -14,6 +14,7 @@ import * as React from 'react';
 import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
+import { getContrastInk } from '@/lib/contrast';
 
 export type AvatarSize = 'sm' | 'md' | 'lg';
 
@@ -32,23 +33,39 @@ const sizeClasses: Record<AvatarSize, string> = {
 
 export interface AvatarRootProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Root> {
   size?: AvatarSize;
+  /** Optional user-supplied background color for initials/fallback avatars; computes accessible foreground contrast automatically. */
+  customColor?: string;
   className?: string;
   children?: React.ReactNode;
 }
 
 export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
   size = 'md',
+  customColor,
   className,
+  style,
   children,
   ...props
 }, ref) => {
+  const dynamicStyle = customColor
+    ? ({
+        '--dynamic-bg': customColor,
+        backgroundColor: customColor,
+        borderColor: 'transparent',
+        color: getContrastInk(customColor),
+        ...style,
+      } as unknown as React.CSSProperties)
+    : style;
+
   return (
     <AvatarContext.Provider value={{ size }}>
       <BaseAvatar.Root
         ref={ref}
+        style={dynamicStyle}
         className={cn(
           'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
           'bg-surface-variant text-on-surface-variant font-label font-bold border border-outline-variant',
+          customColor && 'contrast-auto',
           sizeClasses[size],
           className
         )}
@@ -120,6 +137,8 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseA
   fetchPriority?: 'high' | 'low' | 'auto';
   loading?: 'eager' | 'lazy';
   onLoadingStatusChange?: (status: BaseAvatar.Root.State['imageLoadingStatus']) => void;
+  /** Optional user-supplied background color for initials/fallback avatars; computes accessible foreground contrast automatically. */
+  customColor?: string;
   children?: React.ReactNode;
   className?: string;
 }
@@ -134,20 +153,21 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
   fetchPriority,
   loading,
   onLoadingStatusChange,
+  customColor,
   children,
   className,
   ...props
 }, ref) => {
   if (children) {
     return (
-      <AvatarRoot ref={ref} size={size} className={className} {...props}>
+      <AvatarRoot ref={ref} size={size} customColor={customColor} className={className} {...props}>
         {children}
       </AvatarRoot>
     );
   }
 
   return (
-    <AvatarRoot ref={ref} size={size} className={className} {...props}>
+    <AvatarRoot ref={ref} size={size} customColor={customColor} className={className} {...props}>
       {src && (
         <AvatarImage
           src={src}

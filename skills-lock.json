@@ -5,19 +5,19 @@
       "source": "emilkowalski/skills",
       "sourceType": "github",
       "skillPath": "skills/emil-design-eng/SKILL.md",
-      "computedHash": "87067d79205fdedc6d682891027dd9c7335486c4b4dc2e785638941a9d2e6061"
+      "computedHash": "42d95d172a96ae5263556f5ddef5614941c330baf87b50b76bf84cdcef9c6b3d"
     },
     "find-animation-opportunities": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
       "skillPath": "skills/find-animation-opportunities/SKILL.md",
-      "computedHash": "c6b1d0f6d03a11f8772b1cef4ca5cc88301ae8641ac2697c85ffa87eb458e40a"
+      "computedHash": "cf6fab655f95a99dbf438ee0ebcf17cf7e1cf4700ee83b3ff4f9fe131f05dd47"
     },
     "improve-animations": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
       "skillPath": "skills/improve-animations/SKILL.md",
-      "computedHash": "9cd956e91139211efa5e17fc5e1675b9a3f711ef38cbc92aa8f3fa5b626b7e12"
+      "computedHash": "510edd17e70fc4188c7bfb6abd229925f238a1084fea676ca0f30a604e5058b2"
     },
     "make-interfaces-feel-better": {
       "source": "jakubkrehel/make-interfaces-feel-better",
@@ -29,7 +29,7 @@
       "source": "emilkowalski/skills",
       "sourceType": "github",
       "skillPath": "skills/review-animations/SKILL.md",
-      "computedHash": "6f8d633d7884c1390eff7af4bfaf7a450e798f117e1d49a555e00819dc877f64"
+      "computedHash": "60049d4d140565fe2fd22c240a6ba921069cf88c3460d7561ac772d11145ec9f"
     },
     "shadcn": {
       "source": "shadcn-ui/ui",

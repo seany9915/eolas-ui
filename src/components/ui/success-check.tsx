@@ -98,11 +98,11 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
             'motion-reduce:animate-none'
           )}
           style={{
-            strokeDasharray: 24,
+            strokeDasharray: 1,
             strokeDashoffset: animating ? 0 : 0,
           }}
         >
-          <polyline points="20 6 9 17 4 12" />
+          <polyline pathLength={1} points="20 6 9 17 4 12" />
         </svg>
       </div>
     );

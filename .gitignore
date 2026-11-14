@@ -3,6 +3,3 @@ dist
 scratch
 *.log
 .DS_Store
-.agents/*
-!.agents/rules/
-!.agents/scripts/

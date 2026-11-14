@@ -42,6 +42,8 @@ export interface ListDetailItem {
   disabled?: boolean;
 }
 
+export type ListDetailDensity = 'compact' | 'comfortable' | 'spacious';
+
 export interface ListDetailBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   items: ListDetailItem[];
   selectedId?: string | null;
@@ -60,6 +62,8 @@ export interface ListDetailBlockProps extends React.HTMLAttributes<HTMLDivElemen
   emptyDetailDescription?: string;
   emptyListTitle?: string;
   emptyListDescription?: string;
+  /** Density mode ('compact' | 'comfortable' | 'spacious'). Also inherits `--density` via CSS container style queries. */
+  density?: ListDetailDensity;
   className?: string;
   listWidthClassName?: string;
   children?: React.ReactNode;
@@ -85,6 +89,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       emptyDetailDescription = 'Choose an item from the list to view its details.',
       emptyListTitle,
       emptyListDescription,
+      density,
       className,
       listWidthClassName = '@2xl:w-80 @3xl:w-96',
       children,
@@ -259,6 +264,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       <div
         ref={ref}
         data-slot="list-detail-block"
+        data-density={density}
         className={cn(
           '@container w-full h-full min-h-120 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col @2xl:flex-row',
           className

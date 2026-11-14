@@ -29,7 +29,7 @@ description: Project-level design system and WCAG 2.2 AA implementation rules fo
 ## Strict Accessibility (WCAG 2.2 AA) & Copy
 - **Contrast & color independence:** Follow `DESIGN.md` pairings exactly; never convey state by color alone.
 - **Touch targets:** `44×44px` (`2.75rem`) floor (WCAG 2.2 SC 2.5.5) with stricter per-component minimums (`48px` buttons, `56px` interactive list rows) in `DESIGN.md`.
-- **Forms & landmarks:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>` (never placeholder-only labels). Use semantic landmarks (`<nav>`, `<header>`, `<main>`, `<aside>`, `<section>`).
+- **Forms, auth & landmarks:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>` (never placeholder-only labels), auto-focus the first `[aria-invalid="true"]` control on invalid submit (`<Form focusFirstInvalid />`), never block paste/autofill on auth inputs (WCAG 3.3.8), and keep `scroll-padding-block-start`/`end` for sticky bars (WCAG 2.4.11). Use semantic landmarks (`<nav>`, `<header>`, `<main>`, `<aside>`, `<section>`).
 - **Focus & CSS content:** Never remove `:focus-visible` outlines. Never convey meaningful text solely via CSS `content` without alternative speech text (WCAG F87).
 - **Motion:** Use `DESIGN.md` durations/easings, explicit `transition-[...]` (never `transition-all`), and mandatory `motion-reduce:transition-none` / `prefers-reduced-motion`. Restrict `--blur-*` to micro-primitives (`<TextSwap />`, `<Skeleton.Reveal />`, `<Icon.Toggle />`), never large text overlays.
 - **Plain-English UI copy:** 1–2 simple nouns per label, user-outcome phrasing, zero dev/DB/CSS jargon.

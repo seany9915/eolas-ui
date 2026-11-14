@@ -22,6 +22,7 @@ export type CardProminence = 'default' | 'inverted' | 'filled' | 'accent' | 'spo
 export type CardAffordance = 'static' | 'actionable' | 'selectable' | 'interactive' | 'link';
 
 export type CardSize = 'default' | 'sm';
+export type CardDensity = 'compact' | 'comfortable' | 'spacious';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   prominence?: CardProminence;
@@ -30,6 +31,8 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   selected?: boolean;
   colorRole?: 'primary' | 'secondary' | 'tertiary';
   size?: CardSize;
+  /** Density mode ('compact' | 'comfortable' | 'spacious'). Also inherits `--density` via CSS container style queries. */
+  density?: CardDensity;
   /**
    * When true, adopts CSS Subgrid row tracks (grid-row: span 3; grid-template-rows: subgrid)
    * to align header, content body, and action footer rows across cards in a grid.
@@ -61,6 +64,7 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   selected = false,
   colorRole = 'primary',
   size = 'default',
+  density,
   subgrid = false,
   lift = false,
   invertedAccent,
@@ -152,10 +156,12 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
       tabIndex={tabIndex}
       data-slot="card"
       data-size={size}
+      data-density={density}
       aria-pressed={ariaPressed}
       aria-checked={ariaChecked}
       style={{
         '--card-spacing': size === 'sm' ? '1rem' : '1.5rem',
+        ...(density ? { '--density': density } : {}),
         ...props.style,
       } as React.CSSProperties}
       className={cn(
