@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
 import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemSeparator } from '@/components/ui/item';
+import { Sortable, arrayMove, move } from '@/components/ui/sortable';
 import { BlockDemoShell } from '../BlockDemoShell';
 import { ComponentDemoProps } from '../types';
 
@@ -1017,6 +1018,182 @@ export const ItemDemo: React.FC<ComponentDemoProps> = () => {
             </ItemActions>
           </Item>
         </ItemGroup>
+      </div>
+    </div>
+  );
+};
+
+interface SortableStepItem {
+  id: string;
+  title: string;
+  duration: string;
+}
+
+const INITIAL_SORTABLE_STEPS: SortableStepItem[] = [
+  { id: 'warm-up', title: 'Warm-up sounds', duration: '5 min' },
+  { id: 'listening', title: 'Listening check', duration: '10 min' },
+  { id: 'cards', title: 'Picture cards', duration: '10 min' },
+  { id: 'home', title: 'Home practice', duration: '5 min' },
+];
+
+export const SortableDemo: React.FC<ComponentDemoProps> = () => {
+  const [steps, setSteps] = React.useState<SortableStepItem[]>(INITIAL_SORTABLE_STEPS);
+  const [tags, setTags] = React.useState<string[]>(['Fluency', 'Articulation', 'Listening']);
+
+  const moveStep = (index: number, delta: -1 | 1) => {
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= steps.length) return;
+    setSteps((prev) => arrayMove(prev, index, nextIndex));
+  };
+
+  return (
+    <div className="w-full max-w-lg mx-auto text-left flex flex-col gap-6">
+      {/* 1. Typical vertical example */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-heading text-body-md font-semibold text-on-surface">
+            Session order
+          </span>
+          <Button
+            size="sm"
+            variant="text"
+            colorRole="neutral"
+            onClick={() => setSteps(INITIAL_SORTABLE_STEPS)}
+          >
+            Reset order
+          </Button>
+        </div>
+
+        <Sortable.Root
+          onDragEnd={(event) => {
+            setSteps((prev) => move(prev, event));
+          }}
+        >
+          <Sortable.List aria-label="Session order">
+            {steps.map((step, index) => (
+              <Sortable.Item key={step.id} id={step.id} index={index}>
+                <Sortable.Handle label={`Reorder ${step.title}`} />
+                <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+                  <span className="font-sans text-body-md font-medium text-on-surface truncate">
+                    {step.title}
+                  </span>
+                  <span className="font-sans text-body-sm text-on-surface-variant">
+                    {step.duration}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button
+                    size="icon"
+                    variant="text"
+                    colorRole="neutral"
+                    aria-label={`Move ${step.title} up`}
+                    disabled={index === 0}
+                    onClick={() => moveStep(index, -1)}
+                  >
+                    <Icon name="arrow_upward" size="sm" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="text"
+                    colorRole="neutral"
+                    aria-label={`Move ${step.title} down`}
+                    disabled={index === steps.length - 1}
+                    onClick={() => moveStep(index, 1)}
+                  >
+                    <Icon name="arrow_downward" size="sm" aria-hidden="true" />
+                  </Button>
+                </div>
+              </Sortable.Item>
+            ))}
+          </Sortable.List>
+          <Sortable.Overlay>
+            {(source) => {
+              const activeIndex = steps.findIndex((s) => s.id === source?.id);
+              const active = activeIndex >= 0 ? steps[activeIndex] : undefined;
+              if (!active) return null;
+              return (
+                <div className="flex items-center gap-3 rounded-md border-2 border-primary bg-surface p-3 text-on-surface">
+                  <span
+                    aria-hidden="true"
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded text-on-surface"
+                  >
+                    <svg viewBox="0 0 16 16" fill="currentColor" className="size-4 shrink-0">
+                      <circle cx="5.5" cy="3.5" r="1.25" />
+                      <circle cx="10.5" cy="3.5" r="1.25" />
+                      <circle cx="5.5" cy="8" r="1.25" />
+                      <circle cx="10.5" cy="8" r="1.25" />
+                      <circle cx="5.5" cy="12.5" r="1.25" />
+                      <circle cx="10.5" cy="12.5" r="1.25" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+                    <span className="font-sans text-body-md font-medium text-on-surface truncate">
+                      {active.title}
+                    </span>
+                    <span className="font-sans text-body-sm text-on-surface-variant">
+                      {active.duration}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0" aria-hidden="true">
+                    <span className="inline-flex size-11 items-center justify-center text-on-surface-variant opacity-40">
+                      <Icon name="arrow_upward" size="sm" aria-hidden="true" />
+                    </span>
+                    <span className="inline-flex size-11 items-center justify-center text-on-surface-variant opacity-40">
+                      <Icon name="arrow_downward" size="sm" aria-hidden="true" />
+                    </span>
+                  </div>
+                </div>
+              );
+            }}
+          </Sortable.Overlay>
+        </Sortable.Root>
+      </div>
+
+      {/* 2. Horizontal variant */}
+      <div className="flex flex-col gap-2">
+        <span className="font-label text-label-md text-on-surface-variant">
+          Horizontal priority
+        </span>
+        <Sortable.Root
+          orientation="horizontal"
+          onDragEnd={(event) => {
+            setTags((prev) => move(prev, event));
+          }}
+        >
+          <Sortable.List aria-label="Horizontal priority">
+            {tags.map((tag, index) => (
+              <Sortable.Item key={tag} id={tag} index={index} className="py-1.5 ps-1.5 pe-3 gap-1.5">
+                <Sortable.Handle label={`Reorder ${tag}`} />
+                <span className="font-sans text-body-sm font-medium text-on-surface">
+                  {tag}
+                </span>
+              </Sortable.Item>
+            ))}
+          </Sortable.List>
+        </Sortable.Root>
+      </div>
+
+      {/* 3. Edge cases: long text truncation & disabled item */}
+      <div className="flex flex-col gap-2">
+        <span className="font-label text-label-md text-on-surface-variant">
+          Edge cases
+        </span>
+        <Sortable.Root>
+          <Sortable.List aria-label="Sortable edge cases">
+            <Sortable.Item id="long-item" index={0}>
+              <Sortable.Handle label="Reorder long activity" />
+              <span className="min-w-0 flex-1 font-sans text-body-md text-on-surface truncate">
+                Extended multi-syllable articulation and carryover practice with caregiver notes
+              </span>
+            </Sortable.Item>
+            <Sortable.Item id="locked-item" index={1} disabled>
+              <Sortable.Handle label="Required first step" />
+              <span className="min-w-0 flex-1 font-sans text-body-md text-on-surface-variant truncate">
+                Required first step
+              </span>
+            </Sortable.Item>
+          </Sortable.List>
+        </Sortable.Root>
       </div>
     </div>
   );

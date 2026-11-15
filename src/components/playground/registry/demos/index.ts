@@ -88,6 +88,7 @@ import {
   TextHighlightDemo,
   KbdDemo,
   ItemDemo,
+  SortableDemo,
 } from './LayoutDemos';
 
 import {
@@ -233,6 +234,7 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'deferred-view': DeferredViewDemo,
   'swipe-reveal': SwipeRevealDemo,
   'text-highlight': TextHighlightDemo,
+  'sortable': SortableDemo,
 
   // Clinical AI
   'thinking-orb': ThinkingOrbDemo,

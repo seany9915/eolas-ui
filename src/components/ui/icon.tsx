@@ -177,11 +177,11 @@ export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const sizeClasses: Record<IconSize, string> = {
-  xs: 'text-xs text-[14px]',
-  sm: 'text-base text-[16px]',
-  md: 'text-lg text-[20px]',
-  lg: 'text-xl text-[24px]',
-  xl: 'text-2xl text-[32px]',
+  xs: 'text-[14px]',
+  sm: 'text-[16px]',
+  md: 'text-[20px]',
+  lg: 'text-[24px]',
+  xl: 'text-[32px]',
   inline: 'text-[1.15cap] align-baseline inline-block leading-none',
 };
 
@@ -216,7 +216,10 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
       <span
         ref={ref}
         className={cn(
-          'material-symbols-outlined select-none inline-block align-middle leading-none',
+          'material-symbols-outlined select-none leading-none',
+          size === 'inline'
+            ? 'inline-block align-baseline'
+            : 'inline-flex size-[1em] shrink-0 items-center justify-center',
           sizeClasses[size],
           directional && 'icon-directional',
           className

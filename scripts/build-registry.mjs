@@ -350,6 +350,12 @@ for (const file of files) {
   if (content.includes("from 'react-day-picker'") || content.includes('from "react-day-picker"')) {
     npmDeps.push('react-day-picker');
   }
+  if (content.includes("from '@dnd-kit/react'") || content.includes("from '@dnd-kit/react/sortable'") || content.includes('from "@dnd-kit/react')) {
+    npmDeps.push('@dnd-kit/react');
+  }
+  if (content.includes("from '@dnd-kit/helpers'") || content.includes('from "@dnd-kit/helpers"')) {
+    npmDeps.push('@dnd-kit/helpers');
+  }
 
   // Bundle helper modules from src/lib (other than utils, which is its own item)
   const libFiles = [];

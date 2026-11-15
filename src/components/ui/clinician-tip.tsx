@@ -6,9 +6,10 @@ export interface ClinicianTipProps extends React.HTMLAttributes<HTMLDivElement> 
   /**
    * Visual presentation variant:
    * - 'unboxed' (default): Pure Low-Prominence typographic lockup with zero elevation and zero border. Recommended inside cards and exercise drills.
-   * - 'inset': Subtle grouping wash (`bg-surface-container`) for canvas forms or multi-field layouts outside cards.
+   * - 'surface': Crisp white surface (`bg-surface`) with `border-outline-variant` for placement on the page canvas.
+   * - 'inset': Tonal grouping wash (`bg-surface-container-high`) with `border-outline` for canvas forms or multi-field layouts outside cards.
    */
-  variant?: 'unboxed' | 'inset';
+  variant?: 'unboxed' | 'inset' | 'surface';
   /**
    * Name of the Material Symbol icon. Defaults to 'lightbulb'.
    */
@@ -41,19 +42,22 @@ export const ClinicianTip = React.forwardRef<HTMLDivElement, ClinicianTipProps>(
       ref={ref}
       className={cn(
         'flex items-start gap-2.5 text-left',
-        variant === 'inset' && 'rounded-md bg-surface-container border border-outline-variant px-3.5 py-2.5',
+        variant === 'surface' && 'rounded-md bg-surface border border-outline-variant px-3.5 py-2.5',
+        variant === 'inset' && 'rounded-md bg-surface-container-high border border-outline px-3.5 py-2.5',
         variant === 'unboxed' && 'pt-2 bg-transparent',
         className
       )}
       {...props}
     >
       {icon && (
-        <Icon
-          name={icon}
-          size="md"
-          className="text-secondary shrink-0 mt-0.5"
-          aria-hidden="true"
-        />
+        <span className="inline-flex h-[1.625em] items-center shrink-0">
+          <Icon
+            name={icon}
+            size="md"
+            className="text-secondary"
+            aria-hidden="true"
+          />
+        </span>
       )}
       <div className="text-base text-on-surface-variant leading-relaxed min-w-0">
         {label ? (

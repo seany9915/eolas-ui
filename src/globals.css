@@ -139,7 +139,6 @@
 :root {
   color-scheme: light;
   accent-color: var(--primary);
-  scrollbar-gutter: stable;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -265,6 +264,11 @@ button,
 
 @utility border-accent {
   border-width: 4px;
+}
+
+/* Opt-in stable scrollbar gutter for document-scrolling layouts */
+@utility scrollbar-stable {
+  scrollbar-gutter: stable;
 }
 
 @layer base {
@@ -1173,6 +1177,12 @@ p, li {
 .typeset .not-typeset p:last-child,
 .typeset [data-not-typeset] p:last-child {
   margin-bottom: 0;
+}
+
+/* Prevent double-stacking vertical margin with flex/grid gap-* layouts */
+.typeset:is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]),
+.typeset :is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]) {
+  margin-block: 0;
 }
 
 .typeset-chat {

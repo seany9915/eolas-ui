@@ -1636,6 +1636,24 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/slider"
   },
   {
+    "id": "sortable",
+    "name": "sortable",
+    "title": "Sortable",
+    "description": "Eolas UI Sortable component built on Base UI and DESIGN.md design tokens.",
+    "category": "layout",
+    "tier": "primitive",
+    "basePrimitive": "DESIGN.md Token Primitive",
+    "sourcePath": "src/components/ui/sortable.tsx",
+    "dependencies": [
+      "@base-ui/react",
+      "clsx",
+      "tailwind-merge",
+      "@dnd-kit/react",
+      "@dnd-kit/helpers"
+    ],
+    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/sortable"
+  },
+  {
     "id": "sources",
     "name": "sources",
     "title": "Sources",

@@ -2108,6 +2108,29 @@
       }
     },
     {
+      "name": "sortable",
+      "type": "registry:ui",
+      "title": "Sortable",
+      "description": "Eolas UI Sortable component built on Base UI and DESIGN.md design tokens.",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge",
+        "@dnd-kit/react",
+        "@dnd-kit/helpers"
+      ],
+      "registryDependencies": [
+        "@seany9915/eolas-ui/utils"
+      ],
+      "files": [
+        {
+          "path": "sortable.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sortable.tsx"
+        }
+      ]
+    },
+    {
       "name": "sources",
       "type": "registry:ui",
       "title": "Sources",

@@ -27,7 +27,7 @@ const catMap = {
   // Data & Layout
   'card': 'layout', 'table': 'layout', 'chart': 'layout', 'separator': 'layout', 'resizable': 'layout',
   'collapsible': 'layout', 'toolbar': 'layout', 'carousel': 'layout', 'avatar': 'layout', 'icon': 'layout',
-  'attachment': 'layout', 'sticky-container': 'layout', 'deferred-view': 'layout', 'swipe-reveal': 'layout',
+  'attachment': 'layout', 'sticky-container': 'layout', 'deferred-view': 'layout', 'swipe-reveal': 'layout', 'sortable': 'layout',
   ['text-' + 'highlight']: 'layout',
 
   // AI & Clinical Workflows
