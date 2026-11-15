@@ -9,10 +9,14 @@ export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'inline';
  * supporting any valid Material Symbols ligature via the (string & {}) fallback.
  */
 export type AppIconName =
+  | 'accessibility_new'
   | 'add'
+  | 'analytics'
+  | 'animation'
   | 'archive'
   | 'arrow_back'
   | 'arrow_downward'
+  | 'arrow_drop_down'
   | 'arrow_forward'
   | 'arrow_upward'
   | 'assignment'
@@ -21,6 +25,7 @@ export type AppIconName =
   | 'block'
   | 'bookmark'
   | 'branding_watermark'
+  | 'calendar_today'
   | 'cancel'
   | 'category'
   | 'chat'
@@ -37,18 +42,22 @@ export type AppIconName =
   | 'content_copy'
   | 'contrast'
   | 'crop_free'
+  | 'dashboard'
   | 'delete'
   | 'density_medium'
   | 'description'
   | 'desktop_windows'
   | 'download'
   | 'edit'
+  | 'edit_note'
   | 'emoji_events'
   | 'error'
   | 'event'
   | 'expand_less'
   | 'expand_more'
+  | 'explore'
   | 'extension'
+  | 'face'
   | 'favorite'
   | 'file_download'
   | 'filter_list'
@@ -66,11 +75,17 @@ export type AppIconName =
   | 'health_and_safety'
   | 'hearing'
   | 'history'
+  | 'hourglass_empty'
   | 'inbox'
   | 'info'
+  | 'insights'
+  | 'inventory_2'
   | 'ios_share'
+  | 'keyboard_arrow_down'
+  | 'keyboard_arrow_up'
   | 'language'
   | 'last_page'
+  | 'layers'
   | 'lightbulb'
   | 'local_hospital'
   | 'lock'
@@ -91,11 +106,13 @@ export type AppIconName =
   | 'notifications'
   | 'notifications_active'
   | 'open_in_new'
+  | 'outgoing_mail'
   | 'palette'
   | 'person'
   | 'person_add'
   | 'platforms'
   | 'play_arrow'
+  | 'play_circle'
   | 'print'
   | 'priority_high'
   | 'progress_activity'
@@ -113,12 +130,15 @@ export type AppIconName =
   | 'search'
   | 'search_off'
   | 'security'
+  | 'settings'
   | 'share'
   | 'show_chart'
   | 'skip_next'
   | 'smartphone'
+  | 'spatial_audio'
   | 'star'
   | 'stars'
+  | 'stop'
   | 'summarize'
   | 'swap_horiz'
   | 'swipe'
@@ -127,10 +147,12 @@ export type AppIconName =
   | 'task_alt'
   | 'timer'
   | 'touch_app'
+  | 'trending_up'
   | 'tune'
   | 'undo'
   | 'unfold_less'
   | 'unfold_more'
+  | 'upload'
   | 'verified'
   | 'verified_user'
   | 'view_list'
@@ -146,6 +168,8 @@ export type AppIconName =
 export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name: AppIconName;
   size?: IconSize;
+  /** Renders the solid filled variant (FILL = 1) for active or selected states. */
+  filled?: boolean;
   srLabel?: string;
   /** Mirrors directional icons (arrows, chevrons, undo/redo, speaker waves) in RTL layouts. */
   directional?: boolean;
@@ -161,15 +185,31 @@ const sizeClasses: Record<IconSize, string> = {
   inline: 'text-[1.15cap] align-baseline inline-block leading-none',
 };
 
+const sizeOpsz: Record<IconSize, number> = {
+  xs: 20,
+  sm: 20,
+  md: 20,
+  lg: 24,
+  xl: 40,
+  inline: 20,
+};
+
 const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
   name,
   size = 'lg',
+  filled = false,
   srLabel,
   directional = false,
   className,
+  style,
   ...props
 }, ref) => {
   const isDecorative = !srLabel && !props['aria-label'];
+  const iconStyle: React.CSSProperties = {
+    '--icon-opsz': sizeOpsz[size],
+    '--icon-fill': filled ? 1 : 0,
+    ...style,
+  } as React.CSSProperties;
 
   return (
     <>
@@ -181,6 +221,7 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
           directional && 'icon-directional',
           className
         )}
+        style={iconStyle}
         aria-hidden={isDecorative || srLabel ? 'true' : undefined}
         aria-label={props['aria-label']}
         {...props}
