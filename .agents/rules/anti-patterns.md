@@ -10,7 +10,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Triple-Tint Monochrome** (pastel fill + matching-hue border + matching-hue text) → **Use one of:**
   1. **Filled (`variant="filled"`):** Solid `primary`/`secondary`/`tertiary` fill + `on-*` text, no border.
   2. **Outline (`variant="outline"`):** `1px` `primary`/`secondary` border (never `tertiary` Amber) + neutral `surface` fill (or `on-surface` on inverted surfaces) + matching text.
-  3. **Soft Wash (`variant="soft"`):** `*-container` fill + ultra-dark semantic `on-*-container` ink (`#001849`, `#00201c`, `#261900`, `#052e16`, `#450a0a`, `#331400`, `#1a1c1e`) + `border-transparent` on `<Badge/>`/`<Chip/>` pills. (Callouts, `InlineAlert`s, and tinted cards keep `#1a1c1e` body text with no colored perimeter borders.)
+  3. **Soft Wash (`variant="soft"`):** `*-container` fill + ultra-dark semantic `on-*-container` ink (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1a1c1e`) + `border-transparent` on `<Badge/>`/`<Chip/>` pills. (Callouts, `InlineAlert`s, and tinted cards keep `#1a1c1e` body text with no colored perimeter borders.)
 - **Banned: All-caps chips/badges or static status dots** → **Use:** Sentence case and plain text, `<Badge/>`, or functional icons (dots are strictly for live/real-time presence/recording paired with text).
 
 ## Accessibility & Interaction

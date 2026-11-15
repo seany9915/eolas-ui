@@ -69,6 +69,11 @@ export const eolasLintPreset = [
           message:
             "Direct <dialog> usage is prohibited outside primitives. Use <Dialog> from @/components/ui/dialog.",
         },
+        {
+          selector: "ImportDeclaration[source.value=/^@radix-ui\\//]",
+          message:
+            "Radix UI (@radix-ui/*) is prohibited. Use Base UI primitives from @/components/ui/.",
+        },
       ],
 
       // 7. Restyle contracts tailored to Eolas UI Base UI primitives
@@ -79,7 +84,7 @@ export const eolasLintPreset = [
           contracts: [
             {
               pattern: "^Button$",
-              allow: ["w-full", "mt-*", "mb-*", "mx-*", "my-*", "shrink-*", "self-*"],
+              allow: ["w-full", "mt-*", "mb-*", "mx-*", "my-*", "shrink-*", "self-*", "whitespace-nowrap"],
               deny: [
                 "p-*",
                 "px-*",
@@ -108,12 +113,12 @@ export const eolasLintPreset = [
               },
             },
             {
-              pattern: "^Chip$",
+              pattern: "^(Badge|Chip)$",
               allow: ["layout"],
               deny: ["bg-*", "text-*", "border-*", "rounded-*", "uppercase"],
               message: {
                 default:
-                  "Chip enforces high-contrast clinical status rules. Use variant='filled'|'soft'|'outline' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'. Do not apply ad-hoc background/border color overrides (triple-tint anti-pattern).",
+                  "Badge/Chip enforces high-contrast clinical status rules. Use variant='filled'|'soft'|'outline' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'. Do not apply ad-hoc background/border color overrides (triple-tint anti-pattern).",
                 typography:
                   "All-caps styling (uppercase) is strictly banned on chips/badges per DESIGN.md.",
               },
@@ -140,7 +145,7 @@ export const eolasLintPreset = [
                 "Toast must maintain standard flat rectangular shape (rounded-none) and 44x44px dismiss button. Do not apply rounded-*.",
             },
             {
-              pattern: "^(Tabs|TabsList|TabsTrigger)$",
+              pattern: "^(Tabs|TabsList|TabsTrigger|Tabs\\.List|Tabs\\.Trigger)$",
               allow: ["layout", "w-*"],
               deny: ["bg-*", "uppercase"],
               message:
@@ -154,14 +159,14 @@ export const eolasLintPreset = [
                 "Inputs own their touch floors (44px/48px standard). Do not override height dimensions directly.",
             },
             {
-              pattern: "^(Dialog|AlertDialog|Drawer)$",
+              pattern: "^(Dialog|AlertDialog|Drawer|Sheet|Dialog\\.Popup|AlertDialog\\.Popup|Drawer\\.Popup|Sheet\\.Popup)$",
               allow: ["layout"],
               deny: ["bg-*", "rounded-*"],
               message:
                 "Modal overlays must maintain standard surface styling, focus traps, and backdrop filters defined by Eolas UI.",
             },
             {
-              pattern: "^(Skeleton|SkeletonReveal)$",
+              pattern: "^(Skeleton|SkeletonReveal|Skeleton\\.Reveal)$",
               allow: ["layout", "shape"],
               message:
                 "Skeleton loaders support layout dimensions (w-*, h-*) and shapes (rounded, rounded-full) to mirror target components.",
@@ -173,13 +178,13 @@ export const eolasLintPreset = [
                 "Shared motion primitives manage their own transitions and reduced-motion fallbacks per DESIGN.md.",
             },
             {
-              pattern: "^CardContent$",
+              pattern: "^(CardContent|Card\\.Content)$",
               allow: ["layout", "spacing"],
               message:
                 "CardContent permits internal spacing adjustments (e.g. p-0 for full-bleed media or custom padding).",
             },
             {
-              pattern: "^(TableCell|TableHead)$",
+              pattern: "^(TableCell|TableHead|Table\\.Cell|Table\\.Head)$",
               allow: ["layout", "typography"],
               deny: ["uppercase"],
               message:
@@ -190,11 +195,13 @@ export const eolasLintPreset = [
       ],
     },
   },
-  // Allow internal primitive files inside ui/ and showcase/playground testbeds to define their own styles, floors, spacing, and native elements
+  // Allow internal primitive and block files inside ui/, blocks/, and showcase/playground testbeds to define their own styles, floors, spacing, and native elements
   {
     files: [
       "**/components/ui/**",
       "**/src/components/ui/**",
+      "**/components/blocks/**",
+      "**/src/components/blocks/**",
       "**/playground/**",
       "**/showcase/**",
       "**/*Showcase*/**",

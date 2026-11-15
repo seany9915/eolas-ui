@@ -136,6 +136,35 @@ if (fs.existsSync(GLOBALS_CSS)) {
   });
 }
 
+// Eolas Design System Spec (design-md.json)
+const DESIGN_MD = path.resolve('DESIGN.md');
+const hasDesignMd = fs.existsSync(DESIGN_MD);
+if (hasDesignMd) {
+  const designMdContent = fs.readFileSync(DESIGN_MD, 'utf8');
+  const designMdItem = {
+    $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+    name: 'design-md',
+    type: 'registry:file',
+    title: 'Eolas UI Design System Spec (DESIGN.md)',
+    description: 'Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers',
+    files: [
+      {
+        path: 'DESIGN.md',
+        content: designMdContent,
+        type: 'registry:file',
+        target: '~/DESIGN.md',
+      },
+    ],
+  };
+  fs.writeFileSync(path.join(OUT_DIR, 'design-md.json'), JSON.stringify(designMdItem, null, 2));
+  registryItems.push({
+    name: 'design-md',
+    type: 'registry:file',
+    title: designMdItem.title,
+    description: designMdItem.description,
+  });
+}
+
 // Eolas Agent Rules & Anti-Pattern Checker (agent-rules.json)
 const CORE_CONTRACT = path.resolve('.agents/rules/00-core-contract.md');
 const ANTI_PATTERNS = path.resolve('.agents/rules/anti-patterns.md');
@@ -150,6 +179,7 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
     type: 'registry:file',
     title: 'Eolas UI Agent Rules & Anti-Pattern Checker',
     description: 'Strict architectural contracts, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers',
+    ...(hasDesignMd ? { registryDependencies: [formatRegistryDep('design-md')] } : {}),
     files: [
       {
         path: 'rules/00-core-contract.md',

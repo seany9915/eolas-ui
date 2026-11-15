@@ -134,7 +134,7 @@ if (itemErrors > 0) failed = true;
 if (itemErrors === 0) {
   console.log(`✅ All ${itemFiles.length} item files conform strictly to registry-item.json schema!`);
 } else {
-XX
+  console.error(`❌ ${itemErrors} item(s) failed schema validation.`);
 }
 
 console.log('\n=== Target Path Analysis ===');

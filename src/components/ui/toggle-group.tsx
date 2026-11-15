@@ -86,8 +86,8 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
       sizeClasses,
       'text-on-surface-variant hover:text-on-surface hover:bg-state-hover border border-transparent',
       groupContext.multiple
-        ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary forced-colors:data-[pressed]:border-Highlight'
-        : 'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:shadow-toggle forced-colors:data-[pressed]:border-Highlight',
+        ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary forced-colors:data-[pressed]:border-[Highlight]'
+        : 'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:shadow-toggle forced-colors:data-[pressed]:border-[Highlight]',
       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
     );

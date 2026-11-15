@@ -23,7 +23,7 @@ USAGE:
 
 EXAMPLES:
   npx @seany9915/eolas-ui add button dialog select
-  npx @seany9915/eolas-ui add agent-rules lint theme
+  npx @seany9915/eolas-ui add design-md agent-rules lint theme
   npx @seany9915/eolas-ui add tabs --overwrite
   npx @seany9915/eolas-ui sync
   npx @seany9915/eolas-ui list
@@ -106,20 +106,31 @@ function addComponents(componentNames, overwrite = false) {
 
       const hasSrc = fs.existsSync(path.resolve(cwd, 'src'));
       const defaultSrc = hasSrc ? 'src' : '';
+      const resolveAlias = (rawAlias, fallback) => {
+        if (!rawAlias) return path.join(defaultSrc, fallback);
+        if (rawAlias.startsWith('@/')) {
+          const stripped = rawAlias.slice(2);
+          return hasSrc && !stripped.startsWith('src/') ? path.join('src', stripped) : stripped;
+        }
+        if (rawAlias.startsWith('~/')) {
+          return rawAlias.slice(2);
+        }
+        return rawAlias;
+      };
 
       if (file.target.startsWith('~/')) {
         destPath = path.resolve(cwd, file.target.slice(2));
       } else if (file.target.startsWith('@ui/')) {
-        const alias = componentsConfig?.aliases?.ui?.replace(/^@\//, '') || path.join(defaultSrc, 'components/ui');
+        const alias = resolveAlias(componentsConfig?.aliases?.ui, 'components/ui');
         destPath = path.resolve(cwd, alias, file.target.slice(4));
       } else if (file.target.startsWith('@components/')) {
-        const alias = componentsConfig?.aliases?.components?.replace(/^@\//, '') || path.join(defaultSrc, 'components');
+        const alias = resolveAlias(componentsConfig?.aliases?.components, 'components');
         destPath = path.resolve(cwd, alias, file.target.slice(12));
       } else if (file.target.startsWith('@lib/')) {
-        const alias = componentsConfig?.aliases?.lib?.replace(/^@\//, '') || path.join(defaultSrc, 'lib');
+        const alias = resolveAlias(componentsConfig?.aliases?.lib, 'lib');
         destPath = path.resolve(cwd, alias, file.target.slice(5));
       } else if (file.target.startsWith('@hooks/')) {
-        const alias = componentsConfig?.aliases?.hooks?.replace(/^@\//, '') || path.join(defaultSrc, 'hooks');
+        const alias = resolveAlias(componentsConfig?.aliases?.hooks, 'hooks');
         destPath = path.resolve(cwd, alias, file.target.slice(7));
       } else {
         const isRootFile =
@@ -185,9 +196,11 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
     process.exit(1);
   }
   const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-  const allUiNames = items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
-  console.log(`Syncing all ${allUiNames.length} Eolas UI components...\n`);
-  addComponents(allUiNames, true);
+  const allComponentNames = items
+    .filter((i) => i.type === 'registry:ui' || i.type === 'registry:block')
+    .map((i) => i.name);
+  console.log(`Syncing all ${allComponentNames.length} Eolas UI components and blocks...\n`);
+  addComponents(allComponentNames, true);
 } else if (command === 'add') {
   const flags = args.filter((a) => a.startsWith('-'));
   const names = args.slice(1).filter((a) => !a.startsWith('-'));
@@ -200,8 +213,10 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
       process.exit(1);
     }
     const items = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-    const allUiNames = items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
-    addComponents(allUiNames, overwrite);
+    const allComponentNames = items
+      .filter((i) => i.type === 'registry:ui' || i.type === 'registry:block')
+      .map((i) => i.name);
+    addComponents(allComponentNames, overwrite);
   } else {
     addComponents(names, overwrite);
   }

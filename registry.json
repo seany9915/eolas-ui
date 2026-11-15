@@ -39,10 +39,26 @@
       ]
     },
     {
+      "name": "design-md",
+      "type": "registry:file",
+      "title": "Eolas UI Design System Spec (DESIGN.md)",
+      "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers",
+      "files": [
+        {
+          "path": "DESIGN.md",
+          "type": "registry:file",
+          "target": "~/DESIGN.md"
+        }
+      ]
+    },
+    {
       "name": "agent-rules",
       "type": "registry:file",
       "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
       "description": "Strict architectural contracts, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers",
+      "registryDependencies": [
+        "@seany9915/eolas-ui/design-md"
+      ],
       "files": [
         {
           "path": ".agents/rules/00-core-contract.md",

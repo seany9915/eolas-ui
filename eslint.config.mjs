@@ -24,6 +24,7 @@ export default [
       "scratch/**",
       ".agents/**",
       "packages/eolas-ui/registry/**",
+      "docs/skills-archive/**",
     ],
   },
 ];

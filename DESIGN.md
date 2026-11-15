@@ -35,7 +35,7 @@ colors:
   success: '#157331'
   on-success: '#ffffff'
   success-container: '#c8f5ce'
-  on-success-container: '#052e16'
+  on-success-container: '#1a1c1e'
   neutral: '#1a1c1e'
   on-neutral: '#ffffff'
   neutral-container: '#D1D5DF'
@@ -182,7 +182,7 @@ spacing:
      * *Contrast Constraint:* **Never use `#F9A825` for text (`text-tertiary`) or borders on light backgrounds** (`1.97:1`, fails AA). Approved uses: (1) `tertiary-container` wash + `on-tertiary-container`; (2) solid `tertiary` fill + `#1a1c1e` ink; (3) foreground on dark `on-surface` (`#1a1c1e`) Inverted Cards (`8.67:1` AAA).
 3. **Container Text (Split by Component Size):**
    * **Callouts, InlineAlerts & Tinted Cards:** Keep multi-line body copy in neutral charcoal (`#1a1c1e`, `text-on-surface`) and omit colored perimeter borders.
-   * **Small `<Badge />` & `<Chip />` Pills (`variant="soft"`):** Drop the border (`border-transparent`) to avoid triple-tint, and pair `*-container` fills with ultra-dark semantic `on-*-container` tokens (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#052e16`, `#1a1c1e`).
+   * **Small `<Badge />` & `<Chip />` Pills (`variant="soft"`):** Drop the border (`border-transparent`) to avoid triple-tint, and pair `*-container` fills with ultra-dark semantic `on-*-container` tokens (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1a1c1e`).
 
 ### 2. State & Status Colors (Error / Warning / Success / Neutral)
 
@@ -190,7 +190,7 @@ Reserved strictly for system, operational, and task state (including exercise co
 
 * **Error (`#C4161C`, Red):** `error` / `on-error` (`#ffffff`); `error-container` (`#ffdad6`) / `on-error-container` (`#450a0a`). Validation errors, destructive actions, failed states, and incorrect-answer exercise feedback.
 * **Warning (`#A64B00`, Burnt Orange):** `warning` / `on-warning` (`#ffffff`); `warning-container` (`#FDE3B8`) / `on-warning-container` (`#331400`). Non-blocking cautions ("session expiring soon", "unsaved changes")—distinct from `tertiary` amber.
-* **Success (`#157331`, Deep Green):** `success` / `on-success` (`#ffffff`); `success-container` (`#c8f5ce`) / `on-success-container` (`#052e16`). Completed actions, saved confirmations, passed checks, and correct-answer exercise feedback (use `success`, not `secondary`).
+* **Success (`#157331`, Deep Green):** `success` / `on-success` (`#ffffff`); `success-container` (`#c8f5ce`) / `on-success-container` (`#1a1c1e`). Completed actions, saved confirmations, passed checks, and correct-answer exercise feedback (use `success`, not `secondary`).
 * **Neutral (`#1a1c1e`, Charcoal):** `neutral` / `on-neutral` (`#ffffff`); `neutral-container` (`#D1D5DF`, `11.63:1` AAA vs `#1a1c1e`) / `on-neutral-container` (`#1a1c1e`). Non-critical operational status (offline mode, sync pending, read-only) in `InlineAlert` (`role="neutral"`) and `Chip` (`colorRole="neutral"`). `on-surface` (`#1a1c1e`) and `surface` (`#ffffff`) may also be used directly for `InlineAlert` bars/icons.
 
 ### 3. Surface Hierarchy
@@ -504,7 +504,7 @@ This design system draws a strict architectural line between **passive labels** 
 Both components share a fully rounded pill radius (`rounded.full`, 9999px) and strictly avoid the monochromatic "triple-tint" anti-pattern (matching colored fill, border, and text of the same hue). Select from three approved patterns based on visual emphasis:
 - **High-Contrast Mixed Palette (Pattern 1 / `variant="filled"`):** Saturated brand background (e.g., `primary`, `secondary`, or `tertiary` token) paired with its designated high-contrast text (`on-primary`/`on-secondary`/`on-tertiary`), no border. Use for higher-emphasis, active selections, or status-forward badges/chips (aligns with Filled buttons).
 - **Colored Outline + Neutral Fill + Colored Text (Pattern 2 / `variant="outline"`):** A `1px` border in the brand hue (`primary`/`secondary` only; `tertiary` Amber is excluded here due to light-background contrast limits), a genuinely neutral fill (`surface` white — never a tinted version of the hue), and text in that same brand hue. This is the recommended everyday default for multi-badge layouts (aligns with Outlined buttons): it stays vivid and legible without visual clutter.
-- **Soft Container Wash (Pattern 3 / `variant="soft"`):** Soft role-specific background (`primary-container`, `secondary-container`, `tertiary-container`, `success-container`, `error-container`, `warning-container`, `neutral-container`) paired with its ultra-dark, near-black semantic `on-*-container` token (`#001849`, `#00201c`, `#261900`, `#052e16`, `#450a0a`, `#331400`, `#1a1c1e`) and `border-transparent` (no border). This delivers color-coded status warmth while ultra-dark M3 ink guarantees 11:1+ AAA contrast on small 12px pills without muddy mid-tone washes. Valid for low-to-medium emphasis status tags.
+- **Soft Container Wash (Pattern 3 / `variant="soft"`):** Soft role-specific background (`primary-container`, `secondary-container`, `tertiary-container`, `success-container`, `error-container`, `warning-container`, `neutral-container`) paired with its ultra-dark, near-black semantic `on-*-container` token (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1a1c1e`) and `border-transparent` (no border). This delivers color-coded status warmth while ultra-dark M3 ink guarantees 11:1+ AAA contrast on small 12px pills without muddy mid-tone washes. Valid for low-to-medium emphasis status tags.
 
 #### Approved Chip Variant × Color Role Table
 
@@ -513,7 +513,7 @@ Both components share a fully rounded pill radius (`rounded.full`, 9999px) and s
 | **`primary`** (Electric Blue, `#0052FF`) | `bg-primary text-on-primary` (Solid blue fill, white text) | `border-primary bg-surface text-primary` (1px blue border, white fill, blue text) | `bg-primary-container text-on-primary-container` (Soft blue fill `#dce6ff`, ultra-dark navy `#001849`) | Solid/outline text achieves 5.75:1 AA on `#ffffff`. Soft wash achieves 13.70:1 AAA. |
 | **`secondary`** (Rich Emerald, `#00796B`) | `bg-secondary text-on-secondary` (Solid emerald fill, white text) | `border-secondary bg-surface text-secondary` (1px emerald border, white fill, emerald text) | `bg-secondary-container text-on-secondary-container` (Soft emerald fill, ultra-dark emerald `#00201c`) | Solid/outline text achieves 5.32:1 AA on `#ffffff`. Soft wash achieves 14.33:1 AAA. |
 | **`tertiary`** (Sunny Amber, `#F9A825`) | `bg-tertiary text-on-tertiary` (Solid amber fill, **charcoal text** `#1a1c1e`) | **BANNED on white surfaces** (Amber text fails WCAG 1.4.3 AA at 1.97:1; use Pattern 1 or Pattern 3) | `bg-tertiary-container text-on-tertiary-container` (Soft amber fill, ultra-dark amber `#261900`) | Pattern 1 requires dark text (`text-on-tertiary` = `#1a1c1e`, 8.67:1 AAA). White text on `#F9A825` fails at 1.97:1. Soft wash achieves 15.14:1 AAA. |
-| **`success`** (Forest Green, `#157331`) | `bg-success text-on-success` (Solid green fill, white text) | `border-success bg-surface text-success` (1px green border, white fill, green text) | `bg-success-container text-on-success-container` (Soft green fill, ultra-dark forest `#052e16`) | Solid/outline text achieves 5.95:1 AA on `#ffffff`. Soft wash achieves 12.36:1 AAA. |
+| **`success`** (Forest Green, `#157331`) | `bg-success text-on-success` (Solid green fill, white text) | `border-success bg-surface text-success` (1px green border, white fill, green text) | `bg-success-container text-on-success-container` (Soft green fill, charcoal `#1a1c1e`) | Solid/outline text achieves 5.95:1 AA on `#ffffff`. Soft wash achieves 12.36:1 AAA. |
 | **`warning`** (Ochre Amber, `#A64B00`) | `bg-warning text-on-warning` (Solid ochre fill, white text) | `border-warning bg-surface text-warning` (1px ochre border, white fill, ochre text) | `bg-warning-container text-on-warning-container` (Soft ochre fill, ultra-dark ochre `#331400`) | Deep ochre `#A64B00` achieves 5.79:1 AA on `#ffffff`. Never substitute with `#F9A825`. Soft wash achieves 13.58:1 AAA. |
 | **`error`** (Crimson Red, `#C4161C`) | `bg-error text-on-error` (Solid crimson fill, white text) | `border-error bg-surface text-error` (1px crimson border, white fill, crimson text) | `bg-error-container text-on-error-container` (Soft crimson fill, ultra-dark crimson `#450a0a`) | Solid/outline text achieves 6.04:1 AA on `#ffffff`. Soft wash achieves 12.49:1 AAA. |
 | **`neutral`** (Charcoal / Slate) | `bg-neutral text-on-neutral` (Solid charcoal `#1a1c1e` fill, white text) | `border-outline bg-surface text-on-surface` (1px slate border `#6B6E80`, white fill, charcoal text) | `bg-neutral-container text-on-neutral-container` (Soft slate fill `#D1D5DF`, charcoal text `#1a1c1e`) | Solid text achieves 17.09:1 AAA. Outline border meets 3:1 non-text contrast (5.04:1). Soft wash achieves 11.63:1 AAA. |

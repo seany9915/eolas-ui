@@ -17,6 +17,12 @@
     "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, and motion tokens conforming to DESIGN.md"
   },
   {
+    "name": "design-md",
+    "type": "registry:file",
+    "title": "Eolas UI Design System Spec (DESIGN.md)",
+    "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers"
+  },
+  {
     "name": "agent-rules",
     "type": "registry:file",
     "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
