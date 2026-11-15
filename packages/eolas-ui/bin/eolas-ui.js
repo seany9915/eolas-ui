@@ -86,8 +86,12 @@ function addComponents(componentNames, overwrite = false) {
     // Queue internal registry dependencies
     if (data.registryDependencies && Array.isArray(data.registryDependencies)) {
       for (const dep of data.registryDependencies) {
-        if (!processed.has(dep.replace(/^@seany9915\/eolas-ui\//, ''))) {
-          queue.push(dep.replace(/^@seany9915\/eolas-ui\//, ''));
+        const normalizedDep = dep
+          .replace(/^https:\/\/seany9915\.github\.io\/eolas-ui\/r\//, '')
+          .replace(/\.json$/, '')
+          .replace(/^@seany9915\/eolas-ui\//, '');
+        if (!processed.has(normalizedDep)) {
+          queue.push(normalizedDep);
         }
       }
     }

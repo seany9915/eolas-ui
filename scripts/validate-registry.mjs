@@ -115,11 +115,11 @@ for (const file of itemFiles) {
   }
 
   // Validate registryDependencies format: bare names are reserved for official shadcn items.
-  // Internal dependencies must use explicit namespace e.g. "@seany9915/eolas-ui/utils"
+  // Internal dependencies must use full registry URLs or explicit namespaces.
   if (Array.isArray(item.registryDependencies)) {
     for (const dep of item.registryDependencies) {
-      if (!dep.startsWith('@') && !dep.includes('/')) {
-        errs.push(`registryDependency "${dep}" is a bare name. Cross-component dependencies must use namespace (e.g. "@seany9915/eolas-ui/${dep}").`);
+      if (!dep.startsWith('https://') && !dep.startsWith('@') && !dep.includes('/')) {
+        errs.push(`registryDependency "${dep}" is a bare name. Cross-component dependencies must use full URLs (e.g. "https://seany9915.github.io/eolas-ui/r/${dep}.json") or namespaces.`);
       }
     }
   }

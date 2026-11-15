@@ -21,7 +21,10 @@ if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 }
 
-const formatRegistryDep = (dep) => (dep.startsWith('@') ? dep : `@seany9915/eolas-ui/${dep}`);
+const formatRegistryDep = (dep) =>
+  dep.startsWith('@') || dep.startsWith('http')
+    ? dep
+    : `https://seany9915.github.io/eolas-ui/r/${dep}.json`;
 
 function parseComponentDoc(content, name) {
   const humanTitle = name

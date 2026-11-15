@@ -10,13 +10,13 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/icon",
-    "@seany9915/eolas-ui/skeleton",
-    "@seany9915/eolas-ui/tooltip",
-    "@seany9915/eolas-ui/button",
-    "@seany9915/eolas-ui/chat-message-context",
-    "@seany9915/eolas-ui/inline-citation"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/icon.json",
+    "https://seany9915.github.io/eolas-ui/r/skeleton.json",
+    "https://seany9915.github.io/eolas-ui/r/tooltip.json",
+    "https://seany9915.github.io/eolas-ui/r/button.json",
+    "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+    "https://seany9915.github.io/eolas-ui/r/inline-citation.json"
   ],
   "files": [
     {

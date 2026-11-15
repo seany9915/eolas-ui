@@ -11,9 +11,9 @@
     "recharts"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/chart-card",
-    "@seany9915/eolas-ui/chart"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+    "https://seany9915.github.io/eolas-ui/r/chart.json"
   ],
   "files": [
     {

@@ -10,9 +10,9 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/icon",
-    "@seany9915/eolas-ui/fieldset"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/icon.json",
+    "https://seany9915.github.io/eolas-ui/r/fieldset.json"
   ],
   "files": [
     {

@@ -92,16 +92,16 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   );
 
   // Body copy remains pure white (text-surface) to avoid chromatic glare/fatigue; tertiary accents apply to headlines/icons
-  const invertedStyles = 'bg-on-surface text-surface border-none shadow-ambient';
+  const invertedStyles = 'bg-on-surface text-surface border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient';
 
   const prominenceStyles: Record<CardProminence, string> = {
-    default: 'bg-surface border border-transparent text-on-surface shadow-card',
-    accent: 'bg-surface border border-transparent text-on-surface shadow-card', // @deprecated: falls back to default borderless card
+    default: 'bg-surface border-0 forced-colors:border forced-colors:border-[CanvasText] text-on-surface shadow-card',
+    accent: 'bg-surface border-0 forced-colors:border forced-colors:border-[CanvasText] text-on-surface shadow-card', // @deprecated: falls back to default borderless card
     filled: colorRole === 'secondary'
-      ? 'bg-secondary text-on-secondary border-none shadow-ambient'
+      ? 'bg-secondary text-on-secondary border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient'
       : colorRole === 'tertiary'
-        ? 'bg-tertiary text-on-tertiary border-none shadow-ambient'
-        : 'bg-primary text-on-primary border-none shadow-ambient',
+        ? 'bg-tertiary text-on-tertiary border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient'
+        : 'bg-primary text-on-primary border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient',
     spotlight: invertedStyles,
     inverted: invertedStyles,
   };
@@ -115,8 +115,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     affordanceStyles = cn(
       'cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
       selected
-        ? 'bg-primary-container border-[2px] border-primary text-on-surface shadow-ambient'
-        : 'bg-surface border-[2px] border-transparent text-on-surface shadow-ambient hover:shadow-ambient-hover hover:border-outline-variant/50'
+        ? 'bg-primary-container border-[2px] border-primary forced-colors:border-[2px] forced-colors:border-[Highlight] text-on-surface shadow-ambient'
+        : 'bg-surface border-[2px] border-transparent forced-colors:border-[2px] forced-colors:border-[CanvasText] text-on-surface shadow-ambient hover:shadow-ambient-hover hover:border-outline-variant/50'
     );
   } else if (isActionable) {
     affordanceStyles = cn(

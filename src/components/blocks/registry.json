@@ -13,10 +13,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/sidebar",
-        "@seany9915/eolas-ui/navigation-bar",
-        "@seany9915/eolas-ui/icon"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/sidebar.json",
+        "https://seany9915.github.io/eolas-ui/r/navigation-bar.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [
         {
@@ -48,12 +48,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/field",
-        "@seany9915/eolas-ui/icon",
-        "@seany9915/eolas-ui/radio",
-        "@seany9915/eolas-ui/input"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/field.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/radio.json",
+        "https://seany9915.github.io/eolas-ui/r/input.json"
       ],
       "files": [
         {
@@ -75,9 +75,9 @@
         "recharts"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/chart-card",
-        "@seany9915/eolas-ui/chart"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+        "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
       "files": [
         {
@@ -99,9 +99,9 @@
         "recharts"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/chart-card",
-        "@seany9915/eolas-ui/chart"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+        "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
       "files": [
         {
@@ -122,11 +122,11 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/skeleton",
-        "@seany9915/eolas-ui/empty"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/card.json",
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/skeleton.json",
+        "https://seany9915.github.io/eolas-ui/r/empty.json"
       ],
       "files": [
         {
@@ -147,13 +147,13 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/message-scroller",
-        "@seany9915/eolas-ui/chat-message",
-        "@seany9915/eolas-ui/reasoning",
-        "@seany9915/eolas-ui/prompt-input",
-        "@seany9915/eolas-ui/suggestion-chips",
-        "@seany9915/eolas-ui/empty-state"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/message-scroller.json",
+        "https://seany9915.github.io/eolas-ui/r/chat-message.json",
+        "https://seany9915.github.io/eolas-ui/r/reasoning.json",
+        "https://seany9915.github.io/eolas-ui/r/prompt-input.json",
+        "https://seany9915.github.io/eolas-ui/r/suggestion-chips.json",
+        "https://seany9915.github.io/eolas-ui/r/empty-state.json"
       ],
       "files": [
         {
@@ -185,15 +185,15 @@
         "@tanstack/react-table"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/table",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/input",
-        "@seany9915/eolas-ui/select",
-        "@seany9915/eolas-ui/menu",
-        "@seany9915/eolas-ui/checkbox",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/table.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/input.json",
+        "https://seany9915.github.io/eolas-ui/r/select.json",
+        "https://seany9915.github.io/eolas-ui/r/menu.json",
+        "https://seany9915.github.io/eolas-ui/r/checkbox.json",
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [
         {
@@ -222,10 +222,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/alert-dialog",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/icon"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/alert-dialog.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [
         {
@@ -246,13 +246,13 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/field",
-        "@seany9915/eolas-ui/input",
-        "@seany9915/eolas-ui/select",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/chip",
-        "@seany9915/eolas-ui/icon"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/field.json",
+        "https://seany9915.github.io/eolas-ui/r/input.json",
+        "https://seany9915.github.io/eolas-ui/r/select.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/chip.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [
         {
@@ -274,9 +274,9 @@
         "recharts"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/chart-card",
-        "@seany9915/eolas-ui/chart"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+        "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
       "files": [
         {
@@ -297,14 +297,14 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/field",
-        "@seany9915/eolas-ui/input-group",
-        "@seany9915/eolas-ui/item",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon",
-        "@seany9915/eolas-ui/empty"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/field.json",
+        "https://seany9915.github.io/eolas-ui/r/input-group.json",
+        "https://seany9915.github.io/eolas-ui/r/item.json",
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/empty.json"
       ],
       "files": [
         {
@@ -337,10 +337,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/icon"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/card.json",
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [
         {
@@ -362,9 +362,9 @@
         "recharts"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/chart-card",
-        "@seany9915/eolas-ui/chart"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+        "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
       "files": [
         {
@@ -385,12 +385,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/input",
-        "@seany9915/eolas-ui/progress",
-        "@seany9915/eolas-ui/icon",
-        "@seany9915/eolas-ui/kbd"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/input.json",
+        "https://seany9915.github.io/eolas-ui/r/progress.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/kbd.json"
       ],
       "files": [
         {
@@ -420,9 +420,9 @@
         "recharts"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/chart-card",
-        "@seany9915/eolas-ui/chart"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+        "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
       "files": [
         {
@@ -444,10 +444,10 @@
         "recharts"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/chart-card",
-        "@seany9915/eolas-ui/badge",
-        "@seany9915/eolas-ui/chart"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/chart-card.json",
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
       "files": [
         {
@@ -468,12 +468,12 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/card",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/separator",
-        "@seany9915/eolas-ui/icon",
-        "@seany9915/eolas-ui/progress"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/card.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/separator.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/progress.json"
       ],
       "files": [
         {
@@ -502,10 +502,10 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "@seany9915/eolas-ui/utils",
-        "@seany9915/eolas-ui/button",
-        "@seany9915/eolas-ui/icon",
-        "@seany9915/eolas-ui/badge"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/badge.json"
       ],
       "files": [
         {

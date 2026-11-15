@@ -11,15 +11,15 @@
     "@tanstack/react-table"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/table",
-    "@seany9915/eolas-ui/button",
-    "@seany9915/eolas-ui/input",
-    "@seany9915/eolas-ui/select",
-    "@seany9915/eolas-ui/menu",
-    "@seany9915/eolas-ui/checkbox",
-    "@seany9915/eolas-ui/badge",
-    "@seany9915/eolas-ui/icon"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/table.json",
+    "https://seany9915.github.io/eolas-ui/r/button.json",
+    "https://seany9915.github.io/eolas-ui/r/input.json",
+    "https://seany9915.github.io/eolas-ui/r/select.json",
+    "https://seany9915.github.io/eolas-ui/r/menu.json",
+    "https://seany9915.github.io/eolas-ui/r/checkbox.json",
+    "https://seany9915.github.io/eolas-ui/r/badge.json",
+    "https://seany9915.github.io/eolas-ui/r/icon.json"
   ],
   "files": [
     {

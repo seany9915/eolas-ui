@@ -10,12 +10,12 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/button",
-    "@seany9915/eolas-ui/field",
-    "@seany9915/eolas-ui/icon",
-    "@seany9915/eolas-ui/radio",
-    "@seany9915/eolas-ui/input"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/button.json",
+    "https://seany9915.github.io/eolas-ui/r/field.json",
+    "https://seany9915.github.io/eolas-ui/r/icon.json",
+    "https://seany9915.github.io/eolas-ui/r/radio.json",
+    "https://seany9915.github.io/eolas-ui/r/input.json"
   ],
   "files": [
     {

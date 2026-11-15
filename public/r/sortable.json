@@ -12,7 +12,7 @@
     "@dnd-kit/helpers"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils"
+    "https://seany9915.github.io/eolas-ui/r/utils.json"
   ],
   "files": [
     {

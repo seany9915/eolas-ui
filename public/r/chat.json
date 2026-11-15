@@ -10,13 +10,13 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/message-scroller",
-    "@seany9915/eolas-ui/chat-message",
-    "@seany9915/eolas-ui/reasoning",
-    "@seany9915/eolas-ui/prompt-input",
-    "@seany9915/eolas-ui/suggestion-chips",
-    "@seany9915/eolas-ui/empty-state"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/message-scroller.json",
+    "https://seany9915.github.io/eolas-ui/r/chat-message.json",
+    "https://seany9915.github.io/eolas-ui/r/reasoning.json",
+    "https://seany9915.github.io/eolas-ui/r/prompt-input.json",
+    "https://seany9915.github.io/eolas-ui/r/suggestion-chips.json",
+    "https://seany9915.github.io/eolas-ui/r/empty-state.json"
   ],
   "files": [
     {

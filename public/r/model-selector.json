@@ -10,11 +10,11 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "@seany9915/eolas-ui/utils",
-    "@seany9915/eolas-ui/select",
-    "@seany9915/eolas-ui/combobox",
-    "@seany9915/eolas-ui/tooltip",
-    "@seany9915/eolas-ui/badge"
+    "https://seany9915.github.io/eolas-ui/r/utils.json",
+    "https://seany9915.github.io/eolas-ui/r/select.json",
+    "https://seany9915.github.io/eolas-ui/r/combobox.json",
+    "https://seany9915.github.io/eolas-ui/r/tooltip.json",
+    "https://seany9915.github.io/eolas-ui/r/badge.json"
   ],
   "files": [
     {
