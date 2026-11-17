@@ -183,7 +183,9 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
       onSubmit,
       onFilesPasted,
       onKeyDown,
+      onCompositionEnd,
       onPaste,
+      enterKeyHint,
       minRows = 3,
       maxHeight = '12rem',
       render,
@@ -195,13 +197,24 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
   ) => {
     const { disabled: groupDisabled } = React.useContext(InputGroupContext);
     const isDisabled = disabled ?? groupDisabled;
+    const lastCompositionEndRef = React.useRef<number>(0);
+
+    const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
+      // WebKit/Safari can fire compositionend on the same tick before the confirming Enter keydown.
+      lastCompositionEndRef.current = performance.now();
+      onCompositionEnd?.(e);
+    };
 
     // Enter inserts a newline unless the caller opts into submit-on-Enter via onSubmit.
     // The caller's onKeyDown runs first and can cancel submission with preventDefault().
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       onKeyDown?.(e);
       if (e.defaultPrevented || !onSubmit) return;
-      if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+      const isImeComposing =
+        e.nativeEvent.isComposing ||
+        e.keyCode === 229 ||
+        performance.now() - lastCompositionEndRef.current < 50;
+      if (e.key === 'Enter' && !e.shiftKey && !isImeComposing) {
         e.preventDefault();
         onSubmit();
       }
@@ -236,7 +249,9 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
         'data-slot-control': 'true',
         rows: minRows,
         disabled: isDisabled,
+        enterKeyHint: enterKeyHint ?? (onSubmit ? 'send' : undefined),
         onKeyDown: handleKeyDown,
+        onCompositionEnd: handleCompositionEnd,
         onPaste: handlePaste,
         className: cn('[field-sizing:content] h-auto', textareaClassName),
         style: textareaStyle,
@@ -254,7 +269,9 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
         rows={minRows}
         autoGrow={true}
         disabled={isDisabled}
+        enterKeyHint={enterKeyHint ?? (onSubmit ? 'send' : undefined)}
         onKeyDown={handleKeyDown}
+        onCompositionEnd={handleCompositionEnd}
         onPaste={handlePaste}
         className={textareaClassName}
         style={textareaStyle}

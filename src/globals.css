@@ -1583,6 +1583,22 @@ form[data-tool-active] {
   padding: 2rem;
 }
 
+[data-slot="list-detail-block"][data-density="compact"] [data-slot="list-items"] {
+  padding: 0.25rem;
+}
+
+[data-slot="list-detail-block"][data-density="compact"] [data-slot="detail-body"] {
+  padding: 0.75rem;
+}
+
+[data-slot="list-detail-block"][data-density="spacious"] [data-slot="list-items"] {
+  padding: 0.75rem;
+}
+
+[data-slot="list-detail-block"][data-density="spacious"] [data-slot="detail-body"] {
+  padding: 2rem;
+}
+
 @container style(--density: compact) {
   [data-slot="table-container"]:not([data-density]) [data-slot="table-head"],
   [data-slot="table-container"]:not([data-density]) [data-slot="table-cell"] {
@@ -1595,8 +1611,11 @@ form[data-tool-active] {
   [data-slot="card"]:not([data-density]) {
     padding: 1rem;
   }
-  [data-slot="list-detail-block"]:not([data-density]) {
-    gap: 0.75rem;
+  [data-slot="list-detail-block"]:not([data-density]) [data-slot="list-items"] {
+    padding: 0.25rem;
+  }
+  [data-slot="list-detail-block"]:not([data-density]) [data-slot="detail-body"] {
+    padding: 0.75rem;
   }
 }
 
@@ -1612,8 +1631,11 @@ form[data-tool-active] {
   [data-slot="card"]:not([data-density]) {
     padding: 2rem;
   }
-  [data-slot="list-detail-block"]:not([data-density]) {
-    gap: 1.5rem;
+  [data-slot="list-detail-block"]:not([data-density]) [data-slot="list-items"] {
+    padding: 0.75rem;
+  }
+  [data-slot="list-detail-block"]:not([data-density]) [data-slot="detail-body"] {
+    padding: 2rem;
   }
 }
 

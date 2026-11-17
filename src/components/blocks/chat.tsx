@@ -79,8 +79,8 @@ export const ChatHeader = React.forwardRef<HTMLDivElement, ChatHeaderProps>(
         {children ?? (
           <>
             <div className="flex flex-col min-w-0">
-              {title && <h3 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h3>}
-              {subtitle && <p className="font-sans text-xs text-on-surface-variant truncate">{subtitle}</p>}
+              {title && <h3 className="font-heading text-base font-bold text-on-surface truncate">{title}</h3>}
+              {subtitle && <p className="font-sans text-sm text-on-surface-variant truncate">{subtitle}</p>}
             </div>
             {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
           </>
@@ -167,7 +167,10 @@ export const ChatStatus = React.forwardRef<HTMLDivElement, ChatStatusProps>(
         {...props}
       >
         {isStreaming && (
-          <span className="size-2 rounded-full bg-secondary animate-pulse shrink-0" aria-hidden="true" />
+          <span
+            className="size-2 rounded-full bg-secondary animate-pulse motion-reduce:animate-none shrink-0"
+            aria-hidden="true"
+          />
         )}
         {children || (typeof status === 'string' ? <span>{status}</span> : status)}
         {isStreaming && !status && !children && (
@@ -306,7 +309,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
     };
 
     const handleSend = () => {
-      if (!currentValue.trim() || isLoading) return;
+      if (!currentValue.trim() || isLoading || disabled) return;
       onSubmitMessage?.(currentValue.trim());
       if (!isControlled) {
         setInternalValue('');
@@ -314,9 +317,11 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
     };
 
     const handleSuggestionClick = (suggestionText: string) => {
+      if (disabled) return;
       if (onSelectSuggestion) {
         onSelectSuggestion(suggestionText);
       } else if (submitOnSuggestion) {
+        if (isLoading) return;
         onSubmitMessage?.(suggestionText);
       } else {
         handleValueChange(suggestionText);

@@ -49,9 +49,110 @@ export function kbdVariants({
   );
 }
 
+export function detectMacPlatform(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const platform = navigator.platform || navigator.userAgent || '';
+  return /mac|iphone|ipad|ipod/i.test(platform);
+}
+
+const KEY_SYMBOL_MAP_MAC: Record<string, string> = {
+  mod: '⌘',
+  meta: '⌘',
+  cmd: '⌘',
+  ctrl: '⌃',
+  control: '⌃',
+  alt: '⌥',
+  option: '⌥',
+  shift: '⇧',
+  enter: '↵',
+  return: '↵',
+  backspace: '⌫',
+  delete: '⌦',
+  esc: 'Esc',
+  escape: 'Esc',
+  up: '↑',
+  down: '↓',
+  left: '←',
+  right: '→',
+};
+
+const KEY_SYMBOL_MAP_OTHER: Record<string, string> = {
+  mod: 'Ctrl',
+  meta: 'Win',
+  cmd: 'Win',
+  ctrl: 'Ctrl',
+  control: 'Ctrl',
+  alt: 'Alt',
+  option: 'Alt',
+  shift: 'Shift',
+  enter: 'Enter',
+  return: 'Enter',
+  backspace: 'Backspace',
+  delete: 'Del',
+  esc: 'Esc',
+  escape: 'Esc',
+  up: '↑',
+  down: '↓',
+  left: '←',
+  right: '→',
+};
+
+/**
+ * Formats a normalized shortcut string (e.g. "mod+k", "mod+shift+p") into platform-appropriate key tokens.
+ */
+export function formatShortcut(
+  shortcut: string,
+  platform?: 'mac' | 'other'
+): string[] {
+  const isMac = platform ? platform === 'mac' : detectMacPlatform();
+  const map = isMac ? KEY_SYMBOL_MAP_MAC : KEY_SYMBOL_MAP_OTHER;
+
+  return shortcut
+    .split('+')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const lower = part.toLowerCase();
+      if (map[lower]) return map[lower];
+      return part.length === 1 ? part.toUpperCase() : part;
+    });
+}
+
+/**
+ * Converts a normalized shortcut string (e.g. "mod+k") into a WAI-ARIA `aria-keyshortcuts` value.
+ */
+export function toAriaKeyShortcuts(
+  shortcut: string,
+  platform?: 'mac' | 'other'
+): string {
+  const isMac = platform ? platform === 'mac' : detectMacPlatform();
+  return shortcut
+    .split('+')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const lower = part.toLowerCase();
+      if (lower === 'mod') return isMac ? 'Meta' : 'Control';
+      if (lower === 'meta' || lower === 'cmd') return 'Meta';
+      if (lower === 'ctrl' || lower === 'control') return 'Control';
+      if (lower === 'alt' || lower === 'option') return 'Alt';
+      if (lower === 'shift') return 'Shift';
+      return part.length === 1 ? part.toUpperCase() : part;
+    })
+    .join('+');
+}
+
 export interface KbdProps
   extends React.HTMLAttributes<HTMLElement>,
     KbdVariantsProps {
+  /**
+   * Normalized shortcut string (e.g. "mod+k", "mod+enter") formatted per platform when `children` is omitted.
+   */
+  shortcut?: string;
+  /**
+   * Explicit platform override for deterministic rendering in SSR or previews.
+   */
+  platform?: 'mac' | 'other';
   /**
    * Base UI polymorphic render slot or custom JSX element.
    */
@@ -59,8 +160,11 @@ export interface KbdProps
 }
 
 const KbdComponent = React.forwardRef<HTMLElement, KbdProps>(
-  ({ className, variant = 'default', size = 'md', render, children, ...props }, ref) => {
+  ({ className, variant = 'default', size = 'md', shortcut, platform, render, children, ...props }, ref) => {
     const computedClass = kbdVariants({ variant, size, className });
+    const isMac = platform ? platform === 'mac' : detectMacPlatform();
+    const resolvedChildren =
+      children ?? (shortcut ? formatShortcut(shortcut, platform).join(isMac ? '' : '+') : undefined);
 
     return useRender({
       render,
@@ -69,7 +173,7 @@ const KbdComponent = React.forwardRef<HTMLElement, KbdProps>(
       props: {
         'data-slot': 'kbd',
         className: computedClass,
-        children,
+        children: resolvedChildren,
         ...props,
       },
     });

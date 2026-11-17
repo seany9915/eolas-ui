@@ -101,6 +101,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       defaultSelectedId
     );
     const [internalSearch, setInternalSearch] = React.useState(defaultSearchQuery);
+    const [focusedItemId, setFocusedItemId] = React.useState<string | null>(null);
     const searchInputId = React.useId();
     const listPaneRef = React.useRef<HTMLDivElement | null>(null);
     const detailPaneRef = React.useRef<HTMLDivElement | null>(null);
@@ -142,6 +143,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     const handleActivateItem = (id: string) => {
       // On compact single-pane widths, detail-pane is hidden before selection; move focus into it on open.
       const isCompactView = detailPaneRef.current?.offsetParent === null;
+      setFocusedItemId(id);
       handleSelect(id);
       if (isCompactView) {
         window.requestAnimationFrame(() => {
@@ -174,11 +176,14 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     );
 
     const rovingTargetId = React.useMemo(() => {
+      if (focusedItemId && enabledItems.some((it) => it.id === focusedItemId)) {
+        return focusedItemId;
+      }
       if (currentSelectedId && enabledItems.some((it) => it.id === currentSelectedId)) {
         return currentSelectedId;
       }
       return enabledItems[0]?.id ?? null;
-    }, [enabledItems, currentSelectedId]);
+    }, [enabledItems, focusedItemId, currentSelectedId]);
 
     const handleBackToList = (restoreFocusId?: string | null) => {
       const targetId =
@@ -215,6 +220,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     const focusItemById = (id: string) => {
       const target = itemRefs.current[id];
       if (!target) return;
+      setFocusedItemId(id);
       target.focus();
       target.scrollIntoView({ block: 'nearest' });
     };
@@ -266,18 +272,22 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
         data-slot="list-detail-block"
         data-density={density}
         className={cn(
-          '@container w-full h-full min-h-120 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col @2xl:flex-row',
+          '@container w-full h-full min-h-120 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col',
           className
         )}
         {...props}
       >
+        <div
+          data-slot="list-detail-layout"
+          className="flex-1 min-h-0 w-full flex flex-col @2xl:flex-row"
+        >
         {/* List Pane */}
         <div
           ref={listPaneRef}
           data-slot="list-pane"
           className={cn(
-            'w-full flex-1 @2xl:flex-initial flex-col bg-surface @2xl:border-r border-outline-variant shrink-0 border-r-0 min-h-0',
             listWidthClassName,
+            'w-full flex-1 @2xl:flex-initial flex-col bg-surface @2xl:border-r border-outline-variant shrink-0 border-r-0 min-h-0',
             selectedItem ? 'hidden @2xl:flex' : 'flex'
           )}
         >
@@ -328,7 +338,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           </div>
 
           {/* List Items Container with Roving Arrow-Key Focus */}
-          <div className="flex-1 overflow-y-auto p-2 flex flex-col">
+          <div data-slot="list-items" className="flex-1 overflow-y-auto p-2 flex flex-col">
             {searchable && hasSearchQuery && (
               <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {filteredItems.length === 0
@@ -373,6 +383,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                       tabIndex={item.disabled ? -1 : isRovingTarget ? 0 : -1}
                       aria-disabled={item.disabled || undefined}
                       aria-selected={isSelected}
+                      onFocus={() => !item.disabled && setFocusedItemId(item.id)}
                       onClick={() => !item.disabled && handleActivateItem(item.id)}
                       onKeyDown={(e) => handleItemKeyDown(e, item)}
                     >
@@ -519,7 +530,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               )}
 
               {/* Detail Body */}
-              <div className="flex-1 p-4 @md:p-6 overflow-y-auto">
+              <div data-slot="detail-body" className="flex-1 p-4 @md:p-6 overflow-y-auto">
                 <div className="@container w-full">
                   {renderDetail ? (
                     renderDetail(selectedItem)
@@ -551,6 +562,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     );

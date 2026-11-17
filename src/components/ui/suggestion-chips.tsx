@@ -59,10 +59,68 @@ export interface SuggestionChipsListProps extends React.HTMLAttributes<HTMLDivEl
 }
 
 const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsListProps>(
-  ({ children, layout = 'wrap', className, ...props }, ref) => {
+  ({ children, layout = 'wrap', className, onKeyDown, ...props }, ref) => {
+    const listRef = React.useRef<HTMLDivElement | null>(null);
+
+    const setCombinedRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        listRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref]
+    );
+
+    // Maintain a single Tab stop across the chip list via roving tabIndex.
+    React.useEffect(() => {
+      const root = listRef.current;
+      if (!root) return;
+      const items = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-slot="suggestion-chip"]'));
+      if (items.length === 0) return;
+      const hasZero = items.some((el) => el.getAttribute('tabindex') === '0');
+      if (!hasZero) {
+        items.forEach((el, idx) => el.setAttribute('tabindex', idx === 0 ? '0' : '-1'));
+      }
+    }, [children]);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(e);
+      if (e.defaultPrevented) return;
+      const root = listRef.current;
+      if (!root) return;
+
+      const items = Array.from(
+        root.querySelectorAll<HTMLButtonElement>('[data-slot="suggestion-chip"]:not(:disabled)')
+      );
+      if (items.length <= 1) return;
+
+      const active = document.activeElement as HTMLButtonElement | null;
+      const currentIndex = active ? items.indexOf(active) : -1;
+      if (currentIndex === -1) return;
+
+      let nextIndex = -1;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        nextIndex = (currentIndex + 1) % items.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        nextIndex = (currentIndex - 1 + items.length) % items.length;
+      } else if (e.key === 'Home') {
+        nextIndex = 0;
+      } else if (e.key === 'End') {
+        nextIndex = items.length - 1;
+      }
+
+      if (nextIndex !== -1) {
+        e.preventDefault();
+        items.forEach((el, idx) => el.setAttribute('tabindex', idx === nextIndex ? '0' : '-1'));
+        items[nextIndex]?.focus();
+      }
+    };
+
     return (
       <div
-        ref={ref}
+        ref={setCombinedRef}
+        data-slot="suggestion-chips-list"
+        onKeyDown={handleKeyDown}
         className={cn(
           layout === 'wrap' && 'flex flex-wrap gap-2',
           layout === 'scroll' && 'flex overflow-x-auto gap-2 pb-1 scrollbar-none',
@@ -118,6 +176,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
     return (
       <Button
         variant="unstyled"
+        data-slot="suggestion-chip"
         onClick={handleClick}
         className={cn(
           'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
@@ -155,6 +214,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
     return (
       <Button
         variant="unstyled"
+        data-slot="suggestion-chip"
         onClick={handleClick}
         expandedTouchTarget
         className={cn(
@@ -192,6 +252,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
   return (
     <Button
       variant="unstyled"
+      data-slot="suggestion-chip"
       onClick={handleClick}
       expandedTouchTarget
       className={cn(

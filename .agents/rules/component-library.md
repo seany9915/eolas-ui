@@ -90,6 +90,11 @@ All components in Eolas UI are classified into 6 functional tiers (see `src/comp
 3. **DirectionProvider RTL Synchronization:** Mirror `dir={direction}` onto the container DOM element (`<div dir={direction}>`) alongside Base UI `<DirectionProvider>`.
 4. **Resizable Panels v4:** Use `orientation="horizontal"` and percentage strings (`defaultSize="40%"`), not `direction` or numeric sizes.
 5. **Control Height Synchrony:** Multi-control action rows (`Button`, `Input`, `InputGroup`, `Select`, `Toggle`, `ToggleGroup`, `Combobox`, `OTPField`, `Tabs`) must share identical height tiers (`sm`: 44px, `md`: 48px, `lg`: 56px).
+6. **IME Composition Guard (`isComposing` + WebKit Timing):** Any text-input `onKeyDown` handler that submits or confirms on `Enter` (`PromptInput`, `InputGroup`, `Autocomplete`, `Command`) must ignore IME composition (`!e.nativeEvent.isComposing && e.keyCode !== 229`), and ideally guard against WebKit/Safari firing `compositionend` on the same tick just before `keydown`.
+7. **Focus Recovery & Move Stability:** When an interactive list item is deleted or dismissed (`Attachment`, `Queue`, `Chip`, `DataTable` row), move focus to the next sibling, previous sibling, or container/add trigger rather than letting focus drop to `document.body`. On reorderable lists (`Sortable`, `Queue`), never use array index `key`s and preserve focus on the moved item's handle.
+8. **Single Tab-Stop Roving Focus:** Horizontal chip bars (`SuggestionChips`), action strips, and custom grids should expose a single `Tab` stop with Arrow-key navigation (prefer Base UI `<Toolbar>` or roving `tabIndex`) rather than N separate Tab stops. Never use positive `tabIndex > 0`.
+9. **Collapsed Panel Accessibility (`hidden="until-found"`):** Collapsed disclosures (`Collapsible`, `Accordion`, `Trace`, `Sources`) must use `hidden="until-found"` (with `beforematch` auto-expand) or `hidden`/`inert`—never `opacity-0` or `max-h-0` alone, which leaves hidden controls tabbable.
+10. **Keyboard Parity for Reorder & Multi-Select:** Any drag-reorderable (`Sortable`) or range-selectable list must support keyboard reordering/selection (`Space`/`Enter` + Arrow keys or explicit Move Up/Down actions) and `aria-live` status updates.
 
 ## Reference
 - Base UI docs: https://base-ui.com/react/overview/quick-start

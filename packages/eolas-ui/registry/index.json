@@ -2388,6 +2388,7 @@
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/table.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
+      "https://seany9915.github.io/eolas-ui/r/field.json",
       "https://seany9915.github.io/eolas-ui/r/input.json",
       "https://seany9915.github.io/eolas-ui/r/select.json",
       "https://seany9915.github.io/eolas-ui/r/menu.json",
@@ -2538,6 +2539,7 @@
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
+      "https://seany9915.github.io/eolas-ui/r/field.json",
       "https://seany9915.github.io/eolas-ui/r/input.json",
       "https://seany9915.github.io/eolas-ui/r/progress.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",

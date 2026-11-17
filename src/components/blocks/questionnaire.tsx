@@ -25,6 +25,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Icon } from '@/components/ui/icon';
@@ -378,6 +379,8 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
     // Answer / Values state
     const [internalValues, setInternalValues] = React.useState<Record<string, any>>(initialValues);
     const values = controlledValues !== undefined ? controlledValues : internalValues;
+    const valuesRef = React.useRef(values);
+    valuesRef.current = values;
 
     // Error state per item
     const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -396,9 +399,10 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
 
     const setAnswer = React.useCallback(
       (fieldName: string, value: any, itemName?: string) => {
-        const nextValues = { ...values, [fieldName]: value };
+        const nextValues = { ...valuesRef.current, [fieldName]: value };
+        valuesRef.current = nextValues;
         if (controlledValues === undefined) {
-          setInternalValues(nextValues);
+          setInternalValues((prev) => ({ ...prev, [fieldName]: value }));
         }
         handleValuesChange?.(nextValues);
 
@@ -406,7 +410,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
         const relatedItem = itemName || fieldName;
         setError(relatedItem, null);
       },
-      [values, controlledValues, handleValuesChange, setError]
+      [controlledValues, handleValuesChange, setError]
     );
 
     const changeActiveItem = React.useCallback(
@@ -482,8 +486,9 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
         }
       } else {
         onSkip?.(activeItem);
+        onComplete?.(valuesRef.current);
       }
-    }, [canSkip, isLast, itemNames, activeIndex, activeItem, changeActiveItem, onSkip, setError]);
+    }, [canSkip, isLast, itemNames, activeIndex, activeItem, changeActiveItem, onSkip, onComplete, setError]);
 
     const resetQuestionnaire = React.useCallback(() => {
       setErrors({});
@@ -647,12 +652,14 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           className={cn(
             '@container w-full max-w-2xl mx-auto flex flex-col',
             variant === 'card' &&
-              'bg-surface rounded-lg p-6 @md:p-8 border border-outline-variant shadow-ambient',
+              'bg-surface rounded-lg border border-outline-variant shadow-ambient',
             className
           )}
           {...props}
         >
-          {renderedChildren}
+          <div className={cn('w-full flex flex-col', variant === 'card' && 'p-6 @md:p-8')}>
+            {renderedChildren}
+          </div>
         </form>
       </QuestionnaireContext.Provider>
     );
@@ -830,16 +837,20 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       [choices, shortcuts]
     );
 
-    // Focus active item and toggle inert attribute when active state changes
+    // Focus active item on step transitions (never steal focus on initial mount) and toggle inert
+    const prevIsActiveRef = React.useRef(isActive);
     React.useEffect(() => {
       const el = fieldsetRef.current;
       if (!el) return;
       if (isActive) {
         el.removeAttribute('inert');
-        el.focus();
+        if (!prevIsActiveRef.current) {
+          el.focus();
+        }
       } else {
         el.setAttribute('inert', '');
       }
+      prevIsActiveRef.current = isActive;
     }, [isActive]);
 
     // Hidden until found support (beforematch event for browser Ctrl+F find-in-page)
@@ -1299,14 +1310,25 @@ export const QuestionnaireChoiceLabel: React.FC<QuestionnaireChoiceLabelProps> =
 }) => {
   const choiceContext = useQuestionnaireChoice();
   const desc = description ?? choiceContext?.description;
+  const isSelected = choiceContext?.isSelected ?? false;
 
   return (
     <div className={cn('flex flex-col flex-1 text-left min-w-0', className)} {...props}>
-      <span className="font-sans text-sm font-medium text-on-surface select-none leading-snug">
+      <span
+        className={cn(
+          'font-sans text-base font-medium select-none leading-snug',
+          isSelected ? 'text-on-primary-container' : 'text-on-surface'
+        )}
+      >
         {children}
       </span>
       {desc && (
-        <span className="font-sans text-xs text-on-surface-variant select-none mt-0.5 leading-normal">
+        <span
+          className={cn(
+            'font-sans text-sm select-none mt-0.5 leading-normal',
+            isSelected ? 'text-on-primary-container/90' : 'text-on-surface-variant'
+          )}
+        >
           {desc}
         </span>
       )}
@@ -1383,15 +1405,8 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
   };
 
   return (
-    <div className={cn('w-full mt-3', className)}>
-      {label && (
-        <label
-          htmlFor={inputId}
-          className="block font-sans text-xs font-medium text-on-surface-variant mb-1.5 select-none"
-        >
-          {label}
-        </label>
-      )}
+    <Field.Root className={cn('w-full mt-3', className)}>
+      {label && <Field.Label htmlFor={inputId}>{label}</Field.Label>}
       <Input
         name={fieldName}
         aria-label={label ? undefined : 'Another answer'}
@@ -1402,7 +1417,7 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
         {...props}
         id={inputId}
       />
-    </div>
+    </Field.Root>
   );
 };
 QuestionnaireInput.displayName = 'QuestionnaireInput';

@@ -182,6 +182,42 @@
       }
     },
     {
+      "name": "code-block",
+      "type": "registry:ui",
+      "title": "Code Block",
+      "description": "CodeBlock primitive. Base UI Integration: Consumes Base UI Tooltip and Button primitives. Specification & Reference: - https://ui.shadcn.com/docs/components/base/code-block - https://ui.shadcn.com/docs/ai-elements",
+      "dependencies": [
+        "@base-ui/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ui/code-block.tsx",
+          "type": "registry:ui",
+          "target": "@ui/code-block.tsx"
+        },
+        {
+          "path": "src/lib/announce.ts",
+          "type": "registry:lib",
+          "target": "@lib/announce.ts"
+        }
+      ],
+      "meta": {
+        "taxonomy": [
+          "Displays source code, JSON parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
+          "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
+          "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
+        ]
+      }
+    },
+    {
       "name": "otp-field",
       "type": "registry:ui",
       "title": "Otp Field",

@@ -83,13 +83,17 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
     const paneId = React.useId();
     const supportingHeadingId = React.useId();
     const asideRef = React.useRef<HTMLElement | null>(null);
+    const toggleButtonRef = React.useRef<HTMLButtonElement | null>(null);
     const isControlled = controlledOpen !== undefined;
     const isOpen = isControlled ? controlledOpen : uncontrolledOpen;
 
     React.useEffect(() => {
-      if (asideRef.current) {
-        asideRef.current.inert = !isOpen;
+      const aside = asideRef.current;
+      if (!aside) return;
+      if (!isOpen && aside.contains(document.activeElement)) {
+        toggleButtonRef.current?.focus();
       }
+      aside.inert = !isOpen;
     }, [isOpen]);
 
     const updateOpen = (next: boolean) => {
@@ -138,10 +142,10 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
           side === 'left' && '@3xl:order-first',
           isOpen
             ? cn(
+                paneWidthClassName,
                 // Compact (<768px) stacked panel caps height so primary canvas remains usable
                 'w-full h-auto max-h-[45vh] @3xl:max-h-none border-t border-outline-variant opacity-100',
                 // Wide (@3xl+) full-height side panel
-                paneWidthClassName,
                 '@3xl:h-full @3xl:border-t-0',
                 side === 'left'
                   ? '@3xl:border-e @3xl:border-outline-variant'
@@ -211,6 +215,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
           <div className="flex items-center gap-2 shrink-0">
             {actions}
             <Button
+              ref={toggleButtonRef}
               variant={isOpen ? 'soft' : 'outline'}
               colorRole={isOpen ? 'primary' : 'neutral'}
               size="sm"

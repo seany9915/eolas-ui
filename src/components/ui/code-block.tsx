@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
 import { Tooltip } from './tooltip';
+import { announce } from '@/lib/announce';
 import { cn } from '@/lib/utils';
 
 /* -------------------------------------------------------------------------------------------------
@@ -161,6 +162,7 @@ export const CodeBlockCopyButton: React.FC<CodeBlockCopyButtonProps> = ({
       return;
     }
     setCopied(true);
+    announce(copiedLabel);
     setTimeout(() => setCopied(false), 2000);
   };
 

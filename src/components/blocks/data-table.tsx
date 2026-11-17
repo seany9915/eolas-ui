@@ -60,6 +60,7 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Menu } from '@/components/ui/menu';
@@ -448,9 +449,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                   )}
                   <span>{option.label}</span>
                 </div>
-                {facets?.get(option.value) && (
+                {(facets?.get(option.value) ?? 0) > 0 && (
                   <span className="font-mono text-xs text-on-surface-variant tabular-nums">
-                    {facets.get(option.value)}
+                    {facets?.get(option.value)}
                   </span>
                 )}
               </div>
@@ -606,10 +607,13 @@ export function DataTablePagination<TData>({
         </div>
       )}
       <div className="flex flex-wrap items-center gap-4 @lg:gap-8 ml-auto">
-        <div className="flex items-center gap-2">
-          <label htmlFor={pageSizeId} className="font-sans text-xs text-on-surface-variant select-none">
+        <Field.Root className="flex-row items-center gap-2 w-auto">
+          <Field.Label
+            htmlFor={pageSizeId}
+            className="font-sans text-xs font-normal text-on-surface-variant whitespace-nowrap"
+          >
             Rows per page
-          </label>
+          </Field.Label>
           <Select
             id={pageSizeId}
             options={pageSizeOptions.map((size) => ({
@@ -622,7 +626,7 @@ export function DataTablePagination<TData>({
             }}
             size="sm"
           />
-        </div>
+        </Field.Root>
         <div className="flex items-center justify-center font-sans text-xs text-on-surface font-medium min-w-24 select-none">
           Page {table.getState().pagination.pageIndex + 1} of{' '}
           {Math.max(1, table.getPageCount())}
@@ -907,13 +911,7 @@ export function DataTable<TData, TValue>({
         </DataTableToolbar>
       )}
 
-      <div
-        className={cn(
-          'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface shadow-ambient',
-          containerClassName
-        )}
-      >
-        <Table>
+      <Table containerClassName={cn('shadow-ambient', containerClassName)}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -959,7 +957,7 @@ export function DataTable<TData, TValue>({
                   className="text-center"
                 >
                   <div className="h-32 flex items-center justify-center gap-2 text-on-surface-variant font-sans text-sm">
-                    <span className="inline-flex animate-spin">
+                    <span className="inline-flex animate-spin motion-reduce:animate-none">
                       <Icon
                         name="progress_activity"
                         size="sm"
@@ -1041,7 +1039,6 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
 
       {showPagination && (
         <DataTablePagination

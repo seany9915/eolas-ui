@@ -250,7 +250,14 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
               )}
             >
               {showSidebar && collapsible !== 'none' && (
-                <div className={cn(!shouldShowMobileTrigger && 'hidden sm:block short:block')}>
+                <div
+                  className={cn(
+                    !shouldShowMobileTrigger &&
+                      (embedded
+                        ? sizeClass === 'mobile' && 'hidden short:block'
+                        : 'hidden sm:block short:block')
+                  )}
+                >
                   <Sidebar.Trigger />
                 </div>
               )}
@@ -293,13 +300,17 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           <main
             id="main-content"
             data-slot="app-shell-main"
-            className={cn(
-              '@container flex-1 flex flex-col min-h-0 overflow-y-auto p-4 @md:p-6',
-              // Safe bottom padding on mobile over the fixed navigation bar
-              destinations.length > 0 && (embedded ? 'pb-4' : 'pb-28 sm:pb-6 short:pb-6')
-            )}
+            className="@container flex-1 flex flex-col min-h-0 overflow-y-auto"
           >
-            {children}
+            <div
+              className={cn(
+                'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
+                // Safe bottom padding on mobile over the fixed navigation bar
+                destinations.length > 0 && (embedded ? 'pb-4' : 'pb-28 sm:pb-6 short:pb-6')
+              )}
+            >
+              {children}
+            </div>
           </main>
 
           {/* Mobile Bottom Navigation Bar (Hidden on >=640px and on compact height) */}

@@ -56,6 +56,10 @@ export interface ThinkingOrbProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: 'auto' | 'light' | 'dark';
   /** Optional color tint (#rgb, #rrggbb, rgb()) */
   color?: string;
+  /** Density multiplier for dot/strand/node counts (e.g. 0.5 halves, 2 doubles). Defaults to 1. */
+  dots?: number;
+  /** Radius multiplier for each dot. Defaults to 1.25 for crisp legibility on light surfaces. */
+  dotSize?: number;
   /** Freeze animation on current frame */
   paused?: boolean;
   /** Multiplier for animation speed */
@@ -80,6 +84,8 @@ export const ThinkingOrb = React.forwardRef<HTMLDivElement, ThinkingOrbProps>(
       statusText,
       theme = 'auto',
       color,
+      dots,
+      dotSize = 1.25,
       paused: explicitPaused,
       speed = 1,
       respectReducedMotion: _respectReducedMotion,
@@ -111,6 +117,8 @@ export const ThinkingOrb = React.forwardRef<HTMLDivElement, ThinkingOrbProps>(
           size={pixelSize}
           theme={theme}
           color={color}
+          dots={dots}
+          dotSize={dotSize}
           paused={isPaused}
           speed={isPaused ? 0 : speed}
           aria-hidden="true"

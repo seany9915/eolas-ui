@@ -125,7 +125,11 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
     const safeIndex = totalSteps > 0 ? Math.min(Math.max(0, currentStepIndex), totalSteps - 1) : 0;
 
     const prevStepRef = React.useRef(safeIndex);
-    const direction = safeIndex >= prevStepRef.current ? 'forward' : 'backward';
+    const directionRef = React.useRef<'forward' | 'backward'>('forward');
+    if (safeIndex !== prevStepRef.current) {
+      directionRef.current = safeIndex > prevStepRef.current ? 'forward' : 'backward';
+    }
+    const direction = directionRef.current;
 
     React.useEffect(() => {
       prevStepRef.current = safeIndex;
@@ -158,7 +162,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
         {/* Step Wizard Header / Navigation Indicator */}
         <Card.Header>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0" aria-live="polite" aria-atomic="true">
               <span className="font-mono text-xs font-semibold text-primary tabular-nums">
                 Step {safeIndex + 1} of {totalSteps}
               </span>
@@ -185,7 +189,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                     >
                       <span
                         className={cn(
-                          'size-7 rounded-full flex items-center justify-center font-mono text-xs font-bold tabular-nums transition-colors duration-quick ease-standard select-none',
+                          'size-7 rounded-full flex items-center justify-center font-mono text-xs font-bold tabular-nums transition-colors duration-quick ease-standard motion-reduce:transition-none select-none',
                           isSelected
                             ? 'bg-primary text-on-primary shadow-ambient'
                             : isPast
@@ -224,10 +228,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
         <Separator className="mt-4 mb-0" />
 
         {/* Directional Sliding Step Viewport */}
-        <Card.Content
-          className="relative min-h-50 pt-4 pb-1 overflow-x-clip"
-          aria-live="polite"
-        >
+        <Card.Content className="relative min-h-50 pt-4 pb-1 overflow-x-clip">
           {hiddenUntilFound ? (
             steps.map((s, idx) => (
               <StepPanel

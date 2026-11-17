@@ -22,18 +22,53 @@ import { ComponentDemoProps } from '../types';
 
 export const ThinkingOrbDemo: React.FC<ComponentDemoProps> = () => {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-8 py-8">
-      <div className="flex flex-col items-center gap-2">
-        <ThinkingOrb state="working" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Working</span>
+    <div className="flex flex-col items-center gap-8 py-8">
+      {/* States (new default dotSize = 1.25) */}
+      <div className="flex flex-wrap items-center justify-center gap-8">
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="md" />
+          <span className="font-mono text-xs text-on-surface-variant">Working</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="searching" size="md" />
+          <span className="font-mono text-xs text-on-surface-variant">Searching Library</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="solving" size="md" />
+          <span className="font-mono text-xs text-on-surface-variant">Analyzing Audio</span>
+        </div>
       </div>
-      <div className="flex flex-col items-center gap-2">
-        <ThinkingOrb state="searching" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Searching Library</span>
+
+      {/* Sizes: sm (20px), md (32px), lg (64px) */}
+      <div className="flex flex-wrap items-end justify-center gap-8">
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="sm" />
+          <span className="font-mono text-xs text-on-surface-variant">Small (20px)</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="md" />
+          <span className="font-mono text-xs text-on-surface-variant">Medium (32px)</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="lg" />
+          <span className="font-mono text-xs text-on-surface-variant">Large (64px)</span>
+        </div>
       </div>
-      <div className="flex flex-col items-center gap-2">
-        <ThinkingOrb state="solving" size="md" />
-        <span className="font-mono text-xs text-on-surface-variant">Analyzing Audio</span>
+
+      {/* Visibility comparison: original dotSize vs new default vs primary tint */}
+      <div className="flex flex-wrap items-center justify-center gap-8">
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="md" dotSize={1} />
+          <span className="font-mono text-xs text-on-surface-variant">Original (1x)</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="md" dotSize={1.25} />
+          <span className="font-mono text-xs text-on-surface-variant">Default (1.25x)</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <ThinkingOrb state="working" size="md" color="#0052FF" />
+          <span className="font-mono text-xs text-on-surface-variant">Primary blue</span>
+        </div>
       </div>
     </div>
   );

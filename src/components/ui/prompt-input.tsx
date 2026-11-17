@@ -161,6 +161,10 @@ export interface PromptInputTextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onSubmit'> {
   onSubmit?: () => void;
   onFilesPasted?: (files: File[]) => void;
+  /** Optional list of previously submitted prompts (oldest-to-newest) for ArrowUp/ArrowDown history navigation. */
+  history?: string[];
+  /** Callback invoked when the user steps through prompt history via ArrowUp/ArrowDown. */
+  onHistoryChange?: (value: string) => void;
   minRows?: number;
   maxHeight?: number | string;
 }
@@ -170,14 +174,76 @@ export interface PromptInputTextareaProps
  * suppressing standalone borders to prevent double-border artifacts inside the PromptInput container.
  */
 const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTextareaProps>(
-  ({ className, onSubmit, onFilesPasted, onKeyDown, onPaste, minRows = 3, maxHeight = '12rem', ...props }, ref) => {
+  (
+    {
+      className,
+      onSubmit,
+      onFilesPasted,
+      history,
+      onHistoryChange,
+      onKeyDown,
+      onCompositionEnd,
+      onPaste,
+      minRows = 3,
+      maxHeight = '12rem',
+      enterKeyHint,
+      ...props
+    },
+    ref
+  ) => {
     const generatedId = React.useId();
+    const lastCompositionEndRef = React.useRef<number>(0);
+    const historyIndexRef = React.useRef<number>(-1);
+    const draftBeforeHistoryRef = React.useRef<string>('');
+
+    const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
+      // WebKit/Safari can fire compositionend on the same tick before the confirming Enter keydown.
+      lastCompositionEndRef.current = performance.now();
+      onCompositionEnd?.(e);
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       onKeyDown?.(e);
-      // Respect IME composition: do not submit while selecting characters in Asian input methods
-      if (onSubmit && !e.defaultPrevented && e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+      if (e.defaultPrevented) return;
+
+      const isImeComposing =
+        e.nativeEvent.isComposing ||
+        e.keyCode === 229 ||
+        performance.now() - lastCompositionEndRef.current < 50;
+
+      if (onSubmit && e.key === 'Enter' && !e.shiftKey && !isImeComposing) {
         e.preventDefault();
+        historyIndexRef.current = -1;
         onSubmit();
+        return;
+      }
+
+      if (history && history.length > 0 && onHistoryChange && !isImeComposing) {
+        const target = e.currentTarget;
+        const atStart = target.selectionStart === 0 && target.selectionEnd === 0;
+        const atEnd =
+          target.selectionStart === target.value.length &&
+          target.selectionEnd === target.value.length;
+
+        if (e.key === 'ArrowUp' && (target.value === '' || atStart || historyIndexRef.current >= 0)) {
+          e.preventDefault();
+          if (historyIndexRef.current === -1) {
+            draftBeforeHistoryRef.current = target.value;
+            historyIndexRef.current = history.length - 1;
+          } else if (historyIndexRef.current > 0) {
+            historyIndexRef.current -= 1;
+          }
+          onHistoryChange(history[historyIndexRef.current] ?? '');
+        } else if (e.key === 'ArrowDown' && historyIndexRef.current >= 0 && (atEnd || target.value === history[historyIndexRef.current])) {
+          e.preventDefault();
+          if (historyIndexRef.current < history.length - 1) {
+            historyIndexRef.current += 1;
+            onHistoryChange(history[historyIndexRef.current] ?? '');
+          } else {
+            historyIndexRef.current = -1;
+            onHistoryChange(draftBeforeHistoryRef.current);
+          }
+        }
       }
     };
 
@@ -198,7 +264,9 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
         variant="unstyled"
         rows={minRows}
         autoGrow={true}
+        enterKeyHint={enterKeyHint ?? (onSubmit ? 'send' : undefined)}
         onKeyDown={handleKeyDown}
+        onCompositionEnd={handleCompositionEnd}
         onPaste={handlePaste}
         className={cn(
           'w-full bg-transparent px-1.5 py-1 text-base font-sans text-on-surface leading-relaxed',

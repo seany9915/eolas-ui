@@ -1,6 +1,94 @@
 import { plugin as shadcn } from "@shadcn/lint";
 
 /**
+ * Lightweight local AST plugin for Eolas UI behavior & accessibility guardrails.
+ */
+const eolasBehaviorsPlugin = {
+  rules: {
+    "no-positive-tabindex": {
+      meta: {
+        type: "problem",
+        docs: { description: "Disallow positive tabIndex values that break natural focus order and roving focus." },
+        schema: [],
+      },
+      create(context) {
+        return {
+          JSXAttribute(node) {
+            if (node.name?.name !== "tabIndex" || !node.value) return;
+            const raw =
+              node.value.type === "Literal"
+                ? Number(node.value.value)
+                : node.value.type === "JSXExpressionContainer" && node.value.expression.type === "Literal"
+                  ? Number(node.value.expression.value)
+                  : NaN;
+            if (!Number.isNaN(raw) && raw > 0) {
+              context.report({
+                node,
+                message: "Avoid positive tabIndex (> 0). Use 0, -1 (roving focus), or natural DOM order.",
+              });
+            }
+          },
+        };
+      },
+    },
+    "require-iscomposing-on-enter": {
+      meta: {
+        type: "problem",
+        docs: { description: "Require isComposing guard in text-input Enter key handlers so IME/dictation does not prematurely submit." },
+        schema: [],
+      },
+      create(context) {
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        return {
+          JSXAttribute(node) {
+            if (node.name?.name !== "onKeyDown" || !node.value?.expression) return;
+            const text = sourceCode.getText(node.value.expression);
+            const checksEnter = /\.key\s*===\s*['"]Enter['"]/.test(text);
+            const checksSpace = /\.key\s*===\s*['"]\s['"]/.test(text);
+            const checksComposing = /isComposing/.test(text);
+            if (checksEnter && !checksSpace && !checksComposing) {
+              context.report({
+                node,
+                message:
+                  "Enter key handler in onKeyDown must guard against IME composition (e.g. !e.nativeEvent.isComposing).",
+              });
+            }
+          },
+        };
+      },
+    },
+    "no-static-clickable-elements": {
+      meta: {
+        type: "problem",
+        docs: { description: "Require role and keyboard handler when attaching onClick to div, span, or li outside primitives." },
+        schema: [],
+      },
+      create(context) {
+        return {
+          JSXOpeningElement(node) {
+            const tagName = node.name?.name;
+            if (tagName !== "div" && tagName !== "span" && tagName !== "li") return;
+            const attrs = node.attributes || [];
+            const hasOnClick = attrs.some((a) => a.type === "JSXAttribute" && a.name?.name === "onClick");
+            if (!hasOnClick) return;
+            const hasRole = attrs.some((a) => a.type === "JSXAttribute" && a.name?.name === "role");
+            const hasKeyHandler = attrs.some(
+              (a) => a.type === "JSXAttribute" && (a.name?.name === "onKeyDown" || a.name?.name === "onKeyUp"),
+            );
+            if (!hasRole || !hasKeyHandler) {
+              context.report({
+                node,
+                message: `Clickable <${tagName}> must use <Button> / a Base UI primitive, or include both role and onKeyDown.`,
+              });
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
+/**
  * Pre-configured @shadcn/lint configuration preset for Eolas UI.
  * Enforces semantic token usage and Base UI component contracts for AI coding agents and human developers.
  */
@@ -8,8 +96,12 @@ export const eolasLintPreset = [
   {
     plugins: {
       shadcn,
+      eolas: eolasBehaviorsPlugin,
     },
     rules: {
+      "eolas/no-positive-tabindex": "error",
+      "eolas/require-iscomposing-on-enter": "error",
+      "eolas/no-static-clickable-elements": "error",
       // 1. Strict semantic tokens: scan all strings to catch palette colors in helper functions/objects
       "shadcn/no-raw-colors": [
         "error",
@@ -214,6 +306,7 @@ export const eolasLintPreset = [
       "shadcn/require-static-classes": "off",
       "shadcn/no-raw-colors": ["error", { scanAllStrings: false }],
       "no-restricted-syntax": "off",
+      "eolas/no-static-clickable-elements": "off",
     },
   },
 ];
