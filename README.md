@@ -39,38 +39,38 @@ AI coding agents (Cursor, Claude Code, Antigravity, Copilot) often erode design 
 Eolas UI provides pre-configured `@shadcn/lint` rules to enforce design tokens and component contracts with near-100% 1-shot agent self-correction:
 
 ```bash
-npm install -D @shadcn/lint eslint @typescript-eslint/parser
+npm install -D @shadcn/lint oxlint
 ```
 
-In your project's `eslint.config.mjs`:
-```javascript
-import eolasLint from "@seany9915/eolas-ui/lint";
-
-export default [
-  ...eolasLint,
-];
+In your project's `.oxlintrc.json`:
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/@seany9915/eolas-ui/lint/oxlintrc.json"]
+}
 ```
 
-If you are consuming via the URL registry without `@seany9915/eolas-ui`, configure `@shadcn/lint` in `eslint.config.mjs`:
-```javascript
-import { plugin as shadcn } from "@shadcn/lint";
+Or install the standalone `.oxlintrc.json` and `lint/index.js` directly via the registry:
+```bash
+npx shadcn add @eolas/lint
+```
 
-export default [
-  {
-    plugins: { shadcn },
-    rules: {
-      "shadcn/no-raw-colors": "error",
-      "shadcn/no-arbitrary-values": "error",
-      "shadcn/no-restyle": ["error", {
-        allow: ["layout"],
-        contracts: [
-          { pattern: "^Button$", allow: ["w-full", "mt-*", "mb-*", "mx-*", "my-*", "shrink-*", "self-*"] },
-          { pattern: "^Chip$", allow: ["layout"], deny: ["bg-*", "text-*", "border-*"] },
-        ]
-      }],
-    },
-  },
-];
+If you are consuming via the URL registry without `@eolas/lint`, configure `@shadcn/lint` in `.oxlintrc.json`:
+```json
+{
+  "jsPlugins": ["@shadcn/lint"],
+  "rules": {
+    "shadcn/no-raw-colors": "error",
+    "shadcn/no-arbitrary-values": "error",
+    "shadcn/no-restyle": ["error", {
+      "allow": ["layout"],
+      "contracts": [
+        { "pattern": "^Button$", "allow": ["w-full", "mt-*", "mb-*", "mx-*", "my-*", "shrink-*", "self-*"] },
+        { "pattern": "^Chip$", "allow": ["layout"], "deny": ["bg-*", "text-*", "border-*"] }
+      ]
+    }]
+  }
+}
 ```
 
 ---

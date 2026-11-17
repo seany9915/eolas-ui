@@ -34,7 +34,7 @@ function main(input) {
     return respond({ decision: 'allow' });
   }
   // Don't scan the files where real hex codes / raw CSS values are meant to live or rule messages are defined.
-  if (/globals\.css$|design\.md$|tailwind\.config\.(js|ts|cjs|mjs)$|eslint\.config\.(js|ts|cjs|mjs)$|[\\/]lint[\\/]index\.js$/i.test(targetFile)) {
+  if (/globals\.css$|design\.md$|tailwind\.config\.(js|ts|cjs|mjs)$|oxlint\.config\.(js|ts|mjs|mts)$|\.oxlintrc\.json$|[\\/]lint[\\/]index\.js$/i.test(targetFile)) {
     return respond({ decision: 'allow' });
   }
 

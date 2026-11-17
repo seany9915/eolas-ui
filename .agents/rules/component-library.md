@@ -27,7 +27,7 @@ This project standardizes on **Base UI** (`@base-ui/react`) as its headless prim
 ### Card Anatomy & Pragmatic `<div>`s
 - Informational cards must use `<Card.Header>`, `<Card.Title>`, `<Card.Description>`, `<Card.Action>`, `<Card.Content>`, and `<Card.Footer>` (pure visual/media canvases exempt).
 - Standard layout `<div className="flex flex-col gap-4">` / `<div className="grid ...">` containers are encouraged (never create `<Box>`, `<Flex>`, `<Spacer>`).
-- Direct `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` tags outside `src/components/ui/` are banned (ESLint `no-restricted-syntax`). Use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">`.
+- Direct `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` tags outside `src/components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">`.
 
 ## Primitive-Check-First Workflow (Mandatory)
 - **Button `colorRole` vs `variant`:** `Button` decouples emphasis (`variant="filled" | "outline" | "soft" | "text"`) from M3 color role (`colorRole`); Emerald (`#00796B`) requires an explicit `colorRole="secondary"`, while secondary exit actions ("Cancel", "Back") use `colorRole="neutral"`.

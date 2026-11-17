@@ -138,7 +138,6 @@ function addComponents(componentNames, overwrite = false) {
         destPath = path.resolve(cwd, alias, file.target.slice(7));
       } else {
         const isRootFile =
-          file.target.startsWith('eslint.') ||
           file.target.startsWith('lint/') ||
           file.target.startsWith('.');
 

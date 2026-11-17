@@ -1,0 +1,155 @@
+{
+  "jsPlugins": [
+    "@shadcn/lint",
+    "./index.js"
+  ],
+  "rules": {
+    "eolas/no-positive-tabindex": "error",
+    "eolas/require-iscomposing-on-enter": "error",
+    "eolas/no-static-clickable-elements": "error",
+    "eolas/no-raw-html-controls": "error",
+    "eolas/no-radix-imports": "error",
+    "shadcn/no-raw-colors": [
+      "error",
+      {
+        "scanAllStrings": true
+      }
+    ],
+    "shadcn/no-arbitrary-values": [
+      "error",
+      {
+        "scanAllStrings": true
+      }
+    ],
+    "shadcn/no-inline-styles": [
+      "error",
+      {
+        "message": "Inline styles are forbidden. Use Tailwind classes with Eolas design tokens."
+      }
+    ],
+    "shadcn/no-unknown-classes": "error",
+    "shadcn/require-static-classes": "error",
+    "shadcn/no-restyle": [
+      "error",
+      {
+        "allow": ["layout"],
+        "contracts": [
+          {
+            "pattern": "^Button$",
+            "allow": ["w-full", "mt-*", "mb-*", "mx-*", "my-*", "shrink-*", "self-*", "whitespace-nowrap"],
+            "deny": [
+              "p-*",
+              "px-*",
+              "py-*",
+              "h-*",
+              "min-h-*",
+              "bg-*",
+              "text-*",
+              "rounded-*",
+              "border-*",
+              "uppercase",
+              "outline-offset-0",
+              "transition-all"
+            ],
+            "message": {
+              "spacing": "Button controls its own padding and touch floors (44px min). Use size='sm'|'md'|'lg'|'icon', or apply margin/parent gap.",
+              "color": "Button controls its own colors to guarantee WCAG AA contrast. Use variant='filled'|'soft'|'outline'|'text' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'.",
+              "shape": "Button enforces standard design-system border radius. Do not override rounded-*.",
+              "typography": "All-caps styling (uppercase) is strictly banned on buttons per DESIGN.md.",
+              "motion": "Blanket transition-all is banned. Button manages its own targeted transitions."
+            }
+          },
+          {
+            "pattern": "^(Badge|Chip)$",
+            "allow": ["layout"],
+            "deny": ["bg-*", "text-*", "border-*", "rounded-*", "uppercase"],
+            "message": {
+              "default": "Badge/Chip enforces high-contrast clinical status rules. Use variant='filled'|'soft'|'outline' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'. Do not apply ad-hoc background/border color overrides (triple-tint anti-pattern).",
+              "typography": "All-caps styling (uppercase) is strictly banned on chips/badges per DESIGN.md."
+            }
+          },
+          {
+            "pattern": "^Card$",
+            "allow": ["layout", "w-*", "max-w-*"],
+            "deny": ["bg-*", "rounded-*", "border-*", "shadow-*", "transition-all"],
+            "message": "Card defines clinical elevation and containment. Use CardHeader, CardContent, and CardFooter. Never nest cards inside cards, and never use transition-all (use explicit targeted transitions)."
+          },
+          {
+            "pattern": "^InlineAlert$",
+            "allow": ["layout", "w-*"],
+            "deny": ["rounded-*"],
+            "message": "InlineAlert must maintain standard rectangular shape with solid 4px accent bar. Do not apply rounded-*."
+          },
+          {
+            "pattern": "^Toast$",
+            "allow": ["layout", "w-*"],
+            "deny": ["rounded-*"],
+            "message": "Toast must maintain standard flat rectangular shape (rounded-none) and 44x44px dismiss button. Do not apply rounded-*."
+          },
+          {
+            "pattern": "^(Tabs|TabsList|TabsTrigger|Tabs\\.List|Tabs\\.Trigger)$",
+            "allow": ["layout", "w-*"],
+            "deny": ["bg-*", "uppercase"],
+            "message": "Tabs manage their own selection wash and active borders. Do not override backgrounds or apply uppercase styling."
+          },
+          {
+            "pattern": "^(Input|Field|Textarea)$",
+            "allow": ["layout", "w-*"],
+            "deny": ["h-*", "min-h-*"],
+            "message": "Inputs own their touch floors (44px/48px standard). Do not override height dimensions directly."
+          },
+          {
+            "pattern": "^(Dialog|AlertDialog|Drawer|Sheet|Dialog\\.Popup|AlertDialog\\.Popup|Drawer\\.Popup|Sheet\\.Popup)$",
+            "allow": ["layout"],
+            "deny": ["bg-*", "rounded-*"],
+            "message": "Modal overlays must maintain standard surface styling, focus traps, and backdrop filters defined by Eolas UI."
+          },
+          {
+            "pattern": "^(Skeleton|SkeletonReveal|Skeleton\\.Reveal)$",
+            "allow": ["layout", "shape"],
+            "message": "Skeleton loaders support layout dimensions (w-*, h-*) and shapes (rounded, rounded-full) to mirror target components."
+          },
+          {
+            "pattern": "^(TextSwap|NotificationBadge|TextsReveal|NumberRoll|NumberPopIn|SpinningCounter|ShimmerText|ErrorShake|SuccessCheck)$",
+            "allow": ["layout"],
+            "message": "Shared motion primitives manage their own transitions and reduced-motion fallbacks per DESIGN.md."
+          },
+          {
+            "pattern": "^(CardContent|Card\\.Content)$",
+            "allow": ["layout", "spacing"],
+            "message": "CardContent permits internal spacing adjustments (e.g. p-0 for full-bleed media or custom padding)."
+          },
+          {
+            "pattern": "^(TableCell|TableHead|Table\\.Cell|Table\\.Head)$",
+            "allow": ["layout", "typography"],
+            "deny": ["uppercase"],
+            "message": "Table cells permit text alignment (text-right, text-center) and tabular numbers. All-caps styling (uppercase) is prohibited."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/components/ui/**",
+        "**/src/components/ui/**",
+        "**/components/blocks/**",
+        "**/src/components/blocks/**",
+        "**/playground/**",
+        "**/showcase/**",
+        "**/*Showcase*/**",
+        "**/*Showcase.tsx"
+      ],
+      "rules": {
+        "shadcn/no-restyle": "off",
+        "shadcn/no-arbitrary-values": "off",
+        "shadcn/no-inline-styles": "off",
+        "shadcn/require-static-classes": "off",
+        "shadcn/no-raw-colors": ["error", { "scanAllStrings": false }],
+        "eolas/no-raw-html-controls": "off",
+        "eolas/no-static-clickable-elements": "off"
+      }
+    }
+  ]
+}

@@ -37,17 +37,20 @@ npm install @base-ui/react clsx tailwind-merge
 Prevent AI coding agents and human developers from eroding design tokens, overriding touch target floors (44px min), or introducing anti-patterns:
 
 ```bash
-npm install -D @shadcn/lint eslint @typescript-eslint/parser
+npm install -D @shadcn/lint oxlint
 ```
 
-In your project's `eslint.config.mjs`:
-```javascript
-import eolasLint from "@seany9915/eolas-ui/lint";
+In your project's `.oxlintrc.json`:
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/@seany9915/eolas-ui/lint/oxlintrc.json"]
+}
+```
 
-export default [
-  ...eolasLint,
-  // Your other ESLint configs...
-];
+Or install the config and plugin directly with the CLI:
+```bash
+npx @seany9915/eolas-ui add lint
 ```
 
 This preset automatically enforces:

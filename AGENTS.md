@@ -9,7 +9,7 @@
    - **Primitives (`src/components/ui/`):** Pure Base UI wrappers, tokens, and controlled AI primitives (`PromptInput`, `ChatMessage`, `MessageScroller`, `ModelSelector`, `Trace`, `Tool`). Zero network/DB/auth logic; never import from `blocks` or `features`.
    - **Composite Blocks (`src/components/blocks/`):** Controlled UI compositions built from `ui/` and tokens (props/callbacks only; zero network/auth coupling). Never import from `features/` or `views/`.
    - **Feature Views (`src/features/` or `src/views/`):** Owns state, queries, auth, and routing.
-   - **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `components/ui/` are banned (ESLint `no-restricted-syntax`). Use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">`.
+   - **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">`.
 3. **API preservation:** Never erode component APIs, strip `ref` / `render` props, drop compound subcomponents, or downgrade primitives to `<div>`/`<button>`.
 4. **Always-on guardrails (see `.agents/rules/anti-patterns.md`):**
    - No triple-tint chips; use `*-container` + ultra-dark `on-*-container` on pills, `#1a1c1e` on callouts/cards.

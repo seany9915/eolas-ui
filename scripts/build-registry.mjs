@@ -248,47 +248,27 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
 
 // Eolas Lint preset item (lint.json)
 const LINT_INDEX = path.resolve('packages/eolas-ui/lint/index.js');
-if (fs.existsSync(LINT_INDEX)) {
+const LINT_OXLINT_CONFIG = path.resolve('packages/eolas-ui/lint/oxlintrc.json');
+if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
   const lintContent = fs.readFileSync(LINT_INDEX, 'utf8');
-  const eslintConfigContent = `import tsParser from "@typescript-eslint/parser";
-import { eolasLintPreset } from "./lint/index.js";
-
-export default [
-  {
-    files: ["**/*.{ts,tsx,js,jsx}"],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
-  },
-  ...eolasLintPreset,
-  {
-    ignores: [
-      "dist/**",
-      "public/**",
-      "node_modules/**",
-      ".agents/**",
-    ],
-  },
-];
-`;
+  const baseConfig = JSON.parse(fs.readFileSync(LINT_OXLINT_CONFIG, 'utf8'));
+  const oxlintConfig = {
+    $schema: './node_modules/oxlint/configuration_schema.json',
+    ...baseConfig,
+    jsPlugins: (baseConfig.jsPlugins ?? []).map((entry) => (entry === './index.js' ? './lint/index.js' : entry)),
+    ignorePatterns: ['dist/**', 'public/**', 'node_modules/**', '.agents/**'],
+  };
+  const oxlintConfigContent = `${JSON.stringify(oxlintConfig, null, 2)}\n`;
 
   const lintItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: 'lint',
     type: 'registry:file',
     title: 'Eolas UI Lint',
-    description: '@shadcn/lint preset and ESLint config for Eolas UI Base UI design contracts',
+    description: '@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts',
     devDependencies: [
       '@shadcn/lint',
-      'eslint',
-      '@typescript-eslint/parser',
+      'oxlint',
     ],
     files: [
       {
@@ -298,10 +278,10 @@ export default [
         target: '~/lint/index.js',
       },
       {
-        path: 'eslint.config.mjs',
-        content: eslintConfigContent,
+        path: '.oxlintrc.json',
+        content: oxlintConfigContent,
         type: 'registry:file',
-        target: '~/eslint.config.mjs',
+        target: '~/.oxlintrc.json',
       },
     ],
   };

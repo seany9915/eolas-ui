@@ -1,6 +1,6 @@
 {
   "name": "@seany9915/eolas-ui",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Eolas UI CLI - Private Base UI design system component distributor",
   "type": "module",
   "bin": {
@@ -12,7 +12,8 @@
     "lint"
   ],
   "exports": {
-    "./lint": "./lint/index.js"
+    "./lint": "./lint/index.js",
+    "./oxlintrc": "./lint/oxlintrc.json"
   },
   "dependencies": {
     "@shadcn/lint": "^0.2.0"

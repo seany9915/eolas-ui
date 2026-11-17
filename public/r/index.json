@@ -32,11 +32,10 @@
     "name": "lint",
     "type": "registry:file",
     "title": "Eolas UI Lint",
-    "description": "@shadcn/lint preset and ESLint config for Eolas UI Base UI design contracts",
+    "description": "@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts",
     "devDependencies": [
       "@shadcn/lint",
-      "eslint",
-      "@typescript-eslint/parser"
+      "oxlint"
     ]
   },
   {

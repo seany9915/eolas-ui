@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./packages/eolas-ui/lint/oxlintrc.json"],
+  "ignorePatterns": [
+    "dist/**",
+    "public/**",
+    "node_modules/**",
+    "scratch/**",
+    ".agents/**",
+    "packages/eolas-ui/registry/**",
+    "docs/skills-archive/**"
+  ]
+}

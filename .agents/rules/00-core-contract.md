@@ -13,7 +13,7 @@ description: Core workspace contract — Base UI architecture, 3-layer separatio
 1. **Primitives (`src/components/ui/`):** Pure Base UI wrappers, design tokens, and controlled AI primitives (`PromptInput`, `ChatMessage`, `MessageScroller`, `ModelSelector`, `Trace`, `Tool`). Zero network/DB/auth logic; never import from `blocks` or `features`.
 2. **Composite Blocks (`src/components/blocks/`):** Pure controlled UI assemblies built from `ui/` and tokens (props in, callbacks out; zero network/auth coupling). Never import from `features/` or `views/`.
 3. **Feature Views (`src/features/` or `src/views/`):** Owns state, queries, auth, and routing; composes `blocks/` and `ui/`.
-- **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `src/components/ui/` are banned (ESLint `no-restricted-syntax`). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">` from `@/components/ui/`.
+- **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `src/components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">` from `@/components/ui/`.
 - **Pre-Creation Workflow:** Inventory `src/components/ui/` and `src/components/blocks/` first → reuse or extend with props → only build new in `ui/` or `blocks/` if nothing fits.
 
 ## 3. API Preservation

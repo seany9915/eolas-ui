@@ -1,7 +1,7 @@
 {
   "name": "component-prototyping",
   "private": true,
-  "version": "3.3.0",
+  "version": "3.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,7 @@
     "build:registry": "node scripts/build-registry.mjs && node scripts/generate-manifest.mjs",
     "registry:validate": "node scripts/validate-registry.mjs && node scripts/showcase-coverage.mjs && npx --yes shadcn@latest registry validate",
     "check:coverage": "node scripts/showcase-coverage.mjs",
-    "lint": "eslint .",
+    "lint": "oxlint .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -35,11 +35,10 @@
     "@types/node": "^22.13.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@typescript-eslint/parser": "^8.70.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
-    "eslint": "^10.11.0",
     "opentype.js": "^2.0.0",
+    "oxlint": "^1.94.0",
     "postcss": "^8.5.1",
     "tailwindcss": "^4.0.6",
     "typescript": "^5.7.3",
