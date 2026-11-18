@@ -176,7 +176,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
     return (
       <div
         ref={(node) => {
-          (scrollerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          scrollerRef.current = node;
           if (typeof ref === 'function') ref(node);
           else if (ref) ref.current = node;
         }}

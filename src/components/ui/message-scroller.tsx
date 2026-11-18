@@ -462,7 +462,7 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
       (node: HTMLDivElement | null) => {
         attachViewport(node);
         if (typeof ref === 'function') ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        else if (ref) ref.current = node;
       },
       [attachViewport, ref]
     );
@@ -504,7 +504,7 @@ export const MessageScrollerContent = React.forwardRef<HTMLDivElement, MessageSc
       (node: HTMLDivElement | null) => {
         attachContent(node);
         if (typeof ref === 'function') ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        else if (ref) ref.current = node;
       },
       [attachContent, ref]
     );
@@ -567,7 +567,7 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
         ref={(node) => {
           itemRef.current = node;
           if (typeof ref === 'function') ref(node);
-          else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          else if (ref) ref.current = node;
         }}
         data-slot="message-scroller-item"
         data-message-id={messageId}

@@ -22,19 +22,13 @@ export interface W3CScheduler {
   postTask?<T>(callback: () => T | Promise<T>, options?: TaskPriorityOptions): Promise<T>;
 }
 
-declare global {
-  interface Window {
-    scheduler?: W3CScheduler;
-  }
-}
-
 /**
  * Cooperatively yields control back to the main thread event loop so that
  * pending user interactions (clicks, keystrokes) and browser paints execute immediately.
  * Uses native `scheduler.yield()` if available, falling back to a macro-task timeout.
  */
 export async function yieldToMain(): Promise<void> {
-  if (typeof window !== 'undefined' && window.scheduler?.yield) {
+  if (typeof window !== 'undefined' && typeof window.scheduler?.yield === 'function') {
     try {
       await window.scheduler.yield();
       return;
@@ -59,8 +53,8 @@ export async function postTask<T>(
   callback: () => T | Promise<T>,
   options: TaskPriorityOptions = {}
 ): Promise<T> {
-  if (typeof window !== 'undefined' && window.scheduler?.postTask) {
-    return window.scheduler.postTask(callback, options);
+  if (typeof window !== 'undefined' && typeof window.scheduler?.postTask === 'function') {
+    return window.scheduler.postTask(callback, options) as Promise<T>;
   }
 
   if (options.delay && options.delay > 0) {

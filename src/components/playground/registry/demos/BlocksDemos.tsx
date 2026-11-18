@@ -4,8 +4,9 @@ import {
   DataTableColumnHeader,
   createSelectColumn,
   createActionsColumn,
-  type ColumnDef,
+  createColumnHelper,
 } from '@/components/blocks/data-table';
+import type { DataTableFeatures } from '@/components/blocks/data-table';
 import { Badge } from '@/components/ui/badge';
 import { ApprovalCard } from '@/components/blocks/approval-card';
 import { ChartCard } from '@/components/blocks/chart-card';
@@ -424,98 +425,95 @@ const SAMPLE_PATIENT_SESSIONS: PatientSessionRecord[] = [
   { id: 'REC-108', patientName: 'David Kim', clinician: 'Alex Mercer, SLP', status: 'completed', accuracy: 92, sessionDate: '2026-10-27' },
 ];
 
+const sessionColumnHelper = createColumnHelper<DataTableFeatures, PatientSessionRecord>();
+
 export const DataTableDemo: React.FC<ComponentDemoProps> = () => {
-  const columns = React.useMemo<ColumnDef<PatientSessionRecord>[]>(
-    () => [
-      createSelectColumn<PatientSessionRecord>(),
-      {
-        accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Record" />,
-        cell: ({ row }) => (
-          <span className="font-mono text-xs font-semibold text-on-surface">
-            {row.getValue('id')}
-          </span>
-        ),
-      },
-      {
-        accessorKey: 'patientName',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Patient Name" />,
-        cell: ({ row }) => (
-          <span className="font-medium text-on-surface">{row.getValue('patientName')}</span>
-        ),
-      },
-      {
-        accessorKey: 'clinician',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Clinician" />,
-        cell: ({ row }) => (
-          <span className="text-on-surface-variant text-xs">{row.getValue('clinician')}</span>
-        ),
-      },
-      {
-        accessorKey: 'status',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-        cell: ({ row }) => {
-          const status = row.getValue('status') as PatientSessionRecord['status'];
-          switch (status) {
-            case 'completed':
-              return <Badge variant="outline" colorRole="success" size="sm">Completed</Badge>;
-            case 'active':
-              return <Badge variant="outline" colorRole="primary" size="sm">Active</Badge>;
-            case 'scheduled':
-              return <Badge variant="outline" colorRole="neutral" size="sm">Scheduled</Badge>;
-            case 'cancelled':
-              return <Badge variant="outline" colorRole="error" size="sm">Cancelled</Badge>;
-            default:
-              return null;
-          }
-        },
-        filterFn: (row, id, value: string[]) => {
-          return value.includes(row.getValue(id));
-        },
-      },
-      {
-        accessorKey: 'accuracy',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Accuracy" numeric />
-        ),
-        cell: ({ row }) => {
-          const acc = row.getValue('accuracy') as number;
-          return <span>{acc}%</span>;
-        },
-        meta: {
-          numeric: true,
-          align: 'right',
-        },
-      },
-      {
-        accessorKey: 'sessionDate',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
-        cell: ({ row }) => (
-          <span className="font-mono text-xs text-on-surface-variant">
-            {row.getValue('sessionDate')}
-          </span>
-        ),
-      },
-      createActionsColumn<PatientSessionRecord>([
-        {
-          label: 'View details',
-          icon: 'visibility',
-          onClick: () => {},
-        },
-        {
-          label: 'Export notes',
-          icon: 'download',
-          shortcut: '⌘E',
-          onClick: () => {},
-        },
-        {
-          label: 'Archive session',
-          icon: 'archive',
-          destructive: true,
-          onClick: () => {},
-        },
+  const columns = React.useMemo(
+    () =>
+      sessionColumnHelper.columns([
+        createSelectColumn<PatientSessionRecord>(),
+        sessionColumnHelper.accessor('id', {
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Record" />,
+          cell: ({ row }) => (
+            <span className="font-mono text-xs font-semibold text-on-surface">
+              {row.getValue('id')}
+            </span>
+          ),
+        }),
+        sessionColumnHelper.accessor('patientName', {
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Patient Name" />,
+          cell: ({ row }) => (
+            <span className="font-medium text-on-surface">{row.getValue('patientName')}</span>
+          ),
+        }),
+        sessionColumnHelper.accessor('clinician', {
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Clinician" />,
+          cell: ({ row }) => (
+            <span className="text-on-surface-variant text-xs">{row.getValue('clinician')}</span>
+          ),
+        }),
+        sessionColumnHelper.accessor('status', {
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+          cell: ({ row }) => {
+            const status = row.getValue('status') as PatientSessionRecord['status'];
+            switch (status) {
+              case 'completed':
+                return <Badge variant="outline" colorRole="success" size="sm">Completed</Badge>;
+              case 'active':
+                return <Badge variant="outline" colorRole="primary" size="sm">Active</Badge>;
+              case 'scheduled':
+                return <Badge variant="outline" colorRole="neutral" size="sm">Scheduled</Badge>;
+              case 'cancelled':
+                return <Badge variant="outline" colorRole="error" size="sm">Cancelled</Badge>;
+              default:
+                return null;
+            }
+          },
+          filterFn: (row, id, value: string[]) => {
+            return value.includes(row.getValue(id));
+          },
+        }),
+        sessionColumnHelper.accessor('accuracy', {
+          header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Accuracy" numeric />
+          ),
+          cell: ({ row }) => {
+            const acc = row.getValue('accuracy') as number;
+            return <span>{acc}%</span>;
+          },
+          meta: {
+            numeric: true,
+            align: 'right',
+          },
+        }),
+        sessionColumnHelper.accessor('sessionDate', {
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+          cell: ({ row }) => (
+            <span className="font-mono text-xs text-on-surface-variant">
+              {row.getValue('sessionDate')}
+            </span>
+          ),
+        }),
+        createActionsColumn<PatientSessionRecord>([
+          {
+            label: 'View details',
+            icon: 'visibility',
+            onClick: () => {},
+          },
+          {
+            label: 'Export notes',
+            icon: 'download',
+            shortcut: '⌘E',
+            onClick: () => {},
+          },
+          {
+            label: 'Archive session',
+            icon: 'archive',
+            destructive: true,
+            onClick: () => {},
+          },
+        ]),
       ]),
-    ],
     []
   );
 

@@ -44,7 +44,7 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
         if (typeof ref === 'function') {
           ref(node);
         } else if (ref) {
-          (ref as React.MutableRefObject<HTMLSpanElement | null>).current = node;
+          ref.current = node;
         }
       },
       [ref]

@@ -78,7 +78,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
       (node: HTMLInputElement | null) => {
         innerRef.current = node;
         if (typeof ref === 'function') ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
+        else if (ref) ref.current = node;
       },
       [ref]
     );

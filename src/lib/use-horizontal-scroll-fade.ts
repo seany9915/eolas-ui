@@ -28,7 +28,7 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
       if (typeof externalRef === 'function') {
         externalRef(node);
       } else if (externalRef) {
-        (externalRef as React.MutableRefObject<T | null>).current = node;
+        externalRef.current = node;
       }
     },
     [externalRef]

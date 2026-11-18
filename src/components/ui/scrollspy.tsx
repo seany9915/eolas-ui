@@ -62,7 +62,7 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
       (node: HTMLElement | null) => {
         navRef.current = node;
         if (typeof ref === 'function') ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+        else if (ref) ref.current = node;
       },
       [ref]
     );

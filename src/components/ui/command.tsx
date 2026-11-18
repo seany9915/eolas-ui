@@ -21,7 +21,7 @@ export interface CommandProps
   extends React.ComponentPropsWithoutRef<typeof CommandPrimitive> {}
 
 const CommandRoot = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive>,
+  React.ComponentRef<typeof CommandPrimitive>,
   CommandProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
@@ -105,7 +105,7 @@ export interface CommandInputProps
 }
 
 export const CommandInput = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
+  React.ComponentRef<typeof CommandPrimitive.Input>,
   CommandInputProps
 >(({ className, icon, wrapperClassName, ...props }, ref) => (
   <div
@@ -135,7 +135,7 @@ export const CommandInput = React.forwardRef<
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
 export const CommandList = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
+  React.ComponentRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
@@ -150,7 +150,7 @@ export const CommandList = React.forwardRef<
 CommandList.displayName = CommandPrimitive.List.displayName;
 
 export const CommandEmpty = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
+  React.ComponentRef<typeof CommandPrimitive.Empty>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
 >((props, ref) => (
   <CommandPrimitive.Empty
@@ -162,7 +162,7 @@ export const CommandEmpty = React.forwardRef<
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 
 export const CommandGroup = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Group>,
+  React.ComponentRef<typeof CommandPrimitive.Group>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
@@ -177,7 +177,7 @@ export const CommandGroup = React.forwardRef<
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
 
 export const CommandSeparator = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Separator>,
+  React.ComponentRef<typeof CommandPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
@@ -192,7 +192,7 @@ export interface CommandItemProps
   extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> {}
 
 export const CommandItem = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
+  React.ComponentRef<typeof CommandPrimitive.Item>,
   CommandItemProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
@@ -221,7 +221,7 @@ export const CommandShortcut = ({
 CommandShortcut.displayName = 'CommandShortcut';
 
 export const CommandLoading = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Loading>,
+  React.ComponentRef<typeof CommandPrimitive.Loading>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Loading>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Loading

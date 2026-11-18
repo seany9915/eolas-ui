@@ -25,29 +25,49 @@
  */
 import * as React from 'react';
 import {
+  type Cell,
   type Column,
   type ColumnDef,
-  type Row,
-  type Cell,
+  type ColumnFiltersState,
+  type ColumnVisibilityState,
+  type FilterFn,
   type Header,
   type HeaderGroup,
-  type FilterFn,
-  type SortingFn,
   type OnChangeFn,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
-  type RowSelectionState,
   type PaginationState,
-  type Table as TanStackTable,
+  type ReactTable as TanStackTable,
+  type Row,
+  type RowData,
+  type RowSelectionState,
+  type SortFn,
+  type SortingState,
+  columnFacetingFeature,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  createColumnHelper,
+  createFacetedRowModel,
+  createFacetedUniqueValues,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  filterFn_arrIncludes,
+  filterFn_arrIncludesSome,
+  filterFn_equals,
+  filterFn_inDateRange,
+  filterFn_inNumberRange,
+  filterFn_includesString,
+  filterFn_weakEquals,
   flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_basic,
+  sortFn_datetime,
+  sortFn_text,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 
 import { cn } from '@/lib/utils';
@@ -69,39 +89,96 @@ import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 
 /* -------------------------------------------------------------------------------------------------
- * Re-export TanStack Table Types & Utilities
+ * TanStack Table v9 Feature Registry & Types
  * -----------------------------------------------------------------------------------------------*/
+export interface DataTableColumnMeta {
+  align?: 'left' | 'center' | 'right';
+  numeric?: boolean;
+}
+
+function facetedFilterFnImpl(
+  row: { getValue: (columnId: string) => unknown },
+  columnId: string,
+  filterValue: string[]
+): boolean {
+  if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+  return filterValue.includes(String(row.getValue(columnId)));
+}
+facetedFilterFnImpl.autoRemove = (value: unknown) => !Array.isArray(value) || value.length === 0;
+
+export const dataTableFeatures = tableFeatures({
+  columnFacetingFeature,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  facetedRowModel: createFacetedRowModel(),
+  facetedUniqueValues: createFacetedUniqueValues(),
+  columnMeta: {} as DataTableColumnMeta,
+  filterFns: {
+    includesString: filterFn_includesString,
+    inNumberRange: filterFn_inNumberRange,
+    equals: filterFn_equals,
+    arrIncludes: filterFn_arrIncludes,
+    arrIncludesSome: filterFn_arrIncludesSome,
+    inDateRange: filterFn_inDateRange,
+    weakEquals: filterFn_weakEquals,
+    faceted: facetedFilterFnImpl,
+  },
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    text: sortFn_text,
+    datetime: sortFn_datetime,
+    basic: sortFn_basic,
+  },
+});
+
+/** Alias matching shadcn/ui `data-table-features` convention */
+export const features = dataTableFeatures;
+export type DataTableFeatures = typeof dataTableFeatures;
+
 export type {
   ColumnDef,
   Column,
   Row,
+  RowData,
   Cell,
   Header,
   HeaderGroup,
   TanStackTable,
   SortingState,
   ColumnFiltersState,
-  VisibilityState,
+  ColumnVisibilityState,
+  ColumnVisibilityState as VisibilityState,
   RowSelectionState,
   PaginationState,
   FilterFn,
-  SortingFn,
+  SortFn,
+  SortFn as SortingFn,
   OnChangeFn,
 };
 
-export { flexRender };
+export { createColumnHelper, flexRender };
 
 /* -------------------------------------------------------------------------------------------------
  * Helper: Row Selection Column Generator
  * -----------------------------------------------------------------------------------------------*/
-export function createSelectColumn<TData>(): ColumnDef<TData, any> {
+export function createSelectColumn<TData extends RowData>(): ColumnDef<DataTableFeatures, TData, unknown> {
   return {
     id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
+          table.getIsAllPageRowsSelected()
+            ? true
+            : table.getIsSomePageRowsSelected()
+              ? 'indeterminate'
+              : false
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(Boolean(value))}
         aria-label="Select all rows on current page"
@@ -132,14 +209,14 @@ export interface DataTableRowAction<TData> {
   onClick: (data: TData) => void;
 }
 
-export interface DataTableRowActionsProps<TData> {
-  row: Row<TData>;
+export interface DataTableRowActionsProps<TData extends RowData> {
+  row: Row<DataTableFeatures, TData>;
   actions?: DataTableRowAction<TData>[];
   children?: React.ReactNode;
   className?: string;
 }
 
-export function DataTableRowActions<TData>({
+export function DataTableRowActions<TData extends RowData>({
   row,
   actions,
   children,
@@ -192,11 +269,11 @@ export function DataTableRowActions<TData>({
   );
 }
 
-export function createActionsColumn<TData>(
+export function createActionsColumn<TData extends RowData>(
   actions:
     | DataTableRowAction<TData>[]
     | ((row: TData) => React.ReactNode)
-): ColumnDef<TData, any> {
+): ColumnDef<DataTableFeatures, TData, unknown> {
   return {
     id: 'actions',
     enableSorting: false,
@@ -218,15 +295,15 @@ export function createActionsColumn<TData>(
 /* -------------------------------------------------------------------------------------------------
  * DataTableColumnHeader
  * -----------------------------------------------------------------------------------------------*/
-export interface DataTableColumnHeaderProps<TData, TValue>
+export interface DataTableColumnHeaderProps<TData extends RowData, TValue = unknown>
   extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>;
+  column: Column<DataTableFeatures, TData, TValue>;
   title: string;
   align?: 'left' | 'center' | 'right';
   numeric?: boolean;
 }
 
-export function DataTableColumnHeader<TData, TValue>({
+export function DataTableColumnHeader<TData extends RowData, TValue = unknown>({
   column,
   title,
   align,
@@ -313,12 +390,12 @@ export function DataTableColumnHeader<TData, TValue>({
 /* -------------------------------------------------------------------------------------------------
  * DataTableViewOptions
  * -----------------------------------------------------------------------------------------------*/
-export interface DataTableViewOptionsProps<TData> {
-  table: TanStackTable<TData>;
+export interface DataTableViewOptionsProps<TData extends RowData> {
+  table: TanStackTable<DataTableFeatures, TData>;
   className?: string;
 }
 
-export function DataTableViewOptions<TData>({
+export function DataTableViewOptions<TData extends RowData>({
   table,
   className,
 }: DataTableViewOptionsProps<TData>) {
@@ -375,11 +452,14 @@ export function DataTableViewOptions<TData>({
  * `DataTable` applies it automatically to columns listed in `facetedFilters` that have no `filterFn` of their own;
  * set it manually (`filterFn: facetedFilterFn`) when composing the table yourself.
  */
-export const facetedFilterFn: FilterFn<any> = (row, columnId, filterValue: string[]) => {
-  if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
-  return filterValue.includes(String(row.getValue(columnId)));
-};
-facetedFilterFn.autoRemove = (value) => !Array.isArray(value) || value.length === 0;
+export function facetedFilterFn<TData extends RowData>(
+  row: Row<DataTableFeatures, TData>,
+  columnId: string,
+  filterValue: string[]
+): boolean {
+  return facetedFilterFnImpl(row, columnId, filterValue);
+}
+facetedFilterFn.autoRemove = facetedFilterFnImpl.autoRemove;
 
 /* -------------------------------------------------------------------------------------------------
  * DataTableFacetedFilter
@@ -390,13 +470,13 @@ export interface DataTableFacetedFilterOption {
   icon?: string;
 }
 
-export interface DataTableFacetedFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>;
+export interface DataTableFacetedFilterProps<TData extends RowData, TValue = unknown> {
+  column?: Column<DataTableFeatures, TData, TValue>;
   title?: string;
   options: DataTableFacetedFilterOption[];
 }
 
-export function DataTableFacetedFilter<TData, TValue>({
+export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>({
   column,
   title,
   options,
@@ -474,8 +554,8 @@ export function DataTableFacetedFilter<TData, TValue>({
 /* -------------------------------------------------------------------------------------------------
  * DataTableToolbar
  * -----------------------------------------------------------------------------------------------*/
-export interface DataTableToolbarProps<TData> {
-  table: TanStackTable<TData>;
+export interface DataTableToolbarProps<TData extends RowData> {
+  table: TanStackTable<DataTableFeatures, TData>;
   searchKey?: string;
   searchPlaceholder?: string;
   facetedFilters?: {
@@ -488,7 +568,7 @@ export interface DataTableToolbarProps<TData> {
   children?: React.ReactNode;
 }
 
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData extends RowData>({
   table,
   searchKey,
   searchPlaceholder = 'Filter records…',
@@ -498,11 +578,11 @@ export function DataTableToolbar<TData>({
   children,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
-    table.getState().columnFilters.length > 0 ||
-    Boolean(table.getState().globalFilter);
+    table.state.columnFilters.length > 0 ||
+    Boolean(table.state.globalFilter);
   const targetColumn = searchKey ? table.getColumn(searchKey) : undefined;
   const searchVal = (targetColumn?.getFilterValue() as string) ?? '';
-  const globalVal = (table.getState().globalFilter as string) ?? '';
+  const globalVal = (table.state.globalFilter as string) ?? '';
 
   return (
     <div className="flex flex-col @sm:flex-row items-stretch @sm:items-center justify-between gap-3 w-full">
@@ -575,14 +655,14 @@ export function DataTableToolbar<TData>({
 /* -------------------------------------------------------------------------------------------------
  * DataTablePagination
  * -----------------------------------------------------------------------------------------------*/
-export interface DataTablePaginationProps<TData>
+export interface DataTablePaginationProps<TData extends RowData>
   extends React.HTMLAttributes<HTMLDivElement> {
-  table: TanStackTable<TData>;
+  table: TanStackTable<DataTableFeatures, TData>;
   pageSizeOptions?: number[];
   showSelectedCount?: boolean;
 }
 
-export function DataTablePagination<TData>({
+export function DataTablePagination<TData extends RowData>({
   table,
   pageSizeOptions = [10, 20, 30, 40, 50],
   showSelectedCount = true,
@@ -620,7 +700,7 @@ export function DataTablePagination<TData>({
               label: String(size),
               value: String(size),
             }))}
-            value={String(table.getState().pagination.pageSize)}
+            value={String(table.state.pagination.pageSize)}
             onValueChange={(val) => {
               if (val) table.setPageSize(Number(val));
             }}
@@ -628,7 +708,7 @@ export function DataTablePagination<TData>({
           />
         </Field.Root>
         <div className="flex items-center justify-center font-sans text-xs text-on-surface font-medium min-w-24 select-none">
-          Page {table.getState().pagination.pageIndex + 1} of{' '}
+          Page {table.state.pagination.pageIndex + 1} of{' '}
           {Math.max(1, table.getPageCount())}
         </div>
         <div className="flex items-center gap-1.5">
@@ -681,11 +761,11 @@ export function DataTablePagination<TData>({
 /* -------------------------------------------------------------------------------------------------
  * Master Composite Block: DataTable
  * -----------------------------------------------------------------------------------------------*/
-export interface DataTableProps<TData, TValue = unknown> {
-  columns?: ColumnDef<TData, TValue>[];
+export interface DataTableProps<TData extends RowData> {
+  columns?: ColumnDef<DataTableFeatures, TData, any>[];
   data?: TData[];
   /** Optional external TanStack table instance if managing table state externally */
-  table?: TanStackTable<TData>;
+  table?: TanStackTable<DataTableFeatures, TData>;
   /** Column ID to bind the toolbar text search input to (e.g. 'title' or 'email') */
   searchKey?: string;
   /** Custom placeholder for the search input */
@@ -739,7 +819,7 @@ export interface DataTableProps<TData, TValue = unknown> {
   /** Callback emitted whenever selected rows change. Includes selected rows hidden by active filters. */
   onSelectionChange?: (selectedRows: TData[]) => void;
   /** Stable unique id per row. Set it for server-paginated or reordered data so selection follows records, not indices. */
-  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  getRowId?: (originalRow: TData, index: number, parent?: Row<DataTableFeatures, TData>) => string;
   /** Callback emitted when activating a table row by click, or Enter/Space when the row itself has focus */
   onRowClick?: (row: TData) => void;
   /** Displays a loading state with spinner in the table body */
@@ -750,7 +830,7 @@ export interface DataTableProps<TData, TValue = unknown> {
   containerClassName?: string;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData>({
   columns = [],
   data = [],
   table: propTable,
@@ -784,10 +864,10 @@ export function DataTable<TData, TValue>({
   emptyMessage = 'No records found.',
   className,
   containerClassName,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [internalSorting, setInternalSorting] = React.useState<SortingState>([]);
   const [internalColumnFilters, setInternalColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [internalColumnVisibility, setInternalColumnVisibility] = React.useState<VisibilityState>({});
+  const [internalColumnVisibility, setInternalColumnVisibility] = React.useState<ColumnVisibilityState>({});
   const [internalRowSelection, setInternalRowSelection] = React.useState<RowSelectionState>({});
   const [internalPagination, setInternalPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -837,20 +917,22 @@ export function DataTable<TData, TValue>({
     () => new Set(facetedFilters?.map((f) => f.columnId)),
     [facetedFilters]
   );
-  const resolvedColumns = React.useMemo(
+  const resolvedColumns = React.useMemo<ColumnDef<DataTableFeatures, TData, any>[]>(
     () =>
       facetedColumnIds.size === 0
         ? columns
         : columns.map((col) => {
             const id = col.id ?? (col as { accessorKey?: string }).accessorKey;
-            return id && facetedColumnIds.has(id) && !col.filterFn
-              ? { ...col, filterFn: facetedFilterFn }
-              : col;
+            if (id && facetedColumnIds.has(id) && !('filterFn' in col && col.filterFn)) {
+              return { ...col, filterFn: 'faceted' } as ColumnDef<DataTableFeatures, TData, any>;
+            }
+            return col;
           }),
     [columns, facetedColumnIds]
   );
 
-  const internalTable = useReactTable({
+  const internalTable = useTable({
+    features: dataTableFeatures,
     data,
     columns: resolvedColumns,
     getRowId,
@@ -873,19 +955,13 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setInternalRowSelection,
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   const table = propTable ?? internalTable;
   const colSpanCount = table.getVisibleLeafColumns().length || columns.length || 1;
 
   // Read selection from the table so externally supplied tables are covered too
-  const rowSelectionState = table.getState().rowSelection;
+  const rowSelectionState = table.state.rowSelection;
   const tableData = table.options.data;
   const onSelectionChangeRef = React.useRef(onSelectionChange);
   React.useEffect(() => {
@@ -940,9 +1016,7 @@ export function DataTable<TData, TValue>({
                         isCentered && 'text-center'
                       )}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.isPlaceholder ? null : <table.FlexRender header={header} />}
                     </TableHead>
                   );
                 })}
@@ -1018,7 +1092,7 @@ export function DataTable<TData, TValue>({
                             isCentered && 'text-center'
                           )}
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          <table.FlexRender cell={cell} />
                         </TableCell>
                       );
                     })}

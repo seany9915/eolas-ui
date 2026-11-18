@@ -256,7 +256,7 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
     $schema: './node_modules/oxlint/configuration_schema.json',
     ...baseConfig,
     jsPlugins: (baseConfig.jsPlugins ?? []).map((entry) => (entry === './index.js' ? './lint/index.js' : entry)),
-    ignorePatterns: ['dist/**', 'public/**', 'node_modules/**', '.agents/**'],
+    ignorePatterns: ['dist/**', 'public/**', 'node_modules/**', '.agents/**', 'lint/**'],
   };
   const oxlintConfigContent = `${JSON.stringify(oxlintConfig, null, 2)}\n`;
 

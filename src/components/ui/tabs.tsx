@@ -444,7 +444,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
     return (
       <BaseTabs.Panel
         ref={(node) => {
-          (internalRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          internalRef.current = node;
           if (typeof forwardedRef === 'function') {
             forwardedRef(node);
           } else if (forwardedRef) {

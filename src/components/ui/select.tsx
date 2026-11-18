@@ -369,10 +369,20 @@ export const SelectTrigger = React.forwardRef<
     return React.Children.toArray(children).some((child) => {
       if (!React.isValidElement(child)) return false;
       const type = child.type;
+      const elementProps =
+        typeof child.props === 'object' && child.props !== null
+          ? (child.props as Record<string, unknown>)
+          : null;
+      const displayName =
+        type !== null && (typeof type === 'object' || typeof type === 'function') && 'displayName' in type
+          ? (type as { displayName?: string }).displayName
+          : undefined;
       return (
         type === BaseSelect.Icon ||
-        (type && typeof type === 'object' && 'displayName' in type && ((type as { displayName?: string }).displayName === 'SelectIcon' || (type as { displayName?: string }).displayName === 'Icon')) ||
-        (typeof child.props === 'object' && child.props !== null && (child.props['data-slot'] === 'select-icon' || child.props['aria-hidden'] === 'true'))
+        displayName === 'SelectIcon' ||
+        displayName === 'Icon' ||
+        elementProps?.['data-slot'] === 'select-icon' ||
+        elementProps?.['aria-hidden'] === 'true'
       );
     });
   }, [children]);

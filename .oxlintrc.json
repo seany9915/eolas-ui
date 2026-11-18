@@ -8,6 +8,7 @@
     "scratch/**",
     ".agents/**",
     "packages/eolas-ui/registry/**",
+    "packages/eolas-ui/lint/**",
     "docs/skills-archive/**"
   ]
 }
