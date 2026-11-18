@@ -51,7 +51,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup } from '@/components/ui/toggle-group';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
-import { Sidebar } from '@/components/ui/sidebar';
 import { ComponentDemoProps } from '../types';
 import { cn } from '@/lib/utils';
 

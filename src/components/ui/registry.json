@@ -1473,7 +1473,7 @@
       "name": "number-roll",
       "type": "registry:ui",
       "title": "Number Roll",
-      "description": "NumberRoll Tabular number transition primitive based strictly on transitions.dev. Platform Reference: https://transitions.dev/library.html Supports: - 'pop-in' (default): Individual digit pop-in with spring overshoot and decimal stagger (02-number-pop-in.md). - 'spinning': Slot-machine vertical reel roll with soft edge masks (26-spinning-counter.md). Tabular numerals prevent layout jitter across all variants. Strictly adheres to Roboto Mono typography and prefers-reduced-motion.",
+      "description": "NumberRoll @deprecated Prefer importing `NumberPopIn` (`@/components/ui/number-pop-in`) or `SpinningCounter` (`@/components/ui/spinning-counter`) directly. Kept as a backward-compatibility wrapper around both primitives. Tabular number transition primitive based strictly on transitions.dev. Platform Reference: https://transitions.dev/library.html Supports: - 'pop-in' (default): Individual digit pop-in with spring overshoot and decimal stagger (02-number-pop-in.md). - 'spinning': Slot-machine vertical reel roll with soft edge masks (26-spinning-counter.md). Tabular numerals prevent layout jitter across all variants. Strictly adheres to Roboto Mono typography and prefers-reduced-motion.",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1650,7 +1650,7 @@
       "name": "prompt-input",
       "type": "registry:ui",
       "title": "Prompt Input",
-      "description": "PromptInput primitive. Base UI Integration: Consumes Base UI Button, Textarea primitive, Menu primitive, and Tooltip primitive. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
+      "description": "PromptInput primitive. Base UI Integration: Composes InputGroup (InputGroup, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText), Attachment, Menu, Tooltip, and Button primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -1660,7 +1660,6 @@
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/textarea.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
         "https://seany9915.github.io/eolas-ui/r/attachment.json",
         "https://seany9915.github.io/eolas-ui/r/menu.json",

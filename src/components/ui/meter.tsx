@@ -100,7 +100,7 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
       <BaseMeter.Track className="w-full h-3 rounded-full bg-surface-container-high overflow-hidden relative border border-outline-variant">
         <BaseMeter.Indicator
           className={cn(
-            'h-full transition-[width] duration-[var(--duration-standard)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            'h-full transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none',
             colorRoleClasses[colorRole]
           )}
         />

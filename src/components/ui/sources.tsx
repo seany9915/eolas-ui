@@ -285,6 +285,7 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
 
   const itemUrl = href || citation?.url || '#';
   const itemTitle = title || citation?.title || 'Referenced Source';
+  const itemDescription = description ?? citation?.snippet;
   const itemIcon = icon || citation?.icon;
   const itemFavicon = favicon || citation?.favicon;
   const displayDomain =
@@ -350,6 +351,11 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
           {displayDomain && (
             <span className="text-xs font-mono text-on-surface-variant/80 truncate">
               {displayDomain}
+            </span>
+          )}
+          {itemDescription && activeVariant !== 'inline' && (
+            <span className="text-xs font-sans text-on-surface-variant line-clamp-2">
+              {itemDescription}
             </span>
           )}
         </div>

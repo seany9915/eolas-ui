@@ -113,8 +113,6 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
 
   // Counts for quick badges
   const totalCount = REGISTRY_ENTRIES.length;
-  const primitiveCount = REGISTRY_ENTRIES.filter((e) => e.tier === 'primitive').length;
-  const blockCount = REGISTRY_ENTRIES.filter((e) => e.tier === 'block').length;
 
   return (
     <Sidebar

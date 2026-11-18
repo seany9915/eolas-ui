@@ -29,6 +29,26 @@ export interface StickyContainerProps extends React.ComponentPropsWithoutRef<'di
   children: React.ReactNode;
 }
 
+function getScrollParent(node: Node | null): Element | null {
+  if (
+    !(node instanceof HTMLElement) ||
+    node === document.body ||
+    node === document.documentElement
+  ) {
+    return null;
+  }
+  if (node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth) {
+    const { overflow, overflowY } = getComputedStyle(node);
+    if (
+      (overflow !== 'visible' && overflow !== 'clip') ||
+      (overflowY !== 'visible' && overflowY !== 'clip')
+    ) {
+      return node;
+    }
+  }
+  return getScrollParent(node.parentNode);
+}
+
 export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerProps>(
   (
     {
@@ -45,17 +65,37 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
     ref
   ) => {
     const sentinelRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [isStuckFallback, setIsStuckFallback] = React.useState<boolean>(false);
+
+    const supportsScrollState =
+      typeof CSS !== 'undefined' &&
+      typeof CSS.supports === 'function' &&
+      CSS.supports('container-type: scroll-state');
+
+    const setContainerRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        containerRef.current = node;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      },
+      [ref]
+    );
 
     React.useEffect(() => {
       const sentinel = sentinelRef.current;
       if (!sentinel) return;
 
-      // Provide observer-based fallback for browsers lacking native scroll-state support
-      const supportsScrollState =
-        typeof CSS !== 'undefined' &&
-        typeof CSS.supports === 'function' &&
-        CSS.supports('container-type: scroll-state');
+      // Skip IntersectionObserver in browsers supporting scroll-state unless JS hooks are requested
+      if (supportsScrollState && !onStuckChange && !stuckClassName) {
+        setIsStuckFallback(false);
+        return;
+      }
+
+      const root = getScrollParent(containerRef.current?.parentNode ?? null);
 
       const observer = new IntersectionObserver(
         ([entry]) => {
@@ -65,6 +105,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
           onStuckChange?.(stuck);
         },
         {
+          root,
           rootMargin: `-${topOffset + 1}px 0px 0px 0px`,
           threshold: [0, 1],
         }
@@ -75,7 +116,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
       return () => {
         observer.disconnect();
       };
-    }, [topOffset, onStuckChange]);
+    }, [topOffset, onStuckChange, stuckClassName, supportsScrollState]);
 
     return (
       <div className="contents">
@@ -88,7 +129,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
 
         {/* Outer scroll-state container */}
         <div
-          ref={ref}
+          ref={setContainerRef}
           className={cn('sticky-scroll-container w-full', className)}
           style={{
             top: `${topOffset}px`,
@@ -101,7 +142,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
           <div
             className={cn(
               'sticky-nav-inner w-full transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-              isStuckFallback && cn('is-stuck', stuckClassName),
+              isStuckFallback && (!supportsScrollState ? cn('is-stuck', stuckClassName) : stuckClassName),
               innerClassName
             )}
           >

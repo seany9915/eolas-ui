@@ -1,6 +1,10 @@
 /**
  * NumberRoll
  *
+ * @deprecated Prefer importing `NumberPopIn` (`@/components/ui/number-pop-in`) or
+ * `SpinningCounter` (`@/components/ui/spinning-counter`) directly. Kept as a backward-compatibility
+ * wrapper around both primitives.
+ *
  * Tabular number transition primitive based strictly on transitions.dev.
  * Platform Reference: https://transitions.dev/library.html
  *
@@ -12,9 +16,13 @@
  * Strictly adheres to Roboto Mono typography and prefers-reduced-motion.
  */
 import * as React from 'react';
-import { NumberPopIn, NumberPopInProps } from '@/components/ui/number-pop-in';
-import { SpinningCounter, SpinningCounterProps } from '@/components/ui/spinning-counter';
+import { NumberPopIn } from '@/components/ui/number-pop-in';
+import { SpinningCounter } from '@/components/ui/spinning-counter';
 
+/**
+ * @deprecated Use `NumberPopInProps` (`@/components/ui/number-pop-in`) or
+ * `SpinningCounterProps` (`@/components/ui/spinning-counter`) directly instead.
+ */
 export interface NumberRollProps extends React.HTMLAttributes<HTMLSpanElement> {
   value: number;
   prefix?: string;
@@ -28,6 +36,10 @@ export interface NumberRollProps extends React.HTMLAttributes<HTMLSpanElement> {
   className?: string;
 }
 
+/**
+ * @deprecated Use `NumberPopIn` (`@/components/ui/number-pop-in`) or
+ * `SpinningCounter` (`@/components/ui/spinning-counter`) directly instead.
+ */
 export const NumberRoll = React.forwardRef<HTMLSpanElement, NumberRollProps>(
   (
     {

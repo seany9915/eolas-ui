@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 
 const r = JSON.parse(fs.readFileSync('public/r/registry.json', 'utf8'));
 
@@ -60,7 +59,7 @@ const registryEntries = items.map(item => {
   let fileContent = '';
   try {
     fileContent = fs.readFileSync(filePath, 'utf8');
-  } catch (err) {
+  } catch {
     console.warn('Could not read', filePath);
   }
 
@@ -100,6 +99,7 @@ const registryEntries = items.map(item => {
     item.name === 'toggles' ||
     item.name === 'steppers' ||
     item.name === 'empty-state' ||
+    item.name === 'number-roll' ||
     item.name === 'approval-card' ||
     item.name === 'metric-card' ||
     item.name === 'delete-confirmation-dialog';
@@ -111,6 +111,8 @@ const registryEntries = items.map(item => {
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.'
     : item.name === 'empty-state'
     ? 'Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/empty.'
+    : item.name === 'number-roll'
+    ? 'Deprecated facade over NumberPopIn and SpinningCounter. Prefer importing @/components/ui/number-pop-in or @/components/ui/spinning-counter directly.'
     : item.name === 'approval-card'
     ? 'Deprecated block. Use Confirmation (@/components/ui/confirmation) for [Approve] / [Deny] AI tool approval gates, or Questionnaire (@/components/blocks/questionnaire) with declarative items for choice and clarification prompts.'
     : item.name === 'metric-card'
@@ -126,6 +128,8 @@ const registryEntries = items.map(item => {
     ? 'number-field'
     : item.name === 'empty-state'
     ? 'empty'
+    : item.name === 'number-roll'
+    ? 'number-pop-in, spinning-counter'
     : item.name === 'approval-card'
     ? 'confirmation, questionnaire'
     : item.name === 'metric-card'

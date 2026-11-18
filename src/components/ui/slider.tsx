@@ -58,6 +58,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   const isRange = Array.isArray(value ?? defaultValue);
   const effectiveMinSteps = minStepsBetweenValues ?? (isRange ? 1 : 0);
   const effectiveCollision = thumbCollisionBehavior ?? (isRange ? 'none' : 'push');
+  const labelText = typeof label === 'string' && label.trim() ? label.trim() : undefined;
 
   // Composable compound usage
   if (children) {
@@ -132,18 +133,18 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
             <>
               <BaseSlider.Thumb
                 index={0}
-                aria-label={typeof label === 'string' ? ` minimum` : 'Minimum value'}
+                aria-label={labelText ? `${labelText} minimum` : 'Minimum value'}
                 className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
               <BaseSlider.Thumb
                 index={1}
-                aria-label={typeof label === 'string' ? ` maximum` : 'Maximum value'}
+                aria-label={labelText ? `${labelText} maximum` : 'Maximum value'}
                 className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
             </>
           ) : (
             <BaseSlider.Thumb
-              aria-label={typeof label === 'string' ? label : 'Slider value'}
+              aria-label={labelText ?? 'Slider value'}
               className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             />
           )}

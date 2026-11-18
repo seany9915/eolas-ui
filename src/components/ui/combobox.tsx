@@ -567,7 +567,6 @@ export interface ComboboxContentProps
   collisionBoundary?: BaseCombobox.Positioner.Props['collisionBoundary'];
   collisionAvoidance?: BaseCombobox.Positioner.Props['collisionAvoidance'];
   positionerClassName?: string;
-  listClassName?: string;
 }
 
 export const ComboboxContent = React.forwardRef<
@@ -587,7 +586,6 @@ export const ComboboxContent = React.forwardRef<
       collisionBoundary,
       collisionAvoidance,
       positionerClassName,
-      listClassName,
       children,
       ...props
     },

@@ -98,9 +98,6 @@ const softStyles: Record<ButtonColorRole, string> = {
   neutral: 'bg-neutral-container text-on-neutral-container hover:brightness-95 active:brightness-90',
 };
 
-// Legacy alias for softStyles
-const tonalStyles = softStyles;
-
 const outlinedStyles: Record<ButtonColorRole, string> = {
   primary: 'bg-surface text-primary border-2 border-primary hover:bg-surface-container',
   secondary: 'bg-surface text-secondary border-2 border-secondary hover:bg-secondary-container/30',

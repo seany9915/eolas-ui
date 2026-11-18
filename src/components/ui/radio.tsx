@@ -120,10 +120,10 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
   ) => {
     const generatedId = React.useId();
     const radioId = id || generatedId;
-    const descriptionId = `-description`;
-    const errorId = `-error`;
+    const descriptionId = label && description ? `${radioId}-description` : undefined;
     const hasErrorText = typeof error === 'string' && !!error;
-    const describedBy = [label && description ? descriptionId : null, label && hasErrorText ? errorId : null].filter(Boolean).join(' ') || undefined;
+    const errorId = label && hasErrorText ? `${radioId}-error` : undefined;
+    const describedBy = [props['aria-describedby'], descriptionId, errorId].filter(Boolean).join(' ') || undefined;
 
     const radioNode = (
       <BaseRadio.Root
@@ -134,8 +134,6 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
         readOnly={readOnly}
         required={required}
         inputRef={inputRef}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
         className={cn(
           'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
           'data-[checked]:border-2 data-[checked]:border-primary',
@@ -145,11 +143,15 @@ const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
           !label && className
         )}
         {...props}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={describedBy}
       >
-        <BaseRadio.Indicator
-          keepMounted
-          className="size-2.5 rounded-full bg-primary transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] scale-0 data-[checked]:scale-100"
-        />
+        {children ?? (
+          <BaseRadio.Indicator
+            keepMounted
+            className="size-2.5 rounded-full bg-primary transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] scale-0 data-[checked]:scale-100"
+          />
+        )}
       </BaseRadio.Root>
     );
 

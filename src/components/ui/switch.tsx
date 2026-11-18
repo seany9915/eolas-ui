@@ -76,10 +76,10 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
   ) => {
     const generatedId = React.useId();
     const switchId = id || generatedId;
-    const descriptionId = `-description`;
-    const errorId = `-error`;
+    const descriptionId = label && description ? `${switchId}-description` : undefined;
     const hasErrorText = typeof error === 'string' && !!error;
-    const describedBy = [label && description ? descriptionId : null, label && hasErrorText ? errorId : null].filter(Boolean).join(' ') || undefined;
+    const errorId = label && hasErrorText ? `${switchId}-error` : undefined;
+    const describedBy = [props['aria-describedby'], descriptionId, errorId].filter(Boolean).join(' ') || undefined;
     const currentSize = sizeConfig[size] || sizeConfig.md;
 
     const switchNode = (
@@ -99,8 +99,6 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         nativeButton={nativeButton}
         aria-label={!label ? ariaLabel || 'Switch' : ariaLabel}
         aria-labelledby={ariaLabelBy}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
         className={cn(
           'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
           'bg-surface-container-high',
@@ -112,14 +110,18 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
           !label && className
         )}
         {...props}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={describedBy}
       >
-        <BaseSwitch.Thumb
-          className={cn(
-            'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none',
-            currentSize.thumb,
-            currentSize.translate
-          )}
-        />
+        {children ?? (
+          <BaseSwitch.Thumb
+            className={cn(
+              'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none',
+              currentSize.thumb,
+              currentSize.translate
+            )}
+          />
+        )}
       </BaseSwitch.Root>
     );
 

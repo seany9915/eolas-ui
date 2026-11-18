@@ -105,7 +105,7 @@ function addComponents(componentNames, overwrite = false) {
       if (fs.existsSync(componentsJsonPath)) {
         try {
           componentsConfig = JSON.parse(fs.readFileSync(componentsJsonPath, 'utf8'));
-        } catch (_) {}
+        } catch {}
       }
 
       const hasSrc = fs.existsSync(path.resolve(cwd, 'src'));

@@ -1,7 +1,8 @@
 /**
  * PromptInput primitive.
  *
- * Base UI Integration: Consumes Base UI Button, Textarea primitive, Menu primitive, and Tooltip primitive.
+ * Base UI Integration: Composes InputGroup (InputGroup, InputGroupTextarea, InputGroupAddon,
+ * InputGroupButton, InputGroupText), Attachment, Menu, Tooltip, and Button primitives.
  *
  * Conforms to shadcn AI Elements specification:
  * https://ui.shadcn.com/docs/ai-elements/base/prompt-input
@@ -21,7 +22,6 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
-import { Textarea } from './textarea';
 import { Tooltip } from './tooltip';
 import {
   Attachment,
@@ -67,7 +67,7 @@ import {
 } from './input-group';
 import { cn } from '@/lib/utils';
 
-export interface PromptInputRootProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PromptInputRootProps extends Omit<InputGroupProps, 'onSubmit'> {
   children?: React.ReactNode;
   className?: string;
   disabled?: boolean;
@@ -78,52 +78,26 @@ export interface PromptInputRootProps extends React.HTMLAttributes<HTMLDivElemen
 }
 
 const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
-  ({ children, className, disabled, variant = 'default', floating = false, asForm = false, onFormSubmit, ...props }, ref) => {
+  ({ children, className, disabled, variant = 'default', floating = false, asForm = false, onFormSubmit, render, ...props }, ref) => {
     const isGhost = variant === 'ghost' || variant === 'unboxed';
     const isFloating = floating || variant === 'floating';
-    const rootClasses = cn(
-      '@container relative flex flex-col w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-      isGhost
-        ? 'bg-transparent border-0 rounded-none p-0 focus-within:outline-none'
-        : cn(
-            'border rounded-lg p-2.5 bg-surface text-on-surface',
-            'border-outline has-[input:focus-visible,textarea:focus-visible]:border-primary has-[input:focus-visible,textarea:focus-visible]:outline-2 has-[input:focus-visible,textarea:focus-visible]:-outline-offset-1 has-[input:focus-visible,textarea:focus-visible]:outline-primary',
-            'has-[:invalid]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
-            'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
-            isFloating
-              ? 'shadow-ambient bg-surface/95 backdrop-blur-xs [&:not(:focus-within)]:hover:border-outline'
-              : '[&:not(:focus-within)]:hover:border-outline/80'
-          ),
-      disabled && 'opacity-60 bg-surface-container/30 border-outline-variant cursor-not-allowed',
-      'has-[:disabled]:opacity-60 has-[:disabled]:bg-surface-container/30 has-[:disabled]:border-outline-variant has-[:disabled]:cursor-not-allowed',
-      className
-    );
-
-    if (asForm) {
-      return (
-        <form
-          ref={ref as React.Ref<HTMLFormElement>}
-          onSubmit={onFormSubmit}
-          data-disabled={disabled ? 'true' : undefined}
-          data-slot="prompt-input"
-          className={rootClasses}
-          {...(props as React.FormHTMLAttributes<HTMLFormElement>)}
-        >
-          {children}
-        </form>
-      );
-    }
 
     return (
-      <div
+      <InputGroup
         ref={ref}
-        data-disabled={disabled ? 'true' : undefined}
+        variant={variant}
+        floating={isFloating}
+        disabled={disabled}
+        render={
+          render ??
+          (asForm ? <form onSubmit={onFormSubmit} /> : undefined)
+        }
         data-slot="prompt-input"
-        className={rootClasses}
+        className={cn(!isGhost && 'p-2.5', className)}
         {...props}
       >
         {children}
-      </div>
+      </InputGroup>
     );
   }
 );
@@ -154,9 +128,6 @@ const PromptInputAttachments = React.forwardRef<HTMLDivElement, PromptInputAttac
 );
 PromptInputAttachments.displayName = 'PromptInput.Attachments';
 
-/** Full compound Attachment primitive re-exported for PromptInput */
-const PromptInputAttachment = Attachment;
-
 export interface PromptInputTextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onSubmit'> {
   onSubmit?: () => void;
@@ -170,8 +141,8 @@ export interface PromptInputTextareaProps
 }
 
 /**
- * Textarea field that consumes the project's Textarea primitive,
- * suppressing standalone borders to prevent double-border artifacts inside the PromptInput container.
+ * Textarea field built on InputGroupTextarea so it shares InputGroupContext,
+ * auto-growing behavior, paste handling, and IME-safe Enter submission.
  */
 const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTextareaProps>(
   (
@@ -182,42 +153,26 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
       history,
       onHistoryChange,
       onKeyDown,
-      onCompositionEnd,
-      onPaste,
       minRows = 3,
       maxHeight = '12rem',
-      enterKeyHint,
       ...props
     },
     ref
   ) => {
     const generatedId = React.useId();
-    const lastCompositionEndRef = React.useRef<number>(0);
     const historyIndexRef = React.useRef<number>(-1);
     const draftBeforeHistoryRef = React.useRef<string>('');
 
-    const handleCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
-      // WebKit/Safari can fire compositionend on the same tick before the confirming Enter keydown.
-      lastCompositionEndRef.current = performance.now();
-      onCompositionEnd?.(e);
-    };
+    const handleSubmit = React.useCallback(() => {
+      historyIndexRef.current = -1;
+      onSubmit?.();
+    }, [onSubmit]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       onKeyDown?.(e);
       if (e.defaultPrevented) return;
 
-      const isImeComposing =
-        e.nativeEvent.isComposing ||
-        e.keyCode === 229 ||
-        performance.now() - lastCompositionEndRef.current < 50;
-
-      if (onSubmit && e.key === 'Enter' && !e.shiftKey && !isImeComposing) {
-        e.preventDefault();
-        historyIndexRef.current = -1;
-        onSubmit();
-        return;
-      }
-
+      const isImeComposing = e.nativeEvent.isComposing || e.keyCode === 229;
       if (history && history.length > 0 && onHistoryChange && !isImeComposing) {
         const target = e.currentTarget;
         const atStart = target.selectionStart === 0 && target.selectionEnd === 0;
@@ -247,37 +202,18 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
       }
     };
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
-        const files = Array.from(e.clipboardData.files);
-        onFilesPasted?.(files);
-      }
-      onPaste?.(e);
-    };
-
     return (
-      <Textarea
+      <InputGroupTextarea
         ref={ref}
         id={props.id || generatedId}
         name={props.name || 'prompt'}
         data-slot="prompt-input-textarea"
-        variant="unstyled"
-        rows={minRows}
-        autoGrow={true}
-        enterKeyHint={enterKeyHint ?? (onSubmit ? 'send' : undefined)}
+        minRows={minRows}
+        maxHeight={maxHeight}
+        onSubmit={onSubmit ? handleSubmit : undefined}
+        onFilesPasted={onFilesPasted}
         onKeyDown={handleKeyDown}
-        onCompositionEnd={handleCompositionEnd}
-        onPaste={handlePaste}
-        className={cn(
-          'w-full bg-transparent px-1.5 py-1 text-base font-sans text-on-surface leading-relaxed',
-          'placeholder:text-on-surface-variant/80 resize-none',
-          'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
-          className
-        )}
-        style={{
-          maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
-          ...props.style,
-        }}
+        className={cn('px-1.5 py-1 min-h-0', className)}
         {...props}
       />
     );
@@ -294,21 +230,21 @@ export interface PromptInputActionsProps extends React.HTMLAttributes<HTMLDivEle
 const PromptInputActions = React.forwardRef<HTMLDivElement, PromptInputActionsProps>(
   ({ children, align = 'block-end', className, ...props }, ref) => {
     return (
-      <div
+      <InputGroupAddon
         ref={ref}
-        data-align={align}
+        align={align}
         data-slot="prompt-input-actions"
         className={cn(
-          align === 'block-end' && 'flex flex-wrap items-center justify-between gap-2 pt-1.5 mt-auto px-0.5',
-          align === 'block-start' && 'flex flex-wrap items-center justify-between gap-2 pb-1.5 mb-auto px-0.5',
-          align === 'inline-start' && 'inline-flex items-center gap-1.5 px-0.5',
-          align === 'inline-end' && 'inline-flex items-center gap-1.5 px-0.5 ml-auto',
+          align === 'block-end' && 'px-0.5 pb-0 pt-1.5',
+          align === 'block-start' && 'px-0.5 pt-0 pb-1.5 mb-auto',
+          align === 'inline-start' && 'px-0.5',
+          align === 'inline-end' && 'px-0.5',
           className
         )}
         {...props}
       >
         {children}
-      </div>
+      </InputGroupAddon>
     );
   }
 );
@@ -340,14 +276,14 @@ export interface PromptInputTextProps extends React.HTMLAttributes<HTMLSpanEleme
 
 const PromptInputText = React.forwardRef<HTMLSpanElement, PromptInputTextProps>(
   ({ children, className, ...props }, ref) => (
-    <span
+    <InputGroupText
       ref={ref}
       data-slot="prompt-input-text"
-      className={cn('text-xs font-sans text-on-surface-variant truncate', className)}
+      className={cn('truncate', className)}
       {...props}
     >
       {children}
-    </span>
+    </InputGroupText>
   )
 );
 PromptInputText.displayName = 'PromptInput.Text';
@@ -1109,4 +1045,20 @@ export {
   PromptInputText,
   PromptInputSubmit,
   InputGroupButton as PromptInputButton,
+};
+
+export type {
+  AttachmentProps as PromptInputAttachmentProps,
+  AttachmentMediaProps as PromptInputAttachmentMediaProps,
+  AttachmentContentProps as PromptInputAttachmentContentProps,
+  AttachmentTitleProps as PromptInputAttachmentTitleProps,
+  AttachmentDescriptionProps as PromptInputAttachmentDescriptionProps,
+  AttachmentActionsProps as PromptInputAttachmentActionsProps,
+  AttachmentActionProps as PromptInputAttachmentActionProps,
+  AttachmentTriggerProps as PromptInputAttachmentTriggerProps,
+  AttachmentState as PromptInputAttachmentState,
+  AttachmentOrientation as PromptInputAttachmentOrientation,
+  AttachmentSize as PromptInputAttachmentSize,
+  InputGroupProps,
+  InputGroupButtonProps as PromptInputButtonProps,
 };

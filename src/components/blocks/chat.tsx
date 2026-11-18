@@ -7,7 +7,7 @@
  *             - `ChatMessage` (`src/components/ui/chat-message.tsx`)
  *             - `PromptInput` (`src/components/ui/prompt-input.tsx`)
  *             - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`)
- *             - `EmptyState` (`src/components/ui/empty-state.tsx`)
+ *             - `Empty` (`src/components/ui/empty.tsx`)
  *
  * Specification & Reference:
  * - https://ui.shadcn.com/docs/ai-elements/base/chat
@@ -46,7 +46,7 @@ import {
   type PromptInputEffortOption,
 } from '@/components/ui/prompt-input';
 import { SuggestionChips, SuggestionChip, type SuggestionItem } from '@/components/ui/suggestion-chips';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Empty } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
 
 export interface ChatMessageData extends ChatMessageProps {
@@ -392,7 +392,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                     {messages.length === 0 ? (
                       <div className="flex-1 flex items-center justify-center p-8 min-h-75">
                         {emptyState ?? (
-                          <EmptyState
+                          <Empty
                             variant="unboxed"
                             icon={emptyStateIcon}
                             title={emptyStateTitle}
@@ -507,8 +507,8 @@ export const Chat = Object.assign(ChatRoot, {
   ScrollButton: MessageScrollerButton,
   Suggestions: SuggestionChips,
   Suggestion: SuggestionChip,
-  EmptyState: EmptyState,
-  Empty: EmptyState,
+  EmptyState: Empty,
+  Empty: Empty,
   Bubble: ChatMessageBubble,
   Avatar: ChatMessageAvatar,
   Actions: ChatMessageActions,

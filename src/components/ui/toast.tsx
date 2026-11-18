@@ -311,8 +311,13 @@ const ActiveToastItem: React.FC<{
   const currentIcon = iconMap[toastType] || iconMap.info;
   const isTopPosition = position.startsWith('top');
   const actionOption = t.data?.action;
-  const hasAction = Boolean(t.actionProps || actionOption);
   const isAnchored = Boolean(t.positionerProps?.anchor);
+  const fallbackAction =
+    !t.actionProps && actionOption
+      ? isActionConfig(actionOption)
+        ? { children: actionOption.label, onClick: actionOption.onClick }
+        : actionOption
+      : undefined;
 
   // Exact Base UI Tailwind stacked deck tokens & calculations
   const bottomDeckClasses = cn(
@@ -399,19 +404,11 @@ const ActiveToastItem: React.FC<{
           )}
         </div>
 
-        {/* Action button rendered via BaseToast.Action (returns null automatically if no actionProps/children) */}
+        {/* Action button rendered via BaseToast.Action (reads toast.actionProps from context and returns null when empty) */}
         <BaseToast.Action
           className="font-label text-xs font-semibold px-2.5 py-1 rounded-sm text-primary hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0"
-          onClick={
-            actionOption && isActionConfig(actionOption)
-              ? actionOption.onClick
-              : t.actionProps?.onClick
-          }
-        >
-          {actionOption && isActionConfig(actionOption)
-            ? actionOption.label
-            : t.actionProps?.children}
-        </BaseToast.Action>
+          {...fallbackAction}
+        />
 
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close

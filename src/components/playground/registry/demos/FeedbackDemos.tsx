@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { InlineAlert } from '@/components/ui/inline-alert';
-import { Toast, toast, Toaster } from '@/components/ui/toast';
+import { toast, Toaster } from '@/components/ui/toast';
 import { Badge } from '@/components/ui/badge';
 import { Chip } from '@/components/ui/chip';
 import { NotificationBadge } from '@/components/ui/notification-badge';

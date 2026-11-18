@@ -140,7 +140,7 @@
       "name": "chat",
       "type": "registry:block",
       "title": "Chat",
-      "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `EmptyState` (`src/components/ui/empty-state.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
+      "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `Empty` (`src/components/ui/empty.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -153,7 +153,7 @@
         "https://seany9915.github.io/eolas-ui/r/reasoning.json",
         "https://seany9915.github.io/eolas-ui/r/prompt-input.json",
         "https://seany9915.github.io/eolas-ui/r/suggestion-chips.json",
-        "https://seany9915.github.io/eolas-ui/r/empty-state.json"
+        "https://seany9915.github.io/eolas-ui/r/empty.json"
       ],
       "files": [
         {

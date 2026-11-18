@@ -82,8 +82,8 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
 
     const rootClasses = cn(
       '@container group/input-group relative flex w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-      // Default to row layout for input, switch to column layout if a textarea is present
-      'has-[textarea]:flex-col has-[textarea]:items-stretch has-[input]:flex-row has-[input]:items-center',
+      // Default to row layout for single-line inputs, switch to column layout when a textarea is present
+      'flex-row items-center has-[textarea]:flex-col has-[textarea]:items-stretch',
       sizeMinHeight,
       isGhost
         ? 'bg-transparent border-0 rounded-none p-0 has-[input:focus-visible,textarea:focus-visible]:outline-2 has-[input:focus-visible,textarea:focus-visible]:-outline-offset-2 has-[input:focus-visible,textarea:focus-visible]:outline-primary'
@@ -118,7 +118,7 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
             'data-size': size,
             'data-disabled': disabled ? 'true' : undefined,
             'data-invalid': invalid ? 'true' : undefined,
-            role: 'group',
+            ...(render ? {} : { role: 'group' }),
             className: rootClasses,
             children,
             ...props,

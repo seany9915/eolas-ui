@@ -1218,7 +1218,7 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
           data-state={isSelected ? 'checked' : 'unchecked'}
           data-checked={isSelected ? '' : undefined}
           data-disabled={disabled ? '' : undefined}
-          data-invalid={Boolean(itemContext?.error) ? '' : undefined}
+          data-invalid={itemContext?.error ? '' : undefined}
           className={cn(
             'group w-full min-h-11 py-3 px-4 rounded-md flex items-center justify-between gap-3 text-left cursor-pointer select-none',
             'transition-colors duration-quick ease-standard motion-reduce:transition-none',

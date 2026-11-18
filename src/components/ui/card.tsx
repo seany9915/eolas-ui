@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { cn } from '@/lib/utils';
 
 /**
@@ -15,7 +16,7 @@ export type CardProminence = 'default' | 'inverted' | 'filled' | 'accent' | 'spo
  * Affordance tiers for Card containers:
  * - 'static': Passive grouping container (no hover/press).
  * - 'actionable': Interactive click destination with hover elevation lift and focus ring (canonical).
- * - 'selectable': Accessible choice card with selection border and pressed state.
+ * - 'selectable': Accessible choice card container with selection border, surface wash, and internal [data-card-trigger] focus ring.
  * - 'link': Whole card clickable via an inner CardLink / [data-card-trigger] anchor (Good CSS #28).
  * - 'interactive': @deprecated Use 'actionable' instead.
  */
@@ -51,6 +52,20 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   spotlightAccent?: 'tertiary' | 'tertiary-full' | 'neutral';
   children: React.ReactNode;
 }
+
+interface CardContextValue {
+  prominence: CardProminence;
+  invertedAccent: 'tertiary' | 'neutral';
+  isSelectable: boolean;
+  selected: boolean;
+}
+
+const CardContext = React.createContext<CardContextValue>({
+  prominence: 'default',
+  invertedAccent: 'tertiary',
+  isSelectable: false,
+  selected: false,
+});
 
 const sizeStyles: Record<CardSize, string> = {
   default: 'p-6',
@@ -109,6 +124,9 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   const isSelectable = resolvedAffordance === 'selectable';
   const isActionable = resolvedAffordance === 'actionable' || resolvedAffordance === 'interactive';
   const isLink = resolvedAffordance === 'link';
+  // Selectable cards override surface to light bg-surface/bg-primary-container, so children inherit light-surface text roles.
+  const effectiveProminence: CardProminence = isSelectable ? 'default' : resolvedProminence;
+  const isInverted = effectiveProminence === 'inverted' || effectiveProminence === 'spotlight';
 
   let affordanceStyles = '';
   if (isSelectable) {
@@ -133,49 +151,40 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     affordanceStyles = '';
   }
 
-  const { onKeyDown, ...restProps } = props;
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(e);
-    if (e.defaultPrevented || e.target !== e.currentTarget) return;
-    if (isSelectable && (e.key === ' ' || e.key === 'Enter')) {
-      e.preventDefault();
-      e.currentTarget.click();
-    }
-  };
-
-  const isRadio = props.role === 'radio';
-  const role = isSelectable ? (props.role ?? 'button') : props.role;
-  const ariaPressed = isSelectable && !isRadio ? (props['aria-pressed'] ?? selected) : props['aria-pressed'];
-  const ariaChecked = isRadio ? (props['aria-checked'] ?? selected) : props['aria-checked'];
-  const tabIndex = props.tabIndex !== undefined ? props.tabIndex : (isSelectable ? 0 : undefined);
-
   return (
-    <div
-      ref={ref}
-      role={role}
-      tabIndex={tabIndex}
-      data-slot="card"
-      data-size={size}
-      data-density={density}
-      aria-pressed={ariaPressed}
-      aria-checked={ariaChecked}
-      style={{
-        '--card-spacing': size === 'sm' ? '1rem' : '1.5rem',
-        ...(density ? { '--density': density } : {}),
-        ...props.style,
-      } as React.CSSProperties}
-      className={cn(
-        baseStyles,
-        prominenceStyles[resolvedProminence],
-        affordanceStyles,
-        subgrid && 'card-subgrid',
-        className
-      )}
-      {...restProps}
-      onKeyDown={handleKeyDown}
+    <CardContext.Provider
+      value={{
+        prominence: effectiveProminence,
+        invertedAccent: resolvedAccent,
+        isSelectable,
+        selected,
+      }}
     >
-      {children}
-    </div>
+      <div
+        ref={ref}
+        data-slot="card"
+        data-size={size}
+        data-density={density}
+        data-prominence={effectiveProminence}
+        data-accent={isInverted ? resolvedAccent : undefined}
+        data-selected={isSelectable ? selected : undefined}
+        {...props}
+        style={{
+          '--card-spacing': size === 'sm' ? '1rem' : '1.5rem',
+          ...(density ? { '--density': density } : {}),
+          ...props.style,
+        } as React.CSSProperties}
+        className={cn(
+          baseStyles,
+          prominenceStyles[resolvedProminence],
+          affordanceStyles,
+          subgrid && 'card-subgrid',
+          className
+        )}
+      >
+        {children}
+      </div>
+    </CardContext.Provider>
   );
 });
 
@@ -203,34 +212,58 @@ export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement>
 }
 
 export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ className, as: Tag = 'h3', ...props }, ref) => (
-    <Tag
-      ref={ref}
-      data-slot="card-title"
-      className={cn(
-        'font-heading text-lg font-semibold text-on-surface leading-snug tracking-tight text-balance',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, as: Tag = 'h3', ...props }, ref) => {
+    const { prominence, invertedAccent } = React.useContext(CardContext);
+    const isInverted = prominence === 'inverted' || prominence === 'spotlight';
+    const textTone = isInverted
+      ? invertedAccent === 'neutral'
+        ? 'text-surface'
+        : 'text-tertiary'
+      : prominence === 'filled'
+        ? 'text-current'
+        : 'text-on-surface';
+
+    return (
+      <Tag
+        ref={ref}
+        data-slot="card-title"
+        className={cn(
+          'font-heading text-lg font-semibold leading-snug tracking-tight text-balance',
+          textTone,
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 CardTitle.displayName = 'CardTitle';
 
 export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
 
 export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
-  ({ className, ...props }, ref) => (
-    <p
-      ref={ref}
-      data-slot="card-description"
-      className={cn(
-        'font-sans text-sm text-on-surface-variant leading-relaxed text-pretty',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, ...props }, ref) => {
+    const { prominence } = React.useContext(CardContext);
+    const isInverted = prominence === 'inverted' || prominence === 'spotlight';
+    const textTone = isInverted
+      ? 'text-surface'
+      : prominence === 'filled'
+        ? 'text-current'
+        : 'text-on-surface-variant';
+
+    return (
+      <p
+        ref={ref}
+        data-slot="card-description"
+        className={cn(
+          'font-sans text-sm leading-relaxed text-pretty',
+          textTone,
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 CardDescription.displayName = 'CardDescription';
 
@@ -297,6 +330,36 @@ export const CardLink = React.forwardRef<HTMLAnchorElement, CardLinkProps>(
 );
 CardLink.displayName = 'CardLink';
 
+export interface CardTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseButton> {
+  children: React.ReactNode;
+}
+
+/**
+ * CardTrigger primitive built on Base UI Button (@base-ui/react/button).
+ * Expands the interactive button hit area to cover the entire Card container via `card-link` (::after),
+ * keeping the outer `<Card>` semantic so internal headings and lists stay intact for screen readers.
+ */
+export const CardTrigger = React.forwardRef<HTMLButtonElement, CardTriggerProps>(
+  ({ className, ...props }, ref) => {
+    const { isSelectable, selected } = React.useContext(CardContext);
+    const isRadio = props.role === 'radio';
+
+    return (
+      <BaseButton
+        ref={ref}
+        data-slot="card-trigger"
+        data-card-trigger=""
+        className={cn('card-link text-left cursor-pointer', className)}
+        {...props}
+        aria-pressed={isSelectable && !isRadio ? (props['aria-pressed'] ?? selected) : props['aria-pressed']}
+        aria-checked={isRadio ? (props['aria-checked'] ?? selected) : props['aria-checked']}
+      />
+    );
+  }
+);
+CardTrigger.displayName = 'CardTrigger';
+
 export const Card = Object.assign(CardComponent, {
   Header: CardHeader,
   Title: CardTitle,
@@ -305,6 +368,7 @@ export const Card = Object.assign(CardComponent, {
   Content: CardContent,
   Footer: CardFooter,
   Link: CardLink,
+  Trigger: CardTrigger,
 });
 
 export { CardComponent };
