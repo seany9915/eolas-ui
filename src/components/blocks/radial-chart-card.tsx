@@ -82,7 +82,11 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
     ref
   ) => {
     const arcColor = 'value' in config ? 'var(--color-value)' : 'var(--color-primary)';
-    const chartData = React.useMemo(() => [{ value, fill: arcColor }], [value, arcColor]);
+    const clampedValue = total > 0 ? Math.min(Math.max(0, value), total) : 0;
+    const chartData = React.useMemo(
+      () => [{ value: clampedValue, fill: arcColor }],
+      [clampedValue, arcColor]
+    );
     const displayValue = `${value}${unit}`;
     const resolvedStatusLabel = statusLabel ?? defaultStatusLabelMap[status];
     const resolvedEmpty =
@@ -115,12 +119,13 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
         {...props}
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label={chartLabel ?? `${title}: ${displayValue} of ${total}${unit}`}
           config={config}
           className="aspect-auto h-full w-full"
         >
           <RadialBarChart
+            aria-label={chartLabel ?? `${title}: ${displayValue} of ${total}${unit}`}
             data={chartData}
             startAngle={180}
             endAngle={0}

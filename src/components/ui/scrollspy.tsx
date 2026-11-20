@@ -13,7 +13,7 @@
  * - Complies with DESIGN.md and anti-patterns.md: symmetrical rounded-md geometry without asymmetric single-sided card borders.
  */
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn, sanitizeUrl } from '@/lib/utils';
 
 export interface ScrollspyItem {
   /** Target section DOM element ID without hash (e.g. 'overview') */
@@ -154,7 +154,7 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
       >
         {items.map((item) => {
           const isActive = item.id === activeId;
-          const href = item.href || `#${item.id}`;
+          const href = sanitizeUrl(item.href) || `#${encodeURIComponent(item.id)}`;
 
           return (
             <a

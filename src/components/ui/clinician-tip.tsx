@@ -40,8 +40,10 @@ export const ClinicianTip = React.forwardRef<HTMLDivElement, ClinicianTipProps>(
   return (
     <div
       ref={ref}
+      data-slot="clinician-tip"
+      data-variant={variant}
       className={cn(
-        'flex items-start gap-2.5 text-left',
+        'flex items-start gap-2.5 text-start',
         variant === 'surface' && 'rounded-md bg-surface border border-outline-variant px-3.5 py-2.5',
         variant === 'inset' && 'rounded-md bg-surface-container-high border border-outline px-3.5 py-2.5',
         variant === 'unboxed' && 'pt-2 bg-transparent',
@@ -54,14 +56,29 @@ export const ClinicianTip = React.forwardRef<HTMLDivElement, ClinicianTipProps>(
           <Icon
             name={icon}
             size="md"
-            className="text-secondary"
+            className={cn(
+              'text-secondary',
+              variant === 'unboxed' && 'inverted:text-tertiary'
+            )}
             aria-hidden="true"
           />
         </span>
       )}
-      <div className="text-base text-on-surface-variant leading-relaxed min-w-0">
+      <div
+        className={cn(
+          'text-base text-on-surface-variant leading-relaxed min-w-0',
+          variant === 'unboxed' && 'inverted:text-surface'
+        )}
+      >
         {label ? (
-          <span className="font-semibold text-on-surface mr-1.5">{label}:</span>
+          <span
+            className={cn(
+              'font-semibold text-on-surface me-1.5',
+              variant === 'unboxed' && 'inverted:text-tertiary'
+            )}
+          >
+            {label}:
+          </span>
         ) : null}
         {children}
       </div>

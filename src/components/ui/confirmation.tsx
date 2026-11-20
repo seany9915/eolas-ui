@@ -42,9 +42,16 @@ function resolveDenied(status: ConfirmationStatus, approved?: boolean) {
   return status === 'denied' || status === 'output-denied';
 }
 
+interface ConfirmationContextValue {
+  status: ConfirmationStatus;
+  approved?: boolean;
+}
+
+const ConfirmationContext = React.createContext<ConfirmationContextValue | null>(null);
+
 export interface ConfirmationRootProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: ConfirmationStatus;
-  /** Decision for pproval-responded; without it the response is shown as neither approved nor denied. */
+  /** Decision for approval-responded; without it the response is shown as neither approved nor denied. */
   approved?: boolean;
   variant?: 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
@@ -59,26 +66,28 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
     const isDenied = resolveDenied(status, approved);
 
     return (
-      <div
-        ref={ref}
-        data-slot="confirmation-root"
-        data-status={status}
-        className={cn(
-          'w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-          (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
-            ? 'rounded-none border-none bg-transparent p-0'
-            : cn(
-                'rounded-lg border p-4',
-                !isApproved && !isDenied && 'bg-surface border-outline-variant/80',
-                isApproved && 'bg-surface-container/30 border-outline-variant/80',
-                isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80'
-              ),
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <ConfirmationContext.Provider value={{ status, approved }}>
+        <div
+          ref={ref}
+          data-slot="confirmation-root"
+          data-status={status}
+          className={cn(
+            'w-full transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
+              ? 'rounded-none border-none bg-transparent p-0'
+              : cn(
+                  'rounded-lg border p-4',
+                  !isApproved && !isDenied && 'bg-surface border-outline-variant/80',
+                  isApproved && 'bg-surface-container/30 border-outline-variant/80',
+                  isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80'
+                ),
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </ConfirmationContext.Provider>
     );
   }
 );
@@ -260,7 +269,7 @@ const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, chil
               <span className="text-error/80 line-through truncate max-w-[120px]">{String(item.from)}</span>
             )}
             {item.from !== undefined && item.to !== undefined && (
-              <Icon name="arrow_forward" size="xs" className="text-on-surface-variant/60 shrink-0" />
+              <Icon name="arrow_forward" size="xs" directional className="text-on-surface-variant/60 shrink-0" />
             )}
             {item.to !== undefined && (
               <span className="text-success font-semibold truncate max-w-[140px]">{String(item.to)}</span>
@@ -386,6 +395,73 @@ export const ConfirmationAction = React.forwardRef<HTMLButtonElement, Confirmati
 ConfirmationAction.displayName = 'Confirmation.Action';
 
 export const ConfirmationRequest = ConfirmationHeader;
+
+export interface ConfirmationOutcomeProps extends React.HTMLAttributes<HTMLDivElement> {
+  status?: ConfirmationStatus;
+  approved?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const ConfirmationAccepted = React.forwardRef<HTMLDivElement, ConfirmationOutcomeProps>(
+  ({ status, approved, children, className, ...props }, ref) => {
+    const ctx = React.useContext(ConfirmationContext);
+    const resolvedStatus = status ?? ctx?.status;
+    const resolvedApproved = approved ?? ctx?.approved;
+
+    if (resolvedStatus !== undefined && !resolveApproved(resolvedStatus, resolvedApproved)) {
+      return null;
+    }
+
+    return (
+      <div
+        ref={ref}
+        data-slot="confirmation-accepted"
+        role="status"
+        className={cn('flex items-center gap-2 text-xs font-sans text-success', className)}
+        {...props}
+      >
+        {children ?? (
+          <>
+            <Icon name="check_circle" size="xs" aria-hidden="true" />
+            <span>Approved</span>
+          </>
+        )}
+      </div>
+    );
+  }
+);
+ConfirmationAccepted.displayName = 'Confirmation.Accepted';
+
+const ConfirmationRejected = React.forwardRef<HTMLDivElement, ConfirmationOutcomeProps>(
+  ({ status, approved, children, className, ...props }, ref) => {
+    const ctx = React.useContext(ConfirmationContext);
+    const resolvedStatus = status ?? ctx?.status;
+    const resolvedApproved = approved ?? ctx?.approved;
+
+    if (resolvedStatus !== undefined && !resolveDenied(resolvedStatus, resolvedApproved)) {
+      return null;
+    }
+
+    return (
+      <div
+        ref={ref}
+        data-slot="confirmation-rejected"
+        role="status"
+        className={cn('flex items-center gap-2 text-xs font-sans text-on-surface-variant', className)}
+        {...props}
+      >
+        {children ?? (
+          <>
+            <Icon name="block" size="xs" aria-hidden="true" />
+            <span>Denied</span>
+          </>
+        )}
+      </div>
+    );
+  }
+);
+ConfirmationRejected.displayName = 'Confirmation.Rejected';
 
 /* -------------------------------------------------------------------------------------------------
  * Full Confirmation Composition Component
@@ -516,8 +592,8 @@ export const Confirmation = Object.assign(ConfirmationComponent, {
   Approve: ConfirmationApprove,
   Deny: ConfirmationDeny,
   Request: ConfirmationHeader,
-  Accepted: ConfirmationMedia,
-  Rejected: ConfirmationMedia,
+  Accepted: ConfirmationAccepted,
+  Rejected: ConfirmationRejected,
 });
 
 export {
@@ -531,6 +607,8 @@ export {
   ConfirmationActions,
   ConfirmationApprove,
   ConfirmationDeny,
+  ConfirmationAccepted,
+  ConfirmationRejected,
 };
 
 export default Confirmation;

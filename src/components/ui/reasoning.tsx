@@ -152,7 +152,7 @@ export const ReasoningContent = React.forwardRef<HTMLDivElement, ReasoningConten
     return (
       <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
         <div className="px-3.5 py-3">
-          <div className="border-l-2 border-outline-variant/40 pl-3.5 ml-1 my-0.5 flex flex-col gap-2 whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
+          <div className="border-s-2 border-outline-variant/40 ps-3.5 ms-1 my-0.5 flex flex-col gap-2 whitespace-pre-wrap font-sans text-sm text-on-surface-variant leading-relaxed">
             {children}
           </div>
         </div>
@@ -226,8 +226,10 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
       (child) =>
         React.isValidElement(child) &&
         (child.type === ReasoningTrigger ||
+          child.type === ReasoningHeader ||
           child.type === ReasoningContent ||
           (child.type as { displayName?: string })?.displayName === 'ReasoningTrigger' ||
+          (child.type as { displayName?: string })?.displayName === 'ReasoningHeader' ||
           (child.type as { displayName?: string })?.displayName === 'ReasoningContent')
     );
 
@@ -266,13 +268,23 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
 );
 ReasoningRoot.displayName = 'Reasoning';
 
-export const ReasoningHeader = ReasoningTrigger;
+export const ReasoningHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="reasoning-header"
+      className={cn('flex items-center justify-between gap-2 px-3.5 py-2.5 min-h-[44px] w-full', className)}
+      {...props}
+    />
+  )
+);
+ReasoningHeader.displayName = 'ReasoningHeader';
 
 /* -------------------------------------------------------------------------------------------------
  * Compound Export
  * -----------------------------------------------------------------------------------------------*/
 export const Reasoning = Object.assign(ReasoningRoot, {
-  Header: ReasoningTrigger,
+  Header: ReasoningHeader,
   Trigger: ReasoningTrigger,
   Content: ReasoningContent,
   CopyButton: ReasoningCopyButton,

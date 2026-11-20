@@ -57,17 +57,23 @@ export function useSortableItemContext() {
   return ctx;
 }
 
-function mergeRefs<T>(...refs: Array<React.Ref<T> | ((node: T | null) => void) | undefined>) {
-  return (node: T | null) => {
-    for (const ref of refs) {
-      if (!ref) continue;
-      if (typeof ref === 'function') {
-        ref(node);
-      } else {
-        ref.current = node;
+function useMergedRefs<T>(
+  first: React.Ref<T> | ((node: T | null) => void) | undefined,
+  second: React.Ref<T> | ((node: T | null) => void) | undefined
+) {
+  return React.useCallback(
+    (node: T | null) => {
+      for (const ref of [first, second]) {
+        if (!ref) continue;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else {
+          ref.current = node;
+        }
       }
-    }
-  };
+    },
+    [first, second]
+  );
 }
 
 export type SortableRootProps = React.ComponentProps<typeof DragDropProvider> & {
@@ -192,10 +198,12 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
       [handleRef, isDragging, isDragSource, isDropTarget, disabled]
     );
 
+    const mergedItemRef = useMergedRefs(ref, forwardedRef);
+
     const element = useRender({
       defaultTagName: 'div',
       render,
-      ref: mergeRefs(ref, forwardedRef),
+      ref: mergedItemRef,
       props: {
         'data-slot': 'sortable-item',
         'data-dragging': isDragging ? '' : undefined,
@@ -236,11 +244,12 @@ export const SortableHandle = React.forwardRef<HTMLButtonElement, SortableHandle
   ) => {
     const { handleRef, disabled: itemDisabled } = useSortableItemContext();
     const disabled = Boolean(disabledProp ?? itemDisabled);
+    const mergedHandleRef = useMergedRefs(handleRef, forwardedRef);
 
     return useRender({
       defaultTagName: 'button',
       render,
-      ref: mergeRefs(handleRef, forwardedRef),
+      ref: mergedHandleRef,
       props: {
         type: 'button',
         disabled,

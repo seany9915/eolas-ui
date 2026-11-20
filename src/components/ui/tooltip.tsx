@@ -121,6 +121,7 @@ function TooltipComponentInner<Payload = unknown>(
     >
       <BaseTooltip.Popup
         ref={ref}
+        data-surface="inverted"
         className={cn(
           'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
           'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
@@ -269,6 +270,7 @@ export const TooltipContent = React.forwardRef<
       >
         <BaseTooltip.Popup
           ref={ref}
+          data-surface="inverted"
           className={cn(
             'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
             'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',

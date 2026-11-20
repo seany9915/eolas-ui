@@ -220,7 +220,10 @@ export const MenuSubmenuTrigger = React.forwardRef<HTMLDivElement, MenuSubmenuTr
         )}
         <span className="truncate">{children}</span>
       </div>
-      <span className="material-symbols-outlined text-base text-on-surface-variant shrink-0" aria-hidden="true">
+      <span
+        className="material-symbols-outlined icon-directional text-base text-on-surface-variant shrink-0"
+        aria-hidden="true"
+      >
         chevron_right
       </span>
     </BaseMenu.SubmenuTrigger>
@@ -297,6 +300,8 @@ export interface MenuProps<Payload = unknown> {
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   fullWidth?: boolean;
+  triggerClassName?: string;
+  popupClassName?: string;
   className?: string;
   children?: BaseMenu.Root.Props<Payload>['children'];
 }
@@ -327,6 +332,8 @@ function MenuComponent<Payload = unknown>({
   alignOffset,
   collisionPadding = 8,
   fullWidth = true,
+  triggerClassName,
+  popupClassName,
   className,
   children,
 }: MenuProps<Payload>): React.JSX.Element {
@@ -396,7 +403,7 @@ function MenuComponent<Payload = unknown>({
               className={cn(
                 'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
                 fullWidth ? 'w-full' : 'w-max',
-                className
+                triggerClassName
               )}
             >
               <span>{triggerLabel}</span>
@@ -421,7 +428,8 @@ function MenuComponent<Payload = unknown>({
                   'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
                   'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
                   'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-                  className
+                  className,
+                  popupClassName
                 )}
               >
                 {children
@@ -505,11 +513,12 @@ MenuList.displayName = 'MenuList';
 export interface MenuClearProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Clear> {}
 
 export const MenuClear = React.forwardRef<HTMLButtonElement, MenuClearProps>(
-  ({ className, children, ...props }, ref) => (
+  ({ className, children, 'aria-label': ariaLabel, ...props }, ref) => (
     <BaseMenu.Clear
       ref={ref}
+      aria-label={ariaLabel ?? (children ? undefined : 'Clear filter')}
       className={cn(
-        'inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary',
+        "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
         className
       )}
       {...props}

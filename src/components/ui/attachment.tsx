@@ -77,7 +77,7 @@ export const AttachmentGroup = React.forwardRef<HTMLDivElement, AttachmentGroupP
         className: cn(
           'flex gap-2 max-w-full',
           scrollable
-            ? 'overflow-x-auto px-1 py-1 pr-4 scrollbar-none snap-x snap-mandatory scroll-smooth [mask-image:linear-gradient(to_right,black_calc(100%-12px),transparent)]'
+            ? 'overflow-x-auto px-1 py-1 pe-4 scrollbar-none snap-x snap-mandatory scroll-smooth [mask-image:linear-gradient(to_right,black_calc(100%-12px),transparent)] rtl:[mask-image:linear-gradient(to_left,black_calc(100%-12px),transparent)]'
             : 'flex-wrap items-center',
           className
         ),
@@ -341,7 +341,7 @@ export const AttachmentActions = React.forwardRef<HTMLDivElement, AttachmentActi
         'data-slot': 'attachment-actions',
         className: cn(
           'relative z-10 flex items-center gap-1 shrink-0',
-          isVertical ? 'absolute top-2.5 right-2.5' : 'ml-auto',
+          isVertical ? 'absolute top-2.5 end-2.5' : 'ms-auto',
           className
         ),
         children,

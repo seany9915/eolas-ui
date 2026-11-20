@@ -26,7 +26,7 @@ import { Skeleton } from './skeleton';
 import { Tooltip } from './tooltip';
 import { UnstyledButton } from './button';
 import { useChatMessageContext } from './chat-message-context';
-import { cn } from '@/lib/utils';
+import { cn, sanitizeUrl } from '@/lib/utils';
 import {
   InlineCitation,
   InlineCitationRoot,
@@ -283,15 +283,16 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
   const context = useSourcesContext();
   const activeVariant = propVariant || context.variant || 'card';
 
-  const itemUrl = href || citation?.url || '#';
+  const itemUrl = sanitizeUrl(href || citation?.url);
   const itemTitle = title || citation?.title || 'Referenced Source';
   const itemDescription = description ?? citation?.snippet;
   const itemIcon = icon || citation?.icon;
-  const itemFavicon = favicon || citation?.favicon;
+  const itemFavicon = sanitizeUrl(favicon || citation?.favicon);
   const displayDomain =
     domain ||
     citation?.domain ||
     (() => {
+      if (!itemUrl) return undefined;
       try {
         return new URL(itemUrl).hostname.replace(/^www\./, '');
       } catch {
@@ -305,8 +306,8 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
     return (
       <a
         href={itemUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={itemUrl ? '_blank' : undefined}
+        rel={itemUrl ? 'noopener noreferrer' : undefined}
         aria-label={`Source: ${itemTitle}`}
         className={cn(
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
@@ -323,11 +324,11 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
     <Tooltip content={tooltipLabel}>
       <a
         href={itemUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={itemUrl ? '_blank' : undefined}
+        rel={itemUrl ? 'noopener noreferrer' : undefined}
         aria-label={`Source: ${itemTitle}`}
         className={cn(
-          'group inline-flex items-center gap-2 px-3 py-1.5 min-h-[44px] max-w-full rounded-md text-left',
+          'group inline-flex items-center gap-2 px-3 py-1.5 min-h-[44px] max-w-full rounded-md text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           // Variant styling: 'card' has border and surface, 'ghost' has zero border for inside bubbles, 'inline' is minimal
@@ -344,7 +345,7 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
           </span>
         )}
         <SourceIcon src={itemFavicon} name={itemIcon || 'description'} />
-        <div className="flex flex-col min-w-0 pr-1">
+        <div className="flex flex-col min-w-0 pe-1">
           <span className="text-sm font-sans font-medium text-on-surface truncate group-hover:text-secondary transition-colors">
             {itemTitle}
           </span>
@@ -362,6 +363,7 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
         <Icon
           name="open_in_new"
           size="xs"
+          directional
           className="text-on-surface-variant/70 group-hover:text-secondary shrink-0 transition-colors"
           aria-hidden="true"
         />
@@ -399,17 +401,20 @@ export const SourcesCitationRef: React.FC<SourcesCitationRefProps> = ({
     </span>
   );
 
+  const safeHref = sanitizeUrl(href);
+
   return (
     <Tooltip content={tooltipText}>
-      {href ? (
+      {safeHref ? (
         <UnstyledButton
+          nativeButton={false}
           expandedTouchTarget
           render={
             <a
-              href={href}
+              href={safeHref}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Citation [${index}]: ${title || href}`}
+              aria-label={`Citation [${index}]: ${title || safeHref}`}
             />
           }
           className="group relative inline-flex items-center align-super p-0.5 rounded cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"

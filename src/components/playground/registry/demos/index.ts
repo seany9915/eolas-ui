@@ -110,6 +110,8 @@ import {
   ModelSelectorDemo,
   ToolDemo,
   CheckpointDemo,
+  MessageScrollerDemo,
+  ChatMessageContextDemo,
 } from './ClinicalAiDemos';
 
 import {
@@ -247,9 +249,9 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'queue': QueueDemo,
   'clinician-tip': ClinicianTipDemo,
   'chat-message': ChatMessageDemo,
-  'chat-message-context': ChatMessageDemo,
+  'chat-message-context': ChatMessageContextDemo,
   'prompt-input': PromptInputDemo,
-  'message-scroller': ChatMessageDemo,
+  'message-scroller': MessageScrollerDemo,
   'code-block': CodeBlockDemo,
   'sources': SourcesDemo,
   'inline-citation': InlineCitationDemo,

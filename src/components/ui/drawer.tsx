@@ -44,7 +44,30 @@ export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
 
 type DrawerSwipeDirection = 'right' | 'left' | 'down' | 'up';
 
-const DrawerDirectionContext = React.createContext<DrawerSwipeDirection>('right');
+interface DrawerContextValue {
+  swipeDirection: DrawerSwipeDirection;
+  popupRef?: React.Ref<HTMLDivElement>;
+  popupClassName?: string;
+  popupProps?: Record<string, unknown>;
+}
+
+const DrawerContext = React.createContext<DrawerContextValue>({
+  swipeDirection: 'right',
+});
+
+function mergeDrawerRefs<T>(
+  ...refs: Array<React.Ref<T> | undefined>
+): React.RefCallback<T> {
+  return (node: T | null) => {
+    for (const r of refs) {
+      if (typeof r === 'function') {
+        r(node);
+      } else if (r && typeof r === 'object') {
+        (r as React.MutableRefObject<T | null>).current = node;
+      }
+    }
+  };
+}
 
 export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right: 'fixed inset-y-0 right-0 z-50 flex max-w-full justify-end',
@@ -55,13 +78,13 @@ export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', str
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[env(safe-area-inset-right)] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   left:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[env(safe-area-inset-left)] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   down:
-    'w-full max-h-[88vh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[env(safe-area-inset-bottom)] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88vh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   up:
-    'w-full max-h-[88vh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[env(safe-area-inset-top)] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88vh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
 };
 
 // Visual grab handle pill
@@ -109,7 +132,7 @@ DrawerCloseButton.displayName = 'DrawerCloseButton';
 
 // Standard layout slots
 export const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col gap-1.5 text-left mb-4', className)} {...props} />
+  <div className={cn('flex flex-col gap-1.5 text-start mb-4', className)} {...props} />
 );
 DrawerHeader.displayName = 'DrawerHeader';
 
@@ -170,7 +193,7 @@ export const DrawerViewport = React.forwardRef<
     swipeDirection?: DrawerSwipeDirection;
   }
 >(({ className, swipeDirection, ...props }, ref) => {
-  const contextDirection = React.useContext(DrawerDirectionContext);
+  const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
   return (
     <BaseDrawer.Viewport
       ref={ref}
@@ -187,13 +210,21 @@ export const DrawerPopup = React.forwardRef<
     swipeDirection?: DrawerSwipeDirection;
   }
 >(({ className, swipeDirection, ...props }, ref) => {
-  const contextDirection = React.useContext(DrawerDirectionContext);
+  const {
+    swipeDirection: contextDirection,
+    popupRef,
+    popupClassName,
+    popupProps,
+  } = React.useContext(DrawerContext);
+  const mergedRef = popupRef ? mergeDrawerRefs(popupRef, ref) : ref;
   return (
     <BaseDrawer.Popup
-      ref={ref}
+      ref={mergedRef}
+      {...(popupProps as React.ComponentPropsWithoutRef<typeof BaseDrawer.Popup>)}
       className={cn(
         'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto will-change-[transform]',
         drawerPopupClasses[swipeDirection ?? contextDirection],
+        popupClassName,
         className
       )}
       {...props}
@@ -230,7 +261,7 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
   className,
   backdropClassName,
 }) => {
-  const contextDirection = React.useContext(DrawerDirectionContext);
+  const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
   const swipeDirection = swipeDirectionProp ?? contextDirection;
   return (
   <BaseDrawer.Portal>
@@ -249,9 +280,9 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
 DrawerPanel.displayName = 'DrawerPanel';
 
 export const DrawerRoot: typeof BaseDrawer.Root = ({ swipeDirection = 'right', ...props }) => (
-  <DrawerDirectionContext.Provider value={swipeDirection}>
+  <DrawerContext.Provider value={{ swipeDirection }}>
     <BaseDrawer.Root swipeDirection={swipeDirection} {...props} />
-  </DrawerDirectionContext.Provider>
+  </DrawerContext.Provider>
 );
 
 const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
@@ -284,6 +315,8 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
 }, ref) => {
   // If used as pure headless compound root without shorthand config
   if (!title && !description && !trigger && !footer) {
+    const compoundPopupClassName = cn(popupClassName, className) || undefined;
+    const compoundPopupProps = Object.keys(props).length > 0 ? props : undefined;
     return (
       <DrawerRoot
         open={open}
@@ -303,7 +336,16 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
         triggerId={triggerId}
         defaultTriggerId={defaultTriggerId}
       >
-        {children}
+        <DrawerContext.Provider
+          value={{
+            swipeDirection,
+            popupRef: ref,
+            popupClassName: compoundPopupClassName,
+            popupProps: compoundPopupProps,
+          }}
+        >
+          {children}
+        </DrawerContext.Provider>
       </DrawerRoot>
     );
   }

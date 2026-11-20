@@ -68,7 +68,7 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
     <BaseAccordion.Trigger
       ref={ref}
       className={cn(
-        'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-left group rounded-md',
+        'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className

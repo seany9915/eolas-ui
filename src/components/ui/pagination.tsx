@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn, sanitizeUrl } from '@/lib/utils';
 import { Button, type ButtonProps } from './button';
 import { Icon } from './icon';
 
@@ -54,11 +54,13 @@ export const PaginationLink = React.forwardRef<
   href,
   ...props
 }, ref) => {
-  const isLink = Boolean(href);
+  const safeHref = sanitizeUrl(href);
+  const isLink = Boolean(safeHref);
   return (
     <Button
       ref={ref}
-      render={isLink ? <a href={href} aria-current={isActive ? 'page' : undefined} /> : undefined}
+      nativeButton={isLink ? false : undefined}
+      render={isLink ? <a href={safeHref} aria-current={isActive ? 'page' : undefined} /> : undefined}
       aria-current={!isLink && isActive ? 'page' : undefined}
       variant={isActive ? 'filled' : 'outlined'}
       colorRole={isActive ? 'primary' : 'neutral'}
@@ -89,10 +91,10 @@ export const PaginationPrevious = React.forwardRef<
   <PaginationLink
     ref={ref}
     aria-label="Go to previous page"
-    className={cn('gap-1 pl-2.5 pr-3.5', className)}
+    className={cn('gap-1 ps-2.5 pe-3.5', className)}
     {...props}
   >
-    <Icon name="chevron_left" size="sm" className="text-base" />
+    <Icon name="chevron_left" size="sm" directional className="text-base" />
     <span className="hidden @sm:inline">{children}</span>
   </PaginationLink>
 ));
@@ -109,11 +111,11 @@ export const PaginationNext = React.forwardRef<
   <PaginationLink
     ref={ref}
     aria-label="Go to next page"
-    className={cn('gap-1 pl-3.5 pr-2.5', className)}
+    className={cn('gap-1 ps-3.5 pe-2.5', className)}
     {...props}
   >
     <span className="hidden @sm:inline">{children}</span>
-    <Icon name="chevron_right" size="sm" className="text-base" />
+    <Icon name="chevron_right" size="sm" directional className="text-base" />
   </PaginationLink>
 ));
 PaginationNext.displayName = 'PaginationNext';

@@ -87,12 +87,16 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
         {...props}
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
           className="aspect-auto h-full w-full"
         >
-          <AreaChart data={data} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
+          <AreaChart
+            aria-label={chartLabel ?? title}
+            data={data}
+            margin={{ left: 12, right: 12, top: 12, bottom: 0 }}
+          >
             <defs>
               {series.map((item) => (
                 <linearGradient

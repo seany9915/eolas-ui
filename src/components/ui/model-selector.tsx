@@ -26,6 +26,7 @@ import {
   ComboboxGroup,
   ComboboxGroupLabel,
   ComboboxSeparator,
+  createComboboxItems,
 } from './combobox';
 import { Tooltip } from './tooltip';
 import { Badge } from './badge';
@@ -89,6 +90,14 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   className,
 }) => {
   const hasModels = models.length > 0;
+  const modelItems = React.useMemo(
+    () =>
+      createComboboxItems(models, {
+        getValue: (item: ModelItem) => item.value,
+        getLabel: (item: ModelItem) => item.label,
+      }),
+    [models]
+  );
   const selectedModel = React.useMemo(
     () => models.find((m) => m.value === valueProp),
     [models, valueProp]
@@ -97,7 +106,7 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   return (
     <div className={cn('min-w-36 @sm:min-w-44', className)}>
       <Combobox
-        items={models}
+        items={modelItems}
         value={valueProp}
         defaultValue={defaultValue ?? null}
         onValueChange={(val) => {

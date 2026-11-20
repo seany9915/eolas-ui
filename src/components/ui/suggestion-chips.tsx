@@ -71,15 +71,25 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
       [ref]
     );
 
-    // Maintain a single Tab stop across the chip list via roving tabIndex.
+    // Maintain a single Tab stop across enabled chips via roving tabIndex.
     React.useEffect(() => {
       const root = listRef.current;
       if (!root) return;
-      const items = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-slot="suggestion-chip"]'));
-      if (items.length === 0) return;
-      const hasZero = items.some((el) => el.getAttribute('tabindex') === '0');
-      if (!hasZero) {
-        items.forEach((el, idx) => el.setAttribute('tabindex', idx === 0 ? '0' : '-1'));
+      const allItems = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-slot="suggestion-chip"]'));
+      if (allItems.length === 0) return;
+      const isDisabledChip = (el: HTMLButtonElement) =>
+        el.disabled || el.getAttribute('aria-disabled') === 'true';
+
+      allItems.forEach((el) => {
+        if (isDisabledChip(el)) el.setAttribute('tabindex', '-1');
+      });
+
+      const enabledItems = allItems.filter((el) => !isDisabledChip(el));
+      if (enabledItems.length === 0) return;
+
+      const hasEnabledZero = enabledItems.some((el) => el.getAttribute('tabindex') === '0');
+      if (!hasEnabledZero) {
+        enabledItems.forEach((el, idx) => el.setAttribute('tabindex', idx === 0 ? '0' : '-1'));
       }
     }, [children]);
 
@@ -90,7 +100,9 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
       if (!root) return;
 
       const items = Array.from(
-        root.querySelectorAll<HTMLButtonElement>('[data-slot="suggestion-chip"]:not(:disabled)')
+        root.querySelectorAll<HTMLButtonElement>(
+          '[data-slot="suggestion-chip"]:not(:disabled):not([aria-disabled="true"])'
+        )
       );
       if (items.length <= 1) return;
 
@@ -180,7 +192,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         onClick={handleClick}
         className={cn(
           'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
-          'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-left',
+          'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           className
@@ -203,7 +215,8 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         <Icon
           name="arrow_forward"
           size="xs"
-          className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
+          directional
+          className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
           aria-hidden="true"
         />
       </Button>
@@ -219,7 +232,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         expandedTouchTarget
         className={cn(
           'group inline-flex items-center gap-2 px-3 py-1 h-8 rounded-full',
-          'bg-transparent border-0 hover:bg-surface-container/60 text-left',
+          'bg-transparent border-0 hover:bg-surface-container/60 text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           className
@@ -241,7 +254,8 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
           <Icon
             name="arrow_forward"
             size="xs"
-            className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
+            directional
+            className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
             aria-hidden="true"
           />
         )}
@@ -257,7 +271,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
       expandedTouchTarget
       className={cn(
         'group inline-flex items-center gap-2 px-3.5 py-1 h-8 rounded-full',
-        'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-left',
+        'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-start',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
         className
@@ -279,7 +293,8 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         <Icon
           name="arrow_forward"
           size="xs"
-          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
+          directional
+          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
           aria-hidden="true"
         />
       )}

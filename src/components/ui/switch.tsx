@@ -33,17 +33,17 @@ const sizeConfig: Record<
   sm: {
     track: 'w-9 h-5 p-0.5',
     thumb: 'size-4',
-    translate: 'data-[checked]:translate-x-4',
+    translate: 'data-[checked]:translate-x-4 rtl:data-[checked]:-translate-x-4',
   },
   md: {
     track: 'w-11 h-6 p-0.5',
     thumb: 'size-5',
-    translate: 'data-[checked]:translate-x-5',
+    translate: 'data-[checked]:translate-x-5 rtl:data-[checked]:-translate-x-5',
   },
   lg: {
     track: 'w-14 h-8 p-1',
     thumb: 'size-6',
-    translate: 'data-[checked]:translate-x-6',
+    translate: 'data-[checked]:translate-x-6 rtl:data-[checked]:-translate-x-6',
   },
 };
 

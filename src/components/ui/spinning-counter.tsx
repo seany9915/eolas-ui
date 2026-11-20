@@ -123,7 +123,7 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
           <span
             aria-hidden="true"
             style={{ height: `${cellHeight}px`, lineHeight: `${cellHeight}px` }}
-            className="mr-0.5 inline-flex items-center"
+            className="me-0.5 inline-flex items-center"
           >
             {prefix}
           </span>
@@ -145,7 +145,7 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
           <span
             aria-hidden="true"
             style={{ height: `${cellHeight}px`, lineHeight: `${cellHeight}px` }}
-            className="ml-0.5 inline-flex items-center"
+            className="ms-0.5 inline-flex items-center"
           >
             {suffix}
           </span>

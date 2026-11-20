@@ -107,10 +107,6 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     const detailPaneRef = React.useRef<HTMLDivElement | null>(null);
     const backButtonRef = React.useRef<HTMLButtonElement | null>(null);
     const searchInputRef = React.useRef<HTMLInputElement | null>(null);
-    const itemRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
-    const itemRefCallbacks = React.useRef<Map<string, (node: HTMLDivElement | null) => void>>(
-      new Map()
-    );
 
     const isControlledSelect = selectedId !== undefined;
     const currentSelectedId = isControlledSelect ? selectedId : internalSelectedId;
@@ -118,19 +114,15 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     const isControlledSearch = searchQuery !== undefined;
     const currentSearch = isControlledSearch ? searchQuery : internalSearch;
 
-    const getItemRefCallback = React.useCallback((id: string) => {
-      let cb = itemRefCallbacks.current.get(id);
-      if (!cb) {
-        cb = (node: HTMLDivElement | null) => {
-          if (node) {
-            itemRefs.current[id] = node;
-          } else {
-            delete itemRefs.current[id];
-          }
-        };
-        itemRefCallbacks.current.set(id, cb);
+    const findItemNode = React.useCallback((id: string): HTMLElement | null => {
+      const nodes = listPaneRef.current?.querySelectorAll<HTMLElement>('[role="option"][data-item-id]');
+      if (!nodes) return null;
+      for (const node of nodes) {
+        if (node.dataset.itemId === id) {
+          return node;
+        }
       }
-      return cb;
+      return null;
     }, []);
 
     const handleSelect = (id: string | null) => {
@@ -192,7 +184,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           : rovingTargetId;
       handleSelect(null);
       window.requestAnimationFrame(() => {
-        const targetNode = targetId ? itemRefs.current[targetId] : null;
+        const targetNode = targetId ? findItemNode(targetId) : null;
         if (targetNode && targetNode.offsetParent !== null) {
           targetNode.focus();
         } else if (searchInputRef.current && searchInputRef.current.offsetParent !== null) {
@@ -218,7 +210,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     };
 
     const focusItemById = (id: string) => {
-      const target = itemRefs.current[id];
+      const target = findItemNode(id);
       if (!target) return;
       setFocusedItemId(id);
       target.focus();
@@ -287,7 +279,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           data-slot="list-pane"
           className={cn(
             listWidthClassName,
-            'w-full flex-1 @2xl:flex-initial flex-col bg-surface @2xl:border-r border-outline-variant shrink-0 border-r-0 min-h-0',
+            'w-full flex-1 @2xl:flex-initial flex-col bg-surface border-e-0 @2xl:border-e border-outline-variant shrink-0 min-h-0',
             selectedItem ? 'hidden @2xl:flex' : 'flex'
           )}
         >
@@ -375,7 +367,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                   return (
                     <Item
                       key={item.id}
-                      ref={getItemRefCallback(item.id)}
+                      data-item-id={item.id}
                       role="option"
                       variant={isSelected ? 'selected' : 'default'}
                       interactive={!item.disabled}
@@ -454,9 +446,12 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
         >
           {selectedItem ? (
             <div className="flex-1 flex flex-col h-full min-h-0">
-              {/* Mobile Back Bar with Actions */}
-              <div className="min-h-16 h-16 short:min-h-14 short:h-14 px-3 border-b border-outline-variant flex items-center justify-between gap-2 @2xl:hidden bg-surface shrink-0">
-                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              {/* Unified Detail Header */}
+              <div
+                data-slot="detail-header"
+                className="min-h-16 h-16 short:min-h-14 short:h-14 px-3 @2xl:px-4 @md:px-6 border-b border-outline-variant flex items-center justify-between gap-2 @2xl:gap-3 bg-surface shrink-0"
+              >
+                <div className="flex items-center gap-1.5 @2xl:gap-2.5 min-w-0 flex-1">
                   <Button
                     ref={backButtonRef}
                     variant="text"
@@ -464,23 +459,12 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                     size="sm"
                     onClick={() => handleBackToList(selectedItem.id)}
                     aria-label={title ? `Back to ${title}` : 'Back to list'}
+                    className="@2xl:hidden"
                   >
-                    <Icon name="arrow_back" size="sm" />
+                    <Icon name="arrow_back" size="sm" directional />
                     <span>Back</span>
                   </Button>
                   <h3 className="font-heading text-base font-semibold text-on-surface truncate min-w-0">
-                    {selectedItem.title}
-                  </h3>
-                </div>
-                {detailActions && (
-                  <div className="flex items-center gap-1.5 shrink-0">{detailActions}</div>
-                )}
-              </div>
-
-              {/* Desktop Detail Header */}
-              <div className="min-h-16 h-16 short:min-h-14 short:h-14 px-4 @md:px-6 border-b border-outline-variant hidden @2xl:flex items-center justify-between gap-3 bg-surface shrink-0">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <h3 className="font-heading text-base font-semibold text-on-surface truncate">
                     {selectedItem.title}
                   </h3>
                   {selectedItem.badge && (
@@ -488,6 +472,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                       variant="soft"
                       colorRole={selectedItem.badgeColorRole || 'primary'}
                       size="sm"
+                      className="hidden @2xl:inline-flex"
                     >
                       {selectedItem.badge}
                     </Badge>

@@ -19,6 +19,7 @@ export interface AutocompleteOption {
   value: string;
   label: string;
   disabled?: boolean;
+  [key: string]: unknown;
 }
 
 export type AutocompleteItem = AutocompleteOption;
@@ -27,18 +28,92 @@ export interface AutocompleteGroupOption<Item = AutocompleteOption> {
   label: string;
   items: readonly Item[];
   options?: readonly Item[];
+  [key: string]: unknown;
 }
 
 export type AutocompleteGroupItem = AutocompleteGroupOption;
 
-export interface AutocompleteProps<ItemValue = AutocompleteOption> {
+function isAutocompleteGroupedArray<ItemValue>(
+  val:
+    | readonly ItemValue[]
+    | readonly { items: readonly ItemValue[]; [key: string]: unknown }[]
+): val is readonly { items: readonly ItemValue[]; [key: string]: unknown }[] {
+  if (!Array.isArray(val) || val.length === 0) return false;
+  const first = val[0];
+  return (
+    typeof first === 'object' &&
+    first !== null &&
+    'items' in first &&
+    Array.isArray((first as { items?: unknown }).items)
+  );
+}
+
+function isAutocompleteGroupInput<ItemValue>(
+  val: readonly unknown[] | undefined
+): val is readonly AutocompleteGroupOption<ItemValue>[] {
+  if (!Array.isArray(val) || val.length === 0) return false;
+  const first = val[0];
+  return (
+    typeof first === 'object' &&
+    first !== null &&
+    (('items' in first && Array.isArray((first as { items?: unknown }).items)) ||
+      ('options' in first && Array.isArray((first as { options?: unknown }).options)))
+  );
+}
+
+function normalizeAutocompleteEntry<ItemValue>(
+  entry: ItemValue,
+  index: number,
+  itemToStringValue?: (itemValue: ItemValue) => string
+): AutocompleteOption {
+  if (typeof entry === 'string' || typeof entry === 'number') {
+    const s = String(entry);
+    return { value: s, label: s, disabled: false };
+  }
+  if (entry && typeof entry === 'object') {
+    const obj = entry as Record<string, unknown>;
+    const fallback = itemToStringValue ? itemToStringValue(entry) : undefined;
+    const resolvedValue = obj.value ?? obj.label ?? fallback ?? index;
+    const resolvedLabel = obj.label ?? obj.value ?? fallback ?? index;
+    return {
+      ...obj,
+      value: String(resolvedValue),
+      label: String(resolvedLabel),
+      disabled: Boolean(obj.disabled),
+    };
+  }
+  const fallback = itemToStringValue ? itemToStringValue(entry) : String(index);
+  return { value: fallback, label: fallback, disabled: false };
+}
+
+function normalizeAutocompleteGroupList<ItemValue>(
+  rawGroups: readonly AutocompleteGroupOption<ItemValue>[] | undefined,
+  itemToStringValue?: (itemValue: ItemValue) => string
+): AutocompleteGroupOption[] | undefined {
+  if (!rawGroups || rawGroups.length === 0) return undefined;
+  return rawGroups.map((g) => {
+    const { options: _rawOptions, items: _rawItems, ...restGroup } = g;
+    const list = (_rawItems ?? _rawOptions ?? []) as readonly ItemValue[];
+    return {
+      ...restGroup,
+      label: String(g.label || ''),
+      items: list.map((opt, idx) => normalizeAutocompleteEntry(opt, idx, itemToStringValue)),
+    };
+  });
+}
+
+export interface AutocompleteProps<ItemValue = AutocompleteOption>
+  extends Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    'onChange' | 'onSelect' | 'defaultValue' | 'children'
+  > {
   label?: React.ReactNode;
   description?: React.ReactNode;
   placeholder?: string;
   options?: AutocompleteOption[];
   groups?: AutocompleteGroupOption<ItemValue>[];
-  items?: readonly ItemValue[];
-  filteredItems?: readonly ItemValue[];
+  items?: BaseAutocomplete.Root.Props<ItemValue>['items'];
+  filteredItems?: BaseAutocomplete.Root.Props<ItemValue>['filteredItems'];
   filter?: BaseAutocomplete.Root.Props<ItemValue>['filter'];
   mode?: 'list' | 'both' | 'inline' | 'none';
   inline?: boolean;
@@ -91,74 +166,114 @@ export interface AutocompleteProps<ItemValue = AutocompleteOption> {
   className?: string;
 }
 
-const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps>(
-  (
-    {
-      label,
-      description,
-      placeholder = 'Type to search...',
-      options,
-      groups,
-      items,
-      filteredItems,
-      filter,
-      mode = 'list',
-      inline = false,
-      autoHighlight,
-      keepHighlight,
-      highlightItemOnHover = true,
-      openOnInputClick = true,
-      submitOnItemClick = false,
-      itemToStringValue,
-      actionsRef,
-      value,
-      defaultValue,
-      onValueChange,
-      onChange,
-      onSelect,
-      open,
-      defaultOpen,
-      onOpenChange,
-      onItemHighlighted,
-      leadingIcon = (
-        <span className="material-symbols-outlined text-lg select-none" aria-hidden="true">
-          search
-        </span>
-      ),
-      trailingIcon,
-      clearable = true,
-      showTrigger = false,
-      disabled = false,
-      readOnly = false,
-      required = false,
-      name,
-      id,
-      form,
-      autoComplete,
-      error,
-      container,
-      anchor,
-      side = 'bottom',
-      align = 'start',
-      sideOffset = 4,
-      alignOffset = 0,
-      collisionPadding = 8,
-      collisionBoundary,
-      collisionAvoidance,
-      positionerClassName,
-      popupClassName,
-      listClassName,
-      inputGroupClassName,
-      inputClassName,
-      emptyMessage = 'No matching suggestions found',
-      size = 'md',
-      inputRef,
-      children,
-      className,
-      ...props
-    },
-    ref
-  ) => {
+function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
+  {
+    label,
+    description,
+    placeholder = 'Type to search...',
+    options,
+    groups,
+    items,
+    filteredItems,
+    filter,
+    mode = 'list',
+    inline = false,
+    autoHighlight,
+    keepHighlight,
+    highlightItemOnHover = true,
+    openOnInputClick = true,
+    submitOnItemClick = false,
+    itemToStringValue,
+    actionsRef,
+    value,
+    defaultValue,
+    onValueChange,
+    onChange,
+    onSelect,
+    open,
+    defaultOpen,
+    onOpenChange,
+    onItemHighlighted,
+    leadingIcon = (
+      <span className="material-symbols-outlined text-lg select-none" aria-hidden="true">
+        search
+      </span>
+    ),
+    trailingIcon,
+    clearable = true,
+    showTrigger = false,
+    disabled = false,
+    readOnly = false,
+    required = false,
+    name,
+    id,
+    form,
+    autoComplete,
+    error,
+    container,
+    anchor,
+    side = 'bottom',
+    align = 'start',
+    sideOffset = 4,
+    alignOffset = 0,
+    collisionPadding = 8,
+    collisionBoundary,
+    collisionAvoidance,
+    positionerClassName,
+    popupClassName,
+    listClassName,
+    inputGroupClassName,
+    inputClassName,
+    emptyMessage = 'No matching suggestions found',
+    size = 'md',
+    inputRef,
+    children,
+    className,
+    ...props
+  }: AutocompleteProps<ItemValue>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
+    const generatedId = React.useId();
+    const autocompleteId = id || `autocomplete-${generatedId}`;
+    const descriptionId = description ? `${autocompleteId}-desc` : undefined;
+    const errorId = typeof error === 'string' && error ? `${autocompleteId}-error` : undefined;
+    const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+
+    // Normalize flat options while preserving any caller metadata fields
+    const normalizedOptions = React.useMemo<readonly AutocompleteOption[]>(() => {
+      const list = options ?? (items && !isAutocompleteGroupedArray(items) ? items : undefined);
+      if (list && list.length > 0) {
+        return list.map((opt, index) =>
+          normalizeAutocompleteEntry(opt as ItemValue, index, itemToStringValue)
+        );
+      }
+      return [];
+    }, [options, items, itemToStringValue]);
+
+    // Normalize grouped options while preserving custom group/item fields
+    const normalizedGroups = React.useMemo<readonly AutocompleteGroupOption[] | null>(() => {
+      const normalized = normalizeAutocompleteGroupList(groups, itemToStringValue);
+      return normalized ?? null;
+    }, [groups, itemToStringValue]);
+
+    const normalizedFilteredGroups = React.useMemo(() => {
+      if (!filteredItems || !isAutocompleteGroupInput<ItemValue>(filteredItems)) return undefined;
+      return normalizeAutocompleteGroupList(filteredItems, itemToStringValue);
+    }, [filteredItems, itemToStringValue]);
+
+    // Default itemToStringValue handles both string and object shapes
+    const defaultItemToStringValue = React.useCallback(
+      (item: unknown) => {
+        if (typeof item === 'string' || typeof item === 'number') return String(item);
+        if (item && typeof item === 'object') {
+          const obj = item as { label?: unknown; value?: unknown };
+          return String(obj.label ?? obj.value ?? '');
+        }
+        return '';
+      },
+      []
+    );
+
     // Unify onValueChange and onChange without suppressing eventDetails
     const handleValueChange = (
       val: string,
@@ -186,63 +301,100 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       }
     };
 
-    const generatedId = React.useId();
-    const autocompleteId = id || `autocomplete-${generatedId}`;
-    const descriptionId = description ? `${autocompleteId}-desc` : undefined;
-    const errorId = typeof error === 'string' && error ? `${autocompleteId}-error` : undefined;
-    const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
-
-    // Normalize flat options
-    const normalizedOptions = React.useMemo<readonly AutocompleteOption[]>(() => {
-      const list = options ?? items;
-      if (list && list.length > 0) {
-        return list.map((opt, index) => {
-          if (typeof opt === 'string' || typeof opt === 'number') {
-            return { value: String(opt), label: String(opt), disabled: false };
-          }
-          return {
-            value: String(opt?.value ?? opt?.label ?? index),
-            label: String(opt?.label ?? opt?.value ?? index),
-            disabled: Boolean(opt?.disabled),
-          };
-        });
+    const wrapCompoundRoot = (rootNode: React.JSX.Element) => {
+      if (ref != null || className !== undefined || Object.keys(props).length > 0) {
+        return (
+          <div ref={ref} className={className} {...props}>
+            {rootNode}
+          </div>
+        );
       }
-      return [];
-    }, [options, items]);
-
-    // Normalize grouped options
-    const normalizedGroups = React.useMemo<readonly AutocompleteGroupOption[] | null>(() => {
-      if (!groups || groups.length === 0) return null;
-      return groups.map((g) => ({
-        label: String(g.label || ''),
-        items: (g.items ?? g.options ?? []).map((opt, index) => {
-          if (typeof opt === 'string' || typeof opt === 'number') {
-            return { value: String(opt), label: String(opt), disabled: false };
-          }
-          return {
-            value: String(opt?.value ?? opt?.label ?? index),
-            label: String(opt?.label ?? opt?.value ?? index),
-            disabled: Boolean(opt?.disabled),
-          };
-        }),
-      }));
-    }, [groups]);
-
-    // Default itemToStringValue handles both string and object shapes
-    const defaultItemToStringValue = React.useCallback(
-      (item: AutocompleteOption) => {
-        if (typeof item === 'string') return item;
-        return item?.label ?? item?.value ?? '';
-      },
-      []
-    );
+      return rootNode;
+    };
 
     // If children are provided, this is a compositional/compound Autocomplete
     if (children) {
       if (normalizedGroups && normalizedGroups.length > 0) {
-        return (
+        return wrapCompoundRoot(
           <BaseAutocomplete.Root
             items={normalizedGroups}
+            filteredItems={
+              normalizedFilteredGroups ??
+              (filteredItems as readonly AutocompleteGroupOption[] | undefined)
+            }
+            value={value === null ? '' : value}
+            defaultValue={defaultValue === null ? undefined : defaultValue}
+            onValueChange={handleValueChange}
+            mode={mode}
+            inline={inline}
+            autoHighlight={autoHighlight}
+            keepHighlight={keepHighlight}
+            highlightItemOnHover={highlightItemOnHover}
+            openOnInputClick={openOnInputClick}
+            submitOnItemClick={submitOnItemClick}
+            disabled={disabled}
+            readOnly={readOnly}
+            required={required}
+            name={name}
+            id={id}
+            form={form}
+            actionsRef={actionsRef}
+            open={open}
+            defaultOpen={defaultOpen}
+            onOpenChange={onOpenChange}
+            onItemHighlighted={
+              onItemHighlighted as BaseAutocomplete.Root.Props<AutocompleteOption>['onItemHighlighted']
+            }
+            itemToStringValue={
+              (itemToStringValue as ((itemValue: AutocompleteOption) => string) | undefined) ??
+              defaultItemToStringValue
+            }
+            filter={filter as BaseAutocomplete.Root.Props<AutocompleteOption>['filter']}
+          >
+            {children}
+          </BaseAutocomplete.Root>
+        );
+      }
+
+      if (items !== undefined && !options) {
+        if (isAutocompleteGroupedArray(items)) {
+          return wrapCompoundRoot(
+            <BaseAutocomplete.Root
+              items={items}
+              filteredItems={filteredItems}
+              value={value === null ? '' : value}
+              defaultValue={defaultValue === null ? undefined : defaultValue}
+              onValueChange={handleValueChange}
+              mode={mode}
+              inline={inline}
+              autoHighlight={autoHighlight}
+              keepHighlight={keepHighlight}
+              highlightItemOnHover={highlightItemOnHover}
+              openOnInputClick={openOnInputClick}
+              submitOnItemClick={submitOnItemClick}
+              disabled={disabled}
+              readOnly={readOnly}
+              required={required}
+              name={name}
+              id={id}
+              form={form}
+              actionsRef={actionsRef}
+              open={open}
+              defaultOpen={defaultOpen}
+              onOpenChange={onOpenChange}
+              onItemHighlighted={onItemHighlighted}
+              itemToStringValue={itemToStringValue}
+              filter={filter}
+            >
+              {children}
+            </BaseAutocomplete.Root>
+          );
+        }
+
+        return wrapCompoundRoot(
+          <BaseAutocomplete.Root
+            items={items}
+            filteredItems={filteredItems as readonly ItemValue[] | undefined}
             value={value === null ? '' : value}
             defaultValue={defaultValue === null ? undefined : defaultValue}
             onValueChange={handleValueChange}
@@ -264,7 +416,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
             defaultOpen={defaultOpen}
             onOpenChange={onOpenChange}
             onItemHighlighted={onItemHighlighted}
-            itemToStringValue={itemToStringValue ?? defaultItemToStringValue}
+            itemToStringValue={itemToStringValue}
             filter={filter}
           >
             {children}
@@ -272,10 +424,10 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
         );
       }
 
-      return (
+      return wrapCompoundRoot(
         <BaseAutocomplete.Root
           items={normalizedOptions}
-          filteredItems={filteredItems}
+          filteredItems={filteredItems as readonly AutocompleteOption[] | undefined}
           value={value === null ? '' : value}
           defaultValue={defaultValue === null ? undefined : defaultValue}
           onValueChange={handleValueChange}
@@ -296,9 +448,14 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
           open={open}
           defaultOpen={defaultOpen}
           onOpenChange={onOpenChange}
-          onItemHighlighted={onItemHighlighted}
-          itemToStringValue={itemToStringValue ?? defaultItemToStringValue}
-          filter={filter}
+          onItemHighlighted={
+            onItemHighlighted as BaseAutocomplete.Root.Props<AutocompleteOption>['onItemHighlighted']
+          }
+          itemToStringValue={
+            (itemToStringValue as ((itemValue: AutocompleteOption) => string) | undefined) ??
+            defaultItemToStringValue
+          }
+          filter={filter as BaseAutocomplete.Root.Props<AutocompleteOption>['filter']}
         >
           {children}
         </BaseAutocomplete.Root>
@@ -350,7 +507,7 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       >
         {hasLeading && (
           <span
-            className="text-on-surface-variant pl-3 pr-1 flex items-center pointer-events-none select-none z-10 shrink-0"
+            className="text-on-surface-variant ps-3 pe-1 flex items-center pointer-events-none select-none z-10 shrink-0"
             aria-hidden="true"
           >
             {leadingIcon}
@@ -376,14 +533,14 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
             size === 'sm' && 'h-11 min-h-[44px] text-xs',
             size === 'md' && 'h-12 min-h-[48px] text-sm',
             size === 'lg' && 'h-14 min-h-[56px] text-base',
-            hasLeading ? 'pl-1' : 'pl-3.5',
-            clearable || showTrigger || hasTrailing ? 'pr-2' : 'pr-3.5',
+            hasLeading ? 'ps-1' : 'ps-3.5',
+            clearable || showTrigger || hasTrailing ? 'pe-2' : 'pe-3.5',
             'disabled:cursor-not-allowed',
             inputClassName
           )}
         />
 
-        <div className="flex items-center gap-1.5 pr-2 shrink-0">
+        <div className="flex items-center gap-1.5 pe-2 shrink-0">
           {clearable && <AutocompleteClear />}
           {showTrigger && <AutocompleteTrigger />}
           {hasTrailing && (
@@ -441,11 +598,18 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
         <div ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
           <BaseAutocomplete.Root
             items={normalizedGroups}
-            itemToStringValue={itemToStringValue ?? defaultItemToStringValue}
+            filteredItems={
+              normalizedFilteredGroups ??
+              (filteredItems as readonly AutocompleteGroupOption[] | undefined)
+            }
+            itemToStringValue={
+              (itemToStringValue as ((itemValue: AutocompleteOption) => string) | undefined) ??
+              defaultItemToStringValue
+            }
             value={value === null ? '' : value}
             defaultValue={defaultValue === null ? undefined : defaultValue}
             onValueChange={handleValueChange}
-            filter={filter}
+            filter={filter as BaseAutocomplete.Root.Props<AutocompleteOption>['filter']}
             mode={mode}
             inline={inline}
             autoHighlight={autoHighlight}
@@ -463,7 +627,9 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
             open={open}
             defaultOpen={defaultOpen}
             onOpenChange={onOpenChange}
-            onItemHighlighted={onItemHighlighted}
+            onItemHighlighted={
+              onItemHighlighted as BaseAutocomplete.Root.Props<AutocompleteOption>['onItemHighlighted']
+            }
           >
             <AutocompleteStatus />
             {label && (
@@ -488,12 +654,15 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
       <div ref={ref} className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
         <BaseAutocomplete.Root
           items={normalizedOptions}
-          filteredItems={filteredItems}
-          itemToStringValue={itemToStringValue ?? defaultItemToStringValue}
+          filteredItems={filteredItems as readonly AutocompleteOption[] | undefined}
+          itemToStringValue={
+            (itemToStringValue as ((itemValue: AutocompleteOption) => string) | undefined) ??
+            defaultItemToStringValue
+          }
           value={value === null ? '' : value}
           defaultValue={defaultValue === null ? undefined : defaultValue}
           onValueChange={handleValueChange}
-          filter={filter}
+          filter={filter as BaseAutocomplete.Root.Props<AutocompleteOption>['filter']}
           mode={mode}
           inline={inline}
           autoHighlight={autoHighlight}
@@ -511,7 +680,9 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
           open={open}
           defaultOpen={defaultOpen}
           onOpenChange={onOpenChange}
-          onItemHighlighted={onItemHighlighted}
+          onItemHighlighted={
+            onItemHighlighted as BaseAutocomplete.Root.Props<AutocompleteOption>['onItemHighlighted']
+          }
         >
           <AutocompleteStatus />
           {label && (
@@ -530,8 +701,13 @@ const AutocompleteComponent = React.forwardRef<HTMLDivElement, AutocompleteProps
         {errorElement}
       </div>
     );
-  }
-);
+}
+
+export const AutocompleteComponent = React.forwardRef(AutocompleteComponentInner) as (<
+  ItemValue = AutocompleteOption
+>(
+  props: AutocompleteProps<ItemValue> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
 
 AutocompleteComponent.displayName = 'Autocomplete';
 
@@ -699,12 +875,28 @@ AutocompletePopup.displayName = 'AutocompletePopup';
 export const AutocompleteArrow = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.Arrow>,
   React.ComponentPropsWithoutRef<typeof BaseAutocomplete.Arrow>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Arrow
     ref={ref}
-    className={cn('fill-surface stroke-outline-variant', className)}
+    className={cn(
+      'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
+      'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+      className
+    )}
     {...props}
-  />
+  >
+    {children ?? (
+      <svg
+        width="10"
+        height="5"
+        viewBox="0 0 10 5"
+        className="block fill-surface stroke-outline-variant"
+        aria-hidden="true"
+      >
+        <path d="M0 5 L5 0 L10 5" />
+      </svg>
+    )}
+  </BaseAutocomplete.Arrow>
 ));
 AutocompleteArrow.displayName = 'AutocompleteArrow';
 

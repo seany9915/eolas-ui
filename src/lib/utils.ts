@@ -52,6 +52,49 @@ export function assetUrl(path: string): string {
   return `${cleanBase}${cleanPath}`;
 }
 
+const SAFE_URL_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+
+function stripControlChars(value: string): string {
+  let out = '';
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    if (code <= 0x1f || code === 0x7f) continue;
+    out += value[i];
+  }
+  return out;
+}
+
+/**
+ * Validates user- or agent-supplied URLs before rendering them in links.
+ * Strips control characters and allows only safe HTTP(S)/mailto/tel protocols or non-protocol-relative paths.
+ */
+export function sanitizeUrl(url?: string | null): string | undefined {
+  if (typeof url !== 'string') return undefined;
+  const cleaned = stripControlChars(url).trim();
+  if (!cleaned) return undefined;
+  if (cleaned.startsWith('//')) return undefined;
+
+  if (
+    cleaned.startsWith('/') ||
+    cleaned.startsWith('./') ||
+    cleaned.startsWith('../') ||
+    cleaned.startsWith('#') ||
+    cleaned.startsWith('?')
+  ) {
+    return cleaned;
+  }
+
+  const collapsed = cleaned.replace(/\s+/g, '');
+  const beforeDelimiter = collapsed.split(/[/?#]/, 1)[0];
+  const colonIdx = beforeDelimiter.indexOf(':');
+  if (colonIdx !== -1) {
+    const scheme = beforeDelimiter.slice(0, colonIdx + 1).toLowerCase();
+    return SAFE_URL_PROTOCOLS.has(scheme) ? cleaned : undefined;
+  }
+
+  return cleaned;
+}
+
 // Base UI headless utilities for component authoring and prop composition
 export {
   mergeProps,

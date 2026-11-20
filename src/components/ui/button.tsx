@@ -72,9 +72,9 @@ const baseStyles = cn(
 );
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'h-11 px-3.5 min-h-[44px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:pl-3 has-[>svg:first-child:not(:only-child)]:pl-3 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pr-3 has-[>svg:last-child:not(:only-child)]:pr-3', // Compact floor 44px; optical -2px on icon side
-  md: 'h-12 px-5 min-h-[48px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:pl-4 has-[>svg:first-child:not(:only-child)]:pl-4 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pr-4 has-[>svg:last-child:not(:only-child)]:pr-4', // Button standard floor 48px; optical -4px on icon side
-  lg: 'h-14 px-6 min-h-[56px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:pl-5 has-[>svg:first-child:not(:only-child)]:pl-5 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pr-5 has-[>svg:last-child:not(:only-child)]:pr-5', // Prominent hero floor 56px; optical -4px on icon side
+  sm: 'h-11 px-3.5 min-h-[44px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:ps-3 has-[>svg:first-child:not(:only-child)]:ps-3 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pe-3 has-[>svg:last-child:not(:only-child)]:pe-3', // Compact floor 44px; optical -2px on icon side
+  md: 'h-12 px-5 min-h-[48px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:ps-4 has-[>svg:first-child:not(:only-child)]:ps-4 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pe-4 has-[>svg:last-child:not(:only-child)]:pe-4', // Button standard floor 48px; optical -4px on icon side
+  lg: 'h-14 px-6 min-h-[56px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:ps-5 has-[>svg:first-child:not(:only-child)]:ps-5 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pe-5 has-[>svg:last-child:not(:only-child)]:pe-5', // Prominent hero floor 56px; optical -4px on icon side
   icon: 'h-11 w-11 min-h-[44px] min-w-[44px] p-0 shrink-0 inline-flex items-center justify-center',
 };
 
@@ -182,7 +182,7 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant,
       colorRole,
-      type = 'button',
+      type,
       size = 'md',
       expandedTouchTarget,
       className,
@@ -199,15 +199,19 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isActuallyDisabled = disabled || loading;
     const isFocusableWhenDisabled =
       focusableWhenDisabled ?? (loading ? true : undefined);
+    const isNonButtonIntrinsicRender =
+      React.isValidElement(render) && typeof render.type === 'string' && render.type !== 'button';
+    const resolvedNativeButton = nativeButton ?? (isNonButtonIntrinsicRender ? false : true);
+    const resolvedType = type ?? (resolvedNativeButton ? 'button' : undefined);
 
     return (
       <BaseButton
         ref={ref}
         data-slot="button"
-        type={type}
+        {...(resolvedType !== undefined ? { type: resolvedType } : {})}
         disabled={isActuallyDisabled}
         focusableWhenDisabled={isFocusableWhenDisabled}
-        nativeButton={nativeButton}
+        nativeButton={resolvedNativeButton}
         render={render}
         aria-busy={loading ? true : undefined}
         className={buttonVariants({

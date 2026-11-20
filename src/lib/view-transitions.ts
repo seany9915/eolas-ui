@@ -46,6 +46,16 @@ export interface UseViewTransitionReturn {
 
 export function useViewTransition(): UseViewTransitionReturn {
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const activeIdRef = React.useRef(0);
+  const isMountedRef = React.useRef(true);
+  const originalNamesRef = React.useRef(new WeakMap<HTMLElement, string>());
+
+  React.useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const isSupported = React.useMemo(() => {
     return (
@@ -60,12 +70,15 @@ export function useViewTransition(): UseViewTransitionReturn {
       options?: TransitionOptions
     ): Promise<void> => {
       const { focusTarget, transitionName, targetElement } = options || {};
+      const myId = ++activeIdRef.current;
 
-      // Preserve any existing inline name so it can be restored afterwards
-      const previousName =
-        transitionName && targetElement
-          ? targetElement.style.getPropertyValue('view-transition-name')
-          : '';
+      // Capture baseline view-transition-name once per element so overlapping transitions cannot lose it.
+      if (transitionName && targetElement && !originalNamesRef.current.has(targetElement)) {
+        originalNamesRef.current.set(
+          targetElement,
+          targetElement.style.getPropertyValue('view-transition-name')
+        );
+      }
       if (transitionName && targetElement) {
         targetElement.style.setProperty('view-transition-name', transitionName);
       }
@@ -86,21 +99,33 @@ export function useViewTransition(): UseViewTransitionReturn {
 
       const cleanupName = () => {
         if (transitionName && targetElement) {
-          if (previousName) {
-            targetElement.style.setProperty('view-transition-name', previousName);
+          const baseline = originalNamesRef.current.get(targetElement) ?? '';
+          originalNamesRef.current.delete(targetElement);
+          if (baseline) {
+            targetElement.style.setProperty('view-transition-name', baseline);
           } else {
             targetElement.style.removeProperty('view-transition-name');
           }
         }
       };
 
-      // Commit React state updates synchronously so the new DOM is captured
+      // Commit synchronous and post-await React state updates before snapshots finish.
       const runUpdate = async () => {
-        let result: void | Promise<void> = undefined;
+        let result: unknown = undefined;
         flushSync(() => {
           result = updateFn();
         });
-        await result;
+        if (
+          result !== null &&
+          (typeof result === 'object' || typeof result === 'function') &&
+          'then' in result &&
+          typeof (result as PromiseLike<unknown>).then === 'function'
+        ) {
+          await (result as PromiseLike<unknown>);
+          if (isMountedRef.current) {
+            flushSync(() => {});
+          }
+        }
       };
 
       const prefersReducedMotion =
@@ -112,9 +137,13 @@ export function useViewTransition(): UseViewTransitionReturn {
       if (!isSupported || !document.startViewTransition || prefersReducedMotion) {
         try {
           await updateFn();
-          routeFocus();
+          if (activeIdRef.current === myId) {
+            routeFocus();
+          }
         } finally {
-          cleanupName();
+          if (activeIdRef.current === myId) {
+            cleanupName();
+          }
         }
         return;
       }
@@ -127,15 +156,21 @@ export function useViewTransition(): UseViewTransitionReturn {
 
         // Rejects if the update callback throws, so failures reach the caller
         await transition.finished;
-        routeFocus();
+        if (activeIdRef.current === myId) {
+          routeFocus();
+        }
       } catch (err: unknown) {
         // A skipped transition is not a failure; any other error propagates
         if (!(err instanceof DOMException && err.name === 'AbortError')) {
           throw err;
         }
       } finally {
-        cleanupName();
-        setIsTransitioning(false);
+        if (activeIdRef.current === myId) {
+          cleanupName();
+          if (isMountedRef.current) {
+            setIsTransitioning(false);
+          }
+        }
       }
     },
     [isSupported]

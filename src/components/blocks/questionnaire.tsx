@@ -121,6 +121,7 @@ export interface QuestionnaireContextValue {
   shortcuts?: 'letters' | 'numbers' | boolean;
   items?: QuestionnaireItemDef[];
   hiddenUntilFound?: boolean;
+  hasUserNavigatedRef: React.RefObject<boolean>;
 }
 
 const QuestionnaireContext = React.createContext<QuestionnaireContextValue | null>(null);
@@ -353,12 +354,13 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       () => defaultItem || (items && items[0]?.name) || ''
     );
     const [direction, setDirection] = React.useState<'forward' | 'backward'>('forward');
+    const hasUserNavigatedRef = React.useRef(false);
 
     const activeItem = controlledItem !== undefined ? controlledItem : uncontrolledItem;
 
-    // Fallback: if activeItem is empty and items are registered, activate the first one
+    // Fallback: if activeItem is empty or removed dynamically and items remain, activate the first item
     React.useEffect(() => {
-      if (!activeItem && itemNames.length > 0) {
+      if ((!activeItem || !itemNames.includes(activeItem)) && itemNames.length > 0) {
         const first = itemNames[0];
         if (controlledItem === undefined) {
           setUncontrolledItem(first);
@@ -415,6 +417,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
 
     const changeActiveItem = React.useCallback(
       (nextItem: string, dir: 'forward' | 'backward') => {
+        hasUserNavigatedRef.current = true;
         setDirection(dir);
         if (controlledItem === undefined) {
           setUncontrolledItem(nextItem);
@@ -586,6 +589,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       shortcuts,
       items,
       hiddenUntilFound,
+      hasUserNavigatedRef,
     };
 
     // Auto-render data-driven items when items array is provided without children
@@ -763,6 +767,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       shortcuts,
       errors,
       hiddenUntilFound: rootHiddenUntilFound,
+      hasUserNavigatedRef,
     } = useQuestionnaire();
 
     const shouldHiddenUntilFound = itemHiddenUntilFound ?? rootHiddenUntilFound ?? false;
@@ -782,10 +787,11 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       [ref]
     );
 
-    // Register item name and metadata with Root
+    // Register item name with initial metadata once per mount so metadata updates never reorder declared items
+    const initialMetaRef = React.useRef({ required, type });
     React.useEffect(() => {
-      return registerItem(name, { required, type });
-    }, [registerItem, name, required, type]);
+      return registerItem(name, initialMetaRef.current);
+    }, [registerItem, name]);
 
     React.useEffect(() => {
       updateItemMeta(name, { required, type });
@@ -837,21 +843,21 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       [choices, shortcuts]
     );
 
-    // Focus active item on step transitions (never steal focus on initial mount) and toggle inert
+    // Focus active item only after explicit user step transitions (never steal focus on initial mount)
     const prevIsActiveRef = React.useRef(isActive);
     React.useEffect(() => {
       const el = fieldsetRef.current;
       if (!el) return;
       if (isActive) {
         el.removeAttribute('inert');
-        if (!prevIsActiveRef.current) {
+        if (!prevIsActiveRef.current && hasUserNavigatedRef.current) {
           el.focus();
         }
       } else {
         el.setAttribute('inert', '');
       }
       prevIsActiveRef.current = isActive;
-    }, [isActive]);
+    }, [isActive, hasUserNavigatedRef]);
 
     // Hidden until found support (beforematch event for browser Ctrl+F find-in-page)
     React.useEffect(() => {
@@ -881,18 +887,18 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.defaultPrevented) return;
 
-        // Only react to keys pressed inside this questionnaire or with nothing focused,
+        // Only react to keys pressed inside this questionnaire form,
         // and never while a native control (text entry, button, link, select) has focus
         const target = event.target as HTMLElement | null;
         const form = fieldsetRef.current?.closest('form');
-        if (target && target !== document.body) {
-          if (!form?.contains(target)) return;
-          if (
-            target.isContentEditable ||
-            target.closest('input, textarea, select, button, a[href], summary')
-          ) {
-            return;
-          }
+        if (!target || !form?.contains(target)) {
+          return;
+        }
+        if (
+          target.isContentEditable ||
+          target.closest('input, textarea, select, button, a[href], summary')
+        ) {
+          return;
         }
         if (event.metaKey || event.ctrlKey || event.altKey) {
           return;
@@ -1184,15 +1190,15 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
       }
     };
 
-    // Determine tabindex: in radiogroup, active/selected choice gets 0; else first gets 0
+    // Determine tabindex: in radiogroup, enabled active/selected choice gets 0; else first enabled choice gets 0
     let tabIndex = disabled ? -1 : 0;
     if (!isMultiple && choices.length > 0) {
-      if (isSelected) {
+      if (isSelected && !disabled) {
         tabIndex = 0;
       } else {
-        const hasAnySelected = choices.some((c) => c.value === currentAnswer);
+        const hasEnabledSelected = choices.some((c) => c.value === currentAnswer && !c.disabled);
         const firstEnabled = choices.find((c) => !c.disabled);
-        tabIndex = !hasAnySelected && firstEnabled?.value === value ? 0 : -1;
+        tabIndex = !hasEnabledSelected && firstEnabled?.value === value ? 0 : -1;
       }
     }
 
@@ -1220,7 +1226,7 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
           data-disabled={disabled ? '' : undefined}
           data-invalid={itemContext?.error ? '' : undefined}
           className={cn(
-            'group w-full min-h-11 py-3 px-4 rounded-md flex items-center justify-between gap-3 text-left cursor-pointer select-none',
+            'group w-full min-h-11 py-3 px-4 rounded-md flex items-center justify-between gap-3 text-start cursor-pointer select-none',
             'transition-colors duration-quick ease-standard motion-reduce:transition-none',
             // Focus vs Selection Distinction per DESIGN.md:
             // Floating 2px focus ring with outline-offset: 2px
@@ -1313,7 +1319,7 @@ export const QuestionnaireChoiceLabel: React.FC<QuestionnaireChoiceLabelProps> =
   const isSelected = choiceContext?.isSelected ?? false;
 
   return (
-    <div className={cn('flex flex-col flex-1 text-left min-w-0', className)} {...props}>
+    <div className={cn('flex flex-col flex-1 text-start min-w-0', className)} {...props}>
       <span
         className={cn(
           'font-sans text-base font-medium select-none leading-snug',
@@ -1535,7 +1541,7 @@ export const QuestionnairePrevious: React.FC<QuestionnairePreviousProps> = ({
       className={className}
       {...props}
     >
-      {showIcon && <Icon name="arrow_back" size="sm" aria-hidden="true" />}
+      {showIcon && <Icon name="arrow_back" size="sm" directional aria-hidden="true" />}
       <span>{children}</span>
     </Button>
   );
@@ -1588,7 +1594,7 @@ export const QuestionnaireSkip: React.FC<QuestionnaireSkipProps> = ({
       {...props}
     >
       <span>{children}</span>
-      {showIcon && <Icon name="skip_next" size="sm" aria-hidden="true" />}
+      {showIcon && <Icon name="skip_next" size="sm" directional aria-hidden="true" />}
     </Button>
   );
 };
@@ -1639,7 +1645,7 @@ export const QuestionnaireNext: React.FC<QuestionnaireNextProps> = ({
       {...props}
     >
       <span>{children}</span>
-      {showIcon && <Icon name="arrow_forward" size="sm" aria-hidden="true" />}
+      {showIcon && <Icon name="arrow_forward" size="sm" directional aria-hidden="true" />}
     </Button>
   );
 };

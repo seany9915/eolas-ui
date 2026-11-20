@@ -330,7 +330,6 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
             <BaseCombobox.Input
               data-slot="combobox-input"
               id={comboboxId}
-              name={name || comboboxId}
               placeholder={placeholder}
               disabled={disabled}
               readOnly={readOnly}
@@ -339,14 +338,14 @@ const ComboboxComponent = React.forwardRef<HTMLDivElement, ComboboxProps<any, an
               aria-labelledby={label ? `${comboboxId}-label` : undefined}
               className={cn(
                 'flex-1 min-w-0 bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none',
-                size === 'sm' && 'h-11 pl-3 pr-1 min-h-[44px] text-xs',
-                size === 'md' && 'h-12 pl-3.5 pr-1 min-h-[48px] text-sm',
-                size === 'lg' && 'h-14 pl-5 pr-1 min-h-[56px] text-base',
+                size === 'sm' && 'h-11 ps-3 pe-1 min-h-[44px] text-xs',
+                size === 'md' && 'h-12 ps-3.5 pe-1 min-h-[48px] text-sm',
+                size === 'lg' && 'h-14 ps-5 pe-1 min-h-[56px] text-base',
                 'disabled:cursor-not-allowed',
                 inputClassName
               )}
             />
-            <div className="flex items-center gap-1.5 pr-2 shrink-0">
+            <div className="flex items-center gap-1.5 pe-2 shrink-0">
               {clearable && (
                 <ComboboxClear disabled={disabled || readOnly} />
               )}

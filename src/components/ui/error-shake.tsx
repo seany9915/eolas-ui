@@ -45,6 +45,7 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
   ) => {
     const [isShaking, setIsShaking] = React.useState(false);
     const [hasActiveError, setHasActiveError] = React.useState(Boolean(shake));
+    const shakeTargetRef = React.useRef<HTMLDivElement | null>(null);
     const onShakeEndRef = React.useRef(onShakeEnd);
     const onRevertRef = React.useRef(onRevert);
     React.useEffect(() => {
@@ -59,29 +60,37 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
         return;
       }
 
+      // Force CSS keyframe replay when shake triggers again while already animating
+      const el = shakeTargetRef.current;
+      if (el && el.classList.contains('animate-error-shake')) {
+        el.classList.remove('animate-error-shake');
+        void el.offsetWidth;
+        el.classList.add('animate-error-shake');
+      }
+
       setIsShaking(true);
       setHasActiveError(true);
 
-      // Shake animation timer synchronized with 300ms animate-error-shake keyframe
       const shakeTimer = setTimeout(() => {
         setIsShaking(false);
         onShakeEndRef.current?.();
       }, 300);
 
-      // Optional auto-revert timer (3000ms hold from transitions.dev)
-      let revertTimer: ReturnType<typeof setTimeout> | undefined;
-      if (autoRevert) {
-        revertTimer = setTimeout(() => {
-          setHasActiveError(false);
-          onRevertRef.current?.();
-        }, revertHoldMs);
-      }
-
       return () => {
         clearTimeout(shakeTimer);
-        if (revertTimer) clearTimeout(revertTimer);
       };
-    }, [shake, autoRevert, revertHoldMs]);
+    }, [shake]);
+
+    React.useEffect(() => {
+      if (!shake || !hasActiveError || !autoRevert) return;
+      const revertTimer = setTimeout(() => {
+        setHasActiveError(false);
+        onRevertRef.current?.();
+      }, revertHoldMs);
+      return () => {
+        clearTimeout(revertTimer);
+      };
+    }, [shake, hasActiveError, autoRevert, revertHoldMs]);
 
     return (
       <div
@@ -90,6 +99,7 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
         {...props}
       >
         <div
+          ref={shakeTargetRef}
           className={cn(
             'w-full will-change-transform motion-reduce:transform-none motion-reduce:animate-none',
             isShaking && 'animate-error-shake'
@@ -102,10 +112,11 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
           <p
             className={cn(
               'font-sans text-xs font-semibold text-error flex items-center gap-1 select-none',
-              'transition-opacity duration-300 ease-out motion-reduce:transition-none',
-              hasActiveError ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              'transition-[opacity,visibility] duration-300 ease-out motion-reduce:transition-none',
+              hasActiveError ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
             )}
-            role="alert"
+            role={hasActiveError ? 'alert' : undefined}
+            aria-hidden={!hasActiveError || undefined}
           >
             <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
               error

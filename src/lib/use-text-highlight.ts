@@ -71,8 +71,79 @@ function setOwnerRanges(name: string, owner: symbol, ranges: Range[]) {
   publishHighlights(name);
 }
 
+function findNormalizedMatchRanges(
+  textContent: string,
+  trimmedQuery: string,
+  caseSensitive: boolean
+): Array<[number, number]> {
+  const ranges: Array<[number, number]> = [];
+  if (caseSensitive) {
+    let startIndex = textContent.indexOf(trimmedQuery);
+    while (startIndex !== -1) {
+      const endIndex = startIndex + trimmedQuery.length;
+      if (endIndex <= textContent.length) {
+        ranges.push([startIndex, endIndex]);
+      }
+      startIndex = textContent.indexOf(trimmedQuery, endIndex);
+    }
+    return ranges;
+  }
+
+  const targetQuery = trimmedQuery.toLowerCase();
+  const textToSearch = textContent.toLowerCase();
+
+  // Fast path: 1:1 UTF-16 length match
+  if (textToSearch.length === textContent.length) {
+    let startIndex = textToSearch.indexOf(targetQuery);
+    while (startIndex !== -1) {
+      const endIndex = startIndex + targetQuery.length;
+      if (endIndex <= textContent.length) {
+        ranges.push([startIndex, endIndex]);
+      }
+      startIndex = textToSearch.indexOf(targetQuery, endIndex);
+    }
+    return ranges;
+  }
+
+  // Unicode case-folding length expansion path (e.g. Turkish dotted uppercase I '\u0130' -> 'i\u0307')
+  let folded = '';
+  const origStarts: number[] = [];
+  const origEnds: number[] = [];
+  let i = 0;
+  while (i < textContent.length) {
+    const codePoint = textContent.codePointAt(i);
+    const charLen = codePoint !== undefined && codePoint > 0xffff ? 2 : 1;
+    const origSlice = textContent.slice(i, i + charLen);
+    const lowerSlice = origSlice.toLowerCase();
+    for (let j = 0; j < lowerSlice.length; j++) {
+      origStarts.push(i);
+      origEnds.push(i + charLen);
+    }
+    folded += lowerSlice;
+    i += charLen;
+  }
+
+  let matchIdx = folded.indexOf(targetQuery);
+  while (matchIdx !== -1) {
+    const endFoldedIdx = matchIdx + targetQuery.length - 1;
+    const startOffset = origStarts[matchIdx];
+    const endOffset = origEnds[endFoldedIdx];
+    if (
+      startOffset !== undefined &&
+      endOffset !== undefined &&
+      startOffset <= endOffset &&
+      endOffset <= textContent.length
+    ) {
+      ranges.push([startOffset, endOffset]);
+    }
+    matchIdx = folded.indexOf(targetQuery, matchIdx + targetQuery.length);
+  }
+
+  return ranges;
+}
+
 export function useTextHighlight(
-  containerRef: React.RefObject<HTMLElement | null>,
+  containerTarget: HTMLElement | null | React.RefObject<HTMLElement | null>,
   query: string,
   options: UseTextHighlightOptions = {}
 ): UseTextHighlightResult {
@@ -82,9 +153,13 @@ export function useTextHighlight(
   const [contentVersion, setContentVersion] = React.useState(0);
   const ownerRef = React.useRef<symbol>(Symbol('highlight-owner'));
 
+  const containerElement =
+    containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
+
   // Re-run the search when the container's text changes without the query changing
   React.useEffect(() => {
-    const container = containerRef.current;
+    const container =
+      containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
     if (!container || typeof MutationObserver === 'undefined') return;
     let frame = 0;
     const observer = new MutationObserver(() => {
@@ -96,7 +171,7 @@ export function useTextHighlight(
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [containerRef]);
+  }, [containerTarget, containerElement]);
 
   React.useEffect(() => {
     if (typeof window === 'undefined' || typeof CSS === 'undefined') {
@@ -114,7 +189,8 @@ export function useTextHighlight(
     }
 
     setIsSupported(true);
-    const container = containerRef.current;
+    const container =
+      containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
     const owner = ownerRef.current;
 
     // Clear this instance's highlight if query is empty or container is unmounted
@@ -125,7 +201,6 @@ export function useTextHighlight(
     }
 
     const trimmedQuery = query.trim();
-    const targetQuery = caseSensitive ? trimmedQuery : trimmedQuery.toLowerCase();
     const ranges: Range[] = [];
 
     // Fast DOM text-node tree traversal
@@ -140,16 +215,12 @@ export function useTextHighlight(
     while (currentNode) {
       const textContent = currentNode.textContent;
       if (textContent) {
-        const textToSearch = caseSensitive ? textContent : textContent.toLowerCase();
-        let startIndex = textToSearch.indexOf(targetQuery);
-
-        while (startIndex !== -1) {
+        const offsets = findNormalizedMatchRanges(textContent, trimmedQuery, caseSensitive);
+        for (const [startOffset, endOffset] of offsets) {
           const range = new Range();
-          range.setStart(currentNode, startIndex);
-          range.setEnd(currentNode, startIndex + targetQuery.length);
+          range.setStart(currentNode, startOffset);
+          range.setEnd(currentNode, endOffset);
           ranges.push(range);
-
-          startIndex = textToSearch.indexOf(targetQuery, startIndex + targetQuery.length);
         }
       }
       currentNode = walker.nextNode();
@@ -161,7 +232,7 @@ export function useTextHighlight(
     return () => {
       setOwnerRanges(highlightName, owner, []);
     };
-  }, [containerRef, query, highlightName, caseSensitive, contentVersion]);
+  }, [containerTarget, containerElement, query, highlightName, caseSensitive, contentVersion]);
 
   return { matchCount, isSupported };
 }

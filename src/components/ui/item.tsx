@@ -69,7 +69,7 @@ export function itemVariants({
   className,
 }: ItemVariantsProps = {}): string {
   return cn(
-    'group/item relative flex items-center rounded-md text-left transition-[background-color,border-color,color,transform] duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
+    'group/item relative flex items-center rounded-md text-start transition-[background-color,border-color,color,transform] duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
     variantStyles[variant] ?? variantStyles.default,
     sizeStyles[size] ?? sizeStyles.default,
     'aria-disabled:opacity-50 aria-disabled:pointer-events-none',
@@ -344,7 +344,7 @@ export const ItemActions = React.forwardRef<HTMLDivElement, ItemActionsProps>(
       defaultTagName: 'div',
       props: {
         'data-slot': 'item-actions',
-        className: cn('flex items-center gap-2 shrink-0 ml-auto', className),
+        className: cn('flex items-center gap-2 shrink-0 ms-auto', className),
         children,
         ...props,
       },

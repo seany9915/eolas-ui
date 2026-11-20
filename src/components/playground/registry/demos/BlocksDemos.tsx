@@ -598,12 +598,12 @@ export const ChartCardDemo: React.FC<ComponentDemoProps> = () => {
         footer="Updated today"
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label="Weekly Practice"
           config={chartConfig}
           className="aspect-auto h-full w-full"
         >
-          <AreaChart data={chartData} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
+          <AreaChart aria-label="Weekly Practice" data={chartData} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="day"

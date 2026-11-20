@@ -107,8 +107,8 @@ function facetedFilterFnImpl(
 facetedFilterFnImpl.autoRemove = (value: unknown) => !Array.isArray(value) || value.length === 0;
 
 export const dataTableFeatures = tableFeatures({
-  columnFacetingFeature,
   columnFilteringFeature,
+  columnFacetingFeature,
   columnVisibilityFeature,
   globalFilteringFeature,
   rowPaginationFeature,
@@ -254,7 +254,7 @@ export function DataTableRowActions<TData extends RowData>({
                   <div className="flex items-center justify-between w-full">
                     <span>{action.label}</span>
                     {action.shortcut && (
-                      <span className="font-mono text-xs text-on-surface-variant ml-2">
+                      <span className="font-mono text-xs text-on-surface-variant ms-2">
                         {action.shortcut}
                       </span>
                     )}
@@ -319,7 +319,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue = unknown>({
       <div
         className={cn(
           'text-sm font-semibold text-on-surface font-label',
-          isNumeric && 'text-right font-mono tabular-nums',
+          isNumeric && 'text-end font-mono tabular-nums',
           isCentered && 'text-center',
           className
         )}
@@ -343,7 +343,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue = unknown>({
     <div
       className={cn(
         'flex items-center gap-1',
-        isNumeric ? 'justify-end -mr-3.5' : isCentered ? 'justify-center' : 'justify-start -ml-3.5',
+        isNumeric ? 'justify-end -me-3.5' : isCentered ? 'justify-center' : 'justify-start -ms-3.5',
         className
       )}
       {...props}
@@ -482,7 +482,20 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
+  const normalizedFacetCounts = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    if (!facets) return counts;
+    facets.forEach((count, key) => {
+      const strKey = String(key);
+      counts.set(strKey, (counts.get(strKey) ?? 0) + count);
+    });
+    return counts;
+  }, [facets]);
+
+  const rawFilterValue = column?.getFilterValue();
+  const selectedValues = new Set(
+    Array.isArray(rawFilterValue) ? rawFilterValue.map(String) : []
+  );
 
   return (
     <Menu
@@ -492,7 +505,7 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
         <Button variant="outline" size="sm" colorRole="neutral">
           <Icon name="filter_list" size="xs" aria-hidden="true" />
           <span>{title}</span>
-          {selectedValues?.size > 0 && (
+          {selectedValues.size > 0 && (
             <>
               <span className="w-px h-4 bg-outline-variant mx-1" aria-hidden="true" />
               <Badge variant="outline" colorRole="neutral" size="sm">
@@ -508,17 +521,19 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
         <Menu.Separator />
         {options.map((option) => {
           const isSelected = selectedValues.has(option.value);
+          const facetCount = normalizedFacetCounts.get(option.value) ?? 0;
           return (
             <Menu.CheckboxItem
               key={option.value}
               checked={isSelected}
               onCheckedChange={() => {
+                const nextValues = new Set(selectedValues);
                 if (isSelected) {
-                  selectedValues.delete(option.value);
+                  nextValues.delete(option.value);
                 } else {
-                  selectedValues.add(option.value);
+                  nextValues.add(option.value);
                 }
-                const filterValues = Array.from(selectedValues);
+                const filterValues = Array.from(nextValues);
                 column?.setFilterValue(filterValues.length ? filterValues : undefined);
               }}
             >
@@ -529,9 +544,9 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
                   )}
                   <span>{option.label}</span>
                 </div>
-                {(facets?.get(option.value) ?? 0) > 0 && (
+                {facetCount > 0 && (
                   <span className="font-mono text-xs text-on-surface-variant tabular-nums">
-                    {facets?.get(option.value)}
+                    {facetCount}
                   </span>
                 )}
               </div>
@@ -577,6 +592,7 @@ export function DataTableToolbar<TData extends RowData>({
   enableGlobalFilter = true,
   children,
 }: DataTableToolbarProps<TData>) {
+  const searchInputId = React.useId();
   const isFiltered =
     table.state.columnFilters.length > 0 ||
     Boolean(table.state.globalFilter);
@@ -588,33 +604,43 @@ export function DataTableToolbar<TData extends RowData>({
     <div className="flex flex-col @sm:flex-row items-stretch @sm:items-center justify-between gap-3 w-full">
       <div className="flex flex-1 flex-wrap items-center gap-2">
         {searchKey && targetColumn ? (
-          <Input
-            size="sm"
-            type="search"
-            enterKeyHint="search"
-            clearable
-            aria-label={searchPlaceholder}
-            placeholder={searchPlaceholder}
-            value={searchVal}
-            onChange={(event) => targetColumn.setFilterValue(event.target.value)}
-            onClear={() => targetColumn.setFilterValue('')}
-            leadingIcon={<Icon name="search" size="xs" aria-hidden="true" />}
-            className="w-full @sm:max-w-xs"
-          />
+          <Field.Root className="w-full @sm:max-w-xs">
+            <Field.Label htmlFor={searchInputId} className="sr-only">
+              {searchPlaceholder}
+            </Field.Label>
+            <Input
+              id={searchInputId}
+              size="sm"
+              type="search"
+              enterKeyHint="search"
+              clearable
+              placeholder={searchPlaceholder}
+              value={searchVal}
+              onChange={(event) => targetColumn.setFilterValue(event.target.value)}
+              onClear={() => targetColumn.setFilterValue('')}
+              leadingIcon={<Icon name="search" size="xs" aria-hidden="true" />}
+              className="w-full"
+            />
+          </Field.Root>
         ) : enableGlobalFilter ? (
-          <Input
-            size="sm"
-            type="search"
-            enterKeyHint="search"
-            clearable
-            aria-label={searchPlaceholder}
-            placeholder={searchPlaceholder}
-            value={globalVal}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            onClear={() => table.setGlobalFilter('')}
-            leadingIcon={<Icon name="search" size="xs" aria-hidden="true" />}
-            className="w-full @sm:max-w-xs"
-          />
+          <Field.Root className="w-full @sm:max-w-xs">
+            <Field.Label htmlFor={searchInputId} className="sr-only">
+              {searchPlaceholder}
+            </Field.Label>
+            <Input
+              id={searchInputId}
+              size="sm"
+              type="search"
+              enterKeyHint="search"
+              clearable
+              placeholder={searchPlaceholder}
+              value={globalVal}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              onClear={() => table.setGlobalFilter('')}
+              leadingIcon={<Icon name="search" size="xs" aria-hidden="true" />}
+              className="w-full"
+            />
+          </Field.Root>
         ) : null}
         {facetedFilters?.map((filter) => {
           const col = table.getColumn(filter.columnId);
@@ -672,6 +698,8 @@ export function DataTablePagination<TData extends RowData>({
   const pageSizeId = React.useId();
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
   const totalCount = table.getFilteredRowModel().rows.length;
+  const rawPageCount = table.getPageCount();
+  const hasKnownPageCount = rawPageCount >= 0;
 
   return (
     <div
@@ -686,11 +714,11 @@ export function DataTablePagination<TData extends RowData>({
           {selectedCount} of {totalCount} row(s) selected.
         </div>
       )}
-      <div className="flex flex-wrap items-center gap-4 @lg:gap-8 ml-auto">
-        <Field.Root className="flex-row items-center gap-2 w-auto">
+      <div className="flex flex-wrap items-center gap-4 @lg:gap-8 ms-auto">
+        <Field.Root orientation="horizontal" className="w-auto gap-2">
           <Field.Label
             htmlFor={pageSizeId}
-            className="font-sans text-xs font-normal text-on-surface-variant whitespace-nowrap"
+            className="whitespace-nowrap"
           >
             Rows per page
           </Field.Label>
@@ -708,8 +736,8 @@ export function DataTablePagination<TData extends RowData>({
           />
         </Field.Root>
         <div className="flex items-center justify-center font-sans text-xs text-on-surface font-medium min-w-24 select-none">
-          Page {table.state.pagination.pageIndex + 1} of{' '}
-          {Math.max(1, table.getPageCount())}
+          Page {table.state.pagination.pageIndex + 1}
+          {hasKnownPageCount ? ` of ${Math.max(1, rawPageCount)}` : ''}
         </div>
         <div className="flex items-center gap-1.5">
           <Button
@@ -719,7 +747,7 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
-            <Icon name="first_page" size="xs" aria-hidden="true" />
+            <Icon name="first_page" size="xs" directional aria-hidden="true" />
             <span className="sr-only">Go to first page</span>
           </Button>
           <Button
@@ -729,7 +757,7 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <Icon name="chevron_left" size="xs" aria-hidden="true" />
+            <Icon name="chevron_left" size="xs" directional aria-hidden="true" />
             <span className="sr-only">Go to previous page</span>
           </Button>
           <Button
@@ -739,17 +767,17 @@ export function DataTablePagination<TData extends RowData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <Icon name="chevron_right" size="xs" aria-hidden="true" />
+            <Icon name="chevron_right" size="xs" directional aria-hidden="true" />
             <span className="sr-only">Go to next page</span>
           </Button>
           <Button
             variant="outline"
             colorRole="neutral"
             size="icon"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            onClick={() => hasKnownPageCount && table.setPageIndex(Math.max(0, rawPageCount - 1))}
+            disabled={!hasKnownPageCount || !table.getCanNextPage()}
           >
-            <Icon name="last_page" size="xs" aria-hidden="true" />
+            <Icon name="last_page" size="xs" directional aria-hidden="true" />
             <span className="sr-only">Go to last page</span>
           </Button>
         </div>
@@ -830,6 +858,32 @@ export interface DataTableProps<TData extends RowData> {
   containerClassName?: string;
 }
 
+function useTableStateHandler<T>(
+  currentValue: T,
+  isControlled: boolean,
+  setInternal: React.Dispatch<React.SetStateAction<T>>,
+  onChange?: OnChangeFn<T>
+): OnChangeFn<T> {
+  const latestValueRef = React.useRef(currentValue);
+  const onChangeRef = React.useRef(onChange);
+  React.useEffect(() => {
+    latestValueRef.current = currentValue;
+    onChangeRef.current = onChange;
+  });
+
+  return React.useCallback(
+    (updater) => {
+      const nextValue = updater instanceof Function ? updater(latestValueRef.current) : updater;
+      latestValueRef.current = nextValue;
+      if (!isControlled) {
+        setInternal(nextValue);
+      }
+      onChangeRef.current?.(nextValue);
+    },
+    [isControlled, setInternal]
+  );
+}
+
 export function DataTable<TData extends RowData>({
   columns = [],
   data = [],
@@ -880,35 +934,27 @@ export function DataTable<TData extends RowData>({
   const pagination = paginationProp ?? internalPagination;
   const globalFilter = globalFilterProp ?? internalGlobalFilter;
 
-  // Always keep internal state in sync when the value is uncontrolled, and notify the callback either way
-  function createChangeHandler<T>(
-    controlled: T | undefined,
-    current: T,
-    setInternal: React.Dispatch<React.SetStateAction<T>>,
-    onChange?: OnChangeFn<T>
-  ): OnChangeFn<T> {
-    return (updater) => {
-      if (controlled === undefined) setInternal(updater as React.SetStateAction<T>);
-      onChange?.(updater instanceof Function ? updater(current) : updater);
-    };
-  }
-
-  const setSorting = createChangeHandler(sortingProp, sorting, setInternalSorting, onSortingChangeProp);
-  const setColumnFilters = createChangeHandler(
-    columnFiltersProp,
+  const setSorting = useTableStateHandler(
+    sorting,
+    sortingProp !== undefined,
+    setInternalSorting,
+    onSortingChangeProp
+  );
+  const setColumnFilters = useTableStateHandler(
     columnFilters,
+    columnFiltersProp !== undefined,
     setInternalColumnFilters,
     onColumnFiltersChangeProp
   );
-  const setPagination = createChangeHandler(
-    paginationProp,
+  const setPagination = useTableStateHandler(
     pagination,
+    paginationProp !== undefined,
     setInternalPagination,
     onPaginationChangeProp
   );
-  const setGlobalFilter = createChangeHandler(
-    globalFilterProp,
+  const setGlobalFilter = useTableStateHandler(
     globalFilter,
+    globalFilterProp !== undefined,
     setInternalGlobalFilter,
     onGlobalFilterChangeProp
   );
@@ -917,18 +963,31 @@ export function DataTable<TData extends RowData>({
     () => new Set(facetedFilters?.map((f) => f.columnId)),
     [facetedFilters]
   );
+
+  const applyFacetedFilterFn = React.useCallback(
+    (cols: ColumnDef<DataTableFeatures, TData, any>[]): ColumnDef<DataTableFeatures, TData, any>[] =>
+      cols.map((col) => {
+        if ('columns' in col && Array.isArray(col.columns)) {
+          return { ...col, columns: applyFacetedFilterFn(col.columns) };
+        }
+        const accessorKey =
+          'accessorKey' in col && typeof col.accessorKey === 'string' ? col.accessorKey : undefined;
+        const resolvedId = col.id ?? accessorKey;
+        const normalizedAccessorId = accessorKey?.replace(/\./g, '_');
+        const matches =
+          (resolvedId && facetedColumnIds.has(resolvedId)) ||
+          (normalizedAccessorId && facetedColumnIds.has(normalizedAccessorId));
+        if (matches && !('filterFn' in col && col.filterFn)) {
+          return { ...col, filterFn: 'faceted' };
+        }
+        return col;
+      }),
+    [facetedColumnIds]
+  );
+
   const resolvedColumns = React.useMemo<ColumnDef<DataTableFeatures, TData, any>[]>(
-    () =>
-      facetedColumnIds.size === 0
-        ? columns
-        : columns.map((col) => {
-            const id = col.id ?? (col as { accessorKey?: string }).accessorKey;
-            if (id && facetedColumnIds.has(id) && !('filterFn' in col && col.filterFn)) {
-              return { ...col, filterFn: 'faceted' } as ColumnDef<DataTableFeatures, TData, any>;
-            }
-            return col;
-          }),
-    [columns, facetedColumnIds]
+    () => (facetedColumnIds.size === 0 ? columns : applyFacetedFilterFn(columns)),
+    [columns, facetedColumnIds, applyFacetedFilterFn]
   );
 
   const internalTable = useTable({
@@ -960,17 +1019,28 @@ export function DataTable<TData extends RowData>({
   const table = propTable ?? internalTable;
   const colSpanCount = table.getVisibleLeafColumns().length || columns.length || 1;
 
-  // Read selection from the table so externally supplied tables are covered too
+  // Read selection from the table via ref so changing table identities do not loop selection notifications
   const rowSelectionState = table.state.rowSelection;
   const tableData = table.options.data;
+  const tableRef = React.useRef(table);
+  const hasMountedSelectionRef = React.useRef(false);
   const onSelectionChangeRef = React.useRef(onSelectionChange);
   React.useEffect(() => {
+    tableRef.current = table;
     onSelectionChangeRef.current = onSelectionChange;
   });
 
   React.useEffect(() => {
-    onSelectionChangeRef.current?.(table.getSelectedRowModel().rows.map((r) => r.original));
-  }, [rowSelectionState, tableData, table]);
+    if (!hasMountedSelectionRef.current) {
+      hasMountedSelectionRef.current = true;
+      if (Object.keys(rowSelectionState).length === 0) {
+        return;
+      }
+    }
+    onSelectionChangeRef.current?.(
+      tableRef.current.getSelectedRowModel().rows.map((r) => r.original)
+    );
+  }, [rowSelectionState, tableData]);
 
   return (
     <div className={cn('w-full flex flex-col gap-4 @container', className)}>
@@ -987,7 +1057,7 @@ export function DataTable<TData extends RowData>({
         </DataTableToolbar>
       )}
 
-      <Table containerClassName={cn('shadow-ambient', containerClassName)}>
+      <Table elevated containerClassName={containerClassName}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -1012,7 +1082,7 @@ export function DataTable<TData extends RowData>({
                           : undefined
                       }
                       className={cn(
-                        isNumeric && 'text-right',
+                        isNumeric && 'text-end',
                         isCentered && 'text-center'
                       )}
                     >
@@ -1088,7 +1158,7 @@ export function DataTable<TData extends RowData>({
                         <TableCell
                           key={cell.id}
                           className={cn(
-                            isNumeric && 'text-right font-mono tabular-nums',
+                            isNumeric && 'text-end font-mono tabular-nums',
                             isCentered && 'text-center'
                           )}
                         >

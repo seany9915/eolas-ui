@@ -111,14 +111,20 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
   const observerRef = React.useRef<IntersectionObserver | null>(null);
   const isReadyRef = React.useRef(false);
   const autoScrollRef = React.useRef(autoScroll);
-  autoScrollRef.current = autoScroll;
   const isAtBottomRef = React.useRef(isAtBottom);
-  isAtBottomRef.current = isAtBottom;
   const [viewportEl, setViewportEl] = React.useState<HTMLDivElement | null>(null);
   const [contentEl, setContentEl] = React.useState<HTMLDivElement | null>(null);
 
+  React.useLayoutEffect(() => {
+    autoScrollRef.current = autoScroll;
+    isAtBottomRef.current = isAtBottom;
+  }, [autoScroll, isAtBottom]);
+
   React.useEffect(() => {
     isReadyRef.current = true;
+    return () => {
+      isReadyRef.current = false;
+    };
   }, []);
 
   const attachViewport = React.useCallback((node: HTMLDivElement | null) => {
@@ -216,7 +222,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
   // ResizeObserver on content container to track incoming streamed tokens or expanding disclosures
   React.useEffect(() => {
     const content = contentEl;
-    if (!content) return;
+    if (!content || typeof ResizeObserver === 'undefined') return;
 
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -443,19 +449,36 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
     },
     ref
   ) => {
-    const { viewportRef, attachViewport, pendingScroll } = useMessageScroller();
-    const prevScrollHeightRef = React.useRef<number>(0);
+    const { viewportRef, contentRef, attachViewport, pendingScroll } = useMessageScroller();
+    const prevFirstItemRef = React.useRef<{ el: HTMLElement; offsetTop: number } | null>(null);
 
-    // Track scroll height to support prepending older messages without jumping
+    // Track the first message item so prepended history preserves scroll without shifting streamed appends
     React.useLayoutEffect(() => {
       const vp = viewportRef.current;
-      if (!vp || !preserveScrollOnPrepend) return;
-
-      if (prevScrollHeightRef.current > 0 && vp.scrollHeight > prevScrollHeightRef.current && vp.scrollTop < 100) {
-        const delta = vp.scrollHeight - prevScrollHeightRef.current;
-        vp.scrollTop += delta;
+      if (!vp || !preserveScrollOnPrepend) {
+        prevFirstItemRef.current = null;
+        return;
       }
-      prevScrollHeightRef.current = vp.scrollHeight;
+
+      const container = contentRef.current ?? vp;
+      const firstItem = (container.querySelector<HTMLElement>('[data-slot="message-scroller-item"]') ??
+        container.firstElementChild) as HTMLElement | null;
+      const prev = prevFirstItemRef.current;
+
+      if (
+        prev &&
+        prev.el !== firstItem &&
+        prev.el.isConnected &&
+        container.contains(prev.el) &&
+        vp.scrollTop < 100
+      ) {
+        const delta = prev.el.offsetTop - prev.offsetTop;
+        if (delta > 0) {
+          vp.scrollTop += delta;
+        }
+      }
+
+      prevFirstItemRef.current = firstItem ? { el: firstItem, offsetTop: firstItem.offsetTop } : null;
     });
 
     const mergedRef = React.useCallback(
@@ -475,7 +498,7 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
         aria-label={ariaLabel}
         className={cn(
           'flex-1 w-full overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
-          'scrollbar-thin scrollbar-thumb-outline-variant scrollbar-track-transparent',
+          '[scrollbar-width:thin] [scrollbar-color:var(--outline-variant)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant [&::-webkit-scrollbar-track]:bg-transparent',
           className
         )}
         tabIndex={0}
@@ -540,14 +563,20 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
     const itemRef = React.useRef<HTMLDivElement | null>(null);
     const { viewportRef, scrollPreviousItemPeek, registerItem, notifyItemAdded, isReadyRef } = useMessageScroller();
 
-    // Only items mounted after the initial render are new turns; historical anchors must not hijack the initial position.
-    const isNewTurnRef = React.useRef(isReadyRef.current);
+    // Determine whether this item mounted after initial mount inside effects rather than during render
+    const isNewTurnRef = React.useRef<boolean | null>(null);
 
     React.useEffect(() => {
+      if (isNewTurnRef.current === null) {
+        isNewTurnRef.current = isReadyRef.current;
+      }
       if (isNewTurnRef.current) notifyItemAdded();
-    }, [notifyItemAdded]);
+    }, [isReadyRef, notifyItemAdded]);
 
     React.useEffect(() => {
+      if (isNewTurnRef.current === null) {
+        isNewTurnRef.current = isReadyRef.current;
+      }
       if (scrollAnchor && isNewTurnRef.current && itemRef.current && viewportRef.current) {
         // Pin new user turns near the top, preserving scrollPreviousItemPeek pixels of previous item
         const vp = viewportRef.current;
@@ -555,7 +584,7 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
         const targetScrollTop = Math.max(0, itemTop - scrollPreviousItemPeek);
         vp.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
       }
-    }, [scrollAnchor, scrollPreviousItemPeek, viewportRef]);
+    }, [scrollAnchor, scrollPreviousItemPeek, viewportRef, isReadyRef]);
 
     React.useEffect(() => {
       if (!messageId || !itemRef.current) return;
@@ -596,9 +625,9 @@ export const MessageScrollerButton: React.FC<MessageScrollerButtonProps> = ({
   label,
   className,
 }) => {
-  const { isAtBottom, scrollToBottom, scrollToTop, unreadCount } = useMessageScroller();
+  const { isAtBottom, scrollable, scrollToBottom, scrollToTop, unreadCount } = useMessageScroller();
 
-  const isVisible = direction === 'end' ? !isAtBottom : true;
+  const isVisible = direction === 'end' ? !isAtBottom : scrollable.start;
   if (!isVisible) return null;
 
   const defaultLabel =
@@ -612,11 +641,17 @@ export const MessageScrollerButton: React.FC<MessageScrollerButtonProps> = ({
       data-active={isVisible ? 'true' : 'false'}
       className={cn(
         'absolute z-20 transition-[opacity,transform] duration-quick ease-standard motion-reduce:transition-none',
-        direction === 'end' ? 'bottom-4 right-4' : 'top-4 right-4',
+        direction === 'end' ? 'bottom-4 end-4' : 'top-4 end-4',
         className
       )}
     >
-      <Tooltip content={unreadCount > 0 ? `${unreadCount} new update${unreadCount === 1 ? '' : 's'}` : resolvedLabel}>
+      <Tooltip
+        content={
+          direction === 'end' && unreadCount > 0
+            ? `${unreadCount} new update${unreadCount === 1 ? '' : 's'}`
+            : resolvedLabel
+        }
+      >
         <Button
           type="button"
           variant="filled"

@@ -123,7 +123,7 @@ export const MenubarItem = React.forwardRef<HTMLDivElement, MenubarItemProps>(
         <span className="truncate">{children}</span>
       </div>
       {shortcut && (
-        <span className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ml-auto">
+        <span className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto">
           {shortcut}
         </span>
       )}
@@ -217,7 +217,7 @@ export const MenubarSubmenuTrigger = React.forwardRef<HTMLDivElement, MenubarSub
         )}
         <span className="truncate">{children}</span>
       </div>
-      <Icon name="chevron_right" size="xs" className="text-on-surface-variant shrink-0" />
+      <Icon name="chevron_right" size="xs" directional className="text-on-surface-variant shrink-0" />
     </BaseMenu.SubmenuTrigger>
   )
 );
@@ -284,7 +284,7 @@ export const MenubarShortcut: React.FC<React.HTMLAttributes<HTMLSpanElement>> = 
   ...props
 }) => (
   <span
-    className={cn('font-mono text-xs text-on-surface-variant font-medium tracking-wider ml-auto', className)}
+    className={cn('font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto', className)}
     {...props}
   />
 );

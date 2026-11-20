@@ -20,7 +20,7 @@ export type InlineAlertRole = 'neutral' | 'warning' | 'error' | 'success';
 export type InlineAlertVariant = 'default' | 'destructive' | InlineAlertRole;
 export type InlineAlertAppearance = 'wash' | 'surface';
 
-export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface InlineAlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role'> {
   /** Optional title for monolithic usage. Omit when using `<InlineAlert.Title>` */
   title?: string;
   /** Semantic heading tag for title. Defaults to 'h3' */
@@ -28,6 +28,10 @@ export interface InlineAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   /** Primary semantic role according to DESIGN.md */
   role?: InlineAlertRole;
+  /** Alias for `role` when setting the semantic color scheme without shadowing ARIA `role` */
+  tone?: InlineAlertRole;
+  /** Optional ARIA landmark/live role override (defaults to `'alert'` for errors or `'status'` otherwise) */
+  ariaRole?: 'alert' | 'status' | 'region' | 'note';
   /** Ergonomic alias matching shadcn alert API ('default' -> 'neutral', 'destructive' -> 'error') */
   variant?: InlineAlertVariant;
   /** Visual backdrop style: 'wash' (default, best inside white cards) or 'surface' (white card fill for alerts on the page canvas) */
@@ -95,7 +99,7 @@ export const InlineAlertClose = React.forwardRef<HTMLButtonElement, InlineAlertC
       data-slot="inline-alert-close"
       aria-label="Dismiss alert"
       className={cn(
-        'shrink-0 min-h-[44px] min-w-[44px] size-11 -mr-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none',
+        'shrink-0 min-h-[44px] min-w-[44px] size-11 -me-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none',
         className
       )}
       {...props}
@@ -111,6 +115,8 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   titleAs = 'h3',
   children,
   role,
+  tone,
+  ariaRole: ariaRoleProp,
   variant,
   appearance = 'wash',
   icon,
@@ -119,8 +125,8 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   className,
   ...props
 }, ref) => {
-  // Resolve role: explicit role takes priority, fallback to variant, default to 'neutral'
-  const resolvedRole: InlineAlertRole = role ?? (
+  // Resolve role: explicit tone/role take priority, fallback to variant, default to 'neutral'
+  const resolvedRole: InlineAlertRole = tone ?? role ?? (
     variant === 'destructive' ? 'error' : variant === 'default' ? 'neutral' : (variant ?? 'neutral')
   );
 
@@ -153,7 +159,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   };
 
   const hasIcon = icon !== null && icon !== 'none' && icon !== false && icon !== '';
-  const ariaRole = resolvedRole === 'error' ? 'alert' : 'status';
+  const ariaRole = ariaRoleProp ?? (resolvedRole === 'error' ? 'alert' : 'status');
   const ariaLive = resolvedRole === 'error' ? 'assertive' : 'polite';
 
   const renderIcon = () => {
@@ -187,7 +193,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-role={resolvedRole}
       data-appearance={appearance}
       className={cn(
-        'relative flex items-start gap-4 p-5 pl-6 rounded-l-none rounded-r-default overflow-hidden text-left',
+        'relative flex items-start gap-4 p-5 ps-6 rounded-s-none rounded-e overflow-hidden text-start',
         appearance === 'surface'
           ? 'bg-surface border border-outline-variant shadow-card'
           : cn('border-none', surfaceWashBg[resolvedRole]),
@@ -197,7 +203,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
     >
       {/* Mathematically straight 4px vertical accent bar */}
       <div
-        className={cn('absolute left-0 top-0 bottom-0 w-1', accentBarBg[resolvedRole])}
+        className={cn('absolute start-0 top-0 bottom-0 w-1', accentBarBg[resolvedRole])}
         aria-hidden="true"
       />
       {renderIcon()}

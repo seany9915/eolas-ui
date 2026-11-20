@@ -37,23 +37,27 @@ export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps
     },
     forwardedRef
   ) => {
-    const internalRef = React.useRef<HTMLDivElement>(null);
+    const [containerEl, setContainerEl] = React.useState<HTMLDivElement | null>(null);
 
-    React.useImperativeHandle(forwardedRef, () => {
-      const el = internalRef.current;
-      if (!el) {
-        throw new Error('TextHighlight ref not mounted');
-      }
-      return el;
-    });
+    const setRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        setContainerEl(node);
+        if (typeof forwardedRef === 'function') {
+          forwardedRef(node);
+        } else if (forwardedRef) {
+          forwardedRef.current = node;
+        }
+      },
+      [forwardedRef]
+    );
 
-    const { matchCount, isSupported } = useTextHighlight(internalRef, query, {
+    const { matchCount, isSupported } = useTextHighlight(containerEl, query, {
       highlightName,
       caseSensitive,
     });
 
     return (
-      <div ref={internalRef} className={cn('relative', className)} {...props}>
+      <div ref={setRef} className={cn('relative', className)} {...props}>
         {/* Accessible screen reader live-region announcement */}
         {announceMatches && isSupported && query.trim() && (
           <span data-text-highlight-status className="sr-only" aria-live="polite" aria-atomic="true">

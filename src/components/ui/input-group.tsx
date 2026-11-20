@@ -95,7 +95,7 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
             // Invalid state (explicit prop or via inner control validation)
             (invalid || undefined) &&
               'border-error has-[input:focus-visible,textarea:focus-visible]:border-error has-[input:focus-visible,textarea:focus-visible]:outline-error',
-            'has-[:invalid]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[:invalid]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
+            'has-[:user-invalid]:border-error has-[:user-invalid]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[:user-invalid]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
             'has-[[aria-invalid=true]]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[aria-invalid=true]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
             'has-[[data-invalid]]:border-error has-[[data-invalid]]:has-[input:focus-visible,textarea:focus-visible]:border-error has-[[data-invalid]]:has-[input:focus-visible,textarea:focus-visible]:outline-error',
             isFloating
@@ -103,7 +103,7 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
               : '[&:not(:focus-within)]:hover:border-outline/80'
           ),
       disabled && 'opacity-60 bg-surface-container/30 border-outline-variant cursor-not-allowed',
-      'has-[:disabled]:opacity-60 has-[:disabled]:bg-surface-container/30 has-[:disabled]:border-outline-variant has-[:disabled]:cursor-not-allowed',
+      'has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:opacity-60 has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:bg-surface-container/30 has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:border-outline-variant has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:cursor-not-allowed',
       className
     );
 
@@ -150,8 +150,8 @@ export const InputGroupInput = React.forwardRef<HTMLInputElement, InputGroupInpu
         className={cn(
           'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
           size === 'sm' ? 'text-sm' : 'text-base',
-          '[[data-slot=input-group-addon]+&]:pl-1.5',
-          '[&:has(+[data-slot=input-group-addon])]:pr-1.5',
+          '[[data-slot=input-group-addon]+&]:ps-1.5',
+          '[&:has(+[data-slot=input-group-addon])]:pe-1.5',
           'placeholder:text-on-surface-variant/80',
           'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
           className
@@ -302,8 +302,8 @@ export interface InputGroupAddonProps extends React.HTMLAttributes<HTMLDivElemen
 export const InputGroupAddon = React.forwardRef<HTMLDivElement, InputGroupAddonProps>(
   ({ className, align = 'inline-start', render, children, ...props }, ref) => {
     const alignClasses = cn(
-      align === 'inline-start' && 'order-first flex items-center gap-1.5 pl-3 pr-1 text-on-surface-variant select-none shrink-0',
-      align === 'inline-end' && 'order-last flex items-center gap-1.5 pr-3 pl-1 ml-auto text-on-surface-variant select-none shrink-0',
+      align === 'inline-start' && 'order-first flex items-center gap-1.5 ps-3 pe-1 text-on-surface-variant select-none shrink-0',
+      align === 'inline-end' && 'order-last flex items-center gap-1.5 pe-3 ps-1 ms-auto text-on-surface-variant select-none shrink-0',
       align === 'block-start' && 'order-first flex flex-wrap items-center justify-between gap-2 px-3 pt-2.5 pb-1 w-full text-on-surface-variant',
       align === 'block-end' && 'order-last flex flex-wrap items-center justify-between gap-2 px-3 pb-2.5 pt-1 mt-auto w-full text-on-surface-variant'
     );
@@ -355,9 +355,9 @@ export const InputGroupButton = React.forwardRef<HTMLButtonElement, InputGroupBu
       size === 'icon-xs' && 'size-6 min-h-[24px] min-w-[24px] p-0 rounded-md',
       size === 'icon-sm' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-full',
       size === 'icon' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-md',
-      size === 'xs' && 'h-6 px-2 text-xs rounded-md',
-      size === 'sm' && 'h-8 px-2.5 text-xs rounded-md',
-      size === 'md' && 'h-9 px-3 text-sm rounded-md'
+      size === 'xs' && 'h-6 min-h-[24px] px-2 text-xs rounded-md',
+      size === 'sm' && 'h-8 min-h-[32px] px-2.5 text-xs rounded-md',
+      size === 'md' && 'h-9 min-h-[36px] px-3 text-sm rounded-md'
     );
 
     const buttonSize =

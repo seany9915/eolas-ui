@@ -32,11 +32,11 @@ export interface DialogProps<Payload = unknown> {
   className?: string;
 }
 
-const sizeClasses: Record<string, string> = {
+export const dialogSizeClasses: Record<string, string> = {
   sm: 'max-w-sm',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-  xl: 'max-w-3xl',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
   '2xl': 'max-w-2xl',
   '3xl': 'max-w-3xl',
   '4xl': 'max-w-4xl',
@@ -131,7 +131,7 @@ function DialogComponent<Payload = unknown>({
                 className={cn(
                   'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
                   isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
-                  sizeClasses[size] || sizeClasses.md,
+                  dialogSizeClasses[size] || dialogSizeClasses.md,
                   className
                 )}
               >
@@ -231,7 +231,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
             className={cn(
               'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
-              sizeClasses[size] || sizeClasses.md,
+              dialogSizeClasses[size] || dialogSizeClasses.md,
               className
             )}
             {...props}
@@ -246,7 +246,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
 DialogContent.displayName = 'DialogContent';
 
 export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col gap-1.5 text-left mb-4', className)} {...props} />
+  <div className={cn('flex flex-col gap-1.5 text-start mb-4', className)} {...props} />
 );
 DialogHeader.displayName = 'DialogHeader';
 

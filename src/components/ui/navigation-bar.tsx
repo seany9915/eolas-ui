@@ -174,7 +174,7 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
           >
             {icon}
             {badge !== undefined && badge !== null && (
-              <div className="absolute -top-0.5 -right-2.5 pointer-events-none">
+              <div className="absolute -top-0.5 -end-2.5 pointer-events-none">
                 {typeof badge === 'number' || typeof badge === 'string' ? (
                   <Badge variant="filled" colorRole="primary" size="sm" className="px-1.5 min-w-5 leading-none">
                     {badge}

@@ -87,8 +87,15 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
       }
     }, []);
 
-    // Scroll tracker: updates React progress state for fallback bar animation, custom container tracking, and numeric percentage pill
+    const hasTargetRef = Boolean(targetRef);
+    const useCssDriven = supportsCssScrollTimeline && !hasTargetRef && !showPercentage;
+
+    // Scroll tracker: skips window listener completely when compositor CSS scroll-driven animation is active
     React.useEffect(() => {
+      if (useCssDriven) {
+        return;
+      }
+
       let rafId = 0;
 
       const updateProgress = () => {
@@ -122,11 +129,9 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         cancelAnimationFrame(rafId);
         target.removeEventListener('scroll', handleScroll);
       };
-    }, [targetRef, supportsCssScrollTimeline, showPercentage]);
+    }, [targetRef, useCssDriven]);
 
     const colors = colorStyles[colorRole] || colorStyles.primary;
-    const isWindowScroll = !targetRef?.current;
-    const useCssDriven = supportsCssScrollTimeline && isWindowScroll && !showPercentage;
 
     return (
       <BaseProgress.Root
@@ -151,7 +156,7 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         <div className={cn('w-full overflow-hidden', heightClasses[height], colors.track, trackClassName)}>
           <div
             className={cn(
-              'h-full origin-left',
+              'h-full origin-left rtl:origin-right',
               colors.indicator,
               useCssDriven
                 ? 'reading-progress-root-driven'
@@ -170,7 +175,7 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
 
         {/* Optional floating reading percentage pill */}
         {showPercentage && (
-          <div className="absolute top-3 right-4 pointer-events-auto">
+          <div className="absolute top-3 end-4 pointer-events-auto">
             <span className="font-mono text-xs font-semibold tabular-nums text-on-surface bg-surface/90 backdrop-blur-sm border border-outline-variant px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1.5">
               <span className={cn('size-1.5 rounded-full', colors.indicator)} aria-hidden="true" />
               <BaseProgress.Value>

@@ -60,10 +60,19 @@ interface StepPanelProps {
   onSelect: () => void;
 }
 
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+
 const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, canReveal, direction, onSelect }) => {
   const panelRef = React.useRef<HTMLDivElement>(null);
+  const onSelectRef = React.useRef(onSelect);
 
-  React.useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
+
+  // Upgrade inactive searchable panels to hidden="until-found" synchronously before paint.
+  useIsomorphicLayoutEffect(() => {
     const el = panelRef.current;
     if (!el) return;
 
@@ -72,20 +81,26 @@ const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, canReveal, dire
     } else {
       el.setAttribute('hidden', canReveal ? 'until-found' : '');
     }
+  }, [isSelected, canReveal]);
+
+  React.useEffect(() => {
+    const el = panelRef.current;
+    if (!el || !canReveal) return;
 
     const handleBeforeMatch = () => {
-      onSelect();
+      onSelectRef.current();
     };
 
     el.addEventListener('beforematch', handleBeforeMatch);
     return () => {
       el.removeEventListener('beforematch', handleBeforeMatch);
     };
-  }, [isSelected, canReveal, onSelect]);
+  }, [canReveal]);
 
   return (
     <div
       ref={panelRef}
+      hidden={!isSelected}
       className={cn(
         'w-full px-1 [&[hidden]:not([hidden="until-found"])]:hidden',
         isSelected
@@ -124,16 +139,18 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
     const totalSteps = steps.length;
     const safeIndex = totalSteps > 0 ? Math.min(Math.max(0, currentStepIndex), totalSteps - 1) : 0;
 
-    const prevStepRef = React.useRef(safeIndex);
-    const directionRef = React.useRef<'forward' | 'backward'>('forward');
-    if (safeIndex !== prevStepRef.current) {
-      directionRef.current = safeIndex > prevStepRef.current ? 'forward' : 'backward';
-    }
-    const direction = directionRef.current;
+    const [navState, setNavState] = React.useState<{
+      index: number;
+      direction: 'forward' | 'backward';
+    }>({ index: safeIndex, direction: 'forward' });
 
-    React.useEffect(() => {
-      prevStepRef.current = safeIndex;
-    }, [safeIndex]);
+    if (safeIndex !== navState.index) {
+      setNavState({
+        index: safeIndex,
+        direction: safeIndex > navState.index ? 'forward' : 'backward',
+      });
+    }
+    const direction = navState.direction;
 
     if (totalSteps === 0) {
       return null;
@@ -270,7 +287,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                   onClick={handlePrevious}
                   disabled={isFirstStep}
                 >
-                  <Icon name="chevron_left" size="sm" aria-hidden="true" />
+                  <Icon name="chevron_left" size="sm" directional aria-hidden="true" />
                   <span>{previousLabel}</span>
                 </Button>
               </div>
@@ -281,7 +298,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 onClick={handleNext}
               >
                 <span>{isLastStep ? completeLabel : nextLabel}</span>
-                {!isLastStep && <Icon name="chevron_right" size="sm" aria-hidden="true" />}
+                {!isLastStep && <Icon name="chevron_right" size="sm" directional aria-hidden="true" />}
               </Button>
             </Card.Footer>
           </>

@@ -58,17 +58,20 @@ export const ChartContainer = React.forwardRef<
       typeof RechartsPrimitive.ResponsiveContainer
     >['children'];
   }
->(({ id, className, children, config, ...props }, ref) => {
+>(({ id, className, children, config, role, ...props }, ref) => {
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`;
+  const resolvedRole =
+    role ?? (props['aria-label'] || props['aria-labelledby'] ? 'figure' : undefined);
 
   return (
     <ChartContext.Provider value={{ config }}>
       <div
         data-chart={chartId}
         ref={ref}
+        role={resolvedRole}
         className={cn(
-          "@container flex w-full min-w-0 aspect-video justify-center text-xs font-sans [&_.recharts-cartesian-axis-tick_text]:fill-on-surface-variant [&_.recharts-cartesian-grid_line]:stroke-outline-variant/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-outline-variant [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_line]:stroke-outline-variant/40 [&_.recharts-radial-bar-background-sector]:fill-surface-container [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-surface-container/40 [&_.recharts-reference-line_line]:stroke-outline-variant [&_.recharts-sector]:stroke-transparent [&_.recharts-surface]:outline-none",
+          "@container flex w-full min-w-0 aspect-video justify-center text-xs font-sans [&_.recharts-cartesian-axis-tick_text]:fill-on-surface-variant [&_.recharts-cartesian-grid_line]:stroke-outline-variant/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-outline-variant [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_line]:stroke-outline-variant/40 [&_.recharts-radial-bar-background-sector]:fill-surface-container [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-surface-container/40 [&_.recharts-reference-line_line]:stroke-outline-variant [&_.recharts-sector:not([stroke])]:stroke-transparent [&_.recharts-surface]:outline-none",
           className
         )}
         {...props}
@@ -83,38 +86,55 @@ export const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = 'Chart';
 
+const SAFE_CSS_KEY_RE = /^[a-zA-Z0-9_-]+$/;
+const SAFE_CSS_COLOR_RE = /^[a-zA-Z0-9#(),.%+/\s_-]+$/;
+
+function isSafeCssColor(color: string): boolean {
+  const trimmed = color.trim();
+  return (
+    trimmed.length > 0 &&
+    SAFE_CSS_COLOR_RE.test(trimmed) &&
+    !/url\s*\(|expression\s*\(|@import|\/\*/i.test(trimmed)
+  );
+}
+
 const escapeSelectorValue = (value: string) =>
-  value.replace(/[\\"]/g, '\\$&').replace(/</g, '\\3c ');
+  value.replace(/[^a-zA-Z0-9_-]/g, '');
 
 export const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+  const safeId = escapeSelectorValue(id);
   const colorConfig = Object.entries(config).filter(
-    ([, config]) => config.theme || config.color
+    ([key, itemConfig]) => SAFE_CSS_KEY_RE.test(key) && (itemConfig.theme || itemConfig.color)
   );
 
-  if (!colorConfig.length) {
+  if (!safeId || !colorConfig.length) {
+    return null;
+  }
+
+  const cssRules = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const declarations = colorConfig
+        .map(([key, itemConfig]) => {
+          const color =
+            itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+            itemConfig.color;
+          return color && isSafeCssColor(color) ? `  --color-${key}: ${color.trim()};` : null;
+        })
+        .filter(Boolean);
+      if (declarations.length === 0) return '';
+      return `\n${prefix} [data-chart="${safeId}"] {\n${declarations.join('\n')}\n}\n`;
+    })
+    .filter(Boolean)
+    .join('');
+
+  if (!cssRules) {
     return null;
   }
 
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart="${escapeSelectorValue(id)}"] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .filter(Boolean)
-  .join('\n')}
-}
-`
-          )
-          .join(''),
+        __html: cssRules,
       }}
     />
   );
@@ -314,7 +334,7 @@ export const ChartTooltipContent = React.forwardRef<
                             {
                               'size-2.5 rounded-full': indicator === 'dot',
                               'w-1 h-3 rounded-full': indicator === 'line',
-                              'w-0 border-l border-dashed h-3': indicator === 'dashed',
+                              'w-0 border-s border-dashed h-3': indicator === 'dashed',
                               'my-0.5': nestLabel && indicator === 'dashed',
                             }
                           )}
@@ -382,12 +402,54 @@ export interface ChartLegendContentProps
   nameKey?: string;
 }
 
+// Internal props cloned onto custom Legend content by Recharts LegendImpl
+const RECHARTS_LEGEND_INTERNAL_PROPS = new Set([
+  'align',
+  'chartHeight',
+  'chartWidth',
+  'content',
+  'height',
+  'iconSize',
+  'iconType',
+  'inactiveColor',
+  'itemSorter',
+  'labelStyle',
+  'layout',
+  'margin',
+  'offset',
+  'onBBoxUpdate',
+  'payloadUniqBy',
+  'portal',
+  'position',
+  'width',
+  'wrapperStyle',
+]);
+
+function pickLegendDivProps(props: Record<string, unknown>): React.HTMLAttributes<HTMLDivElement> {
+  const domProps: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (!RECHARTS_LEGEND_INTERNAL_PROPS.has(key)) {
+      domProps[key] = value;
+    }
+  }
+  return domProps as React.HTMLAttributes<HTMLDivElement>;
+}
+
 export const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   ChartLegendContentProps
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = 'bottom', nameKey },
+    {
+      className,
+      hideIcon = false,
+      payload,
+      verticalAlign = 'bottom',
+      nameKey,
+      role = 'list',
+      'aria-label': ariaLabel = 'Chart legend',
+      ...props
+    },
     ref
   ) => {
     const { config } = useChart();
@@ -399,11 +461,14 @@ export const ChartLegendContent = React.forwardRef<
     return (
       <div
         ref={ref}
+        role={role}
+        aria-label={ariaLabel}
         className={cn(
           'flex items-center justify-center gap-4 text-xs font-sans text-on-surface-variant',
           verticalAlign === 'top' ? 'pb-3' : 'pt-3',
           className
         )}
+        {...pickLegendDivProps(props as Record<string, unknown>)}
       >
         {payload.map((item) => {
           const key = `${nameKey || item.dataKey || 'value'}`;
@@ -412,6 +477,7 @@ export const ChartLegendContent = React.forwardRef<
           return (
             <div
               key={item.value}
+              role="listitem"
               className={cn(
                 'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-on-surface-variant'
               )}
@@ -420,14 +486,19 @@ export const ChartLegendContent = React.forwardRef<
                 <img
                   src={itemConfig.avatar}
                   alt=""
+                  aria-hidden="true"
                   className="size-3.5 rounded-full object-cover shrink-0 ring-1 ring-outline-variant/40"
                 />
               ) : itemConfig?.icon && !hideIcon ? (
-                <div className="shrink-0 [&>svg]:size-3.5 [&>svg]:text-on-surface-variant flex items-center justify-center">
+                <div
+                  aria-hidden="true"
+                  className="shrink-0 [&>svg]:size-3.5 [&>svg]:text-on-surface-variant flex items-center justify-center"
+                >
                   <itemConfig.icon />
                 </div>
               ) : (
                 <div
+                  aria-hidden="true"
                   className="size-2 rounded-full shrink-0 border border-outline/30"
                   style={{
                     backgroundColor: item.color,

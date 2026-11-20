@@ -48,7 +48,7 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
       <span
         ref={ref}
         className={cn(
-          'absolute -top-1 -right-1 z-10 select-none pointer-events-none inline-flex items-center justify-center font-mono font-bold leading-none',
+          'absolute -top-1 -end-1 z-10 select-none pointer-events-none inline-flex items-center justify-center font-mono font-bold leading-none',
           'transition-[transform,opacity] duration-fast ease-smooth-out will-change-transform animate-badge-pop',
           'motion-reduce:animate-none motion-reduce:transition-none motion-reduce:transform-none',
           variant === 'primary' && 'bg-primary text-on-primary',

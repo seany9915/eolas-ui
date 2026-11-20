@@ -16,8 +16,8 @@ import { cn } from '@/lib/utils';
 export interface SliderProps {
   label?: React.ReactNode;
   description?: React.ReactNode;
-  value?: number | number[];
-  defaultValue?: number | number[];
+  value?: number | readonly number[];
+  defaultValue?: number | readonly number[];
   onValueChange?: (value: any, eventDetails?: BaseSlider.Root.ChangeEventDetails) => void;
   onValueCommitted?: (value: any, eventDetails?: BaseSlider.Root.CommitEventDetails) => void;
   min?: number;
@@ -38,7 +38,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   label,
   description,
   value,
-  defaultValue = 50,
+  defaultValue,
   onValueChange,
   onValueCommitted,
   min = 0,
@@ -55,7 +55,14 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   className,
   ...props
 }, ref) => {
-  const isRange = Array.isArray(value ?? defaultValue);
+  const rangeValues = Array.isArray(value)
+    ? value
+    : Array.isArray(defaultValue)
+      ? defaultValue
+      : null;
+  const isRange = rangeValues !== null;
+  const thumbCount = rangeValues ? rangeValues.length : 1;
+  const effectiveDefaultValue = value === undefined ? defaultValue : undefined;
   const effectiveMinSteps = minStepsBetweenValues ?? (isRange ? 1 : 0);
   const effectiveCollision = thumbCollisionBehavior ?? (isRange ? 'none' : 'push');
   const labelText = typeof label === 'string' && label.trim() ? label.trim() : undefined;
@@ -66,7 +73,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
       <BaseSlider.Root
         ref={ref}
         value={value}
-        defaultValue={defaultValue}
+        defaultValue={effectiveDefaultValue}
         onValueChange={onValueChange}
         onValueCommitted={onValueCommitted}
         min={min}
@@ -91,7 +98,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
     <BaseSlider.Root
       ref={ref}
       value={value}
-      defaultValue={defaultValue}
+      defaultValue={effectiveDefaultValue}
       onValueChange={onValueChange}
       onValueCommitted={onValueCommitted}
       min={min}
@@ -126,26 +133,34 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
         </span>
       )}
 
-      <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
+      <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
         <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-container-high border border-outline data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
           <BaseSlider.Indicator className="rounded-full bg-primary data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
           {isRange ? (
-            <>
+            Array.from({ length: thumbCount }, (_, thumbIndex) => (
               <BaseSlider.Thumb
-                index={0}
-                aria-label={labelText ? `${labelText} minimum` : 'Minimum value'}
-                className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                key={thumbIndex}
+                index={thumbIndex}
+                aria-label={
+                  thumbCount === 2
+                    ? thumbIndex === 0
+                      ? labelText
+                        ? `${labelText} minimum`
+                        : 'Minimum value'
+                      : labelText
+                        ? `${labelText} maximum`
+                        : 'Maximum value'
+                    : labelText
+                      ? `${labelText} thumb ${thumbIndex + 1}`
+                      : `Slider value ${thumbIndex + 1}`
+                }
+                className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
               />
-              <BaseSlider.Thumb
-                index={1}
-                aria-label={labelText ? `${labelText} maximum` : 'Maximum value'}
-                className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </>
+            ))
           ) : (
             <BaseSlider.Thumb
               aria-label={labelText ?? 'Slider value'}
-              className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+              className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
             />
           )}
         </BaseSlider.Track>

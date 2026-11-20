@@ -9,6 +9,8 @@ import { Plan } from '@/components/ui/plan';
 import { Queue } from '@/components/ui/queue';
 import { ClinicianTip } from '@/components/ui/clinician-tip';
 import { ChatMessage } from '@/components/ui/chat-message';
+import { ChatMessageContext, useChatMessageContext } from '@/components/ui/chat-message-context';
+import { MessageScroller } from '@/components/ui/message-scroller';
 import { PromptInput } from '@/components/ui/prompt-input';
 import { CodeBlock } from '@/components/ui/code-block';
 import { Sources } from '@/components/ui/sources';
@@ -17,6 +19,8 @@ import { SuggestionChips } from '@/components/ui/suggestion-chips';
 import { ModelSelector, type ModelItem, type ThinkingEffort } from '@/components/ui/model-selector';
 import { Tool } from '@/components/ui/tool';
 import { Checkpoint } from '@/components/ui/checkpoint';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
 
@@ -428,6 +432,133 @@ export const CheckpointDemo: React.FC<ComponentDemoProps> = () => {
         turn={4}
         onRestore={() => {}}
       />
+    </div>
+  );
+};
+
+interface DemoScrollMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+const INITIAL_SCROLLER_MESSAGES: DemoScrollMessage[] = [
+  {
+    id: 'm1',
+    role: 'user',
+    content: 'Which warm-up sounds work best before starting /r/ word lists?',
+  },
+  {
+    id: 'm2',
+    role: 'assistant',
+    content: 'Start with gentle vocal glides and relaxed humming for 60 seconds to reduce jaw tension.',
+  },
+  {
+    id: 'm3',
+    role: 'user',
+    content: 'Should we practice initial words before medial syllables?',
+  },
+  {
+    id: 'm4',
+    role: 'assistant',
+    content: 'Yes. Begin with clear initial syllables like "ray" and "row" before moving into longer sentences.',
+  },
+];
+
+export const MessageScrollerDemo: React.FC<ComponentDemoProps> = () => {
+  const [messages, setMessages] = React.useState<DemoScrollMessage[]>(INITIAL_SCROLLER_MESSAGES);
+  const nextTurnRef = React.useRef(5);
+
+  const handleAddTurn = () => {
+    const turn = nextTurnRef.current;
+    nextTurnRef.current += 1;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `m${turn}`,
+        role: turn % 2 === 1 ? 'user' : 'assistant',
+        content:
+          turn % 2 === 1
+            ? `Practice round ${turn}: How did the learner handle ten repetitions?`
+            : `Note ${turn}: Eight of ten repetitions were clear with brief mirror cues.`,
+      },
+    ]);
+  };
+
+  return (
+    <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-sans text-on-surface-variant">
+          Scroll up to reveal the jump-to-bottom button, then add a message.
+        </span>
+        <Button size="sm" variant="outline" colorRole="neutral" onClick={handleAddTurn}>
+          <Icon name="add" size="xs" aria-hidden="true" />
+          <span>Add message</span>
+        </Button>
+      </div>
+      <MessageScroller className="h-64 rounded-lg border border-outline-variant bg-background">
+        <MessageScroller.Viewport aria-label="Sample practice conversation">
+          <MessageScroller.Content>
+            {messages.map((msg) => (
+              <MessageScroller.Item
+                key={msg.id}
+                messageId={msg.id}
+                scrollAnchor={msg.role === 'user'}
+              >
+                <ChatMessage
+                  role={msg.role}
+                  botType={msg.role === 'assistant' ? 'droid' : undefined}
+                  content={msg.content}
+                />
+              </MessageScroller.Item>
+            ))}
+          </MessageScroller.Content>
+        </MessageScroller.Viewport>
+        <MessageScroller.Button direction="end" />
+      </MessageScroller>
+    </div>
+  );
+};
+
+const ChatContextStatusBadge: React.FC = () => {
+  const { inMessage, role } = useChatMessageContext();
+  return (
+    <div className="flex items-center justify-between gap-2 text-xs font-sans text-on-surface-variant">
+      <span>Surface mode</span>
+      <Badge variant="soft" colorRole={inMessage ? 'primary' : 'neutral'} size="sm">
+        {inMessage ? `Inside ${role} bubble` : 'Standalone card'}
+      </Badge>
+    </div>
+  );
+};
+
+export const ChatMessageContextDemo: React.FC<ComponentDemoProps> = () => {
+  const [inMessage, setInMessage] = React.useState(true);
+
+  return (
+    <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-sans text-on-surface-variant">
+          Toggle context to see child helpers adapt their framing automatically.
+        </span>
+        <Button
+          size="sm"
+          variant={inMessage ? 'filled' : 'outline'}
+          colorRole={inMessage ? 'primary' : 'neutral'}
+          onClick={() => setInMessage((prev) => !prev)}
+        >
+          <span>{inMessage ? 'In message: On' : 'In message: Off'}</span>
+        </Button>
+      </div>
+
+      <ChatMessageContext.Provider value={{ inMessage, role: 'assistant' }}>
+        <div className="flex flex-col gap-3 rounded-lg border border-outline-variant bg-surface p-4">
+          <ChatContextStatusBadge />
+          <ClinicianTip>
+            Cue a brief breath pause before multi-syllable words to keep pacing steady.
+          </ClinicianTip>
+        </div>
+      </ChatMessageContext.Provider>
     </div>
   );
 };

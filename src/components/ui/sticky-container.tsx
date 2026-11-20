@@ -67,11 +67,13 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
     const sentinelRef = React.useRef<HTMLDivElement>(null);
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [isStuckFallback, setIsStuckFallback] = React.useState<boolean>(false);
+    const [supportsScrollState, setSupportsScrollState] = React.useState<boolean>(false);
 
-    const supportsScrollState =
-      typeof CSS !== 'undefined' &&
-      typeof CSS.supports === 'function' &&
-      CSS.supports('container-type: scroll-state');
+    React.useEffect(() => {
+      if (typeof CSS !== 'undefined' && typeof CSS.supports === 'function') {
+        setSupportsScrollState(CSS.supports('container-type', 'scroll-state'));
+      }
+    }, []);
 
     const setContainerRef = React.useCallback(
       (node: HTMLDivElement | null) => {
@@ -99,14 +101,18 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          // When the sentinel is no longer intersecting the top edge, the header is stuck
-          const stuck = !entry.isIntersecting;
-          setIsStuckFallback(stuck);
-          onStuckChange?.(stuck);
+          const rootTop = entry.rootBounds?.top ?? topOffset;
+          const stuck = !entry.isIntersecting && entry.boundingClientRect.bottom <= rootTop + 1;
+          setIsStuckFallback((prev) => {
+            if (prev !== stuck) {
+              onStuckChange?.(stuck);
+            }
+            return stuck;
+          });
         },
         {
           root,
-          rootMargin: `-${topOffset + 1}px 0px 0px 0px`,
+          rootMargin: `-${topOffset}px 0px 0px 0px`,
           threshold: [0, 1],
         }
       );
@@ -120,11 +126,11 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
 
     return (
       <div className="contents">
-        {/* Invisible 0px sentinel placed immediately before the sticky container */}
+        {/* Invisible 1px zero-layout-impact sentinel placed immediately before the sticky container */}
         <div
           ref={sentinelRef}
           aria-hidden="true"
-          className="h-0 w-0 p-0 m-0 opacity-0 pointer-events-none"
+          className="h-px -mb-px w-full p-0 opacity-0 pointer-events-none"
         />
 
         {/* Outer scroll-state container */}

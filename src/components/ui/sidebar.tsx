@@ -104,18 +104,20 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     const [openMobile, setOpenMobile] = React.useState(false);
     const isEmbedded = embedded;
 
-    // Uncontrolled state fallback initialized from localStorage or defaultOpen
-    const [_open, _setOpen] = React.useState<boolean>(() => {
-      if (typeof window !== 'undefined') {
-        try {
-          const stored = localStorage.getItem(SIDEBAR_COOKIE_NAME);
-          if (stored !== null) return stored === 'true';
-        } catch {
-          // ignore
+    // Uncontrolled state initialized deterministically for SSR, then synced with localStorage on mount
+    const [_open, _setOpen] = React.useState<boolean>(defaultOpen);
+
+    React.useEffect(() => {
+      if (openProp !== undefined) return;
+      try {
+        const stored = localStorage.getItem(SIDEBAR_COOKIE_NAME);
+        if (stored !== null) {
+          _setOpen(stored === 'true');
         }
+      } catch {
+        // ignore storage errors
       }
-      return defaultOpen;
-    });
+    }, [openProp]);
 
     const open = openProp ?? _open;
     const setOpen = React.useCallback(
@@ -351,7 +353,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
             className,
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
             isEmbedded
-              ? 'absolute inset-y-0 left-0 z-20 h-full w-[var(--sidebar-width)] flex flex-col'
+              ? 'absolute inset-y-0 z-20 h-full w-[var(--sidebar-width)] flex flex-col'
               : cn('fixed inset-y-0 z-20 flex-col h-svh w-[var(--sidebar-width)]', desktopFlexClass)
           )}
           {...props}
@@ -405,7 +407,7 @@ export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTrigger
           }}
           {...props}
         >
-          {children ?? icon ?? <Icon name={isOpen ? 'menu_open' : 'menu'} size="md" />}
+          {children ?? icon ?? <Icon name={isOpen ? 'menu_open' : 'menu'} size="md" directional={isOpen} />}
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
       </Tooltip>
@@ -471,7 +473,7 @@ export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
         className: cn(
           'relative flex flex-1 flex-col bg-surface',
           isEmbedded ? 'min-h-0 h-full' : 'min-h-svh',
-          'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
+          'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
           className
         ),
         ...props,
@@ -643,7 +645,7 @@ export interface SidebarGroupActionProps extends React.ButtonHTMLAttributes<HTML
 export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGroupActionProps>(
   ({ className, render, ...props }, ref) => {
     const classes = cn(
-      'absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
+      'absolute end-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'group-data-[collapsible=icon]:hidden',
       className
     );
@@ -760,7 +762,7 @@ export function sidebarMenuButtonVariants({
     'group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-h-[44px] group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center',
     '[&>span:last-child]:truncate [&>span:last-child]:group-data-[collapsible=icon]:hidden',
     sizeClasses,
-    'has-[+[data-slot=sidebar-menu-badge]]:pr-9 group-data-[collapsible=icon]:has-[+[data-slot=sidebar-menu-badge]]:pr-0',
+    'has-[+[data-slot=sidebar-menu-badge]]:pe-9 group-data-[collapsible=icon]:has-[+[data-slot=sidebar-menu-badge]]:pe-0',
     variantClasses,
     className
   );
@@ -852,14 +854,14 @@ export interface SidebarMenuActionProps
 export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
   ({ className, showOnHover = false, children, ...props }, ref) => {
     const classes = cn(
-      'absolute right-1 top-2 flex aspect-square w-7 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
+      'absolute end-1 top-2 flex aspect-square w-7 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'after:absolute after:-inset-2 md:after:hidden',
       'peer-data-[size=sm]/menu-button:top-1',
       'peer-data-[size=default]/menu-button:top-1.5',
       'peer-data-[size=lg]/menu-button:top-2',
       'group-data-[collapsible=icon]:hidden',
       showOnHover &&
-        'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0 transition-opacity',
+        'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[popup-open]:opacity-100 md:opacity-0 transition-opacity',
       className
     );
 
@@ -888,7 +890,7 @@ export const SidebarMenuBadge = React.forwardRef<
       data-slot="sidebar-menu-badge"
       data-sidebar="menu-badge"
       className={cn(
-        'pointer-events-none absolute right-2 flex h-5 min-w-5 select-none items-center justify-center rounded-md px-1.5 text-xs font-semibold font-mono tabular-nums bg-surface-container text-on-surface-variant peer-hover/menu-button:text-on-surface peer-data-[active=true]/menu-button:bg-primary peer-data-[active=true]/menu-button:text-on-primary',
+        'pointer-events-none absolute end-2 flex h-5 min-w-5 select-none items-center justify-center rounded-md px-1.5 text-xs font-semibold font-mono tabular-nums bg-surface-container text-on-surface-variant peer-hover/menu-button:text-on-surface peer-data-[active=true]/menu-button:bg-primary peer-data-[active=true]/menu-button:text-on-primary',
         'peer-data-[size=sm]/menu-button:top-2',
         'peer-data-[size=default]/menu-button:top-3',
         'peer-data-[size=lg]/menu-button:top-3.5',
@@ -909,9 +911,14 @@ export const SidebarMenuSkeleton = React.forwardRef<
   HTMLDivElement,
   SidebarMenuSkeletonProps
 >(({ className, showIcon = false, ...props }, ref) => {
+  const seedId = React.useId();
   const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`;
-  }, []);
+    let hash = 0;
+    for (let i = 0; i < seedId.length; i++) {
+      hash = (hash * 31 + seedId.charCodeAt(i)) >>> 0;
+    }
+    return `${50 + (hash % 40)}%`;
+  }, [seedId]);
 
   return (
     <div
@@ -923,7 +930,7 @@ export const SidebarMenuSkeleton = React.forwardRef<
     >
       {showIcon && <Skeleton className="size-5 rounded-md" data-sidebar="menu-skeleton-icon" />}
       <Skeleton
-        className="h-4 flex-1 max-w-[--skeleton-width]"
+        className="h-4 flex-1 max-w-[var(--skeleton-width)]"
         data-sidebar="menu-skeleton-text"
         style={{ '--skeleton-width': width } as React.CSSProperties}
       />
@@ -945,7 +952,7 @@ export const SidebarMenuSub = React.forwardRef<
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        'mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-outline-variant px-2.5 py-0.5 group-data-[collapsible=icon]:hidden list-none m-0',
+        'mx-3.5 my-0 flex min-w-0 translate-x-px rtl:-translate-x-px flex-col gap-1 border-s border-outline-variant px-2.5 py-0.5 group-data-[collapsible=icon]:hidden list-none',
         className
       )}
       {...props}
@@ -988,7 +995,7 @@ export const SidebarMenuSubButton = React.forwardRef<
     }[size];
 
     const baseClasses = cn(
-      'flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md font-label text-left outline-none transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] select-none cursor-pointer',
+      'flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md font-label text-start outline-none transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] select-none cursor-pointer',
       'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
       '[&>span:last-child]:truncate',
       isActive

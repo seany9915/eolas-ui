@@ -35,7 +35,7 @@ function parseRgb(color: string): [number, number, number] | null {
 
 function linearizeChannel(channel255: number): number {
   const s = channel255 / 255;
-  return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
 }
 
 /**
@@ -49,5 +49,11 @@ export function getContrastInk(backgroundColor: string): string {
     0.2126 * linearizeChannel(rgb[0]) +
     0.7152 * linearizeChannel(rgb[1]) +
     0.0722 * linearizeChannel(rgb[2]);
-  return luminance > 0.179 ? '#1a1c1e' : '#ffffff';
+  const darkInkLuminance =
+    0.2126 * linearizeChannel(26) +
+    0.7152 * linearizeChannel(28) +
+    0.0722 * linearizeChannel(30);
+  const contrastWithDark = (luminance + 0.05) / (darkInkLuminance + 0.05);
+  const contrastWithWhite = 1.05 / (luminance + 0.05);
+  return contrastWithDark >= contrastWithWhite ? '#1a1c1e' : '#ffffff';
 }

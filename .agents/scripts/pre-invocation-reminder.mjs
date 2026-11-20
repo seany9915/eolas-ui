@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 /**
- * Antigravity PreInvocation hook:
- * Proactively injects a concise, high-signal design contract reminder into the agent's
- * context window before the model begins reasoning on each turn.
- *
- * Uses `ephemeralMessage` so it never bloats the permanent conversation transcript.
+ * Antigravity SessionStart hook:
+ * Injects a concise, high-signal design contract reminder into the agent's
+ * context window at session startup using `systemMessage`.
  */
 
 const REMINDER_TEXT = `[CORE CONTRACT & DESIGN SYSTEM ANCHORS]
@@ -18,7 +16,9 @@ const REMINDER_TEXT = `[CORE CONTRACT & DESIGN SYSTEM ANCHORS]
 const payload = {
   injectSteps: [
     {
-      ephemeralMessage: REMINDER_TEXT,
+      systemMessage: {
+        systemMessage: REMINDER_TEXT,
+      },
     },
   ],
 };

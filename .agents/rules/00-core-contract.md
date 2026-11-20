@@ -13,7 +13,7 @@ description: Core workspace contract — Base UI architecture, 3-layer separatio
 1. **Primitives (`src/components/ui/`):** Pure Base UI wrappers, design tokens, and controlled AI primitives (`PromptInput`, `ChatMessage`, `MessageScroller`, `ModelSelector`, `Trace`, `Tool`). Zero network/DB/auth logic; never import from `blocks` or `features`.
 2. **Composite Blocks (`src/components/blocks/`):** Pure controlled UI assemblies built from `ui/` and tokens (props in, callbacks out; zero network/auth coupling). Never import from `features/` or `views/`.
 3. **Feature Views (`src/features/` or `src/views/`):** Owns state, queries, auth, and routing; composes `blocks/` and `ui/`.
-- **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `src/components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` / `<Button variant="unstyled">` from `@/components/ui/`.
+- **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `src/components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` (for custom-styled bare buttons) from `@/components/ui/`.
 - **Pre-Creation Workflow:** Inventory `src/components/ui/` and `src/components/blocks/` first → reuse or extend with props → only build new in `ui/` or `blocks/` if nothing fits.
 
 ## 3. API Preservation
@@ -26,7 +26,7 @@ Never erode component APIs, strip `ref` / Base UI `render` props, drop compound 
 - **No manual `<Icon>` margins:** Never add `mr-*`/`ml-*` inside buttons/menus/badges (`gap-2` handles spacing).
 - **Shorthands:** Enforce `size-*` over `w-* h-*` and `truncate` over multi-class ellipsis.
 - **Forms:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>`; use `<InputGroup>` + `<InputGroupAddon>` instead of absolute-positioned buttons.
-- **Overlays:** Always render an accessible title (`<DialogTitle>`, `<DrawerTitle>`, `<SheetTitle>`, or `sr-only`); never add manual `z-index`.
+- **Overlays:** Always render an accessible title (`<DialogTitle>`, `<DrawerTitle>`, or `sr-only`); never add manual `z-index`.
 - **Triggers:** Never downgrade triggers with `render={<span />}` ("Behavior Wraps the Line").
 - **Motion:** Never use `transition-all` or ad-hoc `@keyframes` sweeps (use `<ShimmerText>` / `<Skeleton>`).
 - **Copy:** Plain everyday English, 1–2 nouns max per label; never expose dev/DB/CSS jargon (`committed`, `synchronized`, `affordance`, `telemetry`, `workflow`, `protocol`).
@@ -40,8 +40,9 @@ Never erode component APIs, strip `ref` / Base UI `render` props, drop compound 
 | Component architecture, Base UI, navigation taxonomy | [component-library.md](./component-library.md) |
 | Banned visual/code/copy patterns | [anti-patterns.md](./anti-patterns.md) |
 | Color/type/spacing/motion tokens & component specs | project-root `DESIGN.md` |
-| Converting Stitch designs / writing `DESIGN.md` / prompts | `react-components` / `taste-design` / `enhance-prompt` skills |
-| Motion implementation / tuning | `DESIGN.md` Motion section + `transitions-dev` / `transitions-polish` skills |
+| Adding/styling shadcn & Base UI components or applying `DESIGN.md` | `shadcn` skill + `DESIGN.md` |
+| Responsive layout, RTL/i18n spacing, or worst-case UI stress testing | `better-layout` / `break-ui` skills |
+| Motion implementation / tuning | `DESIGN.md` Motion section + `src/globals.css` & `src/components/ui/` motion primitives |
 | Live a11y/browser debugging | `a11y-debugging` / `chrome-devtools` skills + Chrome DevTools MCP |
 | Plain-English / patient / Easy Read / GDPR copy | `govuk-style` / `patient-communication` / `easy-read` / `gdpr-data-handling` skills |
 | Firebase / Firestore / GCP project lookup | `firebase-*` skills + `firebase-mcp-server` (not `google-cloud-firestore`); `google-cloud-resource-manager` `search_projects` |

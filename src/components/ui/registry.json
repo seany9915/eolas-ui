@@ -307,6 +307,7 @@
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/direction-provider.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [

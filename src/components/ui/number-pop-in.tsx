@@ -58,7 +58,7 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
         aria-live="polite"
         {...props}
       >
-        {prefix && <span className="mr-0.5">{prefix}</span>}
+        {prefix && <span className="me-0.5">{prefix}</span>}
 
         <span key={formattedText} className="inline-flex items-baseline">
           {chars.map((char, idx) => {
@@ -87,7 +87,7 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
           })}
         </span>
 
-        {suffix && <span className="ml-0.5">{suffix}</span>}
+        {suffix && <span className="ms-0.5">{suffix}</span>}
       </span>
     );
   }

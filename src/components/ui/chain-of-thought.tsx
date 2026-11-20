@@ -74,7 +74,7 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
         {...props}
       >
         <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
-        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
           <TraceTitle className="truncate">{title}</TraceTitle>
           {description && (
             <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
@@ -83,7 +83,7 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
           )}
         </div>
         {formattedDuration && (
-          <TraceDescription className="ml-auto shrink-0 pl-2">
+          <TraceDescription className="ms-auto shrink-0 ps-2">
             <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
               {formattedDuration}
             </span>
@@ -98,7 +98,7 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
           <TraceCollapsibleTrigger>
             {stepLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
+          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof children === 'string' ? (
               <p>{children}</p>
             ) : (

@@ -165,7 +165,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
         data-slot="card"
         data-size={size}
         data-density={density}
-        data-prominence={effectiveProminence}
+        data-prominence={isInverted ? 'inverted' : effectiveProminence}
+        data-surface={isInverted ? 'inverted' : undefined}
         data-accent={isInverted ? resolvedAccent : undefined}
         data-selected={isSelectable ? selected : undefined}
         {...props}
@@ -350,7 +351,7 @@ export const CardTrigger = React.forwardRef<HTMLButtonElement, CardTriggerProps>
         ref={ref}
         data-slot="card-trigger"
         data-card-trigger=""
-        className={cn('card-link text-left cursor-pointer', className)}
+        className={cn('card-link text-start cursor-pointer', className)}
         {...props}
         aria-pressed={isSelectable && !isRadio ? (props['aria-pressed'] ?? selected) : props['aria-pressed']}
         aria-checked={isRadio ? (props['aria-checked'] ?? selected) : props['aria-checked']}

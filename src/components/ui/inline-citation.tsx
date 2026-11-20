@@ -28,7 +28,7 @@ import {
   CarouselItem,
   useCarousel,
 } from './carousel';
-import { cn } from '@/lib/utils';
+import { cn, sanitizeUrl } from '@/lib/utils';
 
 export interface CitationSourceItem {
   id?: string | number;
@@ -127,13 +127,25 @@ export interface InlineCitationCardTriggerProps {
 }
 
 const InlineCitationCardTrigger = React.forwardRef<
-  HTMLButtonElement,
-  InlineCitationCardTriggerProps & React.ButtonHTMLAttributes<HTMLButtonElement>
+  HTMLElement,
+  InlineCitationCardTriggerProps & React.HTMLAttributes<HTMLElement>
 >(({ children, index, label, href, delay: propDelay, closeDelay: propCloseDelay, className, ...props }, ref) => {
   const context = useInlineCitation();
   const delay = propDelay ?? context?.delay ?? 200;
   const closeDelay = propCloseDelay ?? context?.closeDelay ?? 150;
   const defaultLabel = label || (index !== undefined ? `Citation [${index}]` : 'Citation');
+  const safeHref = sanitizeUrl(href);
+
+  const setTriggerRef = React.useCallback<React.RefCallback<HTMLElement>>(
+    (node) => {
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref]
+  );
 
   const triggerClassName = cn(
     'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer',
@@ -143,13 +155,13 @@ const InlineCitationCardTrigger = React.forwardRef<
 
   return (
     <BasePreviewCard.Trigger
+      ref={setTriggerRef}
       delay={delay}
       closeDelay={closeDelay}
       render={
-        href ? (
+        safeHref ? (
           <a
-            ref={ref as unknown as React.Ref<HTMLAnchorElement>}
-            href={href}
+            href={safeHref}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={defaultLabel}
@@ -157,11 +169,10 @@ const InlineCitationCardTrigger = React.forwardRef<
           />
         ) : (
           <UnstyledButton
-            ref={ref}
             expandedTouchTarget
             aria-label={defaultLabel}
             className={triggerClassName}
-            {...props}
+            {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
           />
         )
       }
@@ -253,10 +264,11 @@ const InlineCitationIcon: React.FC<InlineCitationIconProps> = ({
   className,
   ...props
 }) => {
-  if (src) {
+  const safeSrc = sanitizeUrl(src);
+  if (safeSrc) {
     return (
       <span className={cn('size-3.5 inline-flex items-center justify-center shrink-0 rounded-sm overflow-hidden', className)} {...props}>
-        <img src={src} alt={alt} className="size-full object-contain" />
+        <img src={safeSrc} alt={alt} className="size-full object-contain" />
       </span>
     );
   }
@@ -290,11 +302,14 @@ const InlineCitationSource: React.FC<InlineCitationSourceProps> = ({
   className,
   ...props
 }) => {
+  const safeUrl = sanitizeUrl(url);
+  const safeFavicon = sanitizeUrl(favicon);
   const displayDomain =
     domain ||
     (() => {
+      if (!safeUrl) return undefined;
       try {
-        return new URL(url).hostname.replace(/^www\./, '');
+        return new URL(safeUrl).hostname.replace(/^www\./, '');
       } catch {
         return undefined;
       }
@@ -302,26 +317,33 @@ const InlineCitationSource: React.FC<InlineCitationSourceProps> = ({
 
   return (
     <div className={cn('flex flex-col gap-1 min-w-0', className)} {...props}>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Open source: ${title}`}
-        className="group/link flex items-start justify-between gap-2 text-on-surface hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
-      >
-        <span className="font-heading font-semibold text-sm leading-snug line-clamp-2">
+      {safeUrl ? (
+        <a
+          href={safeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open source: ${title}`}
+          className="group/link flex items-start justify-between gap-2 text-on-surface hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+        >
+          <span className="font-heading font-semibold text-sm leading-snug line-clamp-2">
+            {title}
+          </span>
+          <Icon
+            name="open_in_new"
+            size="xs"
+            directional
+            className="text-on-surface-variant/70 group-hover/link:text-secondary shrink-0 mt-0.5 transition-colors"
+            aria-hidden="true"
+          />
+        </a>
+      ) : (
+        <span className="font-heading font-semibold text-sm leading-snug line-clamp-2 text-on-surface">
           {title}
         </span>
-        <Icon
-          name="open_in_new"
-          size="xs"
-          className="text-on-surface-variant/70 group-hover/link:text-secondary shrink-0 mt-0.5 transition-colors"
-          aria-hidden="true"
-        />
-      </a>
-      {(displayDomain || authorOrDate || icon || favicon) && (
+      )}
+      {(displayDomain || authorOrDate || icon || safeFavicon) && (
         <div className="flex items-center gap-1.5 font-mono text-[11px] text-on-surface-variant">
-          {(favicon || icon) && <InlineCitationIcon src={favicon} name={icon} />}
+          {(safeFavicon || icon) && <InlineCitationIcon src={safeFavicon} name={icon} />}
           {displayDomain && <span>{displayDomain}</span>}
           {displayDomain && authorOrDate && <span>•</span>}
           {authorOrDate && <span>{authorOrDate}</span>}
@@ -346,7 +368,7 @@ const InlineCitationQuote = React.forwardRef<HTMLQuoteElement, InlineCitationQuo
       <blockquote
         ref={ref}
         className={cn(
-          'border-l-2 border-secondary pl-2.5 py-1 text-xs font-normal text-on-surface-variant bg-surface-container/40 rounded-none leading-relaxed',
+          'border-s-2 border-secondary ps-2.5 py-1 text-xs font-normal text-on-surface-variant bg-surface-container/40 rounded-none leading-relaxed',
           className
         )}
         {...props}
@@ -455,7 +477,7 @@ const InlineCitationCarouselPrev: React.FC<InlineCitationCarouselNavProps> = ({ 
       aria-label="Previous citation"
       className={cn('size-6 p-0 rounded-full', className)}
     >
-      <Icon name="chevron_left" size="xs" aria-hidden="true" />
+      <Icon name="chevron_left" size="xs" directional aria-hidden="true" />
     </Button>
   );
 };
@@ -475,7 +497,7 @@ const InlineCitationCarouselNext: React.FC<InlineCitationCarouselNavProps> = ({ 
       aria-label="Next citation"
       className={cn('size-6 p-0 rounded-full', className)}
     >
-      <Icon name="chevron_right" size="xs" aria-hidden="true" />
+      <Icon name="chevron_right" size="xs" directional aria-hidden="true" />
     </Button>
   );
 };

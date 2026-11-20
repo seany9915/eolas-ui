@@ -46,7 +46,9 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
 
   const importStatement = entry.tier === 'block'
     ? `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/blocks/${entry.name}';`
-    : `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/ui/${entry.name}';`;
+    : entry.tier === 'utility' && entry.name === 'utils'
+      ? `import { cn } from '@/lib/utils';`
+      : `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/ui/${entry.name}';`;
 
   const viewportWidthClass = {
     mobile: 'max-w-[375px] mx-auto',
@@ -127,12 +129,12 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             <Button
               size="sm"
               variant="tonal"
-              onClick={() => copyToClipboard(entry.shadcnCommand || `npx shadcn add @seany9915/eolas-ui/${entry.name}`, 'cli')}
+              onClick={() => copyToClipboard(entry.shadcnCommand || `npx @seany9915/eolas-ui add ${entry.name}`, 'cli')}
               className="text-xs font-mono h-9 px-3"
-              title="Copy shadcn CLI command"
+              title="Copy Eolas UI CLI command"
             >
               <Icon name={copiedType === 'cli' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
-              {copiedType === 'cli' ? 'Copied CLI' : 'shadcn add'}
+              {copiedType === 'cli' ? 'Copied CLI' : 'eolas-ui add'}
             </Button>
           </div>
         </div>

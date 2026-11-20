@@ -147,7 +147,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
             <Icon name="radio_button_unchecked" size="xs" />
           )}
         </span>
-        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
           <span
             className={cn(
               'font-sans text-xs truncate',
@@ -167,7 +167,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
           {content && <div className="mt-1.5 font-sans text-xs text-on-surface-variant">{content}</div>}
         </div>
         {formattedDuration && (
-          <TraceDescription className="ml-auto shrink-0 pl-2">
+          <TraceDescription className="ms-auto shrink-0 ps-2">
             <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
               {formattedDuration}
             </span>
@@ -291,12 +291,25 @@ export const QueueRoot: React.FC<QueueProps> = ({
   const resolvedTodoTitle = todoTitle ?? `${pendingItems.length} to do`;
   const resolvedCompletedTitle = completedTitle ?? `${completedItems.length} completed`;
 
-  const isCompound = React.Children.toArray(children).some(
-    (child) =>
-      React.isValidElement(child) &&
-      (child.type === QueueSection ||
-        (child.type as { displayName?: string })?.displayName === 'QueueSection')
-  );
+  const isCompound = React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false;
+    const type = child.type;
+    const displayName = (type as { displayName?: string })?.displayName;
+    return (
+      type === QueueSection ||
+      type === QueueHeader ||
+      type === QueueTitle ||
+      type === QueueList ||
+      type === QueueItemComponent ||
+      type === QueueEmpty ||
+      displayName === 'QueueSection' ||
+      displayName === 'QueueHeader' ||
+      displayName === 'QueueTitle' ||
+      displayName === 'QueueList' ||
+      displayName === 'QueueItem' ||
+      displayName === 'QueueEmpty'
+    );
+  });
 
   return (
     <div data-slot="queue" className={cn('w-full', className)}>

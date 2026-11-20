@@ -40,7 +40,7 @@ function DefaultChevron({
     <span
       className={cn(
         'material-symbols-outlined leading-none select-none',
-        orientation === 'down' || orientation === 'up' ? 'text-base' : 'text-lg',
+        orientation === 'down' || orientation === 'up' ? 'text-base' : 'text-lg icon-directional',
         className
       )}
       aria-hidden="true"
@@ -84,9 +84,9 @@ export function Calendar({
         selected:
           'bg-primary text-on-primary rounded-md [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_start:
-          'rounded-l-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
+          'rounded-s-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_end:
-          'rounded-r-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
+          'rounded-e-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_middle:
           'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-surface-container',
         today:

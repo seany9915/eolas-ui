@@ -123,37 +123,71 @@ declare global {
   }
 }
 
-/**
- * React hook for on-device natural language generation using the Prompt API (Gemini Nano).
- */
-export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
+function serializeAiOptions(options: unknown): string {
+  if (!options) return '';
+  try {
+    return JSON.stringify(options);
+  } catch {
+    return '';
+  }
+}
+
+interface DestroyableInstance {
+  destroy?(): void;
+}
+
+interface BuiltInAiFactory<TInstance extends DestroyableInstance, TOptions> {
+  availability(options?: TOptions): Promise<BuiltInAiAvailability>;
+  create(options?: TOptions & { monitor?: (m: ModelMonitor) => void }): Promise<TInstance>;
+}
+
+function useBuiltInAiSession<TInstance extends DestroyableInstance, TOptions extends object>(
+  factory: BuiltInAiFactory<TInstance, TOptions> | undefined,
+  unsupportedMessage: string,
+  defaultOptions?: TOptions,
+  optionsRequired = false,
+  missingOptionsMessage?: string
+) {
   const [availability, setAvailability] = React.useState<BuiltInAiAvailability>('unavailable');
-  const [isPrompting, setIsPrompting] = React.useState(false);
   const [downloadProgress, setDownloadProgress] = React.useState<number | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
-  const instanceRef = React.useRef<LanguageModelInstance | null>(null);
 
-  const factory = React.useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
-    return window.LanguageModel || window.ai?.languageModel;
-  }, []);
+  const instanceRef = React.useRef<TInstance | null>(null);
+  const activeOptionsKeyRef = React.useRef<string>('');
+  const pendingRef = React.useRef<{ key: string; promise: Promise<TInstance> } | null>(null);
+  const generationRef = React.useRef(0);
+  const mountedRef = React.useRef(true);
 
-  const isSupported = Boolean(factory);
+  const defaultOptionsKey = serializeAiOptions(defaultOptions);
+  const defaultOptionsRef = React.useRef(defaultOptions);
+  React.useEffect(() => {
+    defaultOptionsRef.current = defaultOptions;
+  }, [defaultOptions]);
 
   React.useEffect(() => {
-    if (!factory) {
+    mountedRef.current = true;
+    generationRef.current += 1;
+
+    if (!factory || (optionsRequired && !defaultOptionsRef.current)) {
       setAvailability('unavailable');
-      return;
+      return () => {
+        mountedRef.current = false;
+        generationRef.current += 1;
+        instanceRef.current?.destroy?.();
+        instanceRef.current = null;
+        activeOptionsKeyRef.current = '';
+        pendingRef.current = null;
+      };
     }
 
     let active = true;
     factory
-      .availability(defaultOptions)
+      .availability(defaultOptionsRef.current)
       .then((status) => {
-        if (active) setAvailability(status);
+        if (active && mountedRef.current) setAvailability(status);
       })
       .catch((err: unknown) => {
-        if (active) {
+        if (active && mountedRef.current) {
           setAvailability('unavailable');
           setError(err instanceof Error ? err : new Error(String(err)));
         }
@@ -161,40 +195,116 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
 
     return () => {
       active = false;
-      if (instanceRef.current?.destroy) {
-        instanceRef.current.destroy();
-        instanceRef.current = null;
-      }
+      mountedRef.current = false;
+      generationRef.current += 1;
+      instanceRef.current?.destroy?.();
+      instanceRef.current = null;
+      activeOptionsKeyRef.current = '';
+      pendingRef.current = null;
     };
-  }, [factory, defaultOptions]);
+  }, [factory, defaultOptionsKey, optionsRequired]);
 
   const getOrCreateInstance = React.useCallback(
-    async (opts?: LanguageModelOptions) => {
+    async (overrideOptions?: TOptions): Promise<TInstance> => {
       if (!factory) {
-        throw new Error('LanguageModel (Prompt API) is unsupported in this browser environment.');
+        throw new Error(unsupportedMessage);
       }
 
-      if (instanceRef.current) {
+      const base = defaultOptionsRef.current;
+      const mergedOptions =
+        base && overrideOptions
+          ? ({ ...base, ...overrideOptions } as TOptions)
+          : (overrideOptions ?? base);
+
+      if (optionsRequired && !mergedOptions) {
+        throw new Error(missingOptionsMessage ?? unsupportedMessage);
+      }
+
+      const targetKey = serializeAiOptions(mergedOptions);
+      if (instanceRef.current && activeOptionsKeyRef.current === targetKey) {
         return instanceRef.current;
       }
 
-      const mergedOptions: LanguageModelOptions = { ...defaultOptions, ...opts };
-      const instance = await factory.create({
-        ...mergedOptions,
-        monitor(m: ModelMonitor) {
-          m.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
-            if (e.total > 0) {
-              setDownloadProgress(Math.round((e.loaded / e.total) * 100));
-            }
-          });
-        },
-      });
+      if (pendingRef.current && pendingRef.current.key === targetKey) {
+        return pendingRef.current.promise;
+      }
 
-      instanceRef.current = instance;
-      setDownloadProgress(null);
-      return instance;
+      if (instanceRef.current) {
+        instanceRef.current.destroy?.();
+        instanceRef.current = null;
+        activeOptionsKeyRef.current = '';
+      }
+
+      const expectedGen = ++generationRef.current;
+      const createPromise = factory
+        .create({
+          ...(mergedOptions as TOptions),
+          monitor(m: ModelMonitor) {
+            m.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
+              if (e.total > 0 && mountedRef.current && generationRef.current === expectedGen) {
+                setDownloadProgress(Math.round((e.loaded / e.total) * 100));
+              }
+            });
+          },
+        })
+        .then((instance) => {
+          if (!mountedRef.current || generationRef.current !== expectedGen) {
+            instance.destroy?.();
+            throw new DOMException('AI session creation superseded or unmounted', 'AbortError');
+          }
+          instanceRef.current = instance;
+          activeOptionsKeyRef.current = targetKey;
+          if (pendingRef.current?.promise === createPromise) {
+            pendingRef.current = null;
+          }
+          setDownloadProgress(null);
+          return instance;
+        })
+        .catch((err) => {
+          if (pendingRef.current?.promise === createPromise) {
+            pendingRef.current = null;
+          }
+          throw err;
+        });
+
+      pendingRef.current = { key: targetKey, promise: createPromise };
+      return createPromise;
     },
-    [factory, defaultOptions]
+    [factory, unsupportedMessage, optionsRequired, missingOptionsMessage]
+  );
+
+  return {
+    isSupported: Boolean(factory),
+    availability,
+    downloadProgress,
+    error,
+    setError,
+    getOrCreateInstance,
+  };
+}
+
+/**
+ * React hook for on-device natural language generation using the Prompt API (Gemini Nano).
+ */
+export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
+  const [isPrompting, setIsPrompting] = React.useState(false);
+
+  const factory = React.useMemo(() => {
+    if (typeof window === 'undefined') return undefined;
+    return window.LanguageModel || window.ai?.languageModel;
+  }, []);
+
+  const {
+    isSupported,
+    availability,
+    downloadProgress,
+    error,
+    setError,
+    getOrCreateInstance,
+  } = useBuiltInAiSession<LanguageModelInstance, LanguageModelOptions>(
+    factory,
+    'LanguageModel (Prompt API) is unsupported in this browser environment.',
+    defaultOptions
   );
 
   const prompt = React.useCallback(
@@ -216,7 +326,7 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
         setIsPrompting(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   const promptStreaming = React.useCallback(
@@ -245,7 +355,7 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
         setIsPrompting(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   const countTokens = React.useCallback(
@@ -275,70 +385,24 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
  * React hook for on-device language identification using the Language Detector API.
  */
 export function useLanguageDetector() {
-  const [availability, setAvailability] = React.useState<BuiltInAiAvailability>('unavailable');
   const [isDetecting, setIsDetecting] = React.useState(false);
-  const [downloadProgress, setDownloadProgress] = React.useState<number | null>(null);
-  const [error, setError] = React.useState<Error | null>(null);
-  const instanceRef = React.useRef<LanguageDetectorInstance | null>(null);
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
     return window.LanguageDetector || window.ai?.languageDetector;
   }, []);
 
-  const isSupported = Boolean(factory);
-
-  React.useEffect(() => {
-    if (!factory) {
-      setAvailability('unavailable');
-      return;
-    }
-
-    let active = true;
-    factory
-      .availability()
-      .then((status) => {
-        if (active) setAvailability(status);
-      })
-      .catch((err: unknown) => {
-        if (active) {
-          setAvailability('unavailable');
-          setError(err instanceof Error ? err : new Error(String(err)));
-        }
-      });
-
-    return () => {
-      active = false;
-      if (instanceRef.current?.destroy) {
-        instanceRef.current.destroy();
-        instanceRef.current = null;
-      }
-    };
-  }, [factory]);
-
-  const getOrCreateInstance = React.useCallback(async () => {
-    if (!factory) {
-      throw new Error('LanguageDetector API is unsupported in this browser environment.');
-    }
-
-    if (instanceRef.current) {
-      return instanceRef.current;
-    }
-
-    const instance = await factory.create({
-      monitor(m: ModelMonitor) {
-        m.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
-          if (e.total > 0) {
-            setDownloadProgress(Math.round((e.loaded / e.total) * 100));
-          }
-        });
-      },
-    });
-
-    instanceRef.current = instance;
-    setDownloadProgress(null);
-    return instance;
-  }, [factory]);
+  const {
+    isSupported,
+    availability,
+    downloadProgress,
+    error,
+    setError,
+    getOrCreateInstance,
+  } = useBuiltInAiSession<LanguageDetectorInstance, {}>(
+    factory,
+    'LanguageDetector API is unsupported in this browser environment.'
+  );
 
   const detect = React.useCallback(
     async (text: string): Promise<DetectedLanguageResult[]> => {
@@ -355,7 +419,7 @@ export function useLanguageDetector() {
         setIsDetecting(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   return {
@@ -372,74 +436,24 @@ export function useLanguageDetector() {
  * React hook for on-device text distillation using the Summarizer API.
  */
 export function useSummarizer(defaultOptions?: SummarizerOptions) {
-  const [availability, setAvailability] = React.useState<BuiltInAiAvailability>('unavailable');
   const [isSummarizing, setIsSummarizing] = React.useState(false);
-  const [downloadProgress, setDownloadProgress] = React.useState<number | null>(null);
-  const [error, setError] = React.useState<Error | null>(null);
-  const instanceRef = React.useRef<SummarizerInstance | null>(null);
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
     return window.Summarizer || window.ai?.summarizer;
   }, []);
 
-  const isSupported = Boolean(factory);
-
-  React.useEffect(() => {
-    if (!factory) {
-      setAvailability('unavailable');
-      return;
-    }
-
-    let active = true;
-    factory
-      .availability(defaultOptions)
-      .then((status) => {
-        if (active) setAvailability(status);
-      })
-      .catch((err: unknown) => {
-        if (active) {
-          setAvailability('unavailable');
-          setError(err instanceof Error ? err : new Error(String(err)));
-        }
-      });
-
-    return () => {
-      active = false;
-      if (instanceRef.current?.destroy) {
-        instanceRef.current.destroy();
-        instanceRef.current = null;
-      }
-    };
-  }, [factory, defaultOptions]);
-
-  const getOrCreateInstance = React.useCallback(
-    async (opts?: SummarizerOptions) => {
-      if (!factory) {
-        throw new Error('Summarizer API is unsupported in this browser environment.');
-      }
-
-      if (instanceRef.current) {
-        return instanceRef.current;
-      }
-
-      const mergedOptions: SummarizerOptions = { ...defaultOptions, ...opts };
-      const instance = await factory.create({
-        ...mergedOptions,
-        monitor(m: ModelMonitor) {
-          m.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
-            if (e.total > 0) {
-              setDownloadProgress(Math.round((e.loaded / e.total) * 100));
-            }
-          });
-        },
-      });
-
-      instanceRef.current = instance;
-      setDownloadProgress(null);
-      return instance;
-    },
-    [factory, defaultOptions]
+  const {
+    isSupported,
+    availability,
+    downloadProgress,
+    error,
+    setError,
+    getOrCreateInstance,
+  } = useBuiltInAiSession<SummarizerInstance, SummarizerOptions>(
+    factory,
+    'Summarizer API is unsupported in this browser environment.',
+    defaultOptions
   );
 
   const summarize = React.useCallback(
@@ -461,7 +475,7 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
         setIsSummarizing(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   const summarizeStreaming = React.useCallback(
@@ -489,7 +503,7 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
         setIsSummarizing(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   return {
@@ -507,78 +521,26 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
  * React hook for on-device translation using the Translator API.
  */
 export function useTranslator(defaultOptions?: TranslatorOptions) {
-  const [availability, setAvailability] = React.useState<BuiltInAiAvailability>('unavailable');
   const [isTranslating, setIsTranslating] = React.useState(false);
-  const [downloadProgress, setDownloadProgress] = React.useState<number | null>(null);
-  const [error, setError] = React.useState<Error | null>(null);
-  const instanceRef = React.useRef<TranslatorInstance | null>(null);
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
     return window.Translator || window.ai?.translator;
   }, []);
 
-  const isSupported = Boolean(factory);
-
-  React.useEffect(() => {
-    if (!factory || !defaultOptions) {
-      setAvailability('unavailable');
-      return;
-    }
-
-    let active = true;
-    factory
-      .availability(defaultOptions)
-      .then((status) => {
-        if (active) setAvailability(status);
-      })
-      .catch((err: unknown) => {
-        if (active) {
-          setAvailability('unavailable');
-          setError(err instanceof Error ? err : new Error(String(err)));
-        }
-      });
-
-    return () => {
-      active = false;
-      if (instanceRef.current?.destroy) {
-        instanceRef.current.destroy();
-        instanceRef.current = null;
-      }
-    };
-  }, [factory, defaultOptions]);
-
-  const getOrCreateInstance = React.useCallback(
-    async (opts?: TranslatorOptions) => {
-      if (!factory) {
-        throw new Error('Translator API is unsupported in this browser environment.');
-      }
-
-      if (instanceRef.current) {
-        return instanceRef.current;
-      }
-
-      const options = opts || defaultOptions;
-      if (!options) {
-        throw new Error('Source and target languages are required to create a Translator.');
-      }
-
-      const instance = await factory.create({
-        ...options,
-        monitor(m: ModelMonitor) {
-          m.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
-            if (e.total > 0) {
-              setDownloadProgress(Math.round((e.loaded / e.total) * 100));
-            }
-          });
-        },
-      });
-
-      instanceRef.current = instance;
-      setDownloadProgress(null);
-      return instance;
-    },
-    [factory, defaultOptions]
+  const {
+    isSupported,
+    availability,
+    downloadProgress,
+    error,
+    setError,
+    getOrCreateInstance,
+  } = useBuiltInAiSession<TranslatorInstance, TranslatorOptions>(
+    factory,
+    'Translator API is unsupported in this browser environment.',
+    defaultOptions,
+    true,
+    'Source and target languages are required to create a Translator.'
   );
 
   const translate = React.useCallback(
@@ -596,7 +558,7 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
         setIsTranslating(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   const translateStreaming = React.useCallback(
@@ -624,7 +586,7 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
         setIsTranslating(false);
       }
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, setError]
   );
 
   return {

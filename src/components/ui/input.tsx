@@ -130,17 +130,17 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     const paddingClasses =
       size === 'sm'
         ? cn(
-            hasLeading ? 'pl-10' : 'pl-3.5',
-            hasTrailing ? (showClear || trailingAction ? 'pr-12' : 'pr-10') : 'pr-3.5'
+            hasLeading ? 'ps-10' : 'ps-3.5',
+            hasTrailing ? (showClear || trailingAction ? 'pe-12' : 'pe-10') : 'pe-3.5'
           )
         : size === 'lg'
         ? cn(
-            hasLeading ? 'pl-14' : 'pl-4.5',
-            hasTrailing ? (showClear || trailingAction ? 'pr-16' : 'pr-14') : 'pr-4.5'
+            hasLeading ? 'ps-14' : 'ps-4.5',
+            hasTrailing ? (showClear || trailingAction ? 'pe-16' : 'pe-14') : 'pe-4.5'
           )
         : cn(
-            hasLeading ? 'pl-12' : 'pl-4',
-            hasTrailing ? (showClear || trailingAction ? 'pr-14' : 'pr-12') : 'pr-4'
+            hasLeading ? 'ps-12' : 'ps-4',
+            hasTrailing ? (showClear || trailingAction ? 'pe-14' : 'pe-12') : 'pe-4'
           );
 
     const inputClasses = cn(
@@ -188,7 +188,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
           <span
             className={cn(
               'text-on-surface-variant absolute flex items-center pointer-events-none select-none z-10',
-              size === 'sm' ? 'left-3 text-lg' : size === 'lg' ? 'left-4 text-2xl' : 'left-3.5 text-xl'
+              size === 'sm' ? 'start-3 text-lg' : size === 'lg' ? 'start-4 text-2xl' : 'start-3.5 text-xl'
             )}
             aria-hidden="true"
           >
@@ -202,12 +202,12 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
               'absolute flex items-center z-10',
               size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl',
               trailingAction || showClear
-                ? 'right-2 text-on-surface'
+                ? 'end-2 text-on-surface'
                 : size === 'sm'
-                ? 'right-3 text-on-surface-variant pointer-events-none select-none'
+                ? 'end-3 text-on-surface-variant pointer-events-none select-none'
                 : size === 'lg'
-                ? 'right-4 text-on-surface-variant pointer-events-none select-none'
-                : 'right-3.5 text-on-surface-variant pointer-events-none select-none'
+                ? 'end-4 text-on-surface-variant pointer-events-none select-none'
+                : 'end-3.5 text-on-surface-variant pointer-events-none select-none'
             )}
           >
             {effectiveTrailing}

@@ -90,6 +90,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
                 <Icon
                   name={trendIconMap[changeType]}
                   size="xs"
+                  directional
                   aria-hidden="true"
                 />
                 <span>{change}</span>

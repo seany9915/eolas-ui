@@ -11,6 +11,7 @@ import { Card, type CardProps } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty } from '@/components/ui/empty';
+import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
 export interface ChartCardTrend {
@@ -147,7 +148,14 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                     variant="outline"
                     colorRole={trend.positive !== false ? 'success' : 'error'}
                     size="sm"
-                    icon={trend.positive !== false ? 'trending_up' : 'trending_down'}
+                    icon={
+                      <Icon
+                        name={trend.positive !== false ? 'trending_up' : 'trending_down'}
+                        size="xs"
+                        directional
+                        aria-hidden="true"
+                      />
+                    }
                   >
                     {trend.value}
                   </Badge>

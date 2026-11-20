@@ -76,8 +76,13 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
       );
     }
 
-    const isIndeterminate = value === null || value === undefined;
-    const percentage = isIndeterminate ? 0 : Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+    const isIndeterminate =
+      value === null || value === undefined || !Number.isFinite(value);
+    const range = max - min;
+    const percentage =
+      isIndeterminate || range <= 0
+        ? 0
+        : Math.min(100, Math.max(0, ((value - min) / range) * 100));
     const shouldShowValue = showValue !== undefined ? showValue : label !== undefined;
     const hasHeader = Boolean(label || (shouldShowValue && !isIndeterminate));
 

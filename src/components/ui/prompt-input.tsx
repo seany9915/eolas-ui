@@ -153,6 +153,7 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
       history,
       onHistoryChange,
       onKeyDown,
+      onChange,
       minRows = 3,
       maxHeight = '12rem',
       ...props
@@ -168,6 +169,11 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
       onSubmit?.();
     }, [onSubmit]);
 
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      historyIndexRef.current = -1;
+      onChange?.(e);
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       onKeyDown?.(e);
       if (e.defaultPrevented) return;
@@ -175,21 +181,37 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
       const isImeComposing = e.nativeEvent.isComposing || e.keyCode === 229;
       if (history && history.length > 0 && onHistoryChange && !isImeComposing) {
         const target = e.currentTarget;
+        if (
+          historyIndexRef.current >= 0 &&
+          (historyIndexRef.current >= history.length ||
+            target.value !== (history[historyIndexRef.current] ?? ''))
+        ) {
+          historyIndexRef.current = -1;
+        }
+
         const atStart = target.selectionStart === 0 && target.selectionEnd === 0;
         const atEnd =
           target.selectionStart === target.value.length &&
           target.selectionEnd === target.value.length;
 
-        if (e.key === 'ArrowUp' && (target.value === '' || atStart || historyIndexRef.current >= 0)) {
+        if (
+          e.key === 'ArrowUp' &&
+          (historyIndexRef.current >= 0 || target.value === '' || atStart)
+        ) {
           e.preventDefault();
           if (historyIndexRef.current === -1) {
             draftBeforeHistoryRef.current = target.value;
             historyIndexRef.current = history.length - 1;
+            onHistoryChange(history[historyIndexRef.current] ?? '');
           } else if (historyIndexRef.current > 0) {
             historyIndexRef.current -= 1;
+            onHistoryChange(history[historyIndexRef.current] ?? '');
           }
-          onHistoryChange(history[historyIndexRef.current] ?? '');
-        } else if (e.key === 'ArrowDown' && historyIndexRef.current >= 0 && (atEnd || target.value === history[historyIndexRef.current])) {
+        } else if (
+          e.key === 'ArrowDown' &&
+          historyIndexRef.current >= 0 &&
+          (atEnd || target.value === history[historyIndexRef.current])
+        ) {
           e.preventDefault();
           if (historyIndexRef.current < history.length - 1) {
             historyIndexRef.current += 1;
@@ -212,9 +234,10 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
         maxHeight={maxHeight}
         onSubmit={onSubmit ? handleSubmit : undefined}
         onFilesPasted={onFilesPasted}
-        onKeyDown={handleKeyDown}
         className={cn('px-1.5 py-1 min-h-0', className)}
         {...props}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
     );
   }
@@ -318,6 +341,16 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
   const currentModel = models.find((m) => m.id === model);
   const displayName = currentModel?.name || model;
 
+  const grouped = React.useMemo(() => {
+    const groups: Record<string, PromptInputModelOption[]> = {};
+    for (const m of models) {
+      const p = m.provider || '';
+      if (!groups[p]) groups[p] = [];
+      groups[p].push(m);
+    }
+    return groups;
+  }, [models]);
+
   if (models.length === 0) {
     return (
       <Button
@@ -337,16 +370,6 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
       </Button>
     );
   }
-
-  const grouped = React.useMemo(() => {
-    const groups: Record<string, PromptInputModelOption[]> = {};
-    for (const m of models) {
-      const p = m.provider || '';
-      if (!groups[p]) groups[p] = [];
-      groups[p].push(m);
-    }
-    return groups;
-  }, [models]);
 
   return (
     <Menu
@@ -376,7 +399,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
               {provider && <MenuGroupLabel>{provider}</MenuGroupLabel>}
               {items.map((item) => (
                 <MenuRadioItem key={item.id} value={item.id} className="min-h-11 py-1.5">
-                  <div className="flex flex-col min-w-0 pr-2">
+                  <div className="flex flex-col min-w-0 pe-2">
                     <div className="flex items-center gap-1.5">
                       <span className="font-heading font-semibold text-xs text-on-surface">{item.name}</span>
                       {item.badge && (
@@ -516,7 +539,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
             <MenuGroupLabel>{label}</MenuGroupLabel>
             {options.map((opt) => (
               <MenuRadioItem key={opt.id} value={opt.id} className="min-h-11 py-1 text-xs">
-                <div className="flex flex-col min-w-0 pr-2">
+                <div className="flex flex-col min-w-0 pe-2">
                   <span className="font-heading font-semibold text-xs text-on-surface">{opt.label}</span>
                   {opt.description && (
                     <span className="text-xs font-sans text-on-surface-variant truncate">
@@ -782,7 +805,7 @@ const PromptInputSubmit: React.FC<PromptInputSubmitProps> = ({
   }
 
   return (
-    <Tooltip content={disabled ? undefined : submitLabel}>
+    <Tooltip content={submitLabel} disabled={disabled}>
       <Button
         variant="filled"
         colorRole="primary"
@@ -878,6 +901,15 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
   ) => {
     const isSubmitDisabled = disabled || isLoading || !(value?.trim());
     const [isDraggingOver, setIsDraggingOver] = React.useState(false);
+    const dragDepthRef = React.useRef(0);
+
+    const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (disabled || isLoading || !onFilesSelected) return;
+      dragDepthRef.current += 1;
+      setIsDraggingOver(true);
+    };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -890,12 +922,19 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      setIsDraggingOver(false);
+      dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+      if (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)) {
+        return;
+      }
+      if (dragDepthRef.current === 0) {
+        setIsDraggingOver(false);
+      }
     };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      dragDepthRef.current = 0;
       setIsDraggingOver(false);
       if (disabled || isLoading || !onFilesSelected) return;
       const droppedFiles = e.dataTransfer.files ? Array.from(e.dataTransfer.files) : [];
@@ -909,6 +948,7 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
         variant={variant}
         floating={floating}
         disabled={disabled}
+        onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}

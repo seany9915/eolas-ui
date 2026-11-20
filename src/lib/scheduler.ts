@@ -57,11 +57,29 @@ export async function postTask<T>(
     return window.scheduler.postTask(callback, options) as Promise<T>;
   }
 
-  if (options.delay && options.delay > 0) {
-    await new Promise((resolve) => setTimeout(resolve, options.delay));
+  const { signal, delay = 0 } = options;
+  if (signal?.aborted) {
+    return Promise.reject(signal.reason ?? new DOMException('Task aborted', 'AbortError'));
   }
 
-  return callback();
+  return new Promise<T>((resolve, reject) => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const onAbort = () => {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+      reject(signal?.reason ?? new DOMException('Task aborted', 'AbortError'));
+    };
+
+    signal?.addEventListener('abort', onAbort, { once: true });
+
+    timeoutId = setTimeout(
+      () => {
+        signal?.removeEventListener('abort', onAbort);
+        Promise.resolve().then(callback).then(resolve, reject);
+      },
+      delay > 0 ? delay : 0
+    );
+  });
 }
 
 /**
@@ -93,6 +111,11 @@ export function useYieldingFilter<T>(
 ) {
   const [filtered, setFiltered] = React.useState<T[]>(items);
   const [isFiltering, setIsFiltering] = React.useState(false);
+  const predicateRef = React.useRef(predicate);
+
+  React.useEffect(() => {
+    predicateRef.current = predicate;
+  }, [predicate]);
 
   React.useEffect(() => {
     let active = true;
@@ -102,7 +125,7 @@ export function useYieldingFilter<T>(
       const matched: T[] = [];
       for (let i = 0; i < items.length; i++) {
         if (!active) return;
-        if (predicate(items[i])) {
+        if (predicateRef.current(items[i])) {
           matched.push(items[i]);
         }
         if (i > 0 && i % chunkSize === 0) {
@@ -122,7 +145,7 @@ export function useYieldingFilter<T>(
     return () => {
       active = false;
     };
-  }, [items, predicate, chunkSize]);
+  }, [items, chunkSize]);
 
   return { filtered, isFiltering };
 }

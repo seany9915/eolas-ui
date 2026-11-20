@@ -147,9 +147,16 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       patternClass = cn(filledStyles[colorRole], 'font-semibold');
     }
 
+    const hasSeparateTriggerAndRemove = isInteractive && Boolean(onRemove);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (disabled) return;
-      if (e.key === ' ' || e.key === 'Enter') {
+      if (
+        e.target === e.currentTarget &&
+        isInteractive &&
+        !hasSeparateTriggerAndRemove &&
+        (e.key === ' ' || e.key === 'Enter')
+      ) {
         e.preventDefault();
         e.currentTarget.click();
       }
@@ -175,24 +182,111 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
 
     const labelText = typeof children === 'string' ? children : '';
 
-    const resolvedRole = role ?? (isFilter ? 'button' : isInteractive ? 'button' : undefined);
-    const resolvedTabIndex = tabIndex ?? (isInteractive && !disabled ? 0 : undefined);
+    const resolvedRole = hasSeparateTriggerAndRemove
+      ? undefined
+      : (role ?? (isFilter ? 'button' : isInteractive ? 'button' : undefined));
+    const resolvedTabIndex = hasSeparateTriggerAndRemove
+      ? undefined
+      : (tabIndex ?? (isInteractive && !disabled ? 0 : undefined));
 
-    const dynamicStyle = customColor
-      ? ({
+    const dynamicStyle: (React.CSSProperties & { '--dynamic-bg'?: string }) | undefined = customColor
+      ? {
           '--dynamic-bg': customColor,
           backgroundColor: customColor,
           borderColor: customColor,
           color: getContrastInk(customColor),
           ...style,
-        } as unknown as React.CSSProperties)
+        }
       : style;
+
+    const leadingMedia = (
+      <>
+        {avatar && <span className="shrink-0 -ms-1 me-1">{avatar}</span>}
+        {isCurrentlySelected && (
+          <span className="material-symbols-outlined shrink-0 font-bold -ms-0.5" aria-hidden="true">
+            check
+          </span>
+        )}
+        {!isCurrentlySelected && icon && (
+          typeof icon === 'string' ? (
+            <span className="material-symbols-outlined shrink-0 -ms-0.5" aria-hidden="true">
+              {icon}
+            </span>
+          ) : (
+            <span className="inline-flex items-center shrink-0 -ms-0.5">{icon}</span>
+          )
+        )}
+        <span className="truncate">{children}</span>
+      </>
+    );
+
+    const { 'aria-label': ariaLabel, ...containerProps } = props;
+
+    if (hasSeparateTriggerAndRemove) {
+      return (
+        <div
+          ref={ref}
+          data-slot="chip"
+          aria-disabled={disabled ? true : undefined}
+          onClick={(e) => {
+            if (!disabled) onClick?.(e);
+          }}
+          style={dynamicStyle}
+          className={cn(
+            'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
+            'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+            '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
+            sizeStyles[size],
+            touchTargetClass,
+            patternClass,
+            customColor && 'contrast-auto',
+            !disabled && 'hover:brightness-95',
+            disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
+            className
+          )}
+          {...containerProps}
+        >
+          <BaseButton
+            type="button"
+            disabled={disabled}
+            aria-label={ariaLabel}
+            aria-pressed={isFilter ? isCurrentlySelected : undefined}
+            tabIndex={tabIndex}
+            onClick={() => {
+              if (!disabled && onSelect) {
+                onSelect(!selected);
+              }
+            }}
+            className="inline-flex items-center gap-[inherit] min-w-0 bg-transparent border-0 p-0 text-current cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {leadingMedia}
+          </BaseButton>
+          {onRemove && (
+            <BaseButton
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!disabled) onRemove();
+              }}
+              disabled={disabled}
+              className="ms-1 -me-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
+              aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
+            >
+              <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">
+                close
+              </span>
+            </BaseButton>
+          )}
+        </div>
+      );
+    }
 
     return (
       <div
         ref={ref}
         data-slot="chip"
         role={resolvedRole}
+        aria-label={ariaLabel}
         aria-pressed={isFilter ? isCurrentlySelected : undefined}
         aria-disabled={disabled ? true : undefined}
         tabIndex={resolvedTabIndex}
@@ -211,24 +305,9 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
           disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
           className
         )}
-        {...props}
+        {...containerProps}
       >
-        {avatar && <span className="shrink-0 -ml-1 mr-1">{avatar}</span>}
-        {isCurrentlySelected && (
-          <span className="material-symbols-outlined shrink-0 font-bold -ml-0.5" aria-hidden="true">
-            check
-          </span>
-        )}
-        {!isCurrentlySelected && icon && (
-          typeof icon === 'string' ? (
-            <span className="material-symbols-outlined shrink-0 -ml-0.5" aria-hidden="true">
-              {icon}
-            </span>
-          ) : (
-            <span className="inline-flex items-center shrink-0 -ml-0.5">{icon}</span>
-          )
-        )}
-        <span className="truncate">{children}</span>
+        {leadingMedia}
         {onRemove && (
           <BaseButton
             type="button"
@@ -237,7 +316,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
               if (!disabled) onRemove();
             }}
             disabled={disabled}
-            className="ml-1 -mr-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
+            className="ms-1 -me-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
             aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
           >
             <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">

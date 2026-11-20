@@ -115,7 +115,7 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
             (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed') &&
               'rounded-none border-none bg-transparent divide-y divide-outline-variant/30',
             resolvedVariant === 'timeline' &&
-              'relative flex flex-col gap-2.5 pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-outline-variant',
+              'relative flex flex-col gap-2.5 ps-6 before:absolute before:start-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-outline-variant',
             className
           )}
           {...props}
@@ -377,7 +377,7 @@ export const TraceDescription = React.forwardRef<HTMLSpanElement, TraceDescripti
         ref={ref}
         data-slot="trace-description"
         className={cn(
-          'font-sans text-xs text-on-surface-variant flex items-center gap-1.5 shrink-0 leading-normal tabular-nums ml-auto',
+          'font-sans text-xs text-on-surface-variant flex items-center gap-1.5 shrink-0 leading-normal tabular-nums ms-auto',
           className
         )}
         {...props}
@@ -434,7 +434,7 @@ export const TraceCollapsibleTrigger = React.forwardRef<
       ref={ref}
       data-slot="trace-collapsible-trigger"
       className={cn(
-        'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-left',
+        'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start',
         'hover:bg-surface-container/40 transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'disabled:cursor-not-allowed disabled:opacity-60',
@@ -445,7 +445,7 @@ export const TraceCollapsibleTrigger = React.forwardRef<
       <div className="flex-1 min-w-0 flex items-center gap-2.5">{children}</div>
       {!hideChevron && (
         <span
-          className="flex items-center justify-center size-5 ml-2 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 group-data-[open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
+          className="flex items-center justify-center size-5 ms-2 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 group-data-[open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
           aria-hidden="true"
         >
           <Icon name="expand_more" size="xs" className="inline-flex items-center justify-center" />
@@ -513,7 +513,7 @@ export const TraceActions = React.forwardRef<HTMLDivElement, TraceActionsProps>(
       <div
         ref={ref}
         data-slot="trace-actions"
-        className={cn('flex items-center gap-1.5 shrink-0 pl-2 ml-auto', className)}
+        className={cn('flex items-center gap-1.5 shrink-0 ps-2 ms-auto', className)}
         {...props}
       >
         {children}
@@ -581,7 +581,17 @@ export const TraceSeparator = React.forwardRef<HTMLDivElement, TraceSeparatorPro
 );
 TraceSeparator.displayName = 'Trace.Separator';
 
-export const TraceHeader = TraceCollapsibleTrigger;
+export const TraceHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="trace-header"
+      className={cn('flex items-center justify-between gap-2 px-3.5 py-2.5 min-h-[44px] w-full', className)}
+      {...props}
+    />
+  )
+);
+TraceHeader.displayName = 'Trace.Header';
 export const TraceBody = TraceCollapsibleContent;
 
 /* -------------------------------------------------------------------------------------------------
@@ -599,7 +609,7 @@ export const Trace = Object.assign(TraceRoot, {
   Collapsible: TraceCollapsible,
   CollapsibleTrigger: TraceCollapsibleTrigger,
   CollapsibleContent: TraceCollapsibleContent,
-  Header: TraceCollapsibleTrigger,
+  Header: TraceHeader,
   Body: TraceCollapsibleContent,
   Trigger: TraceCollapsibleTrigger,
   Content: TraceCollapsibleContent,

@@ -103,8 +103,13 @@ export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsReveal
       <TextsRevealContext.Provider value={{ show, hasEntered }}>
         <div
           ref={ref}
-          className={cn('flex flex-col gap-1 w-full select-none', className)}
-          aria-hidden={!show}
+          className={cn(
+            'flex flex-col gap-1 w-full select-none',
+            !show && 'pointer-events-none',
+            className
+          )}
+          aria-hidden={!show || undefined}
+          inert={!show}
           {...props}
         >
           {children}

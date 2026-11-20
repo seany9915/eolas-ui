@@ -81,8 +81,24 @@ function PopoverComponentInner<Payload = unknown>(
   const generatedId = React.useId();
   const popoverId = `popover-${generatedId}`;
 
+  const isCompoundUsage = React.useMemo(() => {
+    if (trigger) return false;
+    if (!title && !description) return true;
+    if (typeof children === 'function') return false;
+    return React.Children.toArray(children).some(
+      (child) =>
+        React.isValidElement(child) &&
+        (child.type === PopoverTrigger ||
+          child.type === PopoverContent ||
+          child.type === BasePopover.Trigger ||
+          child.type === BasePopover.Portal ||
+          child.type === BasePopover.Positioner ||
+          child.type === BasePopover.Popup)
+    );
+  }, [trigger, title, description, children]);
+
   // If used as a composable compound root (<Popover open={...}><PopoverTrigger /><PopoverContent /></Popover>)
-  if (!trigger && !title && !description) {
+  if (isCompoundUsage) {
     return (
       <PopoverContext.Provider value={{ openOnHover, delay, closeDelay }}>
         <BasePopover.Root<Payload>
@@ -126,7 +142,7 @@ function PopoverComponentInner<Payload = unknown>(
           className
         )}
       >
-        {showArrow && <BasePopover.Arrow className="fill-surface stroke-outline-variant" />}
+        {showArrow && <PopoverArrow />}
         {title && (
           <BasePopover.Title className="font-heading text-base font-bold text-on-surface mb-1.5">
             {title}
@@ -207,6 +223,36 @@ export const PopoverComponent = React.forwardRef(PopoverComponentInner) as <Payl
   props: PopoverProps<Payload> & React.RefAttributes<HTMLDivElement>
 ) => React.JSX.Element;
 
+export interface PopoverArrowProps
+  extends React.ComponentPropsWithoutRef<typeof BasePopover.Arrow> {}
+
+export const PopoverArrow = React.forwardRef<HTMLDivElement, PopoverArrowProps>(
+  ({ className, children, ...props }, ref) => (
+    <BasePopover.Arrow
+      ref={ref}
+      className={cn(
+        'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
+        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+        className
+      )}
+      {...props}
+    >
+      {children ?? (
+        <svg
+          width="10"
+          height="5"
+          viewBox="0 0 10 5"
+          className="block fill-surface stroke-outline-variant"
+          aria-hidden="true"
+        >
+          <path d="M0 5 L5 0 L10 5" />
+        </svg>
+      )}
+    </BasePopover.Arrow>
+  )
+);
+PopoverArrow.displayName = 'PopoverArrow';
+
 export interface PopoverContentProps
   extends React.ComponentPropsWithoutRef<typeof BasePopover.Popup> {
   side?: 'top' | 'bottom' | 'left' | 'right';
@@ -257,7 +303,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
           )}
           {...props}
         >
-          {showArrow && <BasePopover.Arrow className="fill-surface stroke-outline-variant" />}
+          {showArrow && <PopoverArrow />}
           {children}
         </BasePopover.Popup>
       </BasePopover.Positioner>
@@ -276,11 +322,25 @@ export interface PopoverTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BasePopover.Trigger> {}
 
 export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
-  ({ className, children, ...props }, ref) => (
-    <BasePopover.Trigger ref={ref} className={className} {...props}>
-      {children}
-    </BasePopover.Trigger>
-  )
+  ({ className, children, openOnHover, delay, closeDelay, ...props }, ref) => {
+    const context = usePopoverContext();
+    const resolvedOpenOnHover = openOnHover ?? context.openOnHover;
+    const resolvedDelay = delay ?? context.delay;
+    const resolvedCloseDelay = closeDelay ?? context.closeDelay;
+
+    return (
+      <BasePopover.Trigger
+        ref={ref}
+        openOnHover={resolvedOpenOnHover}
+        delay={resolvedDelay}
+        closeDelay={resolvedCloseDelay}
+        className={className}
+        {...props}
+      >
+        {children}
+      </BasePopover.Trigger>
+    );
+  }
 );
 PopoverTrigger.displayName = 'PopoverTrigger';
 
@@ -354,7 +414,7 @@ export const Popover = Object.assign(PopoverComponent, {
   Positioner: BasePopover.Positioner,
   Popup: BasePopover.Popup,
   Content: PopoverContent,
-  Arrow: BasePopover.Arrow,
+  Arrow: PopoverArrow,
   Backdrop: PopoverBackdrop,
   Viewport: PopoverViewport,
   Title: PopoverTitle,
@@ -370,7 +430,6 @@ export const PopoverRoot = BasePopover.Root;
 export const PopoverPortal = BasePopover.Portal;
 export const PopoverPositioner = BasePopover.Positioner;
 export const PopoverPopup = BasePopover.Popup;
-export const PopoverArrow = BasePopover.Arrow;
 export const createPopoverHandle = BasePopover.createHandle;
 export const PopoverHandle = BasePopover.Handle;
 

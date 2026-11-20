@@ -40,7 +40,7 @@ export const ContextMenuItem = React.forwardRef<HTMLDivElement, ContextMenuItemP
       )}
       <span className="truncate flex-1">{children}</span>
       {shortcut && (
-        <span className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ml-auto">
+        <span className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto">
           {shortcut}
         </span>
       )}
@@ -211,7 +211,7 @@ export const ContextMenuSubmenuTrigger = React.forwardRef<HTMLDivElement, Contex
         )}
         <span className="truncate">{children}</span>
       </div>
-      <span className="material-symbols-outlined text-base text-on-surface-variant shrink-0" aria-hidden="true">
+      <span className="material-symbols-outlined icon-directional text-base text-on-surface-variant shrink-0" aria-hidden="true">
         chevron_right
       </span>
     </BaseContextMenu.SubmenuTrigger>

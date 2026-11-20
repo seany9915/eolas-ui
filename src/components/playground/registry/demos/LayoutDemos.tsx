@@ -185,12 +185,16 @@ export const ChartDemo: React.FC<ComponentDemoProps> = () => {
 
       <Card.Content>
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label="Weekly articulation activity bar chart comparing actual practice minutes against a 20-minute daily target"
           config={chartConfig}
           className="h-56 w-full aspect-auto"
         >
-          <BarChart data={chartData} margin={{ top: 12, right: 12, left: -16, bottom: 0 }}>
+          <BarChart
+            aria-label="Weekly articulation activity bar chart comparing actual practice minutes against a 20-minute daily target"
+            data={chartData}
+            margin={{ top: 12, right: 12, left: -16, bottom: 0 }}
+          >
             <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-outline-variant/40" />
             <XAxis
               dataKey="day"

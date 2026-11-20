@@ -12,11 +12,16 @@
     "lint"
   ],
   "exports": {
-    "./lint": "./lint/index.js",
+    "./lint": "./lint/index.mjs",
     "./oxlintrc": "./lint/oxlintrc.json"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@shadcn/lint": "^0.2.5"
+  },
+  "peerDependenciesMeta": {
+    "@shadcn/lint": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"

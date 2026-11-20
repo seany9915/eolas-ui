@@ -18,6 +18,7 @@ import useEmblaCarousel, {
 import { cn } from '@/lib/utils';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { Button } from './button';
+import { useDirection } from './direction-provider';
 import { Icon } from './icon';
 
 type EmblaCarouselType = UseEmblaCarouselType[1];
@@ -91,8 +92,14 @@ const CarouselComponent = React.forwardRef<
     },
     ref
   ) => {
+    const contextDir = useDirection();
+    const resolvedDirection =
+      opts?.direction ??
+      (props.dir === 'rtl' || props.dir === 'ltr' ? props.dir : contextDir);
+
     const [carouselRef, api] = useEmblaCarousel(
       {
+        direction: resolvedDirection,
         ...opts,
         axis: orientation === 'horizontal' ? 'x' : 'y',
       },
@@ -145,12 +152,18 @@ const CarouselComponent = React.forwardRef<
         }
 
         if (orientation === 'horizontal') {
+          const isRtl =
+            resolvedDirection === 'rtl' ||
+            (typeof window !== 'undefined' &&
+              window.getComputedStyle(event.currentTarget).direction === 'rtl');
           if (event.key === 'ArrowLeft') {
             event.preventDefault();
-            scrollPrev();
+            if (isRtl) scrollNext();
+            else scrollPrev();
           } else if (event.key === 'ArrowRight') {
             event.preventDefault();
-            scrollNext();
+            if (isRtl) scrollPrev();
+            else scrollNext();
           }
         } else {
           if (event.key === 'ArrowUp') {
@@ -162,7 +175,7 @@ const CarouselComponent = React.forwardRef<
           }
         }
       },
-      [onKeyDown, orientation, scrollPrev, scrollNext]
+      [onKeyDown, orientation, resolvedDirection, scrollPrev, scrollNext]
     );
 
     React.useEffect(() => {
@@ -235,7 +248,7 @@ export const CarouselContent = React.forwardRef<
         ref={ref}
         className={cn(
           'flex',
-          orientation === 'horizontal' ? '-ml-4' : '-mt-4 flex-col',
+          orientation === 'horizontal' ? '-ms-4' : '-mt-4 flex-col',
           className
         )}
         {...props}
@@ -258,7 +271,7 @@ export const CarouselItem = React.forwardRef<
       aria-roledescription="slide"
       className={cn(
         'min-w-0 shrink-0 grow-0 basis-full',
-        orientation === 'horizontal' ? 'pl-4' : 'pt-4',
+        orientation === 'horizontal' ? 'ps-4' : 'pt-4',
         className
       )}
       {...props}
@@ -275,7 +288,7 @@ export interface CarouselControlProps
 export const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   CarouselControlProps
->(({ className, variant = 'outlined', size = 'icon', position, ...props }, ref) => {
+>(({ className, variant = 'outlined', size = 'icon', position, onClick, disabled, ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   const isInline =
@@ -298,19 +311,23 @@ export const CarouselPrevious = React.forwardRef<
           cn(
             'absolute z-10',
             orientation === 'horizontal'
-              ? '-left-12 top-1/2 -translate-y-1/2'
+              ? '-start-12 top-1/2 -translate-y-1/2'
               : '-top-12 left-1/2 -translate-x-1/2'
           ),
         className
       )}
-      disabled={!canScrollPrev}
-      onClick={scrollPrev}
       aria-label="Previous slide"
       {...props}
+      disabled={disabled || !canScrollPrev}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) scrollPrev();
+      }}
     >
       <Icon
         name={orientation === 'horizontal' ? 'chevron_left' : 'keyboard_arrow_up'}
         size="sm"
+        directional={orientation === 'horizontal'}
         className="text-lg"
         aria-hidden="true"
       />
@@ -322,7 +339,7 @@ CarouselPrevious.displayName = 'CarouselPrevious';
 export const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   CarouselControlProps
->(({ className, variant = 'outlined', size = 'icon', position, ...props }, ref) => {
+>(({ className, variant = 'outlined', size = 'icon', position, onClick, disabled, ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   const isInline =
@@ -345,19 +362,23 @@ export const CarouselNext = React.forwardRef<
           cn(
             'absolute z-10',
             orientation === 'horizontal'
-              ? '-right-12 top-1/2 -translate-y-1/2'
+              ? '-end-12 top-1/2 -translate-y-1/2'
               : '-bottom-12 left-1/2 -translate-x-1/2'
           ),
         className
       )}
-      disabled={!canScrollNext}
-      onClick={scrollNext}
       aria-label="Next slide"
       {...props}
+      disabled={disabled || !canScrollNext}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) scrollNext();
+      }}
     >
       <Icon
         name={orientation === 'horizontal' ? 'chevron_right' : 'keyboard_arrow_down'}
         size="sm"
+        directional={orientation === 'horizontal'}
         className="text-lg"
         aria-hidden="true"
       />

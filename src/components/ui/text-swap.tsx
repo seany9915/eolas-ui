@@ -28,16 +28,37 @@ export interface TextSwapProps extends React.HTMLAttributes<HTMLSpanElement> {
 type SwapPhase = 'idle' | 'exit' | 'enter-start' | 'enter';
 
 export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
-  ({ children, duration = 150, translateY = 4, className, ...props }, ref) => {
+  ({ children, duration = 150, translateY = 4, className, style, ...props }, ref) => {
     const [displayedText, setDisplayedText] = React.useState<React.ReactNode>(children);
     const [phase, setPhase] = React.useState<SwapPhase>('idle');
     const spanRef = React.useRef<HTMLSpanElement | null>(null);
+    const durationRef = React.useRef(duration);
 
     const exitTimerRef = React.useRef<number | null>(null);
     const settleTimerRef = React.useRef<number | null>(null);
     const rafRef = React.useRef<number | null>(null);
+    const raf2Ref = React.useRef<number | null>(null);
 
-    // Merge external ref with internal ref for forced reflow
+    React.useEffect(() => {
+      durationRef.current = duration;
+    }, [duration]);
+
+    const clearScheduledTimers = React.useCallback(() => {
+      if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
+      if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (raf2Ref.current) cancelAnimationFrame(raf2Ref.current);
+      exitTimerRef.current = null;
+      settleTimerRef.current = null;
+      rafRef.current = null;
+      raf2Ref.current = null;
+    }, []);
+
+    React.useEffect(() => {
+      return () => clearScheduledTimers();
+    }, [clearScheduledTimers]);
+
+    // Merge external ref with internal ref
     const setRefs = React.useCallback(
       (node: HTMLSpanElement | null) => {
         spanRef.current = node;
@@ -61,46 +82,35 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
           typeof window !== 'undefined' &&
           window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+        clearScheduledTimers();
+
         if (prefersReducedMotion) {
           setDisplayedText(children);
           setPhase('idle');
           return;
         }
 
-        // Clear any running timers from previous quick switches
-        if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
-        if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        const swapDuration = durationRef.current;
 
         // Phase 1: Start exit of old text
         setPhase('exit');
 
         exitTimerRef.current = window.setTimeout(() => {
-          // Phase 2: Swap text and jump to below (instantaneous, no transition)
+          // Phase 2: Swap text and commit enter-start frame before animating in
           setDisplayedText(children);
           setPhase('enter-start');
 
-          // Force reflow so transition begins from enter-start position
-          if (spanRef.current) {
-            void spanRef.current.offsetHeight;
-          }
-
-          // Phase 3: Transition new text back to rest
           rafRef.current = requestAnimationFrame(() => {
-            setPhase('enter');
-            settleTimerRef.current = window.setTimeout(() => {
-              setPhase('idle');
-            }, duration);
+            raf2Ref.current = requestAnimationFrame(() => {
+              setPhase('enter');
+              settleTimerRef.current = window.setTimeout(() => {
+                setPhase('idle');
+              }, durationRef.current);
+            });
           });
-        }, duration);
-
-        return () => {
-          if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
-          if (settleTimerRef.current) window.clearTimeout(settleTimerRef.current);
-          if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        };
+        }, swapDuration);
       }
-    }, [children, duration]);
+    }, [children, clearScheduledTimers]);
 
     const isExit = phase === 'exit';
     const isEnterStart = phase === 'enter-start';
@@ -119,6 +129,7 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
           className
         )}
         style={{
+          ...style,
           transitionDuration: isEnterStart ? '0ms' : `${duration}ms`,
           transform: isExit
             ? `translateY(-${translateY}px)`

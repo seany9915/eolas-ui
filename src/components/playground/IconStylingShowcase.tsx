@@ -273,7 +273,7 @@ export const IconStylingShowcase: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-label text-xs font-bold text-tertiary flex items-center gap-1">
-                  <Icon name="stars" size="xs" />
+                  <Icon name="verified" size="xs" />
                   Amber Accent Icon
                 </span>
                 <span className="font-mono text-xs bg-tertiary/20 text-tertiary px-2 py-0.5 rounded font-bold">8.66:1 AA</span>

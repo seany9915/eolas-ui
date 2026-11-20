@@ -39,6 +39,24 @@ function waitForScrollEnd(scroller: HTMLElement | Window, idleTimeoutMs = 100): 
   });
 }
 
+function getScrollParent(node: Element | null): HTMLElement | null {
+  let current = node?.parentElement ?? null;
+  while (current && current !== document.body && current !== document.documentElement) {
+    const { overflow, overflowY, overflowX } = getComputedStyle(current);
+    const isScrollableY =
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay' || overflow === 'auto' || overflow === 'scroll') &&
+      current.scrollHeight > current.clientHeight;
+    const isScrollableX =
+      (overflowX === 'auto' || overflowX === 'scroll' || overflowX === 'overlay' || overflow === 'auto' || overflow === 'scroll') &&
+      current.scrollWidth > current.clientWidth;
+    if (isScrollableY || isScrollableX) {
+      return current;
+    }
+    current = current.parentElement;
+  }
+  return null;
+}
+
 /**
  * Scrolls `element` into view and resolves once the scroll animation settles.
  */
@@ -47,14 +65,13 @@ export function scrollIntoViewAsync(
   options?: ScrollIntoViewOptions,
   completionOptions?: ScrollCompletionOptions
 ): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
   const result = element.scrollIntoView(options) as unknown;
   if (result instanceof Promise) {
     return result;
   }
-  return waitForScrollEnd(
-    completionOptions?.scroller ?? window,
-    completionOptions?.idleTimeoutMs
-  );
+  const scroller = completionOptions?.scroller ?? getScrollParent(element) ?? window;
+  return waitForScrollEnd(scroller, completionOptions?.idleTimeoutMs);
 }
 
 /**

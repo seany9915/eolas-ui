@@ -372,7 +372,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
           ref={ref}
           data-slot="chat"
           className={cn(
-            '@container relative flex flex-col w-full h-full min-h-120 overflow-hidden transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            '@container relative flex flex-col w-full h-full min-h-120 overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
             variantStyles[variant] ?? variantStyles.card,
             className
           )}
@@ -439,9 +439,9 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                   className={cn(
                     isFloating
                       ? normalizedSuggestions.length > 0
-                        ? 'bottom-36 right-4'
-                        : 'bottom-24 right-4'
-                      : 'bottom-4 right-4'
+                        ? 'bottom-36 end-4'
+                        : 'bottom-24 end-4'
+                      : 'bottom-4 end-4'
                   )}
                 />
               </MessageScroller>

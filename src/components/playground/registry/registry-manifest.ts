@@ -6,7 +6,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "utils",
     "name": "utils",
     "title": "Eolas UI Utilities",
-    "description": "Core utility library exporting cn() class merger, assetUrl() resolver, and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+    "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
     "category": "system",
     "tier": "utility",
     "basePrimitive": "Base UI Headless Library",
@@ -16,7 +16,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "@base-ui/react"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/utils"
+    "shadcnCommand": "npx @seany9915/eolas-ui add utils"
   },
   {
     "id": "accordion",
@@ -37,7 +37,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/accordion"
+    "shadcnCommand": "npx @seany9915/eolas-ui add accordion"
   },
   {
     "id": "alert-dialog",
@@ -53,7 +53,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/alert-dialog"
+    "shadcnCommand": "npx @seany9915/eolas-ui add alert-dialog"
   },
   {
     "id": "attachment",
@@ -69,7 +69,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/attachment"
+    "shadcnCommand": "npx @seany9915/eolas-ui add attachment"
   },
   {
     "id": "autocomplete",
@@ -90,7 +90,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/autocomplete"
+    "shadcnCommand": "npx @seany9915/eolas-ui add autocomplete"
   },
   {
     "id": "avatar",
@@ -111,14 +111,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/avatar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add avatar"
   },
   {
     "id": "badge",
     "name": "badge",
     "title": "Badge",
     "description": "Badge primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/badge",
-    "category": "layout",
+    "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/badge.tsx",
@@ -138,7 +138,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/badge"
+    "shadcnCommand": "npx @seany9915/eolas-ui add badge"
   },
   {
     "id": "bot-avatar",
@@ -155,7 +155,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "bot-avatars"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/bot-avatar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add bot-avatar"
   },
   {
     "id": "breadcrumb",
@@ -171,7 +171,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/breadcrumb"
+    "shadcnCommand": "npx @seany9915/eolas-ui add breadcrumb"
   },
   {
     "id": "button-group",
@@ -193,7 +193,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/button-group"
+    "shadcnCommand": "npx @seany9915/eolas-ui add button-group"
   },
   {
     "id": "button",
@@ -216,14 +216,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/button"
+    "shadcnCommand": "npx @seany9915/eolas-ui add button"
   },
   {
     "id": "calendar",
     "name": "calendar",
     "title": "Calendar",
     "description": "Calendar primitive (React DayPicker). Base UI Ecosystem Documentation: https://ui.shadcn.com/docs/components/base/calendar React DayPicker Documentation: https://daypicker.dev",
-    "category": "layout",
+    "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/calendar.tsx",
@@ -239,7 +239,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "react-day-picker"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/calendar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add calendar"
   },
   {
     "id": "card",
@@ -255,7 +255,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add card"
   },
   {
     "id": "carousel",
@@ -278,7 +278,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "embla-carousel-react"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/carousel"
+    "shadcnCommand": "npx @seany9915/eolas-ui add carousel"
   },
   {
     "id": "chain-of-thought",
@@ -301,7 +301,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chain-of-thought"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chain-of-thought"
   },
   {
     "id": "chart",
@@ -318,7 +318,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chart"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chart"
   },
   {
     "id": "chat-message-context",
@@ -334,7 +334,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chat-message-context"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chat-message-context"
   },
   {
     "id": "chat-message",
@@ -358,7 +358,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chat-message"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chat-message"
   },
   {
     "id": "checkbox-group",
@@ -380,7 +380,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/checkbox-group"
+    "shadcnCommand": "npx @seany9915/eolas-ui add checkbox-group"
   },
   {
     "id": "checkbox",
@@ -402,7 +402,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/checkbox"
+    "shadcnCommand": "npx @seany9915/eolas-ui add checkbox"
   },
   {
     "id": "checkpoint",
@@ -426,7 +426,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/checkpoint"
+    "shadcnCommand": "npx @seany9915/eolas-ui add checkpoint"
   },
   {
     "id": "chip",
@@ -452,7 +452,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chip"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chip"
   },
   {
     "id": "clinician-tip",
@@ -468,7 +468,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/clinician-tip"
+    "shadcnCommand": "npx @seany9915/eolas-ui add clinician-tip"
   },
   {
     "id": "code-block",
@@ -489,7 +489,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/code-block"
+    "shadcnCommand": "npx @seany9915/eolas-ui add code-block"
   },
   {
     "id": "collapsible",
@@ -510,7 +510,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/collapsible"
+    "shadcnCommand": "npx @seany9915/eolas-ui add collapsible"
   },
   {
     "id": "combobox",
@@ -532,14 +532,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/combobox"
+    "shadcnCommand": "npx @seany9915/eolas-ui add combobox"
   },
   {
     "id": "command",
     "name": "command",
     "title": "Command",
     "description": "Command primitive (cmdk + Base UI Dialog). cmdk Documentation: https://cmdk.paco.me",
-    "category": "layout",
+    "category": "overlays",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/command.tsx",
@@ -555,7 +555,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "cmdk"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/command"
+    "shadcnCommand": "npx @seany9915/eolas-ui add command"
   },
   {
     "id": "confirmation",
@@ -580,7 +580,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/confirmation"
+    "shadcnCommand": "npx @seany9915/eolas-ui add confirmation"
   },
   {
     "id": "context-menu",
@@ -596,7 +596,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/context-menu"
+    "shadcnCommand": "npx @seany9915/eolas-ui add context-menu"
   },
   {
     "id": "csp-provider",
@@ -612,7 +612,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/csp-provider"
+    "shadcnCommand": "npx @seany9915/eolas-ui add csp-provider"
   },
   {
     "id": "deferred-view",
@@ -634,7 +634,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/deferred-view"
+    "shadcnCommand": "npx @seany9915/eolas-ui add deferred-view"
   },
   {
     "id": "dialog",
@@ -650,7 +650,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/dialog"
+    "shadcnCommand": "npx @seany9915/eolas-ui add dialog"
   },
   {
     "id": "direction-provider",
@@ -666,7 +666,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/direction-provider"
+    "shadcnCommand": "npx @seany9915/eolas-ui add direction-provider"
   },
   {
     "id": "drawer",
@@ -687,7 +687,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/drawer"
+    "shadcnCommand": "npx @seany9915/eolas-ui add drawer"
   },
   {
     "id": "empty-state",
@@ -706,7 +706,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/empty-state"
+    "shadcnCommand": "npx @seany9915/eolas-ui add empty-state"
   },
   {
     "id": "empty",
@@ -734,7 +734,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/empty"
+    "shadcnCommand": "npx @seany9915/eolas-ui add empty"
   },
   {
     "id": "error-shake",
@@ -751,7 +751,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/error-shake"
+    "shadcnCommand": "npx @seany9915/eolas-ui add error-shake"
   },
   {
     "id": "field",
@@ -773,7 +773,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/field"
+    "shadcnCommand": "npx @seany9915/eolas-ui add field"
   },
   {
     "id": "fieldset",
@@ -794,7 +794,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/fieldset"
+    "shadcnCommand": "npx @seany9915/eolas-ui add fieldset"
   },
   {
     "id": "form",
@@ -814,7 +814,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/form"
+    "shadcnCommand": "npx @seany9915/eolas-ui add form"
   },
   {
     "id": "icon",
@@ -830,7 +830,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/icon"
+    "shadcnCommand": "npx @seany9915/eolas-ui add icon"
   },
   {
     "id": "inline-alert",
@@ -853,7 +853,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/inline-alert"
+    "shadcnCommand": "npx @seany9915/eolas-ui add inline-alert"
   },
   {
     "id": "inline-citation",
@@ -878,14 +878,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/inline-citation"
+    "shadcnCommand": "npx @seany9915/eolas-ui add inline-citation"
   },
   {
     "id": "input-group",
     "name": "input-group",
     "title": "Input Group",
     "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group ANATOMY: InputGroup ├── InputGroupInput (or InputGroupTextarea) └── InputGroupAddon (align=\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\") ├── InputGroupButton └── InputGroupText",
-    "category": "layout",
+    "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/input-group.tsx",
@@ -902,7 +902,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/input-group"
+    "shadcnCommand": "npx @seany9915/eolas-ui add input-group"
   },
   {
     "id": "input",
@@ -927,7 +927,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/input"
+    "shadcnCommand": "npx @seany9915/eolas-ui add input"
   },
   {
     "id": "item",
@@ -950,7 +950,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/item"
+    "shadcnCommand": "npx @seany9915/eolas-ui add item"
   },
   {
     "id": "kbd",
@@ -972,7 +972,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/kbd"
+    "shadcnCommand": "npx @seany9915/eolas-ui add kbd"
   },
   {
     "id": "menu",
@@ -988,7 +988,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/menu"
+    "shadcnCommand": "npx @seany9915/eolas-ui add menu"
   },
   {
     "id": "menubar",
@@ -1004,7 +1004,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/menubar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add menubar"
   },
   {
     "id": "message-scroller",
@@ -1029,7 +1029,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/message-scroller"
+    "shadcnCommand": "npx @seany9915/eolas-ui add message-scroller"
   },
   {
     "id": "meter",
@@ -1050,7 +1050,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/meter"
+    "shadcnCommand": "npx @seany9915/eolas-ui add meter"
   },
   {
     "id": "model-selector",
@@ -1073,7 +1073,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/model-selector"
+    "shadcnCommand": "npx @seany9915/eolas-ui add model-selector"
   },
   {
     "id": "navigation-bar",
@@ -1101,7 +1101,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/navigation-bar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add navigation-bar"
   },
   {
     "id": "navigation-menu",
@@ -1117,7 +1117,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/navigation-menu"
+    "shadcnCommand": "npx @seany9915/eolas-ui add navigation-menu"
   },
   {
     "id": "notification-badge",
@@ -1134,7 +1134,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/notification-badge"
+    "shadcnCommand": "npx @seany9915/eolas-ui add notification-badge"
   },
   {
     "id": "number-field",
@@ -1154,7 +1154,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/number-field"
+    "shadcnCommand": "npx @seany9915/eolas-ui add number-field"
   },
   {
     "id": "number-pop-in",
@@ -1171,7 +1171,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/number-pop-in"
+    "shadcnCommand": "npx @seany9915/eolas-ui add number-pop-in"
   },
   {
     "id": "number-roll",
@@ -1191,7 +1191,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/number-roll"
+    "shadcnCommand": "npx @seany9915/eolas-ui add number-roll"
   },
   {
     "id": "otp-field",
@@ -1212,7 +1212,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/otp-field"
+    "shadcnCommand": "npx @seany9915/eolas-ui add otp-field"
   },
   {
     "id": "pagination",
@@ -1228,7 +1228,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/pagination"
+    "shadcnCommand": "npx @seany9915/eolas-ui add pagination"
   },
   {
     "id": "plan",
@@ -1249,7 +1249,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/plan"
+    "shadcnCommand": "npx @seany9915/eolas-ui add plan"
   },
   {
     "id": "popover",
@@ -1265,7 +1265,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/popover"
+    "shadcnCommand": "npx @seany9915/eolas-ui add popover"
   },
   {
     "id": "preview-card",
@@ -1281,7 +1281,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/preview-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add preview-card"
   },
   {
     "id": "progress-ring",
@@ -1303,7 +1303,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/progress-ring"
+    "shadcnCommand": "npx @seany9915/eolas-ui add progress-ring"
   },
   {
     "id": "progress",
@@ -1324,7 +1324,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/progress"
+    "shadcnCommand": "npx @seany9915/eolas-ui add progress"
   },
   {
     "id": "prompt-input",
@@ -1347,7 +1347,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/prompt-input"
+    "shadcnCommand": "npx @seany9915/eolas-ui add prompt-input"
   },
   {
     "id": "queue",
@@ -1368,7 +1368,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/queue"
+    "shadcnCommand": "npx @seany9915/eolas-ui add queue"
   },
   {
     "id": "radio",
@@ -1389,7 +1389,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/radio"
+    "shadcnCommand": "npx @seany9915/eolas-ui add radio"
   },
   {
     "id": "reading-progress",
@@ -1411,7 +1411,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/reading-progress"
+    "shadcnCommand": "npx @seany9915/eolas-ui add reading-progress"
   },
   {
     "id": "reasoning",
@@ -1436,7 +1436,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/reasoning"
+    "shadcnCommand": "npx @seany9915/eolas-ui add reasoning"
   },
   {
     "id": "resizable",
@@ -1458,7 +1458,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "react-resizable-panels"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/resizable"
+    "shadcnCommand": "npx @seany9915/eolas-ui add resizable"
   },
   {
     "id": "scroll-area",
@@ -1479,7 +1479,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/scroll-area"
+    "shadcnCommand": "npx @seany9915/eolas-ui add scroll-area"
   },
   {
     "id": "scrollspy",
@@ -1503,7 +1503,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/scrollspy"
+    "shadcnCommand": "npx @seany9915/eolas-ui add scrollspy"
   },
   {
     "id": "select",
@@ -1519,7 +1519,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/select"
+    "shadcnCommand": "npx @seany9915/eolas-ui add select"
   },
   {
     "id": "selection-controls",
@@ -1538,7 +1538,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/selection-controls"
+    "shadcnCommand": "npx @seany9915/eolas-ui add selection-controls"
   },
   {
     "id": "separator",
@@ -1559,7 +1559,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/separator"
+    "shadcnCommand": "npx @seany9915/eolas-ui add separator"
   },
   {
     "id": "shimmer-text",
@@ -1576,7 +1576,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/shimmer-text"
+    "shadcnCommand": "npx @seany9915/eolas-ui add shimmer-text"
   },
   {
     "id": "sidebar",
@@ -1598,7 +1598,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/sidebar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add sidebar"
   },
   {
     "id": "skeleton",
@@ -1615,7 +1615,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/skeleton"
+    "shadcnCommand": "npx @seany9915/eolas-ui add skeleton"
   },
   {
     "id": "slider",
@@ -1636,7 +1636,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/slider"
+    "shadcnCommand": "npx @seany9915/eolas-ui add slider"
   },
   {
     "id": "sortable",
@@ -1654,7 +1654,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "@dnd-kit/react",
       "@dnd-kit/helpers"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/sortable"
+    "shadcnCommand": "npx @seany9915/eolas-ui add sortable"
   },
   {
     "id": "sources",
@@ -1680,7 +1680,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/sources"
+    "shadcnCommand": "npx @seany9915/eolas-ui add sources"
   },
   {
     "id": "spinner",
@@ -1702,7 +1702,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/spinner"
+    "shadcnCommand": "npx @seany9915/eolas-ui add spinner"
   },
   {
     "id": "spinning-counter",
@@ -1719,7 +1719,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/spinning-counter"
+    "shadcnCommand": "npx @seany9915/eolas-ui add spinning-counter"
   },
   {
     "id": "steppers",
@@ -1738,7 +1738,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/steppers"
+    "shadcnCommand": "npx @seany9915/eolas-ui add steppers"
   },
   {
     "id": "sticky-container",
@@ -1761,7 +1761,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/sticky-container"
+    "shadcnCommand": "npx @seany9915/eolas-ui add sticky-container"
   },
   {
     "id": "success-check",
@@ -1778,7 +1778,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/success-check"
+    "shadcnCommand": "npx @seany9915/eolas-ui add success-check"
   },
   {
     "id": "suggestion-chips",
@@ -1803,7 +1803,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/suggestion-chips"
+    "shadcnCommand": "npx @seany9915/eolas-ui add suggestion-chips"
   },
   {
     "id": "swipe-reveal",
@@ -1826,7 +1826,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/swipe-reveal"
+    "shadcnCommand": "npx @seany9915/eolas-ui add swipe-reveal"
   },
   {
     "id": "switch",
@@ -1847,7 +1847,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/switch"
+    "shadcnCommand": "npx @seany9915/eolas-ui add switch"
   },
   {
     "id": "table",
@@ -1868,7 +1868,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/table"
+    "shadcnCommand": "npx @seany9915/eolas-ui add table"
   },
   {
     "id": "tabs",
@@ -1892,7 +1892,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/tabs"
+    "shadcnCommand": "npx @seany9915/eolas-ui add tabs"
   },
   {
     "id": "task",
@@ -1915,7 +1915,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/task"
+    "shadcnCommand": "npx @seany9915/eolas-ui add task"
   },
   {
     "id": "text-highlight",
@@ -1937,7 +1937,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/text-highlight"
+    "shadcnCommand": "npx @seany9915/eolas-ui add text-highlight"
   },
   {
     "id": "text-swap",
@@ -1954,7 +1954,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/text-swap"
+    "shadcnCommand": "npx @seany9915/eolas-ui add text-swap"
   },
   {
     "id": "textarea",
@@ -1979,7 +1979,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/textarea"
+    "shadcnCommand": "npx @seany9915/eolas-ui add textarea"
   },
   {
     "id": "texts-reveal",
@@ -1996,7 +1996,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/texts-reveal"
+    "shadcnCommand": "npx @seany9915/eolas-ui add texts-reveal"
   },
   {
     "id": "thinking-orb",
@@ -2013,7 +2013,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "thinking-orbs"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/thinking-orb"
+    "shadcnCommand": "npx @seany9915/eolas-ui add thinking-orb"
   },
   {
     "id": "toast",
@@ -2029,7 +2029,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/toast"
+    "shadcnCommand": "npx @seany9915/eolas-ui add toast"
   },
   {
     "id": "toggle-group",
@@ -2053,7 +2053,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/toggle-group"
+    "shadcnCommand": "npx @seany9915/eolas-ui add toggle-group"
   },
   {
     "id": "toggle",
@@ -2075,7 +2075,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/toggle"
+    "shadcnCommand": "npx @seany9915/eolas-ui add toggle"
   },
   {
     "id": "toggles",
@@ -2094,7 +2094,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/toggles"
+    "shadcnCommand": "npx @seany9915/eolas-ui add toggles"
   },
   {
     "id": "tool",
@@ -2118,7 +2118,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/tool"
+    "shadcnCommand": "npx @seany9915/eolas-ui add tool"
   },
   {
     "id": "toolbar",
@@ -2142,7 +2142,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/toolbar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add toolbar"
   },
   {
     "id": "tooltip",
@@ -2158,7 +2158,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/tooltip"
+    "shadcnCommand": "npx @seany9915/eolas-ui add tooltip"
   },
   {
     "id": "trace",
@@ -2180,7 +2180,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/trace"
+    "shadcnCommand": "npx @seany9915/eolas-ui add trace"
   },
   {
     "id": "view-transition",
@@ -2204,7 +2204,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/view-transition"
+    "shadcnCommand": "npx @seany9915/eolas-ui add view-transition"
   },
   {
     "id": "app-shell",
@@ -2229,7 +2229,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/app-shell"
+    "shadcnCommand": "npx @seany9915/eolas-ui add app-shell"
   },
   {
     "id": "approval-card",
@@ -2248,7 +2248,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/approval-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add approval-card"
   },
   {
     "id": "area-chart-card",
@@ -2265,7 +2265,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/area-chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add area-chart-card"
   },
   {
     "id": "bar-chart-card",
@@ -2282,7 +2282,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/bar-chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add bar-chart-card"
   },
   {
     "id": "chart-card",
@@ -2298,7 +2298,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chart-card"
   },
   {
     "id": "chat",
@@ -2322,7 +2322,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/chat"
+    "shadcnCommand": "npx @seany9915/eolas-ui add chat"
   },
   {
     "id": "data-table",
@@ -2345,7 +2345,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "@tanstack/react-table"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/data-table"
+    "shadcnCommand": "npx @seany9915/eolas-ui add data-table"
   },
   {
     "id": "delete-confirmation-dialog",
@@ -2364,7 +2364,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/delete-confirmation-dialog"
+    "shadcnCommand": "npx @seany9915/eolas-ui add delete-confirmation-dialog"
   },
   {
     "id": "filter-toolbar",
@@ -2380,7 +2380,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/filter-toolbar"
+    "shadcnCommand": "npx @seany9915/eolas-ui add filter-toolbar"
   },
   {
     "id": "line-chart-card",
@@ -2397,7 +2397,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/line-chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add line-chart-card"
   },
   {
     "id": "list-detail-block",
@@ -2423,7 +2423,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/list-detail-block"
+    "shadcnCommand": "npx @seany9915/eolas-ui add list-detail-block"
   },
   {
     "id": "metric-card",
@@ -2442,7 +2442,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/metric-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add metric-card"
   },
   {
     "id": "pie-chart-card",
@@ -2459,7 +2459,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/pie-chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add pie-chart-card"
   },
   {
     "id": "questionnaire",
@@ -2481,7 +2481,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/questionnaire"
+    "shadcnCommand": "npx @seany9915/eolas-ui add questionnaire"
   },
   {
     "id": "radar-chart-card",
@@ -2498,7 +2498,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/radar-chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add radar-chart-card"
   },
   {
     "id": "radial-chart-card",
@@ -2515,7 +2515,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/radial-chart-card"
+    "shadcnCommand": "npx @seany9915/eolas-ui add radial-chart-card"
   },
   {
     "id": "step-wizard",
@@ -2537,7 +2537,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/step-wizard"
+    "shadcnCommand": "npx @seany9915/eolas-ui add step-wizard"
   },
   {
     "id": "supporting-pane-block",
@@ -2563,7 +2563,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "shadcnCommand": "npx shadcn add @seany9915/eolas-ui/supporting-pane-block"
+    "shadcnCommand": "npx @seany9915/eolas-ui add supporting-pane-block"
   }
 ];
 

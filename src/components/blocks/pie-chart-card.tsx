@@ -120,7 +120,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
           color: 'var(--color-outline)',
         },
       };
-    }, [config, data.length, maxSlices]);
+    }, [config, data.length, maxSlices, otherLabel]);
 
     // Normalize data so each slice defaults to var(--color-key) if item.fill is omitted
     const normalizedData = React.useMemo<Array<Record<string, unknown>>>(() => {
@@ -203,12 +203,12 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
         {...props}
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
           className="aspect-auto h-full w-full"
         >
-          <PieChart>
+          <PieChart aria-label={chartLabel ?? title}>
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}

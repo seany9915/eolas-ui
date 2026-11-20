@@ -124,7 +124,7 @@ export const CodeBlockActions = React.forwardRef<HTMLDivElement, CodeBlockAction
         data-floating={floating ? '' : undefined}
         className={cn(
           'flex items-center gap-1.5 shrink-0',
-          floating ? 'absolute top-2 right-2' : 'ml-auto',
+          floating ? 'absolute top-2 end-2' : 'ms-auto',
           className
         )}
         {...props}
@@ -238,7 +238,7 @@ export const CodeBlockLine = React.forwardRef<HTMLDivElement, CodeBlockLineProps
       >
         {lineNumber !== undefined && (
           <span
-            className="w-6 shrink-0 font-mono text-[10px] tabular-nums text-on-surface-variant/50 text-right select-none"
+            className="w-6 shrink-0 font-mono text-[10px] tabular-nums text-on-surface-variant/50 text-end select-none"
             aria-hidden="true"
           >
             {lineNumber}

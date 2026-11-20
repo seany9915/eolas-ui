@@ -112,7 +112,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
       >
         {/* Card Header & Body */}
         <div className="p-5 @sm:p-6 flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5 pr-2">
+          <div className="flex flex-col gap-1.5 pe-2">
             <h4 className="font-heading text-headline-sm font-semibold text-on-surface text-balance">
               {title}
             </h4>
@@ -141,7 +141,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   <label
                     key={opt.id}
                     className={cn(
-                      'flex items-start gap-3 p-3 rounded-md border-2 text-left transition-colors duration-quick motion-reduce:transition-none cursor-pointer select-none',
+                      'flex items-start gap-3 p-3 rounded-md border-2 text-start transition-colors duration-quick motion-reduce:transition-none cursor-pointer select-none',
                       'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                       isSelected
                         ? 'border-primary bg-primary-container text-on-surface'
@@ -179,7 +179,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                       {customInputPlaceholder || 'Other (specify)'}
                     </span>
                   </label>
-                  {selectedId === APPROVAL_CARD_CUSTOM_OPTION_ID && <div className="pl-7">{customInput}</div>}
+                  {selectedId === APPROVAL_CARD_CUSTOM_OPTION_ID && <div className="ps-7">{customInput}</div>}
                 </div>
               )}
             </RadioGroup>
@@ -199,7 +199,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   disabled={stepCurrent <= 1}
                   aria-label="Previous step"
                 >
-                  <Icon name="chevron_left" size="sm" />
+                  <Icon name="chevron_left" size="sm" directional />
                 </Button>
               )}
               <span>
@@ -214,7 +214,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                   disabled={stepCurrent >= stepTotal}
                   aria-label="Next step"
                 >
-                  <Icon name="chevron_right" size="sm" />
+                  <Icon name="chevron_right" size="sm" directional />
                 </Button>
               )}
             </div>

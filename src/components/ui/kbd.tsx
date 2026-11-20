@@ -159,12 +159,25 @@ export interface KbdProps
   render?: useRender.RenderProp;
 }
 
+const subscribeNoop = () => () => {};
+const getServerIsMac = () => false;
+
+function useIsMacPlatform(platform?: 'mac' | 'other'): boolean {
+  const detectedIsMac = React.useSyncExternalStore(
+    subscribeNoop,
+    detectMacPlatform,
+    getServerIsMac
+  );
+  return platform ? platform === 'mac' : detectedIsMac;
+}
+
 const KbdComponent = React.forwardRef<HTMLElement, KbdProps>(
   ({ className, variant = 'default', size = 'md', shortcut, platform, render, children, ...props }, ref) => {
     const computedClass = kbdVariants({ variant, size, className });
-    const isMac = platform ? platform === 'mac' : detectMacPlatform();
+    const isMac = useIsMacPlatform(platform);
+    const resolvedPlatform: 'mac' | 'other' = isMac ? 'mac' : 'other';
     const resolvedChildren =
-      children ?? (shortcut ? formatShortcut(shortcut, platform).join(isMac ? '' : '+') : undefined);
+      children ?? (shortcut ? formatShortcut(shortcut, resolvedPlatform).join(isMac ? '' : '+') : undefined);
 
     return useRender({
       render,

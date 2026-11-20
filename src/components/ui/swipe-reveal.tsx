@@ -34,7 +34,7 @@ export const SwipeRevealContent = React.forwardRef<HTMLDivElement, React.HTMLAtt
         ref={ref}
         tabIndex={-1}
         className={cn(
-          'w-full min-w-full bg-surface text-on-surface [scroll-snap-align:start] outline-none',
+          'swipe-reveal-content w-full min-w-full bg-surface text-on-surface [scroll-snap-align:start] outline-none',
           className
         )}
         {...props}
@@ -126,10 +126,11 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
 
       const handleFocusIn = (event: FocusEvent) => {
         const target = event.target as HTMLElement | null;
-        if (target && target.matches(':focus-visible')) {
-          content.scrollIntoView({
-            block: 'nearest',
-            inline: 'start',
+        const scroller = scrollerRef.current;
+        if (target && target.matches(':focus-visible') && scroller) {
+          scroller.scrollTo({
+            left: content.offsetLeft,
+            behavior: 'smooth',
           });
         }
       };
@@ -160,11 +161,19 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
       return () => scroller.removeEventListener('scroll', handleScroll);
     }, [onOpenChange]);
 
-    // Initial mount: ensure content pane is snapped into view when leading actions exist
+    // Initial mount fallback for browsers without CSS scroll-initial-target: nearest
     React.useEffect(() => {
-      if (contentRef.current && hasLeading) {
-        contentRef.current.scrollIntoView({ inline: 'start', block: 'nearest' });
+      const scroller = scrollerRef.current;
+      const content = contentRef.current;
+      if (!scroller || !content || !hasLeading) return;
+      if (
+        typeof CSS !== 'undefined' &&
+        typeof CSS.supports === 'function' &&
+        CSS.supports('scroll-initial-target', 'nearest')
+      ) {
+        return;
       }
+      scroller.scrollTo({ left: content.offsetLeft, behavior: 'instant' });
     }, [hasLeading]);
 
     const gridColumns = hasLeading && hasTrailing
@@ -181,9 +190,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
           else if (ref) ref.current = node;
         }}
         className={cn(
-          'grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-webkit-overflow-scrolling:touch] scroll-smooth',
-          // overscroll-behavior: chain prevents local rubber-band bounce while allowing parent scroll chaining
-          '[overscroll-behavior:auto] [overscroll-behavior:chain]',
+          'relative swipe-reveal-scroller grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-webkit-overflow-scrolling:touch] scroll-smooth',
           gridColumns,
           disabled && 'overflow-x-hidden',
           'rounded-md border border-outline-variant/50 shadow-ambient',

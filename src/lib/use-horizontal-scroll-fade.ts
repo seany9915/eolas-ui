@@ -21,10 +21,12 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
 ) {
   const { fadeSize = 20, disabled = false } = options;
   const internalRef = React.useRef<T | null>(null);
+  const [element, setElement] = React.useState<T | null>(null);
 
   const setRef = React.useCallback(
     (node: T | null) => {
       internalRef.current = node;
+      setElement(node);
       if (typeof externalRef === 'function') {
         externalRef(node);
       } else if (externalRef) {
@@ -35,7 +37,7 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
   );
 
   React.useEffect(() => {
-    const el = internalRef.current;
+    const el = element ?? internalRef.current;
     if (!el || disabled) {
       if (el) {
         el.style.removeProperty('--fade-start');
@@ -47,8 +49,10 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
     const updateFades = () => {
       const { scrollLeft, scrollWidth, clientWidth } = el;
       const maxScroll = Math.max(0, scrollWidth - clientWidth);
-      const startFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(scrollLeft))) : 0;
-      const endFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(maxScroll - scrollLeft))) : 0;
+      const isRtl = getComputedStyle(el).direction === 'rtl';
+      const offset = isRtl ? Math.abs(scrollLeft) : Math.max(0, scrollLeft);
+      const startFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(offset))) : 0;
+      const endFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(maxScroll - offset))) : 0;
       el.style.setProperty('--fade-start', `${startFade}px`);
       el.style.setProperty('--fade-end', `${endFade}px`);
     };
@@ -66,7 +70,7 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
       el.removeEventListener('scroll', updateFades);
       ro?.disconnect();
     };
-  }, [fadeSize, disabled]);
+  }, [element, fadeSize, disabled]);
 
   return { ref: setRef };
 }

@@ -23,7 +23,9 @@ export type AppIconName =
   | 'attach_file'
   | 'badge'
   | 'block'
+  | 'bolt'
   | 'bookmark'
+  | 'bookmark_added'
   | 'branding_watermark'
   | 'calendar_today'
   | 'cancel'
@@ -76,6 +78,7 @@ export type AppIconName =
   | 'hearing'
   | 'history'
   | 'hourglass_empty'
+  | 'hub'
   | 'inbox'
   | 'info'
   | 'insights'
@@ -86,6 +89,8 @@ export type AppIconName =
   | 'language'
   | 'last_page'
   | 'layers'
+  | 'left_panel_close'
+  | 'left_panel_open'
   | 'lightbulb'
   | 'local_hospital'
   | 'lock'
@@ -97,6 +102,7 @@ export type AppIconName =
   | 'menu_book'
   | 'menu_open'
   | 'mic'
+  | 'mic_none'
   | 'mic_off'
   | 'monitor_heart'
   | 'monitoring'
@@ -108,6 +114,7 @@ export type AppIconName =
   | 'open_in_new'
   | 'outgoing_mail'
   | 'palette'
+  | 'pending_actions'
   | 'person'
   | 'person_add'
   | 'platforms'
@@ -125,6 +132,8 @@ export type AppIconName =
   | 'remove'
   | 'report'
   | 'restart_alt'
+  | 'right_panel_close'
+  | 'right_panel_open'
   | 'route'
   | 'schedule'
   | 'search'
@@ -132,12 +141,14 @@ export type AppIconName =
   | 'security'
   | 'settings'
   | 'share'
+  | 'shield'
   | 'show_chart'
   | 'skip_next'
+  | 'smart_toy'
   | 'smartphone'
   | 'spatial_audio'
+  | 'spellcheck'
   | 'star'
-  | 'stars'
   | 'stop'
   | 'summarize'
   | 'swap_horiz'
@@ -145,8 +156,13 @@ export type AppIconName =
   | 'table_chart'
   | 'tablet_mac'
   | 'task_alt'
+  | 'terminal'
   | 'timer'
+  | 'tips_and_updates'
   | 'touch_app'
+  | 'translate'
+  | 'trending_down'
+  | 'trending_flat'
   | 'trending_up'
   | 'tune'
   | 'undo'
@@ -158,6 +174,7 @@ export type AppIconName =
   | 'view_list'
   | 'visibility'
   | 'visibility_off'
+  | 'volume_off'
   | 'volume_up'
   | 'warning'
   | 'widgets'
@@ -246,6 +263,8 @@ export interface ToggleIconProps extends Omit<React.HTMLAttributes<HTMLSpanEleme
   srLabel?: string;
   onLabel?: string;
   offLabel?: string;
+  /** Mirrors directional icons horizontally in RTL layouts without colliding with inner scale transitions. */
+  directional?: boolean;
   className?: string;
 }
 
@@ -261,6 +280,7 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
   srLabel,
   onLabel,
   offLabel,
+  directional = false,
   className,
   ...props
 }, ref) => {
@@ -270,7 +290,11 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
   return (
     <span
       ref={ref}
-      className={cn('inline-grid grid-cols-1 grid-rows-1 place-items-center select-none align-middle', className)}
+      className={cn(
+        'inline-grid grid-cols-1 grid-rows-1 place-items-center select-none align-middle',
+        directional && 'icon-directional',
+        className
+      )}
       aria-hidden={isDecorative ? 'true' : undefined}
       aria-label={props['aria-label']}
       {...props}
@@ -305,6 +329,7 @@ ToggleIcon.displayName = 'ToggleIcon';
 export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   name: string;
   size?: IconSize;
+  directional?: boolean;
   srLabel?: string;
   className?: string;
 }
@@ -316,6 +341,7 @@ export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanEl
 export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProps>(({
   name,
   size = 'lg',
+  directional = false,
   srLabel,
   className,
   ...props
@@ -354,7 +380,11 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
   return (
     <span
       ref={ref}
-      className={cn('inline-grid grid-cols-1 grid-rows-1 place-items-center select-none align-middle', className)}
+      className={cn(
+        'inline-grid grid-cols-1 grid-rows-1 place-items-center select-none align-middle',
+        directional && 'icon-directional',
+        className
+      )}
       aria-hidden={isDecorative ? 'true' : undefined}
       aria-label={props['aria-label']}
       {...props}

@@ -5,7 +5,7 @@
  * the file is written.
  *
  * Hard-blocks (decision: "deny") live production API keys and private keys.
- * Surfaces ambiguous matches as "ask".
+ * Surfaces ambiguous matches as "force_ask".
  */
 
 let raw = '';
@@ -25,7 +25,7 @@ process.stdin.on('end', () => {
 function main(input) {
   const toolCall = input.toolCall || {};
   const args = toolCall.args || {};
-  const targetFile = args.TargetFile || args.FilePath || '';
+  const targetFile = args.Path || args.TargetFile || args.FilePath || '';
 
   // Exclude example files, documentation, and lockfiles from strict secret checks
   if (/\.env\.example$|\.md$|package-lock\.json$|yarn\.lock$|pnpm-lock\.yaml$/i.test(targetFile)) {
@@ -39,17 +39,24 @@ function main(input) {
 
   const violations = scanForSecrets(content);
   if (violations.length > 0) {
-    return respond({ decision: 'deny', reason: buildReason(violations) });
+    const decision = violations.some((v) => v.severity === 'deny')
+      ? 'deny'
+      : violations.some((v) => v.severity === 'force_ask')
+        ? 'force_ask'
+        : 'ask';
+    return respond({ decision, reason: buildReason(violations) });
   }
   return respond({ decision: 'allow' });
 }
 
 function extractContent(toolName, args) {
+  if (toolName === 'write_file') return args.Content || args.content || '';
+  if (toolName === 'edit_file') return args.Replacement || args.newString || '';
   if (toolName === 'write_to_file') return args.CodeContent || args.content || '';
   if (toolName === 'replace_file_content') return args.ReplacementContent || args.newString || '';
   if (toolName === 'multi_replace_file_content') {
     const chunks = args.ReplacementChunks || [];
-    return chunks.map((c) => c.ReplacementContent || '').join('\n');
+    return chunks.map((c) => c.ReplacementContent || c.newString || '').join('\n');
   }
   return '';
 }
@@ -57,13 +64,25 @@ function extractContent(toolName, args) {
 function scanForSecrets(content) {
   const violations = [];
 
-  // Ignore obvious placeholders / mock templates
-  const isMock = (str) =>
-    /test|mock|dummy|example|placeholder|changeme|xxxx|<your|your[-_]api/i.test(str);
+  // Ignore only unambiguous placeholder templates — never bare substrings like "test" inside random key entropy.
+  const isExplicitPlaceholder = (str) =>
+    /(.)\1{5,}/.test(str) ||
+    /<[^>]+>/.test(str) ||
+    /(?:^|[_-])(?:mock|dummy|example|placeholder|changeme|fake|sample|replace[_-]?me|your[_-]?api|your[_-]?key|your[_-]?token)(?:[_-]|$)/i.test(str) ||
+    /(?:^|[^a-zA-Z0-9])(?:test|mock|dummy|fake|example)[_-](?:key|token|secret|password)(?:$|[^a-zA-Z0-9])/i.test(str);
+
+  const findLiveMatch = (globalRegex, groupIdx = 0, extraFilter = null) => {
+    for (const match of content.matchAll(globalRegex)) {
+      const candidate = match[groupIdx] ?? match[0];
+      if (!candidate) continue;
+      if (extraFilter && !extraFilter(candidate, match)) continue;
+      if (!isExplicitPlaceholder(candidate)) return match;
+    }
+    return null;
+  };
 
   // 1. Google / Firebase / Gemini API Key
-  const googleKeyMatch = content.match(/AIza[0-9A-Za-z-_]{35}/);
-  if (googleKeyMatch && !isMock(googleKeyMatch[0])) {
+  if (findLiveMatch(/AIza[0-9A-Za-z-_]{35}/g)) {
     violations.push({
       severity: 'deny',
       message:
@@ -72,8 +91,7 @@ function scanForSecrets(content) {
   }
 
   // 2. OpenAI / Model API Key
-  const openAiMatch = content.match(/sk-(?:proj-|live-)?[a-zA-Z0-9_-]{24,}/);
-  if (openAiMatch && !isMock(openAiMatch[0])) {
+  if (findLiveMatch(/sk-(?:proj-|live-)?[a-zA-Z0-9_-]{24,}/g)) {
     violations.push({
       severity: 'deny',
       message:
@@ -82,8 +100,7 @@ function scanForSecrets(content) {
   }
 
   // 3. GitHub Personal Access / OAuth / App Tokens
-  const githubMatch = content.match(/(?:ghp|gho|ghs|ghr)_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}/);
-  if (githubMatch && !isMock(githubMatch[0])) {
+  if (findLiveMatch(/(?:ghp|gho|ghs|ghr)_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}/g)) {
     violations.push({
       severity: 'deny',
       message: 'Detected hardcoded GitHub Token. Revoke and move to secure secret storage.',
@@ -91,25 +108,23 @@ function scanForSecrets(content) {
   }
 
   // 4. AWS Access Key ID
-  const awsMatch = content.match(/\bAKIA[0-9A-Z]{16}\b/);
-  if (awsMatch && !isMock(awsMatch[0])) {
+  if (findLiveMatch(/\bAKIA[0-9A-Z]{16}\b/g)) {
     violations.push({
       severity: 'deny',
       message: 'Detected hardcoded AWS Access Key ID. Use IAM roles or environment variables.',
     });
   }
 
-  // 5. Private Keys (RSA / DSA / EC / OPENSSH / PGP)
-  if (/-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/.test(content)) {
+  // 5. Private Keys (RSA / DSA / EC / OPENSSH / ENCRYPTED / PGP)
+  if (/-----BEGIN (?:(?:RSA|EC|OPENSSH|DSA|ENCRYPTED|PGP) )?PRIVATE KEY(?: BLOCK)?-----/.test(content)) {
     violations.push({
       severity: 'deny',
       message: 'Detected Private Key block. Private keys must never be written to application files.',
     });
   }
 
-  // 6. Slack API Tokens
-  const slackMatch = content.match(/xox[baprs]-[0-9a-zA-Z]{10,48}/);
-  if (slackMatch && !isMock(slackMatch[0])) {
+  // 6. Slack API Tokens (including multi-segment xox* and xapp tokens)
+  if (findLiveMatch(/\bxox[baprs]-[0-9a-zA-Z-]{10,}\b|\bxapp-\d-[A-Za-z0-9-]{10,}\b/g)) {
     violations.push({
       severity: 'deny',
       message: 'Detected hardcoded Slack Token.',
@@ -117,21 +132,27 @@ function scanForSecrets(content) {
   }
 
   // 7. Stripe Live Secret Key
-  const stripeMatch = content.match(/sk_live_[0-9a-zA-Z]{24}/);
-  if (stripeMatch && !isMock(stripeMatch[0])) {
+  if (findLiveMatch(/sk_live_[0-9a-zA-Z]{24}/g)) {
     violations.push({
       severity: 'deny',
       message: 'Detected Stripe Live Secret Key. Live billing credentials must remain server-side in secure environment variables.',
     });
   }
 
-  // 8. Generic hardcoded high-entropy credentials assigned to variables
-  const genericSecretAssignment = content.match(
-    /(?:api_key|apiKey|secret_key|secretKey|auth_token|authToken|password)\s*[:=]\s*["']([A-Za-z0-9+/=_-]{32,})["']/i
-  );
-  if (genericSecretAssignment && !isMock(genericSecretAssignment[1])) {
+  // 8. Generic hardcoded high-entropy credentials assigned in JS/TS/JSON (quoted or template literals) or unquoted .env
+  const genericSecretAssignment =
+    findLiveMatch(
+      /(?:api_key|apiKey|secret_key|secretKey|auth_token|authToken|password)\s*[:=]\s*(["'`])([A-Za-z0-9+/=_${}-]{32,})\1/gi,
+      2,
+      (val) => !val.includes('${')
+    ) ||
+    findLiveMatch(
+      /^[ \t]*(?:export[ \t]+)?[A-Z0-9_]*(?:API_KEY|SECRET_KEY|AUTH_TOKEN|ACCESS_TOKEN|PRIVATE_KEY|PASSWORD)[ \t]*=[ \t]*([A-Za-z0-9+/=_-]{32,})[ \t]*(?:#.*)?$/gm,
+      1
+    );
+  if (genericSecretAssignment) {
     violations.push({
-      severity: 'ask',
+      severity: 'force_ask',
       message: `Detected potential hardcoded credential assignment for "${genericSecretAssignment[0].slice(0, 20)}...". Confirm if this is a test dummy or real secret before writing.`,
     });
   }

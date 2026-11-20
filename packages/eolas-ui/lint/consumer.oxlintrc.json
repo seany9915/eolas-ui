@@ -1,0 +1,358 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "unicorn",
+    "typescript",
+    "oxc",
+    "react",
+    "jsx-a11y"
+  ],
+  "jsPlugins": [
+    "@shadcn/lint",
+    "./lint/index.mjs"
+  ],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/set-state-in-effect": "off",
+    "react/refs": "off",
+    "react/purity": "off",
+    "react/immutability": "off",
+    "jsx-a11y/aria-role": [
+      "error",
+      {
+        "ignoreNonDOM": true
+      }
+    ],
+    "jsx-a11y/click-events-have-key-events": "error",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/no-noninteractive-tabindex": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-redundant-roles": "off",
+    "eolas/no-positive-tabindex": "error",
+    "eolas/require-iscomposing-on-enter": "error",
+    "eolas/no-static-clickable-elements": "error",
+    "eolas/no-raw-html-controls": "error",
+    "eolas/no-radix-imports": "error",
+    "shadcn/no-raw-colors": [
+      "error",
+      {
+        "scanAllStrings": true
+      }
+    ],
+    "shadcn/no-arbitrary-values": [
+      "error",
+      {
+        "scanAllStrings": true
+      }
+    ],
+    "shadcn/no-inline-styles": [
+      "error",
+      {
+        "message": "Inline styles are forbidden. Use Tailwind classes with Eolas design tokens."
+      }
+    ],
+    "shadcn/no-unknown-classes": "error",
+    "shadcn/require-static-classes": "error",
+    "shadcn/no-restyle": [
+      "error",
+      {
+        "allow": [
+          "layout"
+        ],
+        "contracts": [
+          {
+            "pattern": "^Button$",
+            "allow": [
+              "layout",
+              "w-full",
+              "mt-*",
+              "mb-*",
+              "mx-*",
+              "my-*",
+              "ms-*",
+              "me-*",
+              "shrink-*",
+              "self-*",
+              "whitespace-nowrap"
+            ],
+            "deny": [
+              "p-*",
+              "px-*",
+              "py-*",
+              "h-*",
+              "min-h-*",
+              "bg-*",
+              "text-*",
+              "rounded-*",
+              "border-*",
+              "uppercase",
+              "outline-offset-0",
+              "transition-all"
+            ],
+            "message": {
+              "spacing": "Button controls its own padding and touch floors (44px min). Use size='sm'|'md'|'lg'|'icon', or apply margin/parent gap.",
+              "color": "Button controls its own colors to guarantee WCAG AA contrast. Use variant='filled'|'soft'|'outline'|'text' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral', or use <UnstyledButton> for custom-styled bare buttons.",
+              "shape": "Button enforces standard design-system border radius. Do not override rounded-*.",
+              "typography": "All-caps styling (uppercase) is strictly banned on buttons per DESIGN.md.",
+              "motion": "Blanket transition-all is banned. Button manages its own targeted transitions."
+            }
+          },
+          {
+            "pattern": "^UnstyledButton$",
+            "allow": [
+              "layout",
+              "spacing",
+              "color",
+              "shape",
+              "typography",
+              "effects",
+              "motion"
+            ],
+            "deny": [
+              "uppercase",
+              "outline-offset-0",
+              "transition-all"
+            ],
+            "message": {
+              "typography": "All-caps styling (uppercase) is strictly banned on buttons per DESIGN.md.",
+              "shape": "Use floating 2px focus rings (outline-offset-2), never outline-offset-0.",
+              "motion": "Blanket transition-all is banned. Declare explicit targeted transition properties."
+            }
+          },
+          {
+            "pattern": "^(Icon|ToggleIcon|CrossFadeIcon|Icon\\.Toggle|Icon\\.CrossFade)$",
+            "allow": [
+              "layout",
+              "color",
+              "motion",
+              "effects"
+            ],
+            "deny": [
+              "mr-*",
+              "ml-*",
+              "transition-all"
+            ],
+            "message": {
+              "spacing": "Use parent gap-* instead of manual margins (mr-*/ml-*) on <Icon>, and use size='xs'|'sm'|'md'|'lg'|'xl'|'inline' for sizing.",
+              "motion": "Blanket transition-all is banned on <Icon>. Use targeted transitions or standard animations (e.g. animate-spin)."
+            }
+          },
+          {
+            "pattern": "^(Badge|Chip)$",
+            "allow": [
+              "layout"
+            ],
+            "deny": [
+              "bg-*",
+              "text-*",
+              "border-*",
+              "rounded-*",
+              "uppercase"
+            ],
+            "message": {
+              "default": "Badge/Chip enforces high-contrast clinical status rules. Use variant='filled'|'soft'|'outline' and colorRole='primary'|'secondary'|'tertiary'|'error'|'warning'|'success'|'neutral'. Do not apply ad-hoc background/border color overrides (triple-tint anti-pattern).",
+              "typography": "All-caps styling (uppercase) is strictly banned on chips/badges per DESIGN.md."
+            }
+          },
+          {
+            "pattern": "^Card$",
+            "allow": [
+              "layout",
+              "w-*",
+              "max-w-*"
+            ],
+            "deny": [
+              "bg-*",
+              "rounded-*",
+              "border-*",
+              "shadow-*",
+              "transition-all"
+            ],
+            "message": "Card defines clinical elevation and containment. Use CardHeader, CardContent, and CardFooter. Never nest cards inside cards, and never use transition-all (use explicit targeted transitions)."
+          },
+          {
+            "pattern": "^(CardHeader|CardTitle|CardDescription|CardFooter|CardAction|Card\\.Header|Card\\.Title|Card\\.Description|Card\\.Footer|Card\\.Action)$",
+            "allow": [
+              "layout",
+              "spacing"
+            ],
+            "deny": [
+              "uppercase",
+              "bg-*",
+              "border-*"
+            ],
+            "message": "Card subcomponents permit layout and internal spacing adjustments only. Background, border, and uppercase styling are managed by <Card>."
+          },
+          {
+            "pattern": "^InlineAlert$",
+            "allow": [
+              "layout",
+              "w-*"
+            ],
+            "deny": [
+              "rounded-*"
+            ],
+            "message": "InlineAlert must maintain standard rectangular shape with solid 4px accent bar. Do not apply rounded-*."
+          },
+          {
+            "pattern": "^Toast$",
+            "allow": [
+              "layout",
+              "w-*"
+            ],
+            "deny": [
+              "rounded-*"
+            ],
+            "message": "Toast must maintain standard asymmetric shape (rounded-s-none rounded-e) with 4px start accent bar and 44x44px dismiss button. Do not apply rounded-*."
+          },
+          {
+            "pattern": "^(Tabs|Tab|TabsList|TabsTab|TabsTrigger|Tabs\\.List|Tabs\\.Tab|Tabs\\.Trigger)$",
+            "allow": [
+              "layout",
+              "w-*"
+            ],
+            "deny": [
+              "bg-*",
+              "uppercase"
+            ],
+            "message": "Tabs manage their own selection wash and active borders. Do not override backgrounds or apply uppercase styling."
+          },
+          {
+            "pattern": "^(Input|Field|Textarea|Select|SelectTrigger|Select\\.Trigger|Combobox|ComboboxInput|ComboboxTrigger|Combobox\\.Input|Combobox\\.Trigger|Autocomplete|AutocompleteInput|AutocompleteTrigger|Autocomplete\\.Input|Autocomplete\\.Trigger|NumberField|NumberFieldGroup|NumberFieldInput|NumberField\\.Group|NumberField\\.Input|OTPField|OTPFieldInput|OTPField\\.Input|PromptInput|PromptInputTextarea|PromptInput\\.Textarea|InputGroup|InputGroupInput|InputGroupTextarea|InputGroup\\.Input|InputGroup\\.Textarea)$",
+            "allow": [
+              "layout",
+              "w-*"
+            ],
+            "deny": [
+              "h-*",
+              "min-h-*"
+            ],
+            "message": "Inputs own their touch floors (44px/48px standard). Do not override height dimensions directly."
+          },
+          {
+            "pattern": "^(FieldGroup|FieldRoot|Field\\.Group|Field\\.Root)$",
+            "allow": [
+              "layout",
+              "w-*",
+              "gap-*"
+            ],
+            "message": "FieldGroup and FieldRoot permit layout sizing and gap spacing between fields or horizontal controls."
+          },
+          {
+            "pattern": "^(FieldLabel|Field\\.Label)$",
+            "allow": [
+              "layout",
+              "sr-only",
+              "whitespace-nowrap"
+            ],
+            "deny": [
+              "uppercase"
+            ],
+            "message": "FieldLabel owns its typography and contrast. Only layout, whitespace-nowrap, or sr-only visibility helpers are permitted."
+          },
+          {
+            "pattern": "^(Dialog|AlertDialog|Drawer|DialogContent|DialogPopup|AlertDialogContent|AlertDialogPopup|DrawerPanel|DrawerPopup|DrawerContent|Dialog\\.Content|Dialog\\.Popup|AlertDialog\\.Content|AlertDialog\\.Popup|Drawer\\.Panel|Drawer\\.Popup|Drawer\\.Content)$",
+            "allow": [
+              "layout"
+            ],
+            "deny": [
+              "bg-*",
+              "rounded-*"
+            ],
+            "message": "Modal overlays must maintain standard surface styling, focus traps, and backdrop filters defined by Eolas UI."
+          },
+          {
+            "pattern": "^(Popover|PopoverPopup|PopoverContent|Popover\\.Popup|Popover\\.Content|Menu|MenuPopup|MenuContent|Menu\\.Popup|Menu\\.Content|Tooltip|TooltipPopup|TooltipContent|Tooltip\\.Popup|Tooltip\\.Content|SelectPopup|SelectContent|Select\\.Popup|Select\\.Content|ComboboxPopup|ComboboxContent|Combobox\\.Popup|Combobox\\.Content|AutocompletePopup|AutocompleteContent|Autocomplete\\.Popup|Autocomplete\\.Content)$",
+            "allow": [
+              "layout",
+              "w-*",
+              "max-w-*",
+              "min-w-*"
+            ],
+            "deny": [
+              "bg-*",
+              "rounded-*",
+              "shadow-*"
+            ],
+            "message": "Tier B overlay popups manage their own surface background, concentric radius, and ambient elevation per DESIGN.md."
+          },
+          {
+            "pattern": "^(Skeleton|SkeletonReveal|Skeleton\\.Reveal)$",
+            "allow": [
+              "layout",
+              "shape"
+            ],
+            "message": "Skeleton loaders support layout dimensions (w-*, h-*) and shapes (rounded, rounded-full) to mirror target components."
+          },
+          {
+            "pattern": "^(TextSwap|NotificationBadge|TextsReveal|NumberRoll|NumberPopIn|SpinningCounter|ShimmerText|ErrorShake|SuccessCheck)$",
+            "allow": [
+              "layout"
+            ],
+            "message": "Shared motion primitives manage their own transitions and reduced-motion fallbacks per DESIGN.md."
+          },
+          {
+            "pattern": "^(CardContent|Card\\.Content)$",
+            "allow": [
+              "layout",
+              "spacing"
+            ],
+            "message": "CardContent permits internal spacing adjustments (e.g. p-0 for full-bleed media or custom padding)."
+          },
+          {
+            "pattern": "^(TableCell|TableHead|Table\\.Cell|Table\\.Head)$",
+            "allow": [
+              "layout",
+              "typography"
+            ],
+            "deny": [
+              "uppercase"
+            ],
+            "message": "Table cells permit text alignment (text-end, text-center) and tabular numbers. All-caps styling (uppercase) is prohibited."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/components/ui/**",
+        "**/src/components/ui/**",
+        "**/src/ui/**",
+        "**/playground/**",
+        "**/showcase/**",
+        "**/*Showcase*/**",
+        "**/*Showcase.tsx"
+      ],
+      "rules": {
+        "shadcn/no-restyle": "off",
+        "shadcn/no-arbitrary-values": "off",
+        "shadcn/no-inline-styles": "off",
+        "shadcn/require-static-classes": "off",
+        "shadcn/no-raw-colors": [
+          "error",
+          {
+            "scanAllStrings": false
+          }
+        ],
+        "eolas/no-raw-html-controls": "off",
+        "eolas/no-static-clickable-elements": "off",
+        "jsx-a11y/anchor-has-content": "off",
+        "jsx-a11y/control-has-associated-label": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/click-events-have-key-events": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "dist/**",
+    "public/**",
+    "node_modules/**",
+    ".agents/**",
+    "lint/**"
+  ]
+}

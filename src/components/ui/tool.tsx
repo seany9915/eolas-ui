@@ -97,7 +97,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
         data-slot="tool-header"
         aria-label={props['aria-label'] || `${name} (${status === 'calling' ? 'Running' : status === 'error' ? 'Failed' : 'Complete'})`}
         className={cn(
-          'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-left select-none',
+          'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start select-none',
           'hover:bg-surface-container/40 transition-colors duration-quick ease-standard motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           className
@@ -199,6 +199,34 @@ const ToolContent = React.forwardRef<HTMLDivElement, ToolContentProps>(
 );
 ToolContent.displayName = 'Tool.Content';
 
+function safeStringify(value: unknown): string {
+  if (value === undefined || value === null) return '';
+  if (typeof value === 'string') return value;
+  const ancestors: object[] = [];
+  const replacer = function (this: unknown, _key: string, val: unknown) {
+    if (typeof val === 'bigint') return `${val.toString()}n`;
+    if (typeof val === 'object' && val !== null) {
+      const thisIdx =
+        typeof this === 'object' && this !== null ? ancestors.indexOf(this) : -1;
+      if (thisIdx !== -1) {
+        ancestors.length = thisIdx + 1;
+      }
+      if (ancestors.includes(val)) return '[Circular]';
+      ancestors.push(val);
+    }
+    return val;
+  };
+  try {
+    return JSON.stringify(value, replacer, 2) ?? String(value);
+  } catch {
+    try {
+      return String(value);
+    } catch {
+      return '[Unserializable]';
+    }
+  }
+}
+
 export interface ToolInputProps extends React.HTMLAttributes<HTMLDivElement> {
   input?: Record<string, unknown> | string;
   title?: string;
@@ -213,11 +241,7 @@ const ToolInput: React.FC<ToolInputProps> = ({
   className,
   ...props
 }) => {
-  const codeString = React.useMemo(() => {
-    if (!input) return '';
-    if (typeof input === 'string') return input;
-    return JSON.stringify(input, null, 2);
-  }, [input]);
+  const codeString = React.useMemo(() => safeStringify(input), [input]);
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)} {...props}>
@@ -256,11 +280,7 @@ const ToolOutput: React.FC<ToolOutputProps> = ({
   className,
   ...props
 }) => {
-  const codeString = React.useMemo(() => {
-    if (!output) return '';
-    if (typeof output === 'string') return output;
-    return JSON.stringify(output, null, 2);
-  }, [output]);
+  const codeString = React.useMemo(() => safeStringify(output), [output]);
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)} {...props}>

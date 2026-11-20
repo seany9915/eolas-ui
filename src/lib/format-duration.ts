@@ -122,18 +122,31 @@ export function useDurationFormat(
   options: DurationFormatOptions = {}
 ): string {
   const { locale, style } = options;
+  const {
+    years,
+    months,
+    weeks,
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
+  } = duration;
 
   return React.useMemo(() => {
-    return formatDuration(duration, { locale, style });
+    return formatDuration(
+      { years, months, weeks, days, hours, minutes, seconds, milliseconds },
+      { locale, style }
+    );
   }, [
-    duration.years,
-    duration.months,
-    duration.weeks,
-    duration.days,
-    duration.hours,
-    duration.minutes,
-    duration.seconds,
-    duration.milliseconds,
+    years,
+    months,
+    weeks,
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
     locale,
     style,
   ]);

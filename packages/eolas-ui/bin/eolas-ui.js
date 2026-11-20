@@ -16,18 +16,68 @@ function printHelp() {
 eolas-ui - Private Base UI Component Registry CLI
 
 USAGE:
-  npx @seany9915/eolas-ui add <item-name...> [--overwrite]
-  npx @seany9915/eolas-ui add --all [--overwrite]
-  npx @seany9915/eolas-ui sync
+  npx @seany9915/eolas-ui add <item-name...> [--overwrite] [--dry-run]
+  npx @seany9915/eolas-ui add --all [--overwrite] [--dry-run]
+  npx @seany9915/eolas-ui sync [--dry-run]
   npx @seany9915/eolas-ui list
 
 EXAMPLES:
   npx @seany9915/eolas-ui add button dialog select
   npx @seany9915/eolas-ui add design-md agent-rules lint theme
   npx @seany9915/eolas-ui add tabs --overwrite
-  npx @seany9915/eolas-ui sync
+  npx @seany9915/eolas-ui add data-table --dry-run
+  npx @seany9915/eolas-ui sync --dry-run
   npx @seany9915/eolas-ui list
 `);
+}
+
+function loadComponentsConfig(cwd) {
+  const componentsJsonPath = path.resolve(cwd, 'components.json');
+  if (!fs.existsSync(componentsJsonPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(componentsJsonPath, 'utf8'));
+  } catch {
+    console.warn('Warning: Could not parse components.json; using default path aliases.');
+    return null;
+  }
+}
+
+function rewriteImports(content, filePath, componentsConfig) {
+  if (!/\.(tsx?|jsx?|mjs)$/i.test(filePath)) return content;
+  const aliases = componentsConfig?.aliases;
+  if (!aliases) return content;
+
+  let next = content;
+  const trimSlash = (val) => val.replace(/\/+$/, '');
+
+  const utilsAlias = aliases.utils ? trimSlash(aliases.utils) : null;
+  const libAlias = aliases.lib ? trimSlash(aliases.lib) : null;
+  const componentsAlias = aliases.components ? trimSlash(aliases.components) : null;
+  const uiAlias = aliases.ui
+    ? trimSlash(aliases.ui)
+    : componentsAlias && componentsAlias !== '@/components'
+      ? `${componentsAlias}/ui`
+      : null;
+
+  if (utilsAlias && utilsAlias !== '@/lib/utils') {
+    next = next.replace(/(['"])@\/lib\/utils\1/g, (_m, q) => `${q}${utilsAlias}${q}`);
+  } else if (libAlias && libAlias !== '@/lib') {
+    next = next.replace(/(['"])@\/lib\/utils\1/g, (_m, q) => `${q}${libAlias}/utils${q}`);
+  }
+
+  if (libAlias && libAlias !== '@/lib') {
+    next = next.replace(/(['"])@\/lib\/([^'"]+)\1/g, (_m, q, rest) => `${q}${libAlias}/${rest}${q}`);
+  }
+
+  if (uiAlias && uiAlias !== '@/components/ui') {
+    next = next.replace(/(['"])@\/components\/ui\/([^'"]+)\1/g, (_m, q, rest) => `${q}${uiAlias}/${rest}${q}`);
+  }
+
+  if (componentsAlias && componentsAlias !== '@/components') {
+    next = next.replace(/(['"])@\/components\/blocks\/([^'"]+)\1/g, (_m, q, rest) => `${q}${componentsAlias}/blocks/${rest}${q}`);
+  }
+
+  return next;
 }
 
 function listComponents() {
@@ -56,7 +106,7 @@ function listComponents() {
   console.log('');
 }
 
-function addComponents(componentNames, overwrite = false) {
+function addComponents(componentNames, { overwrite = false, dryRun = false } = {}) {
   if (componentNames.length === 0) {
     console.error('Error: Please specify one or more components or items to add.');
     console.log('Run `npx @seany9915/eolas-ui list` to see available items.');
@@ -64,10 +114,29 @@ function addComponents(componentNames, overwrite = false) {
   }
 
   const cwd = process.cwd();
+  const componentsConfig = loadComponentsConfig(cwd);
+  const hasSrc = fs.existsSync(path.resolve(cwd, 'src'));
+  const defaultSrc = hasSrc ? 'src' : '';
+
+  const resolveAlias = (rawAlias, fallback) => {
+    if (!rawAlias) return path.join(defaultSrc, fallback);
+    if (rawAlias.startsWith('@/')) {
+      const stripped = rawAlias.slice(2);
+      return hasSrc && !stripped.startsWith('src/') ? path.join('src', stripped) : stripped;
+    }
+    if (rawAlias.startsWith('~/')) {
+      return rawAlias.slice(2);
+    }
+    return rawAlias;
+  };
+
   const queue = [...componentNames];
   const processed = new Set();
   const installedFiles = [];
   const missing = [];
+  const requiredDeps = new Set();
+  const requiredDevDeps = new Set();
+  const docsNotes = [];
 
   while (queue.length > 0) {
     const name = queue.shift();
@@ -82,6 +151,16 @@ function addComponents(componentNames, overwrite = false) {
     }
 
     const data = JSON.parse(fs.readFileSync(compFile, 'utf8'));
+
+    if (Array.isArray(data.dependencies)) {
+      for (const dep of data.dependencies) requiredDeps.add(dep);
+    }
+    if (Array.isArray(data.devDependencies)) {
+      for (const dep of data.devDependencies) requiredDevDeps.add(dep);
+    }
+    if (typeof data.docs === 'string' && data.docs.trim()) {
+      docsNotes.push({ name: data.name, docs: data.docs.trim() });
+    }
 
     // Queue internal registry dependencies
     if (data.registryDependencies && Array.isArray(data.registryDependencies)) {
@@ -98,29 +177,7 @@ function addComponents(componentNames, overwrite = false) {
 
     // Write item files
     for (const file of data.files) {
-      // Resolve target path (supporting shadcn @ui/, @components/, @lib/, @hooks/, ~/ placeholders)
       let destPath;
-      let componentsConfig = null;
-      const componentsJsonPath = path.resolve(cwd, 'components.json');
-      if (fs.existsSync(componentsJsonPath)) {
-        try {
-          componentsConfig = JSON.parse(fs.readFileSync(componentsJsonPath, 'utf8'));
-        } catch {}
-      }
-
-      const hasSrc = fs.existsSync(path.resolve(cwd, 'src'));
-      const defaultSrc = hasSrc ? 'src' : '';
-      const resolveAlias = (rawAlias, fallback) => {
-        if (!rawAlias) return path.join(defaultSrc, fallback);
-        if (rawAlias.startsWith('@/')) {
-          const stripped = rawAlias.slice(2);
-          return hasSrc && !stripped.startsWith('src/') ? path.join('src', stripped) : stripped;
-        }
-        if (rawAlias.startsWith('~/')) {
-          return rawAlias.slice(2);
-        }
-        return rawAlias;
-      };
 
       if (file.target.startsWith('~/')) {
         destPath = path.resolve(cwd, file.target.slice(2));
@@ -152,28 +209,44 @@ function addComponents(componentNames, overwrite = false) {
 
       // Smart resolution for theme file when target is styles/globals.css
       if (file.target === 'styles/globals.css' || file.target === 'globals.css') {
-        const candidates = [
-          path.resolve(cwd, 'src/globals.css'),
-          path.resolve(cwd, 'src/styles/globals.css'),
-          path.resolve(cwd, 'styles/globals.css'),
-          path.resolve(cwd, 'src/index.css'),
-          path.resolve(cwd, 'globals.css'),
-        ];
-        const existing = candidates.find((p) => fs.existsSync(p));
-        if (existing) destPath = existing;
+        if (componentsConfig?.tailwind?.css) {
+          destPath = path.resolve(cwd, componentsConfig.tailwind.css);
+        } else {
+          const candidates = [
+            path.resolve(cwd, 'src/globals.css'),
+            path.resolve(cwd, 'src/styles/globals.css'),
+            path.resolve(cwd, 'src/app/globals.css'),
+            path.resolve(cwd, 'app/globals.css'),
+            path.resolve(cwd, 'styles/globals.css'),
+            path.resolve(cwd, 'src/index.css'),
+            path.resolve(cwd, 'globals.css'),
+          ];
+          const existing = candidates.find((p) => fs.existsSync(p));
+          if (existing) destPath = existing;
+        }
       }
 
-      const destDir = path.dirname(destPath);
-      if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true });
-      }
+      const relDest = path.relative(cwd, destPath).replace(/\\/g, '/');
+      const outputContent = rewriteImports(file.content, relDest, componentsConfig);
+      const exists = fs.existsSync(destPath);
 
-      if (fs.existsSync(destPath) && !overwrite) {
-        console.log(`  - Skipping ${file.target} (already exists, pass --overwrite to replace)`);
+      if (exists && !overwrite) {
+        if (dryRun) {
+          console.log(`  [dry-run] Would skip ${relDest} (already exists)`);
+        } else {
+          console.log(`  - Skipping ${relDest} (already exists, pass --overwrite to replace)`);
+        }
+      } else if (dryRun) {
+        console.log(`  [dry-run] Would write ${relDest}${exists ? ' (overwrite)' : ''}`);
+        installedFiles.push(relDest);
       } else {
-        fs.writeFileSync(destPath, file.content, 'utf8');
-        console.log(`  + Installed ${file.target}`);
-        installedFiles.push(file.target);
+        const destDir = path.dirname(destPath);
+        if (!fs.existsSync(destDir)) {
+          fs.mkdirSync(destDir, { recursive: true });
+        }
+        fs.writeFileSync(destPath, outputContent, 'utf8');
+        console.log(`  + Installed ${relDest}`);
+        installedFiles.push(relDest);
       }
     }
   }
@@ -183,8 +256,20 @@ function addComponents(componentNames, overwrite = false) {
     process.exit(1);
   }
 
-  console.log(`\nSuccessfully processed ${processed.size} items/dependencies.`);
-  console.log('Ensure peer dependencies are installed: npm install @base-ui/react clsx tailwind-merge\n');
+  console.log(`\n${dryRun ? '[dry-run] Would process' : 'Successfully processed'} ${processed.size} items/dependencies (${installedFiles.length} file(s)).`);
+  if (requiredDeps.size > 0) {
+    console.log(`Required dependencies:\n  npm install ${Array.from(requiredDeps).sort().join(' ')}`);
+  }
+  if (requiredDevDeps.size > 0) {
+    console.log(`Required devDependencies:\n  npm install -D ${Array.from(requiredDevDeps).sort().join(' ')}`);
+  }
+  if (docsNotes.length > 0) {
+    console.log('\nSetup notes:');
+    for (const note of docsNotes) {
+      console.log(`- ${note.name}: ${note.docs}`);
+    }
+  }
+  console.log('');
 }
 
 // CLI Dispatcher
@@ -193,6 +278,8 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
 } else if (command === 'list') {
   listComponents();
 } else if (command === 'sync') {
+  const flags = args.slice(1).filter((a) => a.startsWith('-'));
+  const dryRun = flags.includes('--dry-run');
   const indexPath = path.join(REGISTRY_DIR, 'index.json');
   if (!fs.existsSync(indexPath)) {
     console.error('Error: Registry index not found.');
@@ -202,12 +289,13 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
   const allComponentNames = items
     .filter((i) => i.type === 'registry:ui' || i.type === 'registry:block')
     .map((i) => i.name);
-  console.log(`Syncing all ${allComponentNames.length} Eolas UI components and blocks...\n`);
-  addComponents(allComponentNames, true);
+  console.log(`${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} all ${allComponentNames.length} Eolas UI components and blocks...\n`);
+  addComponents(allComponentNames, { overwrite: true, dryRun });
 } else if (command === 'add') {
-  const flags = args.filter((a) => a.startsWith('-'));
+  const flags = args.slice(1).filter((a) => a.startsWith('-'));
   const names = args.slice(1).filter((a) => !a.startsWith('-'));
   const overwrite = flags.includes('--overwrite') || flags.includes('-o');
+  const dryRun = flags.includes('--dry-run');
 
   if (flags.includes('--all') || flags.includes('-a') || names.includes('all')) {
     const indexPath = path.join(REGISTRY_DIR, 'index.json');
@@ -219,9 +307,9 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
     const allComponentNames = items
       .filter((i) => i.type === 'registry:ui' || i.type === 'registry:block')
       .map((i) => i.name);
-    addComponents(allComponentNames, overwrite);
+    addComponents(allComponentNames, { overwrite, dryRun });
   } else {
-    addComponents(names, overwrite);
+    addComponents(names, { overwrite, dryRun });
   }
 } else {
   console.error(`Unknown command: ${command}\n`);

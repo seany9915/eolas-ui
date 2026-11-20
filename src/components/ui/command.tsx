@@ -152,10 +152,10 @@ CommandList.displayName = CommandPrimitive.List.displayName;
 export const CommandEmpty = React.forwardRef<
   React.ComponentRef<typeof CommandPrimitive.Empty>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => (
+>(({ className, ...props }, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className="py-6 text-center text-sm font-sans text-on-surface-variant"
+    className={cn('py-6 text-center text-sm font-sans text-on-surface-variant', className)}
     {...props}
   />
 ));
@@ -212,7 +212,7 @@ export const CommandShortcut = ({
 }: React.HTMLAttributes<HTMLSpanElement>): React.JSX.Element => (
   <span
     className={cn(
-      'ml-auto font-mono text-xs tracking-widest text-on-surface-variant',
+      'ms-auto font-mono text-xs tracking-widest text-on-surface-variant',
       className
     )}
     {...props}

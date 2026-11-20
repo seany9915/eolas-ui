@@ -6,12 +6,9 @@ mainAgent: true
 subagent: true
 inheritCustomizations: true
 tools:
-  - view_file
-  - write_to_file
-  - replace_file_content
-  - list_dir
-  - find_by_name
-  - grep_search
+  - read_file
+  - write_file
+  - edit_file
   - run_command
 ---
 
@@ -45,12 +42,12 @@ Never write bespoke, one-off interactive elements when a shared Base UI primitiv
 ```
 
 ### Step 1: Inventory Search
-Check `src/components/ui/` first before touching the target component. The current workspace catalog includes:
+Check `src/components/ui/` first before touching the target component. The current canonical workspace catalog includes:
 - **Popups & Dialogs**: `dialog.tsx`, `alert-dialog.tsx`, `popover.tsx`, `preview-card.tsx`, `tooltip.tsx`, `drawer.tsx`, `menu.tsx`, `menubar.tsx`, `context-menu.tsx`
-- **Forms & Inputs**: `input.tsx`, `autocomplete.tsx`, `combobox.tsx`, `select.tsx`, `checkbox-group.tsx`, `selection-controls.tsx`, `slider.tsx`, `otp-field.tsx`, `fieldset.tsx`, `form.tsx`
-- **Navigation & Layout**: `tabs.tsx`, `navigation-menu.tsx`, `accordion.tsx`, `collapsible.tsx`, `toolbar.tsx`, `steppers.tsx`, `scroll-area.tsx`, `separator.tsx`, `table.tsx`
-- **Status & Indicators**: `toast.tsx`, `progress.tsx`, `meter.tsx`, `chart.tsx`, `avatar.tsx`, `icon.tsx`
-- **Composites (Styled per DESIGN.md)**: `button.tsx`, `chip.tsx`, `card.tsx`, `flat-callout-banner.tsx`, `toggles.tsx`
+- **Forms & Inputs**: `input.tsx`, `input-group.tsx`, `textarea.tsx`, `autocomplete.tsx`, `combobox.tsx`, `select.tsx`, `command.tsx`, `checkbox.tsx`, `checkbox-group.tsx`, `radio.tsx`, `switch.tsx`, `slider.tsx`, `number-field.tsx`, `otp-field.tsx`, `calendar.tsx`, `field.tsx`, `fieldset.tsx`, `form.tsx`, `toggle.tsx`, `toggle-group.tsx`
+- **Navigation & Layout**: `tabs.tsx`, `navigation-menu.tsx`, `navigation-bar.tsx`, `sidebar.tsx`, `breadcrumb.tsx`, `pagination.tsx`, `accordion.tsx`, `collapsible.tsx`, `toolbar.tsx`, `resizable.tsx`, `carousel.tsx`, `scroll-area.tsx`, `separator.tsx`, `table.tsx`, `empty.tsx`
+- **Status, Feedback & Indicators**: `toast.tsx`, `progress.tsx`, `progress-ring.tsx`, `meter.tsx`, `chart.tsx`, `avatar.tsx`, `icon.tsx`, `inline-alert.tsx`, `clinician-tip.tsx`, `badge.tsx`, `chip.tsx`, `card.tsx`, `skeleton.tsx`, `thinking-orb.tsx`, `bot-avatar.tsx`
+- **AI, Motion & Reveal Primitives**: `prompt-input.tsx`, `chat-message.tsx`, `message-scroller.tsx`, `model-selector.tsx`, `trace.tsx`, `tool.tsx`, `reasoning.tsx`, `plan.tsx`, `task.tsx`, `queue.tsx`, `confirmation.tsx`, `sources.tsx`, `inline-citation.tsx`, `text-swap.tsx`, `texts-reveal.tsx`, `shimmer-text.tsx`, `error-shake.tsx`, `success-check.tsx`, `number-pop-in.tsx`, `spinning-counter.tsx`, `notification-badge.tsx`
 
 ### Step 2: Match or Extend
 - If an existing primitive in `src/components/ui/` satisfies the use case, import and use it.
@@ -58,11 +55,11 @@ Check `src/components/ui/` first before touching the target component. The curre
 
 ### Step 3: Wrap if Absent
 - If Base UI provides a primitive not yet present in `src/components/ui/`, create a cleanly styled wrapper in `src/components/ui/<component>.tsx` using project Tailwind tokens and export it.
-- Note: Components like `Card`, `Chip`/`Badge`, `FlatCalloutBanner` are not standalone Base UI primitives; they are composite components styled according to `DESIGN.md`.
+- Note: Components like `Card`, `Chip`/`Badge`, `InlineAlert`, and `ClinicianTip` are not standalone Base UI primitives; they are styled primitives aligned with `DESIGN.md`.
 
 ### Step 4: Self-Audit
-- Confirm no `@radix-ui/*` imports remain in the refactored files.
-- Confirm no hand-rolled interactive dropdowns/dialogs/accordions remain.
+- Confirm no `@radix-ui/*` or `radix-ui` imports remain in the refactored files.
+- Confirm no hand-rolled interactive dropdowns/dialogs/accordions remain, and no raw `<button>`/`<input>`/`<select>`/`<textarea>`/`<dialog>` exist outside `src/components/ui/`.
 - Confirm all UI labels, toasts, and demo text use plain, everyday English (1–2 simple nouns; describe user outcomes rather than backend/database/CSS terms like `committed`, `synchronized`, `unconstrained`, `telemetry`, `matrix`, or `repository`).
 
 ---
@@ -71,11 +68,11 @@ Check `src/components/ui/` first before touching the target component. The curre
 
 ### A. Radix UI Migration (`@radix-ui/*` -> `@base-ui/react`)
 - **Package import**: Replace all `@radix-ui/react-*` imports with `@base-ui/react`.
-- **Remove `asChild`**: Base UI does not use Radix's `asChild` pattern. Use native Base UI parts (`<Dialog.Trigger render={<button ... />} />` or standard subcomponent compositions).
+- **Remove `asChild`**: Base UI does not use Radix's `asChild` pattern. Use native Base UI `render` composition (`<Dialog.Trigger render={<Button ... />} />` or `<Dialog.Trigger>` default button — never raw `<button>` outside `ui/` and never `render={<span />}`).
 - **State Data Attributes**:
-  - Radix `[data-state="open"|"closed"]` $\rightarrow$ Base UI `[data-open]`, `[data-closed]`, `[data-starting-style]`, `[data-ending-style]`.
-  - Radix `[data-state="checked"|"unchecked"]` $\rightarrow$ Base UI `[data-checked]`, `[data-unchecked]`.
-  - Radix `[data-disabled]` $\rightarrow$ Base UI `[data-disabled]`.
+  - Radix `[data-state="open"|"closed"]` -> Base UI `[data-open]`, `[data-closed]`, `[data-starting-style]`, `[data-ending-style]`.
+  - Radix `[data-state="checked"|"unchecked"]` -> Base UI `[data-checked]`, `[data-unchecked]`.
+  - Radix `[data-disabled]` -> Base UI `[data-disabled]`.
 
 ### B. Handrolled Interactive Widget Migration
 - Replace manual React `useState` open/closed booleans, `useEffect` escape key listeners, outside-click handlers, and manual `tabIndex`/`aria-expanded` attributes with the corresponding Base UI primitive.
@@ -86,8 +83,8 @@ Check `src/components/ui/` first before touching the target component. The curre
 - Verify that root layout stacking context supports portals cleanly.
 
 ### D. Transitions & Motion
-- Use Base UI's `[data-starting-style]` and `[data-ending-style]` with CSS transitions for smooth, interruptible enter/exit animations.
-- Match durations and easings to `DESIGN.md` (Fast: 150ms `cubic-bezier(0.4, 0, 0.2, 1)`, Standard: 200ms `cubic-bezier(0.2, 0, 0, 1)`).
+- Use Base UI's `[data-starting-style]` and `[data-ending-style]` with explicit CSS transitions (`transition-[opacity,transform]` etc. — never `transition-all`) and `motion-reduce:transition-none` for smooth, interruptible enter/exit animations.
+- Match durations and easings to `DESIGN.md`: `--duration-quick` (`150ms`, closes & micro-controls), `--duration-fast` (`250ms`, opens, overlays & accordions), `--ease-standard` (`cubic-bezier(0.22, 1, 0.36, 1)`), `--ease-exit` (`cubic-bezier(0.4, 0, 1, 1)`).
 
 ---
 
@@ -96,8 +93,8 @@ Check `src/components/ui/` first before touching the target component. The curre
 When invoked to refactor a component or directory:
 1. **Analyze Target**: Read the target file(s) and identify all interactive components and styling dependencies.
 2. **Formulate Plan**: List existing `src/components/ui/` primitives to reuse or new wrappers needed.
-3. **Execute Targeted Refactoring**: Apply surgical edits using `replace_file_content` (or `write_to_file` if creating a new shared primitive).
-4. **Preserve External APIs**: Maintain existing component props, callback signatures (`onChange`, `onValueChange`, `onOpenChange`), and custom `className` pass-throughs unless explicitly directed otherwise.
+3. **Execute Targeted Refactoring**: Apply surgical edits using `edit_file` (or `write_file` if creating a new shared primitive).
+4. **Preserve External APIs**: Maintain existing component props, callback signatures (`onChange`, `onValueChange`, `onOpenChange`), `ref` forwarding, Base UI `render` props, and custom `className` pass-throughs unless explicitly directed otherwise.
 5. **Verify**:
-   - Run typecheck or build to ensure zero compilation or type errors (`npx tsc --noEmit` or `npm run build`).
+   - Run Oxlint + TypeScript checks (`npm run lint` and `npm run typecheck`, or `npm run build`).
    - Check against `.agents/rules/anti-patterns.md` before reporting completion.

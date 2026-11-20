@@ -44,6 +44,8 @@ export interface DataDrivenTableProps<T> {
   responsive?: 'scroll' | 'stack';
   /** Density mode ('compact' | 'comfortable' | 'spacious'). Also inherits `--density` via CSS container style queries. */
   density?: TableDensity;
+  /** Applies ambient elevation shadow to the outer table container. */
+  elevated?: boolean;
 }
 
 export type TableProps<T = unknown> =
@@ -53,6 +55,7 @@ export type TableProps<T = unknown> =
       containerClassName?: string;
       responsive?: 'scroll' | 'stack';
       density?: TableDensity;
+      elevated?: boolean;
     })
   | DataDrivenTableProps<T>;
 
@@ -126,7 +129,7 @@ export const TableHead = React.forwardRef<
     scope={scope}
     data-slot="table-head"
     className={cn(
-      'h-12 px-4 text-left align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'h-12 px-4 text-start align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}
@@ -142,7 +145,7 @@ export const TableCell = React.forwardRef<
     ref={ref}
     data-slot="table-cell"
     className={cn(
-      'px-4 py-3.5 align-middle text-on-surface font-sans text-sm [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'px-4 py-3.5 align-middle text-on-surface font-sans text-sm [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}
@@ -184,6 +187,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         keyExtractor,
         className,
         containerClassName,
+        elevated,
       } = props as DataDrivenTableProps<any>;
 
       return (
@@ -194,22 +198,23 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
           style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
           className={cn(
             'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+            elevated && 'shadow-ambient',
             !isStack && 'scroll-fade-x',
             isStack && '@container',
             containerClassName
           )}
         >
-          <table ref={ref} data-slot="table" className={cn('w-full text-left border-collapse font-sans text-sm', className)}>
+          <table ref={ref} data-slot="table" className={cn('w-full text-start border-collapse font-sans text-sm', className)}>
             <thead className={cn(isStack && '@max-sm:hidden')}>
               <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
                 {columns.map((col, idx) => {
                   const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
                   const alignClass =
                     effectiveAlign === 'right'
-                      ? 'text-right'
+                      ? 'text-end'
                       : effectiveAlign === 'center'
                         ? 'text-center'
-                        : 'text-left';
+                        : 'text-start';
                   const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
 
                   return (
@@ -245,10 +250,10 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                     const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
                     const alignClass =
                       effectiveAlign === 'right'
-                        ? 'text-right'
+                        ? 'text-end'
                         : effectiveAlign === 'center'
                           ? 'text-center'
-                          : 'text-left';
+                          : 'text-start';
                     const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
 
                     return (
@@ -265,11 +270,11 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                         )}
                       >
                         {isStack && (
-                          <span className="hidden @max-sm:inline-block font-label text-xs font-semibold text-on-surface-variant mr-3 select-none">
+                          <span className="hidden @max-sm:inline-block font-label text-xs font-semibold text-on-surface-variant me-3 select-none">
                             {col.header}
                           </span>
                         )}
-                        <span className={cn(effectiveAlign === 'right' && isStack && '@max-sm:text-right')}>
+                        <span className={cn(effectiveAlign === 'right' && isStack && '@max-sm:text-end')}>
                           {typeof col.accessor === 'function'
                             ? col.accessor(row)
                             : (row[col.accessor] as React.ReactNode)}
@@ -286,11 +291,12 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
     }
 
     // Composable compound mode (shadcn standard anatomy)
-    const { className, containerClassName, children, responsive: _responsive, density: _density, ...tableProps } =
+    const { className, containerClassName, children, responsive: _responsive, density: _density, elevated, ...tableProps } =
       props as React.HTMLAttributes<HTMLTableElement> & {
         containerClassName?: string;
         responsive?: 'scroll' | 'stack';
         density?: TableDensity;
+        elevated?: boolean;
       };
 
     return (
@@ -301,6 +307,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
         className={cn(
           'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+          elevated && 'shadow-ambient',
           !isStack && 'scroll-fade-x',
           isStack && '@container',
           containerClassName
@@ -309,7 +316,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         <table
           ref={ref}
           data-slot="table"
-          className={cn('w-full caption-bottom text-left border-collapse font-sans text-sm', className)}
+          className={cn('w-full caption-bottom text-start border-collapse font-sans text-sm', className)}
           {...tableProps}
         >
           {children}

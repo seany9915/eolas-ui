@@ -95,12 +95,13 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
         {...props}
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
           className="aspect-auto h-full w-full"
         >
           <BarChart
+            aria-label={chartLabel ?? title}
             data={data}
             layout={isVerticalLayout ? 'vertical' : 'horizontal'}
             margin={

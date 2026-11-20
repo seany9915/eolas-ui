@@ -31,7 +31,7 @@ import {
 } from './trace';
 import { UnstyledButton } from './button';
 import { useChatMessageContext } from './chat-message-context';
-import { cn } from '@/lib/utils';
+import { cn, sanitizeUrl } from '@/lib/utils';
 
 /* -------------------------------------------------------------------------------------------------
  * TaskItem
@@ -49,6 +49,7 @@ export interface TaskItemProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
   ({ title, description, status = 'complete', icon, duration, href, children, className, ...props }, ref) => {
+    const safeHref = sanitizeUrl(href);
     const formattedDuration =
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
@@ -60,7 +61,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
         {...props}
       >
         <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
-        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
           <TraceTitle className="truncate">{title}</TraceTitle>
           {description && (
             <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
@@ -69,7 +70,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
           )}
         </div>
         {formattedDuration && (
-          <TraceDescription className="ml-auto shrink-0 pl-2">
+          <TraceDescription className="ms-auto shrink-0 ps-2">
             <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
               {formattedDuration}
             </span>
@@ -84,7 +85,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
           <TraceCollapsibleTrigger>
             {itemLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
+          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof children === 'string' ? (
               <p>
                 {children}
@@ -92,9 +93,9 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
             ) : (
               children
             )}
-            {href && (
+            {safeHref && (
               <a
-                href={href}
+                href={safeHref}
                 className="mt-1.5 inline-flex min-h-[44px] items-center text-secondary underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
               >
                 Open link
@@ -105,12 +106,13 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
       );
     }
 
-    if (href) {
+    if (safeHref) {
       return (
         <UnstyledButton
+          nativeButton={false}
           render={
             <a
-              href={href}
+              href={safeHref}
               className="group/task-link block w-full hover:bg-surface-container/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
             />
           }
@@ -241,7 +243,17 @@ export const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
 );
 TaskRoot.displayName = 'Task';
 
-export const TaskHeader = TaskTrigger;
+export const TaskHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="task-header"
+      className={cn('flex items-center justify-between gap-2 px-3.5 py-2.5 min-h-[44px] w-full', className)}
+      {...props}
+    />
+  )
+);
+TaskHeader.displayName = 'TaskHeader';
 export const TaskTitle = TraceTitle;
 export const TaskDescription = TraceDescription;
 
@@ -249,7 +261,7 @@ export const TaskDescription = TraceDescription;
  * Compound Export
  * -----------------------------------------------------------------------------------------------*/
 export const Task = Object.assign(TaskRoot, {
-  Header: TaskTrigger,
+  Header: TaskHeader,
   Trigger: TaskTrigger,
   Title: TraceTitle,
   Description: TraceDescription,

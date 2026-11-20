@@ -17,7 +17,7 @@
  * - Zero direct `<button>` tags outside primitives.
  */
 import * as React from 'react';
-import { Sidebar } from '@/components/ui/sidebar';
+import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { NavigationBar } from '@/components/ui/navigation-bar';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -58,6 +58,52 @@ export interface AppShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   embedded?: boolean;
   className?: string;
 }
+
+interface AppShellDestinationMenuProps {
+  destinations: AppShellDestination[];
+  activeId: string;
+  onSelect: (id: string) => void;
+}
+
+const AppShellDestinationMenu: React.FC<AppShellDestinationMenuProps> = ({
+  destinations,
+  activeId,
+  onSelect,
+}) => {
+  const { isMobile, isEmbedded, setOpenMobile } = useSidebar();
+
+  return (
+    <Sidebar.Group>
+      <Sidebar.GroupContent>
+        <Sidebar.Menu>
+          {destinations.map((dest) => {
+            const isActive = activeId === dest.id;
+            return (
+              <Sidebar.MenuItem key={dest.id}>
+                <Sidebar.MenuButton
+                  isActive={isActive}
+                  onClick={() => {
+                    onSelect(dest.id);
+                    if (isMobile && !isEmbedded) {
+                      setOpenMobile(false);
+                    }
+                  }}
+                  tooltip={dest.label}
+                >
+                  <Icon name={dest.icon} size="md" />
+                  <span>{dest.label}</span>
+                </Sidebar.MenuButton>
+                {dest.badge !== undefined && dest.badge !== null && (
+                  <Sidebar.MenuBadge>{dest.badge}</Sidebar.MenuBadge>
+                )}
+              </Sidebar.MenuItem>
+            );
+          })}
+        </Sidebar.Menu>
+      </Sidebar.GroupContent>
+    </Sidebar.Group>
+  );
+};
 
 export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
   (
@@ -105,9 +151,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       return 'desktop';
     }, []);
 
-    const [sizeClass, setSizeClass] = React.useState<'mobile' | 'tablet' | 'desktop'>(
-      embedded ? 'desktop' : getWindowBreakpoint
-    );
+    const [sizeClass, setSizeClass] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
     React.useEffect(() => {
       if (embedded) {
@@ -187,7 +231,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         {!embedded && (
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:items-center focus:min-h-11 focus:px-4 focus:rounded focus:bg-primary focus:text-on-primary focus:font-label focus:text-sm focus:font-semibold focus:outline-2 focus:outline-offset-2 focus:outline-primary"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 focus:inline-flex focus:items-center focus:min-h-11 focus:px-4 focus:rounded focus:bg-primary focus:text-on-primary focus:font-label focus:text-sm focus:font-semibold focus:outline-2 focus:outline-offset-2 focus:outline-primary"
           >
             Skip to content
           </a>
@@ -205,30 +249,11 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
               {sidebarContent ? (
                 sidebarContent
               ) : (
-                <Sidebar.Group>
-                  <Sidebar.GroupContent>
-                    <Sidebar.Menu>
-                      {destinations.map((dest) => {
-                        const isActive = activeId === dest.id;
-                        return (
-                          <Sidebar.MenuItem key={dest.id}>
-                            <Sidebar.MenuButton
-                              isActive={isActive}
-                              onClick={() => handleSelectDestination(dest.id)}
-                              tooltip={dest.label}
-                            >
-                              <Icon name={dest.icon} size="md" />
-                              <span>{dest.label}</span>
-                            </Sidebar.MenuButton>
-                            {dest.badge !== undefined && dest.badge !== null && (
-                              <Sidebar.MenuBadge>{dest.badge}</Sidebar.MenuBadge>
-                            )}
-                          </Sidebar.MenuItem>
-                        );
-                      })}
-                    </Sidebar.Menu>
-                  </Sidebar.GroupContent>
-                </Sidebar.Group>
+                <AppShellDestinationMenu
+                  destinations={destinations}
+                  activeId={activeId}
+                  onSelect={handleSelectDestination}
+                />
               )}
             </Sidebar.Content>
             {sidebarFooter && <Sidebar.Footer>{sidebarFooter}</Sidebar.Footer>}
@@ -297,21 +322,37 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           </header>
 
           {/* Main Workspace Body */}
-          <main
-            id="main-content"
-            data-slot="app-shell-main"
-            className="@container flex-1 flex flex-col min-h-0 overflow-y-auto"
-          >
+          {embedded ? (
             <div
-              className={cn(
-                'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
-                // Safe bottom padding on mobile over the fixed navigation bar
-                destinations.length > 0 && (embedded ? 'pb-4' : 'pb-28 sm:pb-6 short:pb-6')
-              )}
+              data-slot="app-shell-main"
+              className="@container flex-1 flex flex-col min-h-0 overflow-y-auto"
             >
-              {children}
+              <div
+                className={cn(
+                  'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
+                  destinations.length > 0 && 'pb-4'
+                )}
+              >
+                {children}
+              </div>
             </div>
-          </main>
+          ) : (
+            <main
+              id="main-content"
+              data-slot="app-shell-main"
+              className="@container flex-1 flex flex-col min-h-0 overflow-y-auto"
+            >
+              <div
+                className={cn(
+                  'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
+                  // Safe bottom padding on mobile over the fixed navigation bar
+                  destinations.length > 0 && 'pb-28 sm:pb-6 short:pb-6'
+                )}
+              >
+                {children}
+              </div>
+            </main>
+          )}
 
           {/* Mobile Bottom Navigation Bar (Hidden on >=640px and on compact height) */}
           {showMobileBar && (

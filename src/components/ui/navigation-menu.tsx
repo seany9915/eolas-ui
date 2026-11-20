@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NavigationMenu as BaseNavigationMenu } from '@base-ui/react/navigation-menu';
-import { cn } from '@/lib/utils';
+import { cn, sanitizeUrl } from '@/lib/utils';
 import { Icon } from './icon';
 
 export interface NavigationSubItem {
@@ -100,13 +100,15 @@ export interface NavigationMenuLinkProps
 export const NavigationMenuLink = React.forwardRef<
   HTMLAnchorElement,
   NavigationMenuLinkProps
->(({ className, active = false, variant = 'default', ...props }, ref) => {
+>(({ className, active = false, variant = 'default', href, ...props }, ref) => {
   const isBar = variant === 'bar';
+  const safeHref = href === undefined ? undefined : sanitizeUrl(href);
 
   return (
     <BaseNavigationMenu.Link
       ref={ref}
       active={active}
+      href={safeHref}
       className={cn(
         isBar
           ? cn(
@@ -182,12 +184,29 @@ NavigationMenuViewport.displayName = 'NavigationMenuViewport';
 export const NavigationMenuArrow = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Arrow>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <BaseNavigationMenu.Arrow
     ref={ref}
-    className={cn('fill-surface stroke-outline-variant', className)}
+    className={cn(
+      'z-10 flex transition-[left,top] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none',
+      'data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
+      'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+      className
+    )}
     {...props}
-  />
+  >
+    {children ?? (
+      <svg
+        width="10"
+        height="5"
+        viewBox="0 0 10 5"
+        className="block fill-surface stroke-outline-variant"
+        aria-hidden="true"
+      >
+        <path d="M0 5 L5 0 L10 5" />
+      </svg>
+    )}
+  </BaseNavigationMenu.Arrow>
 ));
 NavigationMenuArrow.displayName = 'NavigationMenuArrow';
 
@@ -298,7 +317,7 @@ function NavigationMenuComponentInner<Value = string>(
                                 }
                               }}
                               className={cn(
-                                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg transition-colors cursor-pointer outline-none select-none text-left',
+                                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg transition-colors cursor-pointer outline-none select-none text-start',
                                 isSubActive
                                   ? 'bg-primary-container text-on-primary-container font-semibold'
                                   : 'text-on-surface hover:bg-surface-container focus:bg-surface-container'
@@ -317,14 +336,14 @@ function NavigationMenuComponentInner<Value = string>(
                                 )}
                                 <span>{sub.label}</span>
                                 {isSubActive && (
-                                  <Icon name="check" size="sm" className="ml-auto text-primary leading-none" />
+                                  <Icon name="check" size="sm" className="ms-auto text-primary leading-none" />
                                 )}
                               </div>
                               {sub.description && (
                                 <span
                                   className={cn(
                                     'font-sans text-xs leading-relaxed',
-                                    sub.icon ? 'pl-6' : '',
+                                    sub.icon ? 'ps-6' : '',
                                     isSubActive ? 'text-on-primary-container/85' : 'text-on-surface-variant'
                                   )}
                                 >

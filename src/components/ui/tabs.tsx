@@ -191,7 +191,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                         'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
                         enableScrollFade && 'scroll-fade-x',
                         'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
-                        'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                        'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-e data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                       ),
               typeof className === 'function' ? className(state) : className
             )
@@ -235,7 +235,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                     ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
                     : 'transition-none',
                   'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2px]',
-                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:right-0 data-[orientation=vertical]:w-[2px]',
+                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:end-0 data-[orientation=vertical]:w-[2px]',
                   indicatorClassName
                 )}
               />

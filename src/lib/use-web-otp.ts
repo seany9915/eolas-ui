@@ -52,11 +52,14 @@ export function useWebOtp({
   const [error, setError] = React.useState<Error | null>(null);
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const onCodeReceivedRef = React.useRef(onCodeReceived);
-  onCodeReceivedRef.current = onCodeReceived;
+  React.useEffect(() => {
+    onCodeReceivedRef.current = onCodeReceived;
+  }, [onCodeReceived]);
 
   const isSupported = React.useMemo(() => {
     return (
       typeof window !== 'undefined' &&
+      typeof navigator !== 'undefined' &&
       'OTPCredential' in window &&
       'credentials' in navigator
     );
@@ -100,7 +103,10 @@ export function useWebOtp({
         }
         setError(err instanceof Error ? err : new Error(String(err)));
       } finally {
-        setIsListening(false);
+        if (abortControllerRef.current === ac) {
+          abortControllerRef.current = null;
+          setIsListening(false);
+        }
       }
     };
 

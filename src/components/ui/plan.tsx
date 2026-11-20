@@ -127,7 +127,7 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
         {children ?? (
           <TraceLine status={overallStatus} className={description ? 'items-start py-2' : 'items-center'}>
             <TraceIcon name="route" status="default" className={description ? 'mt-0.5' : undefined} />
-            <div className="flex flex-col min-w-0 flex-1 text-left leading-tight">
+            <div className="flex flex-col min-w-0 flex-1 text-start leading-tight">
               <TraceTitle className="truncate">{title}</TraceTitle>
               {description && (
                 <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
@@ -135,7 +135,7 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
                 </span>
               )}
             </div>
-            <TraceDescription className="ml-auto shrink-0 pl-2">
+            <TraceDescription className="ms-auto shrink-0 ps-2">
               <span className="flex items-center gap-2">
                 <span className="font-mono tabular-nums">
                   {completedCount} of {totalCount} done
@@ -158,7 +158,17 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
 );
 PlanTrigger.displayName = 'PlanTrigger';
 
-export const PlanHeader = PlanTrigger;
+export const PlanHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="plan-header"
+      className={cn('flex items-center justify-between gap-2 px-3.5 py-2.5 min-h-[44px] w-full', className)}
+      {...props}
+    />
+  )
+);
+PlanHeader.displayName = 'PlanHeader';
 export const PlanAction = TraceAction;
 export const PlanActions = TraceActions;
 
@@ -237,7 +247,7 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
           <TraceCollapsibleTrigger>
             {stepLine}
           </TraceCollapsibleTrigger>
-          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
+          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof stepContent === 'string' ? (
               <p>
                 {stepContent}
@@ -310,8 +320,10 @@ export const PlanRoot: React.FC<PlanProps> = ({
     (child) =>
       React.isValidElement(child) &&
       (child.type === PlanTrigger ||
+        child.type === PlanHeader ||
         child.type === PlanContent ||
         (child.type as { displayName?: string })?.displayName === 'PlanTrigger' ||
+        (child.type as { displayName?: string })?.displayName === 'PlanHeader' ||
         (child.type as { displayName?: string })?.displayName === 'PlanContent')
   );
 
@@ -350,7 +362,7 @@ export const PlanRoot: React.FC<PlanProps> = ({
                           stepNumber={step.status === 'pending' ? idx + 1 : undefined}
                           className={step.description ? 'mt-0.5' : undefined}
                         />
-                        <div className="flex flex-col min-w-0 flex-1 leading-tight text-left">
+                        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
                           <TraceTitle className="truncate">{step.title}</TraceTitle>
                           {step.description && (
                             <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
@@ -359,7 +371,7 @@ export const PlanRoot: React.FC<PlanProps> = ({
                           )}
                         </div>
                         {formattedDuration && (
-                          <TraceDescription className="ml-auto shrink-0 pl-2">
+                          <TraceDescription className="ms-auto shrink-0 ps-2">
                             <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
                               {formattedDuration}
                             </span>
@@ -374,7 +386,7 @@ export const PlanRoot: React.FC<PlanProps> = ({
                           <TraceCollapsibleTrigger>
                             {renderStepLine}
                           </TraceCollapsibleTrigger>
-                          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 pl-11 text-sm font-sans text-on-surface-variant leading-relaxed">
+                          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
                             {typeof stepContent === 'string' ? (
                               <p>
                                 {stepContent}

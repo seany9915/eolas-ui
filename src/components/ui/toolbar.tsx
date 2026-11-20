@@ -240,7 +240,7 @@ export const ToolbarInput = React.forwardRef<HTMLInputElement, ToolbarInputProps
         className={cn(
           'h-9 px-3 rounded-sm bg-surface-container border border-outline-variant text-sm font-sans text-on-surface placeholder:text-on-surface-variant/60',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
-          'disabled:opacity-40 disabled:cursor-not-allowed',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
           className
         )}
         {...props}

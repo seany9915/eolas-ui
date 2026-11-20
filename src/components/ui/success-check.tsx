@@ -32,6 +32,13 @@ const SIZE_MAP = {
   lg: 56,
 };
 
+const EXPECTED_ANIMATIONS = new Set([
+  't-check-fade',
+  't-check-transform',
+  't-check-blur',
+  't-check-draw',
+]);
+
 export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
   (
     {
@@ -40,6 +47,7 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
       variant = 'badge',
       onAnimationEnd,
       className,
+      style,
       ...props
     },
     ref
@@ -49,16 +57,20 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
 
     const [animating, setAnimating] = React.useState(Boolean(trigger));
     const prevTriggerRef = React.useRef(trigger);
+    const completedAnimationsRef = React.useRef<Set<string>>(new Set());
 
     React.useEffect(() => {
       if (trigger && trigger !== prevTriggerRef.current) {
+        completedAnimationsRef.current.clear();
         setAnimating(true);
       }
       prevTriggerRef.current = trigger;
     }, [trigger]);
 
     const handleAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) {
+      if (!EXPECTED_ANIMATIONS.has(e.animationName)) return;
+      completedAnimationsRef.current.add(e.animationName);
+      if (completedAnimationsRef.current.size >= EXPECTED_ANIMATIONS.size) {
         setAnimating(false);
         onAnimationEnd?.();
       }
@@ -70,10 +82,6 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
       <div
         ref={ref}
         onAnimationEnd={handleAnimationEnd}
-        style={{
-          width: `${dimension}px`,
-          height: `${dimension}px`,
-        }}
         className={cn(
           'relative inline-flex items-center justify-center select-none overflow-visible',
           isBadge && 'rounded-full bg-success text-on-success shadow-ambient',
@@ -83,6 +91,11 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
         )}
         aria-hidden="true"
         {...props}
+        style={{
+          width: `${dimension}px`,
+          height: `${dimension}px`,
+          ...style,
+        }}
       >
         <svg
           viewBox="0 0 24 24"
@@ -99,7 +112,7 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
           )}
           style={{
             strokeDasharray: 1,
-            strokeDashoffset: animating ? 0 : 0,
+            strokeDashoffset: 0,
           }}
         >
           <polyline pathLength={1} points="20 6 9 17 4 12" />

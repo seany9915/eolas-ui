@@ -25,6 +25,13 @@ const BLOCK_DIR_CANDIDATES = [
   'components/blocks',
 ];
 
+const PLAYGROUND_DIR_CANDIDATES = [
+  'src/components/playground',
+  'components/playground',
+  'src/components/demos',
+  'components/demos',
+];
+
 let raw = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => {
@@ -41,7 +48,7 @@ process.stdin.on('end', () => {
 function main(input) {
   const toolCall = input.toolCall || {};
   const args = toolCall.args || {};
-  const targetFile = args.TargetFile || '';
+  const targetFile = args.Path || args.TargetFile || args.FilePath || '';
   const workspaceRoot = (input.workspacePaths && input.workspacePaths[0]) || process.cwd();
 
   if (!/\.(tsx|jsx)$/i.test(targetFile)) {
@@ -61,10 +68,12 @@ function main(input) {
     return respond({ decision: 'allow' });
   }
 
-  // Writing directly into a primitive directory or composite blocks directory is allowed.
-  const isInsideAllowedDir = [...PRIMITIVE_DIR_CANDIDATES, ...BLOCK_DIR_CANDIDATES].some((dir) =>
-    normalized.includes(`/${dir.replace(/\\/g, '/')}/`)
-  );
+  // Writing directly into a primitive, composite block, or playground/demo directory is allowed.
+  const isInsideAllowedDir = [
+    ...PRIMITIVE_DIR_CANDIDATES,
+    ...BLOCK_DIR_CANDIDATES,
+    ...PLAYGROUND_DIR_CANDIDATES,
+  ].some((dir) => normalized.includes(`/${dir.replace(/\\/g, '/')}/`));
   if (isInsideAllowedDir) {
     return respond({ decision: 'allow' });
   }
@@ -76,9 +85,9 @@ function main(input) {
   }
 
   return respond({
-    decision: 'deny',
+    decision: 'force_ask',
     reason:
-      `Primitive-check gate blocked this change:\n` +
+      `Primitive-check gate requires confirmation:\n` +
       `New component file "${targetFile}" is being created outside the primitive directory ("${inventory.dir}").\n` +
       `Existing primitives in ${inventory.dir}: ${inventory.names.join(', ') || '(none yet)'}.\n` +
       'Rule: Before writing a new UI component, search and reuse or extend existing primitives in src/components/ui/. ' +

@@ -210,7 +210,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       </BaseOTPField.Root>
 
       {error ? (
-        <BaseField.Error className="text-xs text-error font-sans flex items-center gap-1 mt-1">
+        <BaseField.Error match={true} className="text-xs text-error font-sans flex items-center gap-1 mt-1">
           <Icon name="error" size="xs" className="leading-none text-error" />
           <span>{error}</span>
         </BaseField.Error>

@@ -27,7 +27,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Hardcoded Lorem Ipsum / missing zero-state** → **Use:** Loading, empty, and realistic populated states.
 - **Banned: Stacked vertical icon-over-text utility buttons** → **Use:** Inline icon left of label.
 - **Banned: Card Soup / Metric Card Grids ("Card Grid Rain") / nested cards** → **Use:** Low-prominence typography/dividers, tables, definition lists, or accordions; never nest `<Card>` inside `<Card>`.
-- **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (unboxed inside cards; `bg-surface-container border border-outline-variant` on canvas).
+- **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (`variant="unboxed"` inside cards; `variant="surface"` or `variant="inset"` on canvas).
 - **Banned: `surface-variant` fill + `outline-variant` border** (1.31:1 contrast) → **Use:** `outline` (`#6B6E80`) border when a neutral fill needs a boundary.
 - **Banned: Single-sided accent borders on rounded cards** → **Use:** Borderless `border border-transparent` standard cards; reserve `rounded-s-none rounded-e` + `border-s-4` strictly for `<InlineAlert />` and `<Toast />`.
 - **Banned: Div Soup / toxic wrapper-itis** (`<Box>`, `<Flex>`, `<Spacer>`, redundant `<div>`/`<>`) → **Use:** Direct classes on semantic elements or plain layout `<div>`s (`flex`/`grid`).
@@ -39,7 +39,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 
 ## Iconography & Copy
 - **Banned: `mr-*` / `ml-*` on `<Icon>` inside flex containers** → **Use:** Parent `gap-*` (e.g. `<Button>`'s `gap-2`).
-- **Banned: Sparkle/magic icons (`stars`, `auto_awesome`) or emojis** → **Use:** Functional task icons (`translate`, `summarize`, `spellcheck`, `tune`, `bolt`).
+- **Banned: Sparkle/magic icons (`stars`, `auto_awesome`, `auto_fix_high`) or emojis** → **Use:** Functional task icons (`translate`, `summarize`, `spellcheck`, `tune`, `bolt`).
 - **Banned: AI clichés, inflated nouns, or 3+ noun labels** ("Elevate", "Seamless", "Hub", "Matrix", "Repository", "Engine") → **Use:** Plain everyday terms, 1–2 nouns max ("Caseload", "Patients", "Notes", "Saved").
 - **Banned: Dev/DB/CSS jargon in UI copy** (`committed`, `synchronized`, `hydrated`, `unconstrained`, `affordance`, `telemetry`, `workflow`, `protocol`) → **Use:** User-outcome phrasing ("Patient added", "Preview: Full width").
 - **Banned: Fabricated compliance/security claims, invented metrics, or `LABEL // YEAR`** → **Use:** Verifiable app states ("Saved", "Synced", "Offline") and `[metric]` placeholders.

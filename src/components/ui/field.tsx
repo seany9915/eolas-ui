@@ -283,7 +283,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
         )}
 
         {error ? (
-          <FieldError>{error}</FieldError>
+          <FieldError match={true}>{error}</FieldError>
         ) : (
           <FieldError />
         )}

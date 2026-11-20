@@ -60,7 +60,7 @@ export interface ResizablePanelProps extends PanelProps {
 export const ResizablePanel = React.forwardRef<
   HTMLDivElement,
   ResizablePanelProps
->(({ className, ...props }, ref) => {
+>(({ className, order: _order, ...props }, ref) => {
   return (
     <Panel
       elementRef={ref}
@@ -90,14 +90,11 @@ export const ResizableHandle = React.forwardRef<
         // Accessible Floating Focus Ring per DESIGN.md
         'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1 focus-visible:z-20',
         // Vertical Separator (Horizontal Layout: panels placed side-by-side)
-        'w-px cursor-col-resize aria-vertical:w-px aria-vertical:cursor-col-resize [&[aria-orientation=vertical]]:w-px [&[aria-orientation=vertical]]:cursor-col-resize',
+        'h-full w-px cursor-col-resize [&[aria-orientation=vertical]]:w-px [&[aria-orientation=vertical]]:cursor-col-resize',
         'after:absolute after:inset-y-0 after:left-1/2 after:w-3 after:-translate-x-1/2 after:content-[\'\']',
         // Horizontal Separator (Vertical Layout: panels stacked vertically)
-        'aria-horizontal:h-px aria-horizontal:w-full aria-horizontal:cursor-row-resize [&[aria-orientation=horizontal]]:h-px [&[aria-orientation=horizontal]]:w-full [&[aria-orientation=horizontal]]:cursor-row-resize',
-        'aria-horizontal:after:absolute aria-horizontal:after:inset-x-0 aria-horizontal:after:top-1/2 aria-horizontal:after:h-3 aria-horizontal:after:-translate-y-1/2 aria-horizontal:after:content-[\'\']',
-        '[&[aria-orientation=horizontal]]:after:absolute [&[aria-orientation=horizontal]]:after:inset-x-0 [&[aria-orientation=horizontal]]:after:top-1/2 [&[aria-orientation=horizontal]]:after:h-3 [&[aria-orientation=horizontal]]:after:-translate-y-1/2',
-        // Fallback baseline dimensions
-        'h-full aria-horizontal:h-px [&[aria-orientation=horizontal]]:h-px',
+        '[&[aria-orientation=horizontal]]:h-px [&[aria-orientation=horizontal]]:w-full [&[aria-orientation=horizontal]]:cursor-row-resize',
+        '[&[aria-orientation=horizontal]]:after:inset-x-0 [&[aria-orientation=horizontal]]:after:inset-y-auto [&[aria-orientation=horizontal]]:after:left-0 [&[aria-orientation=horizontal]]:after:top-1/2 [&[aria-orientation=horizontal]]:after:h-3 [&[aria-orientation=horizontal]]:after:w-full [&[aria-orientation=horizontal]]:after:translate-x-0 [&[aria-orientation=horizontal]]:after:-translate-y-1/2',
         className
       )}
       {...props}
@@ -111,7 +108,7 @@ export const ResizableHandle = React.forwardRef<
             'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard motion-reduce:transition-none',
             // Dimensions: Capsule pill (28x14px) adapting to orientation
             'h-7 w-3.5',
-            'group-aria-horizontal:h-3.5 group-aria-horizontal:w-7 group-[&[aria-orientation=horizontal]]:h-3.5 group-[&[aria-orientation=horizontal]]:w-7',
+            'group-[[aria-orientation=horizontal]]:h-3.5 group-[[aria-orientation=horizontal]]:w-7',
             // Interactive hover & focus feedback driven by separator
             'group-hover:border-primary group-hover:text-primary',
             'group-focus-visible:border-primary group-focus-visible:text-primary',
@@ -124,7 +121,7 @@ export const ResizableHandle = React.forwardRef<
               aria-hidden="true"
               className={cn(
                 'size-2.5 shrink-0 text-current transition-transform duration-quick ease-standard motion-reduce:transition-none',
-                'group-aria-horizontal:rotate-90 group-[&[aria-orientation=horizontal]]:rotate-90'
+                'group-[[aria-orientation=horizontal]]:rotate-90'
               )}
               viewBox="0 0 10 10"
               fill="currentColor"

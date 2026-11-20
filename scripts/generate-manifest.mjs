@@ -14,9 +14,15 @@ const catMap = {
   'menubar': 'overlays', 'context-menu': 'overlays', 'tooltip': 'overlays', 'preview-card': 'overlays',
 
   // Feedback
-  'inline-alert': 'feedback', 'toast': 'feedback', 'chip': 'feedback', 'notification-badge': 'feedback',
+  'badge': 'feedback', 'inline-alert': 'feedback', 'toast': 'feedback', 'chip': 'feedback', 'notification-badge': 'feedback',
   'meter': 'feedback', 'progress': 'feedback', 'progress-ring': 'feedback', 'empty': 'feedback',
   'empty-state': 'feedback', 'spinner': 'feedback', 'skeleton': 'feedback', 'reading-progress': 'feedback',
+
+  // Inputs (supplement)
+  'calendar': 'inputs', 'input-group': 'inputs',
+
+  // Overlays (supplement)
+  'command': 'overlays',
 
   // Navigation
   'tabs': 'navigation', 'accordion': 'navigation', 'breadcrumb': 'navigation', 'pagination': 'navigation',
@@ -24,7 +30,7 @@ const catMap = {
   'scroll-area': 'navigation', 'scrollspy': 'navigation',
 
   // Data & Layout
-  'card': 'layout', 'table': 'layout', 'chart': 'layout', 'separator': 'layout', 'resizable': 'layout',
+  'card': 'layout', 'item': 'layout', 'kbd': 'layout', 'table': 'layout', 'chart': 'layout', 'separator': 'layout', 'resizable': 'layout',
   'collapsible': 'layout', 'toolbar': 'layout', 'carousel': 'layout', 'avatar': 'layout', 'icon': 'layout',
   'attachment': 'layout', 'sticky-container': 'layout', 'deferred-view': 'layout', 'swipe-reveal': 'layout', 'sortable': 'layout',
   ['text-' + 'highlight']: 'layout',
@@ -37,7 +43,7 @@ const catMap = {
   'checkpoint': 'clinical-ai', 'confirmation': 'clinical-ai', 'reasoning': 'clinical-ai', 'trace': 'clinical-ai', 'bot-avatar': 'clinical-ai', 'thinking-orb': 'clinical-ai',
 
   // Blocks
-  'app-shell': 'blocks', 'approval-card': 'blocks', 'chat': 'blocks', 'data-table': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'list-detail-block': 'blocks', 'metric-card': 'blocks', 'questionnaire': 'blocks', 'step-wizard': 'blocks', 'supporting-pane-block': 'blocks',
+  'app-shell': 'blocks', 'approval-card': 'blocks', 'chart-card': 'blocks', 'chat': 'blocks', 'data-table': 'blocks', 'delete-confirmation-dialog': 'blocks', 'filter-toolbar': 'blocks', 'list-detail-block': 'blocks', 'metric-card': 'blocks', 'questionnaire': 'blocks', 'step-wizard': 'blocks', 'supporting-pane-block': 'blocks',
   'area-chart-card': 'blocks', 'bar-chart-card': 'blocks', 'line-chart-card': 'blocks', 'pie-chart-card': 'blocks', 'radial-chart-card': 'blocks', 'radar-chart-card': 'blocks',
 
   // Motion
@@ -47,7 +53,8 @@ const catMap = {
   'view-transition': 'motion',
 
   // System
-  'direction-provider': 'system', 'csp-provider': 'system', 'utils': 'system'
+  'direction-provider': 'system', 'csp-provider': 'system', 'utils': 'system',
+  'sanitize': 'system', 'scheduler': 'system', 'built-in-ai': 'system', 'scroll-completion': 'system', 'format-duration': 'system'
 };
 
 const items = r.items.filter(i => i.type === 'registry:ui' || i.type === 'registry:block' || (i.type === 'registry:lib' && i.name === 'utils'));
@@ -145,7 +152,7 @@ const registryEntries = items.map(item => {
   const description = transitionsDevMap[item.name] || item.description || `Eolas UI ${title} component.`;
   const taxonomy = item.meta?.taxonomy || [];
   const dependencies = item.dependencies || [];
-  const shadcnCommand = `npx shadcn add @seany9915/eolas-ui/${item.name}`;
+  const shadcnCommand = `npx @seany9915/eolas-ui add ${item.name}`;
 
   return {
     id: item.name,

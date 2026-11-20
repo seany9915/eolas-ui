@@ -138,6 +138,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           compact
             ? 'p-1'
             : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-container/30',
+          'has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-60 has-[[data-disabled]]:hover:bg-transparent',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
           className
         )}
@@ -146,7 +147,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           {checkboxNode}
         </div>
         <div className="flex flex-col flex-1">
-          <span className="font-sans text-sm font-medium text-on-surface select-none group-disabled:text-on-surface-variant">
+          <span className="font-sans text-sm font-medium text-on-surface select-none group-has-[[data-disabled]]:text-on-surface-variant">
             {label}
           </span>
           {descriptionNode}

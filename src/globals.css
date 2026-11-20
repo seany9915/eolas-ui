@@ -1,6 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..700&family=Lexend:wght@400..700&family=Roboto+Mono:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL,GRAD,opsz,wght@0..1,-25..0,20..40,400&icon_names=accessibility_new,add,analytics,animation,archive,arrow_back,arrow_downward,arrow_drop_down,arrow_forward,arrow_upward,assignment,attach_file,badge,block,bolt,bookmark,bookmark_added,branding_watermark,calendar_today,cancel,category,chat,check,check_circle,checklist,chevron_left,chevron_right,clear,close,cloud_sync,cloud_upload,code,content_copy,contrast,crop_free,dashboard,delete,density_medium,description,desktop_windows,download,edit,edit_note,emoji_events,error,event,expand_less,expand_more,explore,extension,face,favorite,file_download,filter_list,first_page,flag,folder,folder_open,format_bold,forum,fullscreen,gavel,graphic_eq,grid_view,groups,health_and_safety,hearing,history,hourglass_empty,hub,inbox,info,insights,inventory_2,ios_share,keyboard_arrow_down,keyboard_arrow_up,language,last_page,layers,left_panel_close,left_panel_open,lightbulb,local_hospital,lock,logout,mail,match_case,medical_services,menu,menu_book,menu_open,mic,mic_none,mic_off,monitor_heart,monitoring,more_horiz,more_vert,nature,notifications,notifications_active,open_in_new,outgoing_mail,palette,pending_actions,person,person_add,platforms,play_arrow,play_circle,print,priority_high,progress_activity,psychology,radio_button_checked,radio_button_unchecked,record_voice_over,redo,refresh,remove,report,restart_alt,right_panel_close,right_panel_open,route,schedule,search,search_off,security,settings,share,shield,show_chart,skip_next,smart_toy,smartphone,spatial_audio,spellcheck,star,stop,summarize,swap_horiz,swipe,table_chart,tablet_mac,task_alt,terminal,timer,tips_and_updates,touch_app,translate,trending_down,trending_flat,trending_up,tune,undo,unfold_less,unfold_more,upload,verified,verified_user,view_list,visibility,visibility_off,volume_off,volume_up,warning,widgets,wifi_tethering,workspace_premium&display=block");
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant inverted (&:is([data-surface="inverted"] *, [data-prominence="inverted"] *));
 @custom-variant focus-visible (&:focus-visible, &[data-preview~="focus"]);
 @custom-variant active (&:active, &[data-preview~="active"]);
 @custom-variant hover {
@@ -71,9 +74,6 @@
   --border-width-default: 1px;
   --border-width-emphasis: 2px;
   --border-width-accent: 4px;
-  --border-default: 1px;
-  --border-emphasis: 2px;
-  --border-accent: 4px;
 
   --radius: 0.5rem;
   --radius-none: 0px;
@@ -81,6 +81,8 @@
   --radius-default: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 }
 
@@ -222,35 +224,37 @@ html {
   }
 }
 
-/* Tabular figures for tables, counters, metrics, and timestamps (Good CSS #21) */
-td,
-time,
-[data-tabular-nums] {
-  font-variant-numeric: tabular-nums;
-}
+@layer base {
+  /* Tabular figures for tables, counters, metrics, and timestamps (Good CSS #21) */
+  td,
+  time,
+  [data-tabular-nums] {
+    font-variant-numeric: tabular-nums;
+  }
 
-/* Defensive input zoom prevention on iOS Safari while respecting body font floor (Good CSS #01) */
-input,
-textarea,
-select {
-  font-size: max(16px, 1rem);
-}
+  /* Defensive input zoom prevention on iOS Safari while respecting utility font sizes (Good CSS #01) */
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1rem);
+  }
 
-/* Suppress native search clear button in WebKit/Blink to prevent double clear 'X' alongside custom clearable action */
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration {
-  -webkit-appearance: none;
-  appearance: none;
-  display: none;
-}
+  /* Suppress native search clear button in WebKit/Blink to prevent double clear 'X' alongside custom clearable action */
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-results-button,
+  input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
 
-/* Prevent text selection highlight during rapid control activation (Good CSS #01) */
-button,
-[role="button"] {
-  user-select: none;
-  -webkit-user-select: none;
+  /* Prevent text selection highlight during rapid control activation (Good CSS #01) */
+  button,
+  [role="button"] {
+    user-select: none;
+    -webkit-user-select: none;
+  }
 }
 
 /* Border Width Token Utility Classes */
@@ -298,8 +302,10 @@ button,
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Optical grade compensation for light-on-dark surfaces */
-  .dark .material-symbols-outlined {
+  /* Optical grade compensation for light-on-dark and inverted surfaces */
+  .dark .material-symbols-outlined,
+  [data-surface="inverted"] .material-symbols-outlined,
+  [data-prominence="inverted"] .material-symbols-outlined {
     --icon-grad: -25;
   }
 
@@ -313,6 +319,12 @@ button,
   [dir="rtl"] .icon-directional,
   :dir(rtl) .icon-directional {
     scale: -1 1;
+  }
+
+  [dir="rtl"],
+  :dir(rtl) {
+    --badge-pop-x: 4px;
+    --step-dir: -1;
   }
 }
 
@@ -420,25 +432,15 @@ select:autofill {
   filter: none;
 }
 
-/* Reduced motion preference: eliminates disruptive movement (transforms, translations, scale, bounce) while preserving accessible opacity fades */
+/* Reduced motion preference: disable smooth page scroll while preserving calm opacity transitions and Floating UI positioner transforms */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  html {
     scroll-behavior: auto !important;
   }
 
-  /* Allow calm, non-vestibular opacity crossfades for dialogs, popovers, and status changes */
-  .transition-opacity,
-  [data-open],
-  [data-closed],
-  [data-starting-style],
-  [data-ending-style] {
+  .transition-opacity {
     transition-property: opacity !important;
     transition-duration: var(--duration-quick, 150ms) !important;
-    transform: none !important;
-    filter: none !important;
   }
 }
 
@@ -527,7 +529,7 @@ select:autofill {
 }
 
 @utility animate-check-draw {
-  animation: t-check-draw var(--check-path-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) var(--check-path-delay, 80ms) forwards;
+  animation: t-check-draw var(--check-path-dur, 500ms) cubic-bezier(0.22, 1, 0.36, 1) var(--check-path-delay, 80ms) both;
 }
 
 @utility animate-digit-pop {
@@ -540,7 +542,7 @@ select:autofill {
 
 @keyframes badge-pop-in {
   0% {
-    transform: translate(-4px, 4px) scale(0);
+    transform: translate(var(--badge-pop-x, -4px), 4px) scale(0);
     filter: blur(var(--blur-small, 2px));
     opacity: 0;
   }
@@ -601,7 +603,7 @@ select:autofill {
 @keyframes step-slide-forward {
   from {
     opacity: 0;
-    transform: translateX(var(--distance-base, 8px));
+    transform: translateX(calc(var(--distance-base, 8px) * var(--step-dir, 1)));
   }
   to {
     opacity: 1;
@@ -612,7 +614,7 @@ select:autofill {
 @keyframes step-slide-backward {
   from {
     opacity: 0;
-    transform: translateX(calc(var(--distance-base, 8px) * -1));
+    transform: translateX(calc(var(--distance-base, 8px) * var(--step-dir, 1) * -1));
   }
   to {
     opacity: 1;
@@ -949,12 +951,14 @@ select:autofill {
 }
 
 /* Global Heading & Body Text-Wrap Defaults */
-h1, h2, h3, h4, h5, h6 {
-  text-wrap: balance;
-}
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
 
-p, li {
-  text-wrap: pretty;
+  p, li {
+    text-wrap: pretty;
+  }
 }
 
 /* Long-Form Content Rhythm (shadcn Typeset container system) */
@@ -1211,7 +1215,7 @@ form[data-tool-active] {
 /* Offscreen rendering optimization (MWG: defer-rendering-heavy-content) */
 .content-visibility-auto {
   content-visibility: auto;
-  contain-intrinsic-size: auto none auto 200px;
+  contain-intrinsic-block-size: auto 200px;
 }
 
 .content-visibility-hidden {
@@ -1235,6 +1239,11 @@ form[data-tool-active] {
     animation-timeline: scroll(root block);
     animation-range: 0% 100%;
     will-change: transform;
+  }
+
+  [dir="rtl"] .reading-progress-root-driven,
+  :dir(rtl) .reading-progress-root-driven {
+    transform-origin: right center;
   }
 }
 
@@ -1293,11 +1302,20 @@ form[data-tool-active] {
   scroll-target-group: auto;
 }
 
-.scrollspy-link[aria-current="true"],
-.scrollspy-link.\:target-current {
+.scrollspy-link:is(:target-current, [aria-current="true"]) {
   color: var(--primary);
   font-weight: 600;
   border-inline-start-color: var(--primary);
+}
+
+/* Swipe-to-reveal scroll container & initial target (MWG: swipe-to-reveal) */
+.swipe-reveal-scroller {
+  overscroll-behavior: auto;
+  overscroll-behavior: chain;
+}
+
+.swipe-reveal-content {
+  scroll-initial-target: nearest;
 }
 
 /* Container clipping boundary offset allowing floating focus rings and ambient drop-shadows to bleed unclipped (MWG: overflow-clipping-control) */
@@ -1318,15 +1336,10 @@ form[data-tool-active] {
   }
 }
 
-/* Asymmetric corner utilities for InlineAlert and Toast */
-@utility rounded-r {
-  border-top-right-radius: var(--radius-default);
-  border-bottom-right-radius: var(--radius-default);
-}
-
+/* Legacy alias utility for inline-end-only rounded toast/alert framing */
 @utility rounded-r-default {
-  border-top-right-radius: var(--radius-default);
-  border-bottom-right-radius: var(--radius-default);
+  border-start-end-radius: var(--radius-default);
+  border-end-end-radius: var(--radius-default);
 }
 
 /* Expand Touch Target Beyond Visual Size (Good CSS #27, WCAG 2.2 SC 2.5.8) */
@@ -1539,6 +1552,24 @@ form[data-tool-active] {
   );
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+}
+
+[dir="rtl"] .scroll-fade-x,
+:dir(rtl) .scroll-fade-x {
+  -webkit-mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    black var(--fade-start, 0px),
+    black calc(100% - var(--fade-end, 0px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    black var(--fade-start, 0px),
+    black calc(100% - var(--fade-end, 0px)),
+    transparent 100%
+  );
 }
 
 /* 4. Higher-Order Density Token Reactivity (MWG: design-token-reactivity)

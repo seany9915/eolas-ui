@@ -138,13 +138,13 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         aria-labelledby={supportingTitle ? supportingHeadingId : undefined}
         aria-label={!supportingTitle ? 'Supporting details' : undefined}
         className={cn(
-          'flex flex-col bg-surface-container shrink-0 min-w-0 overflow-hidden transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+          'flex flex-col bg-surface-container shrink-0 min-w-0 overflow-hidden transition-opacity duration-quick ease-standard motion-reduce:transition-none',
           side === 'left' && '@3xl:order-first',
           isOpen
             ? cn(
                 paneWidthClassName,
                 // Compact (<768px) stacked panel caps height so primary canvas remains usable
-                'w-full h-auto max-h-[45vh] @3xl:max-h-none border-t border-outline-variant opacity-100',
+                'w-full h-auto max-h-96 short:max-h-48 @3xl:max-h-none border-t border-outline-variant opacity-100',
                 // Wide (@3xl+) full-height side panel
                 '@3xl:h-full @3xl:border-t-0',
                 side === 'left'
@@ -229,6 +229,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
                 onName={side === 'left' ? 'left_panel_close' : 'right_panel_close'}
                 offName={side === 'left' ? 'left_panel_open' : 'right_panel_open'}
                 size="sm"
+                directional
               />
               <span className="hidden @sm:inline">
                 {isOpen ? 'Hide details' : 'Show details'}

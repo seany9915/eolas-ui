@@ -21,12 +21,12 @@ export interface ToastProps {
 }
 
 const accentBorder: Record<string, string> = {
-  neutral: 'border-l-neutral',
-  info: 'border-l-neutral', // alias to neutral to preserve primary blue strictly for interactive controls
-  success: 'border-l-success',
-  warning: 'border-l-warning',
-  error: 'border-l-error',
-  loading: 'border-l-primary',
+  neutral: 'border-s-neutral',
+  info: 'border-s-neutral', // alias to neutral to preserve primary blue strictly for interactive controls
+  success: 'border-s-success',
+  warning: 'border-s-warning',
+  error: 'border-s-error',
+  loading: 'border-s-primary',
 };
 
 const iconMap: Record<string, { name: string; color: string }> = {
@@ -65,7 +65,7 @@ const ToastComponent: React.FC<ToastProps> = ({
       <BaseToast.Root
         toast={toastObj}
         className={cn(
-          'relative flex items-start gap-3 p-4 pl-5 rounded-l-none rounded-r-default bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+          'relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-s-4 border-t-0 border-e-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
           accentBorder[type] || accentBorder.info,
           className
         )}
@@ -77,7 +77,7 @@ const ToastComponent: React.FC<ToastProps> = ({
             className={cn('shrink-0 mt-0.5 select-none', currentIcon.color)}
             aria-hidden="true"
           />
-          <div className="flex-1 min-w-0 pr-1">
+          <div className="flex-1 min-w-0 pe-1">
             <BaseToast.Title className="font-heading text-sm font-bold text-on-surface leading-snug">
               {title}
             </BaseToast.Title>
@@ -90,7 +90,7 @@ const ToastComponent: React.FC<ToastProps> = ({
           {onClose && (
             <BaseToast.Close
               onClick={onClose}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
               aria-label="Dismiss toast"
             >
               <Icon name="close" size="sm" aria-hidden="true" />
@@ -322,28 +322,28 @@ const ActiveToastItem: React.FC<{
   // Exact Base UI Tailwind stacked deck tokens & calculations
   const bottomDeckClasses = cn(
     '[--gap:0.75rem] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.05)))] [--shrink:calc(1-var(--scale))] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))]',
-    'absolute right-0 bottom-0 left-auto z-[calc(1000-var(--toast-index))] mr-0 w-full origin-bottom',
+    'absolute end-0 bottom-0 start-auto z-[calc(1000-var(--toast-index))] me-0 w-full origin-bottom',
     '[transform:translateX(var(--toast-swipe-movement-x,0px))_translateY(calc(var(--toast-swipe-movement-y,0px)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))]',
     'data-[expanded]:[transform:translateX(var(--toast-swipe-movement-x,0px))_translateY(calc(var(--offset-y)))]',
     'h-[var(--height)] data-[expanded]:h-[var(--toast-height)]',
-    'after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[\'\']',
+    'after:absolute after:top-full after:start-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[\'\']',
     'data-[starting-style]:[transform:translateY(150%)]',
     '[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(150%)]'
   );
 
   const topDeckClasses = cn(
     '[--gap:0.75rem] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.05)))] [--shrink:calc(1-var(--scale))] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)+calc(var(--toast-index)*var(--gap))+var(--toast-swipe-movement-y))]',
-    'absolute right-0 top-0 left-auto z-[calc(1000-var(--toast-index))] mr-0 w-full origin-top',
+    'absolute end-0 top-0 start-auto z-[calc(1000-var(--toast-index))] me-0 w-full origin-top',
     '[transform:translateX(var(--toast-swipe-movement-x,0px))_translateY(calc(var(--toast-swipe-movement-y,0px)+(var(--toast-index)*var(--peek))+(var(--shrink)*var(--height))))_scale(var(--scale))]',
     'data-[expanded]:[transform:translateX(var(--toast-swipe-movement-x,0px))_translateY(calc(var(--offset-y)))]',
     'h-[var(--height)] data-[expanded]:h-[var(--toast-height)]',
-    'after:absolute after:bottom-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[\'\']',
+    'after:absolute after:bottom-full after:start-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-[\'\']',
     'data-[starting-style]:[transform:translateY(-150%)]',
     '[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(-150%)]'
   );
 
   const commonDeckClasses = cn(
-    'pointer-events-auto flex items-start gap-3 p-4 pl-5 rounded-l-none rounded-r-default bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
+    'pointer-events-auto flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-s-4 border-t-0 border-e-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
     accentBorder[toastType] || accentBorder.info,
     // Smooth transition matching Base UI specification
     '[transition:transform_0.5s_cubic-bezier(0.22,1,0.36,1),opacity_0.5s,height_0.15s,box-shadow_0.2s]',
@@ -360,7 +360,7 @@ const ActiveToastItem: React.FC<{
     'data-[expanded]:data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x,0px)+150%))_translateY(var(--offset-y))]',
     'data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)-150%))]',
     'data-[expanded]:data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)-150%))]',
-    'motion-reduce:transition-none motion-reduce:transform-none'
+    'motion-reduce:transition-none'
   );
 
   const toastCardContent = (
@@ -370,7 +370,7 @@ const ActiveToastItem: React.FC<{
       className={
         isAnchored
           ? cn(
-              'pointer-events-auto relative flex items-start gap-3 p-4 pl-5 rounded-l-none rounded-r-default bg-surface border-l-4 border-t-0 border-r-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
+              'pointer-events-auto relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-s-4 border-t-0 border-e-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
               accentBorder[toastType] || accentBorder.info
             )
           : cn(commonDeckClasses, isTopPosition ? topDeckClasses : bottomDeckClasses)
@@ -391,7 +391,7 @@ const ActiveToastItem: React.FC<{
         />
 
         {/* Toast Body */}
-        <div className="flex-1 min-w-0 pr-1">
+        <div className="flex-1 min-w-0 pe-1">
           {t.title && (
             <BaseToast.Title className="font-heading text-sm font-bold text-on-surface leading-snug">
               {t.title}
@@ -412,7 +412,7 @@ const ActiveToastItem: React.FC<{
 
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close
-          className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -mr-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+          className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
           aria-label="Dismiss toast"
         >
           <Icon name="close" size="sm" aria-hidden="true" />
@@ -434,7 +434,11 @@ const ActiveToastItem: React.FC<{
         className="z-[60] pointer-events-auto"
       >
         {toastCardContent}
-        <BaseToast.Arrow className="fill-surface stroke-outline-variant drop-shadow-sm" />
+        <BaseToast.Arrow className="data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 drop-shadow-sm">
+          <svg width="10" height="5" viewBox="0 0 10 5" className="block fill-surface stroke-outline-variant" aria-hidden="true">
+            <path d="M0 5 L5 0 L10 5" />
+          </svg>
+        </BaseToast.Arrow>
       </BaseToast.Positioner>
     );
   }
@@ -483,7 +487,7 @@ const ToasterViewportContent: React.FC<{
         )}
       >
         {toasts.map((t) => (
-          <ActiveToastItem key={`${t.id}-${t.updateKey ?? 0}`} toast={t} position={position} />
+          <ActiveToastItem key={t.id} toast={t} position={position} />
         ))}
       </BaseToast.Viewport>
     </BaseToast.Portal>

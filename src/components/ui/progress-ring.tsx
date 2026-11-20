@@ -74,9 +74,18 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
     const radius = (dimension - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
 
-    const isIndeterminate = value === null || value === undefined;
-    const clampedValue = isIndeterminate ? 0 : Math.min(max, Math.max(min, value));
-    const percentage = isIndeterminate ? 0 : ((clampedValue - min) / (max - min)) * 100;
+    const isIndeterminate =
+      value === null || value === undefined || !Number.isFinite(value);
+    const range = max - min;
+    const clampedValue = isIndeterminate
+      ? 0
+      : range <= 0
+        ? min
+        : Math.min(max, Math.max(min, value));
+    const percentage =
+      isIndeterminate || range <= 0
+        ? 0
+        : Math.min(100, Math.max(0, ((clampedValue - min) / range) * 100));
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
     const colors = colorStyles[color] || colorStyles.primary;

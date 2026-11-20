@@ -52,9 +52,48 @@ declare global {
   }
 }
 
+const URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href', 'formaction', 'action', 'cite', 'poster']);
+const ALLOWED_URL_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+const SAFE_DATA_IMAGE_RE = /^data:image\/(?:png|jpeg|jpg|gif|webp);base64,[a-z0-9+/=]+$/i;
+
+function stripControlsAndWhitespace(rawValue: string): string {
+  let out = '';
+  for (let i = 0; i < rawValue.length; i++) {
+    const code = rawValue.charCodeAt(i);
+    if (code <= 0x20 || code === 0x7f || /\s/.test(rawValue[i])) continue;
+    out += rawValue[i];
+  }
+  return out;
+}
+
+function isDangerousUrl(rawValue: string): boolean {
+  const normalized = stripControlsAndWhitespace(rawValue);
+  if (!normalized) return false;
+  if (normalized.startsWith('//')) return true;
+
+  if (
+    normalized.startsWith('/') ||
+    normalized.startsWith('./') ||
+    normalized.startsWith('../') ||
+    normalized.startsWith('#') ||
+    normalized.startsWith('?')
+  ) {
+    return false;
+  }
+
+  const beforeDelimiter = normalized.split(/[/?#]/, 1)[0];
+  const colonIdx = beforeDelimiter.indexOf(':');
+  if (colonIdx === -1) return false;
+
+  const scheme = beforeDelimiter.slice(0, colonIdx + 1).toLowerCase();
+  if (ALLOWED_URL_SCHEMES.has(scheme)) return false;
+  if (scheme === 'data:' && SAFE_DATA_IMAGE_RE.test(normalized)) return false;
+  return true;
+}
+
 /**
  * Fallback sanitizer for environments where Element.setHTML() is not yet supported.
- * Strips active scripting elements, inline event handlers, and javascript: protocols.
+ * Strips active scripting elements, inline event handlers, and unsafe URL protocols.
  */
 function fallbackSanitize(html: string, config: SanitizeConfig = {}): string {
   if (typeof window === 'undefined') {
@@ -75,14 +114,15 @@ function fallbackSanitize(html: string, config: SanitizeConfig = {}): string {
         const el = child as HTMLElement;
         const tagName = el.tagName.toLowerCase();
 
-        // Strip dangerous script, iframe, and object tags unconditionally
+        // Strip dangerous script, style, iframe, and embedded plugin tags unconditionally
         if (tagName === 'script' || tagName === 'style' || tagName === 'iframe' || tagName === 'object' || tagName === 'embed') {
           node.removeChild(el);
           continue;
         }
 
         if (replaceChildren.has(tagName)) {
-          // Replace tag with its children
+          // Sanitize descendants first so disallowed child elements inside wrappers are stripped before hoisting
+          cleanNode(el);
           while (el.firstChild) {
             node.insertBefore(el.firstChild, el);
           }
@@ -91,35 +131,28 @@ function fallbackSanitize(html: string, config: SanitizeConfig = {}): string {
         }
 
         if (!allowedTags.has(tagName)) {
-          // Strip disallowed tag and its children
           node.removeChild(el);
           continue;
         }
 
-        // Filter attributes
         const attrs = Array.from(el.attributes);
         for (const attr of attrs) {
           const attrName = attr.name.toLowerCase();
-          const attrValue = attr.value.trim().toLowerCase();
 
-          // Reject any inline on* handler or dangerous protocol
           if (
             attrName.startsWith('on') ||
-            attrValue.startsWith('javascript:') ||
-            attrValue.startsWith('vbscript:') ||
-            attrValue.startsWith('data:text/html')
+            !allowedAttrs.has(attrName) ||
+            (URL_ATTRIBUTES.has(attrName) && isDangerousUrl(attr.value))
           ) {
-            el.removeAttribute(attr.name);
-            continue;
-          }
-
-          if (!allowedAttrs.has(attrName)) {
             el.removeAttribute(attr.name);
           }
         }
 
-        // Recurse down children
         cleanNode(el);
+
+        if (tagName === 'template' && 'content' in el) {
+          cleanNode((el as HTMLTemplateElement).content);
+        }
       }
     }
   }
@@ -137,16 +170,21 @@ export function safeSetHtml(
   untrustedHtml: string,
   config: SanitizeConfig = {}
 ): void {
-  const elements = config.elements || DEFAULT_ALLOWED_ELEMENTS;
+  const rawElements = config.elements || DEFAULT_ALLOWED_ELEMENTS;
   const attributes = config.attributes || DEFAULT_ALLOWED_ATTRIBUTES;
+  const replaceList = config.replaceWithChildrenElements;
+  const replaceSet = replaceList ? new Set(replaceList.map((t) => t.toLowerCase())) : null;
+  const elements = replaceSet
+    ? rawElements.filter((t) => !replaceSet.has(t.toLowerCase()))
+    : rawElements;
 
-  if (typeof element.setHTML === 'function') {
+  if ('setHTML' in Element.prototype && typeof element.setHTML === 'function') {
     try {
       element.setHTML(untrustedHtml, {
         sanitizer: {
           elements,
           attributes,
-          replaceWithChildrenElements: config.replaceWithChildrenElements,
+          replaceWithChildrenElements: replaceList,
         },
       });
       return;

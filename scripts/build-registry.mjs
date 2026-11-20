@@ -11,6 +11,7 @@ const fs = {
 };
 
 const UI_DIR = path.resolve('src/components/ui');
+const BLOCKS_DIR = path.resolve('src/components/blocks');
 const LIB_DIR = path.resolve('src/lib');
 const OUT_DIR = path.resolve('public/r');
 const REGISTRY_INDEX = path.resolve('public/r/index.json');
@@ -25,6 +26,49 @@ const formatRegistryDep = (dep) =>
   dep.startsWith('@') || dep.startsWith('http')
     ? dep
     : `https://seany9915.github.io/eolas-ui/r/${dep}.json`;
+
+const NPM_PACKAGE_DETECTORS = [
+  ['thinking-orbs', /from\s+['"]thinking-orbs['"]/],
+  ['bot-avatars', /from\s+['"]bot-avatars['"]/],
+  ['embla-carousel-react', /from\s+['"]embla-carousel-react['"]/],
+  ['recharts', /from\s+['"]recharts['"]/],
+  ['react-resizable-panels', /from\s+['"]react-resizable-panels['"]/],
+  ['cmdk', /from\s+['"]cmdk['"]/],
+  ['react-day-picker', /from\s+['"]react-day-picker['"]/],
+  ['@dnd-kit/react', /from\s+['"]@dnd-kit\/react(?:\/[^'"]+)?['"]/],
+  ['@dnd-kit/helpers', /from\s+['"]@dnd-kit\/helpers['"]/],
+  ['@tanstack/react-table', /from\s+['"]@tanstack\/react-table['"]/],
+];
+
+function detectNpmDeps(content, includeBase = true) {
+  const deps = new Set(includeBase ? ['@base-ui/react', 'clsx', 'tailwind-merge'] : []);
+  for (const [pkg, pattern] of NPM_PACKAGE_DETECTORS) {
+    if (pattern.test(content)) {
+      deps.add(pkg);
+    }
+  }
+  return Array.from(deps);
+}
+
+function detectLibFiles(content, excludeName = 'utils') {
+  const seen = new Set();
+  const libFiles = [];
+  for (const match of content.matchAll(/from\s+['"]@\/lib\/([^'"]+)['"]/g)) {
+    const libName = match[1];
+    if (!libName || libName === 'utils' || libName === excludeName || seen.has(libName)) continue;
+    const libPath = path.join(LIB_DIR, `${libName}.ts`);
+    if (fs.existsSync(libPath)) {
+      seen.add(libName);
+      libFiles.push({
+        path: `lib/${libName}.ts`,
+        content: fs.readFileSync(libPath, 'utf8'),
+        type: 'registry:lib',
+        target: `@lib/${libName}.ts`,
+      });
+    }
+  }
+  return libFiles;
+}
 
 function parseComponentDoc(content, name) {
   const humanTitle = name
@@ -75,10 +119,14 @@ function parseComponentDoc(content, name) {
   };
 }
 
-// 1. Scan src/components/ui for all .tsx files
-const files = fs.readdirSync(UI_DIR).filter((f) => f.endsWith('.tsx'));
-
-console.log(`Found ${files.length} UI files to catalog.`);
+function pruneStaleJsonFiles(dir, expectedNames) {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of fs.readdirSync(dir)) {
+    if (entry.endsWith('.json') && !expectedNames.has(entry)) {
+      fs.rmSync(path.join(dir, entry), { force: true });
+    }
+  }
+}
 
 const registryItems = [];
 
@@ -90,7 +138,7 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
     name: 'utils',
     type: 'registry:lib',
     title: 'Eolas UI Utilities',
-    description: 'Core utility library exporting cn() class merger, assetUrl() resolver, and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
+    description: 'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
     dependencies: ['clsx', 'tailwind-merge', '@base-ui/react'],
     files: [
       {
@@ -111,6 +159,42 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
   });
 }
 
+// Standalone publishable library utilities
+const STANDALONE_LIBS = ['sanitize', 'scheduler', 'built-in-ai', 'scroll-completion', 'format-duration'];
+for (const libName of STANDALONE_LIBS) {
+  const libPath = path.join(LIB_DIR, `${libName}.ts`);
+  if (!fs.existsSync(libPath)) continue;
+  const libContent = fs.readFileSync(libPath, 'utf8');
+  const docMeta = parseComponentDoc(libContent, libName);
+  const npmDeps = detectNpmDeps(libContent, false);
+  const extraLibFiles = detectLibFiles(libContent, libName);
+  const item = {
+    $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+    name: libName,
+    type: 'registry:lib',
+    title: docMeta.title,
+    description: docMeta.description,
+    ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
+    files: [
+      {
+        path: `lib/${libName}.ts`,
+        content: libContent,
+        type: 'registry:lib',
+        target: `@lib/${libName}.ts`,
+      },
+      ...extraLibFiles,
+    ],
+  };
+  fs.writeFileSync(path.join(OUT_DIR, `${libName}.json`), JSON.stringify(item, null, 2));
+  registryItems.push({
+    name: libName,
+    type: 'registry:lib',
+    title: item.title,
+    description: item.description,
+    ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
+  });
+}
+
 // Eolas Theme item (theme.json)
 const GLOBALS_CSS = path.resolve('src/globals.css');
 if (fs.existsSync(GLOBALS_CSS)) {
@@ -120,7 +204,8 @@ if (fs.existsSync(GLOBALS_CSS)) {
     name: 'theme',
     type: 'registry:file',
     title: 'Eolas UI Clinical Theme',
-    description: 'Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, and motion tokens conforming to DESIGN.md',
+    description: 'Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md',
+    docs: 'Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined. Toggle dark mode by adding class="dark" to <html>.',
     files: [
       {
         path: 'styles/globals.css',
@@ -168,61 +253,42 @@ if (hasDesignMd) {
   });
 }
 
-// Eolas Agent Rules & Anti-Pattern Checker (agent-rules.json)
-const CORE_CONTRACT = path.resolve('.agents/rules/00-core-contract.md');
-const ANTI_PATTERNS = path.resolve('.agents/rules/anti-patterns.md');
-const COMPONENT_LIB = path.resolve('.agents/rules/component-library.md');
-const DESIGN_SYSTEM = path.resolve('.agents/rules/design-system.md');
-const CHECK_SCRIPT = path.resolve('.agents/scripts/check-anti-patterns.mjs');
+// Eolas Agent Rules, Hooks & Enforcement Scripts (agent-rules.json)
+const AGENT_RULE_SOURCES = [
+  { src: '.agents/rules/00-core-contract.md', regPath: 'rules/00-core-contract.md', target: '~/.agents/rules/00-core-contract.md', required: true },
+  { src: '.agents/rules/anti-patterns.md', regPath: 'rules/anti-patterns.md', target: '~/.agents/rules/anti-patterns.md', required: true },
+  { src: '.agents/rules/component-library.md', regPath: 'rules/component-library.md', target: '~/.agents/rules/component-library.md', required: false },
+  { src: '.agents/rules/design-system.md', regPath: 'rules/design-system.md', target: '~/.agents/rules/design-system.md', required: false },
+  { src: '.agents/hooks.json', regPath: 'hooks.json', target: '~/.agents/hooks.json', required: false },
+  { src: '.agents/scripts/check-anti-patterns.mjs', regPath: 'scripts/check-anti-patterns.mjs', target: '~/.agents/scripts/check-anti-patterns.mjs', required: true },
+  { src: '.agents/scripts/check-primitive-inventory.mjs', regPath: 'scripts/check-primitive-inventory.mjs', target: '~/.agents/scripts/check-primitive-inventory.mjs', required: false },
+  { src: '.agents/scripts/check-secrets.mjs', regPath: 'scripts/check-secrets.mjs', target: '~/.agents/scripts/check-secrets.mjs', required: false },
+  { src: '.agents/scripts/pre-invocation-reminder.mjs', regPath: 'scripts/pre-invocation-reminder.mjs', target: '~/.agents/scripts/pre-invocation-reminder.mjs', required: false },
+  { src: 'AGENTS.md', regPath: 'AGENTS.md', target: '~/AGENTS.md', required: false },
+];
 
-if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSync(CHECK_SCRIPT)) {
+const hasRequiredAgentSources = AGENT_RULE_SOURCES
+  .filter((entry) => entry.required)
+  .every((entry) => fs.existsSync(path.resolve(entry.src)));
+
+if (hasRequiredAgentSources) {
+  const agentFiles = AGENT_RULE_SOURCES
+    .filter((entry) => fs.existsSync(path.resolve(entry.src)))
+    .map((entry) => ({
+      path: entry.regPath,
+      content: fs.readFileSync(path.resolve(entry.src), 'utf8'),
+      type: 'registry:file',
+      target: entry.target,
+    }));
+
   const agentRulesItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: 'agent-rules',
     type: 'registry:file',
     title: 'Eolas UI Agent Rules & Anti-Pattern Checker',
-    description: 'Strict architectural contracts, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers',
+    description: 'Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers',
     ...(hasDesignMd ? { registryDependencies: [formatRegistryDep('design-md')] } : {}),
-    files: [
-      {
-        path: 'rules/00-core-contract.md',
-        content: fs.readFileSync(CORE_CONTRACT, 'utf8'),
-        type: 'registry:file',
-        target: '~/.agents/rules/00-core-contract.md',
-      },
-      {
-        path: 'rules/anti-patterns.md',
-        content: fs.readFileSync(ANTI_PATTERNS, 'utf8'),
-        type: 'registry:file',
-        target: '~/.agents/rules/anti-patterns.md',
-      },
-      ...(fs.existsSync(COMPONENT_LIB)
-        ? [
-            {
-              path: 'rules/component-library.md',
-              content: fs.readFileSync(COMPONENT_LIB, 'utf8'),
-              type: 'registry:file',
-              target: '~/.agents/rules/component-library.md',
-            },
-          ]
-        : []),
-      ...(fs.existsSync(DESIGN_SYSTEM)
-        ? [
-            {
-              path: 'rules/design-system.md',
-              content: fs.readFileSync(DESIGN_SYSTEM, 'utf8'),
-              type: 'registry:file',
-              target: '~/.agents/rules/design-system.md',
-            },
-          ]
-        : []),
-      {
-        path: 'scripts/check-anti-patterns.mjs',
-        content: fs.readFileSync(CHECK_SCRIPT, 'utf8'),
-        type: 'registry:file',
-        target: '~/.agents/scripts/check-anti-patterns.mjs',
-      },
-    ],
+    files: agentFiles,
   };
   fs.writeFileSync(path.join(OUT_DIR, 'agent-rules.json'), JSON.stringify(agentRulesItem, null, 2));
   registryItems.push({
@@ -230,6 +296,7 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
     type: 'registry:file',
     title: agentRulesItem.title,
     description: agentRulesItem.description,
+    ...(agentRulesItem.registryDependencies ? { registryDependencies: agentRulesItem.registryDependencies } : {}),
   });
 } else {
   // `.agents/` is gitignored, so it is absent in worktrees and fresh clones: keep the committed item instead of dropping it.
@@ -242,23 +309,28 @@ if (fs.existsSync(CORE_CONTRACT) && fs.existsSync(ANTI_PATTERNS) && fs.existsSyn
       type: 'registry:file',
       title: existing.title,
       description: existing.description,
+      ...(existing.registryDependencies ? { registryDependencies: existing.registryDependencies } : {}),
     });
   }
 }
 
 // Eolas Lint preset item (lint.json)
-const LINT_INDEX = path.resolve('packages/eolas-ui/lint/index.js');
+const LINT_INDEX = path.resolve('packages/eolas-ui/lint/index.mjs');
 const LINT_OXLINT_CONFIG = path.resolve('packages/eolas-ui/lint/oxlintrc.json');
+const LINT_CONSUMER_OXLINT = path.resolve('packages/eolas-ui/lint/consumer.oxlintrc.json');
 if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
   const lintContent = fs.readFileSync(LINT_INDEX, 'utf8');
   const baseConfig = JSON.parse(fs.readFileSync(LINT_OXLINT_CONFIG, 'utf8'));
   const oxlintConfig = {
     $schema: './node_modules/oxlint/configuration_schema.json',
     ...baseConfig,
-    jsPlugins: (baseConfig.jsPlugins ?? []).map((entry) => (entry === './index.js' ? './lint/index.js' : entry)),
+    jsPlugins: (baseConfig.jsPlugins ?? []).map((entry) =>
+      entry === './index.mjs' || entry === './index.js' ? './lint/index.mjs' : entry
+    ),
     ignorePatterns: ['dist/**', 'public/**', 'node_modules/**', '.agents/**', 'lint/**'],
   };
   const oxlintConfigContent = `${JSON.stringify(oxlintConfig, null, 2)}\n`;
+  fs.writeFileSync(LINT_CONSUMER_OXLINT, oxlintConfigContent);
 
   const lintItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -272,13 +344,13 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
     ],
     files: [
       {
-        path: 'lint/index.js',
+        path: 'lint/index.mjs',
         content: lintContent,
         type: 'registry:file',
-        target: '~/lint/index.js',
+        target: '~/lint/index.mjs',
       },
       {
-        path: '.oxlintrc.json',
+        path: 'lint/consumer.oxlintrc.json',
         content: oxlintConfigContent,
         type: 'registry:file',
         target: '~/.oxlintrc.json',
@@ -295,6 +367,10 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
   });
 }
 
+// 1. Scan src/components/ui for all .tsx files
+const files = fs.readdirSync(UI_DIR).filter((f) => f.endsWith('.tsx'));
+console.log(`Found ${files.length} UI files to catalog.`);
+
 for (const file of files) {
   const name = file.replace('.tsx', '');
   const content = fs.readFileSync(path.join(UI_DIR, file), 'utf8');
@@ -310,52 +386,8 @@ for (const file of files) {
     }
   }
 
-  // Detect npm packages needed
-  const npmDeps = ['@base-ui/react', 'clsx', 'tailwind-merge'];
-  if (content.includes("from 'thinking-orbs'")) {
-    npmDeps.push('thinking-orbs');
-  }
-  if (content.includes("from 'bot-avatars'")) {
-    npmDeps.push('bot-avatars');
-  }
-  if (content.includes("from 'embla-carousel-react'") || content.includes('from "embla-carousel-react"')) {
-    npmDeps.push('embla-carousel-react');
-  }
-  if (content.includes("from 'recharts'") || content.includes('from "recharts"')) {
-    npmDeps.push('recharts');
-  }
-  if (content.includes("from 'react-resizable-panels'") || content.includes('from "react-resizable-panels"')) {
-    npmDeps.push('react-resizable-panels');
-  }
-  if (content.includes("from 'cmdk'") || content.includes('from "cmdk"')) {
-    npmDeps.push('cmdk');
-  }
-  if (content.includes("from 'react-day-picker'") || content.includes('from "react-day-picker"')) {
-    npmDeps.push('react-day-picker');
-  }
-  if (content.includes("from '@dnd-kit/react'") || content.includes("from '@dnd-kit/react/sortable'") || content.includes('from "@dnd-kit/react')) {
-    npmDeps.push('@dnd-kit/react');
-  }
-  if (content.includes("from '@dnd-kit/helpers'") || content.includes('from "@dnd-kit/helpers"')) {
-    npmDeps.push('@dnd-kit/helpers');
-  }
-
-  // Bundle helper modules from src/lib (other than utils, which is its own item)
-  const libFiles = [];
-  const libRegex = /from\s+['"]@\/lib\/([^'"]+)['"]/g;
-  let lm;
-  while ((lm = libRegex.exec(content)) !== null) {
-    const libName = lm[1];
-    const libPath = path.join(LIB_DIR, `${libName}.ts`);
-    if (libName !== 'utils' && fs.existsSync(libPath)) {
-      libFiles.push({
-        path: `lib/${libName}.ts`,
-        content: fs.readFileSync(libPath, 'utf8'),
-        type: 'registry:lib',
-        target: `@lib/${libName}.ts`,
-      });
-    }
-  }
+  const npmDeps = detectNpmDeps(content, true);
+  const libFiles = detectLibFiles(content);
 
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -390,8 +422,7 @@ for (const file of files) {
   });
 }
 
-// Scan src/components/blocks for all .tsx files
-const BLOCKS_DIR = path.resolve('src/components/blocks');
+// 2. Scan src/components/blocks for all .tsx files
 if (fs.existsSync(BLOCKS_DIR)) {
   const blockFiles = fs.readdirSync(BLOCKS_DIR).filter((f) => f.endsWith('.tsx'));
   console.log(`Found ${blockFiles.length} composite block files to catalog.`);
@@ -412,13 +443,8 @@ if (fs.existsSync(BLOCKS_DIR)) {
       }
     }
 
-    const npmDeps = ['@base-ui/react', 'clsx', 'tailwind-merge'];
-    if (content.includes("from '@tanstack/react-table'") || content.includes('from "@tanstack/react-table"')) {
-      npmDeps.push('@tanstack/react-table');
-    }
-    if (content.includes("from 'recharts'") || content.includes('from "recharts"')) {
-      npmDeps.push('recharts');
-    }
+    const npmDeps = detectNpmDeps(content, true);
+    const libFiles = detectLibFiles(content);
 
     const item = {
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -435,6 +461,7 @@ if (fs.existsSync(BLOCKS_DIR)) {
           type: 'registry:block',
           target: `@components/blocks/${file}`,
         },
+        ...libFiles,
       ],
       ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
       ...(docMeta.docs ? { docs: docMeta.docs } : {}),
@@ -453,6 +480,14 @@ if (fs.existsSync(BLOCKS_DIR)) {
   }
 }
 
+// Prune stale item JSONs before writing index and catalog
+const expectedJsonNames = new Set([
+  'index.json',
+  'registry.json',
+  ...registryItems.map((item) => `${item.name}.json`),
+]);
+pruneStaleJsonFiles(OUT_DIR, expectedJsonNames);
+
 // Master index (legacy shadcn / CLI array format)
 fs.writeFileSync(REGISTRY_INDEX, JSON.stringify(registryItems, null, 2));
 
@@ -467,6 +502,28 @@ fs.writeFileSync(REGISTRY_CATALOG, JSON.stringify(registryCatalog, null, 2));
 
 // Generate modular source registries and root registry.json
 const ROOT_REGISTRY = path.resolve('registry.json');
+function mapRegistryFilePathToRepoSource(regFilePath) {
+  if (regFilePath.startsWith('ui/') || regFilePath.startsWith('blocks/')) {
+    return `src/components/${regFilePath}`;
+  }
+  if (regFilePath.startsWith('lib/')) {
+    return `src/${regFilePath}`;
+  }
+  if (regFilePath.startsWith('styles/')) {
+    return 'src/globals.css';
+  }
+  if (regFilePath === 'hooks.json') {
+    return '.agents/hooks.json';
+  }
+  if (regFilePath.startsWith('rules/') || regFilePath.startsWith('scripts/')) {
+    return `.agents/${regFilePath}`;
+  }
+  if (regFilePath.startsWith('lint/')) {
+    return `packages/eolas-ui/${regFilePath}`;
+  }
+  return regFilePath;
+}
+
 const rootItems = registryItems.map((item) => {
   const itemFile = path.join(OUT_DIR, `${item.name}.json`);
   if (!fs.existsSync(itemFile)) return item;
@@ -480,21 +537,7 @@ const rootItems = registryItems.map((item) => {
     devDependencies: fullItem.devDependencies,
     registryDependencies: fullItem.registryDependencies,
     files: (fullItem.files || []).map((f) => ({
-      path: f.path.startsWith('ui/')
-        ? `src/components/${f.path}`
-        : f.path.startsWith('blocks/')
-          ? `src/components/${f.path}`
-          : f.path.startsWith('lib/')
-            ? `src/${f.path}`
-            : f.path.startsWith('styles/')
-              ? `src/globals.css`
-              : f.path.startsWith('rules/')
-                ? `.agents/${f.path}`
-                : f.path.startsWith('scripts/')
-                  ? `.agents/${f.path}`
-                  : f.path.startsWith('lint/')
-                    ? `packages/eolas-ui/${f.path}`
-                    : f.path,
+      path: mapRegistryFilePathToRepoSource(f.path),
       type: f.type,
       target: f.target,
     })),
@@ -508,8 +551,6 @@ const isInsideDir = (dir, filePath) => {
 };
 
 // 1. Modular UI Primitives Registry (src/components/ui/registry.json)
-// shadcn CLI rejects `..` parent traversal inside sub-registries, so multi-directory UI items
-// (that bundle src/lib/* helpers) are declared in the root registry.json instead.
 const UI_REGISTRY_DIR = path.resolve('src/components/ui');
 const uiLocalNames = new Set();
 const uiRegistryItems = rootItems
@@ -539,16 +580,15 @@ fs.writeFileSync(
 );
 
 // 2. Modular Composite Blocks Registry (src/components/blocks/registry.json)
-const BLOCKS_REGISTRY_DIR = path.resolve('src/components/blocks');
 const blockLocalNames = new Set();
 const blockRegistryItems = rootItems
-  .filter((i) => i.type === 'registry:block' && i.files.every((f) => isInsideDir(BLOCKS_REGISTRY_DIR, f.path)))
+  .filter((i) => i.type === 'registry:block' && i.files.every((f) => isInsideDir(BLOCKS_DIR, f.path)))
   .map((item) => {
     blockLocalNames.add(item.name);
     return {
       ...item,
       files: item.files.map((f) => ({
-        path: path.relative(BLOCKS_REGISTRY_DIR, path.resolve(f.path)).replace(/\\/g, '/'),
+        path: path.relative(BLOCKS_DIR, path.resolve(f.path)).replace(/\\/g, '/'),
         type: f.type,
         target: f.target,
       })),
@@ -584,6 +624,7 @@ fs.writeFileSync(ROOT_REGISTRY, JSON.stringify(rootCatalog, null, 2));
 if (!fs.existsSync(PKG_REGISTRY)) {
   fs.mkdirSync(PKG_REGISTRY, { recursive: true });
 }
+pruneStaleJsonFiles(PKG_REGISTRY, expectedJsonNames);
 for (const item of registryItems) {
   const itemData = fs.readFileSync(path.join(OUT_DIR, `${item.name}.json`), 'utf8');
   fs.writeFileSync(path.join(PKG_REGISTRY, `${item.name}.json`), itemData);

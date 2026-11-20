@@ -95,7 +95,7 @@ export const BreadcrumbSeparator = ({
     className={cn('text-outline opacity-60 flex items-center select-none', className)}
     {...props}
   >
-    {children ?? <Icon name="chevron_right" size="sm" className="text-base" />}
+    {children ?? <Icon name="chevron_right" size="sm" directional className="text-base" />}
   </li>
 );
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';

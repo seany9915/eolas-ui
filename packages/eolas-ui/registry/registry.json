@@ -7,7 +7,7 @@
       "name": "utils",
       "type": "registry:lib",
       "title": "Eolas UI Utilities",
-      "description": "Core utility library exporting cn() class merger, assetUrl() resolver, and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
       "dependencies": [
         "clsx",
         "tailwind-merge",
@@ -15,10 +15,40 @@
       ]
     },
     {
+      "name": "sanitize",
+      "type": "registry:lib",
+      "title": "Sanitize",
+      "description": "Untrusted HTML Sanitizer Utility & React Component. Platform Reference: Modern Web Guidance (MWG: sanitize-untrusted-html) Safely parses and renders user- or API-supplied HTML content (such as clinical consultation notes, discharge summaries, or formatted audit results) by leveraging the native browser Sanitizer API (Chrome 146+, Edge 146+, Firefox 148+) with a secure DOMParser-based fallback for cross-browser safety."
+    },
+    {
+      "name": "scheduler",
+      "type": "registry:lib",
+      "title": "Scheduler",
+      "description": "Cooperative Task Scheduling & Yielding Utilities. Platform Reference: Modern Web Guidance (MWG: schedule-tasks-by-priority, Web Features: Scheduler API) Provides cooperative yielding to keep the browser main thread and compositor responsive (<50ms Interaction to Next Paint / INP) during heavy data table sorting, large medical record filtering, and client-side processing tasks."
+    },
+    {
+      "name": "built-in-ai",
+      "type": "registry:lib",
+      "title": "Built In Ai",
+      "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator). Platform Reference: Modern Web Guidance (MWG: language-model, language-detection, summarizer, translator) Provides strongly-typed React hooks leveraging Chrome & Edge on-device Gemini Nano / Phi models (Chrome 138+) with graceful fallback strategies."
+    },
+    {
+      "name": "scroll-completion",
+      "type": "registry:lib",
+      "title": "Scroll Completion",
+      "description": "Programmatic scroll completion utilities. Platform Reference: Modern Web Guidance (MWG: scroll-completion-effects) Awaits the native Promise returned by `scrollIntoView()` / `scrollTo()` when supported, and falls back to `scrollend` with an idle-scroll timer on browsers where scroll methods return `undefined`. Prevents premature focus shifts or post-scroll highlights mid-animation."
+    },
+    {
+      "name": "format-duration",
+      "type": "registry:lib",
+      "title": "Format Duration",
+      "description": "Duration Formatting Utility and Hook Platform Reference: Modern Web Guidance (MWG: format-human-readable-durations) Localizes time durations (e.g. clinical appointment lengths, exercise intervals, rehabilitation timers) using the standard `Intl.DurationFormat` API (Baseline Newly Available since March 2025 across Chrome 129+, Edge 129+, Firefox 136+, and Safari 16.4+). Provides a seamless fallback for older runtimes that manual-constructs localized plural strings."
+    },
+    {
       "name": "theme",
       "type": "registry:file",
       "title": "Eolas UI Clinical Theme",
-      "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, and motion tokens conforming to DESIGN.md"
+      "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md"
     },
     {
       "name": "design-md",
@@ -30,7 +60,10 @@
       "name": "agent-rules",
       "type": "registry:file",
       "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
-      "description": "Strict architectural contracts, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers"
+      "description": "Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers",
+      "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/design-md.json"
+      ]
     },
     {
       "name": "lint",
@@ -291,6 +324,7 @@
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/direction-provider.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "meta": {
@@ -2342,7 +2376,8 @@
         "https://seany9915.github.io/eolas-ui/r/card.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
         "https://seany9915.github.io/eolas-ui/r/skeleton.json",
-        "https://seany9915.github.io/eolas-ui/r/empty.json"
+        "https://seany9915.github.io/eolas-ui/r/empty.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ]
     },
     {

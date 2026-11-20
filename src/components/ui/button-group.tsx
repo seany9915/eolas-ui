@@ -41,8 +41,8 @@ export const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupProps
               ? [
                   'flex-row -space-x-px',
                   // Horizontal fused edges: collapse inner corners while preserving outer radius
-                  '[&>*:not(:first-child)]:rounded-l-none',
-                  '[&>*:not(:last-child)]:rounded-r-none',
+                  '[&>*:not(:first-child)]:rounded-s-none',
+                  '[&>*:not(:last-child)]:rounded-e-none',
                 ]
               : [
                   'flex-col -space-y-px',

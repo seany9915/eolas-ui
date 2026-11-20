@@ -82,12 +82,13 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
         {...props}
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
           className="aspect-auto h-full w-full"
         >
           <RadarChart
+            aria-label={chartLabel ?? title}
             data={data}
             outerRadius="70%"
             margin={{ top: 16, right: 24, bottom: 16, left: 24 }}

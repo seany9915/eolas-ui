@@ -86,12 +86,16 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
         {...props}
       >
         <ChartContainer
-          role="img"
+          role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
           className="aspect-auto h-full w-full"
         >
-          <LineChart data={data} margin={{ left: 16, right: 16, top: 12, bottom: 0 }}>
+          <LineChart
+            aria-label={chartLabel ?? title}
+            data={data}
+            margin={{ left: 16, right: 16, top: 12, bottom: 0 }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey={xAxisKey}

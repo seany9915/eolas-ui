@@ -1,6 +1,6 @@
 {
   "design-contract-reminder": {
-    "PreInvocation": [
+    "SessionStart": [
       {
         "type": "command",
         "command": "node ./scripts/pre-invocation-reminder.mjs",
@@ -11,7 +11,7 @@
   "secret-scanning-gate": {
     "PreToolUse": [
       {
-        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "matcher": "write_file|edit_file|write_to_file|replace_file_content|multi_replace_file_content",
         "hooks": [
           {
             "type": "command",
@@ -25,7 +25,7 @@
   "anti-pattern-gate": {
     "PreToolUse": [
       {
-        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "matcher": "write_file|edit_file|write_to_file|replace_file_content|multi_replace_file_content",
         "hooks": [
           {
             "type": "command",
@@ -39,7 +39,7 @@
   "primitive-check-reminder": {
     "PreToolUse": [
       {
-        "matcher": "write_to_file",
+        "matcher": "write_file|write_to_file",
         "hooks": [
           {
             "type": "command",
