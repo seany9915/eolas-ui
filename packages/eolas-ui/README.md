@@ -71,7 +71,7 @@ Or extend the preset directly from `node_modules` in your `.oxlintrc.json`:
 ```
 
 This preset enforces:
-- **`eolas/no-raw-html-controls`**, **`eolas/no-radix-imports`**, **`eolas/no-positive-tabindex`**, **`eolas/require-iscomposing-on-enter`**, **`eolas/no-static-clickable-elements`**
+- **`eolas/*` AST guardrails**: `no-raw-html-controls`, `no-radix-imports`, `no-positive-tabindex`, `require-iscomposing-on-enter`, `no-static-clickable-elements`, `no-nested-card`, `no-sparkle-icons`, `no-triple-tint`, `no-light-surface-tertiary`, `no-transition-all`, `no-spring-easing`, `no-uppercase`, `no-unsafe-type-cast`, plus **`typescript/ban-ts-comment`**
 - **`shadcn/no-raw-colors`**: Enforces Eolas semantic tokens (`bg-primary`, `bg-surface-container`, `text-on-surface`, etc.).
 - **`shadcn/no-arbitrary-values`**: Bans arbitrary bracket classes (`p-[13px]`).
 - **`shadcn/no-restyle`**: Enforces component contracts on `Button`, `Chip`, `Card`, `InlineAlert`, `Toast`, dialogs, drawers, and form controls.

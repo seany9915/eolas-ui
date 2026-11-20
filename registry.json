@@ -166,9 +166,9 @@
           "target": "~/.agents/scripts/check-secrets.mjs"
         },
         {
-          "path": ".agents/scripts/pre-invocation-reminder.mjs",
+          "path": ".agents/scripts/check-oxlint-on-stop.mjs",
           "type": "registry:file",
-          "target": "~/.agents/scripts/pre-invocation-reminder.mjs"
+          "target": "~/.agents/scripts/check-oxlint-on-stop.mjs"
         },
         {
           "path": "AGENTS.md",

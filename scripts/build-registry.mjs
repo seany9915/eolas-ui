@@ -263,7 +263,7 @@ const AGENT_RULE_SOURCES = [
   { src: '.agents/scripts/check-anti-patterns.mjs', regPath: 'scripts/check-anti-patterns.mjs', target: '~/.agents/scripts/check-anti-patterns.mjs', required: true },
   { src: '.agents/scripts/check-primitive-inventory.mjs', regPath: 'scripts/check-primitive-inventory.mjs', target: '~/.agents/scripts/check-primitive-inventory.mjs', required: false },
   { src: '.agents/scripts/check-secrets.mjs', regPath: 'scripts/check-secrets.mjs', target: '~/.agents/scripts/check-secrets.mjs', required: false },
-  { src: '.agents/scripts/pre-invocation-reminder.mjs', regPath: 'scripts/pre-invocation-reminder.mjs', target: '~/.agents/scripts/pre-invocation-reminder.mjs', required: false },
+  { src: '.agents/scripts/check-oxlint-on-stop.mjs', regPath: 'scripts/check-oxlint-on-stop.mjs', target: '~/.agents/scripts/check-oxlint-on-stop.mjs', required: false },
   { src: 'AGENTS.md', regPath: 'AGENTS.md', target: '~/AGENTS.md', required: false },
 ];
 
@@ -287,6 +287,7 @@ if (hasRequiredAgentSources) {
     type: 'registry:file',
     title: 'Eolas UI Agent Rules & Anti-Pattern Checker',
     description: 'Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers',
+    docs: 'For full AST lint enforcement (nested Card, sparkle icons, triple-tint, tertiary contrast, transition-all, spring easing, uppercase, unsafe type casts), also run: npx @seany9915/eolas-ui add lint',
     ...(hasDesignMd ? { registryDependencies: [formatRegistryDep('design-md')] } : {}),
     files: agentFiles,
   };

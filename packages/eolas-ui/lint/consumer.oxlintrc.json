@@ -36,6 +36,15 @@
     "eolas/no-static-clickable-elements": "error",
     "eolas/no-raw-html-controls": "error",
     "eolas/no-radix-imports": "error",
+    "eolas/no-nested-card": "error",
+    "eolas/no-sparkle-icons": "error",
+    "eolas/no-triple-tint": "error",
+    "eolas/no-light-surface-tertiary": "error",
+    "eolas/no-transition-all": "error",
+    "eolas/no-spring-easing": "error",
+    "eolas/no-uppercase": "error",
+    "eolas/no-unsafe-type-cast": "error",
+    "typescript/ban-ts-comment": "error",
     "shadcn/no-raw-colors": [
       "error",
       {

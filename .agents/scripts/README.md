@@ -1,13 +1,13 @@
 # Enforcement hook scripts
 
-These are [Antigravity `PreToolUse` hooks](https://antigravity.google/docs/hooks) wired up in `.agents/hooks.json`. They exist because prompting alone ("never do X") is not reliable enforcement for a fast-moving model — these scripts give a real technical backstop that runs before a file is written, independent of whether the model remembered the rule that turn.
+These are [Antigravity lifecycle hooks](https://antigravity.google/docs/hooks) wired up in `.agents/hooks.json`. Structural code checks live in Oxlint (`packages/eolas-ui/lint/index.mjs` + `.oxlintrc.json`) so they run identically in editors, CI, and for human contributors, while these hooks provide pre-write text/secret/primitive safety and end-of-turn Oxlint feedback for agents.
 
 ## What each script does
 
-- **`pre-invocation-reminder.mjs`** — runs as a `SessionStart` hook when a session starts, injecting a concise `systemMessage` with the core contract anchors (Base UI, primitive check first, DESIGN.md tokens, contrast rules, focus vs selection).
-- **`check-anti-patterns.mjs`** — scans the code about to be written for patterns banned in [`../rules/anti-patterns.md`](../rules/anti-patterns.md) and [`../../DESIGN.md`](../../DESIGN.md): Radix imports, triple-tint monochrome chips, all-caps styling, sparkle/magic icons, emojis, hardcoded hex colors, TODO stubs, type suppressions (`as any`), AI cliché buzzwords, Sunny Amber text on light surfaces, and nested Cards. All violations trigger an immediate `deny` so the agent is blocked and forced to self-correct even when folder write permissions are enabled.
-- **`check-primitive-inventory.mjs`** — fires when a brand-new `.tsx`/`.jsx` file is created under a `components`/`ui`/`primitives`-looking path outside the shared primitive (`src/components/ui`), composite block (`src/components/blocks`), or playground/demo directories. It prompts for confirmation (`force_ask`) and returns the inventory of existing primitives, enforcing the primitive-check-first rule from [`../rules/component-library.md`](../rules/component-library.md).
-- **`check-secrets.mjs`** — scans code about to be written for production API keys, private keys, and credential tokens, returning `deny` on confirmed key formats and `force_ask` on generic high-entropy credential assignments.
+- **`check-anti-patterns.mjs`** (`PreToolUse`) — lightweight pre-write guard for patterns that do not require full-file AST parsing or span non-JS copy/CSS: placeholder/truncation stubs (`// TODO: implement`, `// ... rest of`), decorative emojis in UI copy (allowing `©`, `®`, `™`, `★`), banned AI clichés and dev/DB/CSS jargon inside JSX text and UI copy props, and CSS fallbacks (`text-transform: uppercase`, `transition: all`, `--ease-spring`) in standalone `.css` files. Violations return `deny`.
+- **`check-primitive-inventory.mjs`** (`PreToolUse`) — fires when a brand-new `.tsx`/`.jsx` file is created, checking two things: (1) duplicate or synonym component names (e.g. `Modal`, `Dropdown`, `Snackbar`) anywhere under `src/` (excluding `blocks/`, `playground/`, `demos/`) that overlap with existing primitives in `src/components/ui/`, and (2) files placed directly under top-level `components/` outside `ui/`, `blocks/`, or `playground/`. Prompts with `force_ask` and names the specific conflicting primitives.
+- **`check-secrets.mjs`** (`PreToolUse`) — scans code and config about to be written for production API keys, private keys, and high-entropy credential assignments (including JSON and `.env` files, and confirmed key tokens inside Markdown). Returns `deny` on confirmed key formats and `force_ask` (redacting the value, showing only the key name) on generic credential assignments. Fails safe to `force_ask` if the hook encounters an unexpected error.
+- **`check-oxlint-on-stop.mjs`** (`Stop`) — runs local `oxlint` on modified/untracked files at the end of a turn (`NO_TOOL_CALL` when `continuationActive` is false) and returns `decision: "continue"` with lint diagnostics if any errors remain. Safely no-ops in consumer projects that do not have `.oxlintrc.json` and `oxlint` installed.
 
 ## Antigravity Decision Model ("deny" vs "ask")
 
@@ -16,17 +16,19 @@ In Antigravity's permission model:
 - `decision: "deny"` halts tool execution unconditionally and feeds the `reason` back into the agent context as an error, ensuring the agent corrects itself without human intervention.
 - `decision: "force_ask"` prompts the user every time, ignoring cached permissions.
 
-These scripts use `deny` for technical enforcement so the agent cannot bypass rules even when write permissions are pre-approved.
-
 ## Configuration you likely need to change
 
-1. **`PRIMITIVE_DIR_CANDIDATES`** in `check-primitive-inventory.mjs` — matches where your project keeps shared primitives (`src/components/ui` by default).
+1. **`DEFAULT_PRIMITIVE_DIRS`** in `check-primitive-inventory.mjs` — automatically reads `aliases.ui` from `components.json` if present, falling back to `src/components/ui`.
 2. **Node on `PATH`** — `hooks.json` invokes `node ./scripts/...`. Assumes `node` is available in `PATH`.
 
 ## Testing a hook manually
 
-You can pipe a sample payload into either script directly to see its output without going through Antigravity:
+You can pipe a sample payload into any script directly to inspect its JSON response:
 
 ```powershell
-'{"toolCall":{"name":"write_file","args":{"Path":"src/components/Badge.tsx","Content":"import { X } from \"@radix-ui/react-dialog\";"}},"workspacePaths":["C:/path/to/repo"]}' | node .agents/scripts/check-anti-patterns.mjs
+'{"toolCall":{"name":"write_file","args":{"Path":"src/components/PatientNote.tsx","Content":"<p>Delve into telemetry</p>"}},"workspacePaths":["."]}' | node .agents/scripts/check-anti-patterns.mjs
+```
+
+```powershell
+'{"toolCall":{"name":"write_file","args":{"Path":"src/components/ui/modal.tsx","Content":"export const Modal = () => null;"}},"workspacePaths":["."]}' | node .agents/scripts/check-primitive-inventory.mjs
 ```

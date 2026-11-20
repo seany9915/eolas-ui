@@ -17,18 +17,21 @@ process.stdin.on('end', () => {
   try {
     main(JSON.parse(raw));
   } catch (err) {
-    // Fail open if the hook itself errors so it doesn't block legitimate operations
-    respond({ decision: 'allow' });
+    process.stderr.write(`[check-secrets] Hook error: ${err?.message || err}\n`);
+    respond({
+      decision: 'force_ask',
+      reason: 'Secret-scanning hook encountered an unexpected error and could not verify this write. Review for secrets before proceeding.',
+    });
   }
 });
 
 function main(input) {
   const toolCall = input.toolCall || {};
   const args = toolCall.args || {};
-  const targetFile = args.Path || args.TargetFile || args.FilePath || '';
+  const targetFile = args.Path || args.path || args.TargetFile || args.FilePath || args.filePath || '';
 
-  // Exclude example files, documentation, and lockfiles from strict secret checks
-  if (/\.env\.example$|\.md$|package-lock\.json$|yarn\.lock$|pnpm-lock\.yaml$/i.test(targetFile)) {
+  // Exclude example files and lockfiles from strict secret checks
+  if (/\.env\.example$|package-lock\.json$|yarn\.lock$|pnpm-lock\.yaml$/i.test(targetFile)) {
     return respond({ decision: 'allow' });
   }
 
@@ -37,7 +40,8 @@ function main(input) {
     return respond({ decision: 'allow' });
   }
 
-  const violations = scanForSecrets(content);
+  const isMarkdown = /\.md$/i.test(targetFile);
+  const violations = scanForSecrets(content, { isMarkdown });
   if (violations.length > 0) {
     const decision = violations.some((v) => v.severity === 'deny')
       ? 'deny'
@@ -61,7 +65,7 @@ function extractContent(toolName, args) {
   return '';
 }
 
-function scanForSecrets(content) {
+function scanForSecrets(content, { isMarkdown = false } = {}) {
   const violations = [];
 
   // Ignore only unambiguous placeholder templates — never bare substrings like "test" inside random key entropy.
@@ -90,8 +94,14 @@ function scanForSecrets(content) {
     });
   }
 
-  // 2. OpenAI / Model API Key
-  if (findLiveMatch(/sk-(?:proj-|live-)?[a-zA-Z0-9_-]{24,}/g)) {
+  // 2. OpenAI / Anthropic / Model API Key (anchored to avoid kebab-case false positives like "task-...")
+  if (
+    findLiveMatch(
+      /(?:^|[^a-zA-Z0-9_-])(sk-(?:proj-|ant-|live-|svcacct-)[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{20,}T3BlbkFJ[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{32,})(?=$|[^a-zA-Z0-9_-])/g,
+      1,
+      (val) => /[A-Z0-9]/.test(val.slice(3))
+    )
+  ) {
     violations.push({
       severity: 'deny',
       message:
@@ -131,30 +141,34 @@ function scanForSecrets(content) {
     });
   }
 
-  // 7. Stripe Live Secret Key
-  if (findLiveMatch(/sk_live_[0-9a-zA-Z]{24}/g)) {
+  // 7. Stripe Live Secret / Restricted Keys
+  if (findLiveMatch(/\b[sr]k_live_[0-9a-zA-Z]{24,}\b/g)) {
     violations.push({
       severity: 'deny',
       message: 'Detected Stripe Live Secret Key. Live billing credentials must remain server-side in secure environment variables.',
     });
   }
 
-  // 8. Generic hardcoded high-entropy credentials assigned in JS/TS/JSON (quoted or template literals) or unquoted .env
-  const genericSecretAssignment =
-    findLiveMatch(
-      /(?:api_key|apiKey|secret_key|secretKey|auth_token|authToken|password)\s*[:=]\s*(["'`])([A-Za-z0-9+/=_${}-]{32,})\1/gi,
-      2,
-      (val) => !val.includes('${')
-    ) ||
-    findLiveMatch(
-      /^[ \t]*(?:export[ \t]+)?[A-Z0-9_]*(?:API_KEY|SECRET_KEY|AUTH_TOKEN|ACCESS_TOKEN|PRIVATE_KEY|PASSWORD)[ \t]*=[ \t]*([A-Za-z0-9+/=_-]{32,})[ \t]*(?:#.*)?$/gm,
-      1
-    );
-  if (genericSecretAssignment) {
-    violations.push({
-      severity: 'force_ask',
-      message: `Detected potential hardcoded credential assignment for "${genericSecretAssignment[0].slice(0, 20)}...". Confirm if this is a test dummy or real secret before writing.`,
-    });
+  // 8. Generic hardcoded high-entropy credentials in JS/TS/JSON or unquoted .env (skipped in Markdown docs)
+  if (!isMarkdown) {
+    const genericSecretAssignment =
+      findLiveMatch(
+        /(?:["']?)(api_key|apiKey|secret_key|secretKey|auth_token|authToken|access_token|accessToken|private_key|privateKey|password)(?:["']?)\s*[:=]\s*(["'`])([A-Za-z0-9+/=_${}-]{32,})\2/gi,
+        3,
+        (val) => !val.includes('${') && !/^[a-z]+(?:-[a-z]+)+$/.test(val)
+      ) ||
+      findLiveMatch(
+        /^[ \t]*(?:export[ \t]+)?([A-Z0-9_]*(?:API_KEY|SECRET_KEY|AUTH_TOKEN|ACCESS_TOKEN|PRIVATE_KEY|PASSWORD))[ \t]*=[ \t]*([A-Za-z0-9+/=_-]{32,})[ \t]*(?:#.*)?$/gm,
+        2
+      );
+
+    if (genericSecretAssignment) {
+      const matchedKeyName = genericSecretAssignment[1];
+      violations.push({
+        severity: 'force_ask',
+        message: `Detected potential hardcoded credential assignment for "${matchedKeyName}". Confirm if this is a test dummy or real secret before writing.`,
+      });
+    }
   }
 
   return violations;

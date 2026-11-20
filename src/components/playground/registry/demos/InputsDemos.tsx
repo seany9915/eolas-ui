@@ -299,7 +299,7 @@ export const SelectDemo: React.FC<ComponentDemoProps> = () => {
               <Select.Popup>
                 <Select.List>
                   <Select.Group>
-                    <Select.GroupLabel className="px-3 py-1.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                    <Select.GroupLabel className="px-3 py-1.5 text-[11px] font-bold text-on-surface-variant">
                       Target Sound Modules
                     </Select.GroupLabel>
                     <Select.Item value="r-sound">Vocalic /r/ Practice</Select.Item>
@@ -907,7 +907,7 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-col gap-8 w-full max-w-xl mx-auto py-4">
       {/* 1. Split Button Action */}
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
           Split Action Button
         </h4>
         <p className="font-sans text-xs text-on-surface-variant">
@@ -925,7 +925,7 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
 
       {/* 2. Navigation & Segmented Control with Separator */}
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
           Segmented Navigation with Hairline Separator
         </h4>
         <ButtonGroup>
@@ -946,7 +946,7 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
 
       {/* 3. Fused Input and Action Button */}
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
           Input Addon &amp; Action
         </h4>
         <ButtonGroup className="w-full max-w-md">
@@ -969,7 +969,7 @@ export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-col gap-8 w-full max-w-xl mx-auto py-4 text-left">
       {/* 1. Search Bar with Prefix Icon and Clear Button */}
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
           Search Input with Addons
         </h4>
         <p className="font-sans text-xs text-on-surface-variant">
@@ -1001,7 +1001,7 @@ export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
 
       {/* 2. URL Prefix Input with Action Button */}
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
           Prefix Text and Trailing Action
         </h4>
         <InputGroup className="max-w-md">
@@ -1019,7 +1019,7 @@ export const InputGroupDemo: React.FC<ComponentDemoProps> = () => {
 
       {/* 3. Multi-line AI Chat Prompt Input (shadcn Pattern) */}
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        <h4 className="font-heading text-xs font-bold text-on-surface-variant">
           Multi-line AI Prompt Composer
         </h4>
         <p className="font-sans text-xs text-on-surface-variant">

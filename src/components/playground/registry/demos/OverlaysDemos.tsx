@@ -499,7 +499,7 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
 
       {/* Embedded inline command preview */}
       <div className="flex flex-col gap-2 text-left">
-        <span className="font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
           Embedded Command Menu
         </span>
         <Command className="rounded-xl border border-outline-variant shadow-ambient bg-surface focus-within:border-primary transition-colors">

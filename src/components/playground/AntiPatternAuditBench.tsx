@@ -198,7 +198,7 @@ export const AntiPatternAuditBench: React.FC = () => {
                 {/* DON'T Column */}
                 <div className="p-4 rounded-xl border border-error/40 bg-error-container/20 flex flex-col gap-3">
                   <div className="flex items-center justify-between border-b border-error/20 pb-2">
-                    <span className="font-heading text-xs font-bold text-error flex items-center gap-1.5 uppercase tracking-wider">
+                    <span className="font-heading text-xs font-bold text-error flex items-center gap-1.5">
                       <Icon name="cancel" size="xs" />
                       Don&apos;t (Banned Pattern)
                     </span>
@@ -215,7 +215,7 @@ export const AntiPatternAuditBench: React.FC = () => {
                 {/* DO Column */}
                 <div className="p-4 rounded-xl border border-success/40 bg-success-container/20 flex flex-col gap-3">
                   <div className="flex items-center justify-between border-b border-success/20 pb-2">
-                    <span className="font-heading text-xs font-bold text-success flex items-center gap-1.5 uppercase tracking-wider">
+                    <span className="font-heading text-xs font-bold text-success flex items-center gap-1.5">
                       <Icon name="check_circle" size="xs" />
                       Do (Required Implementation)
                     </span>

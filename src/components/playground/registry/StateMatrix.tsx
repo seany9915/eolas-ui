@@ -18,7 +18,7 @@ export const StateMatrix: React.FC<StateMatrixProps> = ({ items }) => {
           key={item.label}
           className="flex flex-col items-center justify-between p-3 rounded-lg bg-surface-container/30 border border-outline-variant/40 gap-3"
         >
-          <span className="font-heading text-[11px] font-bold text-on-surface-variant uppercase tracking-wider text-center">
+          <span className="font-heading text-[11px] font-bold text-on-surface-variant text-center">
             {item.label}
           </span>
           <div className="flex items-center justify-center min-h-[48px] w-full">

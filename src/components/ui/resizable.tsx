@@ -113,7 +113,7 @@ export const ResizableHandle = React.forwardRef<
             'group-hover:border-primary group-hover:text-primary',
             'group-focus-visible:border-primary group-focus-visible:text-primary',
             // Active dragging feedback
-            'group-data-[separator=active]:border-primary group-data-[separator=active]:bg-primary-container group-data-[separator=active]:text-primary group-data-[separator=active]:shadow-sm'
+            'group-data-[separator=active]:border-primary group-data-[separator=active]:bg-primary-container group-data-[separator=active]:text-on-primary-container group-data-[separator=active]:shadow-sm'
           )}
         >
           {children ?? (

@@ -47,14 +47,18 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
   children,
   ...props
 }, ref) => {
-  const dynamicStyle = customColor
-    ? ({
-        '--dynamic-bg': customColor,
-        backgroundColor: customColor,
-        borderColor: 'transparent',
-        color: getContrastInk(customColor),
-        ...style,
-      } as unknown as React.CSSProperties)
+  const dynamicStyle: AvatarRootProps['style'] = customColor
+    ? (() => {
+        const baseDynamic: React.CSSProperties & { '--dynamic-bg'?: string } = {
+          '--dynamic-bg': customColor,
+          backgroundColor: customColor,
+          borderColor: 'transparent',
+          color: getContrastInk(customColor),
+        };
+        return typeof style === 'function'
+          ? (state) => ({ ...baseDynamic, ...style(state) })
+          : { ...baseDynamic, ...style };
+      })()
     : style;
 
   return (
