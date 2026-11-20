@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * View Transitions API React hook and utility.
  *

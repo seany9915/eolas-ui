@@ -13,9 +13,9 @@
       "title": "Eolas UI Utilities",
       "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
       "dependencies": [
+        "@base-ui/react",
         "clsx",
-        "tailwind-merge",
-        "@base-ui/react"
+        "tailwind-merge"
       ],
       "files": [
         {
@@ -26,10 +26,62 @@
       ]
     },
     {
+      "name": "announce",
+      "type": "registry:lib",
+      "title": "Announce",
+      "description": "Imperative screen-reader live-region announcer.",
+      "files": [
+        {
+          "path": "src/lib/announce.ts",
+          "type": "registry:lib",
+          "target": "@lib/announce.ts"
+        }
+      ]
+    },
+    {
+      "name": "built-in-ai",
+      "type": "registry:lib",
+      "title": "Built-in AI",
+      "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator).",
+      "files": [
+        {
+          "path": "src/lib/built-in-ai.ts",
+          "type": "registry:lib",
+          "target": "@lib/built-in-ai.ts"
+        }
+      ]
+    },
+    {
+      "name": "contrast",
+      "type": "registry:lib",
+      "title": "Contrast",
+      "description": "Dynamic foreground contrast helper for user-supplied background colors.",
+      "files": [
+        {
+          "path": "src/lib/contrast.ts",
+          "type": "registry:lib",
+          "target": "@lib/contrast.ts"
+        }
+      ]
+    },
+    {
+      "name": "format-duration",
+      "type": "registry:lib",
+      "title": "Format Duration",
+      "description": "Duration Formatting Utility and Hook",
+      "files": [
+        {
+          "path": "src/lib/format-duration.ts",
+          "type": "registry:lib",
+          "target": "@lib/format-duration.ts"
+        }
+      ]
+    },
+    {
       "name": "sanitize",
       "type": "registry:lib",
       "title": "Sanitize",
-      "description": "Untrusted HTML Sanitizer Utility & React Component. Platform Reference: Modern Web Guidance (MWG: sanitize-untrusted-html) Safely parses and renders user- or API-supplied HTML content (such as clinical consultation notes, discharge summaries, or formatted audit results) by leveraging the native browser Sanitizer API (Chrome 146+, Edge 146+, Firefox 148+) with a secure DOMParser-based fallback for cross-browser safety.",
+      "description": "Untrusted HTML Sanitizer Utility & React Component.",
       "files": [
         {
           "path": "src/lib/sanitize.ts",
@@ -42,7 +94,7 @@
       "name": "scheduler",
       "type": "registry:lib",
       "title": "Scheduler",
-      "description": "Cooperative Task Scheduling & Yielding Utilities. Platform Reference: Modern Web Guidance (MWG: schedule-tasks-by-priority, Web Features: Scheduler API) Provides cooperative yielding to keep the browser main thread and compositor responsive (<50ms Interaction to Next Paint / INP) during heavy data table sorting, large medical record filtering, and client-side processing tasks.",
+      "description": "Cooperative Task Scheduling & Yielding Utilities.",
       "files": [
         {
           "path": "src/lib/scheduler.ts",
@@ -52,23 +104,10 @@
       ]
     },
     {
-      "name": "built-in-ai",
-      "type": "registry:lib",
-      "title": "Built In Ai",
-      "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator). Platform Reference: Modern Web Guidance (MWG: language-model, language-detection, summarizer, translator) Provides strongly-typed React hooks leveraging Chrome & Edge on-device Gemini Nano / Phi models (Chrome 138+) with graceful fallback strategies.",
-      "files": [
-        {
-          "path": "src/lib/built-in-ai.ts",
-          "type": "registry:lib",
-          "target": "@lib/built-in-ai.ts"
-        }
-      ]
-    },
-    {
       "name": "scroll-completion",
       "type": "registry:lib",
       "title": "Scroll Completion",
-      "description": "Programmatic scroll completion utilities. Platform Reference: Modern Web Guidance (MWG: scroll-completion-effects) Awaits the native Promise returned by `scrollIntoView()` / `scrollTo()` when supported, and falls back to `scrollend` with an idle-scroll timer on browsers where scroll methods return `undefined`. Prevents premature focus shifts or post-scroll highlights mid-animation.",
+      "description": "Programmatic scroll completion utilities.",
       "files": [
         {
           "path": "src/lib/scroll-completion.ts",
@@ -78,15 +117,54 @@
       ]
     },
     {
-      "name": "format-duration",
+      "name": "use-horizontal-scroll-fade",
       "type": "registry:lib",
-      "title": "Format Duration",
-      "description": "Duration Formatting Utility and Hook Platform Reference: Modern Web Guidance (MWG: format-human-readable-durations) Localizes time durations (e.g. clinical appointment lengths, exercise intervals, rehabilitation timers) using the standard `Intl.DurationFormat` API (Baseline Newly Available since March 2025 across Chrome 129+, Edge 129+, Firefox 136+, and Safari 16.4+). Provides a seamless fallback for older runtimes that manual-constructs localized plural strings.",
+      "title": "Use Horizontal Scroll Fade",
+      "description": "Horizontal scroll overflow detection for soft edge-fade masks.",
       "files": [
         {
-          "path": "src/lib/format-duration.ts",
+          "path": "src/lib/use-horizontal-scroll-fade.ts",
           "type": "registry:lib",
-          "target": "@lib/format-duration.ts"
+          "target": "@lib/use-horizontal-scroll-fade.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-text-highlight",
+      "type": "registry:lib",
+      "title": "Use Text Highlight",
+      "description": "useTextHighlight Hook",
+      "files": [
+        {
+          "path": "src/lib/use-text-highlight.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-text-highlight.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-web-otp",
+      "type": "registry:lib",
+      "title": "Use Web OTP",
+      "description": "WebOTP API auto-extraction hook.",
+      "files": [
+        {
+          "path": "src/lib/use-web-otp.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-web-otp.ts"
+        }
+      ]
+    },
+    {
+      "name": "view-transitions",
+      "type": "registry:lib",
+      "title": "View Transitions",
+      "description": "View Transitions API React hook and utility.",
+      "files": [
+        {
+          "path": "src/lib/view-transitions.ts",
+          "type": "registry:lib",
+          "target": "@lib/view-transitions.ts"
         }
       ]
     },
@@ -94,20 +172,21 @@
       "name": "theme",
       "type": "registry:file",
       "title": "Eolas UI Clinical Theme",
-      "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md",
+      "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md.",
       "files": [
         {
           "path": "src/globals.css",
           "type": "registry:file",
-          "target": "styles/globals.css"
+          "target": "~/src/globals.css"
         }
-      ]
+      ],
+      "docs": "Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). Import this stylesheet in your application entry point (e.g. src/main.tsx or app/layout.tsx)."
     },
     {
       "name": "design-md",
       "type": "registry:file",
       "title": "Eolas UI Design System Spec (DESIGN.md)",
-      "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers",
+      "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers.",
       "files": [
         {
           "path": "DESIGN.md",
@@ -118,9 +197,9 @@
     },
     {
       "name": "agent-rules",
-      "type": "registry:file",
+      "type": "registry:item",
       "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
-      "description": "Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers",
+      "description": "Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/design-md.json"
       ],
@@ -175,13 +254,14 @@
           "type": "registry:file",
           "target": "~/AGENTS.md"
         }
-      ]
+      ],
+      "docs": "For full AST lint enforcement (nested Card, sparkle icons, triple-tint, tertiary contrast, transition-all, spring easing, uppercase, unsafe type casts), also run: npx shadcn@latest add @eolas/lint (or npx @seany9915/eolas-ui add lint)."
     },
     {
       "name": "lint",
-      "type": "registry:file",
+      "type": "registry:item",
       "title": "Eolas UI Lint",
-      "description": "@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts",
+      "description": "@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts.",
       "devDependencies": [
         "@shadcn/lint",
         "oxlint"
@@ -197,287 +277,8 @@
           "type": "registry:file",
           "target": "~/.oxlintrc.json"
         }
-      ]
-    },
-    {
-      "name": "avatar",
-      "type": "registry:ui",
-      "title": "Avatar",
-      "description": "Avatar primitive (@base-ui/react/avatar).",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
       ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/avatar.tsx",
-          "type": "registry:ui",
-          "target": "@ui/avatar.tsx"
-        },
-        {
-          "path": "src/lib/contrast.ts",
-          "type": "registry:lib",
-          "target": "@lib/contrast.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Displays a user's profile picture, initials, or fallback icon.",
-          "Supports image loading states (idle, loading, loaded, error) and delayed fallback rendering to prevent visual flashes during fast network loads.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
-        ]
-      }
-    },
-    {
-      "name": "chip",
-      "type": "registry:ui",
-      "title": "Chip",
-      "description": "Chip primitive. Built on Base UI (@base-ui/react) interaction foundations.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/chip.tsx",
-          "type": "registry:ui",
-          "target": "@ui/chip.tsx"
-        },
-        {
-          "path": "src/lib/contrast.ts",
-          "type": "registry:lib",
-          "target": "@lib/contrast.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Use Chip for INTERACTIVE compact elements: 1. Filter chips: Toggleable selection filters with keyboard navigation (aria-pressed). 2. Input/Removable chips: Dismissible tags with accessible remove buttons (onRemove). 3. Action chips: Clickable compact triggers (onClick).",
-          "For PASSIVE, non-interactive status labels or counts, use Badge instead.",
-          "Implements DESIGN.md High-Contrast Accessible standards:",
-          "Pattern 1 (filled): Solid brand fill + high-contrast text.",
-          "Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.",
-          "Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).",
-          "Full WCAG 2.2 SC 2.5.8 touch target compliance (expands to 44px when interactive or removable).",
-          "Floating 2px focus ring (outline-offset: 2px) on keyboard focus."
-        ]
-      }
-    },
-    {
-      "name": "code-block",
-      "type": "registry:ui",
-      "title": "Code Block",
-      "description": "CodeBlock primitive. Base UI Integration: Consumes Base UI Tooltip and Button primitives. Specification & Reference: - https://ui.shadcn.com/docs/components/base/code-block - https://ui.shadcn.com/docs/ai-elements",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/button.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/tooltip.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/code-block.tsx",
-          "type": "registry:ui",
-          "target": "@ui/code-block.tsx"
-        },
-        {
-          "path": "src/lib/announce.ts",
-          "type": "registry:lib",
-          "target": "@lib/announce.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Displays source code, JSON parameters, database query outputs, and formatted clinical data structures inside agent execution traces or messages.",
-          "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
-          "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
-        ]
-      }
-    },
-    {
-      "name": "otp-field",
-      "type": "registry:ui",
-      "title": "Otp Field",
-      "description": "OTPField primitive (@base-ui/react/otp-field).",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/otp-field.tsx",
-          "type": "registry:ui",
-          "target": "@ui/otp-field.tsx"
-        },
-        {
-          "path": "src/lib/use-web-otp.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-web-otp.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Use OTPField for one-time passcode inputs, verification pins, and multi-digit authentication codes.",
-          "Supports automatic focus advancement, paste distribution, character masking, and validation types.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
-        ]
-      }
-    },
-    {
-      "name": "table",
-      "type": "registry:ui",
-      "title": "Table",
-      "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/table.tsx",
-          "type": "registry:ui",
-          "target": "@ui/table.tsx"
-        },
-        {
-          "path": "src/lib/use-horizontal-scroll-fade.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-horizontal-scroll-fade.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Dual-mode data table primitive supporting: 1. Atomic compound composition (<Table>, <Table.Header>, <Table.Body>, <Table.Row>, <Table.Head>, <Table.Cell>, <Table.Footer>, <Table.Caption>). 2. Declarative data-driven mode (<Table columns={...} data={...} keyExtractor={...} responsive=\"stack\" />) with automatic container-query card stacking (@container).",
-          "Implements explicit column header semantics (scope=\"col\"), 56px minimum row heights for OS text zoom adaptability, and automatic tabular-nums on numeric columns.",
-          "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
-        ]
-      }
-    },
-    {
-      "name": "tabs",
-      "type": "registry:ui",
-      "title": "Tabs",
-      "description": "Tabs primitive (@base-ui/react/tabs).",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/tabs.tsx",
-          "type": "registry:ui",
-          "target": "@ui/tabs.tsx"
-        },
-        {
-          "path": "src/lib/use-horizontal-scroll-fade.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-horizontal-scroll-fade.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Use Tabs for switching between mutually exclusive views/panels within the SAME page or context (role=\"tablist\", role=\"tab\", role=\"tabpanel\").",
-          "Do NOT use Tabs for site-wide navigation or URL page routing (use NavigationMenu or standard link anchors `<nav>` instead).",
-          "Do NOT use Tabs for state/mode option toggles that don't switch separate DOM content panels (use ToggleGroup instead).",
-          "Segmented container uses `rounded` (0.5rem / 8px) and segmented tabs use `rounded-sm` (0.25rem / 4px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
-          "Line tabs use `rounded-t-sm` (0.25rem / 4px) with bottom underline or floating active indicator.",
-          "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
-        ]
-      }
-    },
-    {
-      "name": "text-highlight",
-      "type": "registry:ui",
-      "title": "Text Highlight",
-      "description": "TextHighlight primitive. Platform Reference: Modern Web Guidance (MWG: highlight-text-ranges)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/text-highlight.tsx",
-          "type": "registry:ui",
-          "target": "@ui/text-highlight.tsx"
-        },
-        {
-          "path": "src/lib/use-text-highlight.ts",
-          "type": "registry:lib",
-          "target": "@lib/use-text-highlight.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "A declarative text-search and keyword highlight container powered by the CSS Custom Highlight API (`::highlight()`).",
-          "Highlights search matches on the GPU compositor without mutating the DOM tree, splitting strings, or fragmenting screen reader announcements.",
-          "Adheres to WCAG 4.1.3 (Status Messages) by synchronizing visual highlights with an `aria-live=\"polite\"` screen reader match announcer.",
-          "Styles matches using tokenized secondary container palette in globals.css: `::highlight(search-results) { background-color: var(--secondary-container); color: var(--on-secondary-container); }`"
-        ]
-      }
-    },
-    {
-      "name": "view-transition",
-      "type": "registry:ui",
-      "title": "View Transition",
-      "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ui/view-transition.tsx",
-          "type": "registry:ui",
-          "target": "@ui/view-transition.tsx"
-        },
-        {
-          "path": "src/lib/view-transitions.ts",
-          "type": "registry:lib",
-          "target": "@lib/view-transitions.ts"
-        }
-      ],
-      "meta": {
-        "taxonomy": [
-          "Declarative container and trigger components for the View Transitions API (document.startViewTransition).",
-          "Enables smooth, GPU-accelerated morphing between states (thumbnail to hero, tab switches, list expansions).",
-          "Degrades gracefully on unsupported browsers (feature-detected) by running the state update immediately without errors.",
-          "Bypasses the animation under prefers-reduced-motion and offers opt-in focus routing (focusTarget) to prevent screen reader disorientation.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
-        ]
-      }
+      "docs": "Run \"npx oxlint .\" to enforce Eolas UI and @shadcn/lint contracts. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json."
     }
   ]
 }

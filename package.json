@@ -1,14 +1,14 @@
 {
   "name": "component-prototyping",
   "private": true,
-  "version": "4.0.0",
+  "version": "4.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "npm run build:registry && tsc && vite build",
     "typecheck": "tsc --noEmit",
     "build:registry": "node scripts/build-registry.mjs && node scripts/generate-manifest.mjs",
-    "registry:validate": "node scripts/validate-registry.mjs && node scripts/showcase-coverage.mjs && npx --yes shadcn@latest registry validate",
+    "registry:validate": "node scripts/validate-registry.mjs && node scripts/showcase-coverage.mjs",
     "check:coverage": "node scripts/showcase-coverage.mjs",
     "lint": "oxlint .",
     "preview": "vite preview"

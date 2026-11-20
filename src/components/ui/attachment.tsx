@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Attachment component system.
  *

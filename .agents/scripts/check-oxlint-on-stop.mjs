@@ -65,7 +65,27 @@ function main(input) {
     return respond({});
   }
 
-  const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z'], {
+  const ignoredPrefixes = [...IGNORED_PREFIXES];
+  try {
+    const oxlintCfg = JSON.parse(fs.readFileSync(oxlintRc, 'utf8'));
+    if (Array.isArray(oxlintCfg?.ignorePatterns)) {
+      for (const pattern of oxlintCfg.ignorePatterns) {
+        if (typeof pattern !== 'string') continue;
+        const cleaned = pattern.replace(/^\.\//, '').replace(/\\/g, '/');
+        const prefixMatch = cleaned.match(/^([^?*[\]{}]+?)(?:\/\*\*|\/\*|\/)?$/);
+        if (prefixMatch && prefixMatch[1]) {
+          const prefix = prefixMatch[1].endsWith('/') ? prefixMatch[1] : `${prefixMatch[1]}/`;
+          if (!ignoredPrefixes.includes(prefix)) {
+            ignoredPrefixes.push(prefix);
+          }
+        }
+      }
+    }
+  } catch {
+    // Fall back to default IGNORED_PREFIXES if .oxlintrc.json cannot be parsed
+  }
+
+  const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z', '--relative'], {
     cwd: workspaceRoot,
     encoding: 'utf8',
     timeout: 5000,
@@ -91,7 +111,7 @@ function main(input) {
 
     const norm = relRaw.replace(/\\/g, '/').replace(/^\.\//, '');
     if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/i.test(norm)) continue;
-    if (IGNORED_PREFIXES.some((prefix) => norm.startsWith(prefix))) continue;
+    if (ignoredPrefixes.some((prefix) => norm.startsWith(prefix))) continue;
 
     const absPath = path.join(workspaceRoot, norm);
     if (!fs.existsSync(absPath)) continue;
@@ -131,6 +151,9 @@ function main(input) {
 
   if (lintRes.status !== 0) {
     const combined = [lintRes.stdout, lintRes.stderr].filter(Boolean).join('\n').trim();
+    if (/No files found to lint|Finished in \d+m?s on 0 files/i.test(combined)) {
+      return respond({});
+    }
     const trimmed = combined.length > 3000 ? `${combined.slice(0, 3000)}\n... (truncated)` : combined;
     return respond({
       decision: 'continue',

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * ToggleGroup primitive (@base-ui/react/toggle-group).
  *

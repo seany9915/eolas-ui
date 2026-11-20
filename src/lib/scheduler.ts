@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Cooperative Task Scheduling & Yielding Utilities.
  *

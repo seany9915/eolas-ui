@@ -3,7 +3,7 @@
   "name": "scroll-completion",
   "type": "registry:lib",
   "title": "Scroll Completion",
-  "description": "Programmatic scroll completion utilities. Platform Reference: Modern Web Guidance (MWG: scroll-completion-effects) Awaits the native Promise returned by `scrollIntoView()` / `scrollTo()` when supported, and falls back to `scrollend` with an idle-scroll timer on browsers where scroll methods return `undefined`. Prevents premature focus shifts or post-scroll highlights mid-animation.",
+  "description": "Programmatic scroll completion utilities.",
   "files": [
     {
       "path": "lib/scroll-completion.ts",

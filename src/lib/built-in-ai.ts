@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator).
  *

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * InlineAlert primitive.
  *

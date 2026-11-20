@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * NavigationBar primitive (@base-ui/react/button + semantic `<nav>`).
  *

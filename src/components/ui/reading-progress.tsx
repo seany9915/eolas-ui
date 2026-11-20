@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * ReadingProgress primitive (@base-ui/react/progress).
  *

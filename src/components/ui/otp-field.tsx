@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * OTPField primitive (@base-ui/react/otp-field).
  *

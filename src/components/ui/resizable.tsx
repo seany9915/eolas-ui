@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Resizable component primitive built on react-resizable-panels.
  *

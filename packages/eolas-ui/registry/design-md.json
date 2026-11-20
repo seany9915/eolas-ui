@@ -3,7 +3,7 @@
   "name": "design-md",
   "type": "registry:file",
   "title": "Eolas UI Design System Spec (DESIGN.md)",
-  "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers",
+  "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers.",
   "files": [
     {
       "path": "DESIGN.md",

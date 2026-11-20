@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Tabs primitive (@base-ui/react/tabs).
  *

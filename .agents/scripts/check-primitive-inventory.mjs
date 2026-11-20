@@ -75,8 +75,85 @@ process.stdin.on('end', () => {
   }
 });
 
-function resolveAliasDir(rawAlias, workspaceRoot, hasSrc) {
+function stripJsonCommentsAndTrailingCommas(text) {
+  let out = '';
+  let inString = false;
+  let quote = '';
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (inString) {
+      out += ch;
+      if (ch === '\\' && i + 1 < text.length) {
+        out += next;
+        i += 1;
+      } else if (ch === quote) {
+        inString = false;
+      }
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      inString = true;
+      quote = ch;
+      out += ch;
+      continue;
+    }
+    if (ch === '/' && next === '/') {
+      while (i + 1 < text.length && text[i + 1] !== '\n') i += 1;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      const closeIdx = text.indexOf('*/', i + 2);
+      if (closeIdx !== -1) {
+        i = closeIdx + 1;
+        continue;
+      }
+    }
+    out += ch;
+  }
+  return out.replace(/,\s*([}\]])/g, '$1');
+}
+
+function loadTsconfigPaths(workspaceRoot) {
+  const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
+  if (!fs.existsSync(tsconfigPath)) return null;
+  try {
+    const raw = fs.readFileSync(tsconfigPath, 'utf8');
+    const parsed = JSON.parse(stripJsonCommentsAndTrailingCommas(raw));
+    const paths = parsed?.compilerOptions?.paths;
+    return paths && typeof paths === 'object' ? paths : null;
+  } catch {
+    return null;
+  }
+}
+
+function resolveFromTsconfigPaths(rawAlias, tsconfigPaths) {
+  if (!tsconfigPaths) return null;
+  for (const [pattern, targets] of Object.entries(tsconfigPaths)) {
+    if (!Array.isArray(targets) || targets.length === 0) continue;
+    const firstTarget = targets[0];
+    if (typeof firstTarget !== 'string') continue;
+
+    if (pattern.endsWith('/*') && firstTarget.endsWith('/*')) {
+      const prefix = pattern.slice(0, -1);
+      const targetPrefix = firstTarget.slice(0, -1).replace(/^\.\//, '');
+      if (rawAlias.startsWith(prefix)) {
+        return `${targetPrefix}${rawAlias.slice(prefix.length)}`.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+      }
+      if (rawAlias === prefix.slice(0, -1)) {
+        return targetPrefix.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+      }
+    } else if (pattern === rawAlias) {
+      return firstTarget.replace(/^\.\//, '').replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+    }
+  }
+  return null;
+}
+
+function resolveAliasDir(rawAlias, workspaceRoot, hasSrc, tsconfigPaths = null) {
   if (!rawAlias || typeof rawAlias !== 'string') return null;
+  const tsMapped = resolveFromTsconfigPaths(rawAlias, tsconfigPaths);
+  if (tsMapped) return tsMapped;
   if (rawAlias.startsWith('@/')) {
     const stripped = rawAlias.slice(2).replace(/^\/+|\/+$/g, '');
     return hasSrc && !stripped.startsWith('src/') ? `src/${stripped}` : stripped;
@@ -89,6 +166,7 @@ function resolveAliasDir(rawAlias, workspaceRoot, hasSrc) {
 
 function getConfiguredDirs(workspaceRoot) {
   const hasSrc = fs.existsSync(path.join(workspaceRoot, 'src'));
+  const tsconfigPaths = loadTsconfigPaths(workspaceRoot);
   const primitiveDirs = [...DEFAULT_PRIMITIVE_DIRS];
   const blockDirs = [...DEFAULT_BLOCK_DIRS];
 
@@ -96,11 +174,11 @@ function getConfiguredDirs(workspaceRoot) {
   if (fs.existsSync(configPath)) {
     try {
       const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      const uiDir = resolveAliasDir(cfg?.aliases?.ui, workspaceRoot, hasSrc);
+      const uiDir = resolveAliasDir(cfg?.aliases?.ui, workspaceRoot, hasSrc, tsconfigPaths);
       if (uiDir) {
         primitiveDirs.unshift(uiDir);
       }
-      const compDir = resolveAliasDir(cfg?.aliases?.components, workspaceRoot, hasSrc);
+      const compDir = resolveAliasDir(cfg?.aliases?.components, workspaceRoot, hasSrc, tsconfigPaths);
       if (compDir) {
         if (!cfg?.aliases?.ui) {
           primitiveDirs.unshift(`${compDir}/ui`);

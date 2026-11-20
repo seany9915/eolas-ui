@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * CheckboxGroup primitive (@base-ui/react/checkbox-group).
  *

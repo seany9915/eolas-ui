@@ -5,71 +5,272 @@
     "title": "Eolas UI Utilities",
     "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
     "dependencies": [
+      "@base-ui/react",
       "clsx",
-      "tailwind-merge",
-      "@base-ui/react"
+      "tailwind-merge"
+    ],
+    "files": [
+      {
+        "path": "lib/utils.ts",
+        "type": "registry:lib",
+        "target": "@lib/utils.ts"
+      }
+    ]
+  },
+  {
+    "name": "announce",
+    "type": "registry:lib",
+    "title": "Announce",
+    "description": "Imperative screen-reader live-region announcer.",
+    "files": [
+      {
+        "path": "lib/announce.ts",
+        "type": "registry:lib",
+        "target": "@lib/announce.ts"
+      }
+    ]
+  },
+  {
+    "name": "built-in-ai",
+    "type": "registry:lib",
+    "title": "Built-in AI",
+    "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator).",
+    "files": [
+      {
+        "path": "lib/built-in-ai.ts",
+        "type": "registry:lib",
+        "target": "@lib/built-in-ai.ts"
+      }
+    ]
+  },
+  {
+    "name": "contrast",
+    "type": "registry:lib",
+    "title": "Contrast",
+    "description": "Dynamic foreground contrast helper for user-supplied background colors.",
+    "files": [
+      {
+        "path": "lib/contrast.ts",
+        "type": "registry:lib",
+        "target": "@lib/contrast.ts"
+      }
+    ]
+  },
+  {
+    "name": "format-duration",
+    "type": "registry:lib",
+    "title": "Format Duration",
+    "description": "Duration Formatting Utility and Hook",
+    "files": [
+      {
+        "path": "lib/format-duration.ts",
+        "type": "registry:lib",
+        "target": "@lib/format-duration.ts"
+      }
     ]
   },
   {
     "name": "sanitize",
     "type": "registry:lib",
     "title": "Sanitize",
-    "description": "Untrusted HTML Sanitizer Utility & React Component. Platform Reference: Modern Web Guidance (MWG: sanitize-untrusted-html) Safely parses and renders user- or API-supplied HTML content (such as clinical consultation notes, discharge summaries, or formatted audit results) by leveraging the native browser Sanitizer API (Chrome 146+, Edge 146+, Firefox 148+) with a secure DOMParser-based fallback for cross-browser safety."
+    "description": "Untrusted HTML Sanitizer Utility & React Component.",
+    "files": [
+      {
+        "path": "lib/sanitize.ts",
+        "type": "registry:lib",
+        "target": "@lib/sanitize.ts"
+      }
+    ]
   },
   {
     "name": "scheduler",
     "type": "registry:lib",
     "title": "Scheduler",
-    "description": "Cooperative Task Scheduling & Yielding Utilities. Platform Reference: Modern Web Guidance (MWG: schedule-tasks-by-priority, Web Features: Scheduler API) Provides cooperative yielding to keep the browser main thread and compositor responsive (<50ms Interaction to Next Paint / INP) during heavy data table sorting, large medical record filtering, and client-side processing tasks."
-  },
-  {
-    "name": "built-in-ai",
-    "type": "registry:lib",
-    "title": "Built In Ai",
-    "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator). Platform Reference: Modern Web Guidance (MWG: language-model, language-detection, summarizer, translator) Provides strongly-typed React hooks leveraging Chrome & Edge on-device Gemini Nano / Phi models (Chrome 138+) with graceful fallback strategies."
+    "description": "Cooperative Task Scheduling & Yielding Utilities.",
+    "files": [
+      {
+        "path": "lib/scheduler.ts",
+        "type": "registry:lib",
+        "target": "@lib/scheduler.ts"
+      }
+    ]
   },
   {
     "name": "scroll-completion",
     "type": "registry:lib",
     "title": "Scroll Completion",
-    "description": "Programmatic scroll completion utilities. Platform Reference: Modern Web Guidance (MWG: scroll-completion-effects) Awaits the native Promise returned by `scrollIntoView()` / `scrollTo()` when supported, and falls back to `scrollend` with an idle-scroll timer on browsers where scroll methods return `undefined`. Prevents premature focus shifts or post-scroll highlights mid-animation."
+    "description": "Programmatic scroll completion utilities.",
+    "files": [
+      {
+        "path": "lib/scroll-completion.ts",
+        "type": "registry:lib",
+        "target": "@lib/scroll-completion.ts"
+      }
+    ]
   },
   {
-    "name": "format-duration",
+    "name": "use-horizontal-scroll-fade",
     "type": "registry:lib",
-    "title": "Format Duration",
-    "description": "Duration Formatting Utility and Hook Platform Reference: Modern Web Guidance (MWG: format-human-readable-durations) Localizes time durations (e.g. clinical appointment lengths, exercise intervals, rehabilitation timers) using the standard `Intl.DurationFormat` API (Baseline Newly Available since March 2025 across Chrome 129+, Edge 129+, Firefox 136+, and Safari 16.4+). Provides a seamless fallback for older runtimes that manual-constructs localized plural strings."
+    "title": "Use Horizontal Scroll Fade",
+    "description": "Horizontal scroll overflow detection for soft edge-fade masks.",
+    "files": [
+      {
+        "path": "lib/use-horizontal-scroll-fade.ts",
+        "type": "registry:lib",
+        "target": "@lib/use-horizontal-scroll-fade.ts"
+      }
+    ]
+  },
+  {
+    "name": "use-text-highlight",
+    "type": "registry:lib",
+    "title": "Use Text Highlight",
+    "description": "useTextHighlight Hook",
+    "files": [
+      {
+        "path": "lib/use-text-highlight.ts",
+        "type": "registry:lib",
+        "target": "@lib/use-text-highlight.ts"
+      }
+    ]
+  },
+  {
+    "name": "use-web-otp",
+    "type": "registry:lib",
+    "title": "Use Web OTP",
+    "description": "WebOTP API auto-extraction hook.",
+    "files": [
+      {
+        "path": "lib/use-web-otp.ts",
+        "type": "registry:lib",
+        "target": "@lib/use-web-otp.ts"
+      }
+    ]
+  },
+  {
+    "name": "view-transitions",
+    "type": "registry:lib",
+    "title": "View Transitions",
+    "description": "View Transitions API React hook and utility.",
+    "files": [
+      {
+        "path": "lib/view-transitions.ts",
+        "type": "registry:lib",
+        "target": "@lib/view-transitions.ts"
+      }
+    ]
   },
   {
     "name": "theme",
     "type": "registry:file",
     "title": "Eolas UI Clinical Theme",
-    "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md"
+    "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md.",
+    "files": [
+      {
+        "path": "styles/globals.css",
+        "type": "registry:file",
+        "target": "~/src/globals.css"
+      }
+    ],
+    "docs": "Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). Import this stylesheet in your application entry point (e.g. src/main.tsx or app/layout.tsx)."
   },
   {
     "name": "design-md",
     "type": "registry:file",
     "title": "Eolas UI Design System Spec (DESIGN.md)",
-    "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers"
+    "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers.",
+    "files": [
+      {
+        "path": "DESIGN.md",
+        "type": "registry:file",
+        "target": "~/DESIGN.md"
+      }
+    ]
   },
   {
     "name": "agent-rules",
-    "type": "registry:file",
+    "type": "registry:item",
     "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
-    "description": "Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers",
+    "description": "Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/design-md.json"
-    ]
+    ],
+    "files": [
+      {
+        "path": "rules/00-core-contract.md",
+        "type": "registry:file",
+        "target": "~/.agents/rules/00-core-contract.md"
+      },
+      {
+        "path": "rules/anti-patterns.md",
+        "type": "registry:file",
+        "target": "~/.agents/rules/anti-patterns.md"
+      },
+      {
+        "path": "rules/component-library.md",
+        "type": "registry:file",
+        "target": "~/.agents/rules/component-library.md"
+      },
+      {
+        "path": "rules/design-system.md",
+        "type": "registry:file",
+        "target": "~/.agents/rules/design-system.md"
+      },
+      {
+        "path": "hooks.json",
+        "type": "registry:file",
+        "target": "~/.agents/hooks.json"
+      },
+      {
+        "path": "scripts/check-anti-patterns.mjs",
+        "type": "registry:file",
+        "target": "~/.agents/scripts/check-anti-patterns.mjs"
+      },
+      {
+        "path": "scripts/check-primitive-inventory.mjs",
+        "type": "registry:file",
+        "target": "~/.agents/scripts/check-primitive-inventory.mjs"
+      },
+      {
+        "path": "scripts/check-secrets.mjs",
+        "type": "registry:file",
+        "target": "~/.agents/scripts/check-secrets.mjs"
+      },
+      {
+        "path": "scripts/check-oxlint-on-stop.mjs",
+        "type": "registry:file",
+        "target": "~/.agents/scripts/check-oxlint-on-stop.mjs"
+      },
+      {
+        "path": "AGENTS.md",
+        "type": "registry:file",
+        "target": "~/AGENTS.md"
+      }
+    ],
+    "docs": "For full AST lint enforcement (nested Card, sparkle icons, triple-tint, tertiary contrast, transition-all, spring easing, uppercase, unsafe type casts), also run: npx shadcn@latest add @eolas/lint (or npx @seany9915/eolas-ui add lint)."
   },
   {
     "name": "lint",
-    "type": "registry:file",
+    "type": "registry:item",
     "title": "Eolas UI Lint",
-    "description": "@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts",
+    "description": "@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts.",
     "devDependencies": [
       "@shadcn/lint",
       "oxlint"
-    ]
+    ],
+    "files": [
+      {
+        "path": "lint/index.mjs",
+        "type": "registry:file",
+        "target": "~/lint/index.mjs"
+      },
+      {
+        "path": "lint/consumer.oxlintrc.json",
+        "type": "registry:file",
+        "target": "~/.oxlintrc.json"
+      }
+    ],
+    "docs": "Run \"npx oxlint .\" to enforce Eolas UI and @shadcn/lint contracts. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json."
   },
   {
     "name": "accordion",
@@ -77,12 +278,17 @@
     "title": "Accordion",
     "description": "Accordion primitive (@base-ui/react/accordion).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/accordion.tsx",
+        "type": "registry:ui",
+        "target": "@ui/accordion.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -98,29 +304,39 @@
     "title": "Alert Dialog",
     "description": "Eolas UI Alert Dialog component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/dialog.json"
+    ],
+    "files": [
+      {
+        "path": "ui/alert-dialog.tsx",
+        "type": "registry:ui",
+        "target": "@ui/alert-dialog.tsx"
+      }
     ]
   },
   {
     "name": "attachment",
     "type": "registry:ui",
     "title": "Attachment",
-    "description": "Attachment component system. Full API and feature parity with shadcn/ui Base Attachment specification: https://ui.shadcn.com/docs/components/base/attachment ANATOMY: AttachmentGroup └── Attachment ├── AttachmentMedia ├── AttachmentContent │   ├── AttachmentTitle │   └── AttachmentDescription ├── AttachmentActions │   └── AttachmentAction └── AttachmentTrigger FEATURES & CAPABILITIES: - Full compound composition with subcomponents for flexible media, layout, and metadata display. - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'. - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card). - Component sizes: 'default' | 'sm' | 'xs'. - Media variants: 'default' (file-type icons or container wash) and 'image' (aspect-square thumbnails). - Stretched interactive overlay (AttachmentTrigger) with isolated action button stacking (AttachmentActions). - Horizontally scrollable, snapping container (AttachmentGroup) with smooth edge fades. - Base UI polymorphic useRender support across all subcomponents. - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.",
+    "description": "Attachment component system.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json"
+    ],
+    "files": [
+      {
+        "path": "ui/attachment.tsx",
+        "type": "registry:ui",
+        "target": "@ui/attachment.tsx"
+      }
     ]
   },
   {
@@ -129,12 +345,17 @@
     "title": "Autocomplete",
     "description": "Autocomplete primitive (@base-ui/react/autocomplete).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/autocomplete.tsx",
+        "type": "registry:ui",
+        "target": "@ui/autocomplete.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -150,12 +371,18 @@
     "title": "Avatar",
     "description": "Avatar primitive (@base-ui/react/avatar).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json"
+      "https://seany9915.github.io/eolas-ui/r/utils.json",
+      "https://seany9915.github.io/eolas-ui/r/contrast.json"
+    ],
+    "files": [
+      {
+        "path": "ui/avatar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/avatar.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -169,14 +396,19 @@
     "name": "badge",
     "type": "registry:ui",
     "title": "Badge",
-    "description": "Badge primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/badge",
+    "description": "Badge primitive.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/badge.tsx",
+        "type": "registry:ui",
+        "target": "@ui/badge.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -198,13 +430,17 @@
     "title": "Bot Avatar",
     "description": "Eolas UI Bot Avatar component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "bot-avatars"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/bot-avatar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/bot-avatar.tsx"
+      }
     ]
   },
   {
@@ -213,29 +449,39 @@
     "title": "Breadcrumb",
     "description": "Eolas UI Breadcrumb component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+    ],
+    "files": [
+      {
+        "path": "ui/breadcrumb.tsx",
+        "type": "registry:ui",
+        "target": "@ui/breadcrumb.tsx"
+      }
     ]
   },
   {
     "name": "button-group",
     "type": "registry:ui",
     "title": "Button Group",
-    "description": "ButtonGroup primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/button-group",
+    "description": "ButtonGroup primitive.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/button-group.tsx",
+        "type": "registry:ui",
+        "target": "@ui/button-group.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -252,12 +498,17 @@
     "title": "Button",
     "description": "Button primitive (@base-ui/react/button).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/button.tsx",
+        "type": "registry:ui",
+        "target": "@ui/button.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -273,15 +524,19 @@
     "name": "calendar",
     "type": "registry:ui",
     "title": "Calendar",
-    "description": "Calendar primitive (React DayPicker). Base UI Ecosystem Documentation: https://ui.shadcn.com/docs/components/base/calendar React DayPicker Documentation: https://daypicker.dev",
+    "description": "Calendar primitive (React DayPicker).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "react-day-picker"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/calendar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/calendar.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -298,23 +553,26 @@
     "title": "Card",
     "description": "Eolas UI Card component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/card.tsx",
+        "type": "registry:ui",
+        "target": "@ui/card.tsx"
+      }
     ]
   },
   {
     "name": "carousel",
     "type": "registry:ui",
     "title": "Carousel",
-    "description": "Carousel primitive built on embla-carousel-react and Base UI. Embla Carousel Documentation: https://www.embla-carousel.com/",
+    "description": "Carousel primitive built on embla-carousel-react and Base UI.",
     "dependencies": [
       "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "embla-carousel-react"
     ],
     "registryDependencies": [
@@ -322,6 +580,13 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/direction-provider.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/carousel.tsx",
+        "type": "registry:ui",
+        "target": "@ui/carousel.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -336,17 +601,19 @@
     "name": "chain-of-thought",
     "type": "registry:ui",
     "title": "Chain Of Thought",
-    "description": "ChainOfThought primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite and `Chip` design tokens. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/chain-of-thought",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "ChainOfThought primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/trace.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/chain-of-thought.tsx",
+        "type": "registry:ui",
+        "target": "@ui/chain-of-thought.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -364,13 +631,17 @@
     "title": "Chart",
     "description": "Eolas UI Chart component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/chart.tsx",
+        "type": "registry:ui",
+        "target": "@ui/chart.tsx"
+      }
     ]
   },
   {
@@ -378,25 +649,19 @@
     "type": "registry:ui",
     "title": "Chat Message Context",
     "description": "Eolas UI Chat Message Context component built on Base UI and DESIGN.md design tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json"
+    "files": [
+      {
+        "path": "ui/chat-message-context.tsx",
+        "type": "registry:ui",
+        "target": "@ui/chat-message-context.tsx"
+      }
     ]
   },
   {
     "name": "chat-message",
     "type": "registry:ui",
     "title": "Chat Message",
-    "description": "ChatMessage primitive. Base UI Integration: Works seamlessly with Base UI Button and Icon primitives.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "ChatMessage primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -407,6 +672,13 @@
       "https://seany9915.github.io/eolas-ui/r/reasoning.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/chat-message.tsx",
+        "type": "registry:ui",
+        "target": "@ui/chat-message.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -425,14 +697,19 @@
     "title": "Checkbox Group",
     "description": "CheckboxGroup primitive (@base-ui/react/checkbox-group).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/checkbox.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/checkbox-group.tsx",
+        "type": "registry:ui",
+        "target": "@ui/checkbox-group.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -449,13 +726,18 @@
     "title": "Checkbox",
     "description": "Checkbox primitive (@base-ui/react/checkbox).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/checkbox.tsx",
+        "type": "registry:ui",
+        "target": "@ui/checkbox.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -470,18 +752,20 @@
     "name": "checkpoint",
     "type": "registry:ui",
     "title": "Checkpoint",
-    "description": "Checkpoint primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Checkpoint primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/separator.json"
+    ],
+    "files": [
+      {
+        "path": "ui/checkpoint.tsx",
+        "type": "registry:ui",
+        "target": "@ui/checkpoint.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -500,12 +784,18 @@
     "title": "Chip",
     "description": "Chip primitive. Built on Base UI (@base-ui/react) interaction foundations.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json"
+      "https://seany9915.github.io/eolas-ui/r/utils.json",
+      "https://seany9915.github.io/eolas-ui/r/contrast.json"
+    ],
+    "files": [
+      {
+        "path": "ui/chip.tsx",
+        "type": "registry:ui",
+        "target": "@ui/chip.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -525,31 +815,36 @@
     "type": "registry:ui",
     "title": "Clinician Tip",
     "description": "Eolas UI Clinician Tip component built on Base UI and DESIGN.md design tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/clinician-tip.tsx",
+        "type": "registry:ui",
+        "target": "@ui/clinician-tip.tsx"
+      }
     ]
   },
   {
     "name": "code-block",
     "type": "registry:ui",
     "title": "Code Block",
-    "description": "CodeBlock primitive. Base UI Integration: Consumes Base UI Tooltip and Button primitives. Specification & Reference: - https://ui.shadcn.com/docs/components/base/code-block - https://ui.shadcn.com/docs/ai-elements",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "CodeBlock primitive.",
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/announce.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+    ],
+    "files": [
+      {
+        "path": "ui/code-block.tsx",
+        "type": "registry:ui",
+        "target": "@ui/code-block.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -565,12 +860,17 @@
     "title": "Collapsible",
     "description": "Collapsible primitive (@base-ui/react/collapsible).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/collapsible.tsx",
+        "type": "registry:ui",
+        "target": "@ui/collapsible.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -586,12 +886,17 @@
     "title": "Combobox",
     "description": "Combobox primitive (@base-ui/react/combobox).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/combobox.tsx",
+        "type": "registry:ui",
+        "target": "@ui/combobox.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -606,16 +911,20 @@
     "name": "command",
     "type": "registry:ui",
     "title": "Command",
-    "description": "Command primitive (cmdk + Base UI Dialog). cmdk Documentation: https://cmdk.paco.me",
+    "description": "Command primitive (cmdk + Base UI Dialog).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "cmdk"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/dialog.json"
+    ],
+    "files": [
+      {
+        "path": "ui/command.tsx",
+        "type": "registry:ui",
+        "target": "@ui/command.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -630,18 +939,20 @@
     "name": "confirmation",
     "type": "registry:ui",
     "title": "Confirmation",
-    "description": "Confirmation primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Confirmation primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/confirmation.tsx",
+        "type": "registry:ui",
+        "target": "@ui/confirmation.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -661,40 +972,49 @@
     "title": "Context Menu",
     "description": "Eolas UI Context Menu component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/context-menu.tsx",
+        "type": "registry:ui",
+        "target": "@ui/context-menu.tsx"
+      }
     ]
   },
   {
     "name": "csp-provider",
     "type": "registry:ui",
-    "title": "Csp Provider",
-    "description": "Eolas UI Csp Provider component built on Base UI and DESIGN.md design tokens.",
+    "title": "CSP Provider",
+    "description": "Eolas UI CSP Provider component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json"
+    "files": [
+      {
+        "path": "ui/csp-provider.tsx",
+        "type": "registry:ui",
+        "target": "@ui/csp-provider.tsx"
+      }
     ]
   },
   {
     "name": "deferred-view",
     "type": "registry:ui",
     "title": "Deferred View",
-    "description": "DeferredView primitive. Platform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "DeferredView primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/deferred-view.tsx",
+        "type": "registry:ui",
+        "target": "@ui/deferred-view.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -711,13 +1031,18 @@
     "title": "Dialog",
     "description": "Eolas UI Dialog component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json"
+    ],
+    "files": [
+      {
+        "path": "ui/dialog.tsx",
+        "type": "registry:ui",
+        "target": "@ui/dialog.tsx"
+      }
     ]
   },
   {
@@ -726,12 +1051,14 @@
     "title": "Direction Provider",
     "description": "Eolas UI Direction Provider component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json"
+    "files": [
+      {
+        "path": "ui/direction-provider.tsx",
+        "type": "registry:ui",
+        "target": "@ui/direction-provider.tsx"
+      }
     ]
   },
   {
@@ -740,12 +1067,17 @@
     "title": "Drawer",
     "description": "Drawer primitive (@base-ui/react/drawer).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/drawer.tsx",
+        "type": "registry:ui",
+        "target": "@ui/drawer.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -759,30 +1091,33 @@
     "name": "empty-state",
     "type": "registry:ui",
     "title": "Empty State",
-    "description": "EmptyState primitive (backward-compatibility alias for Empty). Canonical primitive resides at @/components/ui/empty. Conforms to https://ui.shadcn.com/docs/components/base/empty",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "EmptyState primitive (backward-compatibility alias for Empty).",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/empty.json"
+    ],
+    "files": [
+      {
+        "path": "ui/empty-state.tsx",
+        "type": "registry:ui",
+        "target": "@ui/empty-state.tsx"
+      }
     ]
   },
   {
     "name": "empty",
     "type": "registry:ui",
     "title": "Empty",
-    "description": "Empty primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/empty",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Empty primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/empty.tsx",
+        "type": "registry:ui",
+        "target": "@ui/empty.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -803,14 +1138,16 @@
     "name": "error-shake",
     "type": "registry:ui",
     "title": "Error Shake",
-    "description": "ErrorShake Horizontal form micro-shake wrapper based on transitions.dev (12-error-state-shake.md). Platform Reference: https://transitions.dev/detail.html?t=error-state-shake Shakes invalid form inputs or blocked actions using a decaying overshoot curve: 0% -> 20% (-6px) -> 40% (+4px) -> 60% (-2px) -> 80% (+1px) -> 100% (0) Synchronized with the 300ms animate-error-shake keyframe in src/globals.css. Supports coordinated error message reveals and auto-revert timers. Complies with WCAG 2.2 and motion-reduce:animate-none.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Horizontal form micro-shake wrapper based on transitions.dev (12-error-state-shake.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/error-shake.tsx",
+        "type": "registry:ui",
+        "target": "@ui/error-shake.tsx"
+      }
     ]
   },
   {
@@ -819,14 +1156,19 @@
     "title": "Field",
     "description": "Field primitive (@base-ui/react/field).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/fieldset.json"
+    ],
+    "files": [
+      {
+        "path": "ui/field.tsx",
+        "type": "registry:ui",
+        "target": "@ui/field.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -843,12 +1185,17 @@
     "title": "Fieldset",
     "description": "Fieldset primitive (@base-ui/react/fieldset).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/fieldset.tsx",
+        "type": "registry:ui",
+        "target": "@ui/fieldset.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -864,12 +1211,17 @@
     "title": "Form",
     "description": "Form primitive (@base-ui/react/form).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/form.tsx",
+        "type": "registry:ui",
+        "target": "@ui/form.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -883,28 +1235,35 @@
     "type": "registry:ui",
     "title": "Icon",
     "description": "Eolas UI Icon component built on Base UI and DESIGN.md design tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/icon.tsx",
+        "type": "registry:ui",
+        "target": "@ui/icon.tsx"
+      }
     ]
   },
   {
     "name": "inline-alert",
     "type": "registry:ui",
     "title": "Inline Alert",
-    "description": "InlineAlert primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/alert",
+    "description": "InlineAlert primitive.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/inline-alert.tsx",
+        "type": "registry:ui",
+        "target": "@ui/inline-alert.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -920,11 +1279,9 @@
     "name": "inline-citation",
     "type": "registry:ui",
     "title": "Inline Citation",
-    "description": "Inline Citation primitive. Base UI Integration: Built on Base UI PreviewCard (@base-ui/react/preview-card), Button (UnstyledButton), and Carousel primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/inline-citation",
+    "description": "Inline Citation primitive.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -932,6 +1289,13 @@
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/skeleton.json",
       "https://seany9915.github.io/eolas-ui/r/carousel.json"
+    ],
+    "files": [
+      {
+        "path": "ui/inline-citation.tsx",
+        "type": "registry:ui",
+        "target": "@ui/inline-citation.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -949,16 +1313,21 @@
     "name": "input-group",
     "type": "registry:ui",
     "title": "Input Group",
-    "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group ANATOMY: InputGroup ├── InputGroupInput (or InputGroupTextarea) └── InputGroupAddon (align=\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\") ├── InputGroupButton └── InputGroupText",
+    "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/textarea.json"
+    ],
+    "files": [
+      {
+        "path": "ui/input-group.tsx",
+        "type": "registry:ui",
+        "target": "@ui/input-group.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -975,14 +1344,19 @@
     "name": "input",
     "type": "registry:ui",
     "title": "Input",
-    "description": "Input primitive (@base-ui/react/input). shadcn Base Input Documentation: https://ui.shadcn.com/docs/components/base/input ANATOMY: Input (or BaseInput / InputPrimitive)",
+    "description": "Input primitive (@base-ui/react/input).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/input.tsx",
+        "type": "registry:ui",
+        "target": "@ui/input.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1000,14 +1374,19 @@
     "name": "item",
     "type": "registry:ui",
     "title": "Item",
-    "description": "Item layout primitive (Content Row / Media Object). Full API reference and feature parity with shadcn/ui Base Item specification: https://ui.shadcn.com/docs/components/base/item ANATOMY: ItemGroup └── Item ├── ItemHeader ├── ItemMedia ├── ItemContent │   ├── ItemTitle │   └── ItemDescription ├── ItemActions ├── ItemFooter └── ItemSeparator",
+    "description": "Item layout primitive (Content Row / Media Object). Full API reference and feature parity with shadcn/ui Base Item specification: https://ui.shadcn.com/docs/components/base/item",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/item.tsx",
+        "type": "registry:ui",
+        "target": "@ui/item.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1023,14 +1402,19 @@
     "name": "kbd",
     "type": "registry:ui",
     "title": "Kbd",
-    "description": "Keyboard key primitive (Kbd). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/kbd",
+    "description": "Keyboard key primitive (Kbd).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/kbd.tsx",
+        "type": "registry:ui",
+        "target": "@ui/kbd.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1047,12 +1431,17 @@
     "title": "Menu",
     "description": "Eolas UI Menu component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/menu.tsx",
+        "type": "registry:ui",
+        "target": "@ui/menu.tsx"
+      }
     ]
   },
   {
@@ -1061,30 +1450,37 @@
     "title": "Menubar",
     "description": "Eolas UI Menubar component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/menubar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/menubar.tsx"
+      }
     ]
   },
   {
     "name": "message-scroller",
     "type": "registry:ui",
     "title": "Message Scroller",
-    "description": "MessageScroller primitive suite. Base UI Integration: Consumes Base UI Button and Tooltip primitives. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/components/base/message-scroller",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "MessageScroller primitive suite.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+    ],
+    "files": [
+      {
+        "path": "ui/message-scroller.tsx",
+        "type": "registry:ui",
+        "target": "@ui/message-scroller.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1104,12 +1500,17 @@
     "title": "Meter",
     "description": "Meter primitive (@base-ui/react/meter).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/meter.tsx",
+        "type": "registry:ui",
+        "target": "@ui/meter.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1123,18 +1524,20 @@
     "name": "model-selector",
     "type": "registry:ui",
     "title": "Model Selector",
-    "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select and Tooltip primitives. Specification & Reference: https://ui.shadcn.com/docs/ai-elements/base/model-selector",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "ModelSelector primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/select.json",
       "https://seany9915.github.io/eolas-ui/r/combobox.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json"
+    ],
+    "files": [
+      {
+        "path": "ui/model-selector.tsx",
+        "type": "registry:ui",
+        "target": "@ui/model-selector.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1152,13 +1555,18 @@
     "title": "Navigation Bar",
     "description": "NavigationBar primitive (@base-ui/react/button + semantic `<nav>`).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json"
+    ],
+    "files": [
+      {
+        "path": "ui/navigation-bar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/navigation-bar.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1181,27 +1589,34 @@
     "title": "Navigation Menu",
     "description": "Eolas UI Navigation Menu component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/navigation-menu.tsx",
+        "type": "registry:ui",
+        "target": "@ui/navigation-menu.tsx"
+      }
     ]
   },
   {
     "name": "notification-badge",
     "type": "registry:ui",
     "title": "Notification Badge",
-    "description": "NotificationBadge Isolated diagonal slide-in and scale-pop badge based on transitions.dev (03-notification-badge.md). Platform Reference: https://transitions.dev/detail.html?t=notification-badge Anchors absolutely onto trigger elements (e.g. action buttons, navigation icons) without displacing trigger layout or causing parent jitter. Adheres to Pattern 1 (High-contrast solid fill) with WCAG AAA foreground contrast. Automatically disables motion under prefers-reduced-motion.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Isolated diagonal slide-in and scale-pop badge based on transitions.dev (03-notification-badge.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/notification-badge.tsx",
+        "type": "registry:ui",
+        "target": "@ui/notification-badge.tsx"
+      }
     ]
   },
   {
@@ -1210,13 +1625,18 @@
     "title": "Number Field",
     "description": "NumberField primitive (@base-ui/react/number-field).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/number-field.tsx",
+        "type": "registry:ui",
+        "target": "@ui/number-field.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1229,45 +1649,54 @@
     "name": "number-pop-in",
     "type": "registry:ui",
     "title": "Number Pop In",
-    "description": "NumberPopIn Digit pop-in animation primitive based strictly on transitions.dev (02-number-pop-in.md). Platform Reference: https://transitions.dev/detail.html?t=number-pop-in Decomposes numeric strings into individual character spans. When updated, each digit pops into place with 8px vertical travel, 2px micro-blur, and spring overshoot (cubic-bezier(0.34, 1.45, 0.64, 1)). Trailing decimal digits stagger by 70ms so updates feel alive without looking chaotic. Tabular numerals prevent layout jitter. Complies with WCAG 2.2 and motion-reduce:animate-none.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Digit pop-in animation primitive based strictly on transitions.dev (02-number-pop-in.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/number-pop-in.tsx",
+        "type": "registry:ui",
+        "target": "@ui/number-pop-in.tsx"
+      }
     ]
   },
   {
     "name": "number-roll",
     "type": "registry:ui",
     "title": "Number Roll",
-    "description": "NumberRoll @deprecated Prefer importing `NumberPopIn` (`@/components/ui/number-pop-in`) or `SpinningCounter` (`@/components/ui/spinning-counter`) directly. Kept as a backward-compatibility wrapper around both primitives. Tabular number transition primitive based strictly on transitions.dev. Platform Reference: https://transitions.dev/library.html Supports: - 'pop-in' (default): Individual digit pop-in with spring overshoot and decimal stagger (02-number-pop-in.md). - 'spinning': Slot-machine vertical reel roll with soft edge masks (26-spinning-counter.md). Tabular numerals prevent layout jitter across all variants. Strictly adheres to Roboto Mono typography and prefers-reduced-motion.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Deprecated: Prefer importing `NumberPopIn` (`@/components/ui/number-pop-in`) or `SpinningCounter` (`@/components/ui/spinning-counter`) directly. Kept as a backward-compatibility wrapper around both primitives. Tabular number transition...",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/number-pop-in.json",
       "https://seany9915.github.io/eolas-ui/r/spinning-counter.json"
+    ],
+    "files": [
+      {
+        "path": "ui/number-roll.tsx",
+        "type": "registry:ui",
+        "target": "@ui/number-roll.tsx"
+      }
     ]
   },
   {
     "name": "otp-field",
     "type": "registry:ui",
-    "title": "Otp Field",
+    "title": "OTP Field",
     "description": "OTPField primitive (@base-ui/react/otp-field).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
+      "https://seany9915.github.io/eolas-ui/r/use-web-otp.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/otp-field.tsx",
+        "type": "registry:ui",
+        "target": "@ui/otp-field.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1282,32 +1711,36 @@
     "type": "registry:ui",
     "title": "Pagination",
     "description": "Eolas UI Pagination component built on Base UI and DESIGN.md design tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/pagination.tsx",
+        "type": "registry:ui",
+        "target": "@ui/pagination.tsx"
+      }
     ]
   },
   {
     "name": "plan",
     "type": "registry:ui",
     "title": "Plan",
-    "description": "Plan composite block. Layer: Primitive (`src/components/ui/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Plan composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/trace.json",
       "https://seany9915.github.io/eolas-ui/r/progress.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/plan.tsx",
+        "type": "registry:ui",
+        "target": "@ui/plan.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1323,12 +1756,17 @@
     "title": "Popover",
     "description": "Eolas UI Popover component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/popover.tsx",
+        "type": "registry:ui",
+        "target": "@ui/popover.tsx"
+      }
     ]
   },
   {
@@ -1337,12 +1775,17 @@
     "title": "Preview Card",
     "description": "Eolas UI Preview Card component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/preview-card.tsx",
+        "type": "registry:ui",
+        "target": "@ui/preview-card.tsx"
+      }
     ]
   },
   {
@@ -1351,12 +1794,17 @@
     "title": "Progress Ring",
     "description": "ProgressRing primitive (@base-ui/react/progress).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/progress-ring.tsx",
+        "type": "registry:ui",
+        "target": "@ui/progress-ring.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1373,13 +1821,18 @@
     "title": "Progress",
     "description": "Progress primitive (@base-ui/react/progress).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/skeleton.json"
+    ],
+    "files": [
+      {
+        "path": "ui/progress.tsx",
+        "type": "registry:ui",
+        "target": "@ui/progress.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1393,12 +1846,7 @@
     "name": "prompt-input",
     "type": "registry:ui",
     "title": "Prompt Input",
-    "description": "PromptInput primitive. Base UI Integration: Composes InputGroup (InputGroup, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText), Attachment, Menu, Tooltip, and Button primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "PromptInput primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -1408,6 +1856,13 @@
       "https://seany9915.github.io/eolas-ui/r/menu.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/input-group.json"
+    ],
+    "files": [
+      {
+        "path": "ui/prompt-input.tsx",
+        "type": "registry:ui",
+        "target": "@ui/prompt-input.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1423,17 +1878,19 @@
     "name": "queue",
     "type": "registry:ui",
     "title": "Queue",
-    "description": "Queue composite block. Layer: Primitive (`src/components/ui/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Queue composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/trace.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/queue.tsx",
+        "type": "registry:ui",
+        "target": "@ui/queue.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1449,12 +1906,17 @@
     "title": "Radio",
     "description": "Radio & RadioGroup primitives (@base-ui/react/radio, @base-ui/react/radio-group).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/radio.tsx",
+        "type": "registry:ui",
+        "target": "@ui/radio.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1468,14 +1930,19 @@
     "name": "reading-progress",
     "type": "registry:ui",
     "title": "Reading Progress",
-    "description": "ReadingProgress primitive (@base-ui/react/progress). Platform Reference: Modern Web Guidance (MWG: scrollytelling / scroll-driven animations)",
+    "description": "ReadingProgress primitive (@base-ui/react/progress).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/reading-progress.tsx",
+        "type": "registry:ui",
+        "target": "@ui/reading-progress.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1490,12 +1957,7 @@
     "name": "reasoning",
     "type": "registry:ui",
     "title": "Reasoning",
-    "description": "Reasoning primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/reasoning",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Reasoning primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/trace.json",
@@ -1503,6 +1965,13 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/reasoning.tsx",
+        "type": "registry:ui",
+        "target": "@ui/reasoning.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1520,15 +1989,19 @@
     "name": "resizable",
     "type": "registry:ui",
     "title": "Resizable",
-    "description": "Resizable component primitive built on react-resizable-panels. React Resizable Panels Documentation: https://github.com/bvaughn/react-resizable-panels",
+    "description": "Resizable component primitive built on react-resizable-panels.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "react-resizable-panels"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/resizable.tsx",
+        "type": "registry:ui",
+        "target": "@ui/resizable.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1544,12 +2017,17 @@
     "title": "Scroll Area",
     "description": "ScrollArea primitive (@base-ui/react/scroll-area).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/scroll-area.tsx",
+        "type": "registry:ui",
+        "target": "@ui/scroll-area.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1563,14 +2041,16 @@
     "name": "scrollspy",
     "type": "registry:ui",
     "title": "Scrollspy",
-    "description": "Scrollspy primitive. Platform Reference: Modern Web Guidance (MWG: scrollspy)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Scrollspy primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/scrollspy.tsx",
+        "type": "registry:ui",
+        "target": "@ui/scrollspy.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1589,30 +2069,36 @@
     "title": "Select",
     "description": "Eolas UI Select component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/select.tsx",
+        "type": "registry:ui",
+        "target": "@ui/select.tsx"
+      }
     ]
   },
   {
     "name": "selection-controls",
     "type": "registry:ui",
     "title": "Selection Controls",
-    "description": "Re-exports selection control primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/checkbox - @/components/ui/checkbox-group - @/components/ui/radio - @/components/ui/switch",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Re-exports selection control primitives for backward compatibility.",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/checkbox.json",
       "https://seany9915.github.io/eolas-ui/r/checkbox-group.json",
       "https://seany9915.github.io/eolas-ui/r/radio.json",
       "https://seany9915.github.io/eolas-ui/r/switch.json"
+    ],
+    "files": [
+      {
+        "path": "ui/selection-controls.tsx",
+        "type": "registry:ui",
+        "target": "@ui/selection-controls.tsx"
+      }
     ]
   },
   {
@@ -1621,12 +2107,17 @@
     "title": "Separator",
     "description": "Separator primitive (@base-ui/react/separator).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/separator.tsx",
+        "type": "registry:ui",
+        "target": "@ui/separator.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1640,25 +2131,25 @@
     "name": "shimmer-text",
     "type": "registry:ui",
     "title": "Shimmer Text",
-    "description": "ShimmerText Ambient streaming text shimmer based on transitions.dev (15-shimmer-text.md). Platform Reference: https://transitions.dev/detail.html?t=shimmer-text Sweeps a subtle brand highlight across muted text on a continuous loop to communicate live AI reasoning, clinical transcription, or background sync. Completely CSP-compliant with zero runtime inline <style> injection. Automatically suppresses animation and settles into high-contrast text when prefers-reduced-motion is active.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Ambient streaming text shimmer based on transitions.dev (15-shimmer-text.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/shimmer-text.tsx",
+        "type": "registry:ui",
+        "target": "@ui/shimmer-text.tsx"
+      }
     ]
   },
   {
     "name": "sidebar",
     "type": "registry:ui",
     "title": "Sidebar",
-    "description": "Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture). Shadcn UI Reference: https://ui.shadcn.com/docs/components/base/sidebar",
+    "description": "Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -1668,6 +2159,13 @@
       "https://seany9915.github.io/eolas-ui/r/separator.json",
       "https://seany9915.github.io/eolas-ui/r/skeleton.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/sidebar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/sidebar.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1684,12 +2182,17 @@
     "title": "Skeleton",
     "description": "Eolas UI Skeleton component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/skeleton.tsx",
+        "type": "registry:ui",
+        "target": "@ui/skeleton.tsx"
+      }
     ]
   },
   {
@@ -1698,12 +2201,17 @@
     "title": "Slider",
     "description": "Slider primitive (@base-ui/react/slider).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/slider.tsx",
+        "type": "registry:ui",
+        "target": "@ui/slider.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1719,25 +2227,27 @@
     "title": "Sortable",
     "description": "Eolas UI Sortable component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
-      "@dnd-kit/react",
-      "@dnd-kit/helpers"
+      "@dnd-kit/helpers",
+      "@dnd-kit/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/sortable.tsx",
+        "type": "registry:ui",
+        "target": "@ui/sortable.tsx"
+      }
     ]
   },
   {
     "name": "sources",
     "type": "registry:ui",
     "title": "Sources",
-    "description": "Sources primitive. Base UI Integration: Works with Base UI Collapsible and Tooltip primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/sources",
+    "description": "Sources primitive.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -1747,6 +2257,13 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
       "https://seany9915.github.io/eolas-ui/r/inline-citation.json"
+    ],
+    "files": [
+      {
+        "path": "ui/sources.tsx",
+        "type": "registry:ui",
+        "target": "@ui/sources.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1765,14 +2282,16 @@
     "name": "spinner",
     "type": "registry:ui",
     "title": "Spinner",
-    "description": "Spinner primitive. Base UI Integration: Companion status & loading indicator. Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Spinner primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/spinner.tsx",
+        "type": "registry:ui",
+        "target": "@ui/spinner.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1787,43 +2306,48 @@
     "name": "spinning-counter",
     "type": "registry:ui",
     "title": "Spinning Counter",
-    "description": "SpinningCounter Slot-machine reel counter based strictly on transitions.dev (26-spinning-counter.md). Platform Reference: https://transitions.dev/detail.html?t=spinning-counter Each numeric character is a clipped vertical reel column that smoothly spins to the target digit with a 90ms per-column stagger and vertical edge soft-masks so numbers never hard-crop at bounding edges. Perfect for celebration milestones, dashboard KPIs, and gamified progress. Complies with WCAG 2.2 and motion-reduce:transition-none.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Slot-machine reel counter based strictly on transitions.dev (26-spinning-counter.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/spinning-counter.tsx",
+        "type": "registry:ui",
+        "target": "@ui/spinning-counter.tsx"
+      }
     ]
   },
   {
     "name": "steppers",
     "type": "registry:ui",
     "title": "Steppers",
-    "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Backward-compatibility alias for NumberField.",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/number-field.json"
+    ],
+    "files": [
+      {
+        "path": "ui/steppers.tsx",
+        "type": "registry:ui",
+        "target": "@ui/steppers.tsx"
+      }
     ]
   },
   {
     "name": "sticky-container",
     "type": "registry:ui",
     "title": "Sticky Container",
-    "description": "StickyContainer primitive. Platform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "StickyContainer primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/sticky-container.tsx",
+        "type": "registry:ui",
+        "target": "@ui/sticky-container.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1839,30 +2363,34 @@
     "name": "success-check",
     "type": "registry:ui",
     "title": "Success Check",
-    "description": "SuccessCheck Celebratory checkmark entrance transition based strictly on transitions.dev (10-success-check.md). Platform Reference: https://transitions.dev/detail.html?t=success-check Composes 5 synchronized layers in parallel: 1. Opacity fade (0 -> 1 over 500ms) 2. 80deg rotational upright spin (80deg -> 0deg over 500ms) 3. Optical blur settle (10px -> 0px over 500ms) 4. Y-bob spring overshoot (translateY 40px -> 0 with cubic-bezier(0.34, 1.35, 0.64, 1)) 5. SVG stroke-draw (delayed 80ms stroke-dashoffset transition) Complies strictly with WCAG 2.2 and motion-reduce:transition-none.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Celebratory checkmark entrance transition based strictly on transitions.dev (10-success-check.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/success-check.tsx",
+        "type": "registry:ui",
+        "target": "@ui/success-check.tsx"
+      }
     ]
   },
   {
     "name": "suggestion-chips",
     "type": "registry:ui",
     "title": "Suggestion Chips",
-    "description": "SuggestionChips primitive. Base UI Integration: Uses Base UI Button foundation.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "SuggestionChips primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/suggestion-chips.tsx",
+        "type": "registry:ui",
+        "target": "@ui/suggestion-chips.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1880,14 +2408,19 @@
     "name": "swipe-reveal",
     "type": "registry:ui",
     "title": "Swipe Reveal",
-    "description": "SwipeReveal primitive. Platform Reference: Modern Web Guidance (MWG: swipe-to-reveal)",
+    "description": "SwipeReveal primitive.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/swipe-reveal.tsx",
+        "type": "registry:ui",
+        "target": "@ui/swipe-reveal.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1904,12 +2437,17 @@
     "title": "Switch",
     "description": "Switch primitive (@base-ui/react/switch).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/switch.tsx",
+        "type": "registry:ui",
+        "target": "@ui/switch.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1923,14 +2461,17 @@
     "name": "table",
     "type": "registry:ui",
     "title": "Table",
-    "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Table primitive.",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json"
+      "https://seany9915.github.io/eolas-ui/r/utils.json",
+      "https://seany9915.github.io/eolas-ui/r/use-horizontal-scroll-fade.json"
+    ],
+    "files": [
+      {
+        "path": "ui/table.tsx",
+        "type": "registry:ui",
+        "target": "@ui/table.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1946,13 +2487,19 @@
     "title": "Tabs",
     "description": "Tabs primitive (@base-ui/react/tabs).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
+      "https://seany9915.github.io/eolas-ui/r/use-horizontal-scroll-fade.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/tabs.tsx",
+        "type": "registry:ui",
+        "target": "@ui/tabs.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1969,17 +2516,19 @@
     "name": "task",
     "type": "registry:ui",
     "title": "Task",
-    "description": "Task primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/task",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Task primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/trace.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/task.tsx",
+        "type": "registry:ui",
+        "target": "@ui/task.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -1995,14 +2544,17 @@
     "name": "text-highlight",
     "type": "registry:ui",
     "title": "Text Highlight",
-    "description": "TextHighlight primitive. Platform Reference: Modern Web Guidance (MWG: highlight-text-ranges)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "TextHighlight primitive.",
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/use-text-highlight.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/text-highlight.tsx",
+        "type": "registry:ui",
+        "target": "@ui/text-highlight.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2017,28 +2569,32 @@
     "name": "text-swap",
     "type": "registry:ui",
     "title": "Text Swap",
-    "description": "TextSwap Micro-transition for in-place text state changes based strictly on transitions.dev (04-text-states-swap.md). Platform Reference: https://transitions.dev/detail.html?t=text-states-swap Implements the 3-phase sequence: 1. .is-exit: Old text slides up 4px with 2px micro-blur and fades to 0 over 150ms. 2. .is-enter-start: Text swaps and jumps below (+4px) without transition. 3. Forced reflow -> .is-enter: New text rises smoothly back to rest (0) over 150ms. Prevents layout thrashing inside buttons, chips, and status badges. Complies with WCAG 2.2 and motion-reduce:transition-none.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Micro-transition for in-place text state changes based strictly on transitions.dev (04-text-states-swap.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/text-swap.tsx",
+        "type": "registry:ui",
+        "target": "@ui/text-swap.tsx"
+      }
     ]
   },
   {
     "name": "textarea",
     "type": "registry:ui",
     "title": "Textarea",
-    "description": "Textarea primitive. Base UI Integration: Works seamlessly with Base UI Field context (<Field.Control> or <Field>).",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Textarea primitive.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/textarea.tsx",
+        "type": "registry:ui",
+        "target": "@ui/textarea.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2056,14 +2612,16 @@
     "name": "texts-reveal",
     "type": "registry:ui",
     "title": "Texts Reveal",
-    "description": "TextsReveal Staggered text entrance container based strictly on transitions.dev (18-texts-reveal.md). Platform Reference: https://transitions.dev/detail.html?t=texts-reveal Features: - Entrance: Lines enter with 12px upward rise, 3px blur, and 40ms stagger. - Decoupled Exit: Single quiet 200ms opacity fade in-place without replaying the stagger in reverse. - Enforces the 5-item stagger cap (max 200ms cumulative delay). - Complies with prefers-reduced-motion.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Staggered text entrance container based strictly on transitions.dev (18-texts-reveal.md).",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/texts-reveal.tsx",
+        "type": "registry:ui",
+        "target": "@ui/texts-reveal.tsx"
+      }
     ]
   },
   {
@@ -2072,13 +2630,17 @@
     "title": "Thinking Orb",
     "description": "Eolas UI Thinking Orb component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "thinking-orbs"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/thinking-orb.tsx",
+        "type": "registry:ui",
+        "target": "@ui/thinking-orb.tsx"
+      }
     ]
   },
   {
@@ -2087,13 +2649,18 @@
     "title": "Toast",
     "description": "Eolas UI Toast component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/toast.tsx",
+        "type": "registry:ui",
+        "target": "@ui/toast.tsx"
+      }
     ]
   },
   {
@@ -2102,13 +2669,18 @@
     "title": "Toggle Group",
     "description": "ToggleGroup primitive (@base-ui/react/toggle-group).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "ui/toggle-group.tsx",
+        "type": "registry:ui",
+        "target": "@ui/toggle-group.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2127,12 +2699,17 @@
     "title": "Toggle",
     "description": "Toggle primitive (@base-ui/react/toggle).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/toggle.tsx",
+        "type": "registry:ui",
+        "target": "@ui/toggle.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2147,27 +2724,26 @@
     "name": "toggles",
     "type": "registry:ui",
     "title": "Toggles",
-    "description": "Re-exports toggle primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/toggle - @/components/ui/toggle-group",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Re-exports toggle primitives for backward compatibility.",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/toggle.json",
       "https://seany9915.github.io/eolas-ui/r/toggle-group.json"
+    ],
+    "files": [
+      {
+        "path": "ui/toggles.tsx",
+        "type": "registry:ui",
+        "target": "@ui/toggles.tsx"
+      }
     ]
   },
   {
     "name": "tool",
     "type": "registry:ui",
     "title": "Tool",
-    "description": "Tool primitive (ToolCall). Base UI Integration: Consumes Base UI Collapsible primitive, Button primitive, and Icon primitive.",
+    "description": "Tool primitive (ToolCall).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -2176,6 +2752,13 @@
       "https://seany9915.github.io/eolas-ui/r/code-block.json",
       "https://seany9915.github.io/eolas-ui/r/inline-alert.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/tool.tsx",
+        "type": "registry:ui",
+        "target": "@ui/tool.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2192,15 +2775,20 @@
     "name": "toolbar",
     "type": "registry:ui",
     "title": "Toolbar",
-    "description": "Toolbar primitive (@base-ui/react/toolbar). WAI-ARIA Role: role=\"toolbar\" Primary Purpose: Group of controls navigable with arrow keys under a SINGLE tab stop.",
+    "description": "Toolbar primitive (@base-ui/react/toolbar).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+    ],
+    "files": [
+      {
+        "path": "ui/toolbar.tsx",
+        "type": "registry:ui",
+        "target": "@ui/toolbar.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2219,23 +2807,26 @@
     "title": "Tooltip",
     "description": "Eolas UI Tooltip component built on Base UI and DESIGN.md design tokens.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/tooltip.tsx",
+        "type": "registry:ui",
+        "target": "@ui/tooltip.tsx"
+      }
     ]
   },
   {
     "name": "trace",
     "type": "registry:ui",
     "title": "Trace",
-    "description": "Trace primitive suite. Base UI Integration: Consumes `@base-ui/react/collapsible` for headless accessible disclosures. Specification & Reference: - https://ui.shadcn.com/docs/components/base/trace - https://ui.shadcn.com/docs/ai-elements",
+    "description": "Trace primitive suite.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -2243,6 +2834,13 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/shimmer-text.json",
       "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+    ],
+    "files": [
+      {
+        "path": "ui/trace.tsx",
+        "type": "registry:ui",
+        "target": "@ui/trace.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2257,14 +2855,20 @@
     "name": "view-transition",
     "type": "registry:ui",
     "title": "View Transition",
-    "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
+    "description": "ViewTransition primitive (@base-ui/react/button).",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/view-transitions.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
+    ],
+    "files": [
+      {
+        "path": "ui/view-transition.tsx",
+        "type": "registry:ui",
+        "target": "@ui/view-transition.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2280,17 +2884,19 @@
     "name": "app-shell",
     "type": "registry:block",
     "title": "App Shell",
-    "description": "AppShell composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Sidebar` compound primitives (`Sidebar.Provider`, `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Footer`, `Sidebar.Trigger`, `Sidebar.Rail`, `Sidebar.Inset`, `Sidebar.Menu`, `Sidebar.MenuItem`, `Sidebar.MenuButton`, `Sidebar.MenuBadge`) (`src/components/ui/sidebar.tsx`) - `NavigationBar`, `NavigationBar.Item` (`src/components/ui/navigation-bar.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "AppShell composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/sidebar.json",
       "https://seany9915.github.io/eolas-ui/r/navigation-bar.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/app-shell.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/app-shell.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2308,12 +2914,7 @@
     "name": "approval-card",
     "type": "registry:block",
     "title": "Approval Card",
-    "description": "ApprovalCard block. @deprecated Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with declarative `items`) for single-step or multi-step choice and free-text clarification prompts.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "ApprovalCard block. Deprecated: Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with...",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -2321,6 +2922,13 @@
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/radio.json",
       "https://seany9915.github.io/eolas-ui/r/input.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/approval-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/approval-card.tsx"
+      }
     ]
   },
   {
@@ -2329,15 +2937,18 @@
     "title": "Area Chart Card",
     "description": "AreaChartCard block. Controlled presentational card for volume trends and intake velocity over time. Composes ChartCard and Chart primitives with smooth gradient fills and accessible tooltips.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
       "https://seany9915.github.io/eolas-ui/r/chart.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/area-chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/area-chart-card.tsx"
+      }
     ]
   },
   {
@@ -2346,27 +2957,25 @@
     "title": "Bar Chart Card",
     "description": "BarChartCard block. Controlled presentational card for categorical throughput, comparative performance, and multi-metric distribution. Composes ChartCard and Chart primitives with rounded bars, accessible tooltips, and legends.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
       "https://seany9915.github.io/eolas-ui/r/chart.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/bar-chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/bar-chart-card.tsx"
+      }
     ]
   },
   {
     "name": "chart-card",
     "type": "registry:block",
     "title": "Chart Card",
-    "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row alignment, and trend badges.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row...",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/card.json",
@@ -2374,18 +2983,20 @@
       "https://seany9915.github.io/eolas-ui/r/skeleton.json",
       "https://seany9915.github.io/eolas-ui/r/empty.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/chart-card.tsx"
+      }
     ]
   },
   {
     "name": "chat",
     "type": "registry:block",
     "title": "Chat",
-    "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `Empty` (`src/components/ui/empty.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Chat composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/message-scroller.json",
@@ -2394,6 +3005,13 @@
       "https://seany9915.github.io/eolas-ui/r/prompt-input.json",
       "https://seany9915.github.io/eolas-ui/r/suggestion-chips.json",
       "https://seany9915.github.io/eolas-ui/r/empty.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/chat.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/chat.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2410,11 +3028,8 @@
     "name": "data-table",
     "type": "registry:block",
     "title": "Data Table",
-    "description": "DataTable composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens: - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`) - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Select` (`src/components/ui/select.tsx`) - `Menu` (`src/components/ui/menu.tsx`) - `Checkbox` (`src/components/ui/checkbox.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `@tanstack/react-table`",
+    "description": "DataTable composite block.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "@tanstack/react-table"
     ],
     "registryDependencies": [
@@ -2429,6 +3044,13 @@
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
     ],
+    "files": [
+      {
+        "path": "blocks/data-table.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/data-table.tsx"
+      }
+    ],
     "meta": {
       "taxonomy": [
         "Enterprise-grade, accessible data table composite block conforming to shadcn/ui Data Table specification.",
@@ -2442,29 +3064,25 @@
     "name": "delete-confirmation-dialog",
     "type": "registry:block",
     "title": "Delete Confirmation Dialog",
-    "description": "DeleteConfirmationDialog block. @deprecated Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "DeleteConfirmationDialog block. Deprecated: Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive...",
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/alert-dialog.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/delete-confirmation-dialog.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/delete-confirmation-dialog.tsx"
+      }
     ]
   },
   {
     "name": "filter-toolbar",
     "type": "registry:block",
     "title": "Filter Toolbar",
-    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch...",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/field.json",
@@ -2473,6 +3091,13 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/chip.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/filter-toolbar.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/filter-toolbar.tsx"
+      }
     ]
   },
   {
@@ -2481,27 +3106,25 @@
     "title": "Line Chart Card",
     "description": "LineChartCard block. Controlled presentational card for multi-series trajectories, baseline targets, and historical benchmark tracking. Composes ChartCard and Chart primitives with high-contrast lines, accessible tooltips, and legends.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
       "https://seany9915.github.io/eolas-ui/r/chart.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/line-chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/line-chart-card.tsx"
+      }
     ]
   },
   {
     "name": "list-detail-block",
     "type": "registry:block",
     "title": "List Detail Block",
-    "description": "ListDetailBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Field` (`Field.Root`, `Field.Label`) (`src/components/ui/field.tsx`) - `InputGroup` (`InputGroup.Addon`, `InputGroup.Input`, `InputGroup.Button`) (`src/components/ui/input-group.tsx`) - `Item` (`Item.Group`, `Item.Media`, `Item.Content`, `Item.Title`, `Item.Description`, `Item.Actions`) (`src/components/ui/item.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Empty` (`src/components/ui/empty.tsx`)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "ListDetailBlock composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -2511,6 +3134,13 @@
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/empty.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/list-detail-block.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/list-detail-block.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2529,17 +3159,19 @@
     "name": "metric-card",
     "type": "registry:block",
     "title": "Metric Card",
-    "description": "MetricCard block. @deprecated Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "MetricCard block. Deprecated: Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical...",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/card.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/metric-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/metric-card.tsx"
+      }
     ]
   },
   {
@@ -2548,27 +3180,26 @@
     "title": "Pie Chart Card",
     "description": "PieChartCard block. Controlled presentational card for category distributions, status proportions, and caseload composition breakdowns. Composes ChartCard and Chart primitives with a centered aggregate KPI and accessible tooltips.",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
       "https://seany9915.github.io/eolas-ui/r/chart.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/pie-chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/pie-chart-card.tsx"
+      }
     ]
   },
   {
     "name": "questionnaire",
     "type": "registry:block",
     "title": "Questionnaire",
-    "description": "Questionnaire composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Kbd` (`src/components/ui/kbd.tsx`)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "Questionnaire composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -2577,6 +3208,13 @@
       "https://seany9915.github.io/eolas-ui/r/progress.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/kbd.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/questionnaire.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/questionnaire.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2591,47 +3229,48 @@
     "name": "radar-chart-card",
     "type": "registry:block",
     "title": "Radar Chart Card",
-    "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids, high-contrast polygons, and accessible tooltips.",
+    "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids...",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
       "https://seany9915.github.io/eolas-ui/r/chart.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/radar-chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/radar-chart-card.tsx"
+      }
     ]
   },
   {
     "name": "radial-chart-card",
     "type": "registry:block",
     "title": "Radial Chart Card",
-    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary color. Composes ChartCard, Badge, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
+    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary...",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
     "registryDependencies": [
-      "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/chart.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/radial-chart-card.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/radial-chart-card.tsx"
+      }
     ]
   },
   {
     "name": "step-wizard",
     "type": "registry:block",
     "title": "Step Wizard",
-    "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Card` (`Card.Header`, `Card.Title`, `Card.Description`, `Card.Content`, `Card.Footer`) (`src/components/ui/card.tsx`) - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Separator` (`src/components/ui/separator.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "StepWizard composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/card.json",
@@ -2639,6 +3278,13 @@
       "https://seany9915.github.io/eolas-ui/r/separator.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/progress.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/step-wizard.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/step-wizard.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [
@@ -2653,17 +3299,19 @@
     "name": "supporting-pane-block",
     "type": "registry:block",
     "title": "Supporting Pane Block",
-    "description": "SupportingPaneBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Badge` (`src/components/ui/badge.tsx`)",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
+    "description": "SupportingPaneBlock composite block.",
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json"
+    ],
+    "files": [
+      {
+        "path": "blocks/supporting-pane-block.tsx",
+        "type": "registry:block",
+        "target": "@components/blocks/supporting-pane-block.tsx"
+      }
     ],
     "meta": {
       "taxonomy": [

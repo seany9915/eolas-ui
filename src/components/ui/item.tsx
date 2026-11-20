@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Item layout primitive (Content Row / Media Object).
  *

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Re-exports selection control primitives for backward compatibility.
  * Dedicated modular files exist at:

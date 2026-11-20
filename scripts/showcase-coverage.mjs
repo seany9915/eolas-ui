@@ -4,6 +4,7 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const UI_DIR = path.resolve(ROOT, 'src/components/ui');
 const BLOCKS_DIR = path.resolve(ROOT, 'src/components/blocks');
+const MANIFEST_FILE = path.resolve(ROOT, 'src/components/playground/registry/registry-manifest.ts');
 const DEMOS_INDEX = path.resolve(ROOT, 'src/components/playground/registry/demos/index.ts');
 
 console.log('=== Verifying Registry Showcase Demo Coverage ===\n');
@@ -29,8 +30,6 @@ const blockFiles = fs.existsSync(BLOCKS_DIR)
 
 // 3. Extract registered demo keys from REGISTRY_DEMOS map in demos/index.ts
 const demosContent = fs.readFileSync(DEMOS_INDEX, 'utf8');
-
-// Match entries like 'button': ButtonDemo or "data-table": DataTableDemo
 const demoMapMatch = demosContent.match(/export const REGISTRY_DEMOS[^=]*=\s*\{([\s\S]*?)\};/);
 if (!demoMapMatch) {
   console.error('❌ Error: Could not locate REGISTRY_DEMOS object in demos/index.ts');
@@ -45,18 +44,38 @@ while ((match = keyRegex.exec(mapBody)) !== null) {
   registeredDemoKeys.add(match[1]);
 }
 
-// 4. Calculate coverage
+// 4. Extract all manifest entry IDs from registry-manifest.ts
+let manifestIds = [];
+if (!fs.existsSync(MANIFEST_FILE)) {
+  console.error(`❌ Error: Registry manifest file not found at ${MANIFEST_FILE}`);
+  process.exit(1);
+}
+const manifestContent = fs.readFileSync(MANIFEST_FILE, 'utf8');
+const manifestArrayMatch = manifestContent.match(/REGISTRY_ENTRIES:\s*RegistryEntry\[\]\s*=\s*(\[[\s\S]*?\n\]);/);
+if (!manifestArrayMatch) {
+  console.error('❌ Error: Could not parse REGISTRY_ENTRIES array in registry-manifest.ts');
+  process.exit(1);
+}
+const manifestEntries = JSON.parse(manifestArrayMatch[1]);
+manifestIds = manifestEntries.map((entry) => entry.id);
+
+// 5. Calculate coverage
 const missingUi = uiFiles.filter((id) => !registeredDemoKeys.has(id));
 const missingBlocks = blockFiles.filter((id) => !registeredDemoKeys.has(id));
+const missingManifest = manifestIds.filter((id) => !registeredDemoKeys.has(id));
 
 const totalComponents = uiFiles.length + blockFiles.length;
 const totalMissing = missingUi.length + missingBlocks.length;
 const totalCovered = totalComponents - totalMissing;
 const coveragePercent = ((totalCovered / totalComponents) * 100).toFixed(1);
 
+const manifestCovered = manifestIds.length - missingManifest.length;
+const manifestPercent = ((manifestCovered / manifestIds.length) * 100).toFixed(1);
+
 console.log(`UI Primitives:    ${uiFiles.length - missingUi.length}/${uiFiles.length} covered`);
 console.log(`Composite Blocks: ${blockFiles.length - missingBlocks.length}/${blockFiles.length} covered`);
-console.log(`Total Coverage:   ${totalCovered}/${totalComponents} (${coveragePercent}%)\n`);
+console.log(`Component Total:  ${totalCovered}/${totalComponents} (${coveragePercent}%)`);
+console.log(`Manifest Entries: ${manifestCovered}/${manifestIds.length} (${manifestPercent}%)\n`);
 
 let hasError = false;
 
@@ -72,10 +91,16 @@ if (missingBlocks.length > 0) {
   missingBlocks.forEach((id) => console.error(`   - src/components/blocks/${id}.tsx`));
 }
 
+if (missingManifest.length > 0) {
+  hasError = true;
+  console.error(`❌ Missing showcase demos for ${missingManifest.length} Manifest entry(ies):`);
+  missingManifest.forEach((id) => console.error(`   - manifest id: ${id}`));
+}
+
 if (hasError) {
   console.error('\nRun `npm run dev` and register the missing demos in src/components/playground/registry/demos/index.ts.');
   process.exit(1);
 }
 
-console.log('✅ 100% Showcase Coverage: All primitives and composite blocks have live interactive playground demos.\n');
+console.log('✅ 100% Showcase Coverage: All primitives, composite blocks, and manifest entries have live interactive playground demos.\n');
 process.exit(0);

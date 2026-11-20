@@ -3,24 +3,17 @@
   "name": "toggles",
   "type": "registry:ui",
   "title": "Toggles",
-  "description": "Re-exports toggle primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/toggle - @/components/ui/toggle-group",
-  "dependencies": [
-    "@base-ui/react",
-    "clsx",
-    "tailwind-merge"
-  ],
+  "description": "Re-exports toggle primitives for backward compatibility.",
   "registryDependencies": [
-    "https://seany9915.github.io/eolas-ui/r/utils.json",
     "https://seany9915.github.io/eolas-ui/r/toggle.json",
     "https://seany9915.github.io/eolas-ui/r/toggle-group.json"
   ],
   "files": [
     {
       "path": "ui/toggles.tsx",
-      "content": "/**\n * Re-exports toggle primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/toggle\n * - @/components/ui/toggle-group\n */\nexport * from './toggle';\nexport * from './toggle-group';\n",
+      "content": "'use client';\n\n/**\n * Re-exports toggle primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/toggle\n * - @/components/ui/toggle-group\n */\nexport * from './toggle';\nexport * from './toggle-group';\n",
       "type": "registry:ui",
       "target": "@ui/toggles.tsx"
     }
-  ],
-  "docs": "Re-exports toggle primitives for backward compatibility.\nDedicated modular files exist at:\n- @/components/ui/toggle\n- @/components/ui/toggle-group"
+  ]
 }

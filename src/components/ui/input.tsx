@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Input primitive (@base-ui/react/input).
  *

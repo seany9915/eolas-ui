@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Combobox primitive (@base-ui/react/combobox).
  *

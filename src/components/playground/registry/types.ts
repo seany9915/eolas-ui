@@ -35,7 +35,9 @@ export interface RegistryEntry {
   replacedBy?: string;
   taxonomy?: string[];
   dependencies?: string[];
+  importStatement?: string;
   shadcnCommand?: string;
+  eolasCommand?: string;
   codeSnippet?: string;
   wcagNotes?: string;
 }

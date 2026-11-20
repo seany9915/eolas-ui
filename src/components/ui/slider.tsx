@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Slider primitive (@base-ui/react/slider).
  *

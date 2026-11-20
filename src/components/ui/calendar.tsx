@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Calendar primitive (React DayPicker).
  *

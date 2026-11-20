@@ -149,6 +149,12 @@ import {
 import {
   DirectionProviderDemo,
   CspProviderDemo,
+  UtilsDemo,
+  SanitizeDemo,
+  SchedulerDemo,
+  BuiltInAiDemo,
+  ScrollCompletionDemo,
+  FormatDurationDemo,
 } from './SystemDemos';
 
 export const REGISTRY_DEMOS: ComponentDemoMap = {
@@ -293,4 +299,10 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   // System
   'direction-provider': DirectionProviderDemo,
   'csp-provider': CspProviderDemo,
+  'utils': UtilsDemo,
+  'sanitize': SanitizeDemo,
+  'scheduler': SchedulerDemo,
+  'built-in-ai': BuiltInAiDemo,
+  'scroll-completion': ScrollCompletionDemo,
+  'format-duration': FormatDurationDemo,
 };

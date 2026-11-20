@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * ListDetailBlock composite block.
  *

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * ScrollArea primitive (@base-ui/react/scroll-area).
  *

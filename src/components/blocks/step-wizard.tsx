@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * StepWizard composite block.
  *

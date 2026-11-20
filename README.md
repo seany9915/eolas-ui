@@ -50,7 +50,7 @@ In your project's `.oxlintrc.json`:
 }
 ```
 
-Or install the standalone `.oxlintrc.json` and `lint/index.js` directly via the registry:
+Or install the standalone `.oxlintrc.json` and `lint/index.mjs` directly via the registry:
 ```bash
 npx shadcn add @eolas/lint
 ```
@@ -77,9 +77,8 @@ If you are consuming via the URL registry without `@eolas/lint`, configure `@sha
 
 ## 📦 What is Included?
 
-All official Base UI primitives + clinical UI components:
-* **Layout & Navigation:** navigation-menu, tabs, menubar, toolbar, scroll-area, separator, direction-provider
-* **Overlays & Dialogs:** dialog, alert-dialog, drawer, popover, tooltip, preview-card
-* **Form & Selection:** select, combobox, autocomplete, checkbox, checkbox-group, radio, switch, slider, number-field, otp-field, input, field, fieldset, form
-* **Feedback & Status:** toast, inline-alert, progress, meter, skeleton, chip
-* **Utilities:** utils (re-exporting Base UI prop composition & headless render hooks)
+140 installable registry items covering Base UI primitives, clinical composite blocks, utility modules, theme tokens, agent rules, and lint enforcement:
+* **UI Primitives (106):** Layout & navigation (`navigation-menu`, `tabs`, `menubar`, `toolbar`, `scroll-area`, `separator`, `sidebar`), overlays (`dialog`, `alert-dialog`, `drawer`, `popover`, `tooltip`, `preview-card`, `command`), form & selection (`select`, `combobox`, `autocomplete`, `checkbox`, `radio`, `switch`, `slider`, `number-field`, `otp-field`, `input`, `input-group`, `field`, `fieldset`, `form`), feedback & status (`toast`, `inline-alert`, `progress`, `meter`, `skeleton`, `badge`, `chip`), motion primitives, and clinical AI UI (`chat-message`, `trace`, `reasoning`, `tool`, `confirmation`, `sources`, `attachment`).
+* **Composite Blocks (18):** `app-shell`, `chart-card` suite (`area-chart-card`, `bar-chart-card`, `line-chart-card`, `pie-chart-card`, `radar-chart-card`, `radial-chart-card`), `chat`, `data-table`, `filter-toolbar`, `list-detail-block`, `questionnaire`, `step-wizard`, `supporting-pane-block`, plus legacy compatibility blocks.
+* **Utilities & Hooks (12):** `utils` (Base UI prop composition & headless render hooks, `cn()`, `sanitizeUrl()`, `assetUrl()`), `sanitize`, `scheduler`, `built-in-ai`, `scroll-completion`, `format-duration`, plus internal UI helper modules (`announce`, `contrast`, `use-horizontal-scroll-fade`, `use-text-highlight`, `use-web-otp`, `view-transitions`).
+* **Design Tokens, Rules & Linter (4):** `theme`, `design-md`, `agent-rules`, and `lint`.

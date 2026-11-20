@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Collapsible primitive (@base-ui/react/collapsible).
  *

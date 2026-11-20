@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Separator primitive (@base-ui/react/separator).
  *

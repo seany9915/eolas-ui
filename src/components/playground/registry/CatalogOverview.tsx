@@ -70,6 +70,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
   const totalCount = REGISTRY_ENTRIES.length;
   const primitivesCount = REGISTRY_ENTRIES.filter((e) => e.tier === 'primitive').length;
   const blocksCount = REGISTRY_ENTRIES.filter((e) => e.tier === 'block').length;
+  const utilitiesCount = REGISTRY_ENTRIES.filter((e) => e.tier === 'utility').length;
 
   const getCategoryCount = (catId: ComponentCategory) => {
     return REGISTRY_ENTRIES.filter((e) => e.category === catId).length;
@@ -86,7 +87,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                 variant="soft"
                 colorRole="primary"
                 size="sm"
-              >Registry v3.1</Badge>
+              >Registry v4.1</Badge>
               <span className="font-mono text-xs px-2.5 py-1 rounded-md bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 Base UI (@base-ui/react)
               </span>
@@ -120,6 +121,13 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                 {blocksCount}
               </span>
               <span className="font-sans text-xs font-medium text-on-surface-variant">Blocks</span>
+            </div>
+            <div className="h-8 w-px bg-outline-variant" />
+            <div>
+              <span className="font-heading text-2xl sm:text-3xl font-bold text-on-surface-variant block leading-none mb-1 tabular-nums">
+                {utilitiesCount}
+              </span>
+              <span className="font-sans text-xs font-medium text-on-surface-variant">Utilities</span>
             </div>
           </div>
         </div>
@@ -177,6 +185,9 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
               </ToggleGroupItem>
               <ToggleGroupItem value="block" className="text-xs px-3">
                 Blocks ({blocksCount})
+              </ToggleGroupItem>
+              <ToggleGroupItem value="utility" className="text-xs px-3">
+                Utilities ({utilitiesCount})
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
@@ -241,9 +252,9 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                         )}
                         <Badge
                           variant="soft"
-                          colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
+                          colorRole={entry.tier === 'block' ? 'secondary' : entry.tier === 'utility' ? 'neutral' : 'primary'}
                           size="sm"
-                        >{entry.tier === 'block' ? 'Block' : 'Primitive'}</Badge>
+                        >{entry.tier === 'block' ? 'Block' : entry.tier === 'utility' ? 'Utility' : 'Primitive'}</Badge>
                       </div>
                     </div>
 

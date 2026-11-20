@@ -3,23 +3,16 @@
   "name": "steppers",
   "type": "registry:ui",
   "title": "Steppers",
-  "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
-  "dependencies": [
-    "@base-ui/react",
-    "clsx",
-    "tailwind-merge"
-  ],
+  "description": "Backward-compatibility alias for NumberField.",
   "registryDependencies": [
-    "https://seany9915.github.io/eolas-ui/r/utils.json",
     "https://seany9915.github.io/eolas-ui/r/number-field.json"
   ],
   "files": [
     {
       "path": "ui/steppers.tsx",
-      "content": "/**\n * Backward-compatibility alias for NumberField.\n * Canonical primitive resides at @/components/ui/number-field.\n * For OTP Passcode input, import directly from @/components/ui/otp-field.\n */\nexport { NumberField, BaseNumberField, NumberFieldRoot, NumberFieldGroup, NumberFieldInput, NumberFieldIncrement, NumberFieldDecrement } from './number-field';\nexport type { NumberFieldProps } from './number-field';\n\n// Legacy alias\nexport { NumberField as Stepper } from './number-field';\nexport type { NumberFieldProps as StepperProps } from './number-field';\n",
+      "content": "'use client';\n\n/**\n * Backward-compatibility alias for NumberField.\n * Canonical primitive resides at @/components/ui/number-field.\n * For OTP Passcode input, import directly from @/components/ui/otp-field.\n */\nexport { NumberField, BaseNumberField, NumberFieldRoot, NumberFieldGroup, NumberFieldInput, NumberFieldIncrement, NumberFieldDecrement } from './number-field';\nexport type { NumberFieldProps } from './number-field';\n\n// Legacy alias\nexport { NumberField as Stepper } from './number-field';\nexport type { NumberFieldProps as StepperProps } from './number-field';\n",
       "type": "registry:ui",
       "target": "@ui/steppers.tsx"
     }
-  ],
-  "docs": "Backward-compatibility alias for NumberField.\nCanonical primitive resides at @/components/ui/number-field.\nFor OTP Passcode input, import directly from @/components/ui/otp-field."
+  ]
 }

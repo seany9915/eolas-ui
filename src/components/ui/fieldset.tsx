@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Fieldset primitive (@base-ui/react/fieldset).
  *

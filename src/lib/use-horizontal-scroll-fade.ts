@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Horizontal scroll overflow detection for soft edge-fade masks.
  *

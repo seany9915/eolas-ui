@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Switch primitive (@base-ui/react/switch).
  *

@@ -9,14 +9,81 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
     "category": "system",
     "tier": "utility",
-    "basePrimitive": "Base UI Headless Library",
+    "basePrimitive": "Eolas Utility Module",
     "sourcePath": "src/lib/utils.ts",
     "dependencies": [
+      "@base-ui/react",
       "clsx",
-      "tailwind-merge",
-      "@base-ui/react"
+      "tailwind-merge"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add utils"
+    "importStatement": "import { cn, sanitizeUrl, mergeProps, useRender } from '@/lib/utils';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/utils",
+    "eolasCommand": "npx @seany9915/eolas-ui add utils"
+  },
+  {
+    "id": "built-in-ai",
+    "name": "built-in-ai",
+    "title": "Built-in AI",
+    "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator).",
+    "category": "system",
+    "tier": "utility",
+    "basePrimitive": "Eolas Utility Module",
+    "sourcePath": "src/lib/built-in-ai.ts",
+    "importStatement": "import { useLanguageModel, useSummarizer, useTranslator } from '@/lib/built-in-ai';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/built-in-ai",
+    "eolasCommand": "npx @seany9915/eolas-ui add built-in-ai"
+  },
+  {
+    "id": "format-duration",
+    "name": "format-duration",
+    "title": "Format Duration",
+    "description": "Duration Formatting Utility and Hook",
+    "category": "system",
+    "tier": "utility",
+    "basePrimitive": "Eolas Utility Module",
+    "sourcePath": "src/lib/format-duration.ts",
+    "importStatement": "import { formatDuration, useDurationFormat } from '@/lib/format-duration';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/format-duration",
+    "eolasCommand": "npx @seany9915/eolas-ui add format-duration"
+  },
+  {
+    "id": "sanitize",
+    "name": "sanitize",
+    "title": "Sanitize",
+    "description": "Untrusted HTML Sanitizer Utility & React Component.",
+    "category": "system",
+    "tier": "utility",
+    "basePrimitive": "Eolas Utility Module",
+    "sourcePath": "src/lib/sanitize.ts",
+    "importStatement": "import { sanitizeHtml, SanitizedHtml } from '@/lib/sanitize';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/sanitize",
+    "eolasCommand": "npx @seany9915/eolas-ui add sanitize"
+  },
+  {
+    "id": "scheduler",
+    "name": "scheduler",
+    "title": "Scheduler",
+    "description": "Cooperative Task Scheduling & Yielding Utilities.",
+    "category": "system",
+    "tier": "utility",
+    "basePrimitive": "Eolas Utility Module",
+    "sourcePath": "src/lib/scheduler.ts",
+    "importStatement": "import { yieldToMain, processChunked, useYieldingFilter } from '@/lib/scheduler';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/scheduler",
+    "eolasCommand": "npx @seany9915/eolas-ui add scheduler"
+  },
+  {
+    "id": "scroll-completion",
+    "name": "scroll-completion",
+    "title": "Scroll Completion",
+    "description": "Programmatic scroll completion utilities.",
+    "category": "system",
+    "tier": "utility",
+    "basePrimitive": "Eolas Utility Module",
+    "sourcePath": "src/lib/scroll-completion.ts",
+    "importStatement": "import { scrollIntoViewAsync, scrollToAsync } from '@/lib/scroll-completion';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/scroll-completion",
+    "eolasCommand": "npx @seany9915/eolas-ui add scroll-completion"
   },
   {
     "id": "accordion",
@@ -33,11 +100,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add accordion"
+    "importStatement": "import { Accordion } from '@/components/ui/accordion';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/accordion",
+    "eolasCommand": "npx @seany9915/eolas-ui add accordion"
   },
   {
     "id": "alert-dialog",
@@ -49,27 +116,27 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/alert-dialog",
     "sourcePath": "src/components/ui/alert-dialog.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add alert-dialog"
+    "importStatement": "import { AlertDialog } from '@/components/ui/alert-dialog';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/alert-dialog",
+    "eolasCommand": "npx @seany9915/eolas-ui add alert-dialog"
   },
   {
     "id": "attachment",
     "name": "attachment",
     "title": "Attachment",
-    "description": "Attachment component system. Full API and feature parity with shadcn/ui Base Attachment specification: https://ui.shadcn.com/docs/components/base/attachment ANATOMY: AttachmentGroup └── Attachment ├── AttachmentMedia ├── AttachmentContent │   ├── AttachmentTitle │   └── AttachmentDescription ├── AttachmentActions │   └── AttachmentAction └── AttachmentTrigger FEATURES & CAPABILITIES: - Full compound composition with subcomponents for flexible media, layout, and metadata display. - Upload lifecycle states: 'idle' | 'uploading' | 'processing' | 'error' | 'done'. - Layout orientations: 'horizontal' (compact row/chip) and 'vertical' (stacked card). - Component sizes: 'default' | 'sm' | 'xs'. - Media variants: 'default' (file-type icons or container wash) and 'image' (aspect-square thumbnails). - Stretched interactive overlay (AttachmentTrigger) with isolated action button stacking (AttachmentActions). - Horizontally scrollable, snapping container (AttachmentGroup) with smooth edge fades. - Base UI polymorphic useRender support across all subcomponents. - Strict compliance with DESIGN.md high-contrast tokens, WCAG AA, and floating focus rings.",
+    "description": "Attachment component system.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/attachment.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add attachment"
+    "importStatement": "import { Attachment } from '@/components/ui/attachment';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/attachment",
+    "eolasCommand": "npx @seany9915/eolas-ui add attachment"
   },
   {
     "id": "autocomplete",
@@ -86,11 +153,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add autocomplete"
+    "importStatement": "import { Autocomplete } from '@/components/ui/autocomplete';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/autocomplete",
+    "eolasCommand": "npx @seany9915/eolas-ui add autocomplete"
   },
   {
     "id": "avatar",
@@ -107,17 +174,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and sentence case typography."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add avatar"
+    "importStatement": "import { Avatar } from '@/components/ui/avatar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/avatar",
+    "eolasCommand": "npx @seany9915/eolas-ui add avatar"
   },
   {
     "id": "badge",
     "name": "badge",
     "title": "Badge",
-    "description": "Badge primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/badge",
+    "description": "Badge primitive.",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
@@ -134,11 +201,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Polymorphic composition powered by Base UI's `useRender` hook."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add badge"
+    "importStatement": "import { Badge } from '@/components/ui/badge';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/badge",
+    "eolasCommand": "npx @seany9915/eolas-ui add badge"
   },
   {
     "id": "bot-avatar",
@@ -150,12 +217,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/bot-avatar.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "bot-avatars"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add bot-avatar"
+    "importStatement": "import { BotAvatar } from '@/components/ui/bot-avatar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/bot-avatar",
+    "eolasCommand": "npx @seany9915/eolas-ui add bot-avatar"
   },
   {
     "id": "breadcrumb",
@@ -167,17 +233,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/use-render",
     "sourcePath": "src/components/ui/breadcrumb.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add breadcrumb"
+    "importStatement": "import { Breadcrumb } from '@/components/ui/breadcrumb';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/breadcrumb",
+    "eolasCommand": "npx @seany9915/eolas-ui add breadcrumb"
   },
   {
     "id": "button-group",
     "name": "button-group",
     "title": "Button Group",
-    "description": "ButtonGroup primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/button-group",
+    "description": "ButtonGroup primitive.",
     "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
@@ -189,11 +255,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 touch target compliance."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add button-group"
+    "importStatement": "import { ButtonGroup } from '@/components/ui/button-group';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/button-group",
+    "eolasCommand": "npx @seany9915/eolas-ui add button-group"
   },
   {
     "id": "button",
@@ -212,17 +278,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Never uses Sunny Amber (tertiary) text on light surfaces without dark container background."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add button"
+    "importStatement": "import { Button } from '@/components/ui/button';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/button",
+    "eolasCommand": "npx @seany9915/eolas-ui add button"
   },
   {
     "id": "calendar",
     "name": "calendar",
     "title": "Calendar",
-    "description": "Calendar primitive (React DayPicker). Base UI Ecosystem Documentation: https://ui.shadcn.com/docs/components/base/calendar React DayPicker Documentation: https://daypicker.dev",
+    "description": "Calendar primitive (React DayPicker).",
     "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -234,12 +300,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "react-day-picker"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add calendar"
+    "importStatement": "import { Calendar } from '@/components/ui/calendar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/calendar",
+    "eolasCommand": "npx @seany9915/eolas-ui add calendar"
   },
   {
     "id": "card",
@@ -251,17 +316,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/button",
     "sourcePath": "src/components/ui/card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add card"
+    "importStatement": "import { Card } from '@/components/ui/card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/card",
+    "eolasCommand": "npx @seany9915/eolas-ui add card"
   },
   {
     "id": "carousel",
     "name": "carousel",
     "title": "Carousel",
-    "description": "Carousel primitive built on embla-carousel-react and Base UI. Embla Carousel Documentation: https://www.embla-carousel.com/",
+    "description": "Carousel primitive built on embla-carousel-react and Base UI.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/button",
@@ -274,17 +339,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     ],
     "dependencies": [
       "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "embla-carousel-react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add carousel"
+    "importStatement": "import { Carousel } from '@/components/ui/carousel';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/carousel",
+    "eolasCommand": "npx @seany9915/eolas-ui add carousel"
   },
   {
     "id": "chain-of-thought",
     "name": "chain-of-thought",
     "title": "Chain Of Thought",
-    "description": "ChainOfThought primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite and `Chip` design tokens. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/chain-of-thought",
+    "description": "ChainOfThought primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -296,12 +361,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on triggers.",
       "Follows DESIGN.md tokens: floating 2px focus ring, semantic tokens, zero triple-tints."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chain-of-thought"
+    "importStatement": "import { ChainOfThought } from '@/components/ui/chain-of-thought';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chain-of-thought",
+    "eolasCommand": "npx @seany9915/eolas-ui add chain-of-thought"
   },
   {
     "id": "chart",
@@ -313,12 +375,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/chart.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chart"
+    "importStatement": "import { Chart } from '@/components/ui/chart';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chart",
+    "eolasCommand": "npx @seany9915/eolas-ui add chart"
   },
   {
     "id": "chat-message-context",
@@ -329,18 +390,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/chat-message-context.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chat-message-context"
+    "importStatement": "import { ChatMessageContext } from '@/components/ui/chat-message-context';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chat-message-context",
+    "eolasCommand": "npx @seany9915/eolas-ui add chat-message-context"
   },
   {
     "id": "chat-message",
     "name": "chat-message",
     "title": "Chat Message",
-    "description": "ChatMessage primitive. Base UI Integration: Works seamlessly with Base UI Button and Icon primitives.",
+    "description": "ChatMessage primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -353,12 +411,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Actions (copy, bookmark, retry) maintain accessible 44x44px touch targets.",
       "Numeric timestamps use `tabular-nums` and `font-mono`."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chat-message"
+    "importStatement": "import { ChatMessage } from '@/components/ui/chat-message';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chat-message",
+    "eolasCommand": "npx @seany9915/eolas-ui add chat-message"
   },
   {
     "id": "checkbox-group",
@@ -376,11 +431,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add checkbox-group"
+    "importStatement": "import { CheckboxGroup } from '@/components/ui/checkbox-group';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/checkbox-group",
+    "eolasCommand": "npx @seany9915/eolas-ui add checkbox-group"
   },
   {
     "id": "checkbox",
@@ -398,17 +453,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius (rounded-xs / 4px on box, rounded 8px on row), floating 2px focus ring, flush primary fill on check, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add checkbox"
+    "importStatement": "import { Checkbox } from '@/components/ui/checkbox';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/checkbox",
+    "eolasCommand": "npx @seany9915/eolas-ui add checkbox"
   },
   {
     "id": "checkpoint",
     "name": "checkpoint",
     "title": "Checkpoint",
-    "description": "Checkpoint primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
+    "description": "Checkpoint primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -421,12 +476,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Monospace tabular-nums for turn numbering and timestamps.",
       "Single-ring floating 2px focus indicator."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add checkpoint"
+    "importStatement": "import { Checkpoint } from '@/components/ui/checkpoint';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/checkpoint",
+    "eolasCommand": "npx @seany9915/eolas-ui add checkpoint"
   },
   {
     "id": "chip",
@@ -448,11 +500,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Floating 2px focus ring (outline-offset: 2px) on keyboard focus."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chip"
+    "importStatement": "import { Chip } from '@/components/ui/chip';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chip",
+    "eolasCommand": "npx @seany9915/eolas-ui add chip"
   },
   {
     "id": "clinician-tip",
@@ -463,18 +515,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/clinician-tip.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add clinician-tip"
+    "importStatement": "import { ClinicianTip } from '@/components/ui/clinician-tip';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/clinician-tip",
+    "eolasCommand": "npx @seany9915/eolas-ui add clinician-tip"
   },
   {
     "id": "code-block",
     "name": "code-block",
     "title": "Code Block",
-    "description": "CodeBlock primitive. Base UI Integration: Consumes Base UI Tooltip and Button primitives. Specification & Reference: - https://ui.shadcn.com/docs/components/base/code-block - https://ui.shadcn.com/docs/ai-elements",
+    "description": "CodeBlock primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -484,12 +533,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 compliant: 44px touch targets on copy buttons.",
       "Follows DESIGN.md tokens: Roboto Mono typography, high-contrast text, concentric radius, and floating 2px focus ring."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add code-block"
+    "importStatement": "import { CodeBlock } from '@/components/ui/code-block';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/code-block",
+    "eolasCommand": "npx @seany9915/eolas-ui add code-block"
   },
   {
     "id": "collapsible",
@@ -506,11 +552,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add collapsible"
+    "importStatement": "import { Collapsible } from '@/components/ui/collapsible';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/collapsible",
+    "eolasCommand": "npx @seany9915/eolas-ui add collapsible"
   },
   {
     "id": "combobox",
@@ -528,17 +574,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush selection indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add combobox"
+    "importStatement": "import { Combobox } from '@/components/ui/combobox';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/combobox",
+    "eolasCommand": "npx @seany9915/eolas-ui add combobox"
   },
   {
     "id": "command",
     "name": "command",
     "title": "Command",
-    "description": "Command primitive (cmdk + Base UI Dialog). cmdk Documentation: https://cmdk.paco.me",
+    "description": "Command primitive (cmdk + Base UI Dialog).",
     "category": "overlays",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -550,19 +596,18 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings, surface-container wash for item selection, and strict semantic tokens."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "cmdk"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add command"
+    "importStatement": "import { Command } from '@/components/ui/command';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/command",
+    "eolasCommand": "npx @seany9915/eolas-ui add command"
   },
   {
     "id": "confirmation",
     "name": "confirmation",
     "title": "Confirmation",
-    "description": "Confirmation primitive. Base UI Integration: Consumes Base UI Button primitive and Icon primitive.",
-    "category": "clinical-ai",
+    "description": "Confirmation primitive.",
+    "category": "overlays",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/confirmation.tsx",
@@ -575,12 +620,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Floating 2px focus rings (`outline-offset: 2px`).",
       "Concentric radius hierarchy (`rounded-xl` container with `rounded` buttons)."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add confirmation"
+    "importStatement": "import { Confirmation } from '@/components/ui/confirmation';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/confirmation",
+    "eolasCommand": "npx @seany9915/eolas-ui add confirmation"
   },
   {
     "id": "context-menu",
@@ -592,33 +634,33 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/context-menu",
     "sourcePath": "src/components/ui/context-menu.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add context-menu"
+    "importStatement": "import { ContextMenu } from '@/components/ui/context-menu';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/context-menu",
+    "eolasCommand": "npx @seany9915/eolas-ui add context-menu"
   },
   {
     "id": "csp-provider",
     "name": "csp-provider",
-    "title": "Csp Provider",
-    "description": "Eolas UI Csp Provider component built on Base UI and DESIGN.md design tokens.",
+    "title": "CSP Provider",
+    "description": "Eolas UI CSP Provider component built on Base UI and DESIGN.md design tokens.",
     "category": "system",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/csp-provider",
     "sourcePath": "src/components/ui/csp-provider.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add csp-provider"
+    "importStatement": "import { CSPProvider } from '@/components/ui/csp-provider';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/csp-provider",
+    "eolasCommand": "npx @seany9915/eolas-ui add csp-provider"
   },
   {
     "id": "deferred-view",
     "name": "deferred-view",
     "title": "Deferred View",
-    "description": "DeferredView primitive. Platform Reference: Modern Web Guidance (MWG: defer-rendering-heavy-content)",
+    "description": "DeferredView primitive.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -629,12 +671,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Supports 'hidden' mode for instantaneous view toggling without destroying component DOM state.",
       "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add deferred-view"
+    "importStatement": "import { DeferredView } from '@/components/ui/deferred-view';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/deferred-view",
+    "eolasCommand": "npx @seany9915/eolas-ui add deferred-view"
   },
   {
     "id": "dialog",
@@ -646,11 +685,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/dialog",
     "sourcePath": "src/components/ui/dialog.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add dialog"
+    "importStatement": "import { Dialog } from '@/components/ui/dialog';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/dialog",
+    "eolasCommand": "npx @seany9915/eolas-ui add dialog"
   },
   {
     "id": "direction-provider",
@@ -662,11 +701,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/direction-provider",
     "sourcePath": "src/components/ui/direction-provider.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add direction-provider"
+    "importStatement": "import { DirectionProvider } from '@/components/ui/direction-provider';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/direction-provider",
+    "eolasCommand": "npx @seany9915/eolas-ui add direction-provider"
   },
   {
     "id": "drawer",
@@ -683,17 +722,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add drawer"
+    "importStatement": "import { Drawer } from '@/components/ui/drawer';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/drawer",
+    "eolasCommand": "npx @seany9915/eolas-ui add drawer"
   },
   {
     "id": "empty-state",
     "name": "empty-state",
     "title": "Empty State",
-    "description": "EmptyState primitive (backward-compatibility alias for Empty). Canonical primitive resides at @/components/ui/empty. Conforms to https://ui.shadcn.com/docs/components/base/empty",
+    "description": "EmptyState primitive (backward-compatibility alias for Empty).",
     "category": "feedback",
     "tier": "utility",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -701,18 +740,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/empty.",
     "replacedBy": "empty",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add empty-state"
+    "importStatement": "import { EmptyState } from '@/components/ui/empty-state';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/empty-state",
+    "eolasCommand": "npx @seany9915/eolas-ui add empty-state"
   },
   {
     "id": "empty",
     "name": "empty",
     "title": "Empty",
-    "description": "Empty primitive. Base UI Integration: Pure design token & Base UI companion primitive. Specification & Reference: https://ui.shadcn.com/docs/components/base/empty",
+    "description": "Empty primitive.",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -729,12 +765,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Also supports monolithic convenience props (icon, title, description, action) for backward compatibility.",
       "Follows DESIGN.md: concentric border radius, semantic high-contrast colors, and text-balance / text-pretty."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add empty"
+    "importStatement": "import { Empty } from '@/components/ui/empty';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/empty",
+    "eolasCommand": "npx @seany9915/eolas-ui add empty"
   },
   {
     "id": "error-shake",
@@ -746,12 +779,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/error-shake.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add error-shake"
+    "importStatement": "import { ErrorShake } from '@/components/ui/error-shake';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/error-shake",
+    "eolasCommand": "npx @seany9915/eolas-ui add error-shake"
   },
   {
     "id": "field",
@@ -769,11 +799,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add field"
+    "importStatement": "import { Field } from '@/components/ui/field';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/field",
+    "eolasCommand": "npx @seany9915/eolas-ui add field"
   },
   {
     "id": "fieldset",
@@ -790,11 +820,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add fieldset"
+    "importStatement": "import { Fieldset } from '@/components/ui/fieldset';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/fieldset",
+    "eolasCommand": "npx @seany9915/eolas-ui add fieldset"
   },
   {
     "id": "form",
@@ -810,11 +840,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add form"
+    "importStatement": "import { Form } from '@/components/ui/form';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/form",
+    "eolasCommand": "npx @seany9915/eolas-ui add form"
   },
   {
     "id": "icon",
@@ -825,18 +855,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/icon.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add icon"
+    "importStatement": "import { Icon } from '@/components/ui/icon';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/icon",
+    "eolasCommand": "npx @seany9915/eolas-ui add icon"
   },
   {
     "id": "inline-alert",
     "name": "inline-alert",
     "title": "Inline Alert",
-    "description": "InlineAlert primitive. Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/alert",
+    "description": "InlineAlert primitive.",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/button",
@@ -849,17 +876,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add inline-alert"
+    "importStatement": "import { InlineAlert } from '@/components/ui/inline-alert';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/inline-alert",
+    "eolasCommand": "npx @seany9915/eolas-ui add inline-alert"
   },
   {
     "id": "inline-citation",
     "name": "inline-citation",
     "title": "Inline Citation",
-    "description": "Inline Citation primitive. Base UI Integration: Built on Base UI PreviewCard (@base-ui/react/preview-card), Button (UnstyledButton), and Carousel primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/inline-citation",
+    "description": "Inline Citation primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/preview-card",
@@ -874,17 +901,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Full keyboard accessibility and prefers-reduced-motion safety."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add inline-citation"
+    "importStatement": "import { InlineCitation } from '@/components/ui/inline-citation';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/inline-citation",
+    "eolasCommand": "npx @seany9915/eolas-ui add inline-citation"
   },
   {
     "id": "input-group",
     "name": "input-group",
     "title": "Input Group",
-    "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group ANATOMY: InputGroup ├── InputGroupInput (or InputGroupTextarea) └── InputGroupAddon (align=\"inline-start\" | \"inline-end\" | \"block-start\" | \"block-end\") ├── InputGroupButton └── InputGroupText",
+    "description": "InputGroup primitive. Full API reference and feature parity with shadcn/ui Base Input Group specification: https://ui.shadcn.com/docs/components/base/input-group",
     "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
@@ -898,17 +925,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and WCAG 2.2 SC 2.5.8 touch target compliance."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add input-group"
+    "importStatement": "import { InputGroup } from '@/components/ui/input-group';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/input-group",
+    "eolasCommand": "npx @seany9915/eolas-ui add input-group"
   },
   {
     "id": "input",
     "name": "input",
     "title": "Input",
-    "description": "Input primitive (@base-ui/react/input). shadcn Base Input Documentation: https://ui.shadcn.com/docs/components/base/input ANATOMY: Input (or BaseInput / InputPrimitive)",
+    "description": "Input primitive (@base-ui/react/input).",
     "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/input",
@@ -923,17 +950,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "For complex input layouts with toolbars, prefixes, suffixes, or multiple buttons, compose with <InputGroup> (@/components/ui/input-group)."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add input"
+    "importStatement": "import { Input } from '@/components/ui/input';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/input",
+    "eolasCommand": "npx @seany9915/eolas-ui add input"
   },
   {
     "id": "item",
     "name": "item",
     "title": "Item",
-    "description": "Item layout primitive (Content Row / Media Object). Full API reference and feature parity with shadcn/ui Base Item specification: https://ui.shadcn.com/docs/components/base/item ANATOMY: ItemGroup └── Item ├── ItemHeader ├── ItemMedia ├── ItemContent │   ├── ItemTitle │   └── ItemDescription ├── ItemActions ├── ItemFooter └── ItemSeparator",
+    "description": "Item layout primitive (Content Row / Media Object). Full API reference and feature parity with shadcn/ui Base Item specification: https://ui.shadcn.com/docs/components/base/item",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
@@ -946,17 +973,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md tokens: Lexend body/description font, Lexend label headers, floating 2px focus ring, and strict semantic tokens with zero artificial elevation on list rows."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add item"
+    "importStatement": "import { Item } from '@/components/ui/item';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/item",
+    "eolasCommand": "npx @seany9915/eolas-ui add item"
   },
   {
     "id": "kbd",
     "name": "kbd",
     "title": "Kbd",
-    "description": "Keyboard key primitive (Kbd). Aligned with shadcn/ui and Base UI ecosystem patterns: https://ui.shadcn.com/docs/components/base/kbd",
+    "description": "Keyboard key primitive (Kbd).",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/use-render",
@@ -968,11 +995,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container wash, subtle outline-variant border, and strict semantic tokens."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add kbd"
+    "importStatement": "import { Kbd } from '@/components/ui/kbd';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/kbd",
+    "eolasCommand": "npx @seany9915/eolas-ui add kbd"
   },
   {
     "id": "menu",
@@ -984,11 +1011,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/menu",
     "sourcePath": "src/components/ui/menu.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add menu"
+    "importStatement": "import { Menu } from '@/components/ui/menu';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/menu",
+    "eolasCommand": "npx @seany9915/eolas-ui add menu"
   },
   {
     "id": "menubar",
@@ -1000,17 +1027,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/menubar",
     "sourcePath": "src/components/ui/menubar.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add menubar"
+    "importStatement": "import { Menubar } from '@/components/ui/menubar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/menubar",
+    "eolasCommand": "npx @seany9915/eolas-ui add menubar"
   },
   {
     "id": "message-scroller",
     "name": "message-scroller",
     "title": "Message Scroller",
-    "description": "MessageScroller primitive suite. Base UI Integration: Consumes Base UI Button and Tooltip primitives. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/components/base/message-scroller",
+    "description": "MessageScroller primitive suite.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1024,12 +1051,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers.",
       "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic colors, zero triple-tints."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add message-scroller"
+    "importStatement": "import { MessageScroller } from '@/components/ui/message-scroller';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/message-scroller",
+    "eolasCommand": "npx @seany9915/eolas-ui add message-scroller"
   },
   {
     "id": "meter",
@@ -1046,17 +1070,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add meter"
+    "importStatement": "import { Meter } from '@/components/ui/meter';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/meter",
+    "eolasCommand": "npx @seany9915/eolas-ui add meter"
   },
   {
     "id": "model-selector",
     "name": "model-selector",
     "title": "Model Selector",
-    "description": "ModelSelector primitive. Base UI Integration: Consumes Base UI Select and Tooltip primitives. Specification & Reference: https://ui.shadcn.com/docs/ai-elements/base/model-selector",
+    "description": "ModelSelector primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1068,12 +1092,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Clear separation between consumer-provided model items and thinking depth controls.",
       "Concentric radius, floating 2px focus ring (`outline-offset: 2px`)."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add model-selector"
+    "importStatement": "import { ModelSelector } from '@/components/ui/model-selector';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/model-selector",
+    "eolasCommand": "npx @seany9915/eolas-ui add model-selector"
   },
   {
     "id": "navigation-bar",
@@ -1097,11 +1118,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Mandatory `prefers-reduced-motion: reduce` dampening."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add navigation-bar"
+    "importStatement": "import { NavigationBar } from '@/components/ui/navigation-bar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/navigation-bar",
+    "eolasCommand": "npx @seany9915/eolas-ui add navigation-bar"
   },
   {
     "id": "navigation-menu",
@@ -1113,11 +1134,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/navigation-menu",
     "sourcePath": "src/components/ui/navigation-menu.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add navigation-menu"
+    "importStatement": "import { NavigationMenu } from '@/components/ui/navigation-menu';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/navigation-menu",
+    "eolasCommand": "npx @seany9915/eolas-ui add navigation-menu"
   },
   {
     "id": "notification-badge",
@@ -1129,12 +1150,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/notification-badge.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add notification-badge"
+    "importStatement": "import { NotificationBadge } from '@/components/ui/notification-badge';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/notification-badge",
+    "eolasCommand": "npx @seany9915/eolas-ui add notification-badge"
   },
   {
     "id": "number-field",
@@ -1150,11 +1168,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add number-field"
+    "importStatement": "import { NumberField } from '@/components/ui/number-field';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/number-field",
+    "eolasCommand": "npx @seany9915/eolas-ui add number-field"
   },
   {
     "id": "number-pop-in",
@@ -1166,12 +1184,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/number-pop-in.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add number-pop-in"
+    "importStatement": "import { NumberPopIn } from '@/components/ui/number-pop-in';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/number-pop-in",
+    "eolasCommand": "npx @seany9915/eolas-ui add number-pop-in"
   },
   {
     "id": "number-roll",
@@ -1186,17 +1201,14 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Deprecated facade over NumberPopIn and SpinningCounter. Prefer importing @/components/ui/number-pop-in or @/components/ui/spinning-counter directly.",
     "replacedBy": "number-pop-in, spinning-counter",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add number-roll"
+    "importStatement": "import { NumberRoll } from '@/components/ui/number-roll';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/number-roll",
+    "eolasCommand": "npx @seany9915/eolas-ui add number-roll"
   },
   {
     "id": "otp-field",
     "name": "otp-field",
-    "title": "Otp Field",
+    "title": "OTP Field",
     "description": "OTPField primitive (@base-ui/react/otp-field).",
     "category": "inputs",
     "tier": "primitive",
@@ -1208,11 +1220,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add otp-field"
+    "importStatement": "import { OTPField } from '@/components/ui/otp-field';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/otp-field",
+    "eolasCommand": "npx @seany9915/eolas-ui add otp-field"
   },
   {
     "id": "pagination",
@@ -1223,18 +1235,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/pagination.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add pagination"
+    "importStatement": "import { Pagination } from '@/components/ui/pagination';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/pagination",
+    "eolasCommand": "npx @seany9915/eolas-ui add pagination"
   },
   {
     "id": "plan",
     "name": "plan",
     "title": "Plan",
-    "description": "Plan composite block. Layer: Primitive (`src/components/ui/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`) and `Progress` primitive (`src/components/ui/progress.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/plan",
+    "description": "Plan composite block.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1244,12 +1253,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Tracks progress with a progress bar and completion counter (e.g. \"2 of 4 done\"). <Plan title=\"...\" steps={[...]} /> and declarative compound composition: <Plan defaultOpen> <PlanHeader> <PlanTitle>Assessment Plan</PlanTitle> <PlanDescription>2 of 4 done</PlanDescription> <PlanTrigger /> </PlanHeader> <PlanContent>...</PlanContent> </Plan>",
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add plan"
+    "importStatement": "import { Plan } from '@/components/ui/plan';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/plan",
+    "eolasCommand": "npx @seany9915/eolas-ui add plan"
   },
   {
     "id": "popover",
@@ -1261,11 +1267,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/popover",
     "sourcePath": "src/components/ui/popover.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add popover"
+    "importStatement": "import { Popover } from '@/components/ui/popover';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/popover",
+    "eolasCommand": "npx @seany9915/eolas-ui add popover"
   },
   {
     "id": "preview-card",
@@ -1277,11 +1283,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/preview-card",
     "sourcePath": "src/components/ui/preview-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add preview-card"
+    "importStatement": "import { PreviewCard } from '@/components/ui/preview-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/preview-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add preview-card"
   },
   {
     "id": "progress-ring",
@@ -1299,11 +1305,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add progress-ring"
+    "importStatement": "import { ProgressRing } from '@/components/ui/progress-ring';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/progress-ring",
+    "eolasCommand": "npx @seany9915/eolas-ui add progress-ring"
   },
   {
     "id": "progress",
@@ -1320,17 +1326,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, semantic tokens, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add progress"
+    "importStatement": "import { Progress } from '@/components/ui/progress';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/progress",
+    "eolasCommand": "npx @seany9915/eolas-ui add progress"
   },
   {
     "id": "prompt-input",
     "name": "prompt-input",
     "title": "Prompt Input",
-    "description": "PromptInput primitive. Base UI Integration: Composes InputGroup (InputGroup, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText), Attachment, Menu, Tooltip, and Button primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
+    "description": "PromptInput primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1342,18 +1348,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
       "Supports Enter to submit and Shift+Enter for newline insertion."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add prompt-input"
+    "importStatement": "import { PromptInput } from '@/components/ui/prompt-input';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/prompt-input",
+    "eolasCommand": "npx @seany9915/eolas-ui add prompt-input"
   },
   {
     "id": "queue",
     "name": "queue",
     "title": "Queue",
-    "description": "Queue composite block. Layer: Primitive (`src/components/ui/`) Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`). Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/queue",
+    "description": "Queue composite block.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1363,12 +1366,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "As the agent works, tasks transition across sections. <Queue items={[...]} /> and declarative compound composition: <Queue> <Queue.Section title=\"2 to do\" status=\"pending\"> <Queue.Item title=\"Task 1\" status=\"pending\" /> </Queue.Section> </Queue>",
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive triggers."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add queue"
+    "importStatement": "import { Queue } from '@/components/ui/queue';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/queue",
+    "eolasCommand": "npx @seany9915/eolas-ui add queue"
   },
   {
     "id": "radio",
@@ -1385,17 +1385,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary indicator, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add radio"
+    "importStatement": "import { Radio } from '@/components/ui/radio';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/radio",
+    "eolasCommand": "npx @seany9915/eolas-ui add radio"
   },
   {
     "id": "reading-progress",
     "name": "reading-progress",
     "title": "Reading Progress",
-    "description": "ReadingProgress primitive (@base-ui/react/progress). Platform Reference: Modern Web Guidance (MWG: scrollytelling / scroll-driven animations)",
+    "description": "ReadingProgress primitive (@base-ui/react/progress).",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/progress",
@@ -1407,17 +1407,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add reading-progress"
+    "importStatement": "import { ReadingProgress } from '@/components/ui/reading-progress';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/reading-progress",
+    "eolasCommand": "npx @seany9915/eolas-ui add reading-progress"
   },
   {
     "id": "reasoning",
     "name": "reasoning",
     "title": "Reasoning",
-    "description": "Reasoning primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/reasoning",
+    "description": "Reasoning primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1431,18 +1431,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on disclosure triggers.",
       "Follows DESIGN.md tokens: floating 2px focus ring, semantic colors, and zero triple-tints."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add reasoning"
+    "importStatement": "import { Reasoning } from '@/components/ui/reasoning';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/reasoning",
+    "eolasCommand": "npx @seany9915/eolas-ui add reasoning"
   },
   {
     "id": "resizable",
     "name": "resizable",
     "title": "Resizable",
-    "description": "Resizable component primitive built on react-resizable-panels. React Resizable Panels Documentation: https://github.com/bvaughn/react-resizable-panels",
+    "description": "Resizable component primitive built on react-resizable-panels.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1453,12 +1450,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B tokens: hairline 1px track (outline-variant), 12px touch-safe hit area, refined capsule pill drag handle (rounded-full, bg-surface, primary hover/active feedback), and floating 2px focus ring."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "react-resizable-panels"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add resizable"
+    "importStatement": "import { Resizable } from '@/components/ui/resizable';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/resizable",
+    "eolasCommand": "npx @seany9915/eolas-ui add resizable"
   },
   {
     "id": "scroll-area",
@@ -1475,17 +1471,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add scroll-area"
+    "importStatement": "import { ScrollArea } from '@/components/ui/scroll-area';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/scroll-area",
+    "eolasCommand": "npx @seany9915/eolas-ui add scroll-area"
   },
   {
     "id": "scrollspy",
     "name": "scrollspy",
     "title": "Scrollspy",
-    "description": "Scrollspy primitive. Platform Reference: Modern Web Guidance (MWG: scrollspy)",
+    "description": "Scrollspy primitive.",
     "category": "navigation",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1498,12 +1494,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Adheres to WCAG 2.2 SC 2.5.8 (44x44px minimum touch targets) and WCAG 1.4.1 (non-color active cues).",
       "Complies with DESIGN.md and anti-patterns.md: symmetrical rounded-md geometry without asymmetric single-sided card borders."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add scrollspy"
+    "importStatement": "import { Scrollspy } from '@/components/ui/scrollspy';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/scrollspy",
+    "eolasCommand": "npx @seany9915/eolas-ui add scrollspy"
   },
   {
     "id": "select",
@@ -1515,17 +1508,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/select",
     "sourcePath": "src/components/ui/select.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add select"
+    "importStatement": "import { Select } from '@/components/ui/select';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/select",
+    "eolasCommand": "npx @seany9915/eolas-ui add select"
   },
   {
     "id": "selection-controls",
     "name": "selection-controls",
     "title": "Selection Controls",
-    "description": "Re-exports selection control primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/checkbox - @/components/ui/checkbox-group - @/components/ui/radio - @/components/ui/switch",
+    "description": "Re-exports selection control primitives for backward compatibility.",
     "category": "inputs",
     "tier": "utility",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1533,12 +1526,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/checkbox, radio, switch.",
     "replacedBy": "checkbox, radio, switch",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add selection-controls"
+    "importStatement": "import { Checkbox, RadioGroup, Switch } from '@/components/ui/selection-controls';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/selection-controls",
+    "eolasCommand": "npx @seany9915/eolas-ui add selection-controls"
   },
   {
     "id": "separator",
@@ -1555,11 +1545,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B tokens: border-outline-variant."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add separator"
+    "importStatement": "import { Separator } from '@/components/ui/separator';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/separator",
+    "eolasCommand": "npx @seany9915/eolas-ui add separator"
   },
   {
     "id": "shimmer-text",
@@ -1571,18 +1561,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/shimmer-text.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add shimmer-text"
+    "importStatement": "import { ShimmerText } from '@/components/ui/shimmer-text';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/shimmer-text",
+    "eolasCommand": "npx @seany9915/eolas-ui add shimmer-text"
   },
   {
     "id": "sidebar",
     "name": "sidebar",
     "title": "Sidebar",
-    "description": "Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture). Shadcn UI Reference: https://ui.shadcn.com/docs/components/base/sidebar",
+    "description": "Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture).",
     "category": "navigation",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/drawer",
@@ -1594,11 +1581,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets (min 44x44px), and calibrated motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add sidebar"
+    "importStatement": "import { Sidebar } from '@/components/ui/sidebar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/sidebar",
+    "eolasCommand": "npx @seany9915/eolas-ui add sidebar"
   },
   {
     "id": "skeleton",
@@ -1611,11 +1598,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/skeleton.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add skeleton"
+    "importStatement": "import { Skeleton } from '@/components/ui/skeleton';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/skeleton",
+    "eolasCommand": "npx @seany9915/eolas-ui add skeleton"
   },
   {
     "id": "slider",
@@ -1632,11 +1619,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add slider"
+    "importStatement": "import { Slider } from '@/components/ui/slider';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/slider",
+    "eolasCommand": "npx @seany9915/eolas-ui add slider"
   },
   {
     "id": "sortable",
@@ -1648,19 +1635,18 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/sortable.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
-      "@dnd-kit/react",
-      "@dnd-kit/helpers"
+      "@dnd-kit/helpers",
+      "@dnd-kit/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add sortable"
+    "importStatement": "import { Sortable } from '@/components/ui/sortable';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/sortable",
+    "eolasCommand": "npx @seany9915/eolas-ui add sortable"
   },
   {
     "id": "sources",
     "name": "sources",
     "title": "Sources",
-    "description": "Sources primitive. Base UI Integration: Works with Base UI Collapsible and Tooltip primitives. Conforms to shadcn AI Elements specification: https://ui.shadcn.com/docs/ai-elements/base/sources",
+    "description": "Sources primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/collapsible",
@@ -1676,17 +1662,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Floating focus rings on links and triggers."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add sources"
+    "importStatement": "import { Sources } from '@/components/ui/sources';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/sources",
+    "eolasCommand": "npx @seany9915/eolas-ui add sources"
   },
   {
     "id": "spinner",
     "name": "spinner",
     "title": "Spinner",
-    "description": "Spinner primitive. Base UI Integration: Companion status & loading indicator. Specification & Reference: https://ui.shadcn.com/docs/components/base/spinner",
+    "description": "Spinner primitive.",
     "category": "feedback",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1697,12 +1683,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Accessible: renders role=\"status\" and aria-label=\"Loading\", with motion-reduce:animate-none for vestibular safety.",
       "Automatically inherits currentColor for flawless integration across buttons, badges, and text."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add spinner"
+    "importStatement": "import { Spinner } from '@/components/ui/spinner';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/spinner",
+    "eolasCommand": "npx @seany9915/eolas-ui add spinner"
   },
   {
     "id": "spinning-counter",
@@ -1714,18 +1697,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/spinning-counter.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add spinning-counter"
+    "importStatement": "import { SpinningCounter } from '@/components/ui/spinning-counter';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/spinning-counter",
+    "eolasCommand": "npx @seany9915/eolas-ui add spinning-counter"
   },
   {
     "id": "steppers",
     "name": "steppers",
     "title": "Steppers",
-    "description": "Backward-compatibility alias for NumberField. Canonical primitive resides at @/components/ui/number-field. For OTP Passcode input, import directly from @/components/ui/otp-field.",
+    "description": "Backward-compatibility alias for NumberField.",
     "category": "navigation",
     "tier": "utility",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1733,18 +1713,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Legacy re-export barrel. Prefer importing canonical primitive: @/components/ui/number-field.",
     "replacedBy": "number-field",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add steppers"
+    "importStatement": "import { NumberField } from '@/components/ui/steppers';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/steppers",
+    "eolasCommand": "npx @seany9915/eolas-ui add steppers"
   },
   {
     "id": "sticky-container",
     "name": "sticky-container",
     "title": "Sticky Container",
-    "description": "StickyContainer primitive. Platform Reference: Modern Web Guidance (MWG: state-aware-sticky-headers)",
+    "description": "StickyContainer primitive.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1756,12 +1733,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Features an accessible zero-height sentinel and IntersectionObserver fallback for Safari and Firefox.",
       "Prevents layout-shift oscillations by strictly constraining state transitions to non-layout-shifting properties (background-color, border-color, box-shadow, and backdrop-blur)."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add sticky-container"
+    "importStatement": "import { StickyContainer } from '@/components/ui/sticky-container';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/sticky-container",
+    "eolasCommand": "npx @seany9915/eolas-ui add sticky-container"
   },
   {
     "id": "success-check",
@@ -1773,18 +1747,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/success-check.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add success-check"
+    "importStatement": "import { SuccessCheck } from '@/components/ui/success-check';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/success-check",
+    "eolasCommand": "npx @seany9915/eolas-ui add success-check"
   },
   {
     "id": "suggestion-chips",
     "name": "suggestion-chips",
     "title": "Suggestion Chips",
-    "description": "SuggestionChips primitive. Base UI Integration: Uses Base UI Button foundation.",
+    "description": "SuggestionChips primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1798,18 +1769,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Floating 2px focus ring with 2px offset.",
       "Strictly adheres to the 5-item stagger cap if animated."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add suggestion-chips"
+    "importStatement": "import { SuggestionChips } from '@/components/ui/suggestion-chips';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/suggestion-chips",
+    "eolasCommand": "npx @seany9915/eolas-ui add suggestion-chips"
   },
   {
     "id": "swipe-reveal",
     "name": "swipe-reveal",
     "title": "Swipe Reveal",
-    "description": "SwipeReveal primitive. Platform Reference: Modern Web Guidance (MWG: swipe-to-reveal)",
+    "description": "SwipeReveal primitive.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/button",
@@ -1822,11 +1790,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit-targets, and floating 2px focus rings."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add swipe-reveal"
+    "importStatement": "import { SwipeReveal } from '@/components/ui/swipe-reveal';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/swipe-reveal",
+    "eolasCommand": "npx @seany9915/eolas-ui add swipe-reveal"
   },
   {
     "id": "switch",
@@ -1843,17 +1811,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, flush primary track fill, smooth thumb sliding, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add switch"
+    "importStatement": "import { Switch } from '@/components/ui/switch';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/switch",
+    "eolasCommand": "npx @seany9915/eolas-ui add switch"
   },
   {
     "id": "table",
     "name": "table",
     "title": "Table",
-    "description": "Table primitive. Platform Reference: - Modern Web Guidance (MWG: responsive-table) - Shadcn UI Table: https://ui.shadcn.com/docs/components/base/table",
+    "description": "Table primitive.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1863,12 +1831,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Implements explicit column header semantics (scope=\"col\"), 56px minimum row heights for OS text zoom adaptability, and automatic tabular-nums on numeric columns.",
       "Follows DESIGN.md Tier B interactive controls: semantic tokens, concentric geometry, and motion restraint."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add table"
+    "importStatement": "import { Table } from '@/components/ui/table';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/table",
+    "eolasCommand": "npx @seany9915/eolas-ui add table"
   },
   {
     "id": "tabs",
@@ -1888,17 +1853,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive tabs."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add tabs"
+    "importStatement": "import { Tabs } from '@/components/ui/tabs';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/tabs",
+    "eolasCommand": "npx @seany9915/eolas-ui add tabs"
   },
   {
     "id": "task",
     "name": "task",
     "title": "Task",
-    "description": "Task primitive. Base UI Integration: Composed strictly on top of Base UI `Trace` primitive suite. Specification & Reference: - https://ui.shadcn.com/docs/ai-elements - https://ui.shadcn.com/docs/ai-elements/task",
+    "description": "Task primitive.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1910,18 +1875,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on interactive elements.",
       "Follows DESIGN.md tokens: floating 2px focus ring, semantic tokens, zero triple-tints."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add task"
+    "importStatement": "import { Task } from '@/components/ui/task';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/task",
+    "eolasCommand": "npx @seany9915/eolas-ui add task"
   },
   {
     "id": "text-highlight",
     "name": "text-highlight",
     "title": "Text Highlight",
-    "description": "TextHighlight primitive. Platform Reference: Modern Web Guidance (MWG: highlight-text-ranges)",
+    "description": "TextHighlight primitive.",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1932,12 +1894,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Adheres to WCAG 4.1.3 (Status Messages) by synchronizing visual highlights with an `aria-live=\"polite\"` screen reader match announcer.",
       "Styles matches using tokenized secondary container palette in globals.css: `::highlight(search-results) { background-color: var(--secondary-container); color: var(--on-secondary-container); }`"
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add text-highlight"
+    "importStatement": "import { TextHighlight } from '@/components/ui/text-highlight';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/text-highlight",
+    "eolasCommand": "npx @seany9915/eolas-ui add text-highlight"
   },
   {
     "id": "text-swap",
@@ -1949,18 +1908,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/text-swap.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add text-swap"
+    "importStatement": "import { TextSwap } from '@/components/ui/text-swap';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/text-swap",
+    "eolasCommand": "npx @seany9915/eolas-ui add text-swap"
   },
   {
     "id": "textarea",
     "name": "textarea",
     "title": "Textarea",
-    "description": "Textarea primitive. Base UI Integration: Works seamlessly with Base UI Field context (<Field.Control> or <Field>).",
+    "description": "Textarea primitive.",
     "category": "inputs",
     "tier": "primitive",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -1974,12 +1930,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 touch target compliance.",
       "For complex multi-line prompt composers with attachment toolbars, compose with <InputGroup> (@/components/ui/input-group) or <PromptInput> (@/components/ui/prompt-input)."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add textarea"
+    "importStatement": "import { Textarea } from '@/components/ui/textarea';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/textarea",
+    "eolasCommand": "npx @seany9915/eolas-ui add textarea"
   },
   {
     "id": "texts-reveal",
@@ -1991,12 +1944,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "transitions.dev (@jakubantalik)",
     "platformReference": "https://transitions.dev/library.html",
     "sourcePath": "src/components/ui/texts-reveal.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add texts-reveal"
+    "importStatement": "import { TextsReveal } from '@/components/ui/texts-reveal';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/texts-reveal",
+    "eolasCommand": "npx @seany9915/eolas-ui add texts-reveal"
   },
   {
     "id": "thinking-orb",
@@ -2008,12 +1958,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/thinking-orb.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "thinking-orbs"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add thinking-orb"
+    "importStatement": "import { ThinkingOrb } from '@/components/ui/thinking-orb';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/thinking-orb",
+    "eolasCommand": "npx @seany9915/eolas-ui add thinking-orb"
   },
   {
     "id": "toast",
@@ -2025,11 +1974,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/toast",
     "sourcePath": "src/components/ui/toast.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add toast"
+    "importStatement": "import { Toast } from '@/components/ui/toast';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/toast",
+    "eolasCommand": "npx @seany9915/eolas-ui add toast"
   },
   {
     "id": "toggle-group",
@@ -2049,11 +1998,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add toggle-group"
+    "importStatement": "import { ToggleGroup } from '@/components/ui/toggle-group';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/toggle-group",
+    "eolasCommand": "npx @seany9915/eolas-ui add toggle-group"
   },
   {
     "id": "toggle",
@@ -2071,17 +2020,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: floating 2px focus ring, 2px `outline` resting border -> 2px `primary` border + `primary-container` pressed state, zero box-shadow, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add toggle"
+    "importStatement": "import { Toggle } from '@/components/ui/toggle';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/toggle",
+    "eolasCommand": "npx @seany9915/eolas-ui add toggle"
   },
   {
     "id": "toggles",
     "name": "toggles",
     "title": "Toggles",
-    "description": "Re-exports toggle primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/toggle - @/components/ui/toggle-group",
+    "description": "Re-exports toggle primitives for backward compatibility.",
     "category": "inputs",
     "tier": "utility",
     "basePrimitive": "DESIGN.md Token Primitive",
@@ -2089,18 +2038,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Legacy re-export barrel. Prefer importing individual primitives: @/components/ui/toggle, toggle-group.",
     "replacedBy": "toggle, toggle-group",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add toggles"
+    "importStatement": "import { Toggle, ToggleGroup } from '@/components/ui/toggles';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/toggles",
+    "eolasCommand": "npx @seany9915/eolas-ui add toggles"
   },
   {
     "id": "tool",
     "name": "tool",
     "title": "Tool",
-    "description": "Tool primitive (ToolCall). Base UI Integration: Consumes Base UI Collapsible primitive, Button primitive, and Icon primitive.",
+    "description": "Tool primitive (ToolCall).",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/collapsible",
@@ -2114,17 +2060,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Integrates seamlessly with CodeBlock for syntax-highlighted parameters."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add tool"
+    "importStatement": "import { Tool } from '@/components/ui/tool';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/tool",
+    "eolasCommand": "npx @seany9915/eolas-ui add tool"
   },
   {
     "id": "toolbar",
     "name": "toolbar",
     "title": "Toolbar",
-    "description": "Toolbar primitive (@base-ui/react/toolbar). WAI-ARIA Role: role=\"toolbar\" Primary Purpose: Group of controls navigable with arrow keys under a SINGLE tab stop.",
+    "description": "Toolbar primitive (@base-ui/react/toolbar).",
     "category": "layout",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/toolbar",
@@ -2138,11 +2084,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add toolbar"
+    "importStatement": "import { Toolbar } from '@/components/ui/toolbar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/toolbar",
+    "eolasCommand": "npx @seany9915/eolas-ui add toolbar"
   },
   {
     "id": "tooltip",
@@ -2154,17 +2100,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/tooltip",
     "sourcePath": "src/components/ui/tooltip.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add tooltip"
+    "importStatement": "import { Tooltip } from '@/components/ui/tooltip';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/tooltip",
+    "eolasCommand": "npx @seany9915/eolas-ui add tooltip"
   },
   {
     "id": "trace",
     "name": "trace",
     "title": "Trace",
-    "description": "Trace primitive suite. Base UI Integration: Consumes `@base-ui/react/collapsible` for headless accessible disclosures. Specification & Reference: - https://ui.shadcn.com/docs/components/base/trace - https://ui.shadcn.com/docs/ai-elements",
+    "description": "Trace primitive suite.",
     "category": "clinical-ai",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/collapsible",
@@ -2176,17 +2122,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Strictly follows DESIGN.md tokens: floating 2px focus ring (outline-offset: 2px), concentric radius (rounded-2xl containers), and semantic high-contrast colors without monochrome triple-tints."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add trace"
+    "importStatement": "import { Trace } from '@/components/ui/trace';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/trace",
+    "eolasCommand": "npx @seany9915/eolas-ui add trace"
   },
   {
     "id": "view-transition",
     "name": "view-transition",
     "title": "View Transition",
-    "description": "ViewTransition primitive (@base-ui/react/button). Platform Reference: Modern Web Guidance (MWG: same-document-transitions)",
+    "description": "ViewTransition primitive (@base-ui/react/button).",
     "category": "motion",
     "tier": "primitive",
     "basePrimitive": "@base-ui/react/button",
@@ -2200,17 +2146,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B interactive controls: concentric radius, 44px minimum hit targets, and floating 2px focus ring."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
+      "@base-ui/react"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add view-transition"
+    "importStatement": "import { ViewTransition } from '@/components/ui/view-transition';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/view-transition",
+    "eolasCommand": "npx @seany9915/eolas-ui add view-transition"
   },
   {
     "id": "app-shell",
     "name": "app-shell",
     "title": "App Shell",
-    "description": "AppShell composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Sidebar` compound primitives (`Sidebar.Provider`, `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Footer`, `Sidebar.Trigger`, `Sidebar.Rail`, `Sidebar.Inset`, `Sidebar.Menu`, `Sidebar.MenuItem`, `Sidebar.MenuButton`, `Sidebar.MenuBadge`) (`src/components/ui/sidebar.tsx`) - `NavigationBar`, `NavigationBar.Item` (`src/components/ui/navigation-bar.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+    "description": "AppShell composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2224,18 +2170,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Compact Height (`short:` / `<480px`): Top bar compresses to 56px (h-14); bottom bar hides to preserve vertical canvas.",
       "Zero direct `<button>` tags outside primitives."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add app-shell"
+    "importStatement": "import { AppShell } from '@/components/blocks/app-shell';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/app-shell",
+    "eolasCommand": "npx @seany9915/eolas-ui add app-shell"
   },
   {
     "id": "approval-card",
     "name": "approval-card",
     "title": "Approval Card",
-    "description": "ApprovalCard block. @deprecated Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with declarative `items`) for single-step or multi-step choice and free-text clarification prompts.",
+    "description": "ApprovalCard block. Deprecated: Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2243,12 +2186,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Deprecated block. Use Confirmation (@/components/ui/confirmation) for [Approve] / [Deny] AI tool approval gates, or Questionnaire (@/components/blocks/questionnaire) with declarative items for choice and clarification prompts.",
     "replacedBy": "confirmation, questionnaire",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add approval-card"
+    "importStatement": "import { ApprovalCard } from '@/components/blocks/approval-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/approval-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add approval-card"
   },
   {
     "id": "area-chart-card",
@@ -2260,12 +2200,11 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/area-chart-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add area-chart-card"
+    "importStatement": "import { AreaChartCard } from '@/components/blocks/area-chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/area-chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add area-chart-card"
   },
   {
     "id": "bar-chart-card",
@@ -2277,34 +2216,30 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/bar-chart-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add bar-chart-card"
+    "importStatement": "import { BarChartCard } from '@/components/blocks/bar-chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/bar-chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add bar-chart-card"
   },
   {
     "id": "chart-card",
     "name": "chart-card",
     "title": "Chart Card",
-    "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row alignment, and trend badges.",
+    "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/chart-card.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chart-card"
+    "importStatement": "import { ChartCard } from '@/components/blocks/chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add chart-card"
   },
   {
     "id": "chat",
     "name": "chat",
     "title": "Chat",
-    "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `Empty` (`src/components/ui/empty.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
+    "description": "Chat composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2317,18 +2252,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "WCAG 2.2 SC 2.5.8 compliant: 44px minimum touch targets on all interactive elements.",
       "Strictly follows DESIGN.md tokens: floating 2px focus ring, semantic high-contrast colors, concentric radius, zero triple-tints."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add chat"
+    "importStatement": "import { Chat } from '@/components/blocks/chat';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/chat",
+    "eolasCommand": "npx @seany9915/eolas-ui add chat"
   },
   {
     "id": "data-table",
     "name": "data-table",
     "title": "Data Table",
-    "description": "DataTable composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens: - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`) - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Select` (`src/components/ui/select.tsx`) - `Menu` (`src/components/ui/menu.tsx`) - `Checkbox` (`src/components/ui/checkbox.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `@tanstack/react-table`",
+    "description": "DataTable composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2340,18 +2272,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Exports both all-in-one <DataTable /> and composable subcomponents: DataTableColumnHeader, DataTablePagination, DataTableViewOptions, DataTableFacetedFilter, DataTableToolbar, DataTableRowActions, createSelectColumn, createActionsColumn."
     ],
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "@tanstack/react-table"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add data-table"
+    "importStatement": "import { DataTable } from '@/components/blocks/data-table';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/data-table",
+    "eolasCommand": "npx @seany9915/eolas-ui add data-table"
   },
   {
     "id": "delete-confirmation-dialog",
     "name": "delete-confirmation-dialog",
     "title": "Delete Confirmation Dialog",
-    "description": "DeleteConfirmationDialog block. @deprecated Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
+    "description": "DeleteConfirmationDialog block. Deprecated: Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2359,28 +2290,22 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Deprecated wrapper block. Use AlertDialog (@/components/ui/alert-dialog) directly with controlled open state and closeOnConfirm={false} for async flows.",
     "replacedBy": "alert-dialog",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add delete-confirmation-dialog"
+    "importStatement": "import { DeleteConfirmationDialog } from '@/components/blocks/delete-confirmation-dialog';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/delete-confirmation-dialog",
+    "eolasCommand": "npx @seany9915/eolas-ui add delete-confirmation-dialog"
   },
   {
     "id": "filter-toolbar",
     "name": "filter-toolbar",
     "title": "Filter Toolbar",
-    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
+    "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/filter-toolbar.tsx",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add filter-toolbar"
+    "importStatement": "import { FilterToolbar } from '@/components/blocks/filter-toolbar';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/filter-toolbar",
+    "eolasCommand": "npx @seany9915/eolas-ui add filter-toolbar"
   },
   {
     "id": "line-chart-card",
@@ -2392,18 +2317,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/line-chart-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add line-chart-card"
+    "importStatement": "import { LineChartCard } from '@/components/blocks/line-chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/line-chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add line-chart-card"
   },
   {
     "id": "list-detail-block",
     "name": "list-detail-block",
     "title": "List Detail Block",
-    "description": "ListDetailBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Field` (`Field.Root`, `Field.Label`) (`src/components/ui/field.tsx`) - `InputGroup` (`InputGroup.Addon`, `InputGroup.Input`, `InputGroup.Button`) (`src/components/ui/input-group.tsx`) - `Item` (`Item.Group`, `Item.Media`, `Item.Content`, `Item.Title`, `Item.Description`, `Item.Actions`) (`src/components/ui/item.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Empty` (`src/components/ui/empty.tsx`)",
+    "description": "ListDetailBlock composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2418,18 +2342,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Accessible keyboard navigation: Listbox roving focus via ArrowDown / ArrowUp / Home / End, selection via Enter / Space / click, and Escape to return on compact views.",
       "Zero direct `<button>` or `<input>` tags outside primitives."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add list-detail-block"
+    "importStatement": "import { ListDetailBlock } from '@/components/blocks/list-detail-block';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/list-detail-block",
+    "eolasCommand": "npx @seany9915/eolas-ui add list-detail-block"
   },
   {
     "id": "metric-card",
     "name": "metric-card",
     "title": "Metric Card",
-    "description": "MetricCard block. @deprecated Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
+    "description": "MetricCard block. Deprecated: Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2437,12 +2358,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "isDeprecated": true,
     "deprecatedNote": "Deprecated block. Compose Card (divided <dl> stat strip), Item.Group, RadialChartCard, or Table (numeric) directly instead of metric card grids.",
     "replacedBy": "card, item, radial-chart-card, table",
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add metric-card"
+    "importStatement": "import { MetricCard } from '@/components/blocks/metric-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/metric-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add metric-card"
   },
   {
     "id": "pie-chart-card",
@@ -2454,18 +2372,17 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/pie-chart-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add pie-chart-card"
+    "importStatement": "import { PieChartCard } from '@/components/blocks/pie-chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/pie-chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add pie-chart-card"
   },
   {
     "id": "questionnaire",
     "name": "questionnaire",
     "title": "Questionnaire",
-    "description": "Questionnaire composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Kbd` (`src/components/ui/kbd.tsx`)",
+    "description": "Questionnaire composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2476,52 +2393,47 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Supports single-choice, multiple-choice, freeform text entry, keyboard shortcuts (A-Z, 1-9), roving tabindex arrow key navigation, form validation, draft restoration, and native FormData serialization.",
       "Accessible: WCAG 2.2 SC 2.5.8 compliant (min-h-11 touch targets), floating 2px focus indicators, fieldset/legend semantics, inert inactive items, live error regions, and container-query responsiveness (@container)."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add questionnaire"
+    "importStatement": "import { Questionnaire } from '@/components/blocks/questionnaire';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/questionnaire",
+    "eolasCommand": "npx @seany9915/eolas-ui add questionnaire"
   },
   {
     "id": "radar-chart-card",
     "name": "radar-chart-card",
     "title": "Radar Chart Card",
-    "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids, high-contrast polygons, and accessible tooltips.",
+    "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/radar-chart-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add radar-chart-card"
+    "importStatement": "import { RadarChartCard } from '@/components/blocks/radar-chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/radar-chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add radar-chart-card"
   },
   {
     "id": "radial-chart-card",
     "name": "radial-chart-card",
     "title": "Radial Chart Card",
-    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary color. Composes ChartCard, Badge, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
+    "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary...",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/radial-chart-card.tsx",
     "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge",
       "recharts"
     ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add radial-chart-card"
+    "importStatement": "import { RadialChartCard } from '@/components/blocks/radial-chart-card';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/radial-chart-card",
+    "eolasCommand": "npx @seany9915/eolas-ui add radial-chart-card"
   },
   {
     "id": "step-wizard",
     "name": "step-wizard",
     "title": "Step Wizard",
-    "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Card` (`Card.Header`, `Card.Title`, `Card.Description`, `Card.Content`, `Card.Footer`) (`src/components/ui/card.tsx`) - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Separator` (`src/components/ui/separator.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
+    "description": "StepWizard composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2532,18 +2444,15 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Accessible: WCAG 2.2 SC 2.5.8 compliant (44x44px minimum touch targets on all interactive step markers and buttons), floating 2px focus indicators (`outline-offset: 2px`), and live regions (`aria-live=\"polite\"`).",
       "Modern HTML integration: supports `hiddenUntilFound` with `hidden=\"until-found\"` and `beforematch` event listener so browser search (<kbd>Ctrl+F</kbd>) finds inactive step content."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add step-wizard"
+    "importStatement": "import { StepWizard } from '@/components/blocks/step-wizard';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/step-wizard",
+    "eolasCommand": "npx @seany9915/eolas-ui add step-wizard"
   },
   {
     "id": "supporting-pane-block",
     "name": "supporting-pane-block",
     "title": "Supporting Pane Block",
-    "description": "SupportingPaneBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Badge` (`src/components/ui/badge.tsx`)",
+    "description": "SupportingPaneBlock composite block.",
     "category": "blocks",
     "tier": "block",
     "basePrimitive": "Composite Block",
@@ -2558,12 +2467,9 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Restores keyboard focus cleanly when closed from inside the pane and marks closed panes inert.",
       "Zero direct `<button>` tags outside primitives."
     ],
-    "dependencies": [
-      "@base-ui/react",
-      "clsx",
-      "tailwind-merge"
-    ],
-    "shadcnCommand": "npx @seany9915/eolas-ui add supporting-pane-block"
+    "importStatement": "import { SupportingPaneBlock } from '@/components/blocks/supporting-pane-block';",
+    "shadcnCommand": "npx shadcn@latest add @eolas/supporting-pane-block",
+    "eolasCommand": "npx @seany9915/eolas-ui add supporting-pane-block"
   }
 ];
 

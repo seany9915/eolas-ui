@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Radio & RadioGroup primitives (@base-ui/react/radio, @base-ui/react/radio-group).
  *

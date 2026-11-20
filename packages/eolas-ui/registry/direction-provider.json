@@ -5,12 +5,7 @@
   "title": "Direction Provider",
   "description": "Eolas UI Direction Provider component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
-    "@base-ui/react",
-    "clsx",
-    "tailwind-merge"
-  ],
-  "registryDependencies": [
-    "https://seany9915.github.io/eolas-ui/r/utils.json"
+    "@base-ui/react"
   ],
   "files": [
     {

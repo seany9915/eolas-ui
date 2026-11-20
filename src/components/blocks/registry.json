@@ -1,17 +1,11 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "@seany9915/eolas-ui/blocks",
   "items": [
     {
       "name": "app-shell",
       "type": "registry:block",
       "title": "App Shell",
-      "description": "AppShell composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Sidebar` compound primitives (`Sidebar.Provider`, `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Footer`, `Sidebar.Trigger`, `Sidebar.Rail`, `Sidebar.Inset`, `Sidebar.Menu`, `Sidebar.MenuItem`, `Sidebar.MenuButton`, `Sidebar.MenuBadge`) (`src/components/ui/sidebar.tsx`) - `NavigationBar`, `NavigationBar.Item` (`src/components/ui/navigation-bar.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "AppShell composite block.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/sidebar.json",
@@ -41,12 +35,7 @@
       "name": "approval-card",
       "type": "registry:block",
       "title": "Approval Card",
-      "description": "ApprovalCard block. @deprecated Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with declarative `items`) for single-step or multi-step choice and free-text clarification prompts.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "ApprovalCard block. Deprecated: Use `Confirmation` (`@/components/ui/confirmation`) for `[Approve] / [Deny]` AI tool approval gates and clinical decision sign-offs, or `Questionnaire` (`@/components/blocks/questionnaire` with...",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -69,13 +58,9 @@
       "title": "Area Chart Card",
       "description": "AreaChartCard block. Controlled presentational card for volume trends and intake velocity over time. Composes ChartCard and Chart primitives with smooth gradient fills and accessible tooltips.",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "recharts"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chart-card.json",
         "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
@@ -93,13 +78,9 @@
       "title": "Bar Chart Card",
       "description": "BarChartCard block. Controlled presentational card for categorical throughput, comparative performance, and multi-metric distribution. Composes ChartCard and Chart primitives with rounded bars, accessible tooltips, and legends.",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "recharts"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chart-card.json",
         "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
@@ -115,12 +96,7 @@
       "name": "chart-card",
       "type": "registry:block",
       "title": "Chart Card",
-      "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row alignment, and trend badges.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "ChartCard block. Shared presentational shell for data visualization cards. Composes Card, Badge, Skeleton, and Empty primitives with container-query responsiveness (@container), loading skeletons, zero-data empty states, subgrid row...",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/card.json",
@@ -141,12 +117,7 @@
       "name": "chat",
       "type": "registry:block",
       "title": "Chat",
-      "description": "Chat composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives: - `MessageScroller` (`src/components/ui/message-scroller.tsx`) - `ChatMessage` (`src/components/ui/chat-message.tsx`) - `PromptInput` (`src/components/ui/prompt-input.tsx`) - `SuggestionChips` (`src/components/ui/suggestion-chips.tsx`) - `Empty` (`src/components/ui/empty.tsx`) Specification & Reference: - https://ui.shadcn.com/docs/ai-elements/base/chat - https://ui.shadcn.com/docs/ai-elements/base/prompt-input",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "Chat composite block.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/message-scroller.json",
@@ -178,11 +149,8 @@
       "name": "data-table",
       "type": "registry:block",
       "title": "Data Table",
-      "description": "DataTable composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens: - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`) - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Select` (`src/components/ui/select.tsx`) - `Menu` (`src/components/ui/menu.tsx`) - `Checkbox` (`src/components/ui/checkbox.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `@tanstack/react-table`",
+      "description": "DataTable composite block.",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "@tanstack/react-table"
       ],
       "registryDependencies": [
@@ -217,14 +185,8 @@
       "name": "delete-confirmation-dialog",
       "type": "registry:block",
       "title": "Delete Confirmation Dialog",
-      "description": "DeleteConfirmationDialog block. @deprecated Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive confirmation workflows. Composes Dialog and Button primitives with WCAG 2.2 AA accessible focus trapping, 44px minimum touch targets, and high-contrast error styling.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "DeleteConfirmationDialog block. Deprecated: Use `AlertDialog` from `@/components/ui/alert-dialog` directly (`closeOnConfirm={false}` with controlled `open` state for async deletion flows). Presentational composite modal for destructive...",
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/alert-dialog.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json"
@@ -241,12 +203,7 @@
       "name": "filter-toolbar",
       "type": "registry:block",
       "title": "Filter Toolbar",
-      "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch targets, and accessible filter clearing.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "FilterToolbar block. Controlled composite toolbar for data tables, caseload lists, and exercise libraries. Composes Field, Input, Select, Button, and Chip primitives with responsive container queries (@container), 44px minimum touch...",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/field.json",
@@ -270,13 +227,9 @@
       "title": "Line Chart Card",
       "description": "LineChartCard block. Controlled presentational card for multi-series trajectories, baseline targets, and historical benchmark tracking. Composes ChartCard and Chart primitives with high-contrast lines, accessible tooltips, and legends.",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "recharts"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chart-card.json",
         "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
@@ -292,12 +245,7 @@
       "name": "list-detail-block",
       "type": "registry:block",
       "title": "List Detail Block",
-      "description": "ListDetailBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Field` (`Field.Root`, `Field.Label`) (`src/components/ui/field.tsx`) - `InputGroup` (`InputGroup.Addon`, `InputGroup.Input`, `InputGroup.Button`) (`src/components/ui/input-group.tsx`) - `Item` (`Item.Group`, `Item.Media`, `Item.Content`, `Item.Title`, `Item.Description`, `Item.Actions`) (`src/components/ui/item.tsx`) - `Badge` (`src/components/ui/badge.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Empty` (`src/components/ui/empty.tsx`)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "ListDetailBlock composite block.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -332,12 +280,7 @@
       "name": "metric-card",
       "type": "registry:block",
       "title": "Metric Card",
-      "description": "MetricCard block. @deprecated Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical analytics, caseload overviews, and progress monitoring. Composes Card, Badge, and Icon primitives with tabular numbers, ambient elevation, and high-contrast clinical status tokens.",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "MetricCard block. Deprecated: Prefer composing `Card` (with a divided `<dl>` stat strip), `Item.Group`, `RadialChartCard`, or `Table` (`numeric: true`) directly to avoid metric card grids. Presentational metric card for clinical...",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/card.json",
@@ -358,9 +301,6 @@
       "title": "Pie Chart Card",
       "description": "PieChartCard block. Controlled presentational card for category distributions, status proportions, and caseload composition breakdowns. Composes ChartCard and Chart primitives with a centered aggregate KPI and accessible tooltips.",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "recharts"
       ],
       "registryDependencies": [
@@ -380,12 +320,7 @@
       "name": "questionnaire",
       "type": "registry:block",
       "title": "Questionnaire",
-      "description": "Questionnaire composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Input` (`src/components/ui/input.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Kbd` (`src/components/ui/kbd.tsx`)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "Questionnaire composite block.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
@@ -415,15 +350,11 @@
       "name": "radar-chart-card",
       "type": "registry:block",
       "title": "Radar Chart Card",
-      "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids, high-contrast polygons, and accessible tooltips.",
+      "description": "RadarChartCard block. Controlled presentational radar / spider card for multi-factor profile assessments, clinical competency pillars, and benchmark polygon overlays. Composes ChartCard and Chart primitives with polar grids...",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "recharts"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chart-card.json",
         "https://seany9915.github.io/eolas-ui/r/chart.json"
       ],
@@ -439,15 +370,11 @@
       "name": "radial-chart-card",
       "type": "registry:block",
       "title": "Radial Chart Card",
-      "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary color. Composes ChartCard, Badge, and Chart primitives with a 180° radial arc and high-contrast status tokens.",
+      "description": "RadialChartCard block. Controlled presentational semicircle gauge card for capacity monitoring, threshold alerts, and target achievement. The arc color comes from the `value` entry in `config`; without one it falls back to the primary...",
       "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge",
         "recharts"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chart-card.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
         "https://seany9915.github.io/eolas-ui/r/chart.json"
@@ -464,12 +391,7 @@
       "name": "step-wizard",
       "type": "registry:block",
       "title": "Step Wizard",
-      "description": "StepWizard composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from Base UI primitives and design tokens: - `Card` (`Card.Header`, `Card.Title`, `Card.Description`, `Card.Content`, `Card.Footer`) (`src/components/ui/card.tsx`) - `Button`, `UnstyledButton` (`src/components/ui/button.tsx`) - `Separator` (`src/components/ui/separator.tsx`) - `Progress` (`src/components/ui/progress.tsx`) - `Icon` (`src/components/ui/icon.tsx`)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "StepWizard composite block.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/card.json",
@@ -498,12 +420,7 @@
       "name": "supporting-pane-block",
       "type": "registry:block",
       "title": "Supporting Pane Block",
-      "description": "SupportingPaneBlock composite block. Layer: Composite Block (`src/components/blocks/`) Foundation: Built strictly from primitives and design tokens: - `Button` (`src/components/ui/button.tsx`) - `Icon` (`src/components/ui/icon.tsx`) - `Badge` (`src/components/ui/badge.tsx`)",
-      "dependencies": [
-        "@base-ui/react",
-        "clsx",
-        "tailwind-merge"
-      ],
+      "description": "SupportingPaneBlock composite block.",
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",

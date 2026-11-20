@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Drawer primitive (@base-ui/react/drawer).
  *

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Carousel primitive built on embla-carousel-react and Base UI.
  *

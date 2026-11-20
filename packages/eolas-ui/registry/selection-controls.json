@@ -3,14 +3,8 @@
   "name": "selection-controls",
   "type": "registry:ui",
   "title": "Selection Controls",
-  "description": "Re-exports selection control primitives for backward compatibility. Dedicated modular files exist at: - @/components/ui/checkbox - @/components/ui/checkbox-group - @/components/ui/radio - @/components/ui/switch",
-  "dependencies": [
-    "@base-ui/react",
-    "clsx",
-    "tailwind-merge"
-  ],
+  "description": "Re-exports selection control primitives for backward compatibility.",
   "registryDependencies": [
-    "https://seany9915.github.io/eolas-ui/r/utils.json",
     "https://seany9915.github.io/eolas-ui/r/checkbox.json",
     "https://seany9915.github.io/eolas-ui/r/checkbox-group.json",
     "https://seany9915.github.io/eolas-ui/r/radio.json",
@@ -19,10 +13,9 @@
   "files": [
     {
       "path": "ui/selection-controls.tsx",
-      "content": "/**\n * Re-exports selection control primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/checkbox\n * - @/components/ui/checkbox-group\n * - @/components/ui/radio\n * - @/components/ui/switch\n */\nexport * from './checkbox';\nexport * from './checkbox-group';\nexport * from './radio';\nexport * from './switch';\n",
+      "content": "'use client';\n\n/**\n * Re-exports selection control primitives for backward compatibility.\n * Dedicated modular files exist at:\n * - @/components/ui/checkbox\n * - @/components/ui/checkbox-group\n * - @/components/ui/radio\n * - @/components/ui/switch\n */\nexport * from './checkbox';\nexport * from './checkbox-group';\nexport * from './radio';\nexport * from './switch';\n",
       "type": "registry:ui",
       "target": "@ui/selection-controls.tsx"
     }
-  ],
-  "docs": "Re-exports selection control primitives for backward compatibility.\nDedicated modular files exist at:\n- @/components/ui/checkbox\n- @/components/ui/checkbox-group\n- @/components/ui/radio\n- @/components/ui/switch"
+  ]
 }

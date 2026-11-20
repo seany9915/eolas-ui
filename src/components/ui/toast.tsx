@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { Toast as BaseToast } from '@base-ui/react/toast';
 import type {

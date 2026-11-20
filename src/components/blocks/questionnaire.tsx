@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Questionnaire composite block.
  *

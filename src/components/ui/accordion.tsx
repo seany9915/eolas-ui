@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Accordion primitive (@base-ui/react/accordion).
  *

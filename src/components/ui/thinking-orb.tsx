@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { ThinkingOrb as RawThinkingOrb, type OrbState, type OrbSize } from 'thinking-orbs';
 import { cn } from '@/lib/utils';

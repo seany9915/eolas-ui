@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Form primitive (@base-ui/react/form).
  *

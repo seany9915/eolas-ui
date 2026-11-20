@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * ViewTransition primitive (@base-ui/react/button).
  *

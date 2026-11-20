@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Avatar primitive (@base-ui/react/avatar).
  *

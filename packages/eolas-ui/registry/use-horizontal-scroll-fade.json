@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-horizontal-scroll-fade",
+  "type": "registry:lib",
+  "title": "Use Horizontal Scroll Fade",
+  "description": "Horizontal scroll overflow detection for soft edge-fade masks.",
+  "files": [
+    {
+      "path": "lib/use-horizontal-scroll-fade.ts",
+      "content": "'use client';\n\n/**\n * Horizontal scroll overflow detection for soft edge-fade masks.\n *\n * Platform Reference: Modern Web Guidance (MWG: soft-edge-content-fade, scrollability-affordance-hints)\n *\n * Updates `--fade-start` and `--fade-end` CSS custom properties on the scroll container\n * so edge masks only appear on sides with actual horizontal overflow.\n */\nimport * as React from 'react';\n\nexport interface UseHorizontalScrollFadeOptions {\n  /** Fade width in pixels when overflow exists on an edge. Defaults to 20. */\n  fadeSize?: number;\n  /** Disable overflow tracking (e.g. vertical orientation or stacked layout). */\n  disabled?: boolean;\n}\n\nexport function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(\n  externalRef?: React.Ref<T>,\n  options: UseHorizontalScrollFadeOptions = {}\n) {\n  const { fadeSize = 20, disabled = false } = options;\n  const internalRef = React.useRef<T | null>(null);\n  const [element, setElement] = React.useState<T | null>(null);\n\n  const setRef = React.useCallback(\n    (node: T | null) => {\n      internalRef.current = node;\n      setElement(node);\n      if (typeof externalRef === 'function') {\n        externalRef(node);\n      } else if (externalRef) {\n        externalRef.current = node;\n      }\n    },\n    [externalRef]\n  );\n\n  React.useEffect(() => {\n    const el = element ?? internalRef.current;\n    if (!el || disabled) {\n      if (el) {\n        el.style.removeProperty('--fade-start');\n        el.style.removeProperty('--fade-end');\n      }\n      return;\n    }\n\n    const updateFades = () => {\n      const { scrollLeft, scrollWidth, clientWidth } = el;\n      const maxScroll = Math.max(0, scrollWidth - clientWidth);\n      const isRtl = getComputedStyle(el).direction === 'rtl';\n      const offset = isRtl ? Math.abs(scrollLeft) : Math.max(0, scrollLeft);\n      const startFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(offset))) : 0;\n      const endFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(maxScroll - offset))) : 0;\n      el.style.setProperty('--fade-start', `${startFade}px`);\n      el.style.setProperty('--fade-end', `${endFade}px`);\n    };\n\n    updateFades();\n    el.addEventListener('scroll', updateFades, { passive: true });\n\n    let ro: ResizeObserver | undefined;\n    if (typeof ResizeObserver !== 'undefined') {\n      ro = new ResizeObserver(updateFades);\n      ro.observe(el);\n    }\n\n    return () => {\n      el.removeEventListener('scroll', updateFades);\n      ro?.disconnect();\n    };\n  }, [element, fadeSize, disabled]);\n\n  return { ref: setRef };\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/use-horizontal-scroll-fade.ts"
+    }
+  ]
+}

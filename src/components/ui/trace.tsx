@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Trace primitive suite.
  *

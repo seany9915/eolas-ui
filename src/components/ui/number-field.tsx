@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * NumberField primitive (@base-ui/react/number-field).
  *

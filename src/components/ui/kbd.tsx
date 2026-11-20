@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Keyboard key primitive (Kbd).
  *

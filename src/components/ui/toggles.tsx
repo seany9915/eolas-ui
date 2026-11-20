@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Re-exports toggle primitives for backward compatibility.
  * Dedicated modular files exist at:

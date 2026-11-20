@@ -1,3 +1,5 @@
+'use client';
+
 import { clsx, type ClassValue } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
@@ -43,10 +45,14 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Resolves a public asset path with the base URL configured for the app.
- * Works seamlessly in both local dev ('/') and deployed subpaths ('/eolas-ui/').
+ * Works seamlessly in Vite (via `import.meta.env.BASE_URL`), Next.js, and root-mounted apps.
  */
 export function assetUrl(path: string): string {
-  const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/';
+  const viteBase =
+    typeof import.meta !== 'undefined'
+      ? (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL
+      : undefined;
+  const base = viteBase || '/';
   const cleanBase = base.endsWith('/') ? base : `${base}/`;
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${cleanBase}${cleanPath}`;

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Toggle primitive (@base-ui/react/toggle).
  *

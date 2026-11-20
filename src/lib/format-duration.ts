@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Duration Formatting Utility and Hook
  *

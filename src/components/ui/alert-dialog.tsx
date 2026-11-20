@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { AlertDialog as BaseAlertDialog } from '@base-ui/react/alert-dialog';
 import { Button } from './button';

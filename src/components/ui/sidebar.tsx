@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Sidebar primitive (@base-ui/react/drawer + Base UI compound architecture).
  *

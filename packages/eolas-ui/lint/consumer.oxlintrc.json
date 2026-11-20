@@ -73,7 +73,7 @@
         ],
         "contracts": [
           {
-            "pattern": "^Button$",
+            "pattern": "^(Button|ButtonRoot|Button\\.Root)$",
             "allow": [
               "layout",
               "w-full",
@@ -110,7 +110,7 @@
             }
           },
           {
-            "pattern": "^UnstyledButton$",
+            "pattern": "^(UnstyledButton|Button\\.Unstyled)$",
             "allow": [
               "layout",
               "spacing",
@@ -145,6 +145,8 @@
               "transition-all"
             ],
             "message": {
+              "default": "Use parent gap-* instead of manual margins (mr-*/ml-*) on <Icon>, and use size='xs'|'sm'|'md'|'lg'|'xl'|'inline' for sizing.",
+              "layout": "Use parent gap-* instead of manual margins (mr-*/ml-*) on <Icon>, and use size='xs'|'sm'|'md'|'lg'|'xl'|'inline' for sizing.",
               "spacing": "Use parent gap-* instead of manual margins (mr-*/ml-*) on <Icon>, and use size='xs'|'sm'|'md'|'lg'|'xl'|'inline' for sizing.",
               "motion": "Blanket transition-all is banned on <Icon>. Use targeted transitions or standard animations (e.g. animate-spin)."
             }
@@ -207,7 +209,7 @@
             "message": "InlineAlert must maintain standard rectangular shape with solid 4px accent bar. Do not apply rounded-*."
           },
           {
-            "pattern": "^Toast$",
+            "pattern": "^(Toast|ToastRoot|ToastContent|Toast\\.Root|Toast\\.Content)$",
             "allow": [
               "layout",
               "w-*"
@@ -230,7 +232,7 @@
             "message": "Tabs manage their own selection wash and active borders. Do not override backgrounds or apply uppercase styling."
           },
           {
-            "pattern": "^(Input|Field|Textarea|Select|SelectTrigger|Select\\.Trigger|Combobox|ComboboxInput|ComboboxTrigger|Combobox\\.Input|Combobox\\.Trigger|Autocomplete|AutocompleteInput|AutocompleteTrigger|Autocomplete\\.Input|Autocomplete\\.Trigger|NumberField|NumberFieldGroup|NumberFieldInput|NumberField\\.Group|NumberField\\.Input|OTPField|OTPFieldInput|OTPField\\.Input|PromptInput|PromptInputTextarea|PromptInput\\.Textarea|InputGroup|InputGroupInput|InputGroupTextarea|InputGroup\\.Input|InputGroup\\.Textarea)$",
+            "pattern": "^(Input|Textarea|Select|SelectTrigger|Select\\.Trigger|Combobox|ComboboxInput|ComboboxTrigger|Combobox\\.Input|Combobox\\.Trigger|Autocomplete|AutocompleteInput|AutocompleteTrigger|Autocomplete\\.Input|Autocomplete\\.Trigger|NumberField|NumberFieldGroup|NumberFieldInput|NumberField\\.Group|NumberField\\.Input|OTPField|OTPFieldInput|OTPField\\.Input|PromptInput|PromptInputTextarea|PromptInput\\.Textarea|InputGroup|InputGroupInput|InputGroupTextarea|InputGroup\\.Input|InputGroup\\.Textarea)$",
             "allow": [
               "layout",
               "w-*"
@@ -242,13 +244,16 @@
             "message": "Inputs own their touch floors (44px/48px standard). Do not override height dimensions directly."
           },
           {
-            "pattern": "^(FieldGroup|FieldRoot|Field\\.Group|Field\\.Root)$",
+            "pattern": "^(FieldGroup|FieldRoot|Field|FieldContent|Field\\.Group|Field\\.Root|Field\\.Content)$",
             "allow": [
               "layout",
               "w-*",
               "gap-*"
             ],
-            "message": "FieldGroup and FieldRoot permit layout sizing and gap spacing between fields or horizontal controls."
+            "deny": [
+              "uppercase"
+            ],
+            "message": "Field, FieldGroup, FieldRoot, and FieldContent permit layout sizing and gap spacing between fields or horizontal controls."
           },
           {
             "pattern": "^(FieldLabel|Field\\.Label)$",

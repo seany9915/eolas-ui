@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Backward-compatibility alias for NumberField.
  * Canonical primitive resides at @/components/ui/number-field.

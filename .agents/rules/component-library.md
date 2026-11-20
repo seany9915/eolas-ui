@@ -44,7 +44,7 @@ This project standardizes on **Base UI** (`@base-ui/react`) as its headless prim
 npx @seany9915/eolas-ui sync --dry-run
 npx @seany9915/eolas-ui sync
 # Or targeted overwrite:
-npx @seany9915/eolas-ui add dialog combobox delete-confirmation-dialog --overwrite
+npx @seany9915/eolas-ui add dialog combobox data-table --overwrite
 ```
 
 ## Navigation & Action Taxonomy (Choosing the Right Primitive)

@@ -17,6 +17,9 @@ const OUT_DIR = path.resolve('public/r');
 const REGISTRY_INDEX = path.resolve('public/r/index.json');
 const REGISTRY_CATALOG = path.resolve('public/r/registry.json');
 const PKG_REGISTRY = path.resolve('packages/eolas-ui/registry');
+const EOLAS_REGISTRY_BASE_URL = (
+  process.env.EOLAS_REGISTRY_BASE_URL || 'https://seany9915.github.io/eolas-ui/r'
+).replace(/\/+$/, '');
 
 if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -25,78 +28,99 @@ if (!fs.existsSync(OUT_DIR)) {
 const formatRegistryDep = (dep) =>
   dep.startsWith('@') || dep.startsWith('http')
     ? dep
-    : `https://seany9915.github.io/eolas-ui/r/${dep}.json`;
+    : `${EOLAS_REGISTRY_BASE_URL}/${dep}.json`;
 
-const NPM_PACKAGE_DETECTORS = [
-  ['thinking-orbs', /from\s+['"]thinking-orbs['"]/],
-  ['bot-avatars', /from\s+['"]bot-avatars['"]/],
-  ['embla-carousel-react', /from\s+['"]embla-carousel-react['"]/],
-  ['recharts', /from\s+['"]recharts['"]/],
-  ['react-resizable-panels', /from\s+['"]react-resizable-panels['"]/],
-  ['cmdk', /from\s+['"]cmdk['"]/],
-  ['react-day-picker', /from\s+['"]react-day-picker['"]/],
-  ['@dnd-kit/react', /from\s+['"]@dnd-kit\/react(?:\/[^'"]+)?['"]/],
-  ['@dnd-kit/helpers', /from\s+['"]@dnd-kit\/helpers['"]/],
-  ['@tanstack/react-table', /from\s+['"]@tanstack\/react-table['"]/],
-];
+const TITLE_ACRONYMS = {
+  ai: 'AI',
+  otp: 'OTP',
+  csp: 'CSP',
+  ui: 'UI',
+  kbd: 'Kbd',
+  md: 'MD',
+  url: 'URL',
+  api: 'API',
+  html: 'HTML',
+  css: 'CSS',
+};
 
-function detectNpmDeps(content, includeBase = true) {
-  const deps = new Set(includeBase ? ['@base-ui/react', 'clsx', 'tailwind-merge'] : []);
-  for (const [pkg, pattern] of NPM_PACKAGE_DETECTORS) {
-    if (pattern.test(content)) {
+const TITLE_OVERRIDES = {
+  'built-in-ai': 'Built-in AI',
+  'csp-provider': 'CSP Provider',
+  'otp-field': 'OTP Field',
+};
+
+function formatTitle(name) {
+  if (TITLE_OVERRIDES[name]) return TITLE_OVERRIDES[name];
+  return name
+    .split('-')
+    .map((s) => TITLE_ACRONYMS[s] || s.charAt(0).toUpperCase() + s.slice(1))
+    .join(' ');
+}
+
+function stripComments(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+}
+
+function detectNpmDeps(content) {
+  const clean = stripComments(content);
+  const deps = new Set();
+  const patterns = [
+    /(?:import|export)\s+(?:type\s+)?(?:[^;'"]*?\s+from\s+)?['"]([^.'"][^'"]*)['"]/g,
+    /\bimport\s*\(\s*['"]([^.'"][^'"]*)['"]\s*\)/g,
+  ];
+  for (const re of patterns) {
+    for (const match of clean.matchAll(re)) {
+      const spec = match[1];
+      if (!spec || spec.startsWith('@/') || spec.startsWith('~/') || spec.startsWith('node:')) continue;
+      const pkg = spec.startsWith('@') ? spec.split('/').slice(0, 2).join('/') : spec.split('/')[0];
+      if (pkg === 'react' || pkg === 'react-dom') continue;
       deps.add(pkg);
+    }
+  }
+  return Array.from(deps).sort();
+}
+
+function detectLibDeps(content, excludeName = null) {
+  const clean = stripComments(content);
+  const deps = new Set();
+  for (const match of clean.matchAll(/from\s+['"]@\/lib\/([^'"]+)['"]/g)) {
+    const libName = match[1].replace(/\.ts$/, '');
+    if (!libName || libName === excludeName) continue;
+    if (fs.existsSync(path.join(LIB_DIR, `${libName}.ts`))) {
+      deps.add(libName);
     }
   }
   return Array.from(deps);
 }
 
-function detectLibFiles(content, excludeName = 'utils') {
-  const seen = new Set();
-  const libFiles = [];
-  for (const match of content.matchAll(/from\s+['"]@\/lib\/([^'"]+)['"]/g)) {
-    const libName = match[1];
-    if (!libName || libName === 'utils' || libName === excludeName || seen.has(libName)) continue;
-    const libPath = path.join(LIB_DIR, `${libName}.ts`);
-    if (fs.existsSync(libPath)) {
-      seen.add(libName);
-      libFiles.push({
-        path: `lib/${libName}.ts`,
-        content: fs.readFileSync(libPath, 'utf8'),
-        type: 'registry:lib',
-        target: `@lib/${libName}.ts`,
-      });
-    }
-  }
-  return libFiles;
-}
-
 function parseComponentDoc(content, name) {
-  const humanTitle = name
-    .split('-')
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ');
-
-  const match = content.match(/^\/\*\*([\s\S]*?)\*\//);
+  const humanTitle = formatTitle(name);
+  const stripped = content.replace(/^\s*['"]use client['"];?\s*/, '');
+  const match = stripped.match(/^\/\*\*([\s\S]*?)\*\//);
   if (!match) {
     return {
       title: humanTitle,
       description: `Eolas UI ${humanTitle} component built on Base UI and DESIGN.md design tokens.`,
       taxonomy: [],
-      docs: undefined,
     };
   }
 
   const lines = match[1].split('\n').map((l) => l.replace(/^\s*\*\s?/, '').trim());
   const cleanDoc = lines.filter(Boolean);
-  const firstLine = cleanDoc[0] || humanTitle;
 
   const descLines = [];
   const taxonomyLines = [];
   let inTaxonomy = false;
+  let stopDesc = false;
+
+  const bareNameRe = new RegExp(`^${name.replace(/-/g, '')}$`, 'i');
+  const stopDescRe =
+    /^(?:TAXONOMY|USAGE|ANATOMY|FEATURES|Layer:|Foundation:|Platform Reference:|Base UI Documentation:|Base UI Ecosystem Documentation:|Shadcn UI Reference:|Base UI Integration:|Aligned with|Full API and feature parity|Dedicated modular files|Canonical primitive)/i;
 
   for (const line of cleanDoc) {
     if (/TAXONOMY|USAGE/i.test(line)) {
       inTaxonomy = true;
+      stopDesc = true;
       continue;
     }
     if (inTaxonomy) {
@@ -105,17 +129,71 @@ function parseComponentDoc(content, name) {
       } else if (taxonomyLines.length > 0) {
         taxonomyLines[taxonomyLines.length - 1] += ` ${line}`;
       }
-    } else if (!line.startsWith('Base UI Documentation:')) {
-      descLines.push(line);
+      continue;
+    }
+    if (stopDescRe.test(line) || /^[-*└├│]/.test(line)) {
+      stopDesc = true;
+      continue;
+    }
+    if (!stopDesc) {
+      if (descLines.length === 0 && bareNameRe.test(line)) {
+        continue;
+      }
+      descLines.push(line.replace(/^@deprecated\s+/i, 'Deprecated: '));
     }
   }
 
-  const description = descLines.join(' ').trim() || firstLine;
+  let description = descLines.join(' ').replace(/\s+/g, ' ').trim();
+  if (!description) {
+    description = cleanDoc[0] || `Eolas UI ${humanTitle} component built on Base UI and DESIGN.md design tokens.`;
+  }
+  if (description.length > 240) {
+    const cut = description.slice(0, 237);
+    const lastSpace = cut.lastIndexOf(' ');
+    description = `${(lastSpace > 140 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:\s]+$/, '')}...`;
+  }
+
   return {
     title: humanTitle,
     description,
     taxonomy: taxonomyLines,
-    docs: cleanDoc.join('\n'),
+  };
+}
+
+function extractCssVars(globalsCss) {
+  const parseDeclarations = (regex) => {
+    const vars = {};
+    for (const match of globalsCss.matchAll(regex)) {
+      for (const decl of match[1].matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/gi)) {
+        vars[decl[1]] = decl[2].replace(/\s+/g, ' ').trim();
+      }
+    }
+    return vars;
+  };
+  return {
+    theme: parseDeclarations(/@theme(?:\s+static)?\s*\{([\s\S]*?)\}/g),
+    light: parseDeclarations(/(?:^|\n):root\s*\{([\s\S]*?)\n\}/g),
+  };
+}
+
+function toCatalogSummary(item) {
+  return {
+    name: item.name,
+    type: item.type,
+    title: item.title,
+    description: item.description,
+    ...(item.dependencies && item.dependencies.length > 0 ? { dependencies: item.dependencies } : {}),
+    ...(item.devDependencies && item.devDependencies.length > 0 ? { devDependencies: item.devDependencies } : {}),
+    ...(item.registryDependencies && item.registryDependencies.length > 0
+      ? { registryDependencies: item.registryDependencies }
+      : {}),
+    files: (item.files || []).map((f) => ({
+      path: f.path,
+      type: f.type,
+      ...(f.target ? { target: f.target } : {}),
+    })),
+    ...(item.meta ? { meta: item.meta } : {}),
+    ...(item.docs ? { docs: item.docs } : {}),
   };
 }
 
@@ -138,8 +216,9 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
     name: 'utils',
     type: 'registry:lib',
     title: 'Eolas UI Utilities',
-    description: 'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
-    dependencies: ['clsx', 'tailwind-merge', '@base-ui/react'],
+    description:
+      'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
+    dependencies: detectNpmDeps(utilsContent),
     files: [
       {
         path: 'lib/utils.ts',
@@ -150,24 +229,23 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
     ],
   };
   fs.writeFileSync(path.join(OUT_DIR, 'utils.json'), JSON.stringify(utilsItem, null, 2));
-  registryItems.push({
-    name: 'utils',
-    type: 'registry:lib',
-    title: utilsItem.title,
-    description: utilsItem.description,
-    dependencies: utilsItem.dependencies,
-  });
+  registryItems.push(toCatalogSummary(utilsItem));
 }
 
-// Standalone publishable library utilities
-const STANDALONE_LIBS = ['sanitize', 'scheduler', 'built-in-ai', 'scroll-completion', 'format-duration'];
-for (const libName of STANDALONE_LIBS) {
-  const libPath = path.join(LIB_DIR, `${libName}.ts`);
-  if (!fs.existsSync(libPath)) continue;
+// Standalone publishable library utilities (all src/lib/*.ts except utils.ts)
+const standaloneLibs = fs
+  .readdirSync(LIB_DIR)
+  .filter((f) => f.endsWith('.ts') && !f.endsWith('.d.ts') && f !== 'utils.ts')
+  .sort();
+
+for (const libFile of standaloneLibs) {
+  const libName = libFile.replace(/\.ts$/, '');
+  const libPath = path.join(LIB_DIR, libFile);
   const libContent = fs.readFileSync(libPath, 'utf8');
   const docMeta = parseComponentDoc(libContent, libName);
-  const npmDeps = detectNpmDeps(libContent, false);
-  const extraLibFiles = detectLibFiles(libContent, libName);
+  const npmDeps = detectNpmDeps(libContent);
+  const libRegDeps = detectLibDeps(libContent, libName).map(formatRegistryDep);
+
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: libName,
@@ -175,53 +253,45 @@ for (const libName of STANDALONE_LIBS) {
     title: docMeta.title,
     description: docMeta.description,
     ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
+    ...(libRegDeps.length > 0 ? { registryDependencies: libRegDeps } : {}),
     files: [
       {
-        path: `lib/${libName}.ts`,
+        path: `lib/${libFile}`,
         content: libContent,
         type: 'registry:lib',
-        target: `@lib/${libName}.ts`,
+        target: `@lib/${libFile}`,
       },
-      ...extraLibFiles,
     ],
   };
   fs.writeFileSync(path.join(OUT_DIR, `${libName}.json`), JSON.stringify(item, null, 2));
-  registryItems.push({
-    name: libName,
-    type: 'registry:lib',
-    title: item.title,
-    description: item.description,
-    ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
-  });
+  registryItems.push(toCatalogSummary(item));
 }
 
 // Eolas Theme item (theme.json)
 const GLOBALS_CSS = path.resolve('src/globals.css');
 if (fs.existsSync(GLOBALS_CSS)) {
   const globalsContent = fs.readFileSync(GLOBALS_CSS, 'utf8');
+  const cssVars = extractCssVars(globalsContent);
   const themeItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: 'theme',
     type: 'registry:file',
     title: 'Eolas UI Clinical Theme',
-    description: 'Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md',
-    docs: 'Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined. Toggle dark mode by adding class="dark" to <html>.',
+    description:
+      'Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md.',
+    docs: 'Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface="inverted"]). Import this stylesheet in your application entry point (e.g. src/main.tsx or app/layout.tsx).',
     files: [
       {
         path: 'styles/globals.css',
         content: globalsContent,
         type: 'registry:file',
-        target: 'styles/globals.css',
+        target: '~/src/globals.css',
       },
     ],
+    cssVars,
   };
   fs.writeFileSync(path.join(OUT_DIR, 'theme.json'), JSON.stringify(themeItem, null, 2));
-  registryItems.push({
-    name: 'theme',
-    type: 'registry:file',
-    title: themeItem.title,
-    description: themeItem.description,
-  });
+  registryItems.push(toCatalogSummary(themeItem));
 }
 
 // Eolas Design System Spec (design-md.json)
@@ -234,7 +304,8 @@ if (hasDesignMd) {
     name: 'design-md',
     type: 'registry:file',
     title: 'Eolas UI Design System Spec (DESIGN.md)',
-    description: 'Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers',
+    description:
+      'Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers.',
     files: [
       {
         path: 'DESIGN.md',
@@ -245,12 +316,7 @@ if (hasDesignMd) {
     ],
   };
   fs.writeFileSync(path.join(OUT_DIR, 'design-md.json'), JSON.stringify(designMdItem, null, 2));
-  registryItems.push({
-    name: 'design-md',
-    type: 'registry:file',
-    title: designMdItem.title,
-    description: designMdItem.description,
-  });
+  registryItems.push(toCatalogSummary(designMdItem));
 }
 
 // Eolas Agent Rules, Hooks & Enforcement Scripts (agent-rules.json)
@@ -284,34 +350,23 @@ if (hasRequiredAgentSources) {
   const agentRulesItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: 'agent-rules',
-    type: 'registry:file',
+    type: 'registry:item',
     title: 'Eolas UI Agent Rules & Anti-Pattern Checker',
-    description: 'Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers',
-    docs: 'For full AST lint enforcement (nested Card, sparkle icons, triple-tint, tertiary contrast, transition-all, spring easing, uppercase, unsafe type casts), also run: npx @seany9915/eolas-ui add lint',
+    description:
+      'Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers.',
+    docs: 'For full AST lint enforcement (nested Card, sparkle icons, triple-tint, tertiary contrast, transition-all, spring easing, uppercase, unsafe type casts), also run: npx shadcn@latest add @eolas/lint (or npx @seany9915/eolas-ui add lint).',
     ...(hasDesignMd ? { registryDependencies: [formatRegistryDep('design-md')] } : {}),
     files: agentFiles,
   };
   fs.writeFileSync(path.join(OUT_DIR, 'agent-rules.json'), JSON.stringify(agentRulesItem, null, 2));
-  registryItems.push({
-    name: 'agent-rules',
-    type: 'registry:file',
-    title: agentRulesItem.title,
-    description: agentRulesItem.description,
-    ...(agentRulesItem.registryDependencies ? { registryDependencies: agentRulesItem.registryDependencies } : {}),
-  });
+  registryItems.push(toCatalogSummary(agentRulesItem));
 } else {
-  // `.agents/` is gitignored, so it is absent in worktrees and fresh clones: keep the committed item instead of dropping it.
+  // Fallback if `.agents/` is absent in an isolated build environment: preserve committed item.
   const existingAgentRules = path.join(OUT_DIR, 'agent-rules.json');
   if (fs.existsSync(existingAgentRules)) {
     const existing = JSON.parse(fs.readFileSync(existingAgentRules, 'utf8'));
     console.warn('.agents/ sources not found: keeping existing agent-rules.json unchanged.');
-    registryItems.push({
-      name: 'agent-rules',
-      type: 'registry:file',
-      title: existing.title,
-      description: existing.description,
-      ...(existing.registryDependencies ? { registryDependencies: existing.registryDependencies } : {}),
-    });
+    registryItems.push(toCatalogSummary(existing));
   }
 }
 
@@ -336,13 +391,11 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
   const lintItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: 'lint',
-    type: 'registry:file',
+    type: 'registry:item',
     title: 'Eolas UI Lint',
-    description: '@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts',
-    devDependencies: [
-      '@shadcn/lint',
-      'oxlint',
-    ],
+    description: '@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts.',
+    docs: 'Run "npx oxlint ." to enforce Eolas UI and @shadcn/lint contracts. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json.',
+    devDependencies: ['@shadcn/lint', 'oxlint'],
     files: [
       {
         path: 'lint/index.mjs',
@@ -359,25 +412,19 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
     ],
   };
   fs.writeFileSync(path.join(OUT_DIR, 'lint.json'), JSON.stringify(lintItem, null, 2));
-  registryItems.push({
-    name: 'lint',
-    type: 'registry:file',
-    title: lintItem.title,
-    description: lintItem.description,
-    devDependencies: lintItem.devDependencies,
-  });
+  registryItems.push(toCatalogSummary(lintItem));
 }
 
 // 1. Scan src/components/ui for all .tsx files
-const files = fs.readdirSync(UI_DIR).filter((f) => f.endsWith('.tsx'));
-console.log(`Found ${files.length} UI files to catalog.`);
+const uiFiles = fs.readdirSync(UI_DIR).filter((f) => f.endsWith('.tsx')).sort();
+console.log(`Found ${uiFiles.length} UI files to catalog.`);
 
-for (const file of files) {
+for (const file of uiFiles) {
   const name = file.replace('.tsx', '');
   const content = fs.readFileSync(path.join(UI_DIR, file), 'utf8');
   const docMeta = parseComponentDoc(content, name);
 
-  // Detect internal component dependencies
+  // Detect internal UI component dependencies
   const internalDeps = [];
   const regex = /from\s+['"](?:\.\/|@\/components\/ui\/)([^'"]+)['"]/g;
   let m;
@@ -387,8 +434,9 @@ for (const file of files) {
     }
   }
 
-  const npmDeps = detectNpmDeps(content, true);
-  const libFiles = detectLibFiles(content);
+  const npmDeps = detectNpmDeps(content);
+  const libDeps = detectLibDeps(content);
+  const regDeps = [...new Set([...libDeps, ...internalDeps])].map(formatRegistryDep);
 
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -396,8 +444,8 @@ for (const file of files) {
     type: 'registry:ui',
     title: docMeta.title,
     description: docMeta.description,
-    dependencies: npmDeps,
-    registryDependencies: [...new Set(['utils', ...internalDeps])].map(formatRegistryDep),
+    ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
+    ...(regDeps.length > 0 ? { registryDependencies: regDeps } : {}),
     files: [
       {
         path: `ui/${file}`,
@@ -405,27 +453,17 @@ for (const file of files) {
         type: 'registry:ui',
         target: `@ui/${file}`,
       },
-      ...libFiles,
     ],
     ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
-    ...(docMeta.docs ? { docs: docMeta.docs } : {}),
   };
 
   fs.writeFileSync(path.join(OUT_DIR, `${name}.json`), JSON.stringify(item, null, 2));
-  registryItems.push({
-    name,
-    type: 'registry:ui',
-    title: item.title,
-    description: item.description,
-    dependencies: npmDeps,
-    registryDependencies: item.registryDependencies,
-    ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
-  });
+  registryItems.push(toCatalogSummary(item));
 }
 
 // 2. Scan src/components/blocks for all .tsx files
 if (fs.existsSync(BLOCKS_DIR)) {
-  const blockFiles = fs.readdirSync(BLOCKS_DIR).filter((f) => f.endsWith('.tsx'));
+  const blockFiles = fs.readdirSync(BLOCKS_DIR).filter((f) => f.endsWith('.tsx')).sort();
   console.log(`Found ${blockFiles.length} composite block files to catalog.`);
 
   for (const file of blockFiles) {
@@ -444,8 +482,9 @@ if (fs.existsSync(BLOCKS_DIR)) {
       }
     }
 
-    const npmDeps = detectNpmDeps(content, true);
-    const libFiles = detectLibFiles(content);
+    const npmDeps = detectNpmDeps(content);
+    const libDeps = detectLibDeps(content);
+    const regDeps = [...new Set([...libDeps, ...internalDeps])].map(formatRegistryDep);
 
     const item = {
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -453,8 +492,8 @@ if (fs.existsSync(BLOCKS_DIR)) {
       type: 'registry:block',
       title: docMeta.title,
       description: docMeta.description,
-      dependencies: npmDeps,
-      registryDependencies: [...new Set(['utils', ...internalDeps])].map(formatRegistryDep),
+      ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
+      ...(regDeps.length > 0 ? { registryDependencies: regDeps } : {}),
       files: [
         {
           path: `blocks/${file}`,
@@ -462,22 +501,12 @@ if (fs.existsSync(BLOCKS_DIR)) {
           type: 'registry:block',
           target: `@components/blocks/${file}`,
         },
-        ...libFiles,
       ],
       ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
-      ...(docMeta.docs ? { docs: docMeta.docs } : {}),
     };
 
     fs.writeFileSync(path.join(OUT_DIR, `${name}.json`), JSON.stringify(item, null, 2));
-    registryItems.push({
-      name,
-      type: 'registry:block',
-      title: item.title,
-      description: item.description,
-      dependencies: npmDeps,
-      registryDependencies: item.registryDependencies,
-      ...(docMeta.taxonomy && docMeta.taxonomy.length > 0 ? { meta: { taxonomy: docMeta.taxonomy } } : {}),
-    });
+    registryItems.push(toCatalogSummary(item));
   }
 }
 
@@ -534,15 +563,18 @@ const rootItems = registryItems.map((item) => {
     type: fullItem.type,
     title: fullItem.title,
     description: fullItem.description,
-    dependencies: fullItem.dependencies,
-    devDependencies: fullItem.devDependencies,
-    registryDependencies: fullItem.registryDependencies,
+    ...(fullItem.dependencies && fullItem.dependencies.length > 0 ? { dependencies: fullItem.dependencies } : {}),
+    ...(fullItem.devDependencies && fullItem.devDependencies.length > 0 ? { devDependencies: fullItem.devDependencies } : {}),
+    ...(fullItem.registryDependencies && fullItem.registryDependencies.length > 0
+      ? { registryDependencies: fullItem.registryDependencies }
+      : {}),
     files: (fullItem.files || []).map((f) => ({
       path: mapRegistryFilePathToRepoSource(f.path),
       type: f.type,
-      target: f.target,
+      ...(f.target ? { target: f.target } : {}),
     })),
     ...(fullItem.meta ? { meta: fullItem.meta } : {}),
+    ...(fullItem.docs ? { docs: fullItem.docs } : {}),
   };
 });
 
@@ -563,7 +595,7 @@ const uiRegistryItems = rootItems
       files: item.files.map((f) => ({
         path: path.relative(UI_REGISTRY_DIR, path.resolve(f.path)).replace(/\\/g, '/'),
         type: f.type,
-        target: f.target,
+        ...(f.target ? { target: f.target } : {}),
       })),
     };
   });
@@ -572,7 +604,6 @@ fs.writeFileSync(
   JSON.stringify(
     {
       $schema: 'https://ui.shadcn.com/schema/registry.json',
-      name: '@seany9915/eolas-ui/ui',
       items: uiRegistryItems,
     },
     null,
@@ -591,7 +622,7 @@ const blockRegistryItems = rootItems
       files: item.files.map((f) => ({
         path: path.relative(BLOCKS_DIR, path.resolve(f.path)).replace(/\\/g, '/'),
         type: f.type,
-        target: f.target,
+        ...(f.target ? { target: f.target } : {}),
       })),
     };
   });
@@ -600,7 +631,6 @@ fs.writeFileSync(
   JSON.stringify(
     {
       $schema: 'https://ui.shadcn.com/schema/registry.json',
-      name: '@seany9915/eolas-ui/blocks',
       items: blockRegistryItems,
     },
     null,

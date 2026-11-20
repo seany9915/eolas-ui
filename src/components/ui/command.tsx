@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Command primitive (cmdk + Base UI Dialog).
  *

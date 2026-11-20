@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Meter primitive (@base-ui/react/meter).
  *

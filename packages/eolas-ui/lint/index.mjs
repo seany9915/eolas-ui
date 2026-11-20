@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 const RAW_HTML_CONTROL_MESSAGES = {
-  button: 'Direct <button> usage is prohibited outside primitives. Use <Button> from @/components/ui/button.',
+  button: 'Direct <button> usage is prohibited outside primitives. Use <Button> or <UnstyledButton> from @/components/ui/button.',
   input: 'Direct <input> usage is prohibited outside primitives. Use <Input> from @/components/ui/input.',
   select: 'Direct <select> usage is prohibited outside primitives. Use <Select> from @/components/ui/select.',
   textarea: 'Direct <textarea> usage is prohibited outside primitives. Use <Textarea> from @/components/ui/textarea.',
@@ -769,6 +769,9 @@ export const plugin = {
           'Program:exit'() {
             for (const { attr, scopeChain } of onKeyDownEntries) {
               const expr = attr.value.expression;
+              if (astChecksReactImeComposing(expr, visitorKeys)) {
+                continue;
+              }
               const candidates = [expr];
 
               if (expr.type === 'Identifier') {
@@ -899,20 +902,37 @@ export const plugin = {
         schema: [],
       },
       create(context) {
-        let renderPropDepth = 0;
+        const renderElementDepthStack = [];
+        const rootRenderOpeningNodes = new WeakSet();
         return {
           JSXAttribute(node) {
             if (node.name?.name === 'render') {
-              renderPropDepth += 1;
+              renderElementDepthStack.push(0);
             }
           },
           'JSXAttribute:exit'(node) {
             if (node.name?.name === 'render') {
-              renderPropDepth = Math.max(0, renderPropDepth - 1);
+              renderElementDepthStack.pop();
+            }
+          },
+          JSXElement(node) {
+            if (renderElementDepthStack.length > 0) {
+              const topIdx = renderElementDepthStack.length - 1;
+              const depthBefore = renderElementDepthStack[topIdx];
+              if (depthBefore === 0 && node.openingElement) {
+                rootRenderOpeningNodes.add(node.openingElement);
+              }
+              renderElementDepthStack[topIdx] = depthBefore + 1;
+            }
+          },
+          'JSXElement:exit'() {
+            if (renderElementDepthStack.length > 0) {
+              const topIdx = renderElementDepthStack.length - 1;
+              renderElementDepthStack[topIdx] = Math.max(0, renderElementDepthStack[topIdx] - 1);
             }
           },
           JSXOpeningElement(node) {
-            if (renderPropDepth > 0) return;
+            if (rootRenderOpeningNodes.has(node)) return;
             if (node.name?.type !== 'JSXIdentifier') return;
             const tag = node.name.name;
             const message = RAW_HTML_CONTROL_MESSAGES[tag];

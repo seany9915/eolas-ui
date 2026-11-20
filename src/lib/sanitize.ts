@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Untrusted HTML Sanitizer Utility & React Component.
  *

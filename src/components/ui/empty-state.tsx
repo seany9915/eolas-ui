@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * EmptyState primitive (backward-compatibility alias for Empty).
  * Canonical primitive resides at @/components/ui/empty.

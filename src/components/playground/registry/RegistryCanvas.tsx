@@ -31,10 +31,10 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
   onBackToCatalog,
   className,
 }) => {
-  const [copiedType, setCopiedType] = React.useState<'import' | 'cli' | null>(null);
+  const [copiedType, setCopiedType] = React.useState<'import' | 'shadcn' | 'eolas' | null>(null);
   const [activeTab, setActiveTab] = React.useState<string>('preview');
 
-  const copyToClipboard = async (text: string, type: 'import' | 'cli') => {
+  const copyToClipboard = async (text: string, type: 'import' | 'shadcn' | 'eolas') => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedType(type);
@@ -44,11 +44,16 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
     }
   };
 
-  const importStatement = entry.tier === 'block'
-    ? `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/blocks/${entry.name}';`
-    : entry.tier === 'utility' && entry.name === 'utils'
-      ? `import { cn } from '@/lib/utils';`
-      : `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/ui/${entry.name}';`;
+  const importStatement =
+    entry.importStatement ||
+    (entry.tier === 'block'
+      ? `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/blocks/${entry.name}';`
+      : entry.tier === 'utility' && entry.sourcePath.startsWith('src/lib/')
+        ? `import { ${entry.title.replace(/\s+/g, '')} } from '@/lib/${entry.name}';`
+        : `import { ${entry.title.replace(/\s+/g, '')} } from '@/components/ui/${entry.name}';`);
+
+  const shadcnCliCommand = entry.shadcnCommand || `npx shadcn@latest add @eolas/${entry.name}`;
+  const eolasCliCommand = entry.eolasCommand || `npx @seany9915/eolas-ui add ${entry.name}`;
 
   const viewportWidthClass = {
     mobile: 'max-w-[375px] mx-auto',
@@ -93,9 +98,9 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               {/* Badges - Following DESIGN.md chips */}
               <Badge
                 variant="soft"
-                colorRole={entry.tier === 'block' ? 'secondary' : 'primary'}
+                colorRole={entry.tier === 'block' ? 'secondary' : entry.tier === 'utility' ? 'neutral' : 'primary'}
                 size="sm"
-              >{entry.tier === 'block' ? 'Composite Block' : 'Primitive'}</Badge>
+              >{entry.tier === 'block' ? 'Composite Block' : entry.tier === 'utility' ? 'Utility' : 'Primitive'}</Badge>
               <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 {entry.basePrimitive}
               </span>
@@ -129,12 +134,22 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             <Button
               size="sm"
               variant="tonal"
-              onClick={() => copyToClipboard(entry.shadcnCommand || `npx @seany9915/eolas-ui add ${entry.name}`, 'cli')}
+              onClick={() => copyToClipboard(shadcnCliCommand, 'shadcn')}
               className="text-xs font-mono h-9 px-3"
-              title="Copy Eolas UI CLI command"
+              title={`Copy shadcn CLI command: ${shadcnCliCommand}`}
             >
-              <Icon name={copiedType === 'cli' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
-              {copiedType === 'cli' ? 'Copied CLI' : 'eolas-ui add'}
+              <Icon name={copiedType === 'shadcn' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
+              {copiedType === 'shadcn' ? 'Copied shadcn' : 'shadcn add'}
+            </Button>
+            <Button
+              size="sm"
+              variant="outlined"
+              onClick={() => copyToClipboard(eolasCliCommand, 'eolas')}
+              className="text-xs font-mono h-9 px-3"
+              title={`Copy Eolas CLI command: ${eolasCliCommand}`}
+            >
+              <Icon name={copiedType === 'eolas' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
+              {copiedType === 'eolas' ? 'Copied eolas-ui' : 'eolas-ui add'}
             </Button>
           </div>
         </div>
@@ -268,19 +283,39 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 <Icon name="download" size="sm" className="text-primary" />
                 Installation via CLI
               </h3>
-              <p className="font-sans text-xs text-on-surface-variant">
-                Install this component into your project with the shadcn CLI registry:
-              </p>
-              <div className="bg-neutral text-on-neutral p-3.5 rounded-lg font-mono text-xs flex items-center justify-between">
-                <span>{entry.shadcnCommand || `npx shadcn add @seany9915/eolas-ui/${entry.name}`}</span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => copyToClipboard(entry.shadcnCommand || `npx shadcn add @seany9915/eolas-ui/${entry.name}`, 'cli')}
-                  className="text-on-neutral hover:bg-neutral-container/20 h-7 px-2 text-xs"
-                >
-                  <Icon name={copiedType === 'cli' ? 'check' : 'content_copy'} size="xs" />
-                </Button>
+              <div className="space-y-2">
+                <p className="font-sans text-xs text-on-surface-variant">
+                  Install via the shadcn CLI (<code className="font-mono">@eolas</code> namespace in <code className="font-mono">components.json</code>):
+                </p>
+                <div className="bg-neutral text-on-neutral p-3.5 rounded-lg font-mono text-xs flex items-center justify-between gap-2">
+                  <span className="truncate">{shadcnCliCommand}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(shadcnCliCommand, 'shadcn')}
+                    className="text-on-neutral hover:bg-neutral-container/20 h-7 px-2 text-xs shrink-0"
+                    aria-label="Copy shadcn CLI command"
+                  >
+                    <Icon name={copiedType === 'shadcn' ? 'check' : 'content_copy'} size="xs" />
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="font-sans text-xs text-on-surface-variant">
+                  Or install directly via the bundled Eolas UI CLI:
+                </p>
+                <div className="bg-surface-container text-on-surface p-3.5 rounded-lg font-mono text-xs border border-outline-variant flex items-center justify-between gap-2">
+                  <span className="truncate">{eolasCliCommand}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(eolasCliCommand, 'eolas')}
+                    className="h-7 px-2 text-xs shrink-0"
+                    aria-label="Copy Eolas CLI command"
+                  >
+                    <Icon name={copiedType === 'eolas' ? 'check' : 'content_copy'} size="xs" />
+                  </Button>
+                </div>
               </div>
             </Card>
 

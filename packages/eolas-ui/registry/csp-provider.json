@@ -2,15 +2,10 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "csp-provider",
   "type": "registry:ui",
-  "title": "Csp Provider",
-  "description": "Eolas UI Csp Provider component built on Base UI and DESIGN.md design tokens.",
+  "title": "CSP Provider",
+  "description": "Eolas UI CSP Provider component built on Base UI and DESIGN.md design tokens.",
   "dependencies": [
-    "@base-ui/react",
-    "clsx",
-    "tailwind-merge"
-  ],
-  "registryDependencies": [
-    "https://seany9915.github.io/eolas-ui/r/utils.json"
+    "@base-ui/react"
   ],
   "files": [
     {

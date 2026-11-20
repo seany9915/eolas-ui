@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import { cn } from '@/lib/utils';

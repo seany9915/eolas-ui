@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * WebOTP API auto-extraction hook.
  *

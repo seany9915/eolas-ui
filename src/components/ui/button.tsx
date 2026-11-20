@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Button primitive (@base-ui/react/button).
  *

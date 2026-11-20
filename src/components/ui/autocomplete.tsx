@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Autocomplete primitive (@base-ui/react/autocomplete).
  *

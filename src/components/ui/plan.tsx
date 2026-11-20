@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Plan composite block.
  *

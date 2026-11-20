@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Field primitive (@base-ui/react/field).
  *

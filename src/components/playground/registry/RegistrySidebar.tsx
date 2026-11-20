@@ -176,6 +176,9 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
           <ToggleGroupItem value="block" className="flex-1 text-xs px-2 py-1">
             Blocks
           </ToggleGroupItem>
+          <ToggleGroupItem value="utility" className="flex-1 text-xs px-2 py-1">
+            Utilities
+          </ToggleGroupItem>
         </ToggleGroup>
       </SidebarHeader>
 

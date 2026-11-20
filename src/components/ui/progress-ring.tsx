@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * ProgressRing primitive (@base-ui/react/progress).
  *
