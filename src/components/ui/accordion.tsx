@@ -71,8 +71,8 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
       data-slot="accordion-trigger"
       className={composeClassName(
         cn(
-          'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded',
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
           'disabled:cursor-not-allowed disabled:opacity-50'
         ),
         className
@@ -222,7 +222,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
       className={composeClassName(
         cn(
           'w-full',
-          level === 2 && 'p-4 rounded-xl bg-surface-container border-none shadow-ambient'
+          level === 2 && 'p-4 rounded-lg bg-surface-container border-none shadow-card'
         ),
         className
       )}

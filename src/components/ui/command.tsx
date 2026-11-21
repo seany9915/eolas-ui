@@ -124,7 +124,7 @@ export const CommandInput = React.forwardRef<
 >(({ className, icon, wrapperClassName, ...props }, ref) => (
   <div
     data-slot="command-input-wrapper"
-    className={cn('flex items-center gap-2 rounded-t-[inherit] border-b border-outline-variant px-3 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary', wrapperClassName)}
+    className={cn('flex items-center gap-2 border-b border-outline-variant px-3 transition-colors duration-[var(--duration-quick)] focus-within:border-b-primary', wrapperClassName)}
     cmdk-input-wrapper=""
   >
     {icon ?? (
@@ -217,7 +217,7 @@ export const CommandItem = React.forwardRef<
     ref={ref}
     data-slot="command-item"
     className={cn(
-      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container/60 data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container/60 aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
+      'relative flex cursor-pointer select-none items-center gap-2 rounded px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
       className
     )}
     {...props}

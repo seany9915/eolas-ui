@@ -372,12 +372,12 @@ export const InputGroupButton = React.forwardRef<HTMLButtonElement, InputGroupBu
   ) => {
     // Map custom input group icon sizes to button styling
     const sizeClasses = cn(
-      size === 'icon-xs' && 'size-6 min-h-[24px] min-w-[24px] p-0 rounded-md',
+      size === 'icon-xs' && 'size-6 min-h-[24px] min-w-[24px] p-0 rounded-sm',
       size === 'icon-sm' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-full',
-      size === 'icon' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-md',
-      size === 'xs' && 'h-6 min-h-[24px] px-2 text-xs rounded-md',
-      size === 'sm' && 'h-8 min-h-[32px] px-2.5 text-xs rounded-md',
-      size === 'md' && 'h-9 min-h-[36px] px-3 text-sm rounded-md'
+      size === 'icon' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-sm',
+      size === 'xs' && 'h-6 min-h-[24px] px-2 text-xs rounded-sm',
+      size === 'sm' && 'h-8 min-h-[32px] px-2.5 text-xs rounded-sm',
+      size === 'md' && 'h-9 min-h-[36px] px-3 text-sm rounded-sm'
     );
 
     const buttonSize =

@@ -245,7 +245,7 @@ export interface ChatProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<NonNullable<ChatProps['variant']>, string> = {
-  card: 'rounded-2xl border-none shadow-ambient bg-surface',
+  card: 'rounded-lg border border-transparent shadow-card bg-surface',
   canvas: 'rounded-none border-0 bg-background',
   ghost: 'rounded-none border-0 bg-transparent',
   unboxed: 'rounded-none border-0 bg-transparent',
@@ -467,7 +467,16 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
               ) : (
                 <>
                   {normalizedSuggestions.length > 0 && (
-                    <div className="px-4 py-2 bg-surface shrink-0 border-t border-outline-variant">
+                    <div
+                      className={cn(
+                        'px-4 py-2 shrink-0 border-t border-outline-variant',
+                        variant === 'card'
+                          ? 'bg-surface'
+                          : variant === 'canvas'
+                            ? 'bg-background'
+                            : 'bg-transparent'
+                      )}
+                    >
                       <SuggestionChips
                         label={suggestionsLabel}
                         suggestions={normalizedSuggestions}
@@ -475,7 +484,16 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                       />
                     </div>
                   )}
-                  <ChatFooter className="border-t border-outline-variant bg-surface">
+                  <ChatFooter
+                    className={cn(
+                      'border-t border-outline-variant',
+                      variant === 'card'
+                        ? 'bg-surface'
+                        : variant === 'canvas'
+                          ? 'bg-background'
+                          : 'bg-transparent'
+                    )}
+                  >
                     {promptInputNode}
                   </ChatFooter>
                 </>

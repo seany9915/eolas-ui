@@ -72,10 +72,10 @@ export const PaginationLink = React.forwardRef<
       colorRole={isActive ? 'primary' : 'neutral'}
       size={size}
       className={cn(
-        'min-w-[44px] min-h-[44px] h-11 px-3.5 tabular-nums font-sans text-sm rounded-md transition-colors',
+        'min-w-[44px] min-h-[44px] h-11 px-3.5 tabular-nums font-sans text-sm rounded transition-colors',
         isActive
           ? 'pointer-events-none font-semibold shadow-ambient'
-          : 'text-on-surface hover:bg-surface-container border-outline-variant hover:border-outline',
+          : 'text-on-surface hover:bg-state-hover border-outline-variant hover:border-outline',
         className
       )}
       {...props}

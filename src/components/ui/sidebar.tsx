@@ -402,7 +402,7 @@ export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTrigger
           size="icon"
           aria-label="Toggle Sidebar"
           className={composeClassName(
-            'size-11 min-h-[44px] min-w-[44px] rounded-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+            'size-11 min-h-[44px] min-w-[44px] rounded text-on-surface-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
             className
           )}
           onClick={(event) => {
@@ -481,7 +481,7 @@ export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
         className: cn(
           'relative flex flex-1 flex-col bg-surface',
           isEmbedded ? 'min-h-0 h-full' : 'min-h-svh',
-          'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
+          'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
           className
         ),
         ...props,
@@ -753,13 +753,13 @@ export function sidebarMenuButtonVariants({
 
   const variantClasses = {
     default:
-      'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold',
+      'text-on-surface-variant hover:bg-state-hover hover:text-on-surface font-medium data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold data-[active=true]:hover:bg-primary-container data-[active=true]:hover:brightness-95',
     outline:
-      'bg-surface border border-outline-variant hover:bg-surface-container hover:text-on-surface text-on-surface-variant font-medium data-[active=true]:border-primary/40 data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold',
+      'bg-surface border border-outline-variant hover:bg-state-hover hover:text-on-surface text-on-surface-variant font-medium data-[active=true]:border-primary/40 data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold data-[active=true]:hover:bg-primary-container data-[active=true]:hover:brightness-95',
   }[variant];
 
   return cn(
-    'peer/menu-button relative flex w-full items-center rounded-md font-label transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] outline-none select-none cursor-pointer',
+    'peer/menu-button relative flex w-full items-center rounded font-label transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] outline-none select-none cursor-pointer',
     // Focus indicator: Floating 2px outer outline (WCAG 2.2 SC 2.4.7)
     'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
     'disabled:pointer-events-none disabled:opacity-50',
@@ -859,7 +859,7 @@ export interface SidebarMenuActionProps
 export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
   ({ className, showOnHover = false, render, nativeButton, children, ...props }, ref) => {
     const baseClasses = cn(
-      'absolute end-1 top-2 flex aspect-square w-7 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
+      'absolute end-1 top-2 flex aspect-square w-7 items-center justify-center rounded p-0 text-on-surface-variant outline-none transition-transform hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'after:absolute after:-inset-2 md:after:hidden',
       'peer-data-[size=sm]/menu-button:top-1',
       'peer-data-[size=default]/menu-button:top-1.5',
@@ -896,7 +896,7 @@ export const SidebarMenuBadge = React.forwardRef<
       data-slot="sidebar-menu-badge"
       data-sidebar="menu-badge"
       className={cn(
-        'pointer-events-none absolute end-2 flex h-5 min-w-5 select-none items-center justify-center rounded-md px-1.5 text-xs font-semibold font-mono tabular-nums bg-surface-container text-on-surface-variant peer-hover/menu-button:text-on-surface peer-data-[active=true]/menu-button:bg-primary peer-data-[active=true]/menu-button:text-on-primary',
+        'pointer-events-none absolute end-2 flex h-5 min-w-5 select-none items-center justify-center rounded-full px-1.5 text-xs font-semibold font-mono tabular-nums bg-surface-container-high text-on-surface-variant peer-hover/menu-button:text-on-surface peer-data-[active=true]/menu-button:bg-primary peer-data-[active=true]/menu-button:text-on-primary',
         'peer-data-[size=sm]/menu-button:top-2',
         'peer-data-[size=default]/menu-button:top-3',
         'peer-data-[size=lg]/menu-button:top-3.5',

@@ -203,16 +203,16 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
                 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isHorizontal
                   ? cn(
-                      'min-h-[44px] px-3.5 py-2 -mb-px rounded-t-md border-b-2 font-medium text-xs',
+                      'min-h-[44px] px-3.5 py-2 -mb-px rounded-t border-b-2 font-medium text-xs',
                       isActive
                         ? 'border-primary bg-primary-container text-on-primary-container font-semibold'
-                        : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline-variant'
+                        : 'border-transparent text-on-surface-variant hover:text-on-surface hover:bg-state-hover hover:border-outline-variant'
                     )
                   : cn(
-                      'min-h-[44px] px-3.5 py-2 rounded-md font-medium text-xs transition-colors',
+                      'min-h-[44px] px-3.5 py-2 rounded font-medium text-xs transition-colors',
                       isActive
                         ? 'bg-primary-container text-on-primary-container font-semibold'
-                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/50'
+                        : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover'
                     ),
                 isActive && activeItemClassName,
                 itemClassName

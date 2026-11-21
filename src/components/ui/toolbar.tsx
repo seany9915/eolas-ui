@@ -118,7 +118,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
             sizeClasses,
             active
               ? 'bg-primary text-on-primary'
-              : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
+              : 'text-on-surface-variant hover:bg-state-hover hover:text-on-surface',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
           ),
           className

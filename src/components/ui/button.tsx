@@ -101,13 +101,13 @@ const softStyles: Record<ButtonColorRole, string> = {
 };
 
 const outlinedStyles: Record<ButtonColorRole, string> = {
-  primary: 'bg-surface text-primary border-2 border-primary hover:bg-surface-container',
+  primary: 'bg-surface text-primary border-2 border-primary hover:bg-state-hover',
   secondary: 'bg-surface text-secondary border-2 border-secondary hover:bg-secondary-container/30',
   tertiary: 'bg-tertiary text-on-tertiary border-2 border-tertiary', // forced fallback to filled for contrast
   error: 'bg-surface text-error border-2 border-error hover:bg-error-container/20',
   warning: 'bg-surface text-warning border-2 border-warning hover:bg-warning-container/20',
   success: 'bg-surface text-success border-2 border-success hover:bg-success-container/20',
-  neutral: 'bg-surface text-on-surface border-2 border-outline hover:bg-surface-container',
+  neutral: 'bg-surface text-on-surface border-2 border-outline hover:bg-state-hover',
 };
 
 const textStyles: Record<ButtonColorRole, string> = {
@@ -117,7 +117,7 @@ const textStyles: Record<ButtonColorRole, string> = {
   error: 'bg-transparent text-error hover:bg-error-container/30',
   warning: 'bg-transparent text-warning hover:bg-warning-container/30',
   success: 'bg-transparent text-success hover:bg-success-container/30',
-  neutral: 'bg-transparent text-on-surface hover:bg-surface-container',
+  neutral: 'bg-transparent text-on-surface hover:bg-state-hover',
 };
 
 export interface ButtonVariantsProps {

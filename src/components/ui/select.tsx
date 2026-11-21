@@ -269,7 +269,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+            'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover transition-colors cursor-pointer',
             'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
             'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
             size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
@@ -312,7 +312,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
               data-slot="select-content"
               finalFocus={finalFocus}
               className={composeClassName(
-                'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-hidden p-1 rounded-md bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+                'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-hidden p-1 rounded bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
                 popupClassName
               )}
             >
@@ -430,7 +430,7 @@ export const SelectTrigger = React.forwardRef<
       ref={mergedRef}
       className={composeClassName(
         [
-          'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+          'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover transition-colors cursor-pointer',
           'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
           size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
           size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
@@ -534,7 +534,7 @@ export const SelectPopup = React.forwardRef<
     ref={ref}
     data-slot="select-content"
     className={composeClassName(
-      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-hidden p-1 rounded-md bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-hidden p-1 rounded bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
       className
     )}
     {...props}
@@ -652,10 +652,10 @@ export const SelectItem = React.forwardRef<
     data-slot="select-item"
     className={composeClassName(
       [
-        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+        'hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
         'data-[selected]:bg-surface-container data-[selected]:text-primary data-[selected]:font-semibold',
-        'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
+        'data-[selected]:hover:bg-primary-container data-[selected]:hover:text-on-primary-container data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
       ],

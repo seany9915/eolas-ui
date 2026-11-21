@@ -524,7 +524,7 @@ export const ComboboxTrigger = React.forwardRef<
       className={composeClassName(
         hasChildren
           ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
-          : 'relative size-7 min-w-[28px] min-h-[28px] rounded flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
+          : 'relative size-7 min-w-[28px] min-h-[28px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
         className
       )}
       {...props}
@@ -564,10 +564,10 @@ export const ComboboxItem = React.forwardRef<
       data-slot="combobox-item"
       className={composeClassName(
         [
-          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
-          'hover:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+          'hover:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
           'data-[selected]:bg-surface-container data-[selected]:text-primary data-[selected]:font-semibold',
-          'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
+          'data-[selected]:hover:bg-primary-container data-[selected]:hover:text-on-primary-container data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
           'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
           indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
         ],
@@ -739,7 +739,7 @@ export const ComboboxPopup = React.forwardRef<
     ref={ref}
     data-slot="combobox-content"
     className={composeClassName(
-      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
       className
     )}
     {...props}
@@ -848,7 +848,7 @@ export const ComboboxChip = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip"
     className={composeClassName(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-surface-container text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
       className
     )}
     {...props}

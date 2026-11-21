@@ -502,7 +502,7 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Embedded Command Menu
         </span>
-        <Command className="rounded-xl border border-outline-variant shadow-ambient bg-surface focus-within:border-primary transition-colors">
+        <Command className="rounded-lg border border-outline-variant shadow-card bg-surface focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary transition-colors">
           <CommandInput placeholder="Type a command or search..." />
           <CommandList className="max-h-[260px]">
             <CommandEmpty>No matching results found.</CommandEmpty>

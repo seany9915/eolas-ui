@@ -41,7 +41,7 @@ export const MenubarTrigger = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none after:absolute after:-inset-1 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container data-[popup-open]:bg-surface-container data-[popup-open]:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
+            'relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none after:absolute after:-inset-1 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover data-[popup-open]:bg-state-hover data-[popup-open]:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }
@@ -91,7 +91,7 @@ export const MenubarContent = React.forwardRef<HTMLDivElement, MenubarContentPro
           ref={ref}
           data-slot="menubar-content"
           className={composeClassName(
-            'min-w-[220px] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+            'min-w-[220px] p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -117,11 +117,11 @@ export const MenubarItem = React.forwardRef<HTMLDivElement, MenubarItemProps>(
       data-slot="menubar-item"
       className={composeClassName(
         cn(
-          'flex items-center justify-between gap-3 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+          'flex items-center justify-between gap-3 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
           'data-[disabled]:opacity-40 data-[disabled]:pointer-events-none',
           destructive
             ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
-            : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface'
+            : 'text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface'
         ),
         className
       )}
@@ -154,7 +154,7 @@ export const MenubarCheckboxItem = React.forwardRef<HTMLDivElement, MenubarCheck
       ref={ref}
       data-slot="menubar-checkbox-item"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -184,7 +184,7 @@ export const MenubarRadioItem = React.forwardRef<HTMLDivElement, MenubarRadioIte
       ref={ref}
       data-slot="menubar-radio-item"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -214,7 +214,7 @@ export const MenubarSubmenuTrigger = React.forwardRef<HTMLDivElement, MenubarSub
       ref={ref}
       data-slot="menubar-sub-trigger"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -252,7 +252,7 @@ export const MenubarLinkItem = React.forwardRef<
     ref={ref}
     data-slot="menubar-link-item"
     className={composeClassName(
-      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
       className
     )}
     {...props}

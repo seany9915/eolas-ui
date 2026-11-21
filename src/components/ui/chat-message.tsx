@@ -9,9 +9,9 @@
  * - Use ChatMessage to display conversational turns (user, assistant, system).
  * - Follows DESIGN.md:
  *   - Assistant messages use neutral surface fill (`bg-surface`), outline-variant border,
- *     calibrated ambient elevation (`shadow-ambient`), and `rounded-2xl rounded-bl-xs`.
+ *     calibrated card elevation (`shadow-card`), and `rounded-lg rounded-es-sm`.
  *   - User messages use role container fill (`bg-primary-container text-on-primary-container`),
- *     `rounded-2xl rounded-br-xs`, and right alignment.
+ *     `rounded-lg rounded-ee-sm`, and right alignment.
  *   - Actions (copy, bookmark, retry) maintain accessible 44x44px touch targets.
  *   - Numeric timestamps use `tabular-nums` and `font-mono`.
  */
@@ -625,7 +625,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   onClick={handleCopy}
                   expandedTouchTarget
                   aria-label={copied ? 'Copied to clipboard' : 'Copy response'}
-                  className="text-xs gap-1 h-8 px-2"
+                  className="text-xs gap-1 h-8 min-h-[32px] px-2"
                 >
                   <Icon name={copied ? 'check' : 'content_copy'} size="xs" aria-hidden="true" />
                   <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -652,7 +652,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                       ? 'Saved to library'
                       : 'Save response to library'
                   }
-                  className="text-xs gap-1 h-8 px-2"
+                  className="text-xs gap-1 h-8 min-h-[32px] px-2"
                 >
                   <Icon
                     name={isBookmarked ? 'bookmark_added' : 'bookmark'}
@@ -673,7 +673,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   onClick={onRetry}
                   expandedTouchTarget
                   aria-label="Regenerate response"
-                  className="text-xs gap-1 h-8 px-2"
+                  className="text-xs gap-1 h-8 min-h-[32px] px-2"
                 >
                   <Icon name="refresh" size="xs" aria-hidden="true" />
                   <span>Retry</span>

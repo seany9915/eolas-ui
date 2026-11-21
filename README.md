@@ -23,7 +23,20 @@ Install `@eolas/theme` before adding components so semantic color roles, surface
 npx shadcn@latest add @eolas/theme
 ```
 
-This writes the complete Tailwind CSS v4 theme to `src/eolas-theme.css` without overwriting your existing stylesheet. Import it in your application entry point (for example, `import './eolas-theme.css'` in `src/main.tsx`) or main CSS file.
+This writes the complete Tailwind CSS v4 theme to `src/eolas-theme.css` without overwriting your existing stylesheet. Import it in your application entry point (for example, `import './eolas-theme.css'` in `src/main.tsx`) or main CSS file, and add the non-blocking Google Fonts & Material Symbols `<link>` tags to your HTML `<head>`:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..700&family=Lexend:wght@400..700&family=Roboto+Mono:wght@400..700&display=swap"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL,GRAD,opsz,wght@0..1,-25..0,20..40,400&display=block"
+  rel="stylesheet"
+/>
+```
 
 ### 2. Add Components on Demand
 

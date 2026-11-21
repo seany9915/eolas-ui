@@ -36,8 +36,8 @@ export const FieldsetRoot = React.forwardRef<
     className={composeClassName(
       cn(
         'w-full group/fieldset flex flex-col gap-3',
-        variant === 'card' && 'p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient gap-4',
-        variant === 'flat' && 'p-5 rounded-xl bg-surface-container border-none gap-4',
+        variant === 'card' && 'p-5 rounded-lg bg-surface border border-outline-variant shadow-card gap-4',
+        variant === 'flat' && 'p-5 rounded-lg bg-surface-container border-none gap-4',
         disabled && 'opacity-60 cursor-not-allowed'
       ),
       className

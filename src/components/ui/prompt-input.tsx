@@ -95,7 +95,7 @@ const PromptInputRoot = React.forwardRef<HTMLDivElement, PromptInputRootProps>(
           (asForm ? <form onSubmit={onFormSubmit} /> : undefined)
         }
         data-slot="prompt-input"
-        className={cn(!isGhost && 'p-2.5', className)}
+        className={cn(!isGhost && 'p-2.5 rounded-md', className)}
         {...props}
       >
         {children}
@@ -368,7 +368,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
         expandedTouchTarget
         aria-label={`Current model: ${displayName}`}
         className={cn(
-          'h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-surface-container transition-colors',
+          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-state-hover transition-colors',
           className
         )}
       >
@@ -389,7 +389,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
           expandedTouchTarget
           aria-label={`Current model: ${displayName}`}
           className={cn(
-            'h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-surface-container transition-colors',
+            'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-state-hover transition-colors',
             className
           )}
         >
@@ -475,10 +475,10 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
         aria-label={buttonLabel}
         aria-pressed={isThinkingActive}
         className={cn(
-          'h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
+          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
           isThinkingActive
             ? 'bg-secondary-container text-on-secondary-container'
-            : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
+            : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
           className
         )}
       >
@@ -513,10 +513,10 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
           expandedTouchTarget
           aria-label={buttonLabel}
           className={cn(
-            'h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
+            'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
             isThinkingActive
               ? 'bg-secondary-container text-on-secondary-container'
-              : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
+              : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
             className
           )}
         >
@@ -621,7 +621,7 @@ export const PromptInputAttachButton: React.FC<PromptInputAttachButtonProps> = (
           onClick={handleClick}
           expandedTouchTarget
           aria-label={label}
-          className={cn('size-8 min-h-[32px] min-w-[32px] p-0 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container', className)}
+          className={cn('size-8 min-h-[32px] min-w-[32px] p-0 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover', className)}
         >
           <Icon name="attach_file" size="xs" aria-hidden="true" />
         </Button>
@@ -665,10 +665,10 @@ export const PromptInputToolToggle: React.FC<PromptInputToolToggleProps> = ({
         aria-pressed={active}
         aria-label={label}
         className={cn(
-          'h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
+          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
           active
             ? 'bg-primary-container text-on-primary-container'
-            : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
+            : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
           className
         )}
       >
@@ -710,10 +710,10 @@ export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
         aria-pressed={isRecording}
         aria-label={isRecording ? 'Stop recording' : label}
         className={cn(
-          'h-8 px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
+          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
           isRecording
             ? 'bg-error-container text-on-error-container'
-            : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
+            : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
           className
         )}
       >
@@ -757,7 +757,7 @@ export const PromptInputStop: React.FC<PromptInputStopProps> = ({
         className
       )}
     >
-      <span className="size-3 rounded-sm bg-current shrink-0" aria-hidden="true" />
+      <span className="size-3 rounded-[2px] bg-current shrink-0" aria-hidden="true" />
     </Button>
   </Tooltip>
 );
@@ -823,7 +823,7 @@ const PromptInputSubmit: React.FC<PromptInputSubmitProps> = ({
         aria-label={submitLabel}
         className={cn(
           showLabel
-            ? 'h-9 px-3.5 rounded-full font-semibold gap-1.5 shrink-0'
+            ? 'h-9 min-h-[36px] px-3.5 rounded-full font-semibold gap-1.5 shrink-0'
             : 'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 disabled:opacity-40 disabled:scale-100',
           className
         )}
@@ -960,7 +960,7 @@ const PromptInputComponent = React.forwardRef<HTMLTextAreaElement, PromptInputPr
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          isDraggingOver && 'border-primary ring-2 ring-primary/20 bg-primary-container/10',
+          isDraggingOver && 'border-primary outline-2 -outline-offset-1 outline-primary bg-primary-container/10',
           className
         )}
       >

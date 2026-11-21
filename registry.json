@@ -208,7 +208,7 @@
       "name": "theme",
       "type": "registry:file",
       "title": "Eolas UI Clinical Theme",
-      "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md.",
+      "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, and motion tokens conforming to DESIGN.md.",
       "categories": [
         "system"
       ],
@@ -219,7 +219,7 @@
           "target": "~/src/eolas-theme.css"
         }
       ],
-      "docs": "Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). `npx shadcn@latest add @eolas/theme` writes the full Tailwind CSS v4 stylesheet to `src/eolas-theme.css` (import it from your entry point or main CSS file); `eolas-ui add theme` automatically writes to your `components.json` `tailwind.css` path when configured."
+      "docs": "Tailwind CSS v4 @theme tokens, semantic color roles, surface hierarchy, and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). `npx shadcn@latest add @eolas/theme` writes to `src/eolas-theme.css`; `eolas-ui add theme` writes to your `components.json` `tailwind.css` path when configured (or `src/eolas-theme.css` otherwise). Load Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined non-blocking via <link rel=\"stylesheet\"> in your document <head> (see README.md)."
     },
     {
       "name": "design-md",

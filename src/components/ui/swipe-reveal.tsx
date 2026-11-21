@@ -341,7 +341,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
                   aria-controls={toggleControlsId}
                   aria-label={toggleLabel}
                   onClick={handleToggleActions}
-                  className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container cursor-pointer transition-colors duration-[var(--duration-quick)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded text-on-surface-variant hover:text-on-surface hover:bg-state-hover cursor-pointer transition-colors duration-[var(--duration-quick)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
                     {isOpen ? 'close' : 'more_vert'}

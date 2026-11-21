@@ -121,7 +121,7 @@ export const TableRow = React.forwardRef<
     ref={ref}
     data-slot="table-row"
     className={cn(
-      'border-b border-outline-variant transition-colors hover:bg-surface-container/30 data-[state=selected]:bg-surface-container min-h-14 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+      'border-b border-outline-variant transition-colors hover:bg-state-hover data-[state=selected]:bg-surface-container data-[state=selected]:hover:bg-surface-container-high min-h-14 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
       className
     )}
     {...props}

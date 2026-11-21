@@ -97,8 +97,8 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
             ? className
             : composeClassName(
                 cn(
-                  'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
-                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded',
+                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
                   'disabled:cursor-not-allowed disabled:opacity-50'
                 ),
                 className
@@ -148,7 +148,7 @@ const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(
         className={composeClassName(
           cn(
             'w-full',
-            isCard && 'rounded-xl bg-surface border border-outline-variant p-4 shadow-ambient'
+            isCard && 'rounded-lg bg-surface border border-outline-variant p-4 shadow-card'
           ),
           className
         )}

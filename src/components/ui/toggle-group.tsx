@@ -11,7 +11,7 @@
  * - Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role="tablist").
  * - Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role="toolbar").
  * - Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).
- * - Outer track uses `bg-surface-container` with `border-outline-variant`. Pressed items adapt by mode:
+ * - Outer track uses `bg-surface-container-high` with `border-outline-variant`. Pressed items adapt by mode:
  *   single-select uses `bg-surface text-on-surface border-outline`, multi-select uses `bg-primary-container text-on-primary-container border-primary`.
  * - Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items.
  */

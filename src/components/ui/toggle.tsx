@@ -35,27 +35,27 @@ export interface ToggleProps<Value extends string = string>
 
 const variantStyles: Record<ToggleVariant, string> = {
   default: cn(
-    'bg-surface border-2 border-outline text-on-surface hover:bg-surface-container/70',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
+    'bg-surface border-2 border-outline text-on-surface hover:bg-state-hover',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:hover:bg-primary-container data-[pressed]:hover:brightness-95'
   ),
   outline: cn(
-    'bg-transparent border-2 border-outline text-on-surface hover:bg-surface-container/60',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
+    'bg-transparent border-2 border-outline text-on-surface hover:bg-state-hover',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:hover:bg-primary-container data-[pressed]:hover:brightness-95'
   ),
   ghost: cn(
-    'bg-transparent border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
-    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary'
+    'bg-transparent border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+    'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:hover:bg-primary-container data-[pressed]:hover:brightness-95'
   ),
   subtle: cn(
-    'bg-surface border-2 border-outline-variant text-on-surface-variant hover:bg-surface-container/40 hover:text-on-surface hover:border-outline',
-    'data-[pressed]:bg-surface-container data-[pressed]:text-on-surface data-[pressed]:border-outline'
+    'bg-surface border-2 border-outline-variant text-on-surface-variant hover:bg-state-hover hover:text-on-surface hover:border-outline',
+    'data-[pressed]:bg-surface-container-high data-[pressed]:text-on-surface data-[pressed]:border-outline data-[pressed]:hover:bg-surface-container-high'
   ),
 };
 
 const sizeStyles: Record<ToggleSize, string> = {
-  sm: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-xs gap-1.5 rounded-sm',
+  sm: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-xs gap-1.5 rounded',
   md: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-sm gap-2 rounded',
-  lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5 rounded-md',
+  lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5 rounded',
 };
 
 const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<string>>(

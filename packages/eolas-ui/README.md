@@ -49,13 +49,21 @@ npx @seany9915/eolas-ui add tabs --overwrite
 ```
 
 ### 3. Fonts & Material Symbols Icons
-Installing `theme` writes the Tailwind CSS v4 stylesheet (to your `components.json` `tailwind.css` path when configured, or `src/eolas-theme.css`) including `@import url(...)` rules for `Atkinson Hyperlegible Next`, `Lexend`, `Roboto Mono`, and the `Material Symbols Outlined` icon subset used by all Eolas UI primitives and blocks.
+Installing `theme` writes the Tailwind CSS v4 stylesheet (to your `components.json` `tailwind.css` path when configured, or `src/eolas-theme.css` without overwriting an existing non-Eolas `src/index.css`).
 
-For faster initial font discovery in production apps, you may optionally add preconnect links in your HTML `<head>`:
+Fonts (`Atkinson Hyperlegible Next`, `Lexend`, `Roboto Mono`) and `Material Symbols Outlined` are loaded non-blocking via `<link>` tags rather than render-blocking CSS `@import` rules. Add these to your HTML `<head>`:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400..700&family=Lexend:wght@400..700&family=Roboto+Mono:wght@400..700&display=swap"
+  rel="stylesheet"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL,GRAD,opsz,wght@0..1,-25..0,20..40,400&display=block"
+  rel="stylesheet"
+/>
 ```
 
 ### 4. Required Dependencies

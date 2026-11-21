@@ -465,8 +465,8 @@
         "taxonomy": [
           "Use ChatMessage to display conversational turns (user, assistant, system).",
           "Follows DESIGN.md:",
-          "Assistant messages use neutral surface fill (`bg-surface`), outline-variant border, calibrated ambient elevation (`shadow-ambient`), and `rounded-2xl rounded-bl-xs`.",
-          "User messages use role container fill (`bg-primary-container text-on-primary-container`), `rounded-2xl rounded-br-xs`, and right alignment.",
+          "Assistant messages use neutral surface fill (`bg-surface`), outline-variant border, calibrated card elevation (`shadow-card`), and `rounded-lg rounded-es-sm`.",
+          "User messages use role container fill (`bg-primary-container text-on-primary-container`), `rounded-lg rounded-ee-sm`, and right alignment.",
           "Actions (copy, bookmark, retry) maintain accessible 44x44px touch targets.",
           "Numeric timestamps use `tabular-nums` and `font-mono`."
         ]
@@ -1226,7 +1226,7 @@
           "A native input element that automatically works with Base UI Field context (<Field.Root>).",
           "Implements Modern Web Guidance (MWG: html) tri-token contract for autocomplete, inputMode, enterKeyHint.",
           "Follows DESIGN.md Tier B interactive controls:",
-          "0.5rem corner radius (rounded-lg) matching Buttons as the primary form control.",
+          "0.5rem corner radius (rounded) matching Buttons as the primary form control.",
           "Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary) for WCAG 2.4.13 contrast and Windows High Contrast Mode (forced-colors: active) compatibility.",
           "WCAG 2.2 SC 2.5.8 compliant hit target sizes: sm (44px), md (48px), lg (56px).",
           "For complex input layouts with toolbars, prefixes, suffixes, or multiple buttons, compose with <InputGroup> (@/components/ui/input-group)."
@@ -2618,7 +2618,7 @@
           "Use Textarea for multi-line freeform text input and notes.",
           "Supports modern CSS `field-sizing: content` via `autoGrow` prop for zero-layout-shift auto-expansion.",
           "Follows DESIGN.md Tier B interactive controls:",
-          "0.5rem corner radius (rounded-lg) matching Button and Input as primary form controls.",
+          "0.5rem corner radius (rounded) matching Button and Input as primary form controls.",
           "Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary).",
           "WCAG 2.2 SC 2.5.8 touch target compliance.",
           "For complex multi-line prompt composers with attachment toolbars, compose with <InputGroup> (@/components/ui/input-group) or <PromptInput> (@/components/ui/prompt-input)."
@@ -2717,7 +2717,7 @@
           "Do NOT use ToggleGroup for switching tabs/panels (use Tabs instead, role=\"tablist\").",
           "Do NOT use ToggleGroup for persistent command action bars (use Toolbar instead, role=\"toolbar\").",
           "Inner items use `rounded-sm` (0.25rem / 4px) and outer container uses `rounded` (0.5rem / 8px) per concentric radius law ($R_{outer} = R_{inner} + padding = 4px + 4px = 8px$).",
-          "Outer track uses `bg-surface-container` with `border-outline-variant`. Pressed items adapt by mode: single-select uses `bg-surface text-on-surface border-outline`, multi-select uses `bg-primary-container text-on-primary-container border-primary`.",
+          "Outer track uses `bg-surface-container-high` with `border-outline-variant`. Pressed items adapt by mode: single-select uses `bg-surface text-on-surface border-outline`, multi-select uses `bg-primary-container text-on-primary-container border-primary`.",
           "Enforces WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets on interactive items."
         ]
       }

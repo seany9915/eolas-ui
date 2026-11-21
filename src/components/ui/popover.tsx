@@ -159,7 +159,7 @@ function PopoverComponentInner<Payload = unknown>(
         </div>
         {showCloseButton && (
           <div className="mt-4 pt-3 border-t border-outline-variant flex justify-end">
-            <BasePopover.Close data-slot="popover-close" className="inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded-md bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <BasePopover.Close data-slot="popover-close" className="inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {closeLabel}
             </BasePopover.Close>
           </div>
@@ -403,7 +403,7 @@ export const PopoverClose = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded-md bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+            'inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }

@@ -280,9 +280,9 @@ export const NavigationMenuDemo: React.FC<ComponentDemoProps> = () => {
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-xl border border-outline-variant bg-surface overflow-visible">
+    <div className="w-full max-w-2xl mx-auto rounded-lg border border-outline-variant bg-surface overflow-visible">
       {/* Navigation Header Chrome */}
-      <div className="bg-surface px-4 border-b border-outline-variant rounded-t-[11px]">
+      <div className="h-12 bg-surface px-4 border-b border-outline-variant rounded-t-[15px]">
         <NavigationMenu
           items={navigationItems}
           activeId={activeId}

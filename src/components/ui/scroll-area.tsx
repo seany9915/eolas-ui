@@ -56,7 +56,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
       className={composeClassName(
         cn(
           'relative overflow-hidden w-full',
-          variant === 'framed' && 'rounded-xl border border-outline-variant bg-surface'
+          variant === 'framed' && 'rounded-lg border border-outline-variant bg-surface'
         ),
         className
       )}

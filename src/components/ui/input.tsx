@@ -13,7 +13,7 @@
  * - A native input element that automatically works with Base UI Field context (<Field.Root>).
  * - Implements Modern Web Guidance (MWG: html) tri-token contract for autocomplete, inputMode, enterKeyHint.
  * - Follows DESIGN.md Tier B interactive controls:
- *   - 0.5rem corner radius (rounded-lg) matching Buttons as the primary form control.
+ *   - 0.5rem corner radius (rounded) matching Buttons as the primary form control.
  *   - Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary)
  *     for WCAG 2.4.13 contrast and Windows High Contrast Mode (forced-colors: active) compatibility.
  *   - WCAG 2.2 SC 2.5.8 compliant hit target sizes: sm (44px), md (48px), lg (56px).

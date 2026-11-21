@@ -9,7 +9,7 @@
  * - Use Textarea for multi-line freeform text input and notes.
  * - Supports modern CSS `field-sizing: content` via `autoGrow` prop for zero-layout-shift auto-expansion.
  * - Follows DESIGN.md Tier B interactive controls:
- *   - 0.5rem corner radius (rounded-lg) matching Button and Input as primary form controls.
+ *   - 0.5rem corner radius (rounded) matching Button and Input as primary form controls.
  *   - Flush 2px focus indicator with negative 1px offset (focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary).
  *   - WCAG 2.2 SC 2.5.8 touch target compliance.
  * - For complex multi-line prompt composers with attachment toolbars, compose with <InputGroup>

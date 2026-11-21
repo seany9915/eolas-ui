@@ -223,7 +223,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               <BaseTabs.Indicator
                 data-slot="tabs-indicator"
                 className={cn(
-                  'absolute rounded-md z-0 pointer-events-none motion-reduce:transition-none',
+                  'absolute rounded-full z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary-container' : 'bg-primary-container',
                   indicatorReady
                     ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
@@ -333,7 +333,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                   )
                 : isPills
                   ? cn(
-                      'rounded-md text-on-surface-variant hover:text-on-surface z-10 border border-transparent',
+                      'rounded-full text-on-surface-variant hover:text-on-surface z-10 border border-transparent',
                       hasSlidingIndicator
                         ? cn(
                             'bg-transparent hover:bg-state-hover',
@@ -372,7 +372,9 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                           'aria-selected:text-primary aria-selected:border-primary'
                         )
                   ),
-            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-20',
+            isContained || isPills
+              ? 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-20'
+              : 'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary focus-visible:z-20',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
             typeof className === 'function' ? className(state) : className
           )

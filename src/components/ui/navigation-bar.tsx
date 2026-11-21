@@ -163,7 +163,7 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
           onClick={handleClick}
           className={composeClassName(
             cn(
-              'group relative flex-1 max-w-28 flex flex-col items-center justify-center min-h-11 min-w-11 py-1 px-1.5 rounded-md',
+              'group relative flex-1 max-w-28 flex flex-col items-center justify-center min-h-11 min-w-11 py-1 px-1.5 rounded',
               'cursor-pointer transition-[color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
               'active:scale-[var(--scale-large)] motion-reduce:active:scale-100 motion-reduce:transition-none',
               'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
@@ -180,7 +180,7 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
               'relative inline-flex items-center justify-center h-8 px-3.5 rounded-full transition-[background-color,color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
               isSelected
                 ? 'bg-primary-container text-on-primary-container'
-                : 'bg-transparent text-on-surface-variant group-hover:bg-surface-container'
+                : 'bg-transparent text-on-surface-variant group-hover:bg-state-hover'
             )}
           >
             {icon}

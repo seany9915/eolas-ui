@@ -53,7 +53,7 @@ export function CalendarDayButton({
       data-today={modifiers.today || undefined}
       data-outside={modifiers.outside || undefined}
       className={cn(
-        'size-9 p-0 font-normal rounded-md inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
+        'size-9 p-0 font-normal rounded inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-state-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
         className
       )}
       {...props}
@@ -114,25 +114,25 @@ export function Calendar({
         caption_label: 'inline-flex items-center gap-0.5 text-sm font-semibold font-label text-on-surface whitespace-nowrap select-none pointer-events-none',
         nav: 'absolute inset-x-0 top-0 flex items-center justify-between h-9 px-1 pointer-events-none z-10',
         button_previous:
-          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         button_next:
-          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
-        weekday: 'text-on-surface-variant rounded-md w-9 font-normal text-xs text-center font-sans select-none',
+        weekday: 'text-on-surface-variant rounded w-9 font-normal text-xs text-center font-sans select-none',
         weeks: 'flex flex-col gap-1',
         week: 'flex w-full mt-1',
         day: 'size-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20 font-sans',
         day_button:
-          'size-9 p-0 font-normal rounded-md inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
+          'size-9 p-0 font-normal rounded inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-state-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
         selected:
-          'bg-primary text-on-primary rounded-md [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
+          'bg-primary text-on-primary rounded [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_start:
-          'rounded-s-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
+          'rounded-s bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_end:
-          'rounded-e-md bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
+          'rounded-e bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_middle:
-          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-surface-container',
+          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-state-hover',
         today:
           '[&>button]:font-bold [&>button]:relative [&>button]:after:content-[""] [&>button]:after:absolute [&>button]:after:bottom-1 [&>button]:after:left-1/2 [&>button]:after:-translate-x-1/2 [&>button]:after:size-1 [&>button]:after:rounded-full [&>button]:after:bg-primary',
         outside:

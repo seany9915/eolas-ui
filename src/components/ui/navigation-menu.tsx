@@ -35,7 +35,7 @@ export const NavigationMenuList = React.forwardRef<
   <BaseNavigationMenu.List
     ref={ref}
     data-slot="navigation-menu-list"
-    className={composeClassName('flex flex-1 h-full list-none items-center gap-2 px-1 bg-transparent w-full', className)}
+    className={composeClassName('flex flex-1 h-full list-none items-stretch gap-2 px-1 bg-transparent w-full', className)}
     {...props}
   />
 ));
@@ -67,11 +67,11 @@ export const NavigationMenuTrigger = React.forwardRef<
     className={composeClassName(
       cn(
         'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
-        'hover:text-on-surface hover:bg-surface-container/60',
-        'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container/40',
+        'hover:text-on-surface hover:bg-state-hover',
+        'data-[popup-open]:text-primary data-[popup-open]:bg-state-hover',
         'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
         active
-          ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
+          ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none after:z-10'
           : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none'
       ),
       className
@@ -132,16 +132,16 @@ export const NavigationMenuLink = React.forwardRef<
           ? cn(
               'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
               active
-                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
+                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none after:z-10'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
               'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary'
             )
           : cn(
-              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded transition-colors cursor-pointer outline-none select-none',
+              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded-sm transition-colors cursor-pointer outline-none select-none',
               active
                 ? 'bg-primary-container text-on-primary-container font-semibold'
-                : 'text-on-surface hover:bg-surface-container focus:bg-surface-container',
-              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                : 'text-on-surface hover:bg-state-hover focus:bg-state-hover',
+              'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary'
             ),
         className
       )}
@@ -178,7 +178,7 @@ export const NavigationMenuPopup = React.forwardRef<
     className={composeClassName(
       cn(
         'relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)]',
-        'rounded-md bg-surface border border-outline-variant shadow-ambient outline-none',
+        'rounded bg-surface border border-outline-variant shadow-ambient outline-none',
         'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
         'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
         'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)]',
@@ -224,12 +224,12 @@ export const NavigationMenuArrow = React.forwardRef<
     {children ?? (
       <svg
         width="10"
-        height="5"
-        viewBox="0 0 10 5"
+        height="6"
+        viewBox="0 0 10 6"
         className="block fill-surface stroke-outline-variant"
         aria-hidden="true"
       >
-        <path d="M0 5 L5 0 L10 5" />
+        <path d="M0 6 L5 1 L10 6" />
       </svg>
     )}
   </BaseNavigationMenu.Arrow>
@@ -346,10 +346,10 @@ function NavigationMenuComponentInner<Value = string>(
                                 }
                               }}
                               className={cn(
-                                'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg transition-colors cursor-pointer outline-none select-none text-start',
+                                'flex flex-col gap-0.5 px-3 py-2.5 rounded-sm transition-colors cursor-pointer select-none text-start',
                                 isSubActive
                                   ? 'bg-primary-container text-on-primary-container font-semibold'
-                                  : 'text-on-surface hover:bg-surface-container focus:bg-surface-container'
+                                  : 'text-on-surface hover:bg-state-hover focus:bg-state-hover'
                               )}
                             >
                               <div className="flex items-center gap-2 font-sans text-sm font-semibold">

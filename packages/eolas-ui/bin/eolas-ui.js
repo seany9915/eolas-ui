@@ -418,7 +418,7 @@ function resolveDestPath(file, itemType, componentsConfig, ctx) {
       destPath = path.resolve(cwd, componentsConfig.tailwind.css);
     } else {
       const candidates = getThemeCandidatePaths(cwd, null);
-      const existing = candidates.find((p) => fs.existsSync(p));
+      const existing = candidates.find((p) => hasEolasThemeSignature(p));
       if (existing) destPath = existing;
     }
   }
@@ -699,8 +699,14 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
     .map((i) => i.name);
 
   if (syncAll) {
-    console.log(`${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} all ${nonDeprecatedNames.length} Eolas UI components, blocks, and utilities...\n`);
-    addComponents(nonDeprecatedNames, { overwrite: true, dryRun });
+    const installedPresets = detectInstalledItems(items, process.cwd()).filter((name) =>
+      ['theme', 'design-md', 'agent-rules', 'lint'].includes(name)
+    );
+    const syncTargets = Array.from(new Set([...nonDeprecatedNames, ...installedPresets]));
+    console.log(
+      `${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} all ${nonDeprecatedNames.length} Eolas UI components, blocks, and utilities${installedPresets.length > 0 ? ` plus ${installedPresets.length} installed preset(s) (${installedPresets.join(', ')})` : ''}...\n`
+    );
+    addComponents(syncTargets, { overwrite: true, dryRun });
   } else {
     const detected = detectInstalledItems(items, process.cwd());
     if (detected.length > 0) {

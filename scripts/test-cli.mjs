@@ -181,6 +181,38 @@ test('7. eolas-ui sync --dry-run detects and plans updates for button, theme, li
   });
 });
 
+test('8. eolas-ui add theme does not hijack an existing non-Eolas src/index.css', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src/index.css'), '@import "tailwindcss";\n/* custom app css */\n', 'utf8');
+
+    const res = runCli(['add', 'theme'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.ok(fs.existsSync(path.join(dir, 'src/eolas-theme.css')), 'Expected src/eolas-theme.css to be created');
+    const indexCss = fs.readFileSync(path.join(dir, 'src/index.css'), 'utf8');
+    assert.match(indexCss, /custom app css/, 'Expected existing src/index.css to remain untouched');
+  });
+});
+
+test('9. eolas-ui sync --all --dry-run also updates already-installed presets', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(dir, 'src/eolas-theme.css'),
+      ':root { --surface-container-low: #f7f9fa; }\n',
+      'utf8'
+    );
+    fs.mkdirSync(path.join(dir, 'lint'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'lint/index.mjs'), '// existing lint plugin\n', 'utf8');
+
+    const res = runCli(['sync', '--all', '--dry-run'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.match(res.stdout, /plus 2 installed preset\(s\)/);
+    assert.match(res.stdout, /src\/eolas-theme\.css/);
+    assert.match(res.stdout, /lint\/index\.mjs/);
+  });
+});
+
 console.log('=== Running Eolas UI CLI Test Suite ===\n');
 let passed = 0;
 for (const t of tests) {

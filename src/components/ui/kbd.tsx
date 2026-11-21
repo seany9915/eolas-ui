@@ -35,7 +35,7 @@ const variantStyles: Record<KbdVariant, string> = {
 const sizeStyles: Record<KbdSize, string> = {
   sm: 'h-4 min-w-4 px-1 text-xs rounded-sm',
   md: 'h-5 min-w-5 px-1.5 text-xs rounded-sm',
-  lg: 'h-6 min-w-6 px-2 text-sm rounded-md',
+  lg: 'h-6 min-w-6 px-2 text-sm rounded-sm',
 };
 
 export function kbdVariants({
