@@ -266,7 +266,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
         data-slot="list-detail-block"
         data-density={density}
         className={cn(
-          '@container w-full h-full min-h-120 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col',
+          '@container size-full min-h-120 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col',
           className
         )}
         {...props}

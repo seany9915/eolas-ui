@@ -10,7 +10,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Triple-Tint Monochrome** (pastel fill + matching-hue border + matching-hue text) → **Use one of:**
   1. **Filled (`variant="filled"`):** Solid `primary`/`secondary`/`tertiary` fill + `on-*` text, no border.
   2. **Outline (`variant="outline"`):** `1px` `primary`/`secondary` border (never `tertiary` Amber) + neutral `surface` fill (or `on-surface` on inverted surfaces) + matching text.
-  3. **Soft Wash (`variant="soft"`):** `*-container` fill + ultra-dark semantic `on-*-container` ink (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1a1c1e`) + `border-transparent` on `<Badge/>`/`<Chip/>` pills. (Callouts, `InlineAlert`s, and tinted cards keep `#1a1c1e` body text with no colored perimeter borders.)
+  3. **Soft Wash (`variant="soft"`):** `*-container` fill + ultra-dark semantic `on-*-container` ink (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1C1A18`) + `border-transparent` on `<Badge/>`/`<Chip/>` pills. (Callouts, `InlineAlert`s, and tinted cards keep `#1C1A18` body text with no colored perimeter borders.)
 - **Banned: All-caps chips/badges or static status dots** → **Use:** Sentence case and plain text, `<Badge/>`, or functional icons (dots are strictly for live/real-time presence/recording paired with text).
 
 ## Accessibility & Interaction
@@ -28,7 +28,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Stacked vertical icon-over-text utility buttons** → **Use:** Inline icon left of label.
 - **Banned: Card Soup / Metric Card Grids ("Card Grid Rain") / nested cards** → **Use:** Low-prominence typography/dividers, tables, definition lists, or accordions; never nest `<Card>` inside `<Card>`.
 - **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (`variant="unboxed"` inside cards; `variant="surface"` or `variant="inset"` on canvas).
-- **Banned: `surface-variant` fill + `outline-variant` border** (1.31:1 contrast) → **Use:** `outline` (`#6B6E80`) border when a neutral fill needs a boundary.
+- **Banned: `surface-variant` fill + `outline-variant` border** (1.31:1 contrast) → **Use:** `outline` (`#706E6B`) border when a neutral fill needs a boundary.
 - **Banned: Single-sided accent borders on rounded cards** → **Use:** Borderless `border border-transparent` standard cards; reserve `rounded-s-none rounded-e` + `border-s-4` strictly for `<InlineAlert />` and `<Toast />`.
 - **Banned: Div Soup / toxic wrapper-itis** (`<Box>`, `<Flex>`, `<Spacer>`, redundant `<div>`/`<>`) → **Use:** Direct classes on semantic elements or plain layout `<div>`s (`flex`/`grid`).
 - **Banned: Desktop FABs** → **Use:** Inline actions, side-drawers, or page headers.
@@ -47,7 +47,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 
 ## Code Quality, Overlays & Component Library
 - **Banned: Placeholder stubs (`// TODO`) or `any` / `@ts-ignore` / `as unknown as T`** → **Use:** Complete runnable code (or `throw new Error('Not implemented: ...')`) and strict types / `zod`.
-- **Banned: Titleless overlays or manual `z-index` (`z-50`, `z-9999`)** → **Use:** `<DialogTitle>` / `<DrawerTitle>` / `<SheetTitle>` (or `sr-only`) and Base UI portal stacking.
+- **Banned: Titleless overlays or manual `z-index` (`z-50`, `z-9999`) outside `ui/` portal primitives** → **Use:** `<DialogTitle>` / `<DrawerTitle>` / `<SheetTitle>` (or `sr-only`) and let `src/components/ui/` portal primitives handle stacking.
 - **Banned: Heavy blurs for simple inputs or bloated multi-tier headers** → **Use:** Inline editing / side panels and consolidated top navigation.
 - **Banned: Manual `relative`/`absolute` buttons inside inputs** → **Use:** `<InputGroup>` + `<InputGroupAddon>` + `<InputGroupButton>`.
 - **Banned: Looped `<Button>` arrays for mode/filter bars** → **Use:** `<ToggleGroup>` (`role="radiogroup"` or `role="group"`).

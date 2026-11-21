@@ -26,6 +26,8 @@ export interface NotificationBadgeProps extends React.HTMLAttributes<HTMLSpanEle
   variant?: 'primary' | 'error' | 'secondary';
   /** Accessible text for assistive technologies (e.g. "3 unread messages"). */
   srLabel?: string;
+  /** Whether to keep a polite live region mounted to announce badge updates. Defaults to false. */
+  announce?: boolean;
   className?: string;
 }
 
@@ -37,37 +39,50 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
       visible = true,
       variant = 'primary',
       srLabel,
+      announce = false,
       className,
       ...props
     },
     ref
   ) => {
-    if (!visible) return null;
-
     const isCounted = !dot && count !== undefined;
+    const displayCount = isCounted ? count : undefined;
 
-    return (
+    const visualBadge = visible ? (
       <span
+        key={displayCount !== undefined ? String(displayCount) : 'dot'}
         ref={ref}
         className={cn(
           'absolute -top-1 -end-1 z-10 select-none pointer-events-none inline-flex items-center justify-center font-mono font-bold leading-none',
-          'transition-[transform,opacity] duration-fast ease-smooth-out will-change-transform animate-badge-pop',
-          'motion-reduce:animate-none motion-reduce:transition-none motion-reduce:transform-none',
+          'animate-badge-pop motion-reduce:animate-none motion-reduce:transform-none',
           variant === 'primary' && 'bg-primary text-on-primary',
           variant === 'error' && 'bg-error text-on-error',
           variant === 'secondary' && 'bg-secondary text-on-secondary',
           dot
             ? 'size-2.5 rounded-full ring-2 ring-surface'
-            : 'min-w-4.5 h-4.5 px-1 text-[10px] rounded-full ring-2 ring-surface',
+            : 'min-w-5 h-5 px-1.5 text-xs rounded-full border-2 border-surface',
           className
         )}
-        role="status"
-        aria-live="polite"
         {...props}
       >
-        {isCounted ? count : null}
-        {srLabel && <span className="sr-only">{srLabel}</span>}
+        {isCounted ? (
+          <span aria-hidden={Boolean(srLabel) || undefined}>{displayCount}</span>
+        ) : null}
+        {!announce && srLabel && <span className="sr-only">{srLabel}</span>}
       </span>
+    ) : null;
+
+    if (!announce) {
+      return visualBadge;
+    }
+
+    return (
+      <>
+        {visualBadge}
+        <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {visible ? (srLabel ?? (isCounted ? String(displayCount) : '')) : ''}
+        </span>
+      </>
     );
   }
 );

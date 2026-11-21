@@ -3,7 +3,10 @@
   "name": "number-roll",
   "type": "registry:ui",
   "title": "Number Roll",
-  "description": "Deprecated: Prefer importing `NumberPopIn` (`@/components/ui/number-pop-in`) or `SpinningCounter` (`@/components/ui/spinning-counter`) directly. Kept as a backward-compatibility wrapper around both primitives. Tabular number transition...",
+  "description": "Deprecated facade over NumberPopIn and SpinningCounter for tabular number transitions. Prefer importing NumberPopIn or SpinningCounter directly.",
+  "categories": [
+    "motion"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/number-pop-in.json",
     "https://seany9915.github.io/eolas-ui/r/spinning-counter.json"

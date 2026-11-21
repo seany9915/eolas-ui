@@ -9,7 +9,7 @@ import type {
   ToastManagerPromiseOptions,
   ToastManagerPositionerProps,
 } from '@base-ui/react/toast';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 
 export type ToastType = 'neutral' | 'info' | 'success' | 'warning' | 'error' | (string & {});
@@ -19,7 +19,7 @@ export interface ToastProps {
   description?: React.ReactNode;
   type?: ToastType;
   onClose?: () => void;
-  className?: string;
+  className?: BaseToast.Root.Props['className'];
 }
 
 const accentBorder: Record<string, string> = {
@@ -65,14 +65,17 @@ const ToastComponent: React.FC<ToastProps> = ({
   return (
     <BaseToast.Provider>
       <BaseToast.Root
+        data-slot="toast"
         toast={toastObj}
-        className={cn(
-          'relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-s-4 border-t-0 border-e-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden transition-[opacity,transform] duration-[var(--duration-slow)] data-[ending-style]:duration-[var(--duration-medium)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-          accentBorder[type] || accentBorder.info,
+        className={composeClassName(
+          [
+            'relative flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+            accentBorder[type] || accentBorder.info,
+          ],
           className
         )}
       >
-        <BaseToast.Content className="flex items-start gap-3 w-full">
+        <BaseToast.Content data-slot="toast-content" className="flex items-start gap-3 w-full">
           <Icon
             name={currentIcon.name}
             size="lg"
@@ -80,19 +83,20 @@ const ToastComponent: React.FC<ToastProps> = ({
             aria-hidden="true"
           />
           <div className="flex-1 min-w-0 pe-1">
-            <BaseToast.Title className="font-heading text-sm font-bold text-on-surface leading-snug">
+            <BaseToast.Title data-slot="toast-title" className="font-heading text-sm font-bold text-on-surface leading-snug">
               {title}
             </BaseToast.Title>
             {description && (
-              <BaseToast.Description className="font-sans text-xs text-on-surface-variant mt-1 leading-normal">
+              <BaseToast.Description data-slot="toast-description" className="font-sans text-sm text-on-surface-variant mt-1 leading-normal">
                 {description}
               </BaseToast.Description>
             )}
           </div>
           {onClose && (
             <BaseToast.Close
+              data-slot="toast-close"
               onClick={onClose}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+              className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
               aria-label="Dismiss toast"
             >
               <Icon name="close" size="sm" aria-hidden="true" />
@@ -345,10 +349,11 @@ const ActiveToastItem: React.FC<{
   );
 
   const commonDeckClasses = cn(
-    'pointer-events-auto flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-s-4 border-t-0 border-e-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
+    'pointer-events-auto flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-sm w-full select-none',
     accentBorder[toastType] || accentBorder.info,
-    // Smooth transition matching Base UI specification
-    '[transition:transform_0.5s_cubic-bezier(0.22,1,0.36,1),opacity_0.5s,height_0.15s,box-shadow_0.2s]',
+    // Calibrated 250ms enter / 150ms exit asymmetry (DESIGN.md)
+    '[transition:transform_var(--duration-fast)_var(--ease-standard),opacity_var(--duration-fast)_var(--ease-standard),height_var(--duration-quick),box-shadow_var(--duration-quick)]',
+    'data-[ending-style]:[transition:transform_var(--duration-quick)_var(--ease-standard),opacity_var(--duration-quick)_var(--ease-standard),height_var(--duration-quick)]',
     'data-[starting-style]:opacity-0',
     'data-[ending-style]:opacity-0',
     'data-[limited]:opacity-0 data-[limited]:pointer-events-none',
@@ -365,20 +370,31 @@ const ActiveToastItem: React.FC<{
     'motion-reduce:transition-none'
   );
 
+  const { className: fallbackActionClassName, ...restFallbackAction } = fallbackAction ?? {};
+
   const toastCardContent = (
     <BaseToast.Root
+      data-slot="toast"
       toast={t}
       swipeDirection={isTopPosition ? ['up', 'right', 'left'] : ['down', 'right', 'left']}
       className={
         isAnchored
           ? cn(
-              'pointer-events-auto relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-s-4 border-t-0 border-e-0 border-b-0 shadow-ambient max-w-sm w-full overflow-hidden select-none',
+              'pointer-events-auto relative flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-sm w-full select-none',
+              'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               accentBorder[toastType] || accentBorder.info
             )
           : cn(commonDeckClasses, isTopPosition ? topDeckClasses : bottomDeckClasses)
       }
     >
-      <BaseToast.Content className="flex items-start gap-3 w-full min-w-0 transition-opacity duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] data-[behind]:opacity-0 data-[expanded]:opacity-100">
+      <BaseToast.Content
+        data-slot="toast-content"
+        className={cn(
+          'flex items-start gap-3 w-full min-w-0',
+          !isAnchored &&
+            'transition-opacity duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] data-[behind]:opacity-0 data-[expanded]:opacity-100 motion-reduce:transition-none'
+        )}
+      >
 
         {/* Semantic Icon with rotation animation on loading */}
         <Icon
@@ -395,12 +411,12 @@ const ActiveToastItem: React.FC<{
         {/* Toast Body */}
         <div className="flex-1 min-w-0 pe-1">
           {t.title && (
-            <BaseToast.Title className="font-heading text-sm font-bold text-on-surface leading-snug">
+            <BaseToast.Title data-slot="toast-title" className="font-heading text-sm font-bold text-on-surface leading-snug">
               {t.title}
             </BaseToast.Title>
           )}
           {t.description && (
-            <BaseToast.Description className="font-sans text-xs text-on-surface-variant mt-1 leading-normal break-words">
+            <BaseToast.Description data-slot="toast-description" className="font-sans text-sm text-on-surface-variant mt-1 leading-normal break-words">
               {t.description}
             </BaseToast.Description>
           )}
@@ -408,13 +424,18 @@ const ActiveToastItem: React.FC<{
 
         {/* Action button rendered via BaseToast.Action (reads toast.actionProps from context and returns null when empty) */}
         <BaseToast.Action
-          className="font-label text-xs font-semibold px-2.5 py-1 rounded-sm text-primary hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0"
-          {...fallbackAction}
+          data-slot="toast-action"
+          {...restFallbackAction}
+          className={composeClassName(
+            'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0 touch-target-expanded',
+            fallbackActionClassName
+          )}
         />
 
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close
-          className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+          data-slot="toast-close"
+          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
           aria-label="Dismiss toast"
         >
           <Icon name="close" size="sm" aria-hidden="true" />
@@ -425,18 +446,15 @@ const ActiveToastItem: React.FC<{
 
   // If anchored toast, wrap in BaseToast.Positioner and add BaseToast.Arrow
   if (t.positionerProps?.anchor) {
+    const { className: positionerClassName, ...restPositionerProps } = t.positionerProps;
     return (
       <BaseToast.Positioner
         toast={t}
-        anchor={t.positionerProps.anchor}
-        side={t.positionerProps.side}
-        align={t.positionerProps.align}
-        sideOffset={t.positionerProps.sideOffset}
-        alignOffset={t.positionerProps.alignOffset}
-        className="z-[60] pointer-events-auto"
+        {...restPositionerProps}
+        className={composeClassName('z-[60] pointer-events-auto', positionerClassName)}
       >
         {toastCardContent}
-        <BaseToast.Arrow className="data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 drop-shadow-sm">
+        <BaseToast.Arrow className="data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90">
           <svg width="10" height="5" viewBox="0 0 10 5" className="block fill-surface stroke-outline-variant" aria-hidden="true">
             <path d="M0 5 L5 0 L10 5" />
           </svg>
@@ -456,11 +474,13 @@ export type ToasterPosition =
   | 'top-center'
   | 'bottom-center';
 
+export type ToastPositionerSide = BaseToast.Positioner.Props['side'];
+
 export interface ToasterProps {
   position?: ToasterPosition;
   limit?: number; // default 5
   timeout?: number; // default 5000
-  className?: string;
+  className?: BaseToast.Viewport.Props['className'];
 }
 
 const positionClasses: Record<ToasterPosition, string> = {
@@ -474,25 +494,39 @@ const positionClasses: Record<ToasterPosition, string> = {
 
 const ToasterViewportContent: React.FC<{
   position: ToasterPosition;
-  className?: string;
+  className?: BaseToast.Viewport.Props['className'];
 }> = ({ position, className }) => {
   const { toasts } = BaseToast.useToastManager<ToastCustomData>();
+  const viewportToasts = toasts.filter((t) => !t.positionerProps?.anchor);
+  const anchoredToasts = toasts.filter((t) => Boolean(t.positionerProps?.anchor));
 
   return (
-    <BaseToast.Portal>
-      {/* High z-index z-[60] so toasts float above modal dialogs and sheets (z-50) */}
-      <BaseToast.Viewport
-        className={cn(
-          'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] focus:outline-none',
-          positionClasses[position],
-          className
-        )}
-      >
-        {toasts.map((t) => (
-          <ActiveToastItem key={t.id} toast={t} position={position} />
-        ))}
-      </BaseToast.Viewport>
-    </BaseToast.Portal>
+    <>
+      <BaseToast.Portal>
+        {/* High z-index z-[60] so toasts float above modal dialogs and sheets (z-50) */}
+        <BaseToast.Viewport
+          data-slot="toast-viewport"
+          className={composeClassName(
+            [
+              'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] focus:outline-none',
+              positionClasses[position],
+            ],
+            className
+          )}
+        >
+          {viewportToasts.map((t) => (
+            <ActiveToastItem key={t.id} toast={t} position={position} />
+          ))}
+        </BaseToast.Viewport>
+      </BaseToast.Portal>
+      {anchoredToasts.length > 0 && (
+        <BaseToast.Portal>
+          {anchoredToasts.map((t) => (
+            <ActiveToastItem key={t.id} toast={t} position={position} />
+          ))}
+        </BaseToast.Portal>
+      )}
+    </>
   );
 };
 

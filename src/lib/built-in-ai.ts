@@ -27,24 +27,49 @@ export interface SummarizerOptions {
 
 export interface SummarizeContextOptions {
   context?: string;
+  signal?: AbortSignal;
 }
 
 export interface TranslatorOptions {
   sourceLanguage: string;
   targetLanguage: string;
+  signal?: AbortSignal;
+}
+
+export interface TranslateCallOptions {
+  signal?: AbortSignal;
+}
+
+export interface DetectCallOptions {
+  signal?: AbortSignal;
 }
 
 export interface LanguageModelPromptOptions {
   responseConstraint?: unknown;
+  omitResponseConstraintInput?: boolean;
   signal?: AbortSignal;
 }
 
+export interface LanguageModelExpectedIO {
+  type: 'text' | 'image' | 'audio';
+  languages?: string[];
+}
+
+export interface LanguageModelInitialPrompt {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+  prefix?: boolean;
+}
+
 export interface LanguageModelOptions {
+  /** Legacy alias mapped into an initial `{ role: 'system', content }` prompt for Chrome 138+ compatibility. */
   systemPrompt?: string;
-  initialPrompts?: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
+  initialPrompts?: LanguageModelInitialPrompt[];
+  expectedInputs?: LanguageModelExpectedIO[];
+  expectedOutputs?: Array<{ type: 'text'; languages?: string[] }>;
   temperature?: number;
   topK?: number;
-  responseConstraint?: unknown;
+  signal?: AbortSignal;
 }
 
 export interface DetectedLanguageResult {
@@ -52,7 +77,7 @@ export interface DetectedLanguageResult {
   confidence: number;
 }
 
-// Global W3C / Chrome Built-in AI interfaces
+// Global W3C / Chrome 138+ Built-in AI interfaces
 interface DownloadProgressEvent extends Event {
   loaded: number;
   total: number;
@@ -67,18 +92,18 @@ interface ModelMonitor {
 
 interface SummarizerInstance {
   summarize(text: string, options?: SummarizeContextOptions): Promise<string>;
-  summarizeStreaming(text: string): AsyncIterable<string>;
+  summarizeStreaming(text: string, options?: SummarizeContextOptions): AsyncIterable<string>;
   destroy?(): void;
 }
 
 interface SummarizerFactory {
   availability(options?: SummarizerOptions): Promise<BuiltInAiAvailability>;
-  create(options?: SummarizerOptions & { monitor?: (m: ModelMonitor) => void }): Promise<SummarizerInstance>;
+  create(options?: SummarizerOptions & { monitor?: (m: ModelMonitor) => void; signal?: AbortSignal }): Promise<SummarizerInstance>;
 }
 
 interface TranslatorInstance {
-  translate(text: string): Promise<string>;
-  translateStreaming(text: string): AsyncIterable<string>;
+  translate(text: string, options?: TranslateCallOptions): Promise<string>;
+  translateStreaming(text: string, options?: TranslateCallOptions): AsyncIterable<string>;
   destroy?(): void;
 }
 
@@ -88,26 +113,32 @@ interface TranslatorFactory {
 }
 
 interface LanguageModelInstance {
+  readonly inputUsage?: number;
+  readonly inputQuota?: number;
   prompt(input: string, options?: LanguageModelPromptOptions): Promise<string>;
   promptStreaming(input: string, options?: LanguageModelPromptOptions): AsyncIterable<string>;
-  countPromptTokens?(input: string): Promise<number>;
-  clone?(): Promise<LanguageModelInstance>;
+  measureInputUsage?(input: string, options?: { signal?: AbortSignal }): Promise<number>;
+  clone?(options?: { signal?: AbortSignal }): Promise<LanguageModelInstance>;
   destroy?(): void;
 }
 
+type ChromeLanguageModelCreateOptions = Omit<LanguageModelOptions, 'systemPrompt'>;
+
 interface LanguageModelFactory {
-  availability(options?: LanguageModelOptions): Promise<BuiltInAiAvailability>;
-  create(options?: LanguageModelOptions & { monitor?: (m: ModelMonitor) => void }): Promise<LanguageModelInstance>;
+  availability(options?: ChromeLanguageModelCreateOptions): Promise<BuiltInAiAvailability>;
+  create(
+    options?: ChromeLanguageModelCreateOptions & { monitor?: (m: ModelMonitor) => void }
+  ): Promise<LanguageModelInstance>;
 }
 
 interface LanguageDetectorInstance {
-  detect(text: string): Promise<DetectedLanguageResult[]>;
+  detect(text: string, options?: DetectCallOptions): Promise<DetectedLanguageResult[]>;
   destroy?(): void;
 }
 
 interface LanguageDetectorFactory {
   availability(): Promise<BuiltInAiAvailability>;
-  create(options?: { monitor?: (m: ModelMonitor) => void }): Promise<LanguageDetectorInstance>;
+  create(options?: { monitor?: (m: ModelMonitor) => void; signal?: AbortSignal }): Promise<LanguageDetectorInstance>;
 }
 
 declare global {
@@ -116,22 +147,43 @@ declare global {
     Translator?: TranslatorFactory;
     LanguageModel?: LanguageModelFactory;
     LanguageDetector?: LanguageDetectorFactory;
-    ai?: {
-      languageModel?: LanguageModelFactory;
-      languageDetector?: LanguageDetectorFactory;
-      summarizer?: SummarizerFactory;
-      translator?: TranslatorFactory;
-    };
   }
+}
+
+function normalizeLanguageModelOptions(
+  options?: LanguageModelOptions
+): ChromeLanguageModelCreateOptions | undefined {
+  if (!options) return undefined;
+  const { systemPrompt, initialPrompts, ...rest } = options;
+  if (!systemPrompt) {
+    return initialPrompts ? { ...rest, initialPrompts } : rest;
+  }
+  const hasSystemPrompt = initialPrompts?.some((entry) => entry.role === 'system');
+  const mergedInitialPrompts: LanguageModelInitialPrompt[] = hasSystemPrompt
+    ? [...(initialPrompts ?? [])]
+    : [{ role: 'system', content: systemPrompt }, ...(initialPrompts ?? [])];
+  return {
+    ...rest,
+    initialPrompts: mergedInitialPrompts,
+  };
 }
 
 function serializeAiOptions(options: unknown): string {
   if (!options) return '';
   try {
-    return JSON.stringify(options);
+    return JSON.stringify(options, (key, value) => (key === 'signal' ? undefined : value));
   } catch {
     return '';
   }
+}
+
+function isTranslatorOptions(value: unknown): value is TranslatorOptions {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'sourceLanguage' in value &&
+    'targetLanguage' in value
+  );
 }
 
 interface DestroyableInstance {
@@ -231,6 +283,27 @@ function useBuiltInAiSession<TInstance extends DestroyableInstance, TOptions ext
         return pendingRef.current.promise;
       }
 
+      // Gate user activation strictly when model download is required ('downloadable').
+      // Never block already-'available' on-device models.
+      const status = await factory.availability(mergedOptions);
+      if (mountedRef.current) {
+        setAvailability(status);
+      }
+      if (status === 'unavailable') {
+        throw new Error(unsupportedMessage);
+      }
+      if (
+        status === 'downloadable' &&
+        typeof navigator !== 'undefined' &&
+        navigator.userActivation &&
+        !navigator.userActivation.isActive
+      ) {
+        throw new DOMException(
+          'Downloading this on-device AI model requires an active user gesture.',
+          'NotAllowedError'
+        );
+      }
+
       if (instanceRef.current) {
         instanceRef.current.destroy?.();
         instanceRef.current = null;
@@ -286,15 +359,22 @@ function useBuiltInAiSession<TInstance extends DestroyableInstance, TOptions ext
 }
 
 /**
- * React hook for on-device natural language generation using the Prompt API (Gemini Nano).
+ * React hook for on-device natural language generation using the Chrome 138+ Prompt API (Gemini Nano).
  */
 export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
   const [isPrompting, setIsPrompting] = React.useState(false);
+  const [inputUsage, setInputUsage] = React.useState<number | null>(null);
+  const [inputQuota, setInputQuota] = React.useState<number | null>(null);
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
-    return window.LanguageModel || window.ai?.languageModel;
+    return window.LanguageModel;
   }, []);
+
+  const normalizedDefaultOptions = React.useMemo(
+    () => normalizeLanguageModelOptions(defaultOptions),
+    [defaultOptions]
+  );
 
   const {
     isSupported,
@@ -303,11 +383,16 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
     error,
     setError,
     getOrCreateInstance,
-  } = useBuiltInAiSession<LanguageModelInstance, LanguageModelOptions>(
+  } = useBuiltInAiSession<LanguageModelInstance, ChromeLanguageModelCreateOptions>(
     factory,
     'LanguageModel (Prompt API) is unsupported in this browser environment.',
-    defaultOptions
+    normalizedDefaultOptions
   );
+
+  const syncUsageMetrics = React.useCallback((model: LanguageModelInstance) => {
+    if (typeof model.inputUsage === 'number') setInputUsage(model.inputUsage);
+    if (typeof model.inputQuota === 'number') setInputQuota(model.inputQuota);
+  }, []);
 
   const prompt = React.useCallback(
     async (
@@ -318,8 +403,11 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
       setIsPrompting(true);
       setError(null);
       try {
-        const model = await getOrCreateInstance(overrideOptions);
-        return await model.prompt(text, promptOpts);
+        const model = await getOrCreateInstance(normalizeLanguageModelOptions(overrideOptions));
+        syncUsageMetrics(model);
+        const result = await model.prompt(text, promptOpts);
+        syncUsageMetrics(model);
+        return result;
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
         setError(parsed);
@@ -328,7 +416,7 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
         setIsPrompting(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, setError, syncUsageMetrics]
   );
 
   const promptStreaming = React.useCallback(
@@ -342,12 +430,14 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
       setError(null);
       let accumulated = '';
       try {
-        const model = await getOrCreateInstance(overrideOptions);
+        const model = await getOrCreateInstance(normalizeLanguageModelOptions(overrideOptions));
+        syncUsageMetrics(model);
         const stream = model.promptStreaming(text, promptOpts);
         for await (const chunk of stream) {
           accumulated += chunk;
           onChunk(chunk);
         }
+        syncUsageMetrics(model);
         return accumulated;
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
@@ -357,18 +447,19 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
         setIsPrompting(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, setError, syncUsageMetrics]
   );
 
-  const countTokens = React.useCallback(
-    async (text: string): Promise<number> => {
+  const measureInputUsage = React.useCallback(
+    async (text: string, options?: { signal?: AbortSignal }): Promise<number> => {
       const model = await getOrCreateInstance();
-      if (model.countPromptTokens) {
-        return await model.countPromptTokens(text);
+      syncUsageMetrics(model);
+      if (typeof model.measureInputUsage === 'function') {
+        return await model.measureInputUsage(text, options);
       }
       return Math.ceil(text.length / 4);
     },
-    [getOrCreateInstance]
+    [getOrCreateInstance, syncUsageMetrics]
   );
 
   return {
@@ -376,10 +467,12 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
     availability,
     isPrompting,
     downloadProgress,
+    inputUsage,
+    inputQuota,
     error,
     prompt,
     promptStreaming,
-    countTokens,
+    measureInputUsage,
   };
 }
 
@@ -391,7 +484,7 @@ export function useLanguageDetector() {
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
-    return window.LanguageDetector || window.ai?.languageDetector;
+    return window.LanguageDetector;
   }, []);
 
   const {
@@ -407,12 +500,12 @@ export function useLanguageDetector() {
   );
 
   const detect = React.useCallback(
-    async (text: string): Promise<DetectedLanguageResult[]> => {
+    async (text: string, options?: DetectCallOptions): Promise<DetectedLanguageResult[]> => {
       setIsDetecting(true);
       setError(null);
       try {
         const detector = await getOrCreateInstance();
-        return await detector.detect(text);
+        return await detector.detect(text, options);
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
         setError(parsed);
@@ -442,7 +535,7 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
-    return window.Summarizer || window.ai?.summarizer;
+    return window.Summarizer;
   }, []);
 
   const {
@@ -484,6 +577,7 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
     async (
       text: string,
       onChunk: (chunk: string) => void,
+      contextOptions?: SummarizeContextOptions,
       overrideOptions?: SummarizerOptions
     ): Promise<string> => {
       setIsSummarizing(true);
@@ -491,7 +585,7 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
       let accumulated = '';
       try {
         const summarizer = await getOrCreateInstance(overrideOptions);
-        const stream = summarizer.summarizeStreaming(text);
+        const stream = summarizer.summarizeStreaming(text, contextOptions);
         for await (const chunk of stream) {
           accumulated += chunk;
           onChunk(chunk);
@@ -527,7 +621,7 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
 
   const factory = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
-    return window.Translator || window.ai?.translator;
+    return window.Translator;
   }, []);
 
   const {
@@ -546,12 +640,24 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
   );
 
   const translate = React.useCallback(
-    async (text: string, overrideOptions?: TranslatorOptions): Promise<string> => {
+    async (
+      text: string,
+      optionsOrOverride?: TranslateCallOptions | TranslatorOptions,
+      overrideOptions?: TranslatorOptions
+    ): Promise<string> => {
       setIsTranslating(true);
       setError(null);
       try {
-        const translator = await getOrCreateInstance(overrideOptions);
-        return await translator.translate(text);
+        const resolvedOverride = isTranslatorOptions(optionsOrOverride)
+          ? optionsOrOverride
+          : overrideOptions;
+        const callOptions: TranslateCallOptions | undefined = isTranslatorOptions(optionsOrOverride)
+          ? optionsOrOverride.signal
+            ? { signal: optionsOrOverride.signal }
+            : undefined
+          : optionsOrOverride;
+        const translator = await getOrCreateInstance(resolvedOverride);
+        return await translator.translate(text, callOptions);
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
         setError(parsed);
@@ -567,14 +673,23 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
     async (
       text: string,
       onChunk: (chunk: string) => void,
+      optionsOrOverride?: TranslateCallOptions | TranslatorOptions,
       overrideOptions?: TranslatorOptions
     ): Promise<string> => {
       setIsTranslating(true);
       setError(null);
       let accumulated = '';
       try {
-        const translator = await getOrCreateInstance(overrideOptions);
-        const stream = translator.translateStreaming(text);
+        const resolvedOverride = isTranslatorOptions(optionsOrOverride)
+          ? optionsOrOverride
+          : overrideOptions;
+        const callOptions: TranslateCallOptions | undefined = isTranslatorOptions(optionsOrOverride)
+          ? optionsOrOverride.signal
+            ? { signal: optionsOrOverride.signal }
+            : undefined
+          : optionsOrOverride;
+        const translator = await getOrCreateInstance(resolvedOverride);
+        const stream = translator.translateStreaming(text, callOptions);
         for await (const chunk of stream) {
           accumulated += chunk;
           onChunk(chunk);

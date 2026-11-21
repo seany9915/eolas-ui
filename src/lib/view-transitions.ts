@@ -12,16 +12,32 @@
 import * as React from 'react';
 import { flushSync } from 'react-dom';
 
-interface ViewTransition {
+export type ViewTransitionUpdateCallback = () => Promise<void> | void;
+
+export interface StartViewTransitionOptions {
+  update?: ViewTransitionUpdateCallback;
+  types?: string[];
+}
+
+interface DOMViewTransition {
   ready: Promise<void>;
   finished: Promise<void>;
   updateCallbackDone: Promise<void>;
+  types?: Set<string>;
   skipTransition(): void;
 }
 
 declare global {
   interface Document {
-    startViewTransition(updateCallback?: () => Promise<void> | void): ViewTransition;
+    startViewTransition(
+      callbackOptions?: ViewTransitionUpdateCallback | StartViewTransitionOptions
+    ): DOMViewTransition;
+  }
+
+  interface Element {
+    startViewTransition?(
+      callbackOptions?: ViewTransitionUpdateCallback | StartViewTransitionOptions
+    ): DOMViewTransition;
   }
 }
 
@@ -32,6 +48,131 @@ export interface TransitionOptions {
   transitionName?: string;
   /** Element on which to temporarily set transitionName */
   targetElement?: HTMLElement | null;
+  /** View Transitions Level 2 active transition types (matches `:active-view-transition-type(...)`) */
+  types?: string[];
+}
+
+function invokeStartViewTransition(
+  host: {
+    startViewTransition?: (
+      callbackOptions?: ViewTransitionUpdateCallback | StartViewTransitionOptions
+    ) => DOMViewTransition;
+  },
+  update: ViewTransitionUpdateCallback,
+  types?: string[]
+): DOMViewTransition {
+  const startFn = host.startViewTransition;
+  if (typeof startFn !== 'function') {
+    throw new Error('startViewTransition is not supported on this target');
+  }
+  if (types && types.length > 0) {
+    try {
+      return startFn.call(host, { update, types });
+    } catch (err) {
+      if (err instanceof TypeError) {
+        return startFn.call(host, update);
+      }
+      throw err;
+    }
+  }
+  return startFn.call(host, update);
+}
+
+function routeTransitionFocus(
+  focusTarget?: HTMLElement | React.RefObject<HTMLElement | null> | null
+): void {
+  if (!focusTarget) return;
+  const resolved = 'current' in focusTarget ? focusTarget.current : focusTarget;
+  if (resolved) {
+    // Only make natively non-focusable targets programmatically focusable, and undo it on blur
+    if (resolved.tabIndex < 0 && !resolved.hasAttribute('tabindex')) {
+      resolved.setAttribute('tabindex', '-1');
+      resolved.addEventListener('blur', () => resolved.removeAttribute('tabindex'), { once: true });
+    }
+    resolved.focus({ preventScroll: true });
+  }
+}
+
+function isReducedMotionPreferred(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
+/**
+ * Runs a scoped view transition on `element` using `element.startViewTransition` (View Transitions Level 2)
+ * when available, gracefully falling back to `document.startViewTransition` or immediate execution.
+ */
+export async function startScopedViewTransition(
+  element: Element | null | undefined,
+  update: () => void | Promise<void>,
+  options?: TransitionOptions
+): Promise<void> {
+  const { focusTarget, transitionName, targetElement, types } = options || {};
+  const baselineName =
+    transitionName && targetElement
+      ? targetElement.style.getPropertyValue('view-transition-name')
+      : null;
+
+  if (transitionName && targetElement) {
+    targetElement.style.setProperty('view-transition-name', transitionName);
+  }
+
+  const cleanupName = () => {
+    if (transitionName && targetElement) {
+      if (baselineName) {
+        targetElement.style.setProperty('view-transition-name', baselineName);
+      } else {
+        targetElement.style.removeProperty('view-transition-name');
+      }
+    }
+  };
+
+  const runUpdate = async () => {
+    let result: unknown = undefined;
+    flushSync(() => {
+      result = update();
+    });
+    if (
+      result !== null &&
+      (typeof result === 'object' || typeof result === 'function') &&
+      'then' in result &&
+      typeof (result as PromiseLike<unknown>).then === 'function'
+    ) {
+      await (result as PromiseLike<unknown>);
+      flushSync(() => {});
+    }
+  };
+
+  const scopedSupported = Boolean(element && typeof element.startViewTransition === 'function');
+  const documentSupported =
+    typeof document !== 'undefined' && typeof document.startViewTransition === 'function';
+
+  if (isReducedMotionPreferred() || (!scopedSupported && !documentSupported)) {
+    try {
+      await update();
+      routeTransitionFocus(focusTarget);
+    } finally {
+      cleanupName();
+    }
+    return;
+  }
+
+  try {
+    const host = scopedSupported && element ? element : document;
+    const transition = invokeStartViewTransition(host, runUpdate, types);
+    transition.ready.catch(() => {});
+    await transition.finished;
+    routeTransitionFocus(focusTarget);
+  } catch (err: unknown) {
+    if (!(err instanceof DOMException && err.name === 'AbortError')) {
+      throw err;
+    }
+  } finally {
+    cleanupName();
+  }
 }
 
 export interface UseViewTransitionReturn {
@@ -71,7 +212,7 @@ export function useViewTransition(): UseViewTransitionReturn {
       updateFn: () => void | Promise<void>,
       options?: TransitionOptions
     ): Promise<void> => {
-      const { focusTarget, transitionName, targetElement } = options || {};
+      const { focusTarget, transitionName, targetElement, types } = options || {};
       const myId = ++activeIdRef.current;
 
       // Capture baseline view-transition-name once per element so overlapping transitions cannot lose it.
@@ -86,17 +227,7 @@ export function useViewTransition(): UseViewTransitionReturn {
       }
 
       const routeFocus = () => {
-        if (!focusTarget) return;
-        const resolved =
-          'current' in focusTarget ? focusTarget.current : focusTarget;
-        if (resolved) {
-          // Only make natively non-focusable targets programmatically focusable, and undo it on blur
-          if (resolved.tabIndex < 0 && !resolved.hasAttribute('tabindex')) {
-            resolved.setAttribute('tabindex', '-1');
-            resolved.addEventListener('blur', () => resolved.removeAttribute('tabindex'), { once: true });
-          }
-          resolved.focus({ preventScroll: true });
-        }
+        routeTransitionFocus(focusTarget);
       };
 
       const cleanupName = () => {
@@ -130,13 +261,8 @@ export function useViewTransition(): UseViewTransitionReturn {
         }
       };
 
-      const prefersReducedMotion =
-        typeof window !== 'undefined' &&
-        typeof window.matchMedia === 'function' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      // Fallback for browsers without View Transitions support
-      if (!isSupported || !document.startViewTransition || prefersReducedMotion) {
+      // Fallback for browsers without View Transitions support or when reduced motion is preferred
+      if (!isSupported || !document.startViewTransition || isReducedMotionPreferred()) {
         try {
           await updateFn();
           if (activeIdRef.current === myId) {
@@ -153,7 +279,7 @@ export function useViewTransition(): UseViewTransitionReturn {
       setIsTransitioning(true);
 
       try {
-        const transition = document.startViewTransition(runUpdate);
+        const transition = invokeStartViewTransition(document, runUpdate, types);
         transition.ready.catch(() => {});
 
         // Rejects if the update callback throws, so failures reach the caller

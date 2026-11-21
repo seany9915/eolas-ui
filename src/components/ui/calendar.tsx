@@ -14,12 +14,53 @@
  *   primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast.
  */
 import * as React from 'react';
-import { DayPicker, type DateRange } from 'react-day-picker';
+import { DayPicker, type DateRange, type DayButtonProps } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 
-export type { DateRange };
+export type { DateRange, DayButtonProps };
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+
+export function CalendarDayButton({
+  className,
+  day,
+  modifiers,
+  ...props
+}: DayButtonProps): React.JSX.Element {
+  const ref = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    if (modifiers.focused) ref.current?.focus();
+  }, [modifiers.focused]);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      data-slot="calendar-day-button"
+      data-day={day.date.toLocaleDateString()}
+      data-selected-single={
+        modifiers.selected &&
+        !modifiers.range_start &&
+        !modifiers.range_end &&
+        !modifiers.range_middle
+          ? true
+          : undefined
+      }
+      data-range-start={modifiers.range_start || undefined}
+      data-range-end={modifiers.range_end || undefined}
+      data-range-middle={modifiers.range_middle || undefined}
+      data-today={modifiers.today || undefined}
+      data-outside={modifiers.outside || undefined}
+      className={cn(
+        'size-9 p-0 font-normal rounded-md inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+CalendarDayButton.displayName = 'CalendarDayButton';
 
 function DefaultChevron({
   orientation = 'left',
@@ -62,8 +103,9 @@ export function Calendar({
 }: CalendarProps): React.JSX.Element {
   return (
     <DayPicker
+      data-slot="calendar"
       showOutsideDays={showOutsideDays}
-      className={cn('p-3 bg-surface text-on-surface rounded-lg border border-outline-variant', className)}
+      className={cn('w-fit p-3 bg-surface text-on-surface rounded-lg border border-outline-variant', className)}
       classNames={{
         root: 'p-1',
         months: 'relative flex flex-col sm:flex-row gap-4',
@@ -72,17 +114,17 @@ export function Calendar({
         caption_label: 'inline-flex items-center gap-0.5 text-sm font-semibold font-label text-on-surface whitespace-nowrap select-none pointer-events-none',
         nav: 'absolute inset-x-0 top-0 flex items-center justify-between h-9 px-1 pointer-events-none z-10',
         button_previous:
-          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         button_next:
-          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] h-8 w-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded-md inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
         weekday: 'text-on-surface-variant rounded-md w-9 font-normal text-xs text-center font-sans select-none',
         weeks: 'flex flex-col gap-1',
         week: 'flex w-full mt-1',
-        day: 'h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20 font-sans',
+        day: 'size-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20 font-sans',
         day_button:
-          'h-9 w-9 p-0 font-normal rounded-md inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
+          'size-9 p-0 font-normal rounded-md inline-flex items-center justify-center font-sans text-sm text-on-surface hover:bg-surface-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none',
         selected:
           'bg-primary text-on-primary rounded-md [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_start:
@@ -94,21 +136,22 @@ export function Calendar({
         today:
           '[&>button]:font-bold [&>button]:relative [&>button]:after:content-[""] [&>button]:after:absolute [&>button]:after:bottom-1 [&>button]:after:left-1/2 [&>button]:after:-translate-x-1/2 [&>button]:after:size-1 [&>button]:after:rounded-full [&>button]:after:bg-primary',
         outside:
-          'text-on-surface-variant/40 opacity-50 [&>button]:text-on-surface-variant/40',
+          'text-on-surface-variant/60 [&>button]:text-on-surface-variant/60',
         disabled:
           'text-on-surface-variant/30 opacity-30 cursor-not-allowed pointer-events-none [&>button]:cursor-not-allowed [&>button]:pointer-events-none',
         hidden: 'invisible',
         dropdowns: 'flex items-center gap-1.5 justify-center text-sm font-semibold font-label text-on-surface',
         dropdown:
-          'absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none z-[5] focus-visible:outline-none',
+          'absolute inset-0 size-full opacity-0 cursor-pointer appearance-none z-[5] focus-visible:outline-none',
         dropdown_root:
-          'relative inline-flex items-center rounded-md border border-outline-variant bg-surface px-1.5 h-8 hover:bg-surface-container transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
+          'relative inline-flex items-center rounded border border-outline bg-surface px-1.5 h-8 hover:bg-surface-container transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
         months_dropdown: '',
         years_dropdown: '',
         ...classNames,
       }}
       components={{
         Chevron: DefaultChevron,
+        DayButton: CalendarDayButton,
         ...components,
       }}
       {...props}

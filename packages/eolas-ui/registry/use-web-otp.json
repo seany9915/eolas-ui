@@ -4,6 +4,9 @@
   "type": "registry:lib",
   "title": "Use Web OTP",
   "description": "WebOTP API auto-extraction hook.",
+  "categories": [
+    "system"
+  ],
   "files": [
     {
       "path": "lib/use-web-otp.ts",

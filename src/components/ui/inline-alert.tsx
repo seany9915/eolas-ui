@@ -132,11 +132,11 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
     variant === 'destructive' ? 'error' : variant === 'default' ? 'neutral' : (variant ?? 'neutral')
   );
 
-  const accentBarBg: Record<InlineAlertRole, string> = {
-    neutral: 'bg-on-surface',
-    warning: 'bg-warning',
-    error: 'bg-error',
-    success: 'bg-success',
+  const accentBorderClasses: Record<InlineAlertRole, string> = {
+    neutral: 'border-s-on-surface',
+    warning: 'border-s-warning',
+    error: 'border-s-error',
+    success: 'border-s-success',
   };
 
   const surfaceWashBg: Record<InlineAlertRole, string> = {
@@ -195,19 +195,15 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-role={resolvedRole}
       data-appearance={appearance}
       className={cn(
-        'relative flex items-start gap-4 p-5 ps-6 rounded-s-none rounded-e overflow-hidden text-start',
+        'relative flex items-start gap-4 p-5 ps-5 rounded-s-none rounded-e border-s-4 text-start',
+        accentBorderClasses[resolvedRole],
         appearance === 'surface'
-          ? 'bg-surface border border-outline-variant shadow-card'
-          : cn('border-none', surfaceWashBg[resolvedRole]),
+          ? 'bg-surface border-t border-e border-b border-outline-variant shadow-card'
+          : surfaceWashBg[resolvedRole],
         className
       )}
       {...props}
     >
-      {/* Mathematically straight 4px vertical accent bar */}
-      <div
-        className={cn('absolute start-0 top-0 bottom-0 w-1', accentBarBg[resolvedRole])}
-        aria-hidden="true"
-      />
       {renderIcon()}
       <div className="flex-1 min-w-0">
         {title && (

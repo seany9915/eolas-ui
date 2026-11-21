@@ -4,6 +4,9 @@
   "type": "registry:ui",
   "title": "Kbd",
   "description": "Keyboard key primitive (Kbd).",
+  "categories": [
+    "layout"
+  ],
   "dependencies": [
     "@base-ui/react"
   ],

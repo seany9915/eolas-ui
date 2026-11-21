@@ -3,7 +3,10 @@
   "name": "chat-message-context",
   "type": "registry:ui",
   "title": "Chat Message Context",
-  "description": "Eolas UI Chat Message Context component built on Base UI and DESIGN.md design tokens.",
+  "description": "React context provider sharing message role, alignment, and display metadata across ChatMessage subcomponents.",
+  "categories": [
+    "clinical-ai"
+  ],
   "files": [
     {
       "path": "ui/chat-message-context.tsx",

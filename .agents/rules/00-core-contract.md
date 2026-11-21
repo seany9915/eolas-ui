@@ -20,13 +20,13 @@ description: Core workspace contract — Base UI architecture, 3-layer separatio
 Never erode component APIs, strip `ref` / Base UI `render` props, drop compound subcomponents, or downgrade primitives to `<div>`/`<button>` during styling or bug fixes. Make surgical diffs only.
 
 ## 4. Always-On Guardrails (Full List: [anti-patterns.md](./anti-patterns.md))
-- **No triple-tint chips/badges:** Use Filled, Colored Outline + neutral `surface`, or Soft Wash (`*-container` + ultra-dark `on-*-container` on pills; `#1a1c1e` on callouts/cards).
+- **No triple-tint chips/badges:** Use Filled, Colored Outline + neutral `surface`, or Soft Wash (`*-container` + ultra-dark `on-*-container` on pills; `#1C1A18` on callouts/cards).
 - **Focus vs. selection:** Floating `outline-offset: 2px` for focus; flush `2px` border + surface wash for selection.
 - **No child-margin hacks:** Never use `space-y-*` / `space-x-*`; use `flex gap-*` or `grid gap-*`.
 - **No manual `<Icon>` margins:** Never add `mr-*`/`ml-*` inside buttons/menus/badges (`gap-2` handles spacing).
 - **Shorthands:** Enforce `size-*` over `w-* h-*` and `truncate` over multi-class ellipsis.
 - **Forms:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>`; use `<InputGroup>` + `<InputGroupAddon>` instead of absolute-positioned buttons.
-- **Overlays:** Always render an accessible title (`<DialogTitle>`, `<DrawerTitle>`, or `sr-only`); never add manual `z-index`.
+- **Overlays:** Always render an accessible title (`<DialogTitle>`, `<DrawerTitle>`, or `sr-only`); never add manual `z-index` in consumer/block/feature code (`ui/` portal primitives manage stacking).
 - **Triggers:** Never downgrade triggers with `render={<span />}` ("Behavior Wraps the Line").
 - **Motion:** Never use `transition-all` or ad-hoc `@keyframes` sweeps (use `<ShimmerText>` / `<Skeleton>`).
 - **Copy:** Plain everyday English, 1–2 nouns max per label; never expose dev/DB/CSS jargon (`committed`, `synchronized`, `affordance`, `telemetry`, `workflow`, `protocol`).
@@ -48,5 +48,7 @@ Never erode component APIs, strip `ref` / Base UI `render` props, drop compound 
 | Firebase / Firestore / GCP project lookup | `firebase-*` skills + `firebase-mcp-server` (not `google-cloud-firestore`); `google-cloud-resource-manager` `search_projects` |
 | Google/Firebase/Cloud docs | `google-developer-knowledge` MCP (`search_documents` fallback on 429) |
 | Complex planning | `sequential-thinking` MCP |
+
+> Note: Workspace skills and MCP servers listed above apply in the Eolas UI authoring repo (or any workspace where those tools are installed). In consuming projects without them, rely on `DESIGN.md`, `.agents/rules/`, and your local `src/components/ui/` and `src/components/blocks/` directories.
 
 Precedence: explicit user prompt > `DESIGN.md` > `.agents/rules/` > general conventions.

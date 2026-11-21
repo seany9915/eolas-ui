@@ -24,6 +24,7 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
   const { fadeSize = 20, disabled = false } = options;
   const internalRef = React.useRef<T | null>(null);
   const [element, setElement] = React.useState<T | null>(null);
+  const [isScrollable, setIsScrollable] = React.useState(false);
 
   const setRef = React.useCallback(
     (node: T | null) => {
@@ -45,18 +46,31 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
         el.style.removeProperty('--fade-start');
         el.style.removeProperty('--fade-end');
       }
+      setIsScrollable(false);
       return;
     }
+
+    // Cache writing direction on mount and ResizeObserver so scroll events never trigger forced style recalc
+    let isRtl = getComputedStyle(el).direction === 'rtl';
 
     const updateFades = () => {
       const { scrollLeft, scrollWidth, clientWidth } = el;
       const maxScroll = Math.max(0, scrollWidth - clientWidth);
-      const isRtl = getComputedStyle(el).direction === 'rtl';
       const offset = isRtl ? Math.abs(scrollLeft) : Math.max(0, scrollLeft);
+      const canScrollLeft = maxScroll > 1 && offset > 0.5;
+      const canScrollRight = maxScroll > 1 && maxScroll - offset > 0.5;
+      const scrollable = canScrollLeft || canScrollRight;
+      setIsScrollable((prev) => (prev === scrollable ? prev : scrollable));
+
       const startFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(offset))) : 0;
       const endFade = maxScroll > 0 ? Math.min(fadeSize, Math.max(0, Math.round(maxScroll - offset))) : 0;
       el.style.setProperty('--fade-start', `${startFade}px`);
       el.style.setProperty('--fade-end', `${endFade}px`);
+    };
+
+    const handleResize = () => {
+      isRtl = getComputedStyle(el).direction === 'rtl';
+      updateFades();
     };
 
     updateFades();
@@ -64,7 +78,7 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
 
     let ro: ResizeObserver | undefined;
     if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(updateFades);
+      ro = new ResizeObserver(handleResize);
       ro.observe(el);
     }
 
@@ -74,5 +88,5 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
     };
   }, [element, fadeSize, disabled]);
 
-  return { ref: setRef };
+  return { ref: setRef, isScrollable };
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://ui.shadcn.com/schema/json",
+  "$schema": "https://ui.shadcn.com/schema.json",
   "style": "base-nova",
   "rsc": false,
   "tsx": true,
@@ -10,13 +10,12 @@
     "cssVariables": true,
     "prefix": ""
   },
-  "iconLibrary": "material-symbols",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@/lib"
   },
   "registries": {
     "@eolas": "https://seany9915.github.io/eolas-ui/r/{name}.json"

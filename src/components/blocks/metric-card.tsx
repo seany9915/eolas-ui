@@ -62,19 +62,19 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
     return (
       <Card ref={ref} className={cn('w-full', className)} {...props}>
         <Card.Header>
-          <span
+          <Card.Title
+            as="span"
             title={typeof title === 'string' ? title : undefined}
-            className="font-label text-xs font-semibold text-on-surface-variant truncate self-center"
+            className="self-center min-w-0"
           >
-            {title}
-          </span>
+            <span className="block truncate">{title}</span>
+          </Card.Title>
           {icon && (
-            <div
-              data-slot="card-action"
-              className="col-start-2 row-start-1 self-center justify-self-end flex items-center justify-center w-8 h-8 rounded-md bg-surface-container text-on-surface-variant shrink-0"
-            >
-              <Icon name={icon} size="md" aria-hidden="true" />
-            </div>
+            <Card.Action className="self-center">
+              <div className="flex items-center justify-center size-8 rounded-md bg-surface-container text-on-surface-variant shrink-0">
+                <Icon name={icon} size="md" aria-hidden="true" />
+              </div>
+            </Card.Action>
           )}
         </Card.Header>
 

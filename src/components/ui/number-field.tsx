@@ -13,59 +13,38 @@
  */
 import * as React from 'react';
 import { NumberField as BaseNumberField } from '@base-ui/react/number-field';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { Icon } from './icon';
 
-export interface NumberFieldProps {
+export type NumberFieldSize = 'sm' | 'md' | 'lg';
+
+export interface NumberFieldProps extends BaseNumberField.Root.Props {
   label?: React.ReactNode;
   description?: React.ReactNode;
   error?: string;
-  value?: number | null;
-  defaultValue?: number;
-  onValueChange?: (value: number | null, eventDetails?: BaseNumberField.Root.ChangeEventDetails) => void;
-  onValueCommitted?: (value: number | null, eventDetails?: BaseNumberField.Root.CommitEventDetails) => void;
-  min?: number;
-  max?: number;
-  step?: number | 'any';
-  smallStep?: number;
-  largeStep?: number;
-  allowOutOfRange?: boolean;
-  allowWheelScrub?: boolean;
-  snapOnStep?: boolean;
-  format?: Intl.NumberFormatOptions;
-  name?: string;
-  required?: boolean;
-  readOnly?: boolean;
-  id?: string;
-  autoFocus?: boolean;
-  disabled?: boolean;
-  children?: React.ReactNode;
-  className?: string;
+  /** Synchronizes control height with sibling Input/Button tiers: sm (44px), md (48px), lg (56px). */
+  size?: NumberFieldSize;
 }
+
+const numberFieldSizeStyles: Record<NumberFieldSize, { button: string; input: string }> = {
+  sm: { button: 'size-11 min-h-[44px] min-w-[44px]', input: 'h-11 text-sm' },
+  md: { button: 'size-12 min-h-[48px] min-w-[48px]', input: 'h-12 text-base' },
+  lg: { button: 'size-14 min-h-[56px] min-w-[56px]', input: 'h-14 text-lg' },
+};
 
 const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(({
   label,
   description,
   error,
-  value,
-  defaultValue,
-  onValueChange,
-  onValueCommitted,
-  min,
-  max,
+  size = 'md',
   step = 1,
   smallStep = 0.1,
   largeStep = 10,
   allowOutOfRange = false,
   allowWheelScrub = false,
   snapOnStep = false,
-  format,
-  name,
   required,
-  readOnly,
   id,
-  autoFocus,
-  disabled,
   children,
   className,
   ...props
@@ -75,32 +54,22 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
   const descriptionId = description ? `${inputId}-description` : undefined;
   const errorId = error ? `${inputId}-error` : undefined;
   const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+  const rootClassName = composeClassName('flex flex-col gap-1.5 w-max', className);
 
   // Composable compound usage
   if (children) {
     return (
       <BaseNumberField.Root
         ref={ref}
-        value={value}
-        defaultValue={defaultValue ?? undefined}
-        onValueChange={onValueChange}
-        onValueCommitted={onValueCommitted}
-        min={min}
-        max={max}
         step={step}
         smallStep={smallStep}
         largeStep={largeStep}
         allowOutOfRange={allowOutOfRange}
         allowWheelScrub={allowWheelScrub}
         snapOnStep={snapOnStep}
-        format={format}
-        name={name}
         required={required}
-        readOnly={readOnly}
         id={inputId}
-        autoFocus={autoFocus}
-        disabled={disabled}
-        className={cn('flex flex-col gap-1.5 w-max', className)}
+        className={rootClassName}
         {...props}
       >
         {children}
@@ -111,26 +80,15 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
   return (
     <BaseNumberField.Root
       ref={ref}
-      value={value}
-      defaultValue={defaultValue ?? undefined}
-      onValueChange={onValueChange}
-      onValueCommitted={onValueCommitted}
-      min={min}
-      max={max}
       step={step}
       smallStep={smallStep}
       largeStep={largeStep}
       allowOutOfRange={allowOutOfRange}
       allowWheelScrub={allowWheelScrub}
       snapOnStep={snapOnStep}
-      format={format}
-      name={name}
       required={required}
-      readOnly={readOnly}
       id={inputId}
-      autoFocus={autoFocus}
-      disabled={disabled}
-      className={cn('flex flex-col gap-1.5 w-max', className)}
+      className={rootClassName}
       {...props}
     >
       {label && (
@@ -160,7 +118,10 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       >
         <BaseNumberField.Decrement
           aria-label="Decrease value"
-          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-e border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
+          className={cn(
+            numberFieldSizeStyles[size].button,
+            'flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-e border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none'
+          )}
         >
           <Icon name="remove" size="sm" />
         </BaseNumberField.Decrement>
@@ -168,11 +129,17 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           data-slot="number-field-input"
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className="h-11 w-14 min-w-[3.5rem] px-1 text-center font-mono text-base font-bold text-on-surface tabular-nums bg-transparent outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
+          className={cn(
+            numberFieldSizeStyles[size].input,
+            'min-w-[4rem] w-20 [field-sizing:content] px-2 text-center font-mono font-bold text-on-surface tabular-nums bg-transparent outline-none focus:outline-none focus-visible:outline-none focus:ring-0'
+          )}
         />
         <BaseNumberField.Increment
           aria-label="Increase value"
-          className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-s border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none"
+          className={cn(
+            numberFieldSizeStyles[size].button,
+            'flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-s border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none'
+          )}
         >
           <Icon name="add" size="sm" />
         </BaseNumberField.Increment>

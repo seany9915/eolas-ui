@@ -33,6 +33,7 @@ interface ToggleGroupContextValue {
   size: ToggleGroupSize;
   orientation: 'horizontal' | 'vertical';
   multiple: boolean;
+  spacing: number;
 }
 
 const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
@@ -40,6 +41,7 @@ const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
   size: 'md',
   orientation: 'horizontal',
   multiple: false,
+  spacing: 0,
 });
 
 export interface ToggleGroupItemProps
@@ -73,23 +75,35 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
     void variant; // Destructured to avoid forwarding deprecated prop to the DOM button
     const groupContext = React.useContext(ToggleGroupContext);
     const effectiveSize = size ?? groupContext.size;
+    const isSpaced = groupContext.spacing > 0;
     const label = ariaLabel ?? ariaLabelProp;
 
-    const sizeClasses = {
-      sm: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-xs gap-1.5',
-      md: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-sm gap-2',
-      lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5',
-    }[effectiveSize];
+    // Synchronize outer tray height (p-1 + 1px border = +10px) with 44px/48px/56px sibling controls
+    const sizeClasses = isSpaced
+      ? {
+          sm: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-xs gap-1.5',
+          md: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-sm gap-2',
+          lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5',
+        }[effectiveSize]
+      : {
+          sm: 'h-[34px] px-3 min-w-[36px] text-xs gap-1.5',
+          md: 'h-[38px] px-4 min-w-[40px] text-sm gap-2',
+          lg: 'h-[46px] px-5 min-w-[48px] text-base gap-2.5',
+        }[effectiveSize];
 
     const baseItemClasses = cn(
-      'inline-flex items-center justify-center rounded-sm font-label font-semibold cursor-pointer select-none',
+      'inline-flex items-center justify-center font-label font-semibold cursor-pointer select-none',
       'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
       'active:scale-[var(--scale-tiny)] motion-reduce:transform-none motion-reduce:transition-none',
       sizeClasses,
-      'text-on-surface-variant hover:text-on-surface hover:bg-state-hover border border-transparent',
+      isSpaced
+        ? 'rounded border border-outline-variant bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+        : 'rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover border border-transparent',
       groupContext.multiple
         ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary forced-colors:data-[pressed]:border-[Highlight]'
-        : 'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:shadow-toggle forced-colors:data-[pressed]:border-[Highlight]',
+        : isSpaced
+          ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary forced-colors:data-[pressed]:border-[Highlight]'
+          : 'data-[pressed]:bg-surface data-[pressed]:text-on-surface data-[pressed]:shadow-toggle forced-colors:data-[pressed]:border-[Highlight]',
       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
     );
@@ -97,6 +111,8 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
     return (
       <BaseToggle
         ref={ref}
+        data-slot="toggle-group-item"
+        data-spacing={groupContext.spacing}
         value={value}
         aria-label={label}
         disabled={disabled}
@@ -133,6 +149,8 @@ interface BaseToggleGroupCommonProps
   /** @deprecated `'outline'` and `'segmented'` are deprecated aliases of `'default'`. */
   variant?: ToggleGroupVariant;
   size?: ToggleGroupSize;
+  /** Spacing multiplier between toggle items (0 = unified segmented tray; >0 = separated rounded items with Tailwind spacing scale gap). */
+  spacing?: number;
   ariaLabel?: string;
   'aria-label'?: string;
   items?: ToggleGroupItemData[];
@@ -174,8 +192,10 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
       disabled = false,
       variant = 'default',
       size = 'md',
+      spacing = 0,
       children,
       className,
+      style,
       ...domProps
     } = props;
 
@@ -197,58 +217,62 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
       return typeof defaultValue === 'string' && defaultValue ? [defaultValue] : [];
     }, [defaultValue]);
 
-    // Track active selection internally for uncontrolled fallback
-    const [internalValue, setInternalValue] = React.useState<string[]>(
-      normalizedValue ?? normalizedDefaultValue ?? []
+    const handleValueChange = React.useCallback(
+      (val: string[], eventDetails: BaseToggleGroup.ChangeEventDetails) => {
+        // Base UI toggle groups allow deselecting all items; honor mandatory by cancelling the empty transition.
+        if (mandatory && val.length === 0) {
+          eventDetails.cancel();
+          return;
+        }
+
+        if (!onValueChange) return;
+
+        if (isSingleStringMode) {
+          // Unpack array to single string value for single-mode listeners
+          const singleVal = val.length > 0 ? val[val.length - 1] : '';
+          (onValueChange as (v: string, d: BaseToggleGroup.ChangeEventDetails) => void)(
+            singleVal,
+            eventDetails
+          );
+        } else {
+          // Multiple mode listeners receive array of strings
+          (onValueChange as (v: string[], d: BaseToggleGroup.ChangeEventDetails) => void)(
+            val,
+            eventDetails
+          );
+        }
+      },
+      [mandatory, onValueChange, isSingleStringMode]
     );
 
-    const effectiveValue = normalizedValue !== undefined ? normalizedValue : internalValue;
-
-    const handleValueChange = (
-      val: string[],
-      eventDetails: BaseToggleGroup.ChangeEventDetails
-    ) => {
-      // If mandatory is true and user tries to deselect the last item, retain previous selection
-      if (mandatory && val.length === 0 && effectiveValue.length > 0) {
-        return;
-      }
-
-      if (normalizedValue === undefined) {
-        setInternalValue(val);
-      }
-
-      if (!onValueChange) return;
-
-      if (isSingleStringMode) {
-        // Unpack array to single string value for single-mode listeners
-        const singleVal = val.length > 0 ? val[val.length - 1] : '';
-        (onValueChange as (v: string, d: BaseToggleGroup.ChangeEventDetails) => void)(
-          singleVal,
-          eventDetails
-        );
-      } else {
-        // Multiple mode listeners receive array of strings
-        (onValueChange as (v: string[], d: BaseToggleGroup.ChangeEventDetails) => void)(
-          val,
-          eventDetails
-        );
-      }
-    };
+    const mergedStyle: typeof style =
+      spacing > 0
+        ? typeof style === 'function'
+          ? (state) =>
+              ({ '--toggle-spacing': spacing, ...style(state) }) as React.CSSProperties
+          : ({ '--toggle-spacing': spacing, ...style } as React.CSSProperties)
+        : style;
 
     return (
-      <ToggleGroupContext.Provider value={{ variant, size, orientation, multiple: isMultipleMode }}>
+      <ToggleGroupContext.Provider value={{ variant, size, orientation, multiple: isMultipleMode, spacing }}>
         <BaseToggleGroup
           ref={ref}
-          value={effectiveValue}
+          data-slot="toggle-group"
+          data-spacing={spacing}
+          value={normalizedValue}
+          defaultValue={normalizedDefaultValue}
           onValueChange={handleValueChange}
           multiple={isMultipleMode}
           orientation={orientation}
           loopFocus={loopFocus}
           disabled={disabled}
           aria-label={label}
+          style={mergedStyle}
           className={(state) =>
             cn(
-              'inline-flex w-fit max-w-full flex-wrap p-1 rounded gap-1 select-none bg-surface-container-high border border-outline-variant',
+              spacing > 0
+                ? 'inline-flex w-fit max-w-full flex-wrap gap-[calc(var(--spacing)*var(--toggle-spacing))] select-none'
+                : 'inline-flex w-fit max-w-full flex-wrap p-1 rounded gap-1 select-none bg-surface-container-high border border-outline-variant',
               orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
               typeof className === 'function' ? className(state) : className
             )

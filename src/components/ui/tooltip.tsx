@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface TooltipProviderProps {
   children?: React.ReactNode;
@@ -35,7 +35,7 @@ export const useTooltipContext = () => React.useContext(TooltipContext);
 export interface TooltipProps<Payload = unknown> {
   content?: React.ReactNode;
   children?: BaseTooltip.Root.Props<Payload>['children'];
-  side?: 'top' | 'right' | 'bottom' | 'left';
+  side?: BaseTooltip.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
@@ -56,7 +56,8 @@ export interface TooltipProps<Payload = unknown> {
   defaultTriggerId?: string | null;
   actionsRef?: React.RefObject<BaseTooltip.Root.Actions | null>;
   portal?: boolean;
-  className?: string;
+  keepMounted?: boolean;
+  className?: BaseTooltip.Popup.Props['className'];
 }
 
 function TooltipComponentInner<Payload = unknown>(
@@ -84,6 +85,7 @@ function TooltipComponentInner<Payload = unknown>(
     defaultTriggerId,
     actionsRef,
     portal = true,
+    keepMounted,
     className,
   }: TooltipProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
@@ -123,13 +125,10 @@ function TooltipComponentInner<Payload = unknown>(
     >
       <BaseTooltip.Popup
         ref={ref}
+        data-slot="tooltip-content"
         data-surface="inverted"
-        className={cn(
-          'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
-          'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
-          'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
-          'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',
-          'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+        className={composeClassName(
+          'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
           className
         )}
       >
@@ -155,6 +154,7 @@ function TooltipComponentInner<Payload = unknown>(
         actionsRef={actionsRef}
       >
         <BaseTooltip.Trigger
+          data-slot="tooltip-trigger"
           render={React.isValidElement(children) ? children : undefined}
           delay={delay}
           closeDelay={closeDelay}
@@ -162,7 +162,7 @@ function TooltipComponentInner<Payload = unknown>(
         >
           {!React.isValidElement(children) && typeof children !== 'function' ? children : undefined}
         </BaseTooltip.Trigger>
-        {portal ? <BaseTooltip.Portal>{popup}</BaseTooltip.Portal> : popup}
+        {portal ? <BaseTooltip.Portal keepMounted={keepMounted}>{popup}</BaseTooltip.Portal> : popup}
       </BaseTooltip.Root>
     </TooltipContext.Provider>
   );
@@ -179,9 +179,12 @@ export const TooltipArrow = React.forwardRef<HTMLDivElement, TooltipArrowProps>(
   ({ className, children, ...props }, ref) => (
     <BaseTooltip.Arrow
       ref={ref}
-      className={cn(
-        'text-on-surface z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
-        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+      data-slot="tooltip-arrow"
+      className={composeClassName(
+        cn(
+          'text-on-surface z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+          'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+        ),
         className
       )}
       {...props}
@@ -217,10 +220,11 @@ export const TooltipTrigger = React.forwardRef<
   return (
     <BaseTooltip.Trigger
       ref={ref}
+      data-slot="tooltip-trigger"
       delay={resolvedDelay}
       closeDelay={resolvedCloseDelay}
       closeOnClick={resolvedCloseOnClick}
-      className={cn('inline-flex cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary', className)}
+      className={composeClassName('inline-flex cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary', className)}
       {...props}
     >
       {children}
@@ -231,14 +235,15 @@ TooltipTrigger.displayName = 'TooltipTrigger';
 
 export interface TooltipContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseTooltip.Popup> {
-  side?: 'top' | 'right' | 'bottom' | 'left';
+  side?: BaseTooltip.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   showArrow?: boolean;
-  containerClassName?: string;
+  containerClassName?: BaseTooltip.Positioner.Props['className'];
   portal?: boolean;
+  keepMounted?: boolean;
 }
 
 export const TooltipContent = React.forwardRef<
@@ -257,6 +262,7 @@ export const TooltipContent = React.forwardRef<
       showArrow = true,
       containerClassName,
       portal = true,
+      keepMounted,
       ...props
     },
     ref
@@ -268,17 +274,14 @@ export const TooltipContent = React.forwardRef<
         sideOffset={sideOffset}
         alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={cn('z-[70] outline-none', containerClassName)}
+        className={composeClassName('z-[70] outline-none', containerClassName)}
       >
         <BaseTooltip.Popup
           ref={ref}
+          data-slot="tooltip-content"
           data-surface="inverted"
-          className={cn(
-            'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none',
-            'transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)]',
-            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)]',
-            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)]',
-            'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+          className={composeClassName(
+            'relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -293,7 +296,7 @@ export const TooltipContent = React.forwardRef<
       return content;
     }
 
-    return <BaseTooltip.Portal>{content}</BaseTooltip.Portal>;
+    return <BaseTooltip.Portal keepMounted={keepMounted}>{content}</BaseTooltip.Portal>;
   }
 );
 TooltipContent.displayName = 'TooltipContent';
@@ -302,7 +305,7 @@ export const TooltipViewport = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseTooltip.Viewport>
 >(({ className, ...props }, ref) => (
-  <BaseTooltip.Viewport ref={ref} className={cn('relative', className)} {...props} />
+  <BaseTooltip.Viewport ref={ref} className={composeClassName('relative', className)} {...props} />
 ));
 TooltipViewport.displayName = 'TooltipViewport';
 

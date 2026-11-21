@@ -3,7 +3,10 @@
   "name": "clinician-tip",
   "type": "registry:ui",
   "title": "Clinician Tip",
-  "description": "Eolas UI Clinician Tip component built on Base UI and DESIGN.md design tokens.",
+  "description": "Clinical guidance callout displaying contextual tips and practice notes with subtle elevation and accessible high-contrast typography.",
+  "categories": [
+    "clinical-ai"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/utils.json",
     "https://seany9915.github.io/eolas-ui/r/icon.json"

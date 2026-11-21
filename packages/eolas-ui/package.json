@@ -1,25 +1,34 @@
 {
   "name": "@seany9915/eolas-ui",
-  "version": "4.1.0",
-  "description": "Eolas UI CLI - Private Base UI design system component distributor",
+  "version": "5.0.0",
+  "description": "Eolas UI CLI - Base UI design system component distributor",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "bin": {
     "eolas-ui": "./bin/eolas-ui.js"
   },
   "files": [
     "bin",
     "registry",
-    "lint"
+    "lint",
+    "LICENSE",
+    "README.md"
   ],
   "exports": {
     "./lint": "./lint/index.mjs",
     "./oxlintrc": "./lint/oxlintrc.json"
   },
   "peerDependencies": {
-    "@shadcn/lint": "^0.2.5"
+    "@shadcn/lint": "^0.2.5",
+    "oxlint": ">=1.0.0"
   },
   "peerDependenciesMeta": {
     "@shadcn/lint": {
+      "optional": true
+    },
+    "oxlint": {
       "optional": true
     }
   },

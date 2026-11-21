@@ -1,5 +1,6 @@
 'use client';
 
+import { isValidElement } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
@@ -41,6 +42,38 @@ const customTwMerge = extendTailwindMerge({
 
 export function cn(...inputs: ClassValue[]) {
   return customTwMerge(clsx(inputs));
+}
+
+/**
+ * Composes a static base class value with Base UI's `className` prop, which may be
+ * either a string or a `(state) => string | undefined` callback.
+ * Preserves `tailwind-merge` deduplication while avoiding extra closures for static strings.
+ */
+export function composeClassName<State = unknown>(
+  base: ClassValue,
+  className?: string | ((state: State) => string | undefined)
+): string | ((state: State) => string) {
+  if (typeof className === 'function') {
+    return (state: State) => cn(base, className(state));
+  }
+  return cn(base, className);
+}
+
+/**
+ * Resolves Base UI's `nativeButton` prop for triggers and buttons that accept a `render` element.
+ * Respects an explicit caller value; otherwise returns `false` when `render` is an intrinsic
+ * non-`<button>` element (e.g. `<a>`, `<span>`, `<div>`) so Base UI applies ARIA button semantics
+ * without dev warnings.
+ */
+export function resolveNativeButton(
+  render: unknown,
+  nativeButton?: boolean
+): boolean | undefined {
+  if (nativeButton !== undefined) return nativeButton;
+  if (isValidElement(render) && typeof render.type === 'string' && render.type !== 'button') {
+    return false;
+  }
+  return undefined;
 }
 
 /**

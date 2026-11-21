@@ -43,9 +43,10 @@ export const ResizablePanelGroup = React.forwardRef<
   return (
     <Group
       elementRef={ref}
+      data-slot="resizable-panel-group"
       orientation={resolvedOrientation}
       className={cn(
-        '@container flex h-full w-full overflow-hidden rounded-lg border border-outline-variant bg-surface',
+        '@container flex size-full overflow-hidden rounded-lg border border-outline-variant bg-surface',
         resolvedOrientation === 'horizontal' ? 'flex-row' : 'flex-col',
         className
       )}
@@ -66,6 +67,7 @@ export const ResizablePanel = React.forwardRef<
   return (
     <Panel
       elementRef={ref}
+      data-slot="resizable-panel"
       className={cn('relative overflow-auto', className)}
       {...props}
     />
@@ -84,6 +86,7 @@ export const ResizableHandle = React.forwardRef<
   return (
     <Separator
       elementRef={ref}
+      data-slot="resizable-handle"
       className={cn(
         'group relative flex items-center justify-center bg-outline-variant select-none touch-none',
         'transition-colors duration-quick ease-standard motion-reduce:transition-none',
@@ -103,10 +106,9 @@ export const ResizableHandle = React.forwardRef<
     >
       {withHandle && (
         <div
-          data-slot="resizable-handle"
           className={cn(
             'z-10 flex items-center justify-center rounded-full border bg-surface text-on-surface-variant pointer-events-none select-none',
-            'border-outline-variant shadow-xs',
+            'border-outline-variant shadow-toggle',
             'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard motion-reduce:transition-none',
             // Dimensions: Capsule pill (28x14px) adapting to orientation
             'h-7 w-3.5',
@@ -115,7 +117,7 @@ export const ResizableHandle = React.forwardRef<
             'group-hover:border-primary group-hover:text-primary',
             'group-focus-visible:border-primary group-focus-visible:text-primary',
             // Active dragging feedback
-            'group-data-[separator=active]:border-primary group-data-[separator=active]:bg-primary-container group-data-[separator=active]:text-on-primary-container group-data-[separator=active]:shadow-sm'
+            'group-data-[separator=active]:border-primary group-data-[separator=active]:bg-primary-container group-data-[separator=active]:text-on-primary-container group-data-[separator=active]:shadow-card'
           )}
         >
           {children ?? (

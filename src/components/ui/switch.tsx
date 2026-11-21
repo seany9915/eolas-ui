@@ -13,7 +13,7 @@
  */
 import * as React from 'react';
 import { Switch as BaseSwitch } from '@base-ui/react/switch';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type SwitchSize = 'sm' | 'md' | 'lg';
 
@@ -23,7 +23,6 @@ export interface SwitchProps
   description?: React.ReactNode;
   error?: boolean | string;
   size?: SwitchSize;
-  className?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
 }
@@ -83,10 +82,12 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
     const errorId = label && hasErrorText ? `${switchId}-error` : undefined;
     const describedBy = [props['aria-describedby'], descriptionId, errorId].filter(Boolean).join(' ') || undefined;
     const currentSize = sizeConfig[size] || sizeConfig.md;
+    const isClassNameFn = typeof className === 'function';
 
     const switchNode = (
       <BaseSwitch.Root
         ref={ref}
+        data-slot="switch"
         id={switchId}
         checked={checked}
         defaultChecked={defaultChecked}
@@ -99,17 +100,19 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         form={form}
         inputRef={inputRef}
         nativeButton={nativeButton}
-        aria-label={!label ? ariaLabel || 'Switch' : ariaLabel}
+        aria-label={ariaLabel}
         aria-labelledby={ariaLabelBy}
-        className={cn(
-          'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
-          'bg-surface-container-high',
-          error ? 'border-error focus-visible:outline-error' : 'border-outline',
-          'data-[checked]:bg-primary data-[checked]:border-primary',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
-          currentSize.track,
-          !label && className
+        className={composeClassName(
+          cn(
+            'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
+            'bg-surface-container-high',
+            error ? 'border-error focus-visible:outline-error' : 'border-outline',
+            'data-[checked]:bg-primary data-[checked]:border-primary',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+            currentSize.track
+          ),
+          !label || isClassNameFn ? className : undefined
         )}
         {...props}
         aria-invalid={error ? true : props['aria-invalid']}
@@ -117,8 +120,9 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
       >
         {children ?? (
           <BaseSwitch.Thumb
+            data-slot="switch-thumb"
             className={cn(
-              'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none',
+              'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none',
               currentSize.thumb,
               currentSize.translate
             )}
@@ -136,7 +140,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         className={cn(
           'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors hover:bg-surface-container/30',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
-          className
+          !isClassNameFn ? className : undefined
         )}
       >
         <label

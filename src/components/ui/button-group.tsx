@@ -8,7 +8,7 @@
  *
  * TAXONOMY & USAGE:
  * - A container to group related buttons, segmented actions, and inputs with fused borders and shared geometry.
- * - Resolves double-border artifacts (-space-x-px / -space-y-px) while ensuring focus rings
+ * - Resolves double-border artifacts via child border-overlap selectors while ensuring focus rings
  *   stay visible with proper stacking context (focus-visible:z-20).
  * - Fuses concentric border radii: rounds outer corners while flattening adjacent internal edges.
  * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
+import { Separator } from './separator';
 
 export interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: 'horizontal' | 'vertical';
@@ -41,13 +42,13 @@ export const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupProps
             'inline-flex isolate',
             isHorizontal
               ? [
-                  'flex-row -space-x-px',
+                  'flex-row [&>*:not(:first-child)]:-ms-px',
                   // Horizontal fused edges: collapse inner corners while preserving outer radius
                   '[&>*:not(:first-child)]:rounded-s-none',
                   '[&>*:not(:last-child)]:rounded-e-none',
                 ]
               : [
-                  'flex-col -space-y-px',
+                  'flex-col [&>*:not(:first-child)]:-mt-px',
                   // Vertical fused edges: collapse inner corners while preserving outer radius
                   '[&>*:not(:first-child)]:rounded-t-none',
                   '[&>*:not(:last-child)]:rounded-b-none',
@@ -72,24 +73,28 @@ ButtonGroupRoot.displayName = 'ButtonGroup';
 /* -------------------------------------------------------------------------------------------------
  * ButtonGroupSeparator
  * -----------------------------------------------------------------------------------------------*/
-export interface ButtonGroupSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ButtonGroupSeparatorProps
+  extends React.ComponentPropsWithoutRef<typeof Separator> {
   orientation?: 'horizontal' | 'vertical';
 }
 
 export const ButtonGroupSeparator = React.forwardRef<HTMLDivElement, ButtonGroupSeparatorProps>(
-  ({ className, orientation: orientationProp, ...props }, ref) => {
+  ({ className, orientation: orientationProp, decorative = false, ...props }, ref) => {
     const context = React.useContext(ButtonGroupContext);
-    const resolvedOrientation = orientationProp ?? (context.orientation === 'horizontal' ? 'vertical' : 'horizontal');
+    const resolvedOrientation =
+      orientationProp ?? (context.orientation === 'horizontal' ? 'vertical' : 'horizontal');
 
     return (
-      <div
+      <Separator
         ref={ref}
-        role="separator"
         data-slot="button-group-separator"
-        aria-orientation={resolvedOrientation}
-        className={cn(
-          'bg-outline-variant/60 shrink-0 self-center z-10',
-          resolvedOrientation === 'vertical' ? 'h-6 w-px' : 'w-full h-px',
+        orientation={resolvedOrientation}
+        decorative={decorative}
+        className={composeClassName(
+          cn(
+            'bg-outline-variant/60 shrink-0 self-center z-10',
+            resolvedOrientation === 'vertical' ? 'h-6 w-px mx-0' : 'w-full h-px my-0'
+          ),
           className
         )}
         {...props}

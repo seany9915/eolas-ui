@@ -33,6 +33,7 @@ export interface TabItemData<Value extends TabValue = string> {
 export type TabItem<Value extends TabValue = string> = TabItemData<Value>;
 
 export type TabsVariant =
+  | 'default'
   | 'line'
   | 'underline'
   | 'pills'
@@ -93,6 +94,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
       <TabsContext.Provider value={{ variant, colorRole, size, orientation, showIndicator }}>
         <BaseTabs.Root
           ref={ref}
+          data-slot="tabs"
           value={value}
           defaultValue={defaultValue}
           onValueChange={onValueChange}
@@ -178,6 +180,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       >
         <BaseTabs.List
           ref={listRef}
+          data-slot="tabs-list"
           activateOnFocus={activateOnFocus}
           loopFocus={loopFocus}
           className={(state) =>
@@ -204,6 +207,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
           {effectiveShowIndicator && effectiveVariant !== 'unstyled' && (
             isContained ? (
               <BaseTabs.Indicator
+                data-slot="tabs-indicator"
                 className={cn(
                   'absolute rounded-sm z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
@@ -217,6 +221,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               />
             ) : isPills ? (
               <BaseTabs.Indicator
+                data-slot="tabs-indicator"
                 className={cn(
                   'absolute rounded-md z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary-container' : 'bg-primary-container',
@@ -230,6 +235,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               />
             ) : (
               <BaseTabs.Indicator
+                data-slot="tabs-indicator"
                 className={cn(
                   'absolute rounded-none z-10 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
@@ -270,16 +276,23 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
       effectiveVariant === 'segment';
     const hasSlidingIndicator = context.showIndicator;
 
-    // Size height tokens (synchronized with 44px sm / 48px md / 56px lg scale across Button & Input)
-    const sizeClasses = {
-      sm: 'py-2 px-3.5 min-h-[44px] text-xs',
-      md: 'py-2.5 px-4 min-h-[48px] text-sm',
-      lg: 'py-3.5 px-5 min-h-[56px] text-base',
-    }[effectiveSize];
+    // Size height tokens: contained items subtract tray padding+border (+10px) to align outer height with 44/48/56px controls
+    const sizeClasses = isContained
+      ? {
+          sm: 'py-1.5 px-3 min-h-[34px] h-[34px] text-xs',
+          md: 'py-1.5 px-4 min-h-[38px] h-[38px] text-sm',
+          lg: 'py-2.5 px-5 min-h-[46px] h-[46px] text-base',
+        }[effectiveSize]
+      : {
+          sm: 'py-2 px-3.5 min-h-[44px] text-xs',
+          md: 'py-2.5 px-4 min-h-[48px] text-sm',
+          lg: 'py-3.5 px-5 min-h-[56px] text-base',
+        }[effectiveSize];
 
     return (
       <BaseTabs.Tab
         ref={ref}
+        data-slot="tabs-trigger"
         value={value}
         disabled={disabled}
         className={(state) =>
@@ -298,12 +311,10 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                           effectiveColorRole === 'secondary'
                             ? cn(
                                 'data-[active]:delay-[60ms] data-[active]:text-on-secondary data-[active]:hover:bg-transparent data-[active]:hover:text-on-secondary',
-                                'data-[selected]:delay-[60ms] data-[selected]:text-on-secondary data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-secondary',
                                 'aria-selected:delay-[60ms] aria-selected:text-on-secondary aria-selected:hover:bg-transparent aria-selected:hover:text-on-secondary font-semibold'
                               )
                             : cn(
                                 'data-[active]:delay-[60ms] data-[active]:text-on-primary data-[active]:hover:bg-transparent data-[active]:hover:text-on-primary',
-                                'data-[selected]:delay-[60ms] data-[selected]:text-on-primary data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-primary',
                                 'aria-selected:delay-[60ms] aria-selected:text-on-primary aria-selected:hover:bg-transparent aria-selected:hover:text-on-primary font-semibold'
                               )
                         )
@@ -312,12 +323,10 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                           effectiveColorRole === 'secondary'
                             ? cn(
                                 'data-[active]:bg-secondary data-[active]:text-on-secondary data-[active]:hover:text-on-secondary',
-                                'data-[selected]:bg-secondary data-[selected]:text-on-secondary data-[selected]:hover:text-on-secondary',
                                 'aria-selected:bg-secondary aria-selected:text-on-secondary aria-selected:hover:text-on-secondary'
                               )
                             : cn(
                                 'data-[active]:bg-primary data-[active]:text-on-primary data-[active]:hover:text-on-primary',
-                                'data-[selected]:bg-primary data-[selected]:text-on-primary data-[selected]:hover:text-on-primary',
                                 'aria-selected:bg-primary aria-selected:text-on-primary aria-selected:hover:text-on-primary'
                               )
                         )
@@ -331,12 +340,10 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                             effectiveColorRole === 'secondary'
                               ? cn(
                                   'data-[active]:text-on-secondary-container data-[active]:hover:bg-transparent data-[active]:hover:text-on-secondary-container',
-                                  'data-[selected]:text-on-secondary-container data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-secondary-container',
                                   'aria-selected:text-on-secondary-container aria-selected:hover:bg-transparent aria-selected:hover:text-on-secondary-container font-semibold'
                                 )
                               : cn(
                                   'data-[active]:text-on-primary-container data-[active]:hover:bg-transparent data-[active]:hover:text-on-primary-container',
-                                  'data-[selected]:text-on-primary-container data-[selected]:hover:bg-transparent data-[selected]:hover:text-on-primary-container',
                                   'aria-selected:text-on-primary-container aria-selected:hover:bg-transparent aria-selected:hover:text-on-primary-container font-semibold'
                                 )
                           )
@@ -345,12 +352,10 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                             effectiveColorRole === 'secondary'
                               ? cn(
                                   'data-[active]:bg-secondary-container data-[active]:text-on-secondary-container data-[active]:hover:text-on-secondary-container',
-                                  'data-[selected]:bg-secondary-container data-[selected]:text-on-secondary-container data-[selected]:hover:text-on-secondary-container',
                                   'aria-selected:bg-secondary-container aria-selected:text-on-secondary-container aria-selected:hover:text-on-secondary-container'
                                 )
                               : cn(
                                   'data-[active]:bg-primary-container data-[active]:text-on-primary-container data-[active]:hover:text-on-primary-container',
-                                  'data-[selected]:bg-primary-container data-[selected]:text-on-primary-container data-[selected]:hover:text-on-primary-container',
                                   'aria-selected:bg-primary-container aria-selected:text-on-primary-container aria-selected:hover:text-on-primary-container'
                                 )
                           )
@@ -360,12 +365,10 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                     hasSlidingIndicator
                       ? cn(
                           'data-[active]:text-primary',
-                          'data-[selected]:text-primary',
                           'aria-selected:text-primary'
                         )
                       : cn(
                           'data-[active]:text-primary data-[active]:border-primary -mb-px',
-                          'data-[selected]:text-primary data-[selected]:border-primary',
                           'aria-selected:text-primary aria-selected:border-primary'
                         )
                   ),
@@ -453,6 +456,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
             forwardedRef.current = node;
           }
         }}
+        data-slot="tabs-content"
         value={value}
         keepMounted={resolvedKeepMounted}
         className={(state) =>
@@ -605,6 +609,12 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
 );
 TabsComponent.displayName = 'Tabs';
 
+export const TabsIndicator = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseTabs.Indicator>
+>((props, ref) => <BaseTabs.Indicator ref={ref} data-slot="tabs-indicator" {...props} />);
+TabsIndicator.displayName = 'TabsIndicator';
+
 // Compound export mapping Base UI primitives & wrappers
 export const Tabs = Object.assign(TabsComponent, {
   Root: TabsRoot,
@@ -613,7 +623,7 @@ export const Tabs = Object.assign(TabsComponent, {
   Trigger: Tab,
   Panel: TabsPanel,
   Content: TabsPanel,
-  Indicator: BaseTabs.Indicator,
+  Indicator: TabsIndicator,
 });
 
 // Re-export Base UI primitives for compound composition
@@ -622,7 +632,6 @@ export const TabsListPrimitive = BaseTabs.List;
 export const TabsTabPrimitive = BaseTabs.Tab;
 export const TabsTriggerPrimitive = BaseTabs.Tab;
 export const TabsPanelPrimitive = BaseTabs.Panel;
-export const TabsIndicator = BaseTabs.Indicator;
 
 // Backward-compatible named exports matching radix/shadcn conventions
 export const TabsTrigger = Tab;

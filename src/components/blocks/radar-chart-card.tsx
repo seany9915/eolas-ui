@@ -87,7 +87,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
           role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
-          className="aspect-auto h-full w-full"
+          className="aspect-auto size-full"
         >
           <RadarChart
             aria-label={chartLabel ?? title}

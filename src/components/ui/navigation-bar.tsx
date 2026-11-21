@@ -21,7 +21,7 @@ import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { useRender } from '@base-ui/react/use-render';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface NavigationBarContextValue {
   value?: string;
@@ -123,6 +123,7 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
       onClick,
       type,
       render,
+      nativeButton,
       ...props
     },
     ref
@@ -143,23 +144,31 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
     };
 
     const itemContext = React.useMemo(() => ({ isSelected }), [isSelected]);
+    const resolvedNativeButton = resolveNativeButton(render, nativeButton);
+    const resolvedType =
+      resolvedNativeButton === false || (render && type === undefined)
+        ? undefined
+        : (type ?? 'button');
 
     return (
       <NavigationBarItemContext.Provider value={itemContext}>
         <BaseButton
           ref={ref}
           render={render}
-          {...(render ? {} : { type: type ?? 'button' })}
+          nativeButton={resolvedNativeButton}
+          {...(resolvedType !== undefined ? { type: resolvedType } : {})}
           data-slot="navigation-bar-item"
           data-selected={isSelected ? 'true' : undefined}
           aria-current={isSelected ? 'page' : undefined}
           onClick={handleClick}
-          className={cn(
-            'group relative flex-1 max-w-28 flex flex-col items-center justify-center min-h-11 min-w-11 py-1 px-1.5 rounded-md',
-            'cursor-pointer transition-[color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-            'active:scale-[var(--scale-large)] motion-reduce:active:scale-100 motion-reduce:transition-none',
-            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-            isSelected ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface',
+          className={composeClassName(
+            cn(
+              'group relative flex-1 max-w-28 flex flex-col items-center justify-center min-h-11 min-w-11 py-1 px-1.5 rounded-md',
+              'cursor-pointer transition-[color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+              'active:scale-[var(--scale-large)] motion-reduce:active:scale-100 motion-reduce:transition-none',
+              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+              isSelected ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'
+            ),
             className
           )}
           {...props}

@@ -84,36 +84,114 @@ export async function postTask<T>(
   });
 }
 
+export interface ProcessChunkedOptions {
+  /** Frame budget in milliseconds before yielding to the main thread. Defaults to 8ms. */
+  budgetMs?: number;
+  /** Optional AbortSignal to cancel chunked processing early. */
+  signal?: AbortSignal;
+}
+
+export interface YieldingFilterOptions {
+  /** Frame budget in milliseconds before yielding to the main thread. Defaults to 8ms. */
+  budgetMs?: number;
+  /** Reactive dependency list that triggers re-filtering without restarting on inline predicate recreation. */
+  deps?: React.DependencyList;
+}
+
+interface NavigatorScheduling {
+  isInputPending?(options?: { includeContinuous?: boolean }): boolean;
+}
+
+const DEFAULT_FRAME_BUDGET_MS = 8;
+
+function getNow(): number {
+  return typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now();
+}
+
+function shouldYield(sliceStart: number, budgetMs: number): boolean {
+  if (typeof navigator !== 'undefined') {
+    const scheduling = (navigator as Navigator & { scheduling?: NavigatorScheduling }).scheduling;
+    if (typeof scheduling?.isInputPending === 'function' && scheduling.isInputPending()) {
+      return true;
+    }
+  }
+  return getNow() - sliceStart >= budgetMs;
+}
+
 /**
- * Iterates through a large array in chunks, cooperatively yielding to the main thread
- * after every `chunkSize` items to maintain 60fps responsiveness.
+ * Iterates through a large array using a frame-friendly time deadline (default 8ms)
+ * and `navigator.scheduling?.isInputPending()` checks to maintain 60fps responsiveness.
  */
 export async function processChunked<T, R>(
   items: T[],
   processFn: (item: T, index: number) => R,
-  chunkSize = 50
+  chunkSizeOrOptions?: number | ProcessChunkedOptions
 ): Promise<R[]> {
+  const options: ProcessChunkedOptions =
+    typeof chunkSizeOrOptions === 'object' && chunkSizeOrOptions !== null
+      ? chunkSizeOrOptions
+      : {};
+  const budgetMs = options.budgetMs ?? DEFAULT_FRAME_BUDGET_MS;
+  const { signal } = options;
+
   const results: R[] = [];
+  let sliceStart = getNow();
+
   for (let i = 0; i < items.length; i++) {
+    if (signal?.aborted) {
+      throw signal.reason ?? new DOMException('Task aborted', 'AbortError');
+    }
     results.push(processFn(items[i], i));
-    if (i > 0 && i % chunkSize === 0) {
+    if (i < items.length - 1 && shouldYield(sliceStart, budgetMs)) {
       await yieldToMain();
+      sliceStart = getNow();
     }
   }
+
   return results;
 }
 
 /**
  * React hook that asynchronously filters large collections without locking the main thread.
+ * Uses an 8ms frame-friendly deadline and `isInputPending()` checks. Pass reactive `deps`
+ * (either via options `{ deps }` or the 4th parameter) so filtering re-runs when query state
+ * changes without restarting on inline predicate arrow re-creation.
  */
 export function useYieldingFilter<T>(
   items: T[],
   predicate: (item: T) => boolean,
-  chunkSize = 100
+  chunkSizeOrOptions?: number | YieldingFilterOptions,
+  deps?: React.DependencyList
 ) {
+  const budgetMs =
+    typeof chunkSizeOrOptions === 'object' && chunkSizeOrOptions !== null
+      ? (chunkSizeOrOptions.budgetMs ?? DEFAULT_FRAME_BUDGET_MS)
+      : DEFAULT_FRAME_BUDGET_MS;
+  const resolvedDeps =
+    typeof chunkSizeOrOptions === 'object' && chunkSizeOrOptions !== null
+      ? (chunkSizeOrOptions.deps ?? deps)
+      : deps;
+
   const [filtered, setFiltered] = React.useState<T[]>(items);
   const [isFiltering, setIsFiltering] = React.useState(false);
   const predicateRef = React.useRef(predicate);
+  const prevDepsRef = React.useRef<React.DependencyList | undefined>(undefined);
+  const depsVersionRef = React.useRef(0);
+
+  if (resolvedDeps !== undefined) {
+    const prev = prevDepsRef.current;
+    const hasChanged =
+      !prev ||
+      prev.length !== resolvedDeps.length ||
+      resolvedDeps.some((value, index) => !Object.is(value, prev[index]));
+    if (hasChanged) {
+      depsVersionRef.current += 1;
+      prevDepsRef.current = resolvedDeps;
+    }
+  }
+  const depsVersion = depsVersionRef.current;
 
   React.useEffect(() => {
     predicateRef.current = predicate;
@@ -125,13 +203,16 @@ export function useYieldingFilter<T>(
 
     async function runFilter() {
       const matched: T[] = [];
+      let sliceStart = getNow();
+
       for (let i = 0; i < items.length; i++) {
         if (!active) return;
         if (predicateRef.current(items[i])) {
           matched.push(items[i]);
         }
-        if (i > 0 && i % chunkSize === 0) {
+        if (i < items.length - 1 && shouldYield(sliceStart, budgetMs)) {
           await yieldToMain();
+          sliceStart = getNow();
         }
       }
       if (active) {
@@ -147,7 +228,7 @@ export function useYieldingFilter<T>(
     return () => {
       active = false;
     };
-  }, [items, chunkSize]);
+  }, [items, budgetMs, depsVersion]);
 
   return { filtered, isFiltering };
 }

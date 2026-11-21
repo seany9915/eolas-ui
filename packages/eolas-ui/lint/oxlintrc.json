@@ -179,7 +179,7 @@
             "message": "Modal overlays must maintain standard surface styling, focus traps, and backdrop filters defined by Eolas UI."
           },
           {
-            "pattern": "^(Popover|PopoverPopup|PopoverContent|Popover\\.Popup|Popover\\.Content|Menu|MenuPopup|MenuContent|Menu\\.Popup|Menu\\.Content|Tooltip|TooltipPopup|TooltipContent|Tooltip\\.Popup|Tooltip\\.Content|SelectPopup|SelectContent|Select\\.Popup|Select\\.Content|ComboboxPopup|ComboboxContent|Combobox\\.Popup|Combobox\\.Content|AutocompletePopup|AutocompleteContent|Autocomplete\\.Popup|Autocomplete\\.Content)$",
+            "pattern": "^(Popover|PopoverPopup|PopoverContent|Popover\\.Popup|Popover\\.Content|Menu|MenuPopup|MenuContent|Menu\\.Popup|Menu\\.Content|Tooltip|TooltipPopup|TooltipContent|Tooltip\\.Popup|Tooltip\\.Content|SelectPopup|SelectContent|Select\\.Popup|Select\\.Content|ComboboxPopup|ComboboxContent|Combobox\\.Popup|Combobox\\.Content|AutocompletePopup|AutocompleteContent|Autocomplete\\.Popup|Autocomplete\\.Content|ContextMenu|ContextMenuPopup|ContextMenuContent|ContextMenu\\.Popup|ContextMenu\\.Content|PreviewCard|PreviewCardPopup|PreviewCardContent|PreviewCard\\.Popup|PreviewCard\\.Content|Menubar|MenubarPopup|MenubarContent|Menubar\\.Popup|Menubar\\.Content|NavigationMenu|NavigationMenuPopup|NavigationMenuContent|NavigationMenu\\.Popup|NavigationMenu\\.Content)$",
             "allow": ["layout", "w-*", "max-w-*", "min-w-*"],
             "deny": ["bg-*", "rounded-*", "shadow-*"],
             "message": "Tier B overlay popups manage their own surface background, concentric radius, and ambient elevation per DESIGN.md."
@@ -214,11 +214,7 @@
       "files": [
         "**/components/ui/**",
         "**/src/components/ui/**",
-        "**/src/ui/**",
-        "**/playground/**",
-        "**/showcase/**",
-        "**/*Showcase*/**",
-        "**/*Showcase.tsx"
+        "**/src/ui/**"
       ],
       "rules": {
         "shadcn/no-restyle": "off",

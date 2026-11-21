@@ -84,7 +84,8 @@ export function FilterToolbar({
         {/* Filter dropdowns and actions */}
         <div className="flex flex-wrap items-center gap-2 w-full @md:w-auto">
           {filterGroups.map((group) => (
-            <div key={group.id} className="w-full @xs:w-auto @xs:min-w-36">
+            <Field.Root key={group.id} className="w-full @xs:w-auto @xs:min-w-36">
+              <Field.Label className="sr-only">{group.label}</Field.Label>
               <Select
                 value={group.value}
                 onValueChange={(val) => {
@@ -96,7 +97,7 @@ export function FilterToolbar({
                 placeholder={group.label}
                 aria-label={group.label}
               />
-            </div>
+            </Field.Root>
           ))}
 
           {hasActiveFilters && onReset && (

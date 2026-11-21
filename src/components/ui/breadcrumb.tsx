@@ -4,18 +4,17 @@ import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
-import { UnstyledButton } from './button';
-import { Tooltip } from './tooltip';
 
 export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {
   separator?: React.ReactNode;
 }
 
 export const BreadcrumbRoot = React.forwardRef<HTMLElement, BreadcrumbProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, separator: _separator, ...props }, ref) => (
     <nav
       ref={ref}
       aria-label="Breadcrumb"
+      data-slot="breadcrumb"
       className={cn('@container relative w-full', className)}
       {...props}
     />
@@ -29,6 +28,7 @@ export const BreadcrumbList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ol
     ref={ref}
+    data-slot="breadcrumb-list"
     className={cn(
       'flex flex-wrap items-center gap-1.5 font-sans text-sm text-on-surface-variant break-words',
       className
@@ -44,6 +44,7 @@ export const BreadcrumbItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <li
     ref={ref}
+    data-slot="breadcrumb-item"
     className={cn('inline-flex items-center gap-1.5 min-w-0', className)}
     {...props}
   />
@@ -61,6 +62,7 @@ export const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLink
       ref,
       defaultTagName: 'a',
       props: {
+        'data-slot': 'breadcrumb-link',
         className: cn(
           'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none',
           className
@@ -80,6 +82,7 @@ export const BreadcrumbPage = React.forwardRef<
     role="link"
     aria-disabled="true"
     aria-current="page"
+    data-slot="breadcrumb-page"
     className={cn('font-medium text-on-surface truncate max-w-[200px] @sm:max-w-none', className)}
     {...props}
   />
@@ -94,6 +97,7 @@ export const BreadcrumbSeparator = ({
   <li
     role="presentation"
     aria-hidden="true"
+    data-slot="breadcrumb-separator"
     className={cn('text-outline opacity-60 flex items-center select-none', className)}
     {...props}
   >
@@ -102,31 +106,25 @@ export const BreadcrumbSeparator = ({
 );
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 
-export interface BreadcrumbEllipsisProps extends React.ComponentPropsWithoutRef<'button'> {
-  tooltipContent?: React.ReactNode;
-}
+export interface BreadcrumbEllipsisProps extends React.ComponentPropsWithoutRef<'span'> {}
 
-export const BreadcrumbEllipsis = React.forwardRef<HTMLButtonElement, BreadcrumbEllipsisProps>(
-  ({ className, children, tooltipContent = 'More links', ...props }, ref) => (
-    <Tooltip content={tooltipContent}>
-      <UnstyledButton
-        ref={ref}
-        type="button"
-        aria-label="More links"
-        className={cn(
-          'inline-flex min-h-[44px] min-w-[44px] size-11 items-center justify-center rounded-sm text-outline hover:text-on-surface hover:bg-surface-container transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 select-none cursor-pointer',
-          className
-        )}
-        {...props}
-      >
-        {children ?? (
-          <>
-            <Icon name="more_horiz" size="sm" className="text-base" aria-hidden="true" />
-            <span className="sr-only">More links</span>
-          </>
-        )}
-      </UnstyledButton>
-    </Tooltip>
+export const BreadcrumbEllipsis = React.forwardRef<HTMLSpanElement, BreadcrumbEllipsisProps>(
+  ({ className, children, ...props }, ref) => (
+    <span
+      ref={ref}
+      role="presentation"
+      aria-hidden="true"
+      data-slot="breadcrumb-ellipsis"
+      className={cn('inline-flex size-9 items-center justify-center', className)}
+      {...props}
+    >
+      {children ?? (
+        <>
+          <Icon name="more_horiz" size="sm" aria-hidden="true" />
+          <span className="sr-only">More</span>
+        </>
+      )}
+    </span>
   )
 );
 BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis';

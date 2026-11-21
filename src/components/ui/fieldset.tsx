@@ -13,16 +13,16 @@
  */
 import * as React from 'react';
 import { Fieldset as BaseFieldset } from '@base-ui/react/fieldset';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type FieldsetVariant = 'default' | 'card' | 'flat';
+export type FieldsetLegendVariant = 'legend' | 'label';
 
 export interface FieldsetProps extends React.ComponentPropsWithoutRef<typeof BaseFieldset.Root> {
   legend?: React.ReactNode;
   description?: React.ReactNode;
   children: React.ReactNode;
   variant?: FieldsetVariant;
-  className?: string;
 }
 
 export const FieldsetRoot = React.forwardRef<
@@ -31,13 +31,15 @@ export const FieldsetRoot = React.forwardRef<
 >(({ className, variant = 'default', disabled, ...props }, ref) => (
   <BaseFieldset.Root
     ref={ref}
-    data-slot="fieldset"
+    data-slot="field-set"
     disabled={disabled}
-    className={cn(
-      'w-full group/fieldset flex flex-col gap-3',
-      variant === 'card' && 'p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient gap-4',
-      variant === 'flat' && 'p-5 rounded-xl bg-surface-container border-none gap-4',
-      disabled && 'opacity-60 cursor-not-allowed',
+    className={composeClassName(
+      cn(
+        'w-full group/fieldset flex flex-col gap-3',
+        variant === 'card' && 'p-5 rounded-xl bg-surface border border-outline-variant shadow-ambient gap-4',
+        variant === 'flat' && 'p-5 rounded-xl bg-surface-container border-none gap-4',
+        disabled && 'opacity-60 cursor-not-allowed'
+      ),
       className
     )}
     {...props}
@@ -45,17 +47,26 @@ export const FieldsetRoot = React.forwardRef<
 ));
 FieldsetRoot.displayName = 'FieldsetRoot';
 
-export const FieldsetLegend = React.forwardRef<
-  HTMLLegendElement,
-  React.ComponentPropsWithoutRef<typeof BaseFieldset.Legend>
->(({ className, ...props }, ref) => (
-  <BaseFieldset.Legend
-    ref={ref}
-    data-slot="fieldset-legend"
-    className={cn('font-heading text-base font-bold text-on-surface px-0.5 block', className)}
-    {...props}
-  />
-));
+export interface FieldsetLegendProps extends React.ComponentPropsWithoutRef<typeof BaseFieldset.Legend> {
+  variant?: FieldsetLegendVariant;
+}
+
+export const FieldsetLegend = React.forwardRef<HTMLLegendElement, FieldsetLegendProps>(
+  ({ className, variant = 'legend', ...props }, ref) => (
+    <BaseFieldset.Legend
+      ref={ref}
+      data-slot="field-legend"
+      data-variant={variant}
+      className={composeClassName(
+        variant === 'label'
+          ? 'font-label text-sm font-semibold text-on-surface px-0.5 block'
+          : 'font-heading text-base font-bold text-on-surface px-0.5 block',
+        className
+      )}
+      {...props}
+    />
+  )
+);
 FieldsetLegend.displayName = 'FieldsetLegend';
 
 export const FieldsetDescription = React.forwardRef<

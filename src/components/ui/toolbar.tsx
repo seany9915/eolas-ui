@@ -21,7 +21,7 @@
 import * as React from 'react';
 import { Toolbar as BaseToolbar } from '@base-ui/react/toolbar';
 import { Tooltip } from './tooltip';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 interface ToolbarContextValue {
   orientation: 'horizontal' | 'vertical';
@@ -55,9 +55,11 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
           orientation={orientation}
           loopFocus={loopFocus}
           disabled={disabled}
-          className={cn(
-            'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant w-max select-none',
-            orientation === 'vertical' && 'flex-col items-stretch',
+          className={composeClassName(
+            cn(
+              'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant w-max select-none',
+              orientation === 'vertical' && 'flex-col items-stretch'
+            ),
             className
           )}
           {...props}
@@ -96,9 +98,9 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
     const context = React.useContext(ToolbarContext);
 
     const sizeClasses = {
-      sm: 'w-11 h-11 min-w-[44px] min-h-[44px] text-xs',
-      md: 'w-11 h-11 min-w-[44px] min-h-[44px] text-sm',
-      lg: 'w-12 h-12 min-w-[48px] min-h-[48px] text-base',
+      sm: 'size-11 min-w-[44px] min-h-[44px] text-xs',
+      md: 'size-11 min-w-[44px] min-h-[44px] text-sm',
+      lg: 'size-12 min-w-[48px] min-h-[48px] text-base',
     }[size];
 
     const button = (
@@ -107,16 +109,18 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
         disabled={disabled}
         focusableWhenDisabled={focusableWhenDisabled}
         aria-pressed={active !== undefined ? active : undefined}
-        className={cn(
-          'rounded-sm flex items-center justify-center font-label font-semibold cursor-pointer select-none',
-          'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-          'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
-          sizeClasses,
-          active
-            ? 'bg-primary text-on-primary'
-            : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
-          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        className={composeClassName(
+          cn(
+            'rounded-sm flex items-center justify-center font-label font-semibold cursor-pointer select-none',
+            'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+            'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
+            sizeClasses,
+            active
+              ? 'bg-primary text-on-primary'
+              : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
+            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
+          ),
           className
         )}
         {...props}
@@ -157,9 +161,11 @@ export const ToolbarGroup = React.forwardRef<HTMLDivElement, ToolbarGroupProps>(
       <BaseToolbar.Group
         ref={ref}
         disabled={disabled}
-        className={cn(
-          'flex items-center gap-1',
-          context.orientation === 'vertical' && 'flex-col items-stretch',
+        className={composeClassName(
+          cn(
+            'flex items-center gap-1',
+            context.orientation === 'vertical' && 'flex-col items-stretch'
+          ),
           className
         )}
         {...props}
@@ -184,7 +190,7 @@ export const ToolbarSeparator = React.forwardRef<HTMLDivElement, ToolbarSeparato
       <BaseToolbar.Separator
         ref={ref}
         orientation={effectiveOrientation}
-        className={cn(
+        className={composeClassName(
           effectiveOrientation === 'vertical'
             ? 'w-px h-6 my-auto mx-1 bg-outline-variant/80 shrink-0'
             : 'h-px w-6 mx-auto my-1 bg-outline-variant/80 shrink-0',
@@ -213,11 +219,13 @@ export const ToolbarLink = React.forwardRef<HTMLAnchorElement, ToolbarLinkProps>
     return (
       <BaseToolbar.Link
         ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container select-none',
-          'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)]',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
-          sizeClasses,
+        className={composeClassName(
+          cn(
+            'inline-flex items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container select-none',
+            'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)]',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
+            sizeClasses
+          ),
           className
         )}
         {...props}
@@ -239,10 +247,12 @@ export const ToolbarInput = React.forwardRef<HTMLInputElement, ToolbarInputProps
         ref={ref}
         disabled={disabled}
         focusableWhenDisabled={focusableWhenDisabled}
-        className={cn(
-          'h-9 px-3 rounded-sm bg-surface-container border border-outline-variant text-sm font-sans text-on-surface placeholder:text-on-surface-variant/60',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
-          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+        className={composeClassName(
+          cn(
+            'h-9 px-3 rounded bg-surface border border-outline text-sm font-sans text-on-surface placeholder:text-on-surface-variant/80',
+            'focus-visible:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
+            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed'
+          ),
           className
         )}
         {...props}
@@ -262,13 +272,10 @@ export interface ToolbarAction {
   tooltip?: React.ReactNode;
 }
 
-export interface ToolbarProps {
+export interface ToolbarProps
+  extends React.ComponentPropsWithoutRef<typeof BaseToolbar.Root> {
   actions?: ToolbarAction[];
-  orientation?: 'horizontal' | 'vertical';
-  loopFocus?: boolean;
-  disabled?: boolean;
   children?: React.ReactNode;
-  className?: string;
 }
 
 const ToolbarComponent = React.forwardRef<HTMLDivElement, ToolbarProps>(

@@ -32,7 +32,9 @@
 import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
+import { useHorizontalScrollFade } from '@/lib/use-horizontal-scroll-fade';
 import { Button, type ButtonProps } from './button';
+import { ShimmerText } from './shimmer-text';
 
 // ============================================================================
 // Types & Context
@@ -68,9 +70,13 @@ export interface AttachmentGroupProps extends React.HTMLAttributes<HTMLDivElemen
 
 export const AttachmentGroup = React.forwardRef<HTMLDivElement, AttachmentGroupProps>(
   ({ className, scrollable = true, render, children, ...props }, ref) => {
+    const { ref: scrollFadeRef } = useHorizontalScrollFade<HTMLDivElement>(ref, {
+      disabled: !scrollable,
+    });
+
     return useRender({
       render,
-      ref,
+      ref: scrollFadeRef,
       defaultTagName: 'div',
       props: {
         'data-slot': 'attachment-group',
@@ -79,7 +85,7 @@ export const AttachmentGroup = React.forwardRef<HTMLDivElement, AttachmentGroupP
         className: cn(
           'flex gap-2 max-w-full',
           scrollable
-            ? 'overflow-x-auto px-1 py-1 pe-4 scrollbar-none snap-x snap-mandatory scroll-smooth [mask-image:linear-gradient(to_right,black_calc(100%-12px),transparent)] rtl:[mask-image:linear-gradient(to_left,black_calc(100%-12px),transparent)]'
+            ? 'overflow-x-auto px-1 py-1 pe-4 scrollbar-none snap-x snap-mandatory scroll-smooth scroll-fade-x'
             : 'flex-wrap items-center',
           className
         ),
@@ -268,8 +274,21 @@ export interface AttachmentTitleProps extends React.HTMLAttributes<HTMLSpanEleme
 
 export const AttachmentTitle = React.forwardRef<HTMLSpanElement, AttachmentTitleProps>(
   ({ className, render, children, ...props }, ref) => {
-    const { size } = useAttachment();
+    const { size, state } = useAttachment();
     const isCompact = size === 'sm' || size === 'xs';
+    const isShimmering = state === 'uploading' || state === 'processing';
+
+    const content = isShimmering ? (
+      <ShimmerText
+        variant="primary"
+        active
+        className="inline-block max-w-full truncate align-bottom font-medium"
+      >
+        {children}
+      </ShimmerText>
+    ) : (
+      children
+    );
 
     return useRender({
       render,
@@ -277,12 +296,13 @@ export const AttachmentTitle = React.forwardRef<HTMLSpanElement, AttachmentTitle
       defaultTagName: 'span',
       props: {
         'data-slot': 'attachment-title',
+        'data-shimmer': isShimmering ? '' : undefined,
         className: cn(
           'truncate font-medium font-sans text-on-surface',
           isCompact ? 'text-xs' : 'text-sm',
           className
         ),
-        children,
+        children: content,
         ...props,
       },
     });
@@ -300,9 +320,6 @@ export interface AttachmentDescriptionProps extends React.HTMLAttributes<HTMLSpa
 
 export const AttachmentDescription = React.forwardRef<HTMLSpanElement, AttachmentDescriptionProps>(
   ({ className, render, children, ...props }, ref) => {
-    const { size } = useAttachment();
-    const isCompact = size === 'sm' || size === 'xs';
-
     return useRender({
       render,
       ref,
@@ -311,7 +328,7 @@ export const AttachmentDescription = React.forwardRef<HTMLSpanElement, Attachmen
         'data-slot': 'attachment-description',
         className: cn(
           'truncate font-sans text-on-surface-variant flex items-center gap-1.5',
-          isCompact ? 'text-[10px]' : 'text-xs',
+          'text-xs',
           className
         ),
         children,

@@ -14,9 +14,10 @@
  */
 import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
-export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface DrawerProps<Payload = unknown>
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean, eventDetails?: BaseDrawer.Root.ChangeEventDetails) => void;
@@ -24,7 +25,7 @@ export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   trigger?: React.ReactNode;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  children?: React.ReactNode;
+  children?: BaseDrawer.Root.Props<Payload>['children'];
   footer?: React.ReactNode;
   swipeDirection?: 'right' | 'left' | 'down' | 'up';
   snapPoints?: BaseDrawer.Root.SnapPoint[];
@@ -35,13 +36,14 @@ export interface DrawerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
   modal?: boolean | 'trap-focus';
   disablePointerDismissal?: boolean;
   actionsRef?: React.RefObject<BaseDrawer.Root.Actions | null>;
-  handle?: BaseDrawer.Handle<unknown>;
+  handle?: BaseDrawer.Handle<Payload>;
   triggerId?: string | null;
   defaultTriggerId?: string | null;
   showCloseButton?: boolean;
   showHandle?: boolean;
-  className?: string;
-  popupClassName?: string;
+  keepMounted?: boolean;
+  className?: BaseDrawer.Popup.Props['className'];
+  popupClassName?: BaseDrawer.Popup.Props['className'];
 }
 
 type DrawerSwipeDirection = 'right' | 'left' | 'down' | 'up';
@@ -49,7 +51,7 @@ type DrawerSwipeDirection = 'right' | 'left' | 'down' | 'up';
 interface DrawerContextValue {
   swipeDirection: DrawerSwipeDirection;
   popupRef?: React.Ref<HTMLDivElement>;
-  popupClassName?: string;
+  popupClassName?: BaseDrawer.Popup.Props['className'];
   popupProps?: Record<string, unknown>;
 }
 
@@ -80,13 +82,13 @@ export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', str
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   left:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   down:
-    'w-full max-h-[88vh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   up:
-    'w-full max-h-[88vh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
 };
 
 // Visual grab handle pill
@@ -106,19 +108,24 @@ export const DrawerHandlePill = React.forwardRef<HTMLDivElement, React.HTMLAttri
 DrawerHandlePill.displayName = 'DrawerHandlePill';
 
 // Accessible Close button
-export interface DrawerCloseButtonProps extends React.ComponentPropsWithoutRef<typeof BaseDrawer.Close> {
-  className?: string;
-}
+export interface DrawerCloseButtonProps
+  extends React.ComponentPropsWithoutRef<typeof BaseDrawer.Close> {}
 
 export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerCloseButtonProps>(
-  ({ className, children, ...props }, ref) => (
+  ({ className, children, render, nativeButton, ...props }, ref) => (
     <BaseDrawer.Close
       ref={ref}
-      className={cn(
-        'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
-        className
-      )}
+      data-slot="drawer-close"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      className={
+        render
+          ? className
+          : composeClassName(
+              'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
+              className
+            )
+      }
       aria-label="Close drawer"
       {...props}
     >
@@ -132,19 +139,53 @@ export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerClose
 );
 DrawerCloseButton.displayName = 'DrawerCloseButton';
 
+export const DrawerTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseDrawer.Trigger>
+>(({ render, nativeButton, ...props }, ref) => (
+  <BaseDrawer.Trigger
+    ref={ref}
+    data-slot="drawer-trigger"
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
+    {...props}
+  />
+));
+DrawerTrigger.displayName = 'DrawerTrigger';
+
+export const DrawerClose = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseDrawer.Close>
+>(({ render, nativeButton, ...props }, ref) => (
+  <BaseDrawer.Close
+    ref={ref}
+    data-slot="drawer-close"
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
+    {...props}
+  />
+));
+DrawerClose.displayName = 'DrawerClose';
+
 // Standard layout slots
-export const DrawerHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col gap-1.5 text-start mb-4', className)} {...props} />
+export const DrawerHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} data-slot="drawer-header" className={cn('flex flex-col gap-1.5 text-start mb-4', className)} {...props} />
+  )
 );
 DrawerHeader.displayName = 'DrawerHeader';
 
-export const DrawerBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('py-2 flex-1 overflow-y-auto min-h-0', className)} {...props} />
+export const DrawerBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} data-slot="drawer-body" className={cn('py-2 flex-1 overflow-y-auto min-h-0', className)} {...props} />
+  )
 );
 DrawerBody.displayName = 'DrawerBody';
 
-export const DrawerFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6', className)} {...props} />
+export const DrawerFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} data-slot="drawer-footer" className={cn('pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6', className)} {...props} />
+  )
 );
 DrawerFooter.displayName = 'DrawerFooter';
 
@@ -154,7 +195,8 @@ export const DrawerTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseDrawer.Title
     ref={ref}
-    className={cn('font-heading text-xl font-bold text-on-surface', className)}
+    data-slot="drawer-title"
+    className={composeClassName('font-heading text-xl font-bold text-on-surface', className)}
     {...props}
   />
 ));
@@ -166,7 +208,8 @@ export const DrawerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseDrawer.Description
     ref={ref}
-    className={cn('font-sans text-base text-on-surface-variant mb-4', className)}
+    data-slot="drawer-description"
+    className={composeClassName('font-sans text-base text-on-surface-variant mb-4', className)}
     {...props}
   />
 ));
@@ -178,7 +221,8 @@ export const DrawerBackdrop = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseDrawer.Backdrop
     ref={ref}
-    className={cn(
+    data-slot="drawer-overlay"
+    className={composeClassName(
       'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-slow)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]',
       className
     )}
@@ -199,12 +243,29 @@ export const DrawerViewport = React.forwardRef<
   return (
     <BaseDrawer.Viewport
       ref={ref}
-      className={cn(drawerViewportClasses[swipeDirection ?? contextDirection], className)}
+      data-slot="drawer-viewport"
+      className={composeClassName(drawerViewportClasses[swipeDirection ?? contextDirection], className)}
       {...props}
     />
   );
 });
 DrawerViewport.displayName = 'DrawerViewport';
+
+function composePopupClassNames(
+  base: string,
+  first?: BaseDrawer.Popup.Props['className'],
+  second?: BaseDrawer.Popup.Props['className']
+): BaseDrawer.Popup.Props['className'] {
+  if (typeof first === 'function' || typeof second === 'function') {
+    return (state) =>
+      cn(
+        base,
+        typeof first === 'function' ? first(state) : first,
+        typeof second === 'function' ? second(state) : second
+      );
+  }
+  return cn(base, first, second);
+}
 
 export const DrawerPopup = React.forwardRef<
   HTMLDivElement,
@@ -219,16 +280,16 @@ export const DrawerPopup = React.forwardRef<
     popupProps,
   } = React.useContext(DrawerContext);
   const mergedRef = popupRef ? mergeDrawerRefs(popupRef, ref) : ref;
+  const baseClasses = cn(
+    'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto will-change-[transform]',
+    drawerPopupClasses[swipeDirection ?? contextDirection]
+  );
   return (
     <BaseDrawer.Popup
       ref={mergedRef}
+      data-slot="drawer-popup"
       {...(popupProps as React.ComponentPropsWithoutRef<typeof BaseDrawer.Popup>)}
-      className={cn(
-        'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto will-change-[transform]',
-        drawerPopupClasses[swipeDirection ?? contextDirection],
-        popupClassName,
-        className
-      )}
+      className={composePopupClassNames(baseClasses, popupClassName, className)}
       {...props}
     />
   );
@@ -241,86 +302,146 @@ export const DrawerContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseDrawer.Content
     ref={ref}
-    className={cn('flex flex-col justify-between h-full', className)}
+    data-slot="drawer-content"
+    className={composeClassName('flex flex-col justify-between h-full', className)}
     {...props}
   />
 ));
 DrawerContent.displayName = 'DrawerContent';
 
 // Composable Panel wrapper combining Portal, Backdrop, Viewport, and Popup
-export interface DrawerPanelProps {
+export interface DrawerPanelProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseDrawer.Popup>, 'children'> {
   children: React.ReactNode;
   swipeDirection?: DrawerSwipeDirection;
   showHandle?: boolean;
-  className?: string;
-  backdropClassName?: string;
+  backdropClassName?: BaseDrawer.Backdrop.Props['className'];
+  keepMounted?: boolean;
 }
 
-export const DrawerPanel: React.FC<DrawerPanelProps> = ({
-  children,
-  swipeDirection: swipeDirectionProp,
-  showHandle = true,
-  className,
-  backdropClassName,
-}) => {
-  const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
-  const swipeDirection = swipeDirectionProp ?? contextDirection;
-  return (
-  <BaseDrawer.Portal>
-    <DrawerBackdrop className={backdropClassName} />
-    <DrawerViewport swipeDirection={swipeDirection}>
-      <DrawerPopup swipeDirection={swipeDirection} className={className}>
-        <DrawerContent>
-          {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
-          {children}
-        </DrawerContent>
-      </DrawerPopup>
-    </DrawerViewport>
-  </BaseDrawer.Portal>
-  );
-};
+export const DrawerPanel = React.forwardRef<HTMLDivElement, DrawerPanelProps>(
+  (
+    {
+      children,
+      swipeDirection: swipeDirectionProp,
+      showHandle = true,
+      className,
+      backdropClassName,
+      keepMounted,
+      ...props
+    },
+    ref
+  ) => {
+    const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
+    const swipeDirection = swipeDirectionProp ?? contextDirection;
+    return (
+      <BaseDrawer.Portal keepMounted={keepMounted}>
+        <DrawerBackdrop className={backdropClassName} />
+        <DrawerViewport swipeDirection={swipeDirection}>
+          <DrawerPopup ref={ref} swipeDirection={swipeDirection} className={className} {...props}>
+            <DrawerContent>
+              {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
+              {children}
+            </DrawerContent>
+          </DrawerPopup>
+        </DrawerViewport>
+      </BaseDrawer.Portal>
+    );
+  }
+);
 DrawerPanel.displayName = 'DrawerPanel';
 
-export const DrawerRoot: typeof BaseDrawer.Root = ({ swipeDirection = 'right', ...props }) => (
-  <DrawerContext.Provider value={{ swipeDirection }}>
-    <BaseDrawer.Root swipeDirection={swipeDirection} {...props} />
-  </DrawerContext.Provider>
-);
-
-const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
-  open,
-  defaultOpen,
-  onOpenChange,
-  onOpenChangeComplete,
-  trigger,
-  title,
-  description,
-  children,
-  footer,
+export function DrawerRoot<Payload = unknown>({
   swipeDirection = 'right',
-  snapPoints,
-  snapToSequentialPoints,
-  snapPoint,
-  defaultSnapPoint,
-  onSnapPointChange,
-  modal = true,
-  disablePointerDismissal,
-  actionsRef,
-  handle,
-  triggerId,
-  defaultTriggerId,
-  showCloseButton = true,
-  showHandle = true,
-  className,
-  popupClassName,
   ...props
-}, ref) => {
+}: BaseDrawer.Root.Props<Payload>): React.JSX.Element {
+  return (
+    <DrawerContext.Provider value={{ swipeDirection }}>
+      <BaseDrawer.Root<Payload> swipeDirection={swipeDirection} {...props} />
+    </DrawerContext.Provider>
+  );
+}
+
+function DrawerComponentInner<Payload = unknown>(
+  {
+    open,
+    defaultOpen,
+    onOpenChange,
+    onOpenChangeComplete,
+    trigger,
+    title,
+    description,
+    children,
+    footer,
+    swipeDirection = 'right',
+    snapPoints,
+    snapToSequentialPoints,
+    snapPoint,
+    defaultSnapPoint,
+    onSnapPointChange,
+    modal = true,
+    disablePointerDismissal,
+    actionsRef,
+    handle,
+    triggerId,
+    defaultTriggerId,
+    showCloseButton = true,
+    showHandle = true,
+    keepMounted,
+    className,
+    popupClassName,
+    ...props
+  }: DrawerProps<Payload>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
+  const combinedPopupClassName: BaseDrawer.Popup.Props['className'] =
+    typeof popupClassName === 'function' || typeof className === 'function'
+      ? (state) =>
+          cn(
+            typeof popupClassName === 'function' ? popupClassName(state) : popupClassName,
+            typeof className === 'function' ? className(state) : className
+          )
+      : cn(popupClassName, className) || undefined;
+
   // If used as pure headless compound root without shorthand config
   if (!title && !description && !trigger && !footer) {
-    const compoundPopupClassName = cn(popupClassName, className) || undefined;
     const compoundPopupProps = Object.keys(props).length > 0 ? props : undefined;
     return (
-      <DrawerRoot
+      <DrawerContext.Provider
+        value={{
+          swipeDirection,
+          popupRef: ref,
+          popupClassName: combinedPopupClassName,
+          popupProps: compoundPopupProps,
+        }}
+      >
+        <BaseDrawer.Root<Payload>
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          onOpenChangeComplete={onOpenChangeComplete}
+          swipeDirection={swipeDirection}
+          snapPoints={snapPoints}
+          snapToSequentialPoints={snapToSequentialPoints}
+          snapPoint={snapPoint}
+          defaultSnapPoint={defaultSnapPoint}
+          onSnapPointChange={onSnapPointChange}
+          modal={modal}
+          disablePointerDismissal={disablePointerDismissal}
+          actionsRef={actionsRef}
+          handle={handle}
+          triggerId={triggerId}
+          defaultTriggerId={defaultTriggerId}
+        >
+          {children}
+        </BaseDrawer.Root>
+      </DrawerContext.Provider>
+    );
+  }
+
+  return (
+    <DrawerContext.Provider value={{ swipeDirection }}>
+      <BaseDrawer.Root<Payload>
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
@@ -338,92 +459,69 @@ const DrawerComponent = React.forwardRef<HTMLDivElement, DrawerProps>(({
         triggerId={triggerId}
         defaultTriggerId={defaultTriggerId}
       >
-        <DrawerContext.Provider
-          value={{
-            swipeDirection,
-            popupRef: ref,
-            popupClassName: compoundPopupClassName,
-            popupProps: compoundPopupProps,
-          }}
-        >
-          {children}
-        </DrawerContext.Provider>
-      </DrawerRoot>
-    );
-  }
-
-  return (
-    <DrawerRoot
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
-      onOpenChangeComplete={onOpenChangeComplete}
-      swipeDirection={swipeDirection}
-      snapPoints={snapPoints}
-      snapToSequentialPoints={snapToSequentialPoints}
-      snapPoint={snapPoint}
-      defaultSnapPoint={defaultSnapPoint}
-      onSnapPointChange={onSnapPointChange}
-      modal={modal}
-      disablePointerDismissal={disablePointerDismissal}
-      actionsRef={actionsRef}
-      handle={handle}
-      triggerId={triggerId}
-      defaultTriggerId={defaultTriggerId}
-    >
-      {trigger && (
-        <BaseDrawer.Trigger
-          render={React.isValidElement(trigger) ? trigger : undefined}
-          className={!React.isValidElement(trigger) ? 'inline-flex cursor-pointer' : undefined}
-        >
-          {!React.isValidElement(trigger) ? trigger : undefined}
-        </BaseDrawer.Trigger>
-      )}
-      <BaseDrawer.Portal>
-        <DrawerBackdrop />
-        <DrawerViewport swipeDirection={swipeDirection}>
-          <DrawerPopup
-            ref={ref}
-            swipeDirection={swipeDirection}
-            className={cn(popupClassName, className)}
-            {...props}
-          >
-            <DrawerContent className="flex flex-col h-full min-h-0">
-              <div className="shrink-0">
-                {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
-                <div className="flex items-center justify-between mb-4">
-                  <DrawerTitle className={cn(!title && 'sr-only')}>{title || 'Panel'}</DrawerTitle>
-                  {showCloseButton && (
-                    <DrawerCloseButton aria-label="Close drawer panel" />
-                  )}
-                </div>
-                {description && <DrawerDescription>{description}</DrawerDescription>}
-              </div>
-              <div className="flex-1 overflow-y-auto min-h-0 py-2">
-                {children}
-              </div>
-              {footer ? (
-                <div className="pt-6 border-t border-outline-variant mt-6 shrink-0">{footer}</div>
-              ) : (
-                <div className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6 shrink-0">
-                  <BaseDrawer.Close className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
-                    Close panel
-                  </BaseDrawer.Close>
-                </div>
-              )}
-            </DrawerContent>
-          </DrawerPopup>
-        </DrawerViewport>
-      </BaseDrawer.Portal>
-    </DrawerRoot>
+        {(renderProps) => (
+          <>
+            {trigger && (
+              <BaseDrawer.Trigger
+                data-slot="drawer-trigger"
+                render={React.isValidElement(trigger) ? trigger : undefined}
+                nativeButton={resolveNativeButton(trigger)}
+                className={!React.isValidElement(trigger) ? 'inline-flex cursor-pointer' : undefined}
+              >
+                {!React.isValidElement(trigger) ? trigger : undefined}
+              </BaseDrawer.Trigger>
+            )}
+            <BaseDrawer.Portal keepMounted={keepMounted}>
+              <DrawerBackdrop />
+              <DrawerViewport swipeDirection={swipeDirection}>
+                <DrawerPopup
+                  ref={ref}
+                  swipeDirection={swipeDirection}
+                  className={combinedPopupClassName}
+                  {...props}
+                >
+                  <DrawerContent className="flex flex-col h-full min-h-0">
+                    <div data-slot="drawer-header" className="shrink-0">
+                      {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
+                      <div className="flex items-center justify-between mb-4">
+                        <DrawerTitle className={cn(!title && 'sr-only')}>{title || 'Panel'}</DrawerTitle>
+                        {showCloseButton && (
+                          <DrawerCloseButton aria-label="Close drawer panel" />
+                        )}
+                      </div>
+                      {description && <DrawerDescription>{description}</DrawerDescription>}
+                    </div>
+                    <div data-slot="drawer-body" className="flex-1 overflow-y-auto min-h-0 py-2">
+                      {typeof children === 'function' ? children(renderProps) : children}
+                    </div>
+                    {footer ? (
+                      <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant mt-6 shrink-0">{footer}</div>
+                    ) : (
+                      <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6 shrink-0">
+                        <BaseDrawer.Close data-slot="drawer-close" className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
+                          Close panel
+                        </BaseDrawer.Close>
+                      </div>
+                    )}
+                  </DrawerContent>
+                </DrawerPopup>
+              </DrawerViewport>
+            </BaseDrawer.Portal>
+          </>
+        )}
+      </BaseDrawer.Root>
+    </DrawerContext.Provider>
   );
-});
-DrawerComponent.displayName = 'Drawer';
+}
+
+const DrawerComponent = React.forwardRef(DrawerComponentInner) as <Payload = unknown>(
+  props: DrawerProps<Payload> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element;
 
 // Compound export mapping Base UI primitives
 export const Drawer = Object.assign(DrawerComponent, {
   Root: DrawerRoot,
-  Trigger: BaseDrawer.Trigger,
+  Trigger: DrawerTrigger,
   Portal: BaseDrawer.Portal,
   Backdrop: DrawerBackdrop,
   Overlay: DrawerOverlay,
@@ -436,7 +534,7 @@ export const Drawer = Object.assign(DrawerComponent, {
   Footer: DrawerFooter,
   Title: DrawerTitle,
   Description: DrawerDescription,
-  Close: BaseDrawer.Close,
+  Close: DrawerClose,
   CloseButton: DrawerCloseButton,
   HandlePill: DrawerHandlePill,
   SwipeArea: BaseDrawer.SwipeArea,
@@ -451,13 +549,11 @@ export const Drawer = Object.assign(DrawerComponent, {
 // Re-export Base UI primitives for compound composition
 export { BaseDrawer };
 
-export const DrawerTrigger = BaseDrawer.Trigger;
 export const DrawerPortal = BaseDrawer.Portal;
 export const DrawerSwipeArea = BaseDrawer.SwipeArea;
 export const DrawerIndent = BaseDrawer.Indent;
 export const DrawerIndentBackground = BaseDrawer.IndentBackground;
 export const DrawerVirtualKeyboardProvider = BaseDrawer.VirtualKeyboardProvider;
-export const DrawerClose = BaseDrawer.Close;
 export const DrawerProvider = BaseDrawer.Provider;
 export const DrawerHandle = BaseDrawer.Handle;
 export const createDrawerHandle = BaseDrawer.createHandle;

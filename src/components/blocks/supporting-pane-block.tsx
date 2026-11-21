@@ -141,19 +141,18 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         aria-label={!supportingTitle ? 'Supporting details' : undefined}
         className={cn(
           'flex flex-col bg-surface-container shrink-0 min-w-0 overflow-hidden transition-opacity duration-quick ease-standard motion-reduce:transition-none',
-          side === 'left' && '@3xl:order-first',
           isOpen
             ? cn(
                 paneWidthClassName,
                 // Compact (<768px) stacked panel caps height so primary canvas remains usable
-                'w-full h-auto max-h-96 short:max-h-48 @3xl:max-h-none border-t border-outline-variant opacity-100',
+                'w-full h-auto max-h-96 short:max-h-48 @3xl:max-h-none opacity-100',
                 // Wide (@3xl+) full-height side panel
-                '@3xl:h-full @3xl:border-t-0',
+                '@3xl:h-full',
                 side === 'left'
-                  ? '@3xl:border-e @3xl:border-outline-variant'
-                  : '@3xl:border-s @3xl:border-outline-variant'
+                  ? 'border-b border-outline-variant @3xl:border-b-0 @3xl:border-e'
+                  : 'border-t border-outline-variant @3xl:border-t-0 @3xl:border-s'
               )
-            : 'w-full h-0 border-t-0 @3xl:w-0 @3xl:h-full @3xl:border-0 opacity-0 invisible pointer-events-none'
+            : 'w-full h-0 border-0 @3xl:w-0 @3xl:h-full @3xl:border-0 opacity-0 invisible pointer-events-none'
         )}
       >
         <div className={cn(paneWidthClassName, 'w-full flex flex-col flex-1 min-h-0 shrink-0 min-w-0')}>
@@ -199,7 +198,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         ref={ref}
         data-slot="supporting-pane-block"
         className={cn(
-          '@container w-full h-full bg-surface flex flex-col min-w-0',
+          '@container size-full bg-surface flex flex-col min-w-0',
           className
         )}
         {...props}
@@ -242,8 +241,17 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
 
         {/* Main Container Split: Primary Canvas + Supporting Pane */}
         <div className="flex-1 flex flex-col @3xl:flex-row min-h-0 overflow-hidden relative">
-          {primaryCanvas}
-          {supportingAside}
+          {side === 'left' ? (
+            <>
+              {supportingAside}
+              {primaryCanvas}
+            </>
+          ) : (
+            <>
+              {primaryCanvas}
+              {supportingAside}
+            </>
+          )}
         </div>
       </div>
     );

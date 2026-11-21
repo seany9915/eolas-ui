@@ -64,7 +64,7 @@ npx @seany9915/eolas-ui add dialog combobox data-table --overwrite
 - **"Behavior Wraps the Line":** Keep disclosure triggers (`Collapsible.Trigger`, `TraceCollapsibleTrigger`, `Accordion.Trigger`, `Dialog.Trigger`) as real `<button>` elements. Never pass `render={<span />}` or `render={<div />}`.
 
 ## Styling & Animating Base UI Primitives
-- Apply Tailwind v4 `@theme` tokens directly; style via Base UI `data-*` attributes (`data-open`, `data-disabled`, `data-starting-style`, `data-ending-style`) rather than duplicating state in React. Respect the root portal/`isolation: isolate` setup and never add manual `z-50` to overlays.
+- Apply Tailwind v4 `@theme` tokens directly; style via Base UI `data-*` attributes (`data-open`, `data-disabled`, `data-starting-style`, `data-ending-style`) rather than duplicating state in React. Respect the root portal/`isolation: isolate` setup and never add manual `z-50` in consumer/block/feature code (`src/components/ui/` portal primitives own overlay stacking).
 - **`className` for Layout & Structural Integration:** Call sites may pass `className` for layout/positioning (`w-full`, `max-w-md`, `mt-4`, `grid-cols-2`, `shrink-0`) and structural boundary resets when docking into a parent container (`rounded-none`, `border-0`, `bg-transparent`). Never pass arbitrary theme, color, or font overrides (`bg-red-500`, `text-gray-400`, `font-serif`)—use `variant`, `colorRole`, `prominence`, and `size` props.
 - **Popup grouping & overlay titles:** Wrap `*Item` in `*Group` (`Select.Group`, `Menu.Group`, `ContextMenu.Group`). Every modal overlay must render `<DialogTitle>`, `<DrawerTitle>`, or `<SheetTitle>` (with `className="sr-only"` if visually hidden).
 - **Motion:** Follow `DESIGN.md`'s 5 Motion Rules, explicit `transition-[...]` (no `transition-all`), and mandatory `motion-reduce:transition-none` / `prefers-reduced-motion`.
@@ -73,7 +73,7 @@ npx @seany9915/eolas-ui add dialog combobox data-table --overwrite
 Retain all compound subcomponents, `ref`, Base UI `render` props, `cn(...)` merging, and existing prop aliases. Make surgical class diffs rather than full-file rewrites.
 
 ## The 6-Tier Functional Component Taxonomy
-All components in Eolas UI are classified into 6 functional tiers (see `src/components/playground/registry/registry-manifest.ts` for the live inventory):
+All components in Eolas UI are classified into 6 functional tiers (in the Eolas UI authoring repo, see `src/components/playground/registry/registry-manifest.ts` for the live inventory; in consuming apps, inspect your local `src/components/ui/` and `src/components/blocks/` directories directly):
 
 | Tier | Category | Directory | Representative Components |
 |---|---|---|---|

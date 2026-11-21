@@ -43,7 +43,12 @@ jobs:
         run: npm run registry:validate
 
       - name: Check committed registry artifacts are up to date
-        run: git diff --exit-code
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Registry artifacts or generated files are out of date:"
+            git status --short
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -28,13 +28,13 @@ export interface WcagRating {
  */
 export const DESIGN_SYSTEM_COLORS = [
   { name: 'surface', hex: '#FFFFFF', label: 'surface (Elevated Card / Pane)' },
-  { name: 'background', hex: '#F2F4F8', label: 'background (Canvas)' },
-  { name: 'surface-container-low', hex: '#F2F4F8', label: 'surface-container-low (Inset Pane / Reading Box)' },
-  { name: 'surface-container-high', hex: '#E3E6EC', label: 'surface-container-high (Recessed Track / Fill)' },
-  { name: 'on-surface', hex: '#1A1C1E', label: 'on-surface (Charcoal Ink)' },
-  { name: 'on-surface-variant', hex: '#434656', label: 'on-surface-variant (Secondary Ink)' },
-  { name: 'primary', hex: '#0052FF', label: 'primary (Electric Blue)' },
-  { name: 'primary-container', hex: '#DCE6FF', label: 'primary-container (Soft Blue)' },
+  { name: 'background', hex: '#F3F1EF', label: 'background (Canvas)' },
+  { name: 'surface-container-low', hex: '#F3F1EF', label: 'surface-container-low (Inset Pane / Reading Box)' },
+  { name: 'surface-container-high', hex: '#E6E4E1', label: 'surface-container-high (Recessed Track / Fill)' },
+  { name: 'on-surface', hex: '#1C1A18', label: 'on-surface (Charcoal Ink)' },
+  { name: 'on-surface-variant', hex: '#4C4A47', label: 'on-surface-variant (Secondary Ink)' },
+  { name: 'primary', hex: '#1B56E8', label: 'primary (Electric Blue)' },
+  { name: 'primary-container', hex: '#E0E9FF', label: 'primary-container (Soft Blue)' },
   { name: 'secondary', hex: '#00796B', label: 'secondary (Rich Emerald)' },
   { name: 'secondary-container', hex: '#D5F0EE', label: 'secondary-container (Soft Emerald)' },
   { name: 'tertiary', hex: '#F9A825', label: 'tertiary (Sunny Amber)' },
@@ -45,8 +45,8 @@ export const DESIGN_SYSTEM_COLORS = [
   { name: 'warning-container', hex: '#FDE3B8', label: 'warning-container (Soft Orange)' },
   { name: 'success', hex: '#157331', label: 'success (Deep Green)' },
   { name: 'success-container', hex: '#C8F5CE', label: 'success-container (Soft Green)' },
-  { name: 'outline', hex: '#6B6E80', label: 'outline (Control Border)' },
-  { name: 'outline-variant', hex: '#BEC6D6', label: 'outline-variant (Subtle Border)' },
+  { name: 'outline', hex: '#706E6B', label: 'outline (Control Border)' },
+  { name: 'outline-variant', hex: '#C9C7C3', label: 'outline-variant (Subtle Border)' },
 ];
 
 /**
@@ -55,7 +55,7 @@ export const DESIGN_SYSTEM_COLORS = [
 export function parseHex(input: string): RgbColor | null {
   if (!input || typeof input !== 'string') return null;
 
-  // Handle compound strings like '#dce6ff / #1a1c1e' by picking the first valid hex
+  // Handle compound strings like '#E0E9FF / #1C1A18' by picking the first valid hex
   const clean = input.trim();
   const hexMatch = clean.match(/#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i);
   if (hexMatch) {
@@ -214,7 +214,7 @@ export const ColorPair: React.FC<ColorPairProps> = ({
  * Interactive Workbench Tool: Allows testing arbitrary foreground and background colors live in the browser.
  */
 export const InteractiveColorPairChecker: React.FC = () => {
-  const [fg, setFg] = React.useState('#1A1C1E');
+  const [fg, setFg] = React.useState('#1C1A18');
   const [bg, setBg] = React.useState('#FFFFFF');
 
   const ratio = React.useMemo(() => getContrastRatio(fg, bg), [fg, bg]);
@@ -260,7 +260,7 @@ export const InteractiveColorPairChecker: React.FC = () => {
             <Input
               value={fg}
               onChange={(e) => setFg(e.target.value)}
-              placeholder="#1A1C1E"
+              placeholder="#1C1A18"
               size="sm"
               className="font-mono"
             />

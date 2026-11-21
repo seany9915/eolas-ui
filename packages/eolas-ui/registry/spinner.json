@@ -4,6 +4,9 @@
   "type": "registry:ui",
   "title": "Spinner",
   "description": "Spinner primitive.",
+  "categories": [
+    "feedback"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/utils.json"
   ],

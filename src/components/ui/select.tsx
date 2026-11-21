@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Select as BaseSelect } from '@base-ui/react/select';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface SelectOption {
   value: string;
@@ -54,7 +54,7 @@ export interface SelectProps<Value = string, Multiple extends boolean | undefine
   position?: 'popper' | 'item-aligned';
   alignItemWithTrigger?: boolean;
   anchor?: BaseSelect.Positioner.Props['anchor'];
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: BaseSelect.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number | BaseSelect.Positioner.Props['sideOffset'];
   alignOffset?: number | BaseSelect.Positioner.Props['alignOffset'];
@@ -66,9 +66,9 @@ export interface SelectProps<Value = string, Multiple extends boolean | undefine
   positionMethod?: 'absolute' | 'fixed';
   disableAnchorTracking?: boolean;
   finalFocus?: BaseSelect.Popup.Props['finalFocus'];
-  positionerClassName?: string;
-  popupClassName?: string;
-  listClassName?: string;
+  positionerClassName?: BaseSelect.Positioner.Props['className'];
+  popupClassName?: BaseSelect.Popup.Props['className'];
+  listClassName?: BaseSelect.List.Props['className'];
   withScrollArrows?: boolean;
   size?: 'sm' | 'md' | 'lg';
   children?: React.ReactNode;
@@ -237,7 +237,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
       multiple={multiple}
       disabled={disabled}
       readOnly={readOnly}
-      name={name || selectId}
+      name={name}
       form={form}
       autoComplete={autoComplete}
       required={required}
@@ -252,7 +252,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
     >
       <div className={cn('flex flex-col gap-1.5 w-full', className)}>
         {label && (
-          <BaseSelect.Label className="font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none">
+          <BaseSelect.Label data-slot="select-label" className="font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none">
             {label}
           </BaseSelect.Label>
         )}
@@ -269,7 +269,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between gap-2 w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+            'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
             'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
             'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
             size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
@@ -279,7 +279,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
             error && 'border-error focus-visible:outline-error'
           )}
         >
-          <BaseSelect.Value placeholder={placeholder} className="truncate font-sans text-sm" />
+          <BaseSelect.Value data-slot="select-value" placeholder={placeholder} className="truncate font-sans text-sm" />
           <BaseSelect.Icon data-slot="select-icon" className="shrink-0 text-on-surface-variant">
             <span className="material-symbols-outlined text-lg" aria-hidden="true">
               unfold_more
@@ -306,28 +306,32 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
             positionMethod={positionMethod}
             disableAnchorTracking={disableAnchorTracking}
             alignItemWithTrigger={isItemAligned}
-            className={cn('z-50 outline-none', positionerClassName)}
+            className={composeClassName('z-50 outline-none', positionerClassName)}
           >
             <BaseSelect.Popup
+              data-slot="select-content"
               finalFocus={finalFocus}
-              className={cn(
-                'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+              className={composeClassName(
+                'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-hidden p-1 rounded-md bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
                 popupClassName
               )}
             >
               {showScrollArrows && <SelectScrollUpArrow />}
               <BaseSelect.List
-                className={cn(
-                  'relative flex flex-col gap-0.5 max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
-                  showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
+                data-slot="select-list"
+                className={composeClassName(
+                  [
+                    'relative flex flex-col gap-1 min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
+                    showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
+                  ],
                   listClassName
                 )}
               >
                 {groups ? (
                   groups.map((group) => (
-                    <BaseSelect.Group key={group.label} className="py-1">
+                    <BaseSelect.Group key={group.label} data-slot="select-group" className="flex flex-col gap-1 py-1">
                       {group.label && (
-                        <BaseSelect.GroupLabel className="sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none">
+                        <BaseSelect.GroupLabel data-slot="select-label" className="sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none">
                           {group.label}
                         </BaseSelect.GroupLabel>
                       )}
@@ -424,15 +428,17 @@ export const SelectTrigger = React.forwardRef<
     <BaseSelect.Trigger
       data-slot="select-trigger"
       ref={mergedRef}
-      className={cn(
-        'inline-flex items-center justify-between gap-2 w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
-        'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
-        size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
-        size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
-        size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-        'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
-        error && 'border-error focus-visible:outline-error',
+      className={composeClassName(
+        [
+          'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container transition-colors cursor-pointer',
+          'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
+          size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
+          size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
+          size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
+          'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+          'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+          error && 'border-error focus-visible:outline-error',
+        ],
         className
       )}
       {...props}
@@ -464,8 +470,9 @@ export const SelectValue = React.forwardRef<
 >(({ className, placeholder, children, ...props }, ref) => (
   <BaseSelect.Value
     ref={ref}
+    data-slot="select-value"
     placeholder={placeholder}
-    className={cn('truncate font-sans text-sm', className)}
+    className={composeClassName('truncate font-sans text-sm', className)}
     {...props}
   >
     {children}
@@ -477,7 +484,7 @@ export interface SelectContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseSelect.Popup> {
   container?: BaseSelect.Portal.Props['container'];
   anchor?: BaseSelect.Positioner.Props['anchor'];
-  side?: 'top' | 'right' | 'bottom' | 'left';
+  side?: BaseSelect.Positioner.Props['side'];
   sideOffset?: number | BaseSelect.Positioner.Props['sideOffset'];
   align?: 'start' | 'center' | 'end';
   alignOffset?: number | BaseSelect.Positioner.Props['alignOffset'];
@@ -490,9 +497,9 @@ export interface SelectContentProps
   sticky?: boolean;
   positionMethod?: 'absolute' | 'fixed';
   disableAnchorTracking?: boolean;
-  positionerClassName?: string;
+  positionerClassName?: BaseSelect.Positioner.Props['className'];
   containerClassName?: string;
-  listClassName?: string;
+  listClassName?: BaseSelect.List.Props['className'];
   withScrollArrows?: boolean;
 }
 
@@ -510,7 +517,7 @@ export const SelectPositioner = React.forwardRef<
     sideOffset={sideOffset}
     collisionPadding={collisionPadding}
     alignItemWithTrigger={alignItemWithTrigger}
-    className={cn('z-50 outline-none', className)}
+    className={composeClassName('z-50 outline-none', className)}
     {...props}
   />
 ));
@@ -525,8 +532,9 @@ export const SelectPopup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.Popup
     ref={ref}
-    className={cn(
-      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
+    data-slot="select-content"
+    className={composeClassName(
+      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-hidden p-1 rounded-md bg-surface border border-outline-variant shadow-ambient transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none flex flex-col',
       className
     )}
     {...props}
@@ -543,8 +551,9 @@ export const SelectList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.List
     ref={ref}
-    className={cn(
-      'relative flex flex-col gap-0.5 max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
+    data-slot="select-list"
+    className={composeClassName(
+      'relative flex flex-col gap-1 min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
       className
     )}
     {...props}
@@ -602,7 +611,7 @@ export const SelectContent = React.forwardRef<
           positionMethod={positionMethod}
           disableAnchorTracking={disableAnchorTracking}
           alignItemWithTrigger={isItemAligned}
-          className={cn(positionerClassName, containerClassName)}
+          className={composeClassName(containerClassName, positionerClassName)}
         >
           <SelectPopup
             ref={ref}
@@ -611,7 +620,7 @@ export const SelectContent = React.forwardRef<
           >
             {showScrollArrows && <SelectScrollUpArrow />}
             <SelectList
-              className={cn(
+              className={composeClassName(
                 showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                 listClassName
               )}
@@ -640,20 +649,23 @@ export const SelectItem = React.forwardRef<
 >(({ className, children, indicatorPosition = 'end', showIndicator = true, indicator, ...props }, ref) => (
   <BaseSelect.Item
     ref={ref}
-    className={cn(
-      'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
-      'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-      'data-[selected]:bg-surface-container data-[selected]:text-primary data-[selected]:font-semibold',
-      'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
-      'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
-      indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
+    data-slot="select-item"
+    className={composeClassName(
+      [
+        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+        'data-[selected]:bg-surface-container data-[selected]:text-primary data-[selected]:font-semibold',
+        'data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
+        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
+      ],
       className
     )}
     {...props}
   >
-    <BaseSelect.ItemText className="truncate">{children}</BaseSelect.ItemText>
+    <BaseSelect.ItemText data-slot="select-item-text" className="truncate">{children}</BaseSelect.ItemText>
     {showIndicator && (
-      <BaseSelect.ItemIndicator className="shrink-0 text-primary flex items-center justify-center">
+      <BaseSelect.ItemIndicator data-slot="select-item-indicator" className="shrink-0 text-primary flex items-center justify-center">
         {indicator ?? (
           <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
             check
@@ -671,7 +683,7 @@ export const SelectBackdrop = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.Backdrop
     ref={ref}
-    className={cn(
+    className={composeClassName(
       'fixed inset-0 z-40 bg-on-surface/40 backdrop-blur-[2px] transition-opacity duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
       className
     )}
@@ -686,7 +698,8 @@ export const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.Label
     ref={ref}
-    className={cn('font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none', className)}
+    data-slot="select-label"
+    className={composeClassName('font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none', className)}
     {...props}
   />
 ));
@@ -696,7 +709,7 @@ export const SelectGroup = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Group>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Group>
 >(({ className, ...props }, ref) => (
-  <BaseSelect.Group ref={ref} className={cn('py-1', className)} {...props} />
+  <BaseSelect.Group ref={ref} data-slot="select-group" className={composeClassName('flex flex-col gap-1 py-1', className)} {...props} />
 ));
 SelectGroup.displayName = 'SelectGroup';
 
@@ -706,7 +719,8 @@ export const SelectGroupLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.GroupLabel
     ref={ref}
-    className={cn(
+    data-slot="select-label"
+    className={composeClassName(
       'px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none sticky top-0 bg-surface/95 backdrop-blur-sm z-10',
       className
     )}
@@ -721,7 +735,8 @@ export const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.Separator
     ref={ref}
-    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
+    data-slot="select-separator"
+    className={composeClassName('h-px my-1 bg-outline-variant/60 -mx-1', className)}
     {...props}
   />
 ));
@@ -733,9 +748,13 @@ export const SelectArrow = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseSelect.Arrow
     ref={ref}
-    className={cn(
-      'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
-      'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+    className={composeClassName(
+      [
+        'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
+        'data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+        'data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90',
+      ],
       className
     )}
     {...props}
@@ -761,7 +780,8 @@ export const SelectScrollUpArrow = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseSelect.ScrollUpArrow
     ref={ref}
-    className={cn(
+    data-slot="select-scroll-up-button"
+    className={composeClassName(
       'top-0 left-0 right-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-b border-outline-variant/30',
       className
     )}
@@ -778,7 +798,8 @@ export const SelectScrollDownArrow = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseSelect.ScrollDownArrow
     ref={ref}
-    className={cn(
+    data-slot="select-scroll-down-button"
+    className={composeClassName(
       'bottom-0 left-0 right-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-t border-outline-variant/30',
       className
     )}
@@ -796,7 +817,7 @@ export const SelectIcon = React.forwardRef<
   <BaseSelect.Icon
     ref={ref}
     data-slot="select-icon"
-    className={cn('shrink-0 text-on-surface-variant', className)}
+    className={composeClassName('shrink-0 text-on-surface-variant', className)}
     {...props}
   >
     {children ?? (

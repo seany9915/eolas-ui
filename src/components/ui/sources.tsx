@@ -22,11 +22,20 @@
  *   - Floating focus rings on links and triggers.
  */
 import * as React from 'react';
-import { Collapsible } from '@base-ui/react/collapsible';
 import { Icon } from './icon';
 import { Skeleton } from './skeleton';
 import { Tooltip } from './tooltip';
 import { UnstyledButton } from './button';
+import {
+  Trace,
+  TraceCollapsible,
+  TraceCollapsibleTrigger,
+  TraceCollapsibleContent,
+  TraceLine,
+  TraceIcon,
+  TraceTitle,
+  TraceDescription,
+} from './trace';
 import { useChatMessageContext } from './chat-message-context';
 import { cn, sanitizeUrl } from '@/lib/utils';
 import {
@@ -140,53 +149,48 @@ export const SourcesCount = React.forwardRef<HTMLSpanElement, SourcesCountProps>
 );
 SourcesCount.displayName = 'Sources.Count';
 
-export interface SourcesTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SourcesTriggerProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof TraceCollapsibleTrigger>, 'children'> {
   count?: number;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
   label?: string;
   children?: React.ReactNode;
-  className?: string;
 }
 
-const SourcesTrigger: React.FC<SourcesTriggerProps> = ({
-  count,
-  open: _open,
-  onOpenChange: _onOpenChange,
-  label = 'Sources',
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <Collapsible.Trigger
-      className={cn(
-        'group flex items-center justify-between gap-2 min-h-[44px] py-2 px-1 text-xs font-label font-semibold text-on-surface-variant',
-        'hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
-        'cursor-pointer transition-[color] duration-quick ease-standard motion-reduce:transition-none',
-        className
-      )}
-      {...props}
-    >
-      <div className="flex items-center gap-1.5">
+const SourcesTrigger = React.forwardRef<HTMLButtonElement, SourcesTriggerProps>(
+  (
+    {
+      count,
+      label = 'Sources',
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <TraceCollapsibleTrigger
+        ref={ref}
+        data-slot="sources-trigger"
+        className={className}
+        {...props}
+      >
         {children ? (
           children
         ) : (
-          <>
-            <SourcesTitle>{label}</SourcesTitle>
-            {typeof count === 'number' && <SourcesCount count={count} />}
-          </>
+          <TraceLine>
+            <TraceIcon name="menu_book" className="text-secondary" />
+            <TraceTitle>{label}</TraceTitle>
+            {typeof count === 'number' && (
+              <TraceDescription>
+                <SourcesCount count={count} />
+              </TraceDescription>
+            )}
+          </TraceLine>
         )}
-      </div>
-      <span
-        className="flex items-center justify-center size-5 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
-        aria-hidden="true"
-      >
-        <Icon name="expand_more" size="xs" />
-      </span>
-    </Collapsible.Trigger>
-  );
-};
+      </TraceCollapsibleTrigger>
+    );
+  }
+);
 SourcesTrigger.displayName = 'Sources.Trigger';
 
 export interface SourcesListProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -200,24 +204,33 @@ const SourcesPanelContext = React.createContext(false);
 const SourcesList = React.forwardRef<HTMLDivElement, SourcesListProps>(
   ({ children, className, ...props }, ref) => {
     const inPanel = React.useContext(SourcesPanelContext);
-    const list = (
-      <div
-        ref={inPanel ? undefined : ref}
-        data-slot="sources-content"
-        className={cn('flex flex-wrap items-center gap-2', inPanel ? 'pt-3' : 'pt-1', className)}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-    if (!inPanel) return list;
+    const { variant } = useSourcesContext();
+
+    if (!inPanel) {
+      return (
+        <Trace
+          ref={ref}
+          variant={variant === 'card' ? 'default' : 'ghost'}
+          data-slot="sources-content"
+          className={className}
+          {...props}
+        >
+          {children}
+        </Trace>
+      );
+    }
+
     return (
-      <Collapsible.Panel
-        ref={ref}
-        className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-quick ease-standard motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
-      >
-        {list}
-      </Collapsible.Panel>
+      <TraceCollapsibleContent ref={ref} variant="flush">
+        <Trace
+          variant="ghost"
+          data-slot="sources-content"
+          className={className}
+          {...props}
+        >
+          {children}
+        </Trace>
+      </TraceCollapsibleContent>
     );
   }
 );
@@ -322,53 +335,78 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
     );
   }
 
+  if (activeVariant === 'inline') {
+    return (
+      <Tooltip content={tooltipLabel}>
+        <a
+          href={itemUrl}
+          target={itemUrl ? '_blank' : undefined}
+          rel={itemUrl ? 'noopener noreferrer' : undefined}
+          className={cn(
+            'group inline-flex items-center gap-1.5 text-sm font-sans font-medium text-on-surface underline underline-offset-2 hover:text-secondary',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
+            className
+          )}
+          {...props}
+        >
+          <SourceIcon src={itemFavicon} name={itemIcon || 'menu_book'} />
+          <span className="truncate">
+            {itemTitle}
+            {itemUrl && <span className="sr-only"> (opens in a new tab)</span>}
+          </span>
+          <Icon
+            name="open_in_new"
+            size="xs"
+            directional
+            className="text-on-surface-variant/70 group-hover:text-secondary shrink-0 transition-colors"
+            aria-hidden="true"
+          />
+        </a>
+      </Tooltip>
+    );
+  }
+
   return (
     <Tooltip content={tooltipLabel}>
       <a
         href={itemUrl}
         target={itemUrl ? '_blank' : undefined}
         rel={itemUrl ? 'noopener noreferrer' : undefined}
-        aria-label={`Source: ${itemTitle}`}
         className={cn(
-          'group inline-flex items-center gap-2 px-3 py-1.5 min-h-[44px] max-w-full rounded-md text-start',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-          'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
-          // Variant styling: 'card' has border and surface, 'ghost' has zero border for inside bubbles, 'inline' is minimal
-          activeVariant === 'card' && 'bg-surface border border-outline-variant hover:border-secondary hover:bg-surface-container/50',
-          activeVariant === 'ghost' && 'bg-transparent border-0 hover:bg-surface-container/60 px-2 rounded',
-          activeVariant === 'inline' && 'p-0 min-h-0 bg-transparent border-0 underline underline-offset-2 hover:text-secondary',
+          'group block w-full text-start transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
+          'hover:bg-surface-container/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           className
         )}
         {...props}
       >
-        {typeof index === 'number' && (
-          <span className="size-5 rounded-full bg-secondary-container text-on-secondary-container font-mono text-xs tabular-nums font-bold flex items-center justify-center shrink-0">
-            {index + 1}
-          </span>
-        )}
-        <SourceIcon src={itemFavicon} name={itemIcon || 'description'} />
-        <div className="flex flex-col min-w-0 pe-1">
-          <span className="text-sm font-sans font-medium text-on-surface truncate group-hover:text-secondary transition-colors">
+        <TraceLine>
+          {itemFavicon ? (
+            <TraceIcon>
+              <SourceIcon src={itemFavicon} />
+            </TraceIcon>
+          ) : typeof index === 'number' ? (
+            <TraceIcon stepNumber={index + 1} />
+          ) : (
+            <TraceIcon name={itemIcon || 'menu_book'} className="text-secondary" />
+          )}
+          <TraceTitle className="font-medium group-hover:text-secondary transition-colors">
             {itemTitle}
-          </span>
+            {itemUrl && <span className="sr-only"> (opens in a new tab)</span>}
+          </TraceTitle>
           {displayDomain && (
-            <span className="text-xs font-mono text-on-surface-variant/80 truncate">
+            <TraceDescription className="hidden @sm:flex font-mono max-w-[160px] truncate">
               {displayDomain}
-            </span>
+            </TraceDescription>
           )}
-          {itemDescription && activeVariant !== 'inline' && (
-            <span className="text-xs font-sans text-on-surface-variant line-clamp-2">
-              {itemDescription}
-            </span>
-          )}
-        </div>
-        <Icon
-          name="open_in_new"
-          size="xs"
-          directional
-          className="text-on-surface-variant/70 group-hover:text-secondary shrink-0 transition-colors"
-          aria-hidden="true"
-        />
+          <TraceIcon className="text-on-surface-variant/70 group-hover:text-secondary">
+            <Icon name="open_in_new" size="xs" directional aria-hidden="true" />
+          </TraceIcon>
+        </TraceLine>
+        {itemDescription && (
+          <p className="px-3.5 pb-2.5 -mt-1 text-xs font-sans text-on-surface-variant line-clamp-2">
+            {itemDescription}
+          </p>
+        )}
       </a>
     </Tooltip>
   );
@@ -441,7 +479,9 @@ export interface SourcesProps {
   sources?: SourceCitation[];
   children?: React.ReactNode;
   collapsible?: boolean;
+  open?: boolean;
   defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
   label?: string;
   variant?: SourcesVariant;
   dedupe?: boolean;
@@ -452,7 +492,9 @@ const SourcesComponent: React.FC<SourcesProps> = ({
   sources,
   children,
   collapsible = true,
+  open,
   defaultOpen = false,
+  onOpenChange,
   label = 'Sources',
   variant,
   dedupe = true,
@@ -460,6 +502,7 @@ const SourcesComponent: React.FC<SourcesProps> = ({
 }) => {
   const chatContext = useChatMessageContext();
   const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'card');
+  const traceVariant = resolvedVariant === 'card' ? 'default' : 'ghost';
 
   const normalizedSources = React.useMemo(() => {
     if (!sources || !dedupe) return sources;
@@ -480,49 +523,51 @@ const SourcesComponent: React.FC<SourcesProps> = ({
   );
   if (isCompound) {
     return (
-      <Collapsible.Root defaultOpen={defaultOpen} className={cn('w-full', className)}>
-        <SourcesRoot variant={resolvedVariant} className="gap-0">
-          <SourcesPanelContext.Provider value>{children}</SourcesPanelContext.Provider>
-        </SourcesRoot>
-      </Collapsible.Root>
+      <SourcesRoot variant={resolvedVariant} className={cn('gap-0', className)}>
+        <Trace variant={traceVariant}>
+          <TraceCollapsible open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
+            <SourcesPanelContext.Provider value>{children}</SourcesPanelContext.Provider>
+          </TraceCollapsible>
+        </Trace>
+      </SourcesRoot>
     );
   }
 
   if (collapsible) {
     return (
-      <Collapsible.Root defaultOpen={defaultOpen} className={cn('w-full', className)}>
-        <SourcesRoot variant={resolvedVariant} className="gap-0">
-          <SourcesTrigger count={count} label={label} />
-          <Collapsible.Panel
-            className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-quick ease-standard motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
-          >
-            <SourcesList className="pt-3">
-              {children ||
-                normalizedSources?.map((item, idx) => (
-                  <SourcesItem key={item.id || item.url || idx} citation={item} index={idx} />
-                ))}
-            </SourcesList>
-          </Collapsible.Panel>
-        </SourcesRoot>
-      </Collapsible.Root>
+      <SourcesRoot variant={resolvedVariant} className={cn('gap-0', className)}>
+        <Trace variant={traceVariant}>
+          <TraceCollapsible open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
+            <SourcesTrigger count={count} label={label} />
+            <TraceCollapsibleContent variant="flush">
+              <Trace variant="ghost">
+                {children ||
+                  normalizedSources?.map((item, idx) => (
+                    <SourcesItem key={item.id || item.url || idx} citation={item} index={idx} />
+                  ))}
+              </Trace>
+            </TraceCollapsibleContent>
+          </TraceCollapsible>
+        </Trace>
+      </SourcesRoot>
     );
   }
 
   return (
     <SourcesRoot variant={resolvedVariant} className={className}>
-      <div className="flex items-center gap-1.5 text-xs font-label font-semibold text-on-surface-variant">
-        <Icon name="menu_book" size="xs" className="text-secondary shrink-0" aria-hidden="true" />
-        <span>{label}</span>
-        <span className="font-mono text-xs tabular-nums px-1.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-medium">
-          {count}
-        </span>
-      </div>
-      <SourcesList>
+      <Trace variant={traceVariant}>
+        <TraceLine>
+          <TraceIcon name="menu_book" className="text-secondary" />
+          <TraceTitle>{label}</TraceTitle>
+          <TraceDescription>
+            <SourcesCount count={count} />
+          </TraceDescription>
+        </TraceLine>
         {children ||
           normalizedSources?.map((item, idx) => (
             <SourcesItem key={item.id || item.url || idx} citation={item} index={idx} />
           ))}
-      </SourcesList>
+      </Trace>
     </SourcesRoot>
   );
 };

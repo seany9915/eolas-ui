@@ -14,7 +14,7 @@
 import * as React from 'react';
 import { OTPField as BaseOTPField } from '@base-ui/react/otp-field';
 import { Field as BaseField } from '@base-ui/react/field';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { useWebOtp } from '@/lib/use-web-otp';
 import { Icon } from './icon';
 
@@ -64,7 +64,6 @@ export interface OTPFieldProps
   autoExtractSmsOtp?: boolean;
   containerRef?: React.Ref<HTMLDivElement>;
   children?: React.ReactNode;
-  className?: string;
 }
 
 const OTP_PATTERNS: Record<string, RegExp | undefined> = {
@@ -72,6 +71,14 @@ const OTP_PATTERNS: Record<string, RegExp | undefined> = {
   alpha: /^[\p{L}]+$/u,
   alphanumeric: /^[\p{L}\d]+$/u,
 };
+
+function assignRef<T>(target: React.Ref<T> | undefined, value: T | null) {
+  if (typeof target === 'function') {
+    target(value);
+  } else if (target && typeof target === 'object') {
+    (target as React.MutableRefObject<T | null>).current = value;
+  }
+}
 
 const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   id,
@@ -108,36 +115,153 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   ...props
 }, ref) => {
   const sepIndex = separatorIndex ?? Math.floor(length / 2);
+  const hasFieldWrapper = Boolean(label || description || error);
+  const isClassNameFn = typeof className === 'function';
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
 
-  const handleValueComplete = React.useCallback(
-    (val: string, eventDetails?: BaseOTPField.Root.CompleteEventDetails) => {
-      onComplete?.(val, eventDetails);
-      onValueComplete?.(val, eventDetails);
+  const mergedRootRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node;
+      assignRef(ref, node);
+      if (!hasFieldWrapper) {
+        assignRef(containerRef, node);
+      }
     },
-    [onComplete, onValueComplete]
+    [ref, containerRef, hasFieldWrapper]
   );
 
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? '');
-  const isControlled = value !== undefined;
+  const currentValue = value ?? internalValue;
+  const isComplete = currentValue.length >= length;
+
+  const handleValueChange = React.useCallback(
+    (nextVal: string, eventDetails?: BaseOTPField.Root.ChangeEventDetails) => {
+      if (value === undefined) {
+        setInternalValue(nextVal);
+      }
+      onValueChange?.(nextVal, eventDetails);
+    },
+    [value, onValueChange]
+  );
+
+  const handleValueComplete = React.useCallback(
+    (val: string, eventDetails?: BaseOTPField.Root.CompleteEventDetails) => {
+      if (value === undefined) {
+        setInternalValue(val);
+      }
+      onComplete?.(val, eventDetails);
+      onValueComplete?.(val, eventDetails);
+    },
+    [value, onComplete, onValueComplete]
+  );
 
   useWebOtp({
-    enabled: Boolean(autoExtractSmsOtp && !disabled && !readOnly),
+    enabled: Boolean(autoExtractSmsOtp && !disabled && !readOnly && !isComplete),
     onCodeReceived: (receivedCode) => {
       const stripped = receivedCode.replace(/\s/g, '');
       const normalized = normalizeValue ? normalizeValue(stripped) : stripped;
-      const pattern = OTP_PATTERNS[validationType];
-      if (normalized.length !== length || (pattern && !pattern.test(normalized))) return;
-      if (!isControlled) setInternalValue(normalized);
-      onValueChange?.(normalized);
+      const otpPattern = OTP_PATTERNS[validationType];
+      if (normalized.length !== length || (otpPattern && !otpPattern.test(normalized))) return;
+
+      // Deliver received SMS OTP through the first slot input so Base UI runs its native
+      // uncontrolled/controlled pipeline (onValueChange, onValueComplete) without
+      // forcing controlled mode.
+      const firstInput = rootRef.current?.querySelector<HTMLInputElement>('input');
+      const nativeValueSetter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        'value'
+      )?.set;
+      if (firstInput && nativeValueSetter) {
+        nativeValueSetter.call(firstInput, normalized);
+        firstInput.dispatchEvent(new Event('input', { bubbles: true }));
+        if (autoSubmit) {
+          firstInput.form?.requestSubmit();
+        }
+        return;
+      }
+
+      handleValueChange(normalized);
       handleValueComplete(normalized);
+      if (autoSubmit) {
+        firstInput?.form?.requestSubmit();
+      }
     },
   });
+
+  const otpRoot = (
+    <BaseOTPField.Root
+      ref={mergedRootRef}
+      id={id}
+      length={length}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={handleValueChange}
+      onValueComplete={handleValueComplete}
+      onValueInvalid={onValueInvalid}
+      normalizeValue={normalizeValue}
+      name={name}
+      form={form}
+      required={required}
+      readOnly={readOnly}
+      autoFocus={autoFocus}
+      disabled={disabled}
+      autoSubmit={autoSubmit}
+      mask={mask}
+      validationType={validationType}
+      inputMode={inputMode}
+      autoComplete={autoComplete}
+      aria-label={!label && hasFieldWrapper ? 'One-time passcode' : undefined}
+      className={composeClassName(
+        cn(
+          !hasFieldWrapper && '@container',
+          'flex gap-1.5 @sm:gap-2 items-center',
+          center ? 'justify-center' : 'justify-start'
+        ),
+        !hasFieldWrapper || isClassNameFn ? className : undefined
+      )}
+      {...props}
+    >
+      {children ? (
+        children
+      ) : (
+        Array.from({ length }, (_, idx) => (
+          <React.Fragment key={idx}>
+            {showSeparator && idx === sepIndex && (
+              <BaseOTPField.Separator
+                className="text-on-surface-variant/60 flex items-center justify-center font-bold px-1 select-none"
+                aria-hidden="true"
+              >
+                –
+              </BaseOTPField.Separator>
+            )}
+            <BaseOTPField.Input
+              pattern={pattern}
+              aria-label={idx === 0 ? undefined : `Character ${idx + 1} of ${length}`}
+              className={cn(
+                'w-10 min-w-10 @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded',
+                'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
+                'border-outline hover:border-on-surface-variant/80',
+                'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+                'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+                'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error',
+                error && 'border-error focus-visible:border-error focus-visible:outline-error'
+              )}
+            />
+          </React.Fragment>
+        ))
+      )}
+    </BaseOTPField.Root>
+  );
+
+  if (!hasFieldWrapper) {
+    return otpRoot;
+  }
 
   return (
     <BaseField.Root
       ref={containerRef}
       invalid={Boolean(error)}
-      className={cn('@container flex flex-col gap-1.5 w-full', className)}
+      className={cn('@container flex flex-col gap-1.5 w-full', !isClassNameFn ? className : undefined)}
     >
       {label && (
         <BaseField.Label className={cn('font-label text-sm font-semibold text-on-surface flex items-center', center ? 'justify-center' : 'justify-between')}>
@@ -154,62 +278,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
         </BaseField.Description>
       )}
 
-      <BaseOTPField.Root
-        ref={ref}
-        id={id}
-        length={length}
-        value={isControlled ? value : internalValue}
-        onValueChange={(next, details) => {
-          if (!isControlled) setInternalValue(next);
-          onValueChange?.(next, details);
-        }}
-        onValueComplete={handleValueComplete}
-        onValueInvalid={onValueInvalid}
-        normalizeValue={normalizeValue}
-        name={name}
-        form={form}
-        required={required}
-        readOnly={readOnly}
-        autoFocus={autoFocus}
-        disabled={disabled}
-        autoSubmit={autoSubmit}
-        mask={mask}
-        validationType={validationType}
-        inputMode={inputMode}
-        autoComplete={autoComplete}
-        aria-label={!label ? 'One-time passcode' : undefined}
-        className={cn('flex gap-1.5 @sm:gap-2 items-center', center ? 'justify-center' : 'justify-start')}
-        {...props}
-      >
-        {children ? (
-          children
-        ) : (
-          Array.from({ length }, (_, idx) => (
-            <React.Fragment key={idx}>
-              {showSeparator && idx === sepIndex && (
-                <BaseOTPField.Separator
-                  className="text-on-surface-variant/60 flex items-center justify-center font-bold px-1 select-none"
-                  aria-hidden="true"
-                >
-                  –
-                </BaseOTPField.Separator>
-              )}
-              <BaseOTPField.Input
-                pattern={pattern}
-                aria-label={`Character ${idx + 1} of ${length}`}
-                className={cn(
-                  'w-10 min-w-10 @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded-lg',
-                  'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
-                  'border-outline hover:border-on-surface-variant/80',
-                  'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-                  'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-                  error && 'border-error focus-visible:border-error focus-visible:outline-error'
-                )}
-              />
-            </React.Fragment>
-          ))
-        )}
-      </BaseOTPField.Root>
+      {otpRoot}
 
       {error ? (
         <BaseField.Error match={true} className="text-xs text-error font-sans flex items-center gap-1 mt-1">

@@ -69,6 +69,7 @@ export const ChartContainer = React.forwardRef<
   return (
     <ChartContext.Provider value={{ config }}>
       <div
+        data-slot="chart"
         data-chart={chartId}
         ref={ref}
         role={resolvedRole}
@@ -294,6 +295,7 @@ export const ChartTooltipContent = React.forwardRef<
     return (
       <div
         ref={ref}
+        data-slot="chart-tooltip"
         className={cn(
           'pointer-events-none select-none grid min-w-[8rem] items-start gap-1.5 rounded-[0.75rem] border border-outline-variant/60 bg-surface/95 backdrop-blur-sm px-3 py-2 text-xs shadow-ambient text-on-surface',
           className
@@ -463,10 +465,11 @@ export const ChartLegendContent = React.forwardRef<
     return (
       <div
         ref={ref}
+        data-slot="chart-legend"
         role={role}
         aria-label={ariaLabel}
         className={cn(
-          'flex items-center justify-center gap-4 text-xs font-sans text-on-surface-variant',
+          'flex flex-wrap items-center justify-center gap-4 text-xs font-sans text-on-surface-variant',
           verticalAlign === 'top' ? 'pb-3' : 'pt-3',
           className
         )}
@@ -481,7 +484,7 @@ export const ChartLegendContent = React.forwardRef<
               key={item.value}
               role="listitem"
               className={cn(
-                'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-on-surface-variant'
+                'flex items-center gap-1.5 [&>svg]:size-3 [&>svg]:text-on-surface-variant'
               )}
             >
               {itemConfig?.avatar ? (
@@ -489,7 +492,7 @@ export const ChartLegendContent = React.forwardRef<
                   src={itemConfig.avatar}
                   alt=""
                   aria-hidden="true"
-                  className="size-3.5 rounded-full object-cover shrink-0 ring-1 ring-outline-variant/40"
+                  className="size-3.5 rounded-full object-cover shrink-0 border border-outline-variant/40"
                 />
               ) : itemConfig?.icon && !hideIcon ? (
                 <div

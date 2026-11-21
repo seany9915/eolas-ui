@@ -14,36 +14,104 @@
  */
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { useViewTransition, type TransitionOptions } from '@/lib/view-transitions';
+import {
+  useViewTransition,
+  startScopedViewTransition,
+  type TransitionOptions,
+} from '@/lib/view-transitions';
 import { cn } from '@/lib/utils';
+
+type NativeViewTransitionProps = React.ViewTransitionProps;
 
 export interface ViewTransitionProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Unique view-transition-name CSS identifier for morphing pair */
   name?: string;
+  /** Optional React 19 ViewTransition class override for default transitions */
+  defaultTransition?: NativeViewTransitionProps['default'];
+  /** Optional React 19 ViewTransition class override on enter */
+  enter?: NativeViewTransitionProps['enter'];
+  /** Optional React 19 ViewTransition class override on exit */
+  exit?: NativeViewTransitionProps['exit'];
+  /** Optional React 19 ViewTransition class override on update */
+  update?: NativeViewTransitionProps['update'];
+  /** Optional React 19 ViewTransition class override on shared element transitions */
+  share?: NativeViewTransitionProps['share'];
+  /** Optional React 19 ViewTransition lifecycle callbacks */
+  onEnter?: NativeViewTransitionProps['onEnter'];
+  onExit?: NativeViewTransitionProps['onExit'];
+  onUpdate?: NativeViewTransitionProps['onUpdate'];
+  onShare?: NativeViewTransitionProps['onShare'];
   children: React.ReactNode;
   className?: string;
 }
 
+const NativeViewTransition = React.ViewTransition;
+
 /**
  * Container marking an element for shared View Transition morphing.
+ * Leverages React 19's native `<React.ViewTransition>` when available while
+ * preserving block/flex/grid layout semantics (no forced `inline-block`) and
+ * full backward compatibility with imperative `document.startViewTransition`.
  */
 export const ViewTransition = React.forwardRef<HTMLDivElement, ViewTransitionProps>(
-  ({ name, className, style, children, ...props }, ref) => {
-    const dynamicStyle: React.CSSProperties = {
-      ...style,
-      ...(name ? { viewTransitionName: name } : {}),
-    };
+  (
+    {
+      name,
+      defaultTransition,
+      enter,
+      exit,
+      update,
+      share,
+      onEnter,
+      onExit,
+      onUpdate,
+      onShare,
+      className,
+      style,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const dynamicStyle: React.CSSProperties | undefined =
+      style || name
+        ? {
+            ...style,
+            ...(name ? { viewTransitionName: name } : {}),
+          }
+        : undefined;
 
-    return (
+    const wrapped = (
       <div
         ref={ref}
         style={dynamicStyle}
-        className={cn('inline-block', className)}
+        className={cn(className)}
         {...props}
       >
         {children}
       </div>
     );
+
+    if (NativeViewTransition) {
+      return (
+        <NativeViewTransition
+          name={name}
+          default={defaultTransition}
+          enter={enter}
+          exit={exit}
+          update={update}
+          share={share}
+          onEnter={onEnter}
+          onExit={onExit}
+          onUpdate={onUpdate}
+          onShare={onShare}
+        >
+          {wrapped}
+        </NativeViewTransition>
+      );
+    }
+
+    return wrapped;
   }
 );
 ViewTransition.displayName = 'ViewTransition';
@@ -106,6 +174,6 @@ export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTra
 );
 ViewTransitionTrigger.displayName = 'ViewTransitionTrigger';
 
-export { useViewTransition };
+export { useViewTransition, startScopedViewTransition };
 
 export default ViewTransition;

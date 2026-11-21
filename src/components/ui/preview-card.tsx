@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { PreviewCard as BasePreviewCard } from '@base-ui/react/preview-card';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 interface PreviewCardContextValue {
   delay?: number;
@@ -24,9 +24,10 @@ export const PreviewCardTrigger = React.forwardRef<HTMLAnchorElement, PreviewCar
     return (
       <BasePreviewCard.Trigger
         ref={ref}
+        data-slot="preview-card-trigger"
         delay={resolvedDelay}
         closeDelay={resolvedCloseDelay}
-        className={cn(
+        className={composeClassName(
           'inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
           className
         )}
@@ -47,12 +48,45 @@ export const PreviewCardPositioner = React.forwardRef<HTMLDivElement, PreviewCar
     <BasePreviewCard.Positioner
       ref={ref}
       sideOffset={sideOffset}
-      className={cn('z-50 outline-none', className)}
+      className={composeClassName('z-50 outline-none', className)}
       {...props}
     />
   )
 );
 PreviewCardPositioner.displayName = 'PreviewCardPositioner';
+
+export interface PreviewCardArrowProps
+  extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Arrow> {}
+
+export const PreviewCardArrow = React.forwardRef<HTMLDivElement, PreviewCardArrowProps>(
+  ({ className, children, ...props }, ref) => (
+    <BasePreviewCard.Arrow
+      ref={ref}
+      data-slot="preview-card-arrow"
+      className={composeClassName(
+        cn(
+          'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+          'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+        ),
+        className
+      )}
+      {...props}
+    >
+      {children ?? (
+        <svg
+          width="10"
+          height="5"
+          viewBox="0 0 10 5"
+          className="block fill-surface stroke-outline-variant"
+          aria-hidden="true"
+        >
+          <path d="M0 5 L5 0 L10 5" />
+        </svg>
+      )}
+    </BasePreviewCard.Arrow>
+  )
+);
+PreviewCardArrow.displayName = 'PreviewCardArrow';
 
 export interface PreviewCardPopupProps
   extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Popup> {}
@@ -61,11 +95,9 @@ export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopu
   ({ className, ...props }, ref) => (
     <BasePreviewCard.Popup
       ref={ref}
-      className={cn(
-        'w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2',
-        'transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)]',
-        'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
-        'motion-reduce:transition-none motion-reduce:transform-none',
+      data-slot="preview-card-content"
+      className={composeClassName(
+        'w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2 transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98] motion-reduce:transition-none motion-reduce:transform-none',
         className
       )}
       {...props}
@@ -75,24 +107,22 @@ export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopu
 PreviewCardPopup.displayName = 'PreviewCardPopup';
 
 export interface PreviewCardProps<Payload = unknown>
-  extends Omit<React.ComponentPropsWithoutRef<typeof BasePreviewCard.Root>, 'children'> {
+  extends Omit<BasePreviewCard.Root.Props<Payload>, 'children'> {
   trigger?: React.ReactNode;
   title?: string;
   description?: string;
   icon?: string;
   badgeText?: string;
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean, eventDetails?: BasePreviewCard.Root.ChangeEventDetails) => void;
-  onOpenChangeComplete?: (open: boolean) => void;
-  actionsRef?: React.RefObject<BasePreviewCard.Root.Actions | null>;
-  handle?: BasePreviewCard.Handle<Payload>;
-  triggerId?: string | null;
-  defaultTriggerId?: string | null;
+  side?: BasePreviewCard.Positioner.Props['side'];
+  align?: BasePreviewCard.Positioner.Props['align'];
+  sideOffset?: BasePreviewCard.Positioner.Props['sideOffset'];
+  alignOffset?: BasePreviewCard.Positioner.Props['alignOffset'];
+  showArrow?: boolean;
+  keepMounted?: boolean;
   delay?: number;
   closeDelay?: number;
-  children?: React.ReactNode;
-  className?: string;
+  children?: BasePreviewCard.Root.Props<Payload>['children'];
+  className?: BasePreviewCard.Popup.Props['className'];
 }
 
 function PreviewCardComponentInner<Payload = unknown>(
@@ -102,6 +132,12 @@ function PreviewCardComponentInner<Payload = unknown>(
     description,
     icon,
     badgeText,
+    side,
+    align,
+    sideOffset = 8,
+    alignOffset,
+    showArrow = false,
+    keepMounted,
     open,
     defaultOpen,
     onOpenChange,
@@ -114,6 +150,7 @@ function PreviewCardComponentInner<Payload = unknown>(
     closeDelay,
     children,
     className,
+    ...rootProps
   }: PreviewCardProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
 ): React.JSX.Element {
@@ -130,6 +167,7 @@ function PreviewCardComponentInner<Payload = unknown>(
           handle={handle}
           triggerId={triggerId}
           defaultTriggerId={defaultTriggerId}
+          {...rootProps}
         >
           {children}
         </BasePreviewCard.Root>
@@ -148,44 +186,55 @@ function PreviewCardComponentInner<Payload = unknown>(
         handle={handle}
         triggerId={triggerId}
         defaultTriggerId={defaultTriggerId}
+        {...rootProps}
       >
-        <PreviewCardTrigger
-          render={React.isValidElement(trigger) ? trigger : undefined}
-        >
-          {React.isValidElement(trigger) ? undefined : trigger}
-        </PreviewCardTrigger>
-        <BasePreviewCard.Portal>
-          <PreviewCardPositioner>
-            <PreviewCardPopup ref={ref} className={className}>
-              {children ? (
-                children
-              ) : (
-                <>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {icon && (
-                        <span className="material-symbols-outlined text-primary text-xl shrink-0" aria-hidden="true">
-                          {icon}
-                        </span>
+        {(renderProps) => (
+          <>
+            <PreviewCardTrigger
+              render={React.isValidElement(trigger) ? trigger : undefined}
+            >
+              {React.isValidElement(trigger) ? undefined : trigger}
+            </PreviewCardTrigger>
+            <BasePreviewCard.Portal keepMounted={keepMounted}>
+              <PreviewCardPositioner
+                side={side}
+                align={align}
+                sideOffset={sideOffset}
+                alignOffset={alignOffset}
+              >
+                <PreviewCardPopup ref={ref} className={className}>
+                  {showArrow && <PreviewCardArrow />}
+                  {children ? (
+                    typeof children === 'function' ? children(renderProps) : children
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {icon && (
+                            <span className="material-symbols-outlined text-primary text-xl shrink-0" aria-hidden="true">
+                              {icon}
+                            </span>
+                          )}
+                          {title && <h4 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h4>}
+                        </div>
+                        {badgeText && (
+                          <span className="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label text-xs font-semibold shrink-0">
+                            {badgeText}
+                          </span>
+                        )}
+                      </div>
+                      {description && (
+                        <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
+                          {description}
+                        </p>
                       )}
-                      {title && <h4 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h4>}
-                    </div>
-                    {badgeText && (
-                      <span className="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label text-xs font-semibold shrink-0">
-                        {badgeText}
-                      </span>
-                    )}
-                  </div>
-                  {description && (
-                    <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
-                      {description}
-                    </p>
+                    </>
                   )}
-                </>
-              )}
-            </PreviewCardPopup>
-          </PreviewCardPositioner>
-        </BasePreviewCard.Portal>
+                </PreviewCardPopup>
+              </PreviewCardPositioner>
+            </BasePreviewCard.Portal>
+          </>
+        )}
       </BasePreviewCard.Root>
     </PreviewCardContext.Provider>
   );
@@ -202,7 +251,7 @@ export const PreviewCard = Object.assign(PreviewCardComponent, {
   Portal: BasePreviewCard.Portal,
   Positioner: PreviewCardPositioner,
   Popup: PreviewCardPopup,
-  Arrow: BasePreviewCard.Arrow,
+  Arrow: PreviewCardArrow,
   Backdrop: BasePreviewCard.Backdrop,
   Viewport: BasePreviewCard.Viewport,
   createHandle: BasePreviewCard.createHandle,
@@ -213,7 +262,7 @@ export const PreviewCard = Object.assign(PreviewCardComponent, {
 export { BasePreviewCard };
 export const PreviewCardRoot = BasePreviewCard.Root;
 export const PreviewCardPortal = BasePreviewCard.Portal;
-export const PreviewCardArrow = BasePreviewCard.Arrow;
+export const PreviewCardArrowPrimitive = BasePreviewCard.Arrow;
 export const PreviewCardBackdrop = BasePreviewCard.Backdrop;
 export const PreviewCardViewport = BasePreviewCard.Viewport;
 export const createPreviewCardHandle = BasePreviewCard.createHandle;

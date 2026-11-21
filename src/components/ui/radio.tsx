@@ -14,14 +14,14 @@
 import * as React from 'react';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type RadioValue = string | number;
 
 // Accessible Radio Group
-export interface RadioGroupProps<Value extends RadioValue = string>
+export interface RadioGroupProps<Value = string>
   extends Omit<
-    React.ComponentPropsWithoutRef<typeof BaseRadioGroup>,
+    BaseRadioGroup.Props<Value>,
     'value' | 'defaultValue' | 'onValueChange' | 'onChange'
   > {
   value?: Value;
@@ -34,66 +34,71 @@ export interface RadioGroupProps<Value extends RadioValue = string>
   children?: React.ReactNode;
 }
 
-const RadioGroupComponent = React.forwardRef<HTMLDivElement, RadioGroupProps<any>>(
-  (
-    {
-      value,
-      defaultValue,
-      onValueChange,
-      disabled = false,
-      readOnly = false,
-      required = false,
-      orientation = 'vertical',
-      name,
-      form,
-      ariaLabel,
-      ariaLabelledBy,
-      error,
-      children,
-      className,
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <BaseRadioGroup
-        ref={ref}
-        value={value}
-        defaultValue={defaultValue}
-        onValueChange={onValueChange}
-        disabled={disabled}
-        readOnly={readOnly}
-        required={required}
-        name={name}
-        form={form}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        aria-invalid={error ? true : undefined}
-        className={cn(
+function RadioGroupComponentInner<Value = string>(
+  {
+    value,
+    defaultValue,
+    onValueChange,
+    disabled = false,
+    readOnly = false,
+    required = false,
+    orientation = 'vertical',
+    name,
+    form,
+    ariaLabel,
+    ariaLabelledBy,
+    error,
+    children,
+    className,
+    ...props
+  }: RadioGroupProps<Value>,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
+  return (
+    <BaseRadioGroup<Value>
+      ref={ref}
+      data-slot="radio-group"
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      name={name}
+      form={form}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      aria-invalid={error ? true : undefined}
+      className={composeClassName(
+        cn(
           'flex w-full',
-          orientation === 'horizontal' ? 'flex-row flex-wrap gap-4' : 'flex-col gap-1',
-          className
-        )}
-        {...props}
-      >
-        {children}
-        {error && (
-          <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none mt-1.5">
-            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-              error
-            </span>
-            <span>{error}</span>
+          orientation === 'horizontal' ? 'flex-row flex-wrap gap-4' : 'flex-col gap-1'
+        ),
+        className
+      )}
+      {...props}
+    >
+      {children}
+      {error && (
+        <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none mt-1.5">
+          <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+            error
           </span>
-        )}
-      </BaseRadioGroup>
-    );
-  }
-);
+          <span>{error}</span>
+        </span>
+      )}
+    </BaseRadioGroup>
+  );
+}
+
+const RadioGroupComponent = React.forwardRef(RadioGroupComponentInner) as (<Value = string>(
+  props: RadioGroupProps<Value> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
 RadioGroupComponent.displayName = 'RadioGroup';
 
 // Accessible Radio Item
-export interface RadioProps<Value extends RadioValue = string>
-  extends Omit<React.ComponentPropsWithoutRef<typeof BaseRadio.Root>, 'value'> {
+export interface RadioProps<Value = string>
+  extends Omit<BaseRadio.Root.Props<Value>, 'value'> {
   value: Value;
   label?: React.ReactNode;
   description?: React.ReactNode;
@@ -101,104 +106,111 @@ export interface RadioProps<Value extends RadioValue = string>
   compact?: boolean;
 }
 
-const RadioComponent = React.forwardRef<HTMLElement, RadioProps<any>>(
-  (
-    {
-      label,
-      value,
-      description,
-      disabled = false,
-      readOnly = false,
-      required = false,
-      id,
-      error,
-      compact = false,
-      className,
-      inputRef,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const generatedId = React.useId();
-    const radioId = id || generatedId;
-    const descriptionId = label && description ? `${radioId}-description` : undefined;
-    const hasErrorText = typeof error === 'string' && !!error;
-    const errorId = label && hasErrorText ? `${radioId}-error` : undefined;
-    const describedBy = [props['aria-describedby'], descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+function RadioComponentInner<Value = string>(
+  {
+    label,
+    value,
+    description,
+    disabled = false,
+    readOnly = false,
+    required = false,
+    id,
+    error,
+    compact = false,
+    className,
+    inputRef,
+    children,
+    ...props
+  }: RadioProps<Value>,
+  ref: React.ForwardedRef<HTMLElement>
+) {
+  const generatedId = React.useId();
+  const radioId = id || generatedId;
+  const descriptionId = label && description ? `${radioId}-description` : undefined;
+  const hasErrorText = typeof error === 'string' && !!error;
+  const errorId = label && hasErrorText ? `${radioId}-error` : undefined;
+  const describedBy = [props['aria-describedby'], descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+  const isClassNameFn = typeof className === 'function';
 
-    const radioNode = (
-      <BaseRadio.Root
-        ref={ref}
-        id={radioId}
-        value={value}
-        disabled={disabled}
-        readOnly={readOnly}
-        required={required}
-        inputRef={inputRef}
-        className={cn(
+  const radioNode = (
+    <BaseRadio.Root<Value>
+      ref={ref}
+      data-slot="radio-group-item"
+      id={radioId}
+      value={value}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      inputRef={inputRef}
+      className={composeClassName(
+        cn(
           'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
           'data-[checked]:border-2 data-[checked]:border-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-primary',
           'data-[disabled]:border-outline-variant data-[disabled]:bg-surface-container/30 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
-          error ? 'border-error focus-visible:outline-error' : 'border-outline',
-          !label && className
-        )}
-        {...props}
-        aria-invalid={error ? true : props['aria-invalid']}
-        aria-describedby={describedBy}
-      >
-        {children ?? (
-          <BaseRadio.Indicator
-            keepMounted
-            className="size-2.5 rounded-full bg-primary transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] scale-0 data-[checked]:scale-100"
-          />
-        )}
-      </BaseRadio.Root>
-    );
+          error ? 'border-error focus-visible:outline-error' : 'border-outline'
+        ),
+        !label || isClassNameFn ? className : undefined
+      )}
+      {...props}
+      aria-invalid={error ? true : props['aria-invalid']}
+      aria-describedby={describedBy}
+    >
+      {children ?? (
+        <BaseRadio.Indicator
+          data-slot="radio-group-indicator"
+          keepMounted
+          className="size-2.5 rounded-full bg-primary transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] scale-0 data-[checked]:scale-100"
+        />
+      )}
+    </BaseRadio.Root>
+  );
 
-    if (!label) {
-      return radioNode;
-    }
-
-    return (
-      <label
-        htmlFor={radioId}
-        className={cn(
-          'flex items-start gap-3 cursor-pointer group rounded transition-colors',
-          compact
-            ? 'p-1'
-            : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-container/30',
-          'has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-60 has-[[data-disabled]]:hover:bg-transparent',
-          disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
-          className
-        )}
-      >
-        <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">
-          {radioNode}
-        </div>
-        <div className="flex flex-col flex-1">
-          <span className="font-sans text-sm font-medium text-on-surface select-none group-has-[[data-disabled]]:text-on-surface-variant">
-            {label}
-          </span>
-          {description && (
-            <span id={descriptionId} className="font-sans text-sm text-on-surface-variant select-none mt-0.5">
-              {description}
-            </span>
-          )}
-          {hasErrorText && (
-            <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
-              <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-                error
-              </span>
-              <span>{error}</span>
-            </span>
-          )}
-        </div>
-      </label>
-    );
+  if (!label) {
+    return radioNode;
   }
-);
+
+  return (
+    <label
+      htmlFor={radioId}
+      className={cn(
+        'flex items-start gap-3 cursor-pointer group rounded transition-colors',
+        compact
+          ? 'p-1'
+          : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-container/30',
+        'has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-60 has-[[data-disabled]]:hover:bg-transparent',
+        disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
+        !isClassNameFn ? className : undefined
+      )}
+    >
+      <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">
+        {radioNode}
+      </div>
+      <div className="flex flex-col flex-1">
+        <span className="font-sans text-sm font-medium text-on-surface select-none group-has-[[data-disabled]]:text-on-surface-variant">
+          {label}
+        </span>
+        {description && (
+          <span id={descriptionId} className="font-sans text-sm text-on-surface-variant select-none mt-0.5">
+            {description}
+          </span>
+        )}
+        {hasErrorText && (
+          <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
+            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
+              error
+            </span>
+            <span>{error}</span>
+          </span>
+        )}
+      </div>
+    </label>
+  );
+}
+
+const RadioComponent = React.forwardRef(RadioComponentInner) as (<Value = string>(
+  props: RadioProps<Value> & React.RefAttributes<HTMLElement>
+) => React.JSX.Element) & { displayName?: string };
 RadioComponent.displayName = 'Radio';
 
 // Compound export mapping Base UI primitives

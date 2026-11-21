@@ -48,7 +48,7 @@ export const AntiPatternAuditBench: React.FC = () => {
       category: 'Chips & Badges',
       ruleSummary: 'Banned: light tint fill + matching border + matching text of the same hue family (e.g. green fill + green border + green text). Enforce the 3-pattern rotation.',
       bannedDescription: 'Pastel monochrome chips look washed out, fail WCAG contrast ratios on tinted surfaces, and lack visual authority.',
-      requiredDescription: 'Rotate between high-contrast filled, colored outline on clean neutral surface, and soft container wash with dark charcoal ink (#1a1c1e).',
+      requiredDescription: 'Rotate between high-contrast filled, colored outline on clean neutral surface, and soft container wash with dark charcoal ink (#1C1A18).',
       dontExample: (
         <div className="flex flex-wrap items-center gap-2">
           {/* Banned: Single hue family tint + border + text */}

@@ -15,15 +15,30 @@
  *   - Integrates seamlessly with CodeBlock for syntax-highlighted parameters.
  */
 import * as React from 'react';
-import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
-import { Icon } from './icon';
 import { Badge } from './badge';
 import { CodeBlock } from './code-block';
 import { InlineAlert } from './inline-alert';
+import {
+  Trace,
+  TraceCollapsible,
+  TraceCollapsibleTrigger,
+  TraceCollapsibleContent,
+  TraceLine,
+  TraceIcon,
+  TraceTitle,
+  TraceDescription,
+  type TraceStatus,
+} from './trace';
 import { useChatMessageContext } from './chat-message-context';
 import { cn } from '@/lib/utils';
 
 export type ToolStatus = 'calling' | 'complete' | 'error';
+
+function toTraceStatus(status: ToolStatus): TraceStatus {
+  if (status === 'calling') return 'running';
+  if (status === 'error') return 'error';
+  return 'complete';
+}
 
 interface ToolContextValue {
   variant: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
@@ -31,7 +46,62 @@ interface ToolContextValue {
 
 const ToolContext = React.createContext<ToolContextValue>({ variant: 'default' });
 
-export interface ToolRootProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Root> {
+interface ToolLineRowProps {
+  name: string;
+  status: ToolStatus;
+  duration?: string | number;
+  iconName?: string;
+  children?: React.ReactNode;
+}
+
+const ToolLineRow: React.FC<ToolLineRowProps> = ({
+  name,
+  status,
+  duration,
+  iconName,
+  children,
+}) => {
+  const traceStatus = toTraceStatus(status);
+  const formattedDuration = React.useMemo(() => {
+    if (!duration) return null;
+    if (typeof duration === 'number') return `${duration.toFixed(1)}s`;
+    return duration;
+  }, [duration]);
+
+  const resolvedIconName =
+    status === 'calling' || status === 'error' ? undefined : iconName || 'terminal';
+
+  return (
+    <TraceLine status={traceStatus}>
+      <TraceIcon name={resolvedIconName} status={traceStatus} />
+      <TraceTitle className="font-mono" title={name}>
+        {name}
+      </TraceTitle>
+      {formattedDuration && (
+        <TraceDescription duration={formattedDuration} className="hidden @sm:flex" />
+      )}
+      <div className="flex items-center gap-2 shrink-0">
+        {status === 'calling' ? (
+          <Badge size="sm" variant="outline" colorRole="neutral" className="text-xs leading-none h-5 py-0.5 px-2">
+            Running
+          </Badge>
+        ) : status === 'error' ? (
+          <Badge size="sm" variant="filled" colorRole="error" className="text-xs leading-none h-5 py-0.5 px-2">
+            Failed
+          </Badge>
+        ) : (
+          <Badge size="sm" variant="outline" colorRole="success" className="text-xs leading-none h-5 py-0.5 px-2">
+            Complete
+          </Badge>
+        )}
+        {children}
+      </div>
+    </TraceLine>
+  );
+};
+
+export interface ToolRootProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof TraceCollapsible>, 'className'> {
   status?: ToolStatus;
   variant?: 'default' | 'card' | 'embedded' | 'ghost' | 'unboxed';
   children?: React.ReactNode;
@@ -39,37 +109,41 @@ export interface ToolRootProps extends React.ComponentPropsWithoutRef<typeof Bas
 }
 
 const ToolRoot = React.forwardRef<HTMLDivElement, ToolRootProps>(
-  ({ status = 'complete', variant, children, className, ...props }, ref) => {
+  ({ status = 'complete', variant, children, className, open, defaultOpen, onOpenChange, disabled, ...props }, ref) => {
     const chatContext = useChatMessageContext();
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'default');
 
     return (
       <ToolContext.Provider value={{ variant: resolvedVariant }}>
-        <BaseCollapsible.Root
+        <Trace
           ref={ref}
+          variant={resolvedVariant}
           data-slot="tool-root"
           data-status={status}
           className={cn(
-            '@container w-full overflow-hidden',
-            'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-            (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed')
-              ? 'rounded-none border-none bg-transparent divide-y divide-outline-variant/30'
-              : 'rounded-lg border border-outline-variant/80 bg-surface',
             resolvedVariant !== 'ghost' && resolvedVariant !== 'unboxed' && status === 'calling' && 'border-primary',
             resolvedVariant !== 'ghost' && resolvedVariant !== 'unboxed' && status === 'error' && 'border-error',
             className
           )}
-          {...props}
         >
-          {children}
-        </BaseCollapsible.Root>
+          <TraceCollapsible
+            open={open}
+            defaultOpen={defaultOpen}
+            onOpenChange={onOpenChange}
+            disabled={disabled}
+            {...props}
+          >
+            {children}
+          </TraceCollapsible>
+        </Trace>
       </ToolContext.Provider>
     );
   }
 );
 ToolRoot.displayName = 'Tool.Root';
 
-export interface ToolHeaderProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Trigger> {
+export interface ToolHeaderProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof TraceCollapsibleTrigger>, 'children' | 'className'> {
   name: string;
   status?: ToolStatus;
   duration?: string | number;
@@ -80,94 +154,30 @@ export interface ToolHeaderProps extends React.ComponentPropsWithoutRef<typeof B
 
 const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
   ({ name, status = 'complete', duration, iconName, children, className, ...props }, ref) => {
-    const formattedDuration = React.useMemo(() => {
-      if (!duration) return null;
-      if (typeof duration === 'number') return `${duration.toFixed(1)}s`;
-      return duration;
-    }, [duration]);
-
-    const defaultIcon =
-      status === 'calling'
-        ? 'progress_activity'
-        : status === 'error'
-        ? 'error'
-        : iconName || 'terminal';
-
     return (
-      <BaseCollapsible.Trigger
+      <TraceCollapsibleTrigger
         ref={ref}
         data-slot="tool-header"
         aria-label={props['aria-label'] || `${name} (${status === 'calling' ? 'Running' : status === 'error' ? 'Failed' : 'Complete'})`}
-        className={cn(
-          'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start select-none',
-          'hover:bg-surface-container/40 transition-colors duration-quick ease-standard motion-reduce:transition-none',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-          className
-        )}
+        className={className}
         {...props}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span
-            className={cn(
-              'flex size-5 shrink-0 items-center justify-center text-xs select-none transition-colors',
-              status === 'calling' && 'text-on-surface-variant',
-              status === 'complete' && 'text-success',
-              status === 'error' && 'text-error'
-            )}
-            aria-hidden="true"
-          >
-            <Icon
-              name={defaultIcon}
-              size="xs"
-              className={status === 'calling' ? 'animate-spin motion-reduce:animate-none' : undefined}
-            />
-          </span>
-
-          <span
-            className="font-mono text-xs font-semibold text-on-surface truncate"
-            title={name}
-          >
-            {name}
-          </span>
-
-          {formattedDuration && (
-            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80 hidden @sm:inline">
-              {formattedDuration}
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {status === 'calling' ? (
-            <Badge size="sm" variant="outline" colorRole="neutral" className="text-xs leading-none h-5 py-0.5 px-2">
-              Running
-            </Badge>
-          ) : status === 'error' ? (
-            <Badge size="sm" variant="filled" colorRole="error" className="text-xs leading-none h-5 py-0.5 px-2">
-              Failed
-            </Badge>
-          ) : (
-            <Badge size="sm" variant="outline" colorRole="success" className="text-xs leading-none h-5 py-0.5 px-2">
-              Complete
-            </Badge>
-          )}
-
+        <ToolLineRow
+          name={name}
+          status={status}
+          duration={duration}
+          iconName={iconName}
+        >
           {children}
-
-          <span
-            className="flex items-center justify-center size-5 text-on-surface-variant/80 shrink-0 group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none"
-            aria-hidden="true"
-          >
-            <Icon name="expand_more" size="xs" />
-          </span>
-        </div>
-      </BaseCollapsible.Trigger>
+        </ToolLineRow>
+      </TraceCollapsibleTrigger>
     );
   }
 );
 ToolHeader.displayName = 'Tool.Header';
 
-export interface ToolContentProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Panel> {
+export interface ToolContentProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof TraceCollapsibleContent>, 'className'> {
   children?: React.ReactNode;
   className?: string;
 }
@@ -178,24 +188,22 @@ const ToolContent = React.forwardRef<HTMLDivElement, ToolContentProps>(
     const isGhost = variant === 'ghost' || variant === 'unboxed';
 
     return (
-      <BaseCollapsible.Panel
+      <TraceCollapsibleContent
         ref={ref}
         data-slot="tool-content"
-        className={cn(
-          "overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-quick ease-standard motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
-          className
-        )}
+        variant="flush"
+        className={className}
         {...props}
       >
         <div
           className={cn(
-            'flex flex-col gap-3 p-3.5 pt-1 text-sm font-sans text-on-surface-variant',
-            isGhost ? 'px-0 border-t border-outline-variant/30' : 'border-t border-outline-variant/40'
+            'flex flex-col gap-3 p-3.5 pt-2.5 text-sm font-sans text-on-surface-variant',
+            isGhost && 'px-0'
           )}
         >
           {children}
         </div>
-      </BaseCollapsible.Panel>
+      </TraceCollapsibleContent>
     );
   }
 );
@@ -253,12 +261,12 @@ const ToolInput: React.FC<ToolInputProps> = ({
       {children ? (
         children
       ) : codeString ? (
-        <CodeBlock language="json" variant="flush">
+        <CodeBlock language="json" size="sm" variant="flush">
           <CodeBlock.Header className="px-3 py-1 bg-surface-container/60">
             <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">arguments.json</CodeBlock.Title>
             <CodeBlock.CopyButton value={codeString} />
           </CodeBlock.Header>
-          <CodeBlock.Content>
+          <CodeBlock.Content wrap className="max-h-64">
             <code>{codeString}</code>
           </CodeBlock.Content>
         </CodeBlock>
@@ -292,12 +300,12 @@ const ToolOutput: React.FC<ToolOutputProps> = ({
       {children ? (
         children
       ) : codeString ? (
-        <CodeBlock language="json" variant="flush">
+        <CodeBlock language="json" size="sm" variant="flush">
           <CodeBlock.Header className="px-3 py-1 bg-surface-container/60">
             <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">result.json</CodeBlock.Title>
             <CodeBlock.CopyButton value={codeString} />
           </CodeBlock.Header>
-          <CodeBlock.Content>
+          <CodeBlock.Content wrap className="max-h-64">
             <code>{codeString}</code>
           </CodeBlock.Content>
         </CodeBlock>
@@ -377,6 +385,34 @@ const ToolComponent = React.forwardRef<HTMLDivElement, ToolProps>(
       if (status === 'error') setOpen(true);
     }, [status]);
 
+    const hasBody = Boolean(
+      children || input !== undefined || output !== undefined || error !== undefined
+    );
+
+    if (!hasBody) {
+      return (
+        <Trace
+          ref={ref}
+          variant={resolvedVariant}
+          data-slot="tool-root"
+          data-status={status}
+          className={cn(
+            resolvedVariant !== 'ghost' && resolvedVariant !== 'unboxed' && status === 'calling' && 'border-primary',
+            resolvedVariant !== 'ghost' && resolvedVariant !== 'unboxed' && status === 'error' && 'border-error',
+            className
+          )}
+          {...props}
+        >
+          <ToolLineRow
+            name={name}
+            status={status}
+            duration={duration}
+            iconName={iconName}
+          />
+        </Trace>
+      );
+    }
+
     return (
       <ToolRoot
         ref={ref}
@@ -398,9 +434,9 @@ const ToolComponent = React.forwardRef<HTMLDivElement, ToolProps>(
             children
           ) : (
             <>
-              {input && <ToolInput input={input} />}
-              {output && <ToolOutput output={output} />}
-              {error && <ToolError error={error} />}
+              {input !== undefined && <ToolInput input={input} />}
+              {output !== undefined && <ToolOutput output={output} />}
+              {error !== undefined && <ToolError error={error} />}
             </>
           )}
         </ToolContent>

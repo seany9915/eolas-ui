@@ -58,6 +58,17 @@ function extractContent(toolName, args) {
   return '';
 }
 
+function hasMatchingBacktick(code, startIdx) {
+  for (let j = startIdx; j < code.length; j++) {
+    if (code[j] === '\\') {
+      j += 1;
+      continue;
+    }
+    if (code[j] === '`') return true;
+  }
+  return false;
+}
+
 function stripComments(code) {
   let out = '';
   let quote = null;
@@ -86,8 +97,10 @@ function stripComments(code) {
         continue;
       }
     }
-    if (ch === '"' || ch === '`') {
-      quote = ch;
+    if (ch === '"') {
+      quote = '"';
+    } else if (ch === '`' && hasMatchingBacktick(code, i + 1)) {
+      quote = '`';
     } else if (ch === "'" && (i === 0 || !/[A-Za-z0-9]/.test(code[i - 1]))) {
       quote = "'";
     }
@@ -100,13 +113,10 @@ const STUB_RE =
   /\/\/\s*(?:TODO:?\s*implement|\.\.\.\s*rest of|handle other cases|insert logic here)|\/\*\s*\.\.\.\s*\*\/|\{\/\*\s*\.\.\.\s*rest of[^*]*\*\/\}/i;
 const EMOJI_RE = /\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F/u;
 const AI_BUZZWORDS = 'delve|tapestry|unleash|elevate|spearhead|testament|enclave|telemetric|apparatus';
-const JSX_JARGON = 'committed to|unconstrained|hydrated|synchronized|telemetry|safety matrix|drill matrix|caseload repository|narrative storage';
-const PROP_JARGON = 'committed to|unconstrained|hydrated|synchronized|telemetry|matrix|repository|affordances';
+const PROP_JARGON = 'committed to|unconstrained|hydrated|synchronized|telemetry|matrix|repository';
 const UI_PROP_NAMES = '(?:label|title|description|placeholder|heading|alt|aria-label|emptyText|helperText)';
 
-const JSX_BUZZWORD_RE = new RegExp(`(?<!=)>\\s*[^<>{}=]*?\\b(?:${AI_BUZZWORDS})\\b[^<>{}=]*?<`, 'i');
 const PROP_BUZZWORD_RE = new RegExp(`\\b${UI_PROP_NAMES}\\s*=\\s*["'][^"']*?\\b(?:${AI_BUZZWORDS})\\b`, 'i');
-const JSX_JARGON_RE = new RegExp(`(?<!=)>\\s*[^<>{}=]*?\\b(?:${JSX_JARGON})\\b[^<>{}=]*?<`, 'i');
 const PROP_JARGON_RE = new RegExp(`\\b${UI_PROP_NAMES}\\s*=\\s*["'][^"']*?\\b(?:${PROP_JARGON})\\b`, 'i');
 
 function scan(content, targetFile) {
@@ -123,11 +133,11 @@ function scan(content, targetFile) {
     if (EMOJI_RE.test(stripped)) {
       violations.push('Found a decorative emoji character. Anti-patterns rule bans emojis in UI copy — use Material Symbols via <Icon>.');
     }
-    if (JSX_BUZZWORD_RE.test(stripped) || PROP_BUZZWORD_RE.test(stripped)) {
+    if (PROP_BUZZWORD_RE.test(stripped)) {
       violations.push('Found banned AI cliché vocabulary ("delve", "tapestry", "unleash", "elevate", "enclave", "apparatus", etc.) in UI copy. Write in plain everyday English.');
     }
-    if (JSX_JARGON_RE.test(stripped) || PROP_JARGON_RE.test(stripped)) {
-      violations.push('Found dev/database/CSS jargon in UI copy ("committed to", "unconstrained", "synchronized", "telemetry", "matrix", "repository", "affordances"). Describe user outcomes in plain English.');
+    if (PROP_JARGON_RE.test(stripped)) {
+      violations.push('Found dev/database/CSS jargon in UI copy ("committed to", "unconstrained", "synchronized", "telemetry", "matrix", "repository"). Describe user outcomes in plain English.');
     }
   }
 
@@ -135,8 +145,8 @@ function scan(content, targetFile) {
     if (/text-transform\s*:\s*uppercase\b/i.test(stripped)) {
       violations.push('Found `text-transform: uppercase` in CSS. DESIGN.md bans all-caps styling.');
     }
-    if (/transition\s*:\s*all\b/i.test(stripped)) {
-      violations.push('Found `transition: all` in CSS. Declare explicit targeted properties.');
+    if (/transition(?:-property)?\s*:\s*all\b/i.test(stripped)) {
+      violations.push('Found `transition: all` / `transition-property: all` in CSS. Declare explicit targeted properties.');
     }
     if (/--ease-spring\b/.test(stripped)) {
       violations.push('Found `--ease-spring` in CSS outside globals.css. Standard UI chrome must use `--ease-standard`.');

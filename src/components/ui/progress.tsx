@@ -12,7 +12,7 @@
  */
 import * as React from 'react';
 import { Progress as BaseProgress } from '@base-ui/react/progress';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface ProgressProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseProgress.Root>, 'value'> {
@@ -28,7 +28,6 @@ export interface ProgressProps
   'aria-valuetext'?: string;
   getAriaValueText?: (formattedValue: string | null, value: number | null) => string;
   children?: React.ReactNode;
-  className?: string;
 }
 
 const sizeClasses: Record<'sm' | 'md' | 'lg', string> = {
@@ -62,6 +61,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
       return (
         <BaseProgress.Root
           ref={ref}
+          data-slot="progress"
           value={value ?? null}
           max={max}
           min={min}
@@ -70,7 +70,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
           {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
           getAriaValueText={getAriaValueText}
           aria-label={props['aria-label'] || label || (children ? undefined : 'Progress')}
-          className={cn('flex flex-col gap-1.5 w-full', className)}
+          className={composeClassName('flex flex-col gap-1.5 w-full', className)}
           {...props}
         >
           {children}
@@ -91,6 +91,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
     return (
       <BaseProgress.Root
         ref={ref}
+        data-slot="progress"
         value={value ?? null}
         max={max}
         min={min}
@@ -99,20 +100,21 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
         {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
         getAriaValueText={getAriaValueText}
         aria-label={props['aria-label'] || label || 'Progress'}
-        className={cn('flex flex-col gap-1.5 w-full', className)}
+        className={composeClassName('flex flex-col gap-1.5 w-full', className)}
         {...props}
       >
         {hasHeader && (
           <div className="flex justify-between items-center font-label text-sm font-semibold text-on-surface">
-            {label && <BaseProgress.Label>{label}</BaseProgress.Label>}
+            {label && <BaseProgress.Label data-slot="progress-label">{label}</BaseProgress.Label>}
             {shouldShowValue && !isIndeterminate && (
-              <BaseProgress.Value className="font-mono text-sm font-bold text-on-surface tabular-nums">
+              <BaseProgress.Value data-slot="progress-value" className="font-mono text-sm font-bold text-on-surface tabular-nums">
                 {(formattedValue, val) => formattedValue || `${val ?? Math.round(percentage)}%`}
               </BaseProgress.Value>
             )}
           </div>
         )}
         <BaseProgress.Track
+          data-slot="progress-track"
           className={cn(
             'relative w-full rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/30',
             sizeClasses[size],
@@ -120,6 +122,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
           )}
         >
           <BaseProgress.Indicator
+            data-slot="progress-indicator"
             className={cn(
               'h-full bg-primary transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:animate-none',
               'data-[indeterminate]:w-full data-[indeterminate]:animate-pulse'
@@ -132,22 +135,47 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
 );
 ProgressComponent.displayName = 'Progress';
 
+export const ProgressRoot = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseProgress.Root>
+>((props, ref) => <BaseProgress.Root ref={ref} data-slot="progress" {...props} />);
+ProgressRoot.displayName = 'ProgressRoot';
+
+export const ProgressLabel = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseProgress.Label>
+>((props, ref) => <BaseProgress.Label ref={ref} data-slot="progress-label" {...props} />);
+ProgressLabel.displayName = 'ProgressLabel';
+
+export const ProgressValue = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseProgress.Value>
+>((props, ref) => <BaseProgress.Value ref={ref} data-slot="progress-value" {...props} />);
+ProgressValue.displayName = 'ProgressValue';
+
+export const ProgressTrack = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseProgress.Track>
+>((props, ref) => <BaseProgress.Track ref={ref} data-slot="progress-track" {...props} />);
+ProgressTrack.displayName = 'ProgressTrack';
+
+export const ProgressIndicator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseProgress.Indicator>
+>((props, ref) => <BaseProgress.Indicator ref={ref} data-slot="progress-indicator" {...props} />);
+ProgressIndicator.displayName = 'ProgressIndicator';
+
 // Compound export mapping Base UI primitives
 export const Progress = Object.assign(ProgressComponent, {
-  Root: BaseProgress.Root,
-  Track: BaseProgress.Track,
-  Indicator: BaseProgress.Indicator,
-  Label: BaseProgress.Label,
-  Value: BaseProgress.Value,
+  Root: ProgressRoot,
+  Track: ProgressTrack,
+  Indicator: ProgressIndicator,
+  Label: ProgressLabel,
+  Value: ProgressValue,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseProgress };
-export const ProgressRoot = BaseProgress.Root;
-export const ProgressLabel = BaseProgress.Label;
-export const ProgressValue = BaseProgress.Value;
-export const ProgressTrack = BaseProgress.Track;
-export const ProgressIndicator = BaseProgress.Indicator;
 
 // Cross-export Skeleton for backward compatibility with existing imports
 export { Skeleton } from './skeleton';

@@ -7,11 +7,13 @@
  * Foundation: Built strictly from Base UI primitives, TanStack Table, and design tokens:
  *             - `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell` (`src/components/ui/table.tsx`)
  *             - `Button` (`src/components/ui/button.tsx`)
- *             - `Input` (`src/components/ui/input.tsx`)
+ *             - `InputGroup` (`src/components/ui/input-group.tsx`)
  *             - `Select` (`src/components/ui/select.tsx`)
  *             - `Menu` (`src/components/ui/menu.tsx`)
  *             - `Checkbox` (`src/components/ui/checkbox.tsx`)
  *             - `Badge` (`src/components/ui/badge.tsx`)
+ *             - `Spinner` (`src/components/ui/spinner.tsx`)
+ *             - `Empty` (`src/components/ui/empty.tsx`)
  *             - `Icon` (`src/components/ui/icon.tsx`)
  *             - `@tanstack/react-table`
  *
@@ -83,11 +85,18 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import { Select } from '@/components/ui/select';
 import { Menu } from '@/components/ui/menu';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import { Spinner } from '@/components/ui/spinner';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { Icon } from '@/components/ui/icon';
 
 /* -------------------------------------------------------------------------------------------------
@@ -243,7 +252,7 @@ export function DataTableRowActions<TData extends RowData>({
         {children ? (
           children
         ) : actions && actions.length > 0 ? (
-          <>
+          <Menu.Group>
             {actions.map((action, idx) => (
               <React.Fragment key={action.id || action.label || idx}>
                 {action.destructive && idx > 0 && <Menu.Separator />}
@@ -264,7 +273,7 @@ export function DataTableRowActions<TData extends RowData>({
                 </Menu.Item>
               </React.Fragment>
             ))}
-          </>
+          </Menu.Group>
         ) : null}
       </Menu>
     </div>
@@ -341,6 +350,17 @@ export function DataTableColumnHeader<TData extends RowData, TValue = unknown>({
       <Icon name="unfold_more" size="xs" aria-hidden="true" />
     );
 
+  const currentSort = column.getIsSorted();
+  const handleSortClick = () => {
+    if (currentSort === 'asc') {
+      column.toggleSorting(true);
+    } else if (currentSort === 'desc') {
+      column.clearSorting();
+    } else {
+      column.toggleSorting(false);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -350,41 +370,23 @@ export function DataTableColumnHeader<TData extends RowData, TValue = unknown>({
       )}
       {...props}
     >
-      <Menu
-        side="bottom"
-        align={isNumeric ? 'end' : 'start'}
-        trigger={
-          <Button
-            variant="ghost"
-            size="sm"
-            colorRole="neutral"
-          >
-            {isNumeric && sortIcon}
-            <span className={cn(isNumeric && 'font-mono tabular-nums')}>{title}</span>
-            {!isNumeric && sortIcon}
-          </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        colorRole="neutral"
+        onClick={handleSortClick}
+        aria-label={
+          currentSort === 'asc'
+            ? `Sort by ${title} descending`
+            : currentSort === 'desc'
+              ? `Clear sort on ${title}`
+              : `Sort by ${title} ascending`
         }
       >
-        <Menu.Item icon="arrow_upward" onClick={() => column.toggleSorting(false)}>
-          <span>Asc</span>
-        </Menu.Item>
-        <Menu.Item icon="arrow_downward" onClick={() => column.toggleSorting(true)}>
-          <span>Desc</span>
-        </Menu.Item>
-        {column.getIsSorted() && (
-          <Menu.Item icon="clear" onClick={() => column.clearSorting()}>
-            <span>Clear sort</span>
-          </Menu.Item>
-        )}
-        {column.getCanHide() && (
-          <>
-            <Menu.Separator />
-            <Menu.Item icon="visibility_off" onClick={() => column.toggleVisibility(false)}>
-              <span>Hide</span>
-            </Menu.Item>
-          </>
-        )}
-      </Menu>
+        {isNumeric && sortIcon}
+        <span className={cn(isNumeric && 'font-mono tabular-nums')}>{title}</span>
+        {!isNumeric && sortIcon}
+      </Button>
     </div>
   );
 }
@@ -510,7 +512,7 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
           {selectedValues.size > 0 && (
             <>
               <span className="w-px h-4 bg-outline-variant mx-1" aria-hidden="true" />
-              <Badge variant="outline" colorRole="neutral" size="sm">
+              <Badge variant="soft" colorRole="neutral" size="sm">
                 {selectedValues.size}
               </Badge>
             </>
@@ -595,53 +597,66 @@ export function DataTableToolbar<TData extends RowData>({
   children,
 }: DataTableToolbarProps<TData>) {
   const searchInputId = React.useId();
+  const searchInputRef = React.useRef<HTMLInputElement | null>(null);
   const isFiltered =
     table.state.columnFilters.length > 0 ||
     Boolean(table.state.globalFilter);
   const targetColumn = searchKey ? table.getColumn(searchKey) : undefined;
   const searchVal = (targetColumn?.getFilterValue() as string) ?? '';
   const globalVal = (table.state.globalFilter as string) ?? '';
+  const isColumnSearch = Boolean(searchKey && targetColumn);
+  const showSearch = isColumnSearch || enableGlobalFilter;
+  const activeSearchValue = isColumnSearch ? searchVal : globalVal;
+
+  const handleSearchChange = (value: string) => {
+    if (isColumnSearch && targetColumn) {
+      targetColumn.setFilterValue(value);
+    } else {
+      table.setGlobalFilter(value);
+    }
+  };
+
+  const handleClearSearch = () => {
+    handleSearchChange('');
+    searchInputRef.current?.focus();
+  };
 
   return (
-    <div className="flex flex-col @sm:flex-row items-stretch @sm:items-center justify-between gap-3 w-full">
+    <div
+      data-slot="data-table-toolbar"
+      className="flex flex-col @sm:flex-row items-stretch @sm:items-center justify-between gap-3 w-full"
+    >
       <div className="flex flex-1 flex-wrap items-center gap-2">
-        {searchKey && targetColumn ? (
+        {showSearch ? (
           <Field.Root className="w-full @sm:max-w-xs">
             <Field.Label htmlFor={searchInputId} className="sr-only">
               {searchPlaceholder}
             </Field.Label>
-            <Input
-              id={searchInputId}
-              size="sm"
-              type="search"
-              enterKeyHint="search"
-              clearable
-              placeholder={searchPlaceholder}
-              value={searchVal}
-              onChange={(event) => targetColumn.setFilterValue(event.target.value)}
-              onClear={() => targetColumn.setFilterValue('')}
-              leadingIcon={<Icon name="search" size="xs" aria-hidden="true" />}
-              className="w-full"
-            />
-          </Field.Root>
-        ) : enableGlobalFilter ? (
-          <Field.Root className="w-full @sm:max-w-xs">
-            <Field.Label htmlFor={searchInputId} className="sr-only">
-              {searchPlaceholder}
-            </Field.Label>
-            <Input
-              id={searchInputId}
-              size="sm"
-              type="search"
-              enterKeyHint="search"
-              clearable
-              placeholder={searchPlaceholder}
-              value={globalVal}
-              onChange={(event) => table.setGlobalFilter(event.target.value)}
-              onClear={() => table.setGlobalFilter('')}
-              leadingIcon={<Icon name="search" size="xs" aria-hidden="true" />}
-              className="w-full"
-            />
+            <InputGroup size="sm">
+              <InputGroupAddon align="inline-start">
+                <Icon name="search" size="xs" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                ref={searchInputRef}
+                id={searchInputId}
+                enterKeyHint="search"
+                placeholder={searchPlaceholder}
+                value={activeSearchValue}
+                onChange={(event) => handleSearchChange(event.target.value)}
+              />
+              {activeSearchValue && (
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    size="icon-xs"
+                    colorRole="neutral"
+                    aria-label="Clear search"
+                    onClick={handleClearSearch}
+                  >
+                    <Icon name="close" size="xs" aria-hidden="true" />
+                  </InputGroupButton>
+                </InputGroupAddon>
+              )}
+            </InputGroup>
           </Field.Root>
         ) : null}
         {facetedFilters?.map((filter) => {
@@ -705,6 +720,7 @@ export function DataTablePagination<TData extends RowData>({
 
   return (
     <div
+      data-slot="data-table-pagination"
       className={cn(
         'flex flex-col @sm:flex-row items-center justify-between gap-4 py-2 px-1 w-full',
         className
@@ -713,7 +729,7 @@ export function DataTablePagination<TData extends RowData>({
     >
       {showSelectedCount && (
         <div className="font-sans text-xs text-on-surface-variant flex-1 select-none">
-          {selectedCount} of {totalCount} row(s) selected.
+          {selectedCount} of {totalCount} {totalCount === 1 ? 'row' : 'rows'} selected.
         </div>
       )}
       <div className="flex flex-wrap items-center gap-4 @lg:gap-8 ms-auto">
@@ -792,7 +808,7 @@ export function DataTablePagination<TData extends RowData>({
  * Master Composite Block: DataTable
  * -----------------------------------------------------------------------------------------------*/
 export interface DataTableProps<TData extends RowData> {
-  columns?: ColumnDef<DataTableFeatures, TData, any>[];
+  columns?: ColumnDef<DataTableFeatures, TData, unknown>[];
   data?: TData[];
   /** Optional external TanStack table instance if managing table state externally */
   table?: TanStackTable<DataTableFeatures, TData>;
@@ -967,7 +983,9 @@ export function DataTable<TData extends RowData>({
   );
 
   const applyFacetedFilterFn = React.useCallback(
-    (cols: ColumnDef<DataTableFeatures, TData, any>[]): ColumnDef<DataTableFeatures, TData, any>[] =>
+    (
+      cols: ColumnDef<DataTableFeatures, TData, unknown>[]
+    ): ColumnDef<DataTableFeatures, TData, unknown>[] =>
       cols.map((col) => {
         if ('columns' in col && Array.isArray(col.columns)) {
           return { ...col, columns: applyFacetedFilterFn(col.columns) };
@@ -987,7 +1005,7 @@ export function DataTable<TData extends RowData>({
     [facetedColumnIds]
   );
 
-  const resolvedColumns = React.useMemo<ColumnDef<DataTableFeatures, TData, any>[]>(
+  const resolvedColumns = React.useMemo<ColumnDef<DataTableFeatures, TData, unknown>[]>(
     () => (facetedColumnIds.size === 0 ? columns : applyFacetedFilterFn(columns)),
     [columns, facetedColumnIds, applyFacetedFilterFn]
   );
@@ -1045,7 +1063,7 @@ export function DataTable<TData extends RowData>({
   }, [rowSelectionState, tableData]);
 
   return (
-    <div className={cn('w-full flex flex-col gap-4 @container', className)}>
+    <div data-slot="data-table" className={cn('w-full flex flex-col gap-4 @container', className)}>
       {showToolbar && (
         <DataTableToolbar
           table={table}
@@ -1103,13 +1121,7 @@ export function DataTable<TData extends RowData>({
                   className="text-center"
                 >
                   <div className="h-32 flex items-center justify-center gap-2 text-on-surface-variant font-sans text-sm">
-                    <span className="inline-flex animate-spin motion-reduce:animate-none">
-                      <Icon
-                        name="progress_activity"
-                        size="sm"
-                        aria-hidden="true"
-                      />
-                    </span>
+                    <Spinner size="sm" aria-hidden="true" />
                     <span>Loading records…</span>
                   </div>
                 </TableCell>
@@ -1177,9 +1189,15 @@ export function DataTable<TData extends RowData>({
                   colSpan={colSpanCount}
                   className="text-center"
                 >
-                  <div className="h-32 flex items-center justify-center text-on-surface-variant font-sans text-sm">
-                    {emptyMessage}
-                  </div>
+                  <Empty variant="flush" className="my-0">
+                    <EmptyHeader>
+                      {typeof emptyMessage === 'string' ? (
+                        <EmptyTitle>{emptyMessage}</EmptyTitle>
+                      ) : (
+                        <EmptyDescription className="mb-0">{emptyMessage}</EmptyDescription>
+                      )}
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             )}

@@ -85,7 +85,20 @@ function main(input) {
     // Fall back to default IGNORED_PREFIXES if .oxlintrc.json cannot be parsed
   }
 
-  const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z', '--relative'], {
+  const topRes = spawnSync('git', ['rev-parse', '--show-toplevel'], {
+    cwd: workspaceRoot,
+    encoding: 'utf8',
+    timeout: 5000,
+  });
+
+  if (topRes.error || topRes.status !== 0 || !topRes.stdout) {
+    return respond({});
+  }
+
+  const gitTopLevel = safeRealpath(topRes.stdout.trim());
+  const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
+
+  const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z'], {
     cwd: workspaceRoot,
     encoding: 'utf8',
     timeout: 5000,
@@ -109,11 +122,16 @@ function main(input) {
     }
     if (!relRaw) continue;
 
-    const norm = relRaw.replace(/\\/g, '/').replace(/^\.\//, '');
+    const absPath = path.resolve(gitTopLevel, relRaw);
+    const relToWorkspace = path.relative(resolvedWorkspaceRoot, absPath);
+    if (!relToWorkspace || relToWorkspace.startsWith('..') || path.isAbsolute(relToWorkspace)) {
+      continue;
+    }
+
+    const norm = relToWorkspace.replace(/\\/g, '/').replace(/^\.\//, '');
     if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/i.test(norm)) continue;
     if (ignoredPrefixes.some((prefix) => norm.startsWith(prefix))) continue;
 
-    const absPath = path.join(workspaceRoot, norm);
     if (!fs.existsSync(absPath)) continue;
     try {
       if (!fs.statSync(absPath).isFile()) continue;
@@ -162,6 +180,14 @@ function main(input) {
   }
 
   return respond({});
+}
+
+function safeRealpath(targetPath) {
+  try {
+    return fs.realpathSync(targetPath);
+  } catch {
+    return path.resolve(targetPath);
+  }
 }
 
 function respond(obj) {

@@ -43,6 +43,24 @@ export interface ScrollspyProps extends React.ComponentPropsWithoutRef<'nav'> {
   orientation?: 'vertical' | 'horizontal';
 }
 
+function getScrollParent(node: Element | null): HTMLElement | null {
+  let current = node?.parentElement ?? null;
+  while (current && current !== document.body && current !== document.documentElement) {
+    const { overflow, overflowY, overflowX } = getComputedStyle(current);
+    const isScrollableY =
+      (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay' || overflow === 'auto' || overflow === 'scroll') &&
+      current.scrollHeight > current.clientHeight;
+    const isScrollableX =
+      (overflowX === 'auto' || overflowX === 'scroll' || overflowX === 'overlay' || overflow === 'auto' || overflow === 'scroll') &&
+      current.scrollWidth > current.clientWidth;
+    if (isScrollableY || isScrollableX) {
+      return current;
+    }
+    current = current.parentElement;
+  }
+  return null;
+}
+
 export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
   (
     {
@@ -73,21 +91,31 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
     );
 
     const activeId = controlledActiveId !== undefined ? controlledActiveId : internalActiveId;
+    const activeIdRef = React.useRef(activeId);
+    const controlledActiveIdRef = React.useRef(controlledActiveId);
+    const onActiveChangeRef = React.useRef(onActiveChange);
+    activeIdRef.current = activeId;
+    controlledActiveIdRef.current = controlledActiveId;
+    onActiveChangeRef.current = onActiveChange;
 
-    const handleActiveChange = React.useCallback(
-      (newId: string) => {
-        if (newId && newId !== activeId) {
-          if (controlledActiveId === undefined) {
-            setInternalActiveId(newId);
-          }
-          onActiveChange?.(newId);
+    // Stable callback so IntersectionObserver / scrollend do not tear down on every active section change
+    const handleActiveChange = React.useCallback((newId: string) => {
+      if (newId && newId !== activeIdRef.current) {
+        activeIdRef.current = newId;
+        if (controlledActiveIdRef.current === undefined) {
+          setInternalActiveId(newId);
         }
-      },
-      [activeId, controlledActiveId, onActiveChange]
-    );
+        onActiveChangeRef.current?.(newId);
+      }
+    }, []);
 
     React.useEffect(() => {
       if (typeof window === 'undefined' || items.length === 0) return;
+
+      const sectionElements = items
+        .map((item) => document.getElementById(item.id))
+        .filter((el): el is HTMLElement => el !== null);
+      const scrollContainer = getScrollParent(sectionElements[0] ?? null);
 
       // 1. Check for native CSS scroll-target-group support
       const supportsScrollTargetGroup =
@@ -100,25 +128,31 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
           const currentLink = navRef.current?.querySelector<HTMLAnchorElement>('a:target-current');
           if (currentLink) {
             const href = currentLink.getAttribute('href');
-            const targetId = href?.startsWith('#') ? href.slice(1) : href;
-            if (targetId) {
-              handleActiveChange(targetId);
+            const rawTargetId = href?.startsWith('#') ? href.slice(1) : href;
+            if (rawTargetId) {
+              let decodedId = rawTargetId;
+              try {
+                decodedId = decodeURIComponent(rawTargetId);
+              } catch {
+                // Fall back to rawTargetId on malformed percent-encoding
+              }
+              const matchedItem = items.find(
+                (item) => item.id === decodedId || item.id === rawTargetId
+              );
+              handleActiveChange(matchedItem ? matchedItem.id : decodedId);
             }
           }
         };
 
         syncCurrent();
-        document.addEventListener('scrollend', syncCurrent);
+        const scrollTarget: EventTarget = scrollContainer ?? document;
+        scrollTarget.addEventListener('scrollend', syncCurrent);
         return () => {
-          document.removeEventListener('scrollend', syncCurrent);
+          scrollTarget.removeEventListener('scrollend', syncCurrent);
         };
       }
 
       // 2. IntersectionObserver fallback for Safari, Firefox, and older Chrome
-      const sectionElements = items
-        .map((item) => document.getElementById(item.id))
-        .filter((el): el is HTMLElement => el !== null);
-
       if (sectionElements.length === 0) return;
 
       const observer = new IntersectionObserver(
@@ -129,7 +163,7 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
             }
           });
         },
-        { rootMargin, threshold: 0 }
+        { root: scrollContainer, rootMargin, threshold: 0 }
       );
 
       sectionElements.forEach((el) => observer.observe(el));
@@ -169,15 +203,15 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
                 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isHorizontal
                   ? cn(
-                      'min-h-[44px] px-3.5 py-2 -mb-px border-b-2 font-medium text-xs',
+                      'min-h-[44px] px-3.5 py-2 -mb-px rounded-t-md border-b-2 font-medium text-xs',
                       isActive
-                        ? 'border-primary text-primary font-semibold'
+                        ? 'border-primary bg-primary-container text-on-primary-container font-semibold'
                         : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-outline-variant'
                     )
                   : cn(
                       'min-h-[44px] px-3.5 py-2 rounded-md font-medium text-xs transition-colors',
                       isActive
-                        ? 'bg-primary-container/40 text-primary font-semibold'
+                        ? 'bg-primary-container text-on-primary-container font-semibold'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/50'
                     ),
                 isActive && activeItemClassName,

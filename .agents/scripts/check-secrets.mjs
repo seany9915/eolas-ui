@@ -72,8 +72,19 @@ function scanForSecrets(content, { isMarkdown = false } = {}) {
   const isExplicitPlaceholder = (str) =>
     /(.)\1{5,}/.test(str) ||
     /<[^>]+>/.test(str) ||
-    /(?:^|[_-])(?:mock|dummy|example|placeholder|changeme|fake|sample|replace[_-]?me|your[_-]?api|your[_-]?key|your[_-]?token)(?:[_-]|$)/i.test(str) ||
+    /(?:^|[_-])(?:mock|dummy|example|placeholder|changeme|fake|sample|replace[_-]?me|your[_-]?api|your[_-]?key|your[_-]?token|your[_-]?pass(?:word)?)(?:[_-]|$)/i.test(str) ||
     /(?:^|[^a-zA-Z0-9])(?:test|mock|dummy|fake|example)[_-](?:key|token|secret|password)(?:$|[^a-zA-Z0-9])/i.test(str);
+
+  const DB_PLACEHOLDER_PW_RE =
+    /^(?:password|passwd|secret|changeme|example|placeholder|your[_-]?pass(?:word)?|postgres|mysql|redis|mongo|admin|root|test|demo|local|dev|xxx+)$/i;
+
+  const isPlausibleGenericSecret = (val) =>
+    !val.includes('${') &&
+    !/^[a-z]+(?:-[a-z]+)+$/.test(val) &&
+    !/^[a-z]+(?:_[a-z]+)+$/.test(val) &&
+    !/^[a-z]+(?:\.[a-z]+)+$/.test(val) &&
+    !/^(?:https?:\/\/|\/)/i.test(val) &&
+    (/[0-9]/.test(val) || (/[A-Z]/.test(val) && /[a-z]/.test(val)));
 
   const findLiveMatch = (globalRegex, groupIdx = 0, extraFilter = null) => {
     for (const match of content.matchAll(globalRegex)) {
@@ -109,8 +120,8 @@ function scanForSecrets(content, { isMarkdown = false } = {}) {
     });
   }
 
-  // 3. GitHub Personal Access / OAuth / App Tokens
-  if (findLiveMatch(/(?:ghp|gho|ghs|ghr)_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}/g)) {
+  // 3. GitHub Personal Access / OAuth / User-to-Server / App Tokens
+  if (findLiveMatch(/(?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}/g)) {
     violations.push({
       severity: 'deny',
       message: 'Detected hardcoded GitHub Token. Revoke and move to secure secret storage.',
@@ -149,17 +160,40 @@ function scanForSecrets(content, { isMarkdown = false } = {}) {
     });
   }
 
-  // 8. Generic hardcoded high-entropy credentials in JS/TS/JSON or unquoted .env (skipped in Markdown docs)
+  // 8. Signed 3-segment JSON Web Tokens (JWT)
+  if (findLiveMatch(/\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g)) {
+    violations.push({
+      severity: 'deny',
+      message: 'Detected hardcoded JWT token literal. Never commit signed bearer tokens into source files.',
+    });
+  }
+
+  // 9. Database connection URIs with embedded non-placeholder passwords
+  if (
+    findLiveMatch(
+      /(?:postgres|postgresql|mysql|mongodb(?:\+srv)?|redis|rediss):\/\/[^:\s/'"]+:([^@\s/'"]{8,})@/gi,
+      1,
+      (val) => !val.includes('${') && !DB_PLACEHOLDER_PW_RE.test(val)
+    )
+  ) {
+    violations.push({
+      severity: 'deny',
+      message: 'Detected database connection URI with an embedded password. Move credentials to environment variables.',
+    });
+  }
+
+  // 10. Generic hardcoded high-entropy credentials in JS/TS/JSON or unquoted .env (skipped in Markdown docs)
   if (!isMarkdown) {
     const genericSecretAssignment =
       findLiveMatch(
-        /(?:["']?)(api_key|apiKey|secret_key|secretKey|auth_token|authToken|access_token|accessToken|private_key|privateKey|password)(?:["']?)\s*[:=]\s*(["'`])([A-Za-z0-9+/=_${}-]{32,})\2/gi,
+        /(?:["']?)(api_key|apiKey|secret_key|secretKey|auth_token|authToken|access_token|accessToken|private_key|privateKey|password)(?:["']?)\s*[:=]\s*(["'`])([^\s"'`\\]{32,})\2/gi,
         3,
-        (val) => !val.includes('${') && !/^[a-z]+(?:-[a-z]+)+$/.test(val)
+        isPlausibleGenericSecret
       ) ||
       findLiveMatch(
-        /^[ \t]*(?:export[ \t]+)?([A-Z0-9_]*(?:API_KEY|SECRET_KEY|AUTH_TOKEN|ACCESS_TOKEN|PRIVATE_KEY|PASSWORD))[ \t]*=[ \t]*([A-Za-z0-9+/=_-]{32,})[ \t]*(?:#.*)?$/gm,
-        2
+        /^[ \t]*(?:export[ \t]+)?([A-Z0-9_]*(?:API_KEY|SECRET_KEY|AUTH_TOKEN|ACCESS_TOKEN|PRIVATE_KEY|PASSWORD))[ \t]*=[ \t]*([^\s#]{32,})[ \t]*(?:#.*)?$/gm,
+        2,
+        isPlausibleGenericSecret
       );
 
     if (genericSecretAssignment) {

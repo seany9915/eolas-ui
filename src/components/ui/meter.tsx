@@ -12,27 +12,21 @@
  */
 import * as React from 'react';
 import { Meter as BaseMeter } from '@base-ui/react/meter';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
-export interface MeterProps {
+export interface MeterProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseMeter.Root>, 'value' | 'children'> {
   value: number;
-  min?: number;
-  max?: number;
   label?: React.ReactNode;
   description?: React.ReactNode;
-  format?: Intl.NumberFormatOptions;
-  locale?: Intl.LocalesArgument;
-  'aria-valuetext'?: string;
-  getAriaValueText?: (formattedValue: string, value: number) => string;
   children?: React.ReactNode;
-  className?: string;
   colorRole?: 'primary' | 'secondary' | 'tertiary' | 'warning' | 'error' | 'success';
 }
 
 const colorRoleClasses: Record<'primary' | 'secondary' | 'tertiary' | 'warning' | 'error' | 'success', string> = {
   primary: 'bg-primary',
   secondary: 'bg-secondary',
-  tertiary: 'bg-tertiary',
+  tertiary: 'bg-tertiary border border-outline',
   warning: 'bg-warning',
   error: 'bg-error',
   success: 'bg-success',
@@ -65,7 +59,7 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
         locale={locale}
         {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
         getAriaValueText={getAriaValueText}
-        className={cn('flex flex-col gap-1.5 w-full', className)}
+        className={composeClassName('flex flex-col gap-1.5 w-full', className)}
         {...props}
       >
         {children}
@@ -83,7 +77,7 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
       locale={locale}
       {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
       getAriaValueText={getAriaValueText}
-      className={cn('flex flex-col gap-1.5 w-full', className)}
+      className={composeClassName('flex flex-col gap-1.5 w-full', className)}
       {...props}
     >
       {(label || value !== undefined) && (

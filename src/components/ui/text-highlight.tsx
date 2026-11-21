@@ -15,7 +15,11 @@
  *   `::highlight(search-results) { background-color: var(--secondary-container); color: var(--on-secondary-container); }`
  */
 import * as React from 'react';
-import { useTextHighlight, type UseTextHighlightOptions } from '@/lib/use-text-highlight';
+import {
+  useTextHighlight,
+  findNormalizedMatchRanges,
+  type UseTextHighlightOptions,
+} from '@/lib/use-text-highlight';
 import { cn } from '@/lib/utils';
 
 export interface TextHighlightProps extends React.HTMLAttributes<HTMLDivElement>, UseTextHighlightOptions {
@@ -24,6 +28,41 @@ export interface TextHighlightProps extends React.HTMLAttributes<HTMLDivElement>
   /** Whether to render an accessible hidden live region announcing match count. Defaults to true */
   announceMatches?: boolean;
   children: React.ReactNode;
+}
+
+function renderFallbackHighlightedString(
+  text: string,
+  trimmedQuery: string,
+  caseSensitive: boolean
+): { nodes: React.ReactNode; count: number } {
+  if (!trimmedQuery) return { nodes: text, count: 0 };
+  const ranges = findNormalizedMatchRanges(text, trimmedQuery, caseSensitive);
+  if (ranges.length === 0) return { nodes: text, count: 0 };
+
+  const parts: React.ReactNode[] = [];
+  let cursor = 0;
+
+  for (let i = 0; i < ranges.length; i++) {
+    const [start, end] = ranges[i];
+    if (start > cursor) {
+      parts.push(text.slice(cursor, start));
+    }
+    parts.push(
+      <mark
+        key={`${start}-${end}-${i}`}
+        className="bg-secondary-container text-on-secondary-container underline decoration-2 underline-offset-2 rounded-xs"
+      >
+        {text.slice(start, end)}
+      </mark>
+    );
+    cursor = end;
+  }
+
+  if (cursor < text.length) {
+    parts.push(text.slice(cursor));
+  }
+
+  return { nodes: parts, count: ranges.length };
 }
 
 export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps>(
@@ -58,15 +97,35 @@ export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps
       caseSensitive,
     });
 
+    const trimmedQuery = query.trim();
+
+    // When CSS.highlights is unsupported, never mutate React children with TreeWalker.
+    // Render declarative <mark> spans only for plain string children; degrade safely otherwise.
+    const fallbackResult = React.useMemo(() => {
+      if (isSupported || typeof children !== 'string' || !trimmedQuery) {
+        return null;
+      }
+      return renderFallbackHighlightedString(children, trimmedQuery, caseSensitive);
+    }, [isSupported, children, trimmedQuery, caseSensitive]);
+
+    const effectiveMatchCount = fallbackResult ? fallbackResult.count : matchCount;
+    const canAnnounce = isSupported || typeof children === 'string';
+    const liveMessage =
+      canAnnounce && trimmedQuery
+        ? effectiveMatchCount > 0
+          ? `${effectiveMatchCount} ${effectiveMatchCount === 1 ? 'search match' : 'search matches'} found`
+          : 'No matches found'
+        : '';
+
     return (
       <div ref={setRef} className={cn('relative', className)} {...props}>
-        {/* Accessible screen reader live-region announcement */}
-        {announceMatches && isSupported && query.trim() && (
+        {/* Permanently mounted sr-only live region so assistive tech reliably announces updates */}
+        {announceMatches && (
           <span data-text-highlight-status className="sr-only" aria-live="polite" aria-atomic="true">
-            {matchCount > 0 ? `${matchCount} search matches found` : 'No matches found'}
+            {liveMessage}
           </span>
         )}
-        {children}
+        {fallbackResult ? fallbackResult.nodes : children}
       </div>
     );
   }

@@ -15,7 +15,7 @@
 import * as React from 'react';
 import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { getContrastInk } from '@/lib/contrast';
 
 export type AvatarSize = 'sm' | 'md' | 'lg';
@@ -37,7 +37,6 @@ export interface AvatarRootProps extends React.ComponentPropsWithoutRef<typeof B
   size?: AvatarSize;
   /** Optional user-supplied background color for initials/fallback avatars; computes accessible foreground contrast automatically. */
   customColor?: string;
-  className?: string;
   children?: React.ReactNode;
 }
 
@@ -67,12 +66,16 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
     <AvatarContext.Provider value={{ size }}>
       <BaseAvatar.Root
         ref={ref}
+        data-slot="avatar"
+        data-size={size}
         style={dynamicStyle}
-        className={cn(
-          'relative inline-flex items-center justify-center rounded-full overflow-hidden select-none',
-          'bg-surface-container-high text-on-surface-variant font-label font-bold border border-outline-variant',
-          customColor && 'contrast-auto',
-          sizeClasses[size],
+        className={composeClassName(
+          cn(
+            'group/avatar relative inline-flex items-center justify-center rounded-full select-none shrink-0',
+            'bg-surface-container-high text-on-surface-variant font-label font-bold border border-outline-variant',
+            customColor && 'contrast-auto',
+            sizeClasses[size]
+          ),
           className
         )}
         {...props}
@@ -84,9 +87,7 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
 });
 AvatarRoot.displayName = 'AvatarRoot';
 
-export interface AvatarImageProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Image> {
-  className?: string;
-}
+export interface AvatarImageProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Image> {}
 
 export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(({
   className,
@@ -95,8 +96,9 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
   return (
     <BaseAvatar.Image
       ref={ref}
-      className={cn(
-        'w-full h-full object-cover transition-opacity duration-[var(--duration-quick)] data-[loading]:opacity-0 motion-reduce:transition-none',
+      data-slot="avatar-image"
+      className={composeClassName(
+        'size-full rounded-full object-cover transition-opacity duration-[var(--duration-quick)] data-[loading]:opacity-0 data-[error]:hidden motion-reduce:transition-none',
         className
       )}
       {...props}
@@ -106,7 +108,6 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
 AvatarImage.displayName = 'AvatarImage';
 
 export interface AvatarFallbackProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Fallback> {
-  className?: string;
   children?: React.ReactNode;
 }
 
@@ -119,9 +120,10 @@ export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackPr
   return (
     <BaseAvatar.Fallback
       ref={ref}
+      data-slot="avatar-fallback"
       delay={delay}
-      className={cn(
-        'flex items-center justify-center w-full h-full font-label font-semibold',
+      className={composeClassName(
+        'flex items-center justify-center size-full rounded-full font-label font-semibold overflow-hidden',
         className
       )}
       {...props}
@@ -131,6 +133,62 @@ export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackPr
   );
 });
 AvatarFallback.displayName = 'AvatarFallback';
+
+export interface AvatarBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {}
+
+export const AvatarBadge = React.forwardRef<HTMLSpanElement, AvatarBadgeProps>(({
+  className,
+  ...props
+}, ref) => (
+  <span
+    ref={ref}
+    data-slot="avatar-badge"
+    className={cn(
+      'absolute bottom-0 end-0 z-10 inline-flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface select-none',
+      'size-2.5 group-data-[size=sm]/avatar:size-2 group-data-[size=md]/avatar:size-2.5 group-data-[size=lg]/avatar:size-3.5',
+      '[&>svg]:size-2 group-data-[size=lg]/avatar:[&>svg]:size-2.5',
+      className
+    )}
+    {...props}
+  />
+));
+AvatarBadge.displayName = 'AvatarBadge';
+
+export interface AvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(({
+  className,
+  ...props
+}, ref) => (
+  <div
+    ref={ref}
+    data-slot="avatar-group"
+    className={cn(
+      'group/avatar-group flex items-center [&>*:not(:first-child)]:-ms-2 [&>[data-slot=avatar]]:ring-2 [&>[data-slot=avatar]]:ring-surface',
+      className
+    )}
+    {...props}
+  />
+));
+AvatarGroup.displayName = 'AvatarGroup';
+
+export interface AvatarGroupCountProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const AvatarGroupCount = React.forwardRef<HTMLDivElement, AvatarGroupCountProps>(({
+  className,
+  ...props
+}, ref) => (
+  <div
+    ref={ref}
+    data-slot="avatar-group-count"
+    className={cn(
+      'relative flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-container text-xs font-label font-semibold text-on-surface-variant ring-2 ring-surface border border-outline-variant select-none',
+      className
+    )}
+    {...props}
+  />
+));
+AvatarGroupCount.displayName = 'AvatarGroupCount';
 
 export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Root> {
   src?: string;
@@ -146,7 +204,6 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseA
   /** Optional user-supplied background color for initials/fallback avatars; computes accessible foreground contrast automatically. */
   customColor?: string;
   children?: React.ReactNode;
-  className?: string;
 }
 
 const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
@@ -192,7 +249,7 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
 });
 AvatarComponent.displayName = 'Avatar';
 
-export interface AvatarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface AvatarButtonProps extends React.ComponentPropsWithoutRef<typeof BaseButton> {
   avatar: AvatarProps;
   label?: string;
 }
@@ -208,10 +265,12 @@ export const AvatarButton = React.forwardRef<HTMLButtonElement, AvatarButtonProp
       ref={ref}
       type="button"
       aria-label={label}
-      className={cn(
-        'min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1 rounded-full cursor-pointer',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-        'transition-transform active:scale-95 hover:opacity-90 motion-reduce:active:scale-100 motion-reduce:transition-none',
+      className={composeClassName(
+        cn(
+          'min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1 rounded-full cursor-pointer',
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'transition-transform active:scale-95 hover:opacity-90 motion-reduce:active:scale-100 motion-reduce:transition-none'
+        ),
         className
       )}
       {...props}
@@ -227,6 +286,9 @@ export const Avatar = Object.assign(AvatarComponent, {
   Root: AvatarRoot,
   Image: AvatarImage,
   Fallback: AvatarFallback,
+  Badge: AvatarBadge,
+  Group: AvatarGroup,
+  GroupCount: AvatarGroupCount,
   Button: AvatarButton,
 });
 

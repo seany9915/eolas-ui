@@ -42,11 +42,11 @@ const sizeConfig: Record<ProgressRingSize, { dimension: number; defaultStroke: n
 };
 
 const colorStyles: Record<ProgressRingColor, { indicator: string; track: string }> = {
-  primary: { indicator: 'text-primary', track: 'text-surface-container' },
-  secondary: { indicator: 'text-secondary', track: 'text-surface-container' },
-  success: { indicator: 'text-success', track: 'text-surface-container' },
-  warning: { indicator: 'text-warning', track: 'text-surface-container' },
-  error: { indicator: 'text-error', track: 'text-surface-container' },
+  primary: { indicator: 'text-primary', track: 'text-surface-container-high' },
+  secondary: { indicator: 'text-secondary', track: 'text-surface-container-high' },
+  success: { indicator: 'text-success', track: 'text-surface-container-high' },
+  warning: { indicator: 'text-warning', track: 'text-surface-container-high' },
+  error: { indicator: 'text-error', track: 'text-surface-container-high' },
 };
 
 const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps>(
@@ -66,6 +66,8 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
       indicatorClassName,
       format,
       locale,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
       ...props
     },
     ref
@@ -91,11 +93,13 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
     const colors = colorStyles[color] || colorStyles.primary;
+    const resolvedAriaLabel = ariaLabel ?? (!label && !ariaLabelledBy ? 'Progress' : undefined);
 
     return (
       <BaseProgress.Root
         ref={ref}
-        aria-label={props['aria-label'] || label || 'Progress'}
+        aria-label={resolvedAriaLabel}
+        aria-labelledby={ariaLabelledBy}
         value={value ?? null}
         max={max}
         min={min}
@@ -113,7 +117,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
         <div className="relative inline-flex items-center justify-center" style={{ width: dimension, height: dimension }}>
           <svg
             className={cn(
-              'w-full h-full -rotate-90 origin-center',
+              'size-full -rotate-90 origin-center',
               isIndeterminate && 'animate-spin motion-reduce:animate-none'
             )}
             viewBox={`0 0 ${dimension} ${dimension}`}
@@ -127,7 +131,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
               stroke="currentColor"
               strokeWidth={strokeWidth}
               fill="transparent"
-              className={cn(colors.track, trackClassName)}
+              className={cn(colors.track, 'forced-colors:stroke-[GrayText]', trackClassName)}
             />
 
             {/* Filled progress circle */}
@@ -143,6 +147,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
               fill="transparent"
               className={cn(
                 colors.indicator,
+                'forced-colors:stroke-[Highlight]',
                 'transition-[stroke-dashoffset] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
                 indicatorClassName
               )}
@@ -154,7 +159,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
             {children !== undefined ? (
               children
             ) : showValue && !isIndeterminate ? (
-              <BaseProgress.Value>
+              <BaseProgress.Value aria-hidden="true">
                 {(formattedValue, val) => formattedValue || `${Math.round(val ?? percentage)}%`}
               </BaseProgress.Value>
             ) : null}

@@ -13,50 +13,54 @@
  */
 import * as React from 'react';
 import { Slider as BaseSlider } from '@base-ui/react/slider';
-import { cn } from '@/lib/utils';
+import { composeClassName } from '@/lib/utils';
 
-export interface SliderProps {
+export interface SliderProps<Value extends number | readonly number[] = number | readonly number[]>
+  extends Omit<
+    BaseSlider.Root.Props<Value>,
+    'value' | 'defaultValue' | 'onValueChange' | 'onValueCommitted'
+  > {
   label?: React.ReactNode;
   description?: React.ReactNode;
-  value?: number | readonly number[];
-  defaultValue?: number | readonly number[];
-  onValueChange?: (value: any, eventDetails?: BaseSlider.Root.ChangeEventDetails) => void;
-  onValueCommitted?: (value: any, eventDetails?: BaseSlider.Root.CommitEventDetails) => void;
-  min?: number;
-  max?: number;
-  step?: number;
-  minStepsBetweenValues?: number;
-  thumbCollisionBehavior?: 'push' | 'swap' | 'none';
-  format?: Intl.NumberFormatOptions;
-  locale?: Intl.LocalesArgument;
-  orientation?: 'horizontal' | 'vertical';
-  name?: string;
-  disabled?: boolean;
-  children?: React.ReactNode;
-  className?: string;
+  value?: Value;
+  defaultValue?: Value;
+  onValueChange?: (
+    value: Value extends number ? number : Value,
+    eventDetails: BaseSlider.Root.ChangeEventDetails
+  ) => void;
+  onValueCommitted?: (
+    value: Value extends number ? number : Value,
+    eventDetails: BaseSlider.Root.CommitEventDetails
+  ) => void;
 }
 
-const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
-  label,
-  description,
-  value,
-  defaultValue,
-  onValueChange,
-  onValueCommitted,
-  min = 0,
-  max = 100,
-  step = 1,
-  minStepsBetweenValues,
-  thumbCollisionBehavior,
-  format,
-  locale,
-  orientation = 'horizontal',
-  name,
-  disabled,
-  children,
-  className,
-  ...props
-}, ref) => {
+const SLIDER_ROOT_BASE_CLASS =
+  'flex flex-col gap-2 w-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40';
+
+function SliderComponentInner<Value extends number | readonly number[] = number | readonly number[]>(
+  {
+    label,
+    description,
+    value,
+    defaultValue,
+    onValueChange,
+    onValueCommitted,
+    min = 0,
+    max = 100,
+    step = 1,
+    minStepsBetweenValues,
+    thumbCollisionBehavior,
+    format,
+    locale,
+    orientation = 'horizontal',
+    name,
+    disabled,
+    children,
+    className,
+    ...props
+  }: SliderProps<Value>,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
   const rangeValues = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)
@@ -68,12 +72,14 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   const effectiveMinSteps = minStepsBetweenValues ?? (isRange ? 1 : 0);
   const effectiveCollision = thumbCollisionBehavior ?? (isRange ? 'none' : 'push');
   const labelText = typeof label === 'string' && label.trim() ? label.trim() : undefined;
+  const rootClassName = composeClassName(SLIDER_ROOT_BASE_CLASS, className);
 
   // Composable compound usage
   if (children) {
     return (
-      <BaseSlider.Root
+      <BaseSlider.Root<Value>
         ref={ref}
+        data-slot="slider"
         value={value}
         defaultValue={effectiveDefaultValue}
         onValueChange={onValueChange}
@@ -88,7 +94,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
         orientation={orientation}
         name={name}
         disabled={disabled}
-        className={cn('flex flex-col gap-2 w-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40', className)}
+        className={rootClassName}
         {...props}
       >
         {children}
@@ -97,8 +103,9 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
   }
 
   return (
-    <BaseSlider.Root
+    <BaseSlider.Root<Value>
       ref={ref}
+      data-slot="slider"
       value={value}
       defaultValue={effectiveDefaultValue}
       onValueChange={onValueChange}
@@ -113,7 +120,7 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
       orientation={orientation}
       name={name}
       disabled={disabled}
-      className={cn('flex flex-col gap-2 w-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40', className)}
+      className={rootClassName}
       {...props}
     >
       {(label || value !== undefined) && (
@@ -135,13 +142,14 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
         </span>
       )}
 
-      <BaseSlider.Control className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
-        <BaseSlider.Track className="relative h-2 w-full rounded-full bg-surface-container-high border border-outline data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
-          <BaseSlider.Indicator className="rounded-full bg-primary data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
+      <BaseSlider.Control data-slot="slider-control" className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
+        <BaseSlider.Track data-slot="slider-track" className="relative h-2 w-full rounded-full bg-surface-container-high border border-outline data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
+          <BaseSlider.Indicator data-slot="slider-range" className="rounded-full bg-primary data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
           {isRange ? (
             Array.from({ length: thumbCount }, (_, thumbIndex) => (
               <BaseSlider.Thumb
                 key={thumbIndex}
+                data-slot="slider-thumb"
                 index={thumbIndex}
                 aria-label={
                   thumbCount === 2
@@ -156,32 +164,62 @@ const SliderComponent = React.forwardRef<HTMLDivElement, SliderProps>(({
                       ? `${labelText} thumb ${thumbIndex + 1}`
                       : `Slider value ${thumbIndex + 1}`
                 }
-                className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+                className="relative block size-5 rounded-full border-2 border-on-primary bg-primary shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
               />
             ))
           ) : (
             <BaseSlider.Thumb
+              data-slot="slider-thumb"
               aria-label={labelText ?? 'Slider value'}
-              className="block size-5 rounded-full border-2 border-primary bg-surface shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+              className="relative block size-5 rounded-full border-2 border-on-primary bg-primary shadow-ambient hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
             />
           )}
         </BaseSlider.Track>
       </BaseSlider.Control>
     </BaseSlider.Root>
   );
-});
+}
 
+const SliderComponent = React.forwardRef(SliderComponentInner) as (<
+  Value extends number | readonly number[] = number | readonly number[]
+>(
+  props: SliderProps<Value> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
 SliderComponent.displayName = 'Slider';
+
+export const SliderControl = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseSlider.Control>
+>((props, ref) => <BaseSlider.Control ref={ref} data-slot="slider-control" {...props} />);
+SliderControl.displayName = 'SliderControl';
+
+export const SliderTrack = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseSlider.Track>
+>((props, ref) => <BaseSlider.Track ref={ref} data-slot="slider-track" {...props} />);
+SliderTrack.displayName = 'SliderTrack';
+
+export const SliderIndicator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseSlider.Indicator>
+>((props, ref) => <BaseSlider.Indicator ref={ref} data-slot="slider-range" {...props} />);
+SliderIndicator.displayName = 'SliderIndicator';
+
+export const SliderThumb = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseSlider.Thumb>
+>((props, ref) => <BaseSlider.Thumb ref={ref} data-slot="slider-thumb" {...props} />);
+SliderThumb.displayName = 'SliderThumb';
 
 // Compound export mapping Base UI primitives
 export const Slider = Object.assign(SliderComponent, {
   Root: BaseSlider.Root,
   Label: BaseSlider.Label,
   Value: BaseSlider.Value,
-  Control: BaseSlider.Control,
-  Track: BaseSlider.Track,
-  Indicator: BaseSlider.Indicator,
-  Thumb: BaseSlider.Thumb,
+  Control: SliderControl,
+  Track: SliderTrack,
+  Indicator: SliderIndicator,
+  Thumb: SliderThumb,
 });
 
 // Re-export Base UI primitives for compound composition
@@ -189,9 +227,5 @@ export { BaseSlider };
 export const SliderRoot = BaseSlider.Root;
 export const SliderLabel = BaseSlider.Label;
 export const SliderValue = BaseSlider.Value;
-export const SliderControl = BaseSlider.Control;
-export const SliderTrack = BaseSlider.Track;
-export const SliderIndicator = BaseSlider.Indicator;
-export const SliderThumb = BaseSlider.Thumb;
 
 export default Slider;

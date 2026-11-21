@@ -29,6 +29,7 @@ import {
   ComboboxGroupLabel,
   ComboboxSeparator,
   createComboboxItems,
+  type ComboboxProps,
 } from './combobox';
 import { Tooltip } from './tooltip';
 import { Badge } from './badge';
@@ -42,25 +43,39 @@ export interface ModelItem extends SelectOption {
 
 export type ThinkingEffort = 'off' | 'low' | 'medium' | 'high';
 
-export interface ModelSelectorRootProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
-  className?: string;
+export type ModelSelectorRootProps<
+  Value = string,
+  Multiple extends boolean | undefined = false,
+  Item = Value
+> = ComboboxProps<Value, Multiple, Item>;
+
+function ModelSelectorRootInner<
+  Value = string,
+  Multiple extends boolean | undefined = false,
+  Item = Value
+>(
+  { children, className, ...props }: ModelSelectorRootProps<Value, Multiple, Item>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
+  return (
+    <Combobox<Value, Multiple, Item>
+      ref={ref}
+      data-slot="model-selector-root"
+      className={cn('inline-flex items-center gap-2', className)}
+      {...props}
+    >
+      {children}
+    </Combobox>
+  );
 }
 
-const ModelSelectorRoot = React.forwardRef<HTMLDivElement, ModelSelectorRootProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        data-slot="model-selector-root"
-        className={cn('inline-flex items-center gap-2', className)}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-);
+const ModelSelectorRoot = React.forwardRef(ModelSelectorRootInner) as (<
+  Value = string,
+  Multiple extends boolean | undefined = false,
+  Item = Value
+>(
+  props: ModelSelectorRootProps<Value, Multiple, Item> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
 ModelSelectorRoot.displayName = 'ModelSelector.Root';
 
 export const EFFORT_OPTIONS: SelectOption[] = [
@@ -248,7 +263,12 @@ const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorPro
     ref
   ) => {
     return (
-      <ModelSelectorRoot ref={ref} className={className} {...props}>
+      <div
+        ref={ref}
+        data-slot="model-selector-root"
+        className={cn('inline-flex items-center gap-2', className)}
+        {...props}
+      >
         <ModelSelectorModel
           value={model}
           defaultValue={defaultModel}
@@ -266,7 +286,7 @@ const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorPro
             size={size}
           />
         )}
-      </ModelSelectorRoot>
+      </div>
     );
   }
 );

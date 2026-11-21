@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Popover as BasePopover } from '@base-ui/react/popover';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 
 interface PopoverContextValue {
@@ -28,7 +28,7 @@ export interface PopoverProps<Payload = unknown> {
   openOnHover?: boolean;
   delay?: number;
   closeDelay?: number;
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: BasePopover.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
@@ -43,7 +43,8 @@ export interface PopoverProps<Payload = unknown> {
   showCloseButton?: boolean;
   closeLabel?: string;
   portal?: boolean;
-  className?: string;
+  keepMounted?: boolean;
+  className?: BasePopover.Popup.Props['className'];
 }
 
 function PopoverComponentInner<Payload = unknown>(
@@ -76,6 +77,7 @@ function PopoverComponentInner<Payload = unknown>(
     showCloseButton = false,
     closeLabel = 'Close',
     portal = true,
+    keepMounted,
     className,
   }: PopoverProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
@@ -133,25 +135,22 @@ function PopoverComponentInner<Payload = unknown>(
     >
       <BasePopover.Popup
         ref={ref}
+        data-slot="popover-content"
         initialFocus={initialFocus}
         finalFocus={finalFocus}
-        className={cn(
-          'w-80 p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none',
-          'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-          'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-          'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
-          'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+        className={composeClassName(
+          'w-80 p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
           className
         )}
       >
         {showArrow && <PopoverArrow />}
         {title && (
-          <BasePopover.Title className="font-heading text-base font-bold text-on-surface mb-1.5">
+          <BasePopover.Title data-slot="popover-title" className="font-heading text-base font-bold text-on-surface mb-1.5">
             {title}
           </BasePopover.Title>
         )}
         {description && (
-          <BasePopover.Description className="font-sans text-sm text-on-surface-variant mb-3 leading-relaxed">
+          <BasePopover.Description data-slot="popover-description" className="font-sans text-sm text-on-surface-variant mb-3 leading-relaxed">
             {description}
           </BasePopover.Description>
         )}
@@ -160,7 +159,7 @@ function PopoverComponentInner<Payload = unknown>(
         </div>
         {showCloseButton && (
           <div className="mt-4 pt-3 border-t border-outline-variant flex justify-end">
-            <BasePopover.Close className="inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded-md bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <BasePopover.Close data-slot="popover-close" className="inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded-md bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {closeLabel}
             </BasePopover.Close>
           </div>
@@ -185,7 +184,9 @@ function PopoverComponentInner<Payload = unknown>(
         <>
           <BasePopover.Trigger
             id={popoverId}
+            data-slot="popover-trigger"
             render={React.isValidElement(trigger) ? trigger : undefined}
+            nativeButton={resolveNativeButton(trigger)}
             openOnHover={openOnHover}
             delay={delay}
             closeDelay={closeDelay}
@@ -193,7 +194,7 @@ function PopoverComponentInner<Payload = unknown>(
             {!React.isValidElement(trigger) ? trigger : undefined}
           </BasePopover.Trigger>
           {portal ? (
-            <BasePopover.Portal>
+            <BasePopover.Portal keepMounted={keepMounted}>
               {isModalBackdrop && (
                 <BasePopover.Backdrop className="fixed inset-0 bg-on-surface/30 z-50 transition-opacity duration-[var(--duration-fast)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
               )}
@@ -232,9 +233,12 @@ export const PopoverArrow = React.forwardRef<HTMLDivElement, PopoverArrowProps>(
   ({ className, children, ...props }, ref) => (
     <BasePopover.Arrow
       ref={ref}
-      className={cn(
-        'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
-        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+      data-slot="popover-arrow"
+      className={composeClassName(
+        cn(
+          'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+          'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+        ),
         className
       )}
       {...props}
@@ -257,14 +261,15 @@ PopoverArrow.displayName = 'PopoverArrow';
 
 export interface PopoverContentProps
   extends React.ComponentPropsWithoutRef<typeof BasePopover.Popup> {
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: BasePopover.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   showArrow?: boolean;
-  containerClassName?: string;
+  containerClassName?: BasePopover.Positioner.Props['className'];
   portal?: boolean;
+  keepMounted?: boolean;
 }
 
 export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
@@ -280,6 +285,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
       showArrow = true,
       containerClassName,
       portal = true,
+      keepMounted,
       ...props
     },
     ref
@@ -291,16 +297,13 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
         sideOffset={sideOffset}
         alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={cn('z-50 outline-none', containerClassName)}
+        className={composeClassName('z-50 outline-none', containerClassName)}
       >
         <BasePopover.Popup
           ref={ref}
-          className={cn(
-            'w-80 p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none',
-            'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
-            'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+          data-slot="popover-content"
+          className={composeClassName(
+            'w-80 p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -315,7 +318,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
       return content;
     }
 
-    return <BasePopover.Portal>{content}</BasePopover.Portal>;
+    return <BasePopover.Portal keepMounted={keepMounted}>{content}</BasePopover.Portal>;
   }
 );
 PopoverContent.displayName = 'PopoverContent';
@@ -324,7 +327,7 @@ export interface PopoverTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BasePopover.Trigger> {}
 
 export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
-  ({ className, children, openOnHover, delay, closeDelay, ...props }, ref) => {
+  ({ className, children, openOnHover, delay, closeDelay, render, nativeButton, ...props }, ref) => {
     const context = usePopoverContext();
     const resolvedOpenOnHover = openOnHover ?? context.openOnHover;
     const resolvedDelay = delay ?? context.delay;
@@ -333,6 +336,9 @@ export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTrigger
     return (
       <BasePopover.Trigger
         ref={ref}
+        data-slot="popover-trigger"
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
         openOnHover={resolvedOpenOnHover}
         delay={resolvedDelay}
         closeDelay={resolvedCloseDelay}
@@ -346,13 +352,26 @@ export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTrigger
 );
 PopoverTrigger.displayName = 'PopoverTrigger';
 
+export const PopoverHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="popover-header"
+      className={cn('flex flex-col gap-1 text-start mb-3', className)}
+      {...props}
+    />
+  )
+);
+PopoverHeader.displayName = 'PopoverHeader';
+
 export const PopoverTitle = React.forwardRef<
   HTMLHeadingElement,
   React.ComponentPropsWithoutRef<typeof BasePopover.Title>
 >(({ className, ...props }, ref) => (
   <BasePopover.Title
     ref={ref}
-    className={cn('font-heading text-base font-bold text-on-surface mb-1.5', className)}
+    data-slot="popover-title"
+    className={composeClassName('font-heading text-base font-bold text-on-surface mb-1.5', className)}
     {...props}
   />
 ));
@@ -364,7 +383,8 @@ export const PopoverDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BasePopover.Description
     ref={ref}
-    className={cn('font-sans text-sm text-on-surface-variant mb-3 leading-relaxed', className)}
+    data-slot="popover-description"
+    className={composeClassName('font-sans text-sm text-on-surface-variant mb-3 leading-relaxed', className)}
     {...props}
   />
 ));
@@ -373,13 +393,20 @@ PopoverDescription.displayName = 'PopoverDescription';
 export const PopoverClose = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof BasePopover.Close>
->(({ className, ...props }, ref) => (
+>(({ className, render, nativeButton, ...props }, ref) => (
   <BasePopover.Close
     ref={ref}
-    className={cn(
-      'inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded-md bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
-      className
-    )}
+    data-slot="popover-close"
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
+    className={
+      render
+        ? className
+        : composeClassName(
+            'inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded-md bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+            className
+          )
+    }
     {...props}
   />
 ));
@@ -391,7 +418,8 @@ export const PopoverBackdrop = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BasePopover.Backdrop
     ref={ref}
-    className={cn(
+    data-slot="popover-backdrop"
+    className={composeClassName(
       'fixed inset-0 bg-on-surface/30 z-50 transition-opacity duration-[var(--duration-fast)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
       className
     )}
@@ -404,7 +432,7 @@ export const PopoverViewport = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BasePopover.Viewport>
 >(({ className, ...props }, ref) => (
-  <BasePopover.Viewport ref={ref} className={cn('relative', className)} {...props} />
+  <BasePopover.Viewport ref={ref} data-slot="popover-viewport" className={composeClassName('relative', className)} {...props} />
 ));
 PopoverViewport.displayName = 'PopoverViewport';
 
@@ -416,6 +444,7 @@ export const Popover = Object.assign(PopoverComponent, {
   Positioner: BasePopover.Positioner,
   Popup: BasePopover.Popup,
   Content: PopoverContent,
+  Header: PopoverHeader,
   Arrow: PopoverArrow,
   Backdrop: PopoverBackdrop,
   Viewport: PopoverViewport,

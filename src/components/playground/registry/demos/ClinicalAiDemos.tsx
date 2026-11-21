@@ -70,7 +70,7 @@ export const ThinkingOrbDemo: React.FC<ComponentDemoProps> = () => {
           <span className="font-mono text-xs text-on-surface-variant">Default (1.25x)</span>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <ThinkingOrb state="working" size="md" color="#0052FF" />
+          <ThinkingOrb state="working" size="md" color="#1B56E8" />
           <span className="font-mono text-xs text-on-surface-variant">Primary blue</span>
         </div>
       </div>
@@ -158,7 +158,7 @@ export const TraceDemo: React.FC<ComponentDemoProps> = () => {
               Speech Practice Guide (R-Sounds)
               <span className="sr-only">(opens external resource)</span>
             </Trace.Title>
-            <Trace.Icon name="arrow_outward" />
+            <Trace.Icon name="open_in_new" />
           </Trace.Line>
         </a>
       </Trace>

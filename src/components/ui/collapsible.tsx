@@ -13,7 +13,7 @@
  */
 import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 interface CollapsibleContextValue {
   hiddenUntilFound?: boolean;
@@ -33,12 +33,10 @@ export interface CollapsibleProps extends React.ComponentPropsWithoutRef<typeof 
   hiddenUntilFound?: boolean;
   keepMounted?: boolean;
   variant?: 'card' | 'unstyled';
-  className?: string;
 }
 
 export interface CollapsiblePanelProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Panel> {
   children?: React.ReactNode;
-  className?: string;
   contentClassName?: string;
   unstyled?: boolean;
 }
@@ -52,9 +50,10 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
     return (
       <BaseCollapsible.Panel
         ref={ref}
+        data-slot="collapsible-content"
         hiddenUntilFound={resolvedHiddenUntilFound}
         keepMounted={resolvedKeepMounted}
-        className={cn(
+        className={composeClassName(
           "overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
           className
         )}
@@ -80,34 +79,45 @@ export const CollapsibleContent = CollapsiblePanel;
 export type CollapsibleContentProps = CollapsiblePanelProps;
 
 export interface CollapsibleTriggerProps extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Trigger> {
-  children: React.ReactNode;
-  className?: string;
+  children?: React.ReactNode;
   hideChevron?: boolean;
 }
 
 export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, CollapsibleTriggerProps>(
-  ({ children, className, hideChevron = false, ...props }, ref) => (
-    <BaseCollapsible.Trigger
-      ref={ref}
-      className={cn(
-        'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-        'disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      {!hideChevron && (
-        <span
-          className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none shrink-0"
-          aria-hidden="true"
-        >
-          keyboard_arrow_down
-        </span>
-      )}
-    </BaseCollapsible.Trigger>
-  )
+  ({ children, className, hideChevron, render, nativeButton, ...props }, ref) => {
+    const shouldShowChevron = hideChevron !== undefined ? !hideChevron : !render;
+    return (
+      <BaseCollapsible.Trigger
+        ref={ref}
+        data-slot="collapsible-trigger"
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
+        className={
+          render
+            ? className
+            : composeClassName(
+                cn(
+                  'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  'disabled:cursor-not-allowed disabled:opacity-50'
+                ),
+                className
+              )
+        }
+        {...props}
+      >
+        {children}
+        {shouldShowChevron && (
+          <span
+            className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none shrink-0"
+            aria-hidden="true"
+          >
+            keyboard_arrow_down
+          </span>
+        )}
+      </BaseCollapsible.Trigger>
+    );
+  }
 );
 CollapsibleTrigger.displayName = 'CollapsibleTrigger';
 
@@ -130,13 +140,16 @@ const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(
     <CollapsibleContext.Provider value={{ hiddenUntilFound, keepMounted }}>
       <BaseCollapsible.Root
         ref={ref}
+        data-slot="collapsible"
         defaultOpen={defaultOpen}
         open={open}
         onOpenChange={onOpenChange}
         disabled={disabled}
-        className={cn(
-          'w-full',
-          isCard && 'rounded-xl bg-surface border border-outline-variant p-4 shadow-ambient',
+        className={composeClassName(
+          cn(
+            'w-full',
+            isCard && 'rounded-xl bg-surface border border-outline-variant p-4 shadow-ambient'
+          ),
           className
         )}
         {...props}

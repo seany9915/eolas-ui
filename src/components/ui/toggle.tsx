@@ -81,6 +81,7 @@ const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<string>>
     return (
       <BaseToggle
         ref={ref}
+        data-slot="toggle"
         value={value}
         pressed={pressed}
         defaultPressed={defaultPressed}

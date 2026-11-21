@@ -4,6 +4,9 @@
   "type": "registry:lib",
   "title": "Announce",
   "description": "Imperative screen-reader live-region announcer.",
+  "categories": [
+    "system"
+  ],
   "files": [
     {
       "path": "lib/announce.ts",

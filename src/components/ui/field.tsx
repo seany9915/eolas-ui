@@ -16,13 +16,13 @@
 import * as React from 'react';
 import { Field as BaseField } from '@base-ui/react/field';
 import { Icon } from './icon';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 // ============================================================================
 // Layout Types & Slots
 // ============================================================================
 
-export type FieldOrientation = 'vertical' | 'horizontal';
+export type FieldOrientation = 'vertical' | 'horizontal' | 'responsive';
 
 export interface FieldRootProps extends React.ComponentPropsWithoutRef<typeof BaseField.Root> {
   orientation?: FieldOrientation;
@@ -34,11 +34,15 @@ export const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       ref={ref}
       data-slot="field"
       data-orientation={orientation}
-      className={cn(
-        'w-full group/field',
-        orientation === 'horizontal'
-          ? 'flex flex-row items-center justify-between gap-4'
-          : 'flex flex-col gap-1.5',
+      className={composeClassName(
+        cn(
+          'w-full group/field',
+          orientation === 'horizontal'
+            ? 'flex flex-row items-center justify-between gap-4'
+            : orientation === 'responsive'
+              ? 'flex flex-col gap-1.5 @md/field-group:flex-row @md/field-group:items-center @md/field-group:justify-between @md/field-group:gap-4'
+              : 'flex flex-col gap-1.5'
+        ),
         className
       )}
       {...props}
@@ -58,8 +62,8 @@ export const FieldLabel = React.forwardRef<
   <BaseField.Label
     ref={ref}
     data-slot="field-label"
-    className={cn(
-      'font-label text-sm font-semibold text-on-surface group-has-[:user-invalid]/field:text-error data-[invalid]:text-error flex items-center justify-between select-none',
+    className={composeClassName(
+      'font-label text-sm font-semibold text-on-surface group-has-[:user-invalid]/field:text-error group-data-[invalid]/field:text-error group-data-[invalid=true]/field:text-error data-[invalid]:text-error group-data-[disabled]/field:opacity-50 group-data-[disabled=true]/field:opacity-50 data-[disabled]:opacity-50 flex items-center justify-between select-none',
       className
     )}
     {...props}
@@ -72,7 +76,10 @@ export const FieldTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
     <div
       ref={ref}
       data-slot="field-title"
-      className={cn('font-label text-sm font-semibold text-on-surface select-none', className)}
+      className={cn(
+        'font-label text-sm font-semibold text-on-surface group-data-[invalid]/field:text-error group-data-[invalid=true]/field:text-error data-[invalid]:text-error group-data-[disabled]/field:opacity-50 group-data-[disabled=true]/field:opacity-50 data-[disabled]:opacity-50 select-none',
+        className
+      )}
       {...props}
     />
   )
@@ -86,7 +93,10 @@ export const FieldDescription = React.forwardRef<
   <BaseField.Description
     ref={ref}
     data-slot="field-description"
-    className={cn('text-sm text-on-surface-variant font-sans', className)}
+    className={composeClassName(
+      'text-sm text-on-surface-variant font-sans group-data-[invalid]/field:text-error/90 group-data-[invalid=true]/field:text-error/90 data-[invalid]:text-error/90 group-data-[disabled]/field:opacity-50 group-data-[disabled=true]/field:opacity-50 data-[disabled]:opacity-50',
+      className
+    )}
     {...props}
   />
 ));
@@ -109,22 +119,47 @@ export const FieldGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
     <div
       ref={ref}
       data-slot="field-group"
-      className={cn('flex flex-col gap-4 w-full', className)}
+      className={cn('@container/field-group flex flex-col gap-4 w-full', className)}
       {...props}
     />
   )
 );
 FieldGroup.displayName = 'FieldGroup';
 
-export const FieldSeparator = React.forwardRef<HTMLHRElement, React.HTMLAttributes<HTMLHRElement>>(
-  ({ className, ...props }, ref) => (
-    <hr
-      ref={ref}
-      data-slot="field-separator"
-      className={cn('border-0 border-t border-outline-variant/60 my-2 w-full', className)}
-      {...props}
-    />
-  )
+export interface FieldSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+}
+
+export const FieldSeparator = React.forwardRef<HTMLDivElement, FieldSeparatorProps>(
+  ({ className, children, ...props }, ref) => {
+    if (children) {
+      return (
+        <div
+          ref={ref}
+          data-slot="field-separator"
+          data-content="true"
+          className={cn('relative flex items-center gap-3 my-2 w-full text-xs text-on-surface-variant font-sans', className)}
+          {...props}
+        >
+          <span className="h-px flex-1 bg-outline-variant/60" aria-hidden="true" />
+          <span data-slot="field-separator-content" className="shrink-0 px-1 text-on-surface-variant">
+            {children}
+          </span>
+          <span className="h-px flex-1 bg-outline-variant/60" aria-hidden="true" />
+        </div>
+      );
+    }
+
+    return (
+      <div
+        ref={ref}
+        role="separator"
+        data-slot="field-separator"
+        className={cn('h-px bg-outline-variant/60 my-2 w-full', className)}
+        {...props}
+      />
+    );
+  }
 );
 FieldSeparator.displayName = 'FieldSeparator';
 
@@ -159,41 +194,92 @@ export const FieldControl = React.forwardRef<HTMLInputElement, FieldControlProps
 );
 FieldControl.displayName = 'FieldControl';
 
-export const FieldError = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof BaseField.Error>
->(({ className, children, render, ...props }, ref) => (
-  <BaseField.Error
-    ref={ref}
-    data-slot="field-error"
-    className={cn(
-      'flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-quick',
-      className
-    )}
-    render={
-      render ??
-      ((elementProps) => (
-        <div
-          {...elementProps}
-          className={cn(
-            'flex items-center gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-quick',
-            elementProps.className
-          )}
-        >
-          <Icon name="error" size="sm" className="shrink-0 text-error" />
-          <span>{elementProps.children}</span>
-        </div>
-      ))
+export interface FieldErrorProps extends React.ComponentPropsWithoutRef<typeof BaseField.Error> {
+  errors?: Array<{ message?: string } | undefined>;
+}
+
+export const FieldError = React.forwardRef<HTMLDivElement, FieldErrorProps>(
+  ({ className, children, errors, match, render, ...props }, ref) => {
+    const uniqueErrors = React.useMemo(() => {
+      if (!errors?.length) return [];
+      const seen = new Set<string>();
+      const messages: string[] = [];
+      for (const err of errors) {
+        const msg = err?.message?.trim();
+        if (msg && !seen.has(msg)) {
+          seen.add(msg);
+          messages.push(msg);
+        }
+      }
+      return messages;
+    }, [errors]);
+
+    const hasErrorsProp = errors !== undefined;
+    if (children === undefined && hasErrorsProp && uniqueErrors.length === 0) {
+      return null;
     }
-    {...props}
-  >
-    {children}
-  </BaseField.Error>
-));
+
+    const isMultipleErrors = children === undefined && uniqueErrors.length > 1;
+    const resolvedChildren =
+      children !== undefined
+        ? children
+        : uniqueErrors.length === 1
+          ? uniqueErrors[0]
+          : uniqueErrors.length > 1
+            ? (
+                <ul className="ms-4 flex list-disc flex-col gap-1">
+                  {uniqueErrors.map((msg) => (
+                    <li key={msg}>{msg}</li>
+                  ))}
+                </ul>
+              )
+            : undefined;
+    const resolvedMatch = match ?? (hasErrorsProp && uniqueErrors.length > 0 ? true : undefined);
+
+    return (
+      <BaseField.Error
+        ref={ref}
+        data-slot="field-error"
+        match={resolvedMatch}
+        className={composeClassName(
+          cn(
+            'flex gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-quick',
+            isMultipleErrors ? 'items-start' : 'items-center'
+          ),
+          className
+        )}
+        render={
+          render ??
+          ((elementProps) => (
+            <div {...elementProps}>
+              <Icon name="error" size="sm" className={cn('shrink-0 text-error', isMultipleErrors && 'mt-0.5')} />
+              <span>{elementProps.children}</span>
+            </div>
+          ))
+        }
+        {...props}
+      >
+        {resolvedChildren}
+      </BaseField.Error>
+    );
+  }
+);
 FieldError.displayName = 'FieldError';
 
 export const FieldValidity = BaseField.Validity;
-export const FieldItem = BaseField.Item;
+
+export const FieldItem = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseField.Item>
+>(({ className, ...props }, ref) => (
+  <BaseField.Item
+    ref={ref}
+    data-slot="field-item"
+    className={composeClassName('flex items-center gap-2', className)}
+    {...props}
+  />
+));
+FieldItem.displayName = 'FieldItem';
 
 // ============================================================================
 // Monolithic Convenience Component
@@ -208,7 +294,6 @@ export interface FieldProps extends React.ComponentPropsWithoutRef<typeof BaseFi
   required?: boolean;
   orientation?: FieldOrientation;
   children: React.ReactNode;
-  className?: string;
 }
 
 const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
@@ -224,6 +309,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
       className,
       name,
       disabled,
+      invalid,
       validate,
       validationMode,
       validationDebounceTime,
@@ -247,12 +333,12 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
         validate={validate}
         validationMode={validationMode}
         validationDebounceTime={validationDebounceTime}
-        invalid={Boolean(error)}
+        invalid={error ? true : invalid}
         orientation={orientation}
         className={className}
         {...props}
       >
-        {orientation === 'horizontal' ? (
+        {orientation === 'horizontal' || orientation === 'responsive' ? (
           <>
             {(label || helperText) && (
               <FieldContent>

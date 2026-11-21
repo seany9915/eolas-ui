@@ -4,6 +4,9 @@
   "type": "registry:ui",
   "title": "Toggles",
   "description": "Re-exports toggle primitives for backward compatibility.",
+  "categories": [
+    "inputs"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/toggle.json",
     "https://seany9915.github.io/eolas-ui/r/toggle-group.json"

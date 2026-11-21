@@ -213,7 +213,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                             ? 'bg-primary text-on-primary shadow-ambient'
                             : isPast
                             ? 'bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary'
-                            : 'border border-outline-variant text-on-surface-variant/60 bg-surface'
+                            : 'border border-outline-variant text-on-surface-variant bg-surface'
                         )}
                       >
                         {isPast ? (

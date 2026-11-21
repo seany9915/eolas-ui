@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface MenuItemData {
   id: string;
@@ -22,12 +22,15 @@ export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
   ({ className, destructive, icon, children, ...props }, ref) => (
     <BaseMenu.Item
       ref={ref}
-      className={cn(
-        'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
-        destructive
-          ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
-          : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="menu-item"
+      className={composeClassName(
+        cn(
+          'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+          destructive
+            ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
+            : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
+        ),
         className
       )}
       {...props}
@@ -43,13 +46,47 @@ export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
 );
 MenuItem.displayName = 'MenuItem';
 
+export interface MenuArrowProps
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.Arrow> {}
+
+export const MenuArrow = React.forwardRef<HTMLDivElement, MenuArrowProps>(
+  ({ className, children, ...props }, ref) => (
+    <BaseMenu.Arrow
+      ref={ref}
+      data-slot="menu-arrow"
+      className={composeClassName(
+        cn(
+          'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+          'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+        ),
+        className
+      )}
+      {...props}
+    >
+      {children ?? (
+        <svg
+          width="10"
+          height="5"
+          viewBox="0 0 10 5"
+          className="block fill-surface stroke-outline-variant"
+          aria-hidden="true"
+        >
+          <path d="M0 5 L5 0 L10 5" />
+        </svg>
+      )}
+    </BaseMenu.Arrow>
+  )
+);
+MenuArrow.displayName = 'MenuArrow';
+
 export interface MenuContentProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Popup> {
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: BaseMenu.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
-  containerClassName?: string;
+  containerClassName?: BaseMenu.Positioner.Props['className'];
+  keepMounted?: boolean;
 }
 
 export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
@@ -63,27 +100,25 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
       alignOffset,
       collisionPadding = 8,
       containerClassName,
+      keepMounted,
       ...props
     },
     ref
   ) => (
-    <BaseMenu.Portal>
+    <BaseMenu.Portal keepMounted={keepMounted}>
       <BaseMenu.Positioner
         side={side}
         align={align}
         sideOffset={sideOffset}
         alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={cn('z-50 outline-none', containerClassName)}
+        className={composeClassName('z-50 outline-none', containerClassName)}
       >
         <BaseMenu.Popup
           ref={ref}
-          className={cn(
-            'min-w-[200px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
-            'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
-            'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+          data-slot="menu-content"
+          className={composeClassName(
+            'min-w-[200px] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -102,23 +137,44 @@ export const MenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseMenu.Separator
     ref={ref}
-    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
+    data-slot="menu-separator"
+    className={composeClassName('h-px my-1 bg-outline-variant/60 -mx-1', className)}
     {...props}
   />
 ));
 MenuSeparator.displayName = 'MenuSeparator';
 
+export const MenuShortcut = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
+  <span
+    ref={ref}
+    data-slot="menu-shortcut"
+    className={cn('font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto', className)}
+    {...props}
+  />
+));
+MenuShortcut.displayName = 'MenuShortcut';
+
 export interface MenuTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger> {}
 
 export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
-  ({ className, children, ...props }, ref) => (
+  ({ className, children, render, nativeButton, ...props }, ref) => (
     <BaseMenu.Trigger
       ref={ref}
-      className={cn(
-        'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
-        className
-      )}
+      data-slot="menu-trigger"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      className={
+        render
+          ? className
+          : composeClassName(
+              'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+              className
+            )
+      }
       {...props}
     >
       {children}
@@ -136,10 +192,9 @@ export const MenuCheckboxItem = React.forwardRef<HTMLDivElement, MenuCheckboxIte
   ({ className, children, icon, ...props }, ref) => (
     <BaseMenu.CheckboxItem
       ref={ref}
-      className={cn(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="menu-checkbox-item"
+      className={composeClassName(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -171,10 +226,9 @@ export const MenuRadioItem = React.forwardRef<HTMLDivElement, MenuRadioItemProps
   ({ className, children, icon, ...props }, ref) => (
     <BaseMenu.RadioItem
       ref={ref}
-      className={cn(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="menu-radio-item"
+      className={composeClassName(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -206,10 +260,9 @@ export const MenuSubmenuTrigger = React.forwardRef<HTMLDivElement, MenuSubmenuTr
   ({ className, children, icon, ...props }, ref) => (
     <BaseMenu.SubmenuTrigger
       ref={ref}
-      className={cn(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="menu-sub-trigger"
+      className={composeClassName(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -239,7 +292,8 @@ export const MenuGroupLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseMenu.GroupLabel
     ref={ref}
-    className={cn('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
+    data-slot="menu-label"
+    className={composeClassName('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
     {...props}
   />
 ));
@@ -249,7 +303,7 @@ export const MenuGroup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseMenu.Group>
 >(({ className, ...props }, ref) => (
-  <BaseMenu.Group ref={ref} className={cn('py-1', className)} {...props} />
+  <BaseMenu.Group ref={ref} data-slot="menu-group" className={composeClassName('py-1', className)} {...props} />
 ));
 MenuGroup.displayName = 'MenuGroup';
 
@@ -257,7 +311,7 @@ export const MenuRadioGroup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseMenu.RadioGroup>
 >(({ className, ...props }, ref) => (
-  <BaseMenu.RadioGroup ref={ref} className={cn('py-1', className)} {...props} />
+  <BaseMenu.RadioGroup ref={ref} data-slot="menu-radio-group" className={composeClassName('py-1', className)} {...props} />
 ));
 MenuRadioGroup.displayName = 'MenuRadioGroup';
 
@@ -267,8 +321,9 @@ export const MenuLinkItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseMenu.LinkItem
     ref={ref}
-    className={cn(
-      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+    data-slot="menu-link-item"
+    className={composeClassName(
+      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
       className
     )}
     {...props}
@@ -296,15 +351,15 @@ export interface MenuProps<Payload = unknown> {
   handle?: BaseMenu.Handle<Payload>;
   triggerId?: string | null;
   defaultTriggerId?: string | null;
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: BaseMenu.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   fullWidth?: boolean;
-  triggerClassName?: string;
-  popupClassName?: string;
-  className?: string;
+  triggerClassName?: BaseMenu.Trigger.Props['className'];
+  popupClassName?: BaseMenu.Popup.Props['className'];
+  className?: BaseMenu.Popup.Props['className'];
   children?: BaseMenu.Root.Props<Payload>['children'];
 }
 
@@ -395,16 +450,21 @@ function MenuComponent<Payload = unknown>({
           {trigger ? (
             <BaseMenu.Trigger
               id={menuId}
+              data-slot="menu-trigger"
               render={React.isValidElement(trigger) ? trigger : undefined}
+              nativeButton={resolveNativeButton(trigger)}
             >
               {!React.isValidElement(trigger) ? trigger : undefined}
             </BaseMenu.Trigger>
           ) : (
             <BaseMenu.Trigger
               id={menuId}
-              className={cn(
-                'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded-md border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
-                fullWidth ? 'w-full' : 'w-max',
+              data-slot="menu-trigger"
+              className={composeClassName(
+                cn(
+                  'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+                  fullWidth ? 'w-full' : 'w-max'
+                ),
                 triggerClassName
               )}
             >
@@ -424,15 +484,21 @@ function MenuComponent<Payload = unknown>({
               className="z-50 outline-none"
             >
               <BaseMenu.Popup
-                className={cn(
-                  'min-w-[200px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
-                  'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-                  'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-                  'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
-                  'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-                  className,
-                  popupClassName
-                )}
+                data-slot="menu-content"
+                className={
+                  typeof className === 'function' || typeof popupClassName === 'function'
+                    ? (state) =>
+                        cn(
+                          'min-w-[200px] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+                          typeof className === 'function' ? className(state) : className,
+                          typeof popupClassName === 'function' ? popupClassName(state) : popupClassName
+                        )
+                    : cn(
+                        'min-w-[200px] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+                        className,
+                        popupClassName
+                      )
+                }
               >
                 {children
                   ? renderChildren(renderProps)
@@ -487,9 +553,9 @@ export const MenuInput = React.forwardRef<HTMLInputElement, MenuInputProps>(
       </span>
       <BaseMenu.Input
         ref={ref}
-        className={cn(
-          'w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-on-surface-variant/70 outline-none',
-          'disabled:cursor-not-allowed disabled:opacity-50',
+        data-slot="menu-input"
+        className={composeClassName(
+          'w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-on-surface-variant/80 outline-none disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
         {...props}
@@ -505,7 +571,8 @@ export const MenuList = React.forwardRef<HTMLDivElement, MenuListProps>(
   ({ className, ...props }, ref) => (
     <BaseMenu.List
       ref={ref}
-      className={cn('overflow-y-auto max-h-[min(300px,var(--available-height))] outline-none', className)}
+      data-slot="menu-list"
+      className={composeClassName('overflow-y-auto max-h-[min(300px,var(--available-height))] outline-none', className)}
       {...props}
     />
   )
@@ -518,8 +585,9 @@ export const MenuClear = React.forwardRef<HTMLButtonElement, MenuClearProps>(
   ({ className, children, 'aria-label': ariaLabel, ...props }, ref) => (
     <BaseMenu.Clear
       ref={ref}
+      data-slot="menu-clear"
       aria-label={ariaLabel ?? (children ? undefined : 'Clear filter')}
-      className={cn(
+      className={composeClassName(
         "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
         className
       )}
@@ -541,7 +609,8 @@ export const MenuEmpty = React.forwardRef<HTMLDivElement, MenuEmptyProps>(
   ({ className, ...props }, ref) => (
     <BaseMenu.Empty
       ref={ref}
-      className={cn('py-4 px-3 text-center font-sans text-sm text-on-surface-variant select-none', className)}
+      data-slot="menu-empty"
+      className={composeClassName('py-4 px-3 text-center font-sans text-sm text-on-surface-variant select-none', className)}
       {...props}
     />
   )
@@ -562,6 +631,7 @@ export const Menu = Object.assign(MenuComponent, {
   Item: MenuItem,
   LinkItem: MenuLinkItem,
   Separator: MenuSeparator,
+  Shortcut: MenuShortcut,
   Group: MenuGroup,
   GroupLabel: MenuGroupLabel,
   SubmenuRoot: BaseMenu.SubmenuRoot,
@@ -571,7 +641,7 @@ export const Menu = Object.assign(MenuComponent, {
   RadioGroup: MenuRadioGroup,
   RadioItem: MenuRadioItem,
   RadioItemIndicator: BaseMenu.RadioItemIndicator,
-  Arrow: BaseMenu.Arrow,
+  Arrow: MenuArrow,
   Backdrop: BaseMenu.Backdrop,
   Viewport: BaseMenu.Viewport,
   createHandle: BaseMenu.createHandle,
@@ -594,7 +664,7 @@ export const MenuItemPrimitive = BaseMenu.Item;
 export const MenuSubmenuRoot = BaseMenu.SubmenuRoot;
 export const MenuCheckboxItemIndicator = BaseMenu.CheckboxItemIndicator;
 export const MenuRadioItemIndicator = BaseMenu.RadioItemIndicator;
-export const MenuArrow = BaseMenu.Arrow;
+export const MenuArrowPrimitive = BaseMenu.Arrow;
 export const MenuBackdrop = BaseMenu.Backdrop;
 export const MenuViewport = BaseMenu.Viewport;
 export const createMenuHandle = BaseMenu.createHandle;

@@ -50,7 +50,7 @@ export interface ItemVariantsProps {
 
 const variantStyles: Record<ItemVariant, string> = {
   default: 'bg-transparent text-on-surface border-2 border-transparent',
-  outline: 'bg-surface text-on-surface border border-outline-variant',
+  outline: 'bg-surface text-on-surface border-2 border-outline-variant',
   muted: 'bg-surface-container text-on-surface border-2 border-transparent',
   ghost: 'bg-transparent text-on-surface border-2 border-transparent hover:bg-surface-container/60',
   selected: 'bg-primary-container text-on-primary-container border-2 border-primary hover:bg-primary-container/90',
@@ -71,7 +71,7 @@ export function itemVariants({
   className,
 }: ItemVariantsProps = {}): string {
   return cn(
-    'group/item relative flex items-center rounded-md text-start transition-[background-color,border-color,color,transform] duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
+    'group/item relative flex items-center has-[[data-slot=item-description]]:items-start rounded-md text-start transition-[background-color,border-color,color,transform] duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
     variantStyles[variant] ?? variantStyles.default,
     sizeStyles[size] ?? sizeStyles.default,
     'aria-disabled:opacity-50 aria-disabled:pointer-events-none',
@@ -172,7 +172,7 @@ export const ItemGroup = React.forwardRef<HTMLDivElement, ItemGroupProps>(
       defaultTagName: 'div',
       props: {
         'data-slot': 'item-group',
-        role: 'group',
+        role: 'list',
         className: cn(
           'flex flex-col w-full',
           divided ? 'divide-y divide-outline-variant/60' : 'gap-1.5',
@@ -216,7 +216,7 @@ ItemSeparator.displayName = 'ItemSeparator';
 // ItemMedia
 // ============================================================================
 
-export type ItemMediaVariant = 'icon' | 'avatar' | 'image';
+export type ItemMediaVariant = 'default' | 'icon' | 'avatar' | 'image';
 
 export interface ItemMediaProps extends React.HTMLAttributes<HTMLDivElement> {
   render?: useRender.RenderProp;
@@ -224,19 +224,21 @@ export interface ItemMediaProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const mediaVariantStyles: Record<ItemMediaVariant, string> = {
+  default: 'bg-transparent flex items-center justify-center shrink-0 [&_svg]:size-4 [&_.material-symbols-outlined]:text-base',
   icon: 'size-9 rounded-md bg-surface-container text-on-surface-variant group-data-[variant=selected]/item:bg-surface group-data-[variant=selected]/item:text-primary flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
   avatar: 'size-10 rounded-full overflow-hidden flex items-center justify-center shrink-0',
   image: 'size-12 rounded-md overflow-hidden object-cover flex items-center justify-center shrink-0',
 };
 
 export const ItemMedia = React.forwardRef<HTMLDivElement, ItemMediaProps>(
-  ({ className, variant = 'icon', render, children, ...props }, ref) => {
+  ({ className, variant = 'default', render, children, ...props }, ref) => {
     return useRender({
       render,
       ref,
       defaultTagName: 'div',
       props: {
         'data-slot': 'item-media',
+        'data-variant': variant,
         // Icons are decorative; image and avatar media may carry meaningful alt text.
         'aria-hidden': variant === 'icon' ? 'true' : undefined,
         className: cn('shrink-0 select-none', mediaVariantStyles[variant], className),

@@ -30,7 +30,7 @@ import {
   CarouselItem,
   useCarousel,
 } from './carousel';
-import { cn, sanitizeUrl } from '@/lib/utils';
+import { cn, composeClassName, sanitizeUrl } from '@/lib/utils';
 
 export interface CitationSourceItem {
   id?: string | number;
@@ -48,8 +48,6 @@ export interface CitationSourceItem {
  * Context
  * -----------------------------------------------------------------------------------------------*/
 interface InlineCitationContextValue {
-  activeIndex: number;
-  setActiveIndex: (index: number) => void;
   delay?: number;
   closeDelay?: number;
 }
@@ -76,10 +74,8 @@ const InlineCitationRoot: React.FC<InlineCitationProps> = ({
   closeDelay = 150,
   ...props
 }) => {
-  const [activeIndex, setActiveIndex] = React.useState(0);
-
   return (
-    <InlineCitationContext.Provider value={{ activeIndex, setActiveIndex, delay, closeDelay }}>
+    <InlineCitationContext.Provider value={{ delay, closeDelay }}>
       <BasePreviewCard.Root {...props}>
         {children}
       </BasePreviewCard.Root>
@@ -117,7 +113,8 @@ InlineCitationText.displayName = 'InlineCitationText';
 /* -------------------------------------------------------------------------------------------------
  * InlineCitationCardTrigger (Interactive citation pill)
  * -----------------------------------------------------------------------------------------------*/
-export interface InlineCitationCardTriggerProps {
+export interface InlineCitationCardTriggerProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BasePreviewCard.Trigger>, 'children'> {
   children?: React.ReactNode;
   index?: number | string;
   label?: string;
@@ -125,13 +122,12 @@ export interface InlineCitationCardTriggerProps {
   closeDelay?: number;
   /** Source URL. When set, the trigger is a real link so keyboard and screen-reader users can reach the source without the hover card. */
   href?: string;
-  className?: string;
 }
 
 const InlineCitationCardTrigger = React.forwardRef<
   HTMLElement,
-  InlineCitationCardTriggerProps & React.HTMLAttributes<HTMLElement>
->(({ children, index, label, href, delay: propDelay, closeDelay: propCloseDelay, className, ...props }, ref) => {
+  InlineCitationCardTriggerProps
+>(({ children, index, label, href, delay: propDelay, closeDelay: propCloseDelay, className, render, ...props }, ref) => {
   const context = useInlineCitation();
   const delay = propDelay ?? context?.delay ?? 200;
   const closeDelay = propCloseDelay ?? context?.closeDelay ?? 150;
@@ -149,10 +145,9 @@ const InlineCitationCardTrigger = React.forwardRef<
     [ref]
   );
 
-  const triggerClassName = cn(
+  const baseTriggerClassName = cn(
     'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    className
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   );
 
   return (
@@ -160,24 +155,13 @@ const InlineCitationCardTrigger = React.forwardRef<
       ref={setTriggerRef}
       delay={delay}
       closeDelay={closeDelay}
-      render={
-        safeHref ? (
-          <a
-            href={safeHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={defaultLabel}
-            className={triggerClassName}
-          />
-        ) : (
-          <UnstyledButton
-            expandedTouchTarget
-            aria-label={defaultLabel}
-            className={triggerClassName}
-            {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
-          />
-        )
-      }
+      aria-label={defaultLabel}
+      {...(safeHref
+        ? { href: safeHref, target: '_blank', rel: 'noopener noreferrer' }
+        : {})}
+      render={render ?? (safeHref ? undefined : <UnstyledButton expandedTouchTarget />)}
+      className={composeClassName(baseTriggerClassName, className)}
+      {...props}
     >
       {children || (
         <span
@@ -198,36 +182,38 @@ InlineCitationCardTrigger.displayName = 'InlineCitationCardTrigger';
 /* -------------------------------------------------------------------------------------------------
  * InlineCitationCard (Popup container)
  * -----------------------------------------------------------------------------------------------*/
-export interface InlineCitationCardProps {
+export interface InlineCitationCardProps
+  extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Popup> {
   children?: React.ReactNode;
-  className?: string;
   sideOffset?: number;
 }
 
-const InlineCitationCard: React.FC<InlineCitationCardProps> = ({
-  children,
-  className,
-  sideOffset = 8,
-}) => {
-  return (
-    <BasePreviewCard.Portal>
-      <BasePreviewCard.Positioner sideOffset={sideOffset} className="z-50 outline-none">
-        <BasePreviewCard.Popup
-          className={cn(
-            'w-80 max-w-[calc(100vw-2rem)] p-3.5 rounded bg-surface border border-outline-variant shadow-ambient text-on-surface',
-            'transition-[opacity,transform] duration-quick ease-standard origin-[var(--transform-origin)]',
-            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98]',
-            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
-            'motion-reduce:transition-none',
-            className
-          )}
-        >
-          {children}
-        </BasePreviewCard.Popup>
-      </BasePreviewCard.Positioner>
-    </BasePreviewCard.Portal>
-  );
-};
+const InlineCitationCard = React.forwardRef<HTMLDivElement, InlineCitationCardProps>(
+  ({ children, className, sideOffset = 8, ...props }, ref) => {
+    return (
+      <BasePreviewCard.Portal>
+        <BasePreviewCard.Positioner sideOffset={sideOffset} className="z-50 outline-none">
+          <BasePreviewCard.Popup
+            ref={ref}
+            className={composeClassName(
+              cn(
+                'w-80 max-w-[calc(100vw-2rem)] p-3.5 rounded bg-surface border border-outline-variant shadow-ambient text-on-surface',
+                'transition-[opacity,transform] duration-quick ease-standard origin-[var(--transform-origin)]',
+                'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98]',
+                'data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
+                'motion-reduce:transition-none'
+              ),
+              className
+            )}
+            {...props}
+          >
+            {children}
+          </BasePreviewCard.Popup>
+        </BasePreviewCard.Positioner>
+      </BasePreviewCard.Portal>
+    );
+  }
+);
 InlineCitationCard.displayName = 'InlineCitationCard';
 
 /* -------------------------------------------------------------------------------------------------
@@ -344,7 +330,7 @@ const InlineCitationSource: React.FC<InlineCitationSourceProps> = ({
         </span>
       )}
       {(displayDomain || authorOrDate || icon || safeFavicon) && (
-        <div className="flex items-center gap-1.5 font-mono text-[11px] text-on-surface-variant">
+        <div className="flex items-center gap-1.5 font-mono text-xs text-on-surface-variant">
           {(safeFavicon || icon) && <InlineCitationIcon src={safeFavicon} name={icon} />}
           {displayDomain && <span>{displayDomain}</span>}
           {displayDomain && authorOrDate && <span>•</span>}

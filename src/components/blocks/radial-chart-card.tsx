@@ -124,7 +124,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
           role="figure"
           aria-label={chartLabel ?? `${title}: ${displayValue} of ${total}${unit}`}
           config={config}
-          className="aspect-auto h-full w-full"
+          className="aspect-auto size-full"
         >
           <RadialBarChart
             aria-label={chartLabel ?? `${title}: ${displayValue} of ${total}${unit}`}

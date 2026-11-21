@@ -20,7 +20,7 @@
  */
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { getContrastInk } from '@/lib/contrast';
 
 export type ChipVariant =
@@ -43,7 +43,7 @@ export type ChipColorRole =
 
 export type ChipSize = 'sm' | 'md' | 'lg';
 
-export interface ChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'> {
+export interface ChipProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onSelect' | 'className'> {
   variant?: ChipVariant;
   colorRole?: ChipColorRole;
   size?: ChipSize;
@@ -61,7 +61,7 @@ export interface ChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   disabled?: boolean;
   /** Optional user-supplied background color for dynamic tags; computes accessible foreground contrast automatically. */
   customColor?: string;
-  className?: string;
+  className?: string | ((state: BaseButton.State) => string | undefined);
   children?: React.ReactNode;
 }
 
@@ -104,7 +104,7 @@ const sizeStyles: Record<ChipSize, string> = {
   lg: 'h-9 px-3.5 text-sm gap-2 [&>svg]:size-4.5 [&>[data-icon]]:size-4.5 [&_.material-symbols-outlined]:!text-[19px] [&_.material-symbols-outlined]:!leading-none',
 };
 
-export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
+export const Chip = React.forwardRef<HTMLElement, ChipProps>(
   (
     {
       variant = 'outline',
@@ -115,7 +115,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       selected,
       onSelect,
       onRemove,
-  removeLabel,
+      removeLabel,
       disabled = false,
       customColor,
       onClick,
@@ -151,21 +151,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
 
     const hasSeparateTriggerAndRemove = isInteractive && Boolean(onRemove);
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (disabled) return;
-      if (
-        e.target === e.currentTarget &&
-        isInteractive &&
-        !hasSeparateTriggerAndRemove &&
-        (e.key === ' ' || e.key === 'Enter')
-      ) {
-        e.preventDefault();
-        e.currentTarget.click();
-      }
-      onKeyDown?.(e);
-    };
-
-    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleInteractiveClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
       if (disabled) return;
       if (onSelect) {
         onSelect(!selected);
@@ -173,30 +159,21 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       onClick?.(e);
     };
 
-    // WCAG 2.2 SC 2.5.8: 44px min-h touch target floor when interactive or removable
-    const touchTargetClass = isInteractive || onRemove
-      ? 'min-h-[44px]'
-      : size === 'lg'
-        ? 'min-h-[40px]'
-        : size === 'sm'
-          ? 'min-h-[28px]'
-          : 'min-h-[32px]';
+    // Separate compact visual pill height from vertical touch-target expansion (no horizontal sibling overlap)
+    const touchTargetClass = isInteractive
+      ? 'relative after:absolute after:-inset-y-2 after:inset-x-0 after:content-[\'\']'
+      : '';
 
     const labelText = typeof children === 'string' ? children : '';
 
-    const resolvedRole = hasSeparateTriggerAndRemove
-      ? undefined
-      : (role ?? (isFilter ? 'button' : isInteractive ? 'button' : undefined));
-    const resolvedTabIndex = hasSeparateTriggerAndRemove
-      ? undefined
-      : (tabIndex ?? (isInteractive && !disabled ? 0 : undefined));
-
-    const dynamicStyle: (React.CSSProperties & { '--dynamic-bg'?: string }) | undefined = customColor
+    const dynamicStyle:
+      | (React.CSSProperties & { '--dynamic-bg'?: string; '--chip-ink'?: string })
+      | undefined = customColor
       ? {
           '--dynamic-bg': customColor,
+          '--chip-ink': getContrastInk(customColor),
           backgroundColor: customColor,
           borderColor: customColor,
-          color: getContrastInk(customColor),
           ...style,
         }
       : style;
@@ -224,27 +201,36 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
 
     const { 'aria-label': ariaLabel, ...containerProps } = props;
 
+    const sharedBaseClasses = cn(
+      'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
+      'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+      '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
+      sizeStyles[size],
+      touchTargetClass,
+      patternClass,
+      customColor && 'contrast-auto'
+    );
+
+    const resolvedStaticClassName =
+      typeof className === 'function' ? className({ disabled }) : className;
+
     if (hasSeparateTriggerAndRemove) {
       return (
         <div
-          ref={ref}
+          ref={ref as React.Ref<HTMLDivElement>}
           data-slot="chip"
+          role={role}
           aria-disabled={disabled ? true : undefined}
           onClick={(e) => {
             if (!disabled) onClick?.(e);
           }}
+          onKeyDown={onKeyDown}
           style={dynamicStyle}
           className={cn(
-            'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
-            'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-            '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
-            sizeStyles[size],
-            touchTargetClass,
-            patternClass,
-            customColor && 'contrast-auto',
+            sharedBaseClasses,
             !disabled && 'hover:brightness-95',
             disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
-            className
+            resolvedStaticClassName
           )}
           {...containerProps}
         >
@@ -271,7 +257,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
                 if (!disabled) onRemove();
               }}
               disabled={disabled}
-              className="ms-1 -me-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
+              className="relative ms-0.5 -me-1.5 size-6 min-w-[24px] min-h-[24px] hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center rounded-full text-current shrink-0 after:absolute after:-inset-y-2 after:inset-x-0 after:content-['']"
               aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
             >
               <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">
@@ -283,29 +269,50 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       );
     }
 
+    if (isInteractive) {
+      return (
+        <BaseButton
+          ref={ref}
+          type="button"
+          data-slot="chip"
+          {...(role !== undefined ? { role } : {})}
+          aria-label={ariaLabel}
+          aria-pressed={isFilter ? isCurrentlySelected : undefined}
+          disabled={disabled}
+          tabIndex={tabIndex}
+          onClick={handleInteractiveClick}
+          onKeyDown={onKeyDown}
+          style={dynamicStyle}
+          className={composeClassName(
+            cn(
+              sharedBaseClasses,
+              !disabled &&
+                'cursor-pointer hover:brightness-95 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+              disabled && 'opacity-50 pointer-events-none cursor-not-allowed'
+            ),
+            className
+          )}
+          {...(containerProps as React.ComponentPropsWithoutRef<typeof BaseButton>)}
+        >
+          {leadingMedia}
+        </BaseButton>
+      );
+    }
+
     return (
       <div
-        ref={ref}
+        ref={ref as React.Ref<HTMLDivElement>}
         data-slot="chip"
-        role={resolvedRole}
+        role={role}
         aria-label={ariaLabel}
-        aria-pressed={isFilter ? isCurrentlySelected : undefined}
         aria-disabled={disabled ? true : undefined}
-        tabIndex={resolvedTabIndex}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
+        tabIndex={tabIndex}
+        onKeyDown={onKeyDown}
         style={dynamicStyle}
         className={cn(
-          'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
-          'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-          '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
-          sizeStyles[size],
-          touchTargetClass,
-          patternClass,
-          customColor && 'contrast-auto',
-          isInteractive && !disabled && 'cursor-pointer hover:brightness-95 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          sharedBaseClasses,
           disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
-          className
+          resolvedStaticClassName
         )}
         {...containerProps}
       >
@@ -318,7 +325,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
               if (!disabled) onRemove();
             }}
             disabled={disabled}
-            className="ms-1 -me-1 hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center p-0.5 rounded-full text-current shrink-0"
+            className="relative ms-0.5 -me-1.5 size-6 min-w-[24px] min-h-[24px] hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center rounded-full text-current shrink-0 after:absolute after:-inset-y-2 after:inset-x-0 after:content-['']"
             aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
           >
             <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">

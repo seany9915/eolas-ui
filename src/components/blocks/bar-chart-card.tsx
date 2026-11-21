@@ -40,6 +40,8 @@ export interface BarChartCardProps
   layout?: 'horizontal' | 'vertical';
   yAxisWidth?: number;
   showLegend?: boolean;
+  /** Whether to render the numeric Y-axis scale in horizontal layout. Defaults to `true`. */
+  showYAxis?: boolean;
   trend?: ChartCardTrend;
   /** Accessible chart summary announced to screen readers. Defaults to `title`. */
   chartLabel?: string;
@@ -57,6 +59,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       layout = 'horizontal',
       yAxisWidth = 80,
       showLegend,
+      showYAxis = true,
       trend,
       footer,
       action,
@@ -100,7 +103,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
           role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
-          className="aspect-auto h-full w-full"
+          className="aspect-auto size-full"
         >
           <BarChart
             aria-label={chartLabel ?? title}
@@ -109,7 +112,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
             margin={
               isVerticalLayout
                 ? { left: 0, right: 16, top: 12, bottom: 0 }
-                : { left: 12, right: 12, top: 12, bottom: 0 }
+                : { left: showYAxis ? 0 : 12, right: 12, top: 12, bottom: 0 }
             }
           >
             <CartesianGrid vertical={isVerticalLayout} horizontal={!isVerticalLayout} />
@@ -136,7 +139,14 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
                   minTickGap={16}
                   className="text-xs text-on-surface-variant"
                 />
-                <YAxis hide />
+                <YAxis
+                  hide={!showYAxis}
+                  width={showYAxis ? 36 : 0}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={4}
+                  className="text-xs text-on-surface-variant"
+                />
               </>
             )}
             <ChartTooltip

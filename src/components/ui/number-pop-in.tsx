@@ -23,6 +23,8 @@ export interface NumberPopInProps extends React.HTMLAttributes<HTMLSpanElement> 
   suffix?: string;
   decimals?: number;
   format?: (value: number) => string;
+  /** Whether to announce value updates via a polite live region. Defaults to false. */
+  announce?: boolean;
   className?: string;
 }
 
@@ -34,6 +36,9 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
       suffix = '',
       decimals = 0,
       format,
+      announce = false,
+      role,
+      'aria-live': ariaLive,
       className,
       ...props
     },
@@ -45,31 +50,69 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
       return Math.round(value).toLocaleString();
     }, [value, format, decimals]);
 
-    // Decompose into characters
-    const chars = formattedText.split('');
-    const totalChars = chars.length;
+    // Decompose into characters and anchor stagger cleanly to numeric digits (never the '.' separator).
+    const charItems = React.useMemo(() => {
+      const chars = formattedText.split('');
+      const decimalIdx = formattedText.lastIndexOf('.');
+
+      if (decimalIdx !== -1) {
+        let fractionalDigitCount = 0;
+        return chars.map((char, idx) => {
+          let staggerIndex = 0;
+          if (idx > decimalIdx && /[0-9]/.test(char)) {
+            fractionalDigitCount += 1;
+            staggerIndex = Math.min(fractionalDigitCount, 2);
+          }
+          return { char, idx, staggerIndex };
+        });
+      }
+
+      const digitIndices: number[] = [];
+      for (let i = 0; i < chars.length; i += 1) {
+        if (/[0-9]/.test(chars[i])) {
+          digitIndices.push(i);
+        }
+      }
+
+      const staggerByIndex = new Map<number, number>();
+      if (digitIndices.length > 1) {
+        const trailingCount = Math.min(2, digitIndices.length - 1);
+        const startPos = digitIndices.length - trailingCount;
+        for (let i = 0; i < trailingCount; i += 1) {
+          staggerByIndex.set(digitIndices[startPos + i], i + 1);
+        }
+      }
+
+      return chars.map((char, idx) => ({
+        char,
+        idx,
+        staggerIndex: staggerByIndex.get(idx) ?? 0,
+      }));
+    }, [formattedText]);
+
+    const fullText = `${prefix}${formattedText}${suffix}`;
 
     return (
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-baseline font-mono text-inherit tabular-nums select-none overflow-hidden',
+          'inline-flex items-baseline font-mono text-inherit tabular-nums overflow-visible',
           className
         )}
-        role="status"
-        aria-live="polite"
+        role={role ?? (announce ? 'status' : undefined)}
+        aria-live={ariaLive ?? (announce ? 'polite' : undefined)}
         {...props}
       >
-        {prefix && <span className="me-0.5">{prefix}</span>}
+        <span className="sr-only select-none">{fullText}</span>
 
-        <span key={formattedText} className="inline-flex items-baseline">
-          {chars.map((char, idx) => {
-            // Transitions.dev rule: The last two characters stagger (stagger=1, stagger=2)
-            // so decimals feel alive.
-            let staggerIndex = 0;
-            if (idx === totalChars - 2) staggerIndex = 1;
-            if (idx === totalChars - 1) staggerIndex = 2;
+        {prefix && (
+          <span aria-hidden="true" className="me-0.5">
+            {prefix}
+          </span>
+        )}
 
+        <span key={formattedText} aria-hidden="true" className="inline-flex items-baseline">
+          {charItems.map(({ char, idx, staggerIndex }) => {
             const delayMs = staggerIndex * 70; // 70ms per digit (--digit-stagger)
 
             return (
@@ -79,7 +122,7 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
                   animationDelay: `${delayMs}ms`,
                 }}
                 className={cn(
-                  'inline-block animate-digit-pop will-change-[transform,opacity,filter]',
+                  'inline-block animate-digit-pop',
                   'motion-reduce:animate-none motion-reduce:transform-none motion-reduce:filter-none'
                 )}
               >
@@ -89,7 +132,11 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
           })}
         </span>
 
-        {suffix && <span className="ms-0.5">{suffix}</span>}
+        {suffix && (
+          <span aria-hidden="true" className="ms-0.5">
+            {suffix}
+          </span>
+        )}
       </span>
     );
   }

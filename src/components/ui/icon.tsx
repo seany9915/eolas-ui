@@ -221,9 +221,11 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
   directional = false,
   className,
   style,
+  role,
   ...props
 }, ref) => {
-  const isDecorative = !srLabel && !props['aria-label'];
+  const hasAriaLabel = Boolean(props['aria-label']);
+  const isDecorative = !srLabel && !hasAriaLabel;
   const iconStyle: React.CSSProperties = {
     '--icon-opsz': sizeOpsz[size],
     '--icon-fill': filled ? 1 : 0,
@@ -244,6 +246,7 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
           className
         )}
         style={iconStyle}
+        role={role ?? (hasAriaLabel && !srLabel ? 'img' : undefined)}
         aria-hidden={isDecorative || srLabel ? 'true' : undefined}
         aria-label={props['aria-label']}
         {...props}
@@ -284,10 +287,12 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
   offLabel,
   directional = false,
   className,
+  role,
   ...props
 }, ref) => {
+  const hasAriaLabel = Boolean(props['aria-label']);
   const activeLabel = srLabel ?? (active ? onLabel : offLabel);
-  const isDecorative = !activeLabel && !props['aria-label'];
+  const isDecorative = !activeLabel && !hasAriaLabel;
 
   return (
     <span
@@ -297,6 +302,7 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
         directional && 'icon-directional',
         className
       )}
+      role={role ?? (hasAriaLabel ? 'img' : undefined)}
       aria-hidden={isDecorative ? 'true' : undefined}
       aria-label={props['aria-label']}
       {...props}
@@ -346,6 +352,7 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
   directional = false,
   srLabel,
   className,
+  role,
   ...props
 }, ref) => {
   const [currentName, setCurrentName] = React.useState(name);
@@ -354,9 +361,19 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
 
   // Stage the swap during render so the timer effect below is not torn down by its own state updates.
   if (name !== currentName) {
-    setPrevName(currentName);
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     setCurrentName(name);
-    setEntered(false);
+    if (prefersReducedMotion) {
+      setPrevName(null);
+      setEntered(true);
+    } else {
+      setPrevName(currentName);
+      setEntered(false);
+    }
   }
 
   // Mount both icons in their start state, then flip on the next frames so the transition runs.
@@ -377,7 +394,8 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
     const timer = window.setTimeout(() => setPrevName(null), 250); // Matches --duration-fast (250ms)
     return () => window.clearTimeout(timer);
   }, [prevName]);
-  const isDecorative = !srLabel && !props['aria-label'];
+  const hasAriaLabel = Boolean(props['aria-label']);
+  const isDecorative = !srLabel && !hasAriaLabel;
 
   return (
     <span
@@ -387,6 +405,7 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
         directional && 'icon-directional',
         className
       )}
+      role={role ?? (hasAriaLabel ? 'img' : undefined)}
       aria-hidden={isDecorative ? 'true' : undefined}
       aria-label={props['aria-label']}
       {...props}

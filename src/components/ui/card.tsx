@@ -108,8 +108,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     'rounded-[1rem] transition-[box-shadow,border-color,background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] relative motion-reduce:transition-none'
   );
 
-  // Body copy remains pure white (text-surface) to avoid chromatic glare/fatigue; tertiary accents apply to headlines/icons
-  const invertedStyles = 'bg-on-surface text-surface border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient';
+  // Body copy uses warm off-white (text-on-neutral) on dark stone (bg-neutral) to avoid glare; tertiary accents apply to headlines/icons
+  const invertedStyles = 'bg-neutral text-on-neutral border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient';
 
   const prominenceStyles: Record<CardProminence, string> = {
     default: 'bg-surface border-0 forced-colors:border forced-colors:border-[CanvasText] text-on-surface shadow-card',
@@ -135,8 +135,8 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     affordanceStyles = cn(
       'cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
       selected
-        ? 'bg-primary-container border-[2px] border-primary forced-colors:border-[2px] forced-colors:border-[Highlight] text-on-surface shadow-ambient'
-        : 'bg-surface border-[2px] border-transparent forced-colors:border-[2px] forced-colors:border-[CanvasText] text-on-surface shadow-ambient hover:shadow-ambient-hover hover:border-outline-variant/50'
+        ? 'bg-primary-container border-[2px] border-primary forced-colors:border-[2px] forced-colors:border-[Highlight] text-on-surface shadow-card'
+        : 'bg-surface border-[2px] border-transparent forced-colors:border-[2px] forced-colors:border-[CanvasText] text-on-surface shadow-card hover:shadow-ambient-hover hover:border-outline-variant/50'
     );
   } else if (isActionable) {
     affordanceStyles = cn(

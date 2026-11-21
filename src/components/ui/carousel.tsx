@@ -17,13 +17,14 @@ import * as React from 'react';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { Button } from './button';
 import { useDirection } from './direction-provider';
 import { Icon } from './icon';
 
-type EmblaCarouselType = UseEmblaCarouselType[1];
+export type CarouselApi = UseEmblaCarouselType[1];
+type EmblaCarouselType = CarouselApi;
 type EmblaOptionsType = Parameters<typeof useEmblaCarousel>[0];
 type EmblaPluginType = Parameters<typeof useEmblaCarousel>[1];
 
@@ -31,7 +32,7 @@ export type CarouselProps = {
   opts?: EmblaOptionsType;
   plugins?: EmblaPluginType;
   orientation?: 'horizontal' | 'vertical';
-  setApi?: (api: EmblaCarouselType) => void;
+  setApi?: (api: CarouselApi) => void;
 };
 
 type CarouselContextProps = {
@@ -223,6 +224,7 @@ const CarouselComponent = React.forwardRef<
       >
         <div
           ref={ref}
+          data-slot="carousel"
           className={cn('@container relative', className)}
           role="region"
           aria-roledescription="carousel"
@@ -245,7 +247,7 @@ export const CarouselContent = React.forwardRef<
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div ref={carouselRef} className="overflow-hidden">
+    <div ref={carouselRef} data-slot="carousel-content" className="overflow-hidden">
       <div
         ref={ref}
         className={cn(
@@ -271,6 +273,7 @@ export const CarouselItem = React.forwardRef<
       ref={ref}
       role="group"
       aria-roledescription="slide"
+      data-slot="carousel-item"
       className={cn(
         'min-w-0 shrink-0 grow-0 basis-full',
         orientation === 'horizontal' ? 'ps-4' : 'pt-4',
@@ -290,32 +293,34 @@ export interface CarouselControlProps
 export const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   CarouselControlProps
->(({ className, variant = 'outlined', size = 'icon', position, onClick, disabled, ...props }, ref) => {
+>(({ className, variant = 'outline', size = 'icon', position, onClick, disabled, ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   const isInline =
     position === 'inline' ||
-    className?.includes('relative') ||
-    className?.includes('static');
+    (typeof className === 'string' &&
+      (className.includes('relative') || className.includes('static')));
 
   return (
     <Button
       ref={ref}
+      data-slot="carousel-previous"
       variant={variant}
       size={size}
-      className={cn(
-        'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
-        'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
-        'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-        'disabled:opacity-30 disabled:pointer-events-none',
-        'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
-        !isInline &&
-          cn(
+      className={composeClassName(
+        [
+          'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
+          'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+          'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+          'disabled:opacity-30 disabled:pointer-events-none',
+          'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
+          !isInline && [
             'absolute z-10',
             orientation === 'horizontal'
               ? '-start-12 top-1/2 -translate-y-1/2'
-              : '-top-12 left-1/2 -translate-x-1/2'
-          ),
+              : '-top-12 left-1/2 -translate-x-1/2',
+          ],
+        ],
         className
       )}
       aria-label="Previous slide"
@@ -341,32 +346,34 @@ CarouselPrevious.displayName = 'CarouselPrevious';
 export const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   CarouselControlProps
->(({ className, variant = 'outlined', size = 'icon', position, onClick, disabled, ...props }, ref) => {
+>(({ className, variant = 'outline', size = 'icon', position, onClick, disabled, ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   const isInline =
     position === 'inline' ||
-    className?.includes('relative') ||
-    className?.includes('static');
+    (typeof className === 'string' &&
+      (className.includes('relative') || className.includes('static')));
 
   return (
     <Button
       ref={ref}
+      data-slot="carousel-next"
       variant={variant}
       size={size}
-      className={cn(
-        'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
-        'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
-        'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-        'disabled:opacity-30 disabled:pointer-events-none',
-        'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
-        !isInline &&
-          cn(
+      className={composeClassName(
+        [
+          'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
+          'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+          'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+          'disabled:opacity-30 disabled:pointer-events-none',
+          'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
+          !isInline && [
             'absolute z-10',
             orientation === 'horizontal'
               ? '-end-12 top-1/2 -translate-y-1/2'
-              : '-bottom-12 left-1/2 -translate-x-1/2'
-          ),
+              : '-bottom-12 left-1/2 -translate-x-1/2',
+          ],
+        ],
         className
       )}
       aria-label="Next slide"

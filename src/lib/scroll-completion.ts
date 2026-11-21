@@ -13,19 +13,123 @@ export interface ScrollCompletionOptions {
   scroller?: HTMLElement | Window;
   /** Idle gap (ms) before resolving if neither scroll Promise nor `scrollend` fires. Defaults to 100ms. */
   idleTimeoutMs?: number;
+  /** Optional AbortSignal to cancel waiting for scroll completion (rejects with AbortError). */
+  signal?: AbortSignal;
+  /** When true, rejects with AbortError if the user interrupts the programmatic scroll via wheel, touch, or pointer input. */
+  abortOnUserInterrupt?: boolean;
 }
 
-function waitForScrollEnd(scroller: HTMLElement | Window, idleTimeoutMs = 100): Promise<void> {
+function createAbortError(signal?: AbortSignal, message = 'Scroll aborted'): unknown {
+  return signal?.reason ?? new DOMException(message, 'AbortError');
+}
+
+function raceWithSignalAndInterrupt(
+  promise: Promise<void>,
+  scroller: HTMLElement | Window,
+  signal?: AbortSignal,
+  abortOnUserInterrupt = false
+): Promise<void> {
+  if (!signal && !abortOnUserInterrupt) return promise;
+  if (signal?.aborted) {
+    return Promise.reject(createAbortError(signal));
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    let settled = false;
+
+    const cleanup = () => {
+      signal?.removeEventListener('abort', onAbort);
+      if (abortOnUserInterrupt) {
+        scroller.removeEventListener('wheel', onUserInterrupt);
+        scroller.removeEventListener('touchstart', onUserInterrupt);
+        scroller.removeEventListener('pointerdown', onUserInterrupt);
+      }
+    };
+
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(createAbortError(signal));
+    };
+
+    const onUserInterrupt = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new DOMException('Scroll interrupted by user', 'AbortError'));
+    };
+
+    signal?.addEventListener('abort', onAbort, { once: true });
+    if (abortOnUserInterrupt) {
+      scroller.addEventListener('wheel', onUserInterrupt, { passive: true, once: true });
+      scroller.addEventListener('touchstart', onUserInterrupt, { passive: true, once: true });
+      scroller.addEventListener('pointerdown', onUserInterrupt, { passive: true, once: true });
+    }
+
+    promise.then(
+      () => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve();
+      },
+      (err) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(err);
+      }
+    );
+  });
+}
+
+function waitForScrollEnd(
+  scroller: HTMLElement | Window,
+  idleTimeoutMs = 100,
+  signal?: AbortSignal,
+  abortOnUserInterrupt = false
+): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
+  if (signal?.aborted) {
+    return Promise.reject(createAbortError(signal));
+  }
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let settled = false;
 
-    const finish = () => {
+    const cleanup = () => {
       if (timeoutId !== undefined) clearTimeout(timeoutId);
       scroller.removeEventListener('scrollend', finish);
       scroller.removeEventListener('scroll', onScroll);
+      signal?.removeEventListener('abort', onAbort);
+      if (abortOnUserInterrupt) {
+        scroller.removeEventListener('wheel', onUserInterrupt);
+        scroller.removeEventListener('touchstart', onUserInterrupt);
+        scroller.removeEventListener('pointerdown', onUserInterrupt);
+      }
+    };
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
       resolve();
+    };
+
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(createAbortError(signal));
+    };
+
+    const onUserInterrupt = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new DOMException('Scroll interrupted by user', 'AbortError'));
     };
 
     const onScroll = () => {
@@ -35,6 +139,12 @@ function waitForScrollEnd(scroller: HTMLElement | Window, idleTimeoutMs = 100): 
 
     scroller.addEventListener('scrollend', finish, { once: true });
     scroller.addEventListener('scroll', onScroll, { passive: true });
+    signal?.addEventListener('abort', onAbort, { once: true });
+    if (abortOnUserInterrupt) {
+      scroller.addEventListener('wheel', onUserInterrupt, { passive: true, once: true });
+      scroller.addEventListener('touchstart', onUserInterrupt, { passive: true, once: true });
+      scroller.addEventListener('pointerdown', onUserInterrupt, { passive: true, once: true });
+    }
     timeoutId = setTimeout(finish, idleTimeoutMs);
   });
 }
@@ -66,12 +176,17 @@ export function scrollIntoViewAsync(
   completionOptions?: ScrollCompletionOptions
 ): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
+  const { signal, abortOnUserInterrupt = false, idleTimeoutMs } = completionOptions ?? {};
+  if (signal?.aborted) {
+    return Promise.reject(createAbortError(signal));
+  }
+
+  const scroller = completionOptions?.scroller ?? getScrollParent(element) ?? window;
   const result = element.scrollIntoView(options) as unknown;
   if (result instanceof Promise) {
-    return result;
+    return raceWithSignalAndInterrupt(result as Promise<void>, scroller, signal, abortOnUserInterrupt);
   }
-  const scroller = completionOptions?.scroller ?? getScrollParent(element) ?? window;
-  return waitForScrollEnd(scroller, completionOptions?.idleTimeoutMs);
+  return waitForScrollEnd(scroller, idleTimeoutMs, signal, abortOnUserInterrupt);
 }
 
 /**
@@ -80,11 +195,23 @@ export function scrollIntoViewAsync(
 export function scrollToAsync(
   scroller: HTMLElement | Window,
   options: ScrollToOptions,
-  idleTimeoutMs = 100
+  idleTimeoutMsOrOptions: number | Pick<ScrollCompletionOptions, 'idleTimeoutMs' | 'signal' | 'abortOnUserInterrupt'> = 100
 ): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+
+  const resolvedOptions =
+    typeof idleTimeoutMsOrOptions === 'number'
+      ? { idleTimeoutMs: idleTimeoutMsOrOptions }
+      : idleTimeoutMsOrOptions;
+  const { idleTimeoutMs = 100, signal, abortOnUserInterrupt = false } = resolvedOptions;
+
+  if (signal?.aborted) {
+    return Promise.reject(createAbortError(signal));
+  }
+
   const result = scroller.scrollTo(options) as unknown;
   if (result instanceof Promise) {
-    return result;
+    return raceWithSignalAndInterrupt(result as Promise<void>, scroller, signal, abortOnUserInterrupt);
   }
-  return waitForScrollEnd(scroller, idleTimeoutMs);
+  return waitForScrollEnd(scroller, idleTimeoutMs, signal, abortOnUserInterrupt);
 }

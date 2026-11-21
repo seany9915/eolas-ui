@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { ContextMenu as BaseContextMenu } from '@base-ui/react/context-menu';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface ContextMenuItemData {
   id: string;
@@ -25,12 +25,15 @@ export const ContextMenuItem = React.forwardRef<HTMLDivElement, ContextMenuItemP
   ({ className, destructive, icon, shortcut, children, ...props }, ref) => (
     <BaseContextMenu.Item
       ref={ref}
-      className={cn(
-        'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
-        destructive
-          ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
-          : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="context-menu-item"
+      className={composeClassName(
+        cn(
+          'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+          destructive
+            ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
+            : 'text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
+        ),
         className
       )}
       {...props}
@@ -42,7 +45,7 @@ export const ContextMenuItem = React.forwardRef<HTMLDivElement, ContextMenuItemP
       )}
       <span className="truncate flex-1">{children}</span>
       {shortcut && (
-        <span className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto">
+        <span data-slot="context-menu-shortcut" className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto">
           {shortcut}
         </span>
       )}
@@ -51,11 +54,25 @@ export const ContextMenuItem = React.forwardRef<HTMLDivElement, ContextMenuItemP
 );
 ContextMenuItem.displayName = 'ContextMenuItem';
 
+export const ContextMenuShortcut = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
+  <span
+    ref={ref}
+    data-slot="context-menu-shortcut"
+    className={cn('font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto', className)}
+    {...props}
+  />
+));
+ContextMenuShortcut.displayName = 'ContextMenuShortcut';
+
 export interface ContextMenuContentProps extends React.ComponentPropsWithoutRef<typeof BaseContextMenu.Popup> {
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
-  containerClassName?: string;
+  containerClassName?: BaseContextMenu.Positioner.Props['className'];
+  keepMounted?: boolean;
 }
 
 export const ContextMenuContent = React.forwardRef<HTMLDivElement, ContextMenuContentProps>(
@@ -67,25 +84,23 @@ export const ContextMenuContent = React.forwardRef<HTMLDivElement, ContextMenuCo
       alignOffset,
       collisionPadding = 8,
       containerClassName,
+      keepMounted,
       ...props
     },
     ref
   ) => (
-    <BaseContextMenu.Portal>
+    <BaseContextMenu.Portal keepMounted={keepMounted}>
       <BaseContextMenu.Positioner
         sideOffset={sideOffset}
         alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={cn('z-50 outline-none', containerClassName)}
+        className={composeClassName('z-50 outline-none', containerClassName)}
       >
         <BaseContextMenu.Popup
           ref={ref}
-          className={cn(
-            'min-w-[200px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
-            'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-            'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-            'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
-            'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+          data-slot="context-menu-content"
+          className={composeClassName(
+            'min-w-[200px] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -104,7 +119,8 @@ export const ContextMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseContextMenu.Separator
     ref={ref}
-    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
+    data-slot="context-menu-separator"
+    className={composeClassName('h-px my-1 bg-outline-variant/60 -mx-1', className)}
     {...props}
   />
 ));
@@ -114,7 +130,7 @@ export const ContextMenuTrigger = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseContextMenu.Trigger>
 >(({ className, ...props }, ref) => (
-  <BaseContextMenu.Trigger ref={ref} className={className} {...props} />
+  <BaseContextMenu.Trigger ref={ref} data-slot="context-menu-trigger" className={className} {...props} />
 ));
 ContextMenuTrigger.displayName = 'ContextMenuTrigger';
 
@@ -127,10 +143,9 @@ export const ContextMenuCheckboxItem = React.forwardRef<HTMLDivElement, ContextM
   ({ className, children, icon, ...props }, ref) => (
     <BaseContextMenu.CheckboxItem
       ref={ref}
-      className={cn(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="context-menu-checkbox-item"
+      className={composeClassName(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -162,10 +177,9 @@ export const ContextMenuRadioItem = React.forwardRef<HTMLDivElement, ContextMenu
   ({ className, children, icon, ...props }, ref) => (
     <BaseContextMenu.RadioItem
       ref={ref}
-      className={cn(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="context-menu-radio-item"
+      className={composeClassName(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -197,10 +211,9 @@ export const ContextMenuSubmenuTrigger = React.forwardRef<HTMLDivElement, Contex
   ({ className, children, icon, ...props }, ref) => (
     <BaseContextMenu.SubmenuTrigger
       ref={ref}
-      className={cn(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface',
-        'hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+      data-slot="context-menu-sub-trigger"
+      className={composeClassName(
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
@@ -227,7 +240,8 @@ export const ContextMenuGroupLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseContextMenu.GroupLabel
     ref={ref}
-    className={cn('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
+    data-slot="context-menu-label"
+    className={composeClassName('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
     {...props}
   />
 ));
@@ -237,7 +251,7 @@ export const ContextMenuGroup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseContextMenu.Group>
 >(({ className, ...props }, ref) => (
-  <BaseContextMenu.Group ref={ref} className={cn('py-1', className)} {...props} />
+  <BaseContextMenu.Group ref={ref} data-slot="context-menu-group" className={composeClassName('py-1', className)} {...props} />
 ));
 ContextMenuGroup.displayName = 'ContextMenuGroup';
 
@@ -245,7 +259,7 @@ export const ContextMenuRadioGroup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseContextMenu.RadioGroup>
 >(({ className, ...props }, ref) => (
-  <BaseContextMenu.RadioGroup ref={ref} className={cn('py-1', className)} {...props} />
+  <BaseContextMenu.RadioGroup ref={ref} data-slot="context-menu-radio-group" className={composeClassName('py-1', className)} {...props} />
 ));
 ContextMenuRadioGroup.displayName = 'ContextMenuRadioGroup';
 
@@ -255,8 +269,9 @@ export const ContextMenuLinkItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseContextMenu.LinkItem
     ref={ref}
-    className={cn(
-      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+    data-slot="context-menu-link-item"
+    className={composeClassName(
+      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-surface-container focus:bg-surface-container data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
       className
     )}
     {...props}
@@ -264,17 +279,10 @@ export const ContextMenuLinkItem = React.forwardRef<
 ));
 ContextMenuLinkItem.displayName = 'ContextMenuLinkItem';
 
-export interface ContextMenuProps {
-  children?: React.ReactNode;
+export interface ContextMenuProps
+  extends React.ComponentPropsWithoutRef<typeof BaseContextMenu.Root> {
   items?: ContextMenuItemData[];
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean, eventDetails: BaseContextMenu.Root.ChangeEventDetails) => void;
-  onOpenChangeComplete?: (open: boolean) => void;
-  disabled?: boolean;
-  loopFocus?: boolean;
-  actionsRef?: React.RefObject<BaseContextMenu.Root.Actions | null>;
-  className?: string;
+  className?: BaseContextMenu.Trigger.Props['className'];
 }
 
 const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
@@ -305,6 +313,7 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
           disabled={disabled}
           loopFocus={loopFocus}
           actionsRef={actionsRef}
+          {...props}
         >
           {children}
         </BaseContextMenu.Root>
@@ -320,13 +329,14 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
         disabled={disabled}
         loopFocus={loopFocus}
         actionsRef={actionsRef}
+        {...props}
       >
-        <BaseContextMenu.Trigger ref={ref} className={cn('w-full', className)} {...props}>
+        <BaseContextMenu.Trigger ref={ref} data-slot="context-menu-trigger" className={composeClassName('w-full', className)}>
           {children}
         </BaseContextMenu.Trigger>
         <BaseContextMenu.Portal>
           <BaseContextMenu.Positioner sideOffset={4} collisionPadding={8} className="z-50 outline-none">
-            <BaseContextMenu.Popup className="min-w-[200px] p-1 rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none">
+            <BaseContextMenu.Popup data-slot="context-menu-content" className="min-w-[200px] p-1 rounded-md bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none">
               {items.map((item) => (
                 <ContextMenuItem
                   key={item.id}
@@ -360,6 +370,7 @@ export const ContextMenu = Object.assign(ContextMenuComponent, {
   Item: ContextMenuItem,
   LinkItem: ContextMenuLinkItem,
   Separator: ContextMenuSeparator,
+  Shortcut: ContextMenuShortcut,
   Group: ContextMenuGroup,
   GroupLabel: ContextMenuGroupLabel,
   CheckboxItem: ContextMenuCheckboxItem,

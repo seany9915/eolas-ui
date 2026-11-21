@@ -1,11 +1,11 @@
-# Eolas UI — Private Base UI Component Registry
+# Eolas UI — Base UI Component Registry CLI
 
-`eolas-ui` is a CLI distributor for the clinical Base UI component library and design system.
+`eolas-ui` is a CLI distributor for the Eolas UI clinical Base UI component library and design system. It works completely offline from the bundled registry snapshot and stays in exact parity with the public GitHub Pages registry (`https://seany9915.github.io/eolas-ui/r/`).
 
 ## Setup in a Consuming Project
 
-### 1. Configure `.npmrc`
-Ensure your project has access to GitHub Packages:
+### 1. Configure `.npmrc` (GitHub Packages)
+Ensure your project can install `@seany9915/eolas-ui` from GitHub Packages:
 
 ```ini
 @seany9915:registry=https://npm.pkg.github.com
@@ -13,29 +13,43 @@ Ensure your project has access to GitHub Packages:
 ```
 
 ### 2. Add Components, Theme, Rules & Lint
-Run `eolas-ui` to install components and their dependencies into your project (respects `components.json` `aliases` and `tailwind.css`):
+Run `eolas-ui` to install components and their dependencies into your project (respects `components.json` `aliases`, `tsconfig.json` / `jsconfig.json` path mappings, and `tailwind.css`):
 
 ```bash
+# Print CLI version
+npx @seany9915/eolas-ui --version
+
 # List all available primitives, composite blocks, presets, rules, and utilities
 npx @seany9915/eolas-ui list
 
 # Add the design system theme, rules, and lint preset
 npx @seany9915/eolas-ui add theme design-md agent-rules lint
 
-# Add specific components (auto-fetches internal dependencies and utils)
+# Add specific components (auto-fetches internal dependencies and utils; accepts @eolas/ prefixes)
 npx @seany9915/eolas-ui add dialog select tabs
+npx @seany9915/eolas-ui add @eolas/button
+
+# Install all non-deprecated primitives, composite blocks, and utilities
+npx @seany9915/eolas-ui add --all
+npx @seany9915/eolas-ui add --all --include-deprecated
 
 # Preview changes without writing files
 npx @seany9915/eolas-ui add data-table --dry-run
 npx @seany9915/eolas-ui sync --dry-run
 
-# Overwrite existing files to update to latest version
-npx @seany9915/eolas-ui add tabs --overwrite
+# Update only already-installed items (components, blocks, utilities, theme, design-md, agent-rules, lint)
 npx @seany9915/eolas-ui sync
+
+# Explicitly sync the full non-deprecated catalog (or include deprecated compatibility items)
+npx @seany9915/eolas-ui sync --all
+npx @seany9915/eolas-ui sync --all --include-deprecated
+
+# Overwrite specific existing files to update to the latest version
+npx @seany9915/eolas-ui add tabs --overwrite
 ```
 
 ### 3. Fonts & Material Symbols Icons
-Installing `theme` adds `@import url(...)` rules to your stylesheet for `Atkinson Hyperlegible Next`, `Lexend`, `Roboto Mono`, and the `Material Symbols Outlined` icon subset used by all Eolas UI primitives and blocks.
+Installing `theme` writes the Tailwind CSS v4 stylesheet (to your `components.json` `tailwind.css` path when configured, or `src/eolas-theme.css`) including `@import url(...)` rules for `Atkinson Hyperlegible Next`, `Lexend`, `Roboto Mono`, and the `Material Symbols Outlined` icon subset used by all Eolas UI primitives and blocks.
 
 For faster initial font discovery in production apps, you may optionally add preconnect links in your HTML `<head>`:
 
@@ -54,14 +68,24 @@ npm install @base-ui/react clsx tailwind-merge
 Specialized primitives/blocks also declare their optional packages (such as `recharts`, `react-day-picker`, `@tanstack/react-table`, `cmdk`, `react-resizable-panels`, `embla-carousel-react`, or `@dnd-kit/react`).
 
 ### 5. Agent Guardrails with `@shadcn/lint` & Oxlint
-Prevent AI coding agents and developers from eroding design tokens, overriding touch target floors (44px min), or introducing anti-patterns:
+Prevent AI coding agents and developers from eroding design tokens, overriding touch target floors (44px min), or introducing anti-patterns.
+
+**Option A (Standalone files via CLI):**
 
 ```bash
 npm install -D @shadcn/lint oxlint
 npx @seany9915/eolas-ui add lint
 ```
 
-Or extend the preset directly from `node_modules` in your `.oxlintrc.json`:
+**Option B (Extend directly from `node_modules`):**
+
+Install `@seany9915/eolas-ui` as a devDependency alongside `@shadcn/lint` and `oxlint`:
+
+```bash
+npm install -D @seany9915/eolas-ui @shadcn/lint oxlint
+```
+
+Then extend the preset in `.oxlintrc.json`:
 
 ```json
 {
@@ -71,7 +95,11 @@ Or extend the preset directly from `node_modules` in your `.oxlintrc.json`:
 ```
 
 This preset enforces:
-- **`eolas/*` AST guardrails**: `no-raw-html-controls`, `no-radix-imports`, `no-positive-tabindex`, `require-iscomposing-on-enter`, `no-static-clickable-elements`, `no-nested-card`, `no-sparkle-icons`, `no-triple-tint`, `no-light-surface-tertiary`, `no-transition-all`, `no-spring-easing`, `no-uppercase`, `no-unsafe-type-cast`, plus **`typescript/ban-ts-comment`**
-- **`shadcn/no-raw-colors`**: Enforces Eolas semantic tokens (`bg-primary`, `bg-surface-container`, `text-on-surface`, etc.).
-- **`shadcn/no-arbitrary-values`**: Bans arbitrary bracket classes (`p-[13px]`).
-- **`shadcn/no-restyle`**: Enforces component contracts on `Button`, `Chip`, `Card`, `InlineAlert`, `Toast`, dialogs, drawers, and form controls.
+- **13 `eolas/*` AST guardrails**: `no-raw-html-controls`, `no-radix-imports`, `no-positive-tabindex`, `require-iscomposing-on-enter`, `no-static-clickable-elements`, `no-nested-card`, `no-sparkle-icons`, `no-triple-tint`, `no-light-surface-tertiary`, `no-transition-all`, `no-spring-easing`, `no-uppercase`, `no-unsafe-type-cast`, plus **`typescript/ban-ts-comment`**
+- **6 `shadcn/*` rules**:
+  - `shadcn/no-raw-colors` — enforces Eolas semantic tokens (`bg-primary`, `bg-surface-container`, `text-on-surface`, etc.)
+  - `shadcn/no-arbitrary-values` — bans arbitrary bracket classes (`p-[13px]`)
+  - `shadcn/no-inline-styles` — bans ad-hoc `style={{ ... }}` overrides
+  - `shadcn/no-unknown-classes` — flags unrecognized utility classes
+  - `shadcn/require-static-classes` — enforces statically analyzable Tailwind classes
+  - `shadcn/no-restyle` — enforces component contracts on `Button`, `UnstyledButton`, `Icon`, `Badge`, `Chip`, `Card`, `InlineAlert`, `Toast`, `Tabs`, dialogs, drawers, popups, form controls, `Skeleton`, motion primitives, and table cells

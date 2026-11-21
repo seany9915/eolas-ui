@@ -94,38 +94,41 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
       };
     }, [shake, hasActiveError, autoRevert, revertHoldMs]);
 
+    const showError = Boolean(hasActiveError && errorMessage);
+
     return (
       <div
         ref={ref}
-        className={cn('w-full flex flex-col gap-1.5', className)}
+        className={cn('w-full flex flex-col', showError && 'gap-1.5', className)}
         {...props}
       >
         <div
           ref={shakeTargetRef}
           className={cn(
-            'w-full will-change-transform motion-reduce:transform-none motion-reduce:animate-none',
+            'w-full motion-reduce:transform-none motion-reduce:animate-none',
             isShaking && 'animate-error-shake'
           )}
         >
           {children}
         </div>
 
-        {errorMessage && (
-          <p
-            className={cn(
-              'font-sans text-xs font-semibold text-error flex items-center gap-1 select-none',
-              'transition-[opacity,visibility] duration-300 ease-out motion-reduce:transition-none',
-              hasActiveError ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
-            )}
-            role={hasActiveError ? 'alert' : undefined}
-            aria-hidden={!hasActiveError || undefined}
-          >
-            <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
-              error
-            </span>
-            <span>{errorMessage}</span>
-          </p>
-        )}
+        <p
+          role="alert"
+          className={cn(
+            'font-sans text-xs font-semibold text-error flex items-center gap-1',
+            'transition-[opacity,visibility] duration-300 ease-out motion-reduce:transition-none',
+            showError ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+          )}
+        >
+          {showError ? (
+            <>
+              <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
+                error
+              </span>
+              <span>{errorMessage}</span>
+            </>
+          ) : null}
+        </p>
       </div>
     );
   }

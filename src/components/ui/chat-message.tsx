@@ -45,10 +45,18 @@ export interface ChatMessageRootProps extends React.HTMLAttributes<HTMLDivElemen
 const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
   ({ role = 'assistant', align, children, className, ...props }, ref) => {
     const resolvedAlign = align ?? (role === 'user' ? 'end' : 'start');
+    const hasAvatarChild = React.Children.toArray(children).some(
+      (child) =>
+        React.isValidElement(child) &&
+        (child.type === ChatMessageAvatar ||
+          (child.type as { displayName?: string })?.displayName === 'ChatMessage.Avatar')
+    );
+
     return (
       <ChatMessageContext.Provider value={{ inMessage: true, role }}>
         <div
           ref={ref}
+          data-slot="message"
           data-role={role}
           data-align={resolvedAlign}
           className={cn(
@@ -58,16 +66,29 @@ const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
           )}
           {...props}
         >
-          <div
-            className={cn(
-              'flex flex-col gap-1.5',
-              resolvedAlign === 'end'
-                ? 'items-end max-w-[90%] @md:max-w-[80%]'
-                : 'items-start max-w-[95%] @md:max-w-[85%]'
-            )}
-          >
-            {children}
-          </div>
+          {hasAvatarChild ? (
+            <div
+              className={cn(
+                'flex items-start gap-3',
+                resolvedAlign === 'end'
+                  ? 'flex-row-reverse max-w-[90%] @md:max-w-[80%]'
+                  : 'flex-row max-w-[95%] @md:max-w-[85%]'
+              )}
+            >
+              {children}
+            </div>
+          ) : (
+            <div
+              className={cn(
+                'flex flex-col gap-1.5',
+                resolvedAlign === 'end'
+                  ? 'items-end max-w-[90%] @md:max-w-[80%]'
+                  : 'items-start max-w-[95%] @md:max-w-[85%]'
+              )}
+            >
+              {children}
+            </div>
+          )}
         </div>
       </ChatMessageContext.Provider>
     );
@@ -76,7 +97,7 @@ const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
 ChatMessageRoot.displayName = 'ChatMessage.Root';
 
 export interface ChatMessageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  role: ChatRole;
+  role?: ChatRole;
   authorName?: string;
   timestamp?: number | string;
   botType?: BotAvatarType;
@@ -93,8 +114,11 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
   className,
   ...props
 }) => {
-  const defaultName = role === 'user' ? 'You' : role === 'assistant' ? 'Assistant' : 'System';
+  const chatContext = useChatMessageContext();
+  const resolvedRole: ChatRole = role ?? (chatContext.inMessage ? chatContext.role : 'assistant');
+  const defaultName = resolvedRole === 'user' ? 'You' : resolvedRole === 'assistant' ? 'Assistant' : 'System';
   const displayName = authorName || defaultName;
+  const showDefaultName = authorName !== undefined || children === undefined;
 
   const formattedTime = React.useMemo(() => {
     if (!timestamp) return null;
@@ -107,17 +131,20 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
 
   return (
     <div
+      data-slot="message-header"
       {...props}
       className={cn(
         'flex items-center gap-2 text-xs font-label text-on-surface-variant select-none',
-        role === 'user' ? 'flex-row-reverse' : 'flex-row',
+        resolvedRole === 'user' ? 'flex-row-reverse' : 'flex-row',
         className
       )}
     >
-      {role === 'assistant' && botType && (
+      {resolvedRole === 'assistant' && botType && (
         <BotAvatar type={botType} size="sm" className="shrink-0" />
       )}
-      <span className="font-semibold text-on-surface">{displayName}</span>
+      {showDefaultName && (
+        <span className="font-semibold text-on-surface">{displayName}</span>
+      )}
       {formattedTime && (
         <span className="text-xs font-mono tabular-nums text-on-surface-variant/80">
           {formattedTime}
@@ -129,31 +156,82 @@ const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
 };
 ChatMessageHeader.displayName = 'ChatMessage.Header';
 
+export type BubbleVariant =
+  | 'default'
+  | 'secondary'
+  | 'muted'
+  | 'tinted'
+  | 'outline'
+  | 'ghost'
+  | 'destructive'
+  | 'card';
+
 export interface ChatMessageBubbleProps extends React.HTMLAttributes<HTMLDivElement> {
-  role: ChatRole;
-  variant?: 'card' | 'ghost';
+  role?: ChatRole;
+  variant?: BubbleVariant;
+  align?: 'start' | 'end';
   children?: React.ReactNode;
   className?: string;
 }
 
 const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProps>(
-  ({ role, variant, children, className, ...props }, ref) => {
-    const resolvedVariant = variant ?? (role === 'assistant' ? 'ghost' : 'card');
+  ({ role, variant, align, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedRole = role ?? (chatContext.inMessage ? chatContext.role : undefined);
+    const resolvedAlign = align ?? (resolvedRole === 'user' ? 'end' : 'start');
+    const resolvedVariant: BubbleVariant =
+      variant ?? (role !== undefined ? (role === 'assistant' ? 'ghost' : 'card') : 'default');
+
+    const cornerClass =
+      resolvedVariant === 'ghost'
+        ? 'rounded-none'
+        : resolvedRole === 'system' && resolvedVariant === 'card'
+        ? 'rounded-md'
+        : resolvedAlign === 'end'
+        ? 'rounded-lg rounded-ee-sm'
+        : 'rounded-lg rounded-es-sm';
+
+    const variantClass = (() => {
+      switch (resolvedVariant) {
+        case 'ghost':
+          return 'w-full bg-transparent text-on-surface border-0 px-0 py-1';
+        case 'secondary':
+          return 'bg-secondary-container text-on-secondary-container';
+        case 'muted':
+          return 'bg-surface-container-high text-on-surface';
+        case 'tinted':
+          return 'bg-primary-container text-on-primary-container';
+        case 'outline':
+          return 'bg-surface text-on-surface border border-outline-variant';
+        case 'destructive':
+          return 'bg-error-container text-on-error-container';
+        case 'card':
+          if (resolvedRole === 'user') {
+            return 'bg-primary-container text-on-primary-container';
+          }
+          if (resolvedRole === 'system') {
+            return 'bg-surface-container text-on-surface-variant text-sm font-medium';
+          }
+          return 'bg-surface text-on-surface border border-outline-variant shadow-ambient';
+        case 'default':
+        default:
+          return resolvedAlign === 'end'
+            ? 'bg-primary text-on-primary'
+            : 'bg-surface-container text-on-surface';
+      }
+    })();
+
     return (
       <div
         ref={ref}
-        data-role={role}
+        data-slot="bubble"
+        data-role={resolvedRole}
+        data-align={resolvedAlign}
         data-variant={resolvedVariant}
         className={cn(
-          'p-4 text-base font-sans leading-relaxed transition-colors',
-          role === 'user' &&
-            'bg-primary-container text-on-primary-container rounded-lg rounded-ee-sm',
-          role === 'assistant' &&
-            (resolvedVariant === 'ghost'
-              ? 'w-full bg-transparent text-on-surface border-0 px-0 py-1 rounded-none'
-              : 'bg-surface text-on-surface border border-outline-variant shadow-ambient rounded-lg rounded-es-sm'),
-          role === 'system' &&
-            'bg-surface-container text-on-surface-variant rounded-md text-sm font-medium',
+          'relative flex flex-col p-4 text-base font-sans leading-relaxed transition-colors',
+          cornerClass,
+          variantClass,
           className
         )}
         {...props}
@@ -165,26 +243,120 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
 );
 ChatMessageBubble.displayName = 'ChatMessage.Bubble';
 
+export interface BubbleContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const BubbleContent = React.forwardRef<HTMLDivElement, BubbleContentProps>(
+  ({ children, className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="bubble-content"
+      className={cn('typeset typeset-chat min-w-0 break-words', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+);
+BubbleContent.displayName = 'Bubble.Content';
+
+export interface BubbleReactionsProps extends React.HTMLAttributes<HTMLDivElement> {
+  side?: 'top' | 'bottom';
+  align?: 'start' | 'end';
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const BubbleReactions = React.forwardRef<HTMLDivElement, BubbleReactionsProps>(
+  ({ side = 'bottom', align = 'start', children, className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="bubble-reactions"
+      data-side={side}
+      data-align={align}
+      className={cn(
+        'flex flex-wrap items-center gap-1',
+        side === 'top' ? 'order-first mb-1.5 -mt-1' : 'order-last mt-1.5 -mb-1',
+        align === 'end' ? 'justify-end' : 'justify-start',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+);
+BubbleReactions.displayName = 'Bubble.Reactions';
+
+export interface BubbleGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  align?: 'start' | 'end';
+  children?: React.ReactNode;
+  className?: string;
+}
+
+const BubbleGroup = React.forwardRef<HTMLDivElement, BubbleGroupProps>(
+  ({ align, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedAlign = align ?? (chatContext.inMessage && chatContext.role === 'user' ? 'end' : 'start');
+
+    return (
+      <div
+        ref={ref}
+        role="group"
+        data-slot="bubble-group"
+        data-align={resolvedAlign}
+        className={cn(
+          'flex flex-col gap-1',
+          resolvedAlign === 'end' ? 'items-end' : 'items-start',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+BubbleGroup.displayName = 'Bubble.Group';
+
 export interface ChatMessageAvatarProps
-  extends Omit<React.ComponentPropsWithoutRef<typeof Avatar>, 'fallback'> {
+  extends Omit<React.ComponentPropsWithoutRef<typeof Avatar>, 'fallback' | 'children'> {
   role?: ChatRole;
   botType?: BotAvatarType;
   src?: string;
   name?: string;
   fallback?: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
 const ChatMessageAvatar: React.FC<ChatMessageAvatarProps> = ({
-  role = 'assistant',
+  role,
   botType,
   src,
   name,
   fallback,
+  children,
   className,
   ...props
 }) => {
-  if (role === 'assistant' && botType) {
+  const chatContext = useChatMessageContext();
+  const resolvedRole: ChatRole = role ?? (chatContext.inMessage ? chatContext.role : 'assistant');
+
+  if (children !== undefined) {
+    return (
+      <div
+        data-slot="message-avatar"
+        className={cn('shrink-0 flex items-start', className)}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  if (resolvedRole === 'assistant' && botType) {
     return <BotAvatar type={botType} size="sm" className={className} />;
   }
 
@@ -195,19 +367,19 @@ const ChatMessageAvatar: React.FC<ChatMessageAvatarProps> = ({
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : role === 'user'
+    : resolvedRole === 'user'
     ? 'U'
     : 'AI';
 
   return (
     <Avatar
       src={src}
-      alt={name || (role === 'user' ? 'User avatar' : 'Assistant avatar')}
+      alt={name || (resolvedRole === 'user' ? 'User avatar' : 'Assistant avatar')}
       fallback={fallback || initials}
       size="sm"
       className={cn(
         'size-7 text-xs shrink-0 select-none border',
-        role === 'user'
+        resolvedRole === 'user'
           ? 'bg-primary text-on-primary border-primary'
           : 'bg-surface-container text-on-surface border-outline-variant',
         className
@@ -470,7 +642,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                 }
               >
                 <Button
-                  variant={isBookmarked ? 'tonal' : 'ghost'}
+                  variant={isBookmarked ? 'soft' : 'ghost'}
                   colorRole={isBookmarked ? 'primary' : 'neutral'}
                   size="sm"
                   onClick={onBookmark}
@@ -528,7 +700,7 @@ const ChatMessageContentWrapper = React.forwardRef<HTMLDivElement, ChatMessageCo
     <div
       ref={ref}
       data-slot="message-content"
-      className={cn('flex flex-col gap-1.5 w-full', className)}
+      className={cn('flex flex-col gap-1.5 w-full min-w-0', className)}
       {...props}
     >
       {children}
@@ -538,12 +710,21 @@ const ChatMessageContentWrapper = React.forwardRef<HTMLDivElement, ChatMessageCo
 ChatMessageContentWrapper.displayName = 'ChatMessage.ContentWrapper';
 
 /* -------------------------------------------------------------------------------------------------
- * Compound Component
+ * Compound Components
  * -----------------------------------------------------------------------------------------------*/
+const Bubble = Object.assign(ChatMessageBubble, {
+  Content: BubbleContent,
+  Reactions: BubbleReactions,
+  Group: BubbleGroup,
+});
+
 export const ChatMessageCompound = Object.assign(ChatMessage, {
   Root: ChatMessageRoot,
   Header: ChatMessageHeader,
-  Bubble: ChatMessageBubble,
+  Bubble,
+  BubbleContent,
+  BubbleReactions,
+  BubbleGroup,
   Content: ChatMessageContentWrapper,
   ContentWrapper: ChatMessageContentWrapper,
   Attachments: ChatMessageAttachments,
@@ -562,13 +743,16 @@ export {
   ChatMessageActions,
   ChatMessageAvatar,
   ChatMessageGroup,
+  Bubble,
+  BubbleContent,
+  BubbleReactions,
+  BubbleGroup,
   // shadcn AI Elements direct aliases
   ChatMessageCompound as Message,
   ChatMessageRoot as MessageRoot,
   ChatMessageHeader as MessageHeader,
   ChatMessageContentWrapper as MessageContent,
   ChatMessageBubble as MessageBubble,
-  ChatMessageBubble as Bubble,
   ChatMessageAttachments as MessageAttachments,
   ChatMessageActions as MessageFooter,
   ChatMessageActions as MessageActions,

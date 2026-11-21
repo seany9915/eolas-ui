@@ -11,7 +11,10 @@
       "name": "utils",
       "type": "registry:lib",
       "title": "Eolas UI Utilities",
-      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+      "categories": [
+        "system"
+      ],
       "dependencies": [
         "@base-ui/react",
         "clsx",
@@ -30,6 +33,9 @@
       "type": "registry:lib",
       "title": "Announce",
       "description": "Imperative screen-reader live-region announcer.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/announce.ts",
@@ -43,6 +49,9 @@
       "type": "registry:lib",
       "title": "Built-in AI",
       "description": "On-device Built-in AI Hooks (Prompt API, Language Detector, Summarizer & Translator).",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/built-in-ai.ts",
@@ -56,6 +65,9 @@
       "type": "registry:lib",
       "title": "Contrast",
       "description": "Dynamic foreground contrast helper for user-supplied background colors.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/contrast.ts",
@@ -69,6 +81,9 @@
       "type": "registry:lib",
       "title": "Format Duration",
       "description": "Duration Formatting Utility and Hook",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/format-duration.ts",
@@ -82,6 +97,9 @@
       "type": "registry:lib",
       "title": "Sanitize",
       "description": "Untrusted HTML Sanitizer Utility & React Component.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/sanitize.ts",
@@ -95,6 +113,9 @@
       "type": "registry:lib",
       "title": "Scheduler",
       "description": "Cooperative Task Scheduling & Yielding Utilities.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/scheduler.ts",
@@ -108,6 +129,9 @@
       "type": "registry:lib",
       "title": "Scroll Completion",
       "description": "Programmatic scroll completion utilities.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/scroll-completion.ts",
@@ -121,6 +145,9 @@
       "type": "registry:lib",
       "title": "Use Horizontal Scroll Fade",
       "description": "Horizontal scroll overflow detection for soft edge-fade masks.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/use-horizontal-scroll-fade.ts",
@@ -134,6 +161,9 @@
       "type": "registry:lib",
       "title": "Use Text Highlight",
       "description": "useTextHighlight Hook",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/use-text-highlight.ts",
@@ -147,6 +177,9 @@
       "type": "registry:lib",
       "title": "Use Web OTP",
       "description": "WebOTP API auto-extraction hook.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/use-web-otp.ts",
@@ -160,6 +193,9 @@
       "type": "registry:lib",
       "title": "View Transitions",
       "description": "View Transitions API React hook and utility.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/lib/view-transitions.ts",
@@ -173,20 +209,26 @@
       "type": "registry:file",
       "title": "Eolas UI Clinical Theme",
       "description": "Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "src/globals.css",
           "type": "registry:file",
-          "target": "~/src/globals.css"
+          "target": "~/src/eolas-theme.css"
         }
       ],
-      "docs": "Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). Import this stylesheet in your application entry point (e.g. src/main.tsx or app/layout.tsx)."
+      "docs": "Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). `npx shadcn@latest add @eolas/theme` writes the full Tailwind CSS v4 stylesheet to `src/eolas-theme.css` (import it from your entry point or main CSS file); `eolas-ui add theme` automatically writes to your `components.json` `tailwind.css` path when configured."
     },
     {
       "name": "design-md",
       "type": "registry:file",
       "title": "Eolas UI Design System Spec (DESIGN.md)",
       "description": "Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers.",
+      "categories": [
+        "system"
+      ],
       "files": [
         {
           "path": "DESIGN.md",
@@ -200,8 +242,11 @@
       "type": "registry:item",
       "title": "Eolas UI Agent Rules & Anti-Pattern Checker",
       "description": "Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers.",
+      "categories": [
+        "system"
+      ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/design-md.json"
+        "seany9915/eolas-ui/design-md"
       ],
       "files": [
         {
@@ -262,6 +307,9 @@
       "type": "registry:item",
       "title": "Eolas UI Lint",
       "description": "@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts.",
+      "categories": [
+        "system"
+      ],
       "devDependencies": [
         "@shadcn/lint",
         "oxlint"

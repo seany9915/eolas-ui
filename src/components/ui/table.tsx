@@ -48,6 +48,12 @@ export interface DataDrivenTableProps<T> {
   density?: TableDensity;
   /** Applies ambient elevation shadow to the outer table container. */
   elevated?: boolean;
+  /** Optional accessible table caption. When provided, enables role="region" on the scroll container. */
+  caption?: string;
+  /** Optional accessible label. When provided, enables role="region" on the scroll container. */
+  'aria-label'?: string;
+  /** Optional accessible labelledby ID. When provided, enables role="region" on the scroll container. */
+  'aria-labelledby'?: string;
 }
 
 export type TableProps<T = unknown> =
@@ -58,6 +64,7 @@ export type TableProps<T = unknown> =
       responsive?: 'scroll' | 'stack';
       density?: TableDensity;
       elevated?: boolean;
+      caption?: string;
     })
   | DataDrivenTableProps<T>;
 
@@ -177,7 +184,8 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
     const responsive = props.responsive ?? 'scroll';
     const density = props.density;
     const isStack = responsive === 'stack';
-    const { ref: scrollFadeRef } = useHorizontalScrollFade<HTMLDivElement>(undefined, {
+    const captionId = React.useId();
+    const { ref: scrollFadeRef, isScrollable } = useHorizontalScrollFade<HTMLDivElement>(undefined, {
       disabled: isStack,
     });
 
@@ -190,23 +198,44 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         className,
         containerClassName,
         elevated,
+        caption,
+        'aria-label': ariaLabel,
+        'aria-labelledby': ariaLabelledBy,
       } = props as DataDrivenTableProps<any>;
+
+      const regionAriaLabel = ariaLabel;
+      const regionAriaLabelledBy = ariaLabelledBy ?? (caption ? captionId : undefined);
+      const hasAccessibleName = Boolean(regionAriaLabel || regionAriaLabelledBy);
 
       return (
         <div
           ref={scrollFadeRef}
           data-slot="table-container"
           data-density={density}
+          role={hasAccessibleName ? 'region' : undefined}
+          aria-label={hasAccessibleName ? regionAriaLabel : undefined}
+          aria-labelledby={hasAccessibleName ? regionAriaLabelledBy : undefined}
+          tabIndex={isScrollable ? 0 : undefined}
           style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
           className={cn(
             'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
             elevated && 'shadow-ambient',
-            !isStack && 'scroll-fade-x',
+            !isStack && 'scroll-shadow-x',
             isStack && '@container',
             containerClassName
           )}
         >
-          <table ref={ref} data-slot="table" className={cn('w-full text-start border-collapse font-sans text-sm', className)}>
+          <table
+            ref={ref}
+            data-slot="table"
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            className={cn('w-full caption-bottom text-start border-collapse font-sans text-sm', className)}
+          >
+            {caption && (
+              <TableCaption id={captionId}>{caption}</TableCaption>
+            )}
             <thead className={cn(isStack && '@max-sm:hidden')}>
               <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
                 {columns.map((col, idx) => {
@@ -224,7 +253,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                       key={idx}
                       scope="col"
                       data-slot="table-head"
-                      className={cn('px-6 py-4 font-semibold', alignClass, numericClass, col.className)}
+                      className={cn('h-12 px-4 py-3.5 font-semibold', alignClass, numericClass, col.className)}
                     >
                       {col.header}
                     </th>
@@ -235,7 +264,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
             <tbody
               className={cn(
                 'divide-y divide-outline-variant',
-                isStack && '@max-sm:divide-y-0 @max-sm:space-y-3 @max-sm:block @max-sm:p-3'
+                isStack && '@max-sm:divide-y-0 @max-sm:flex @max-sm:flex-col @max-sm:gap-3 @max-sm:p-3'
               )}
             >
               {data.map((row) => (
@@ -263,7 +292,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                         key={cIdx}
                         data-slot="table-cell"
                         className={cn(
-                          'px-6 py-4 text-on-surface',
+                          'px-4 py-3.5 text-on-surface',
                           alignClass,
                           numericClass,
                           col.className,
@@ -293,24 +322,60 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
     }
 
     // Composable compound mode (shadcn standard anatomy)
-    const { className, containerClassName, children, responsive: _responsive, density: _density, elevated, ...tableProps } =
-      props as React.HTMLAttributes<HTMLTableElement> & {
-        containerClassName?: string;
-        responsive?: 'scroll' | 'stack';
-        density?: TableDensity;
-        elevated?: boolean;
-      };
+    const {
+      className,
+      containerClassName,
+      children,
+      responsive: _responsive,
+      density: _density,
+      elevated,
+      caption,
+      ...tableProps
+    } = props as React.HTMLAttributes<HTMLTableElement> & {
+      containerClassName?: string;
+      responsive?: 'scroll' | 'stack';
+      density?: TableDensity;
+      elevated?: boolean;
+      caption?: string;
+    };
+
+    let inferredCaptionLabel: string | undefined;
+    let inferredCaptionId: string | undefined;
+    if (!tableProps['aria-label'] && !tableProps['aria-labelledby'] && !caption) {
+      React.Children.forEach(children, (child) => {
+        if (
+          React.isValidElement<{ id?: string; children?: React.ReactNode }>(child) &&
+          (child.type === TableCaption || child.type === 'caption')
+        ) {
+          if (child.props.id) {
+            inferredCaptionId = child.props.id;
+          } else if (typeof child.props.children === 'string' && child.props.children.trim()) {
+            inferredCaptionLabel = child.props.children.trim();
+          }
+        }
+      });
+    }
+
+    const regionAriaLabel = tableProps['aria-label'] ?? inferredCaptionLabel;
+    const regionAriaLabelledBy =
+      tableProps['aria-labelledby'] ?? (caption ? captionId : inferredCaptionId);
+    const hasAccessibleName = Boolean(regionAriaLabel || regionAriaLabelledBy);
 
     return (
       <div
         ref={scrollFadeRef}
         data-slot="table-container"
         data-density={density}
+        role={hasAccessibleName ? 'region' : undefined}
+        aria-label={hasAccessibleName ? regionAriaLabel : undefined}
+        aria-labelledby={hasAccessibleName ? regionAriaLabelledBy : undefined}
+        tabIndex={isScrollable ? 0 : undefined}
         style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
         className={cn(
           'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           elevated && 'shadow-ambient',
-          !isStack && 'scroll-fade-x',
+          !isStack && 'scroll-shadow-x',
           isStack && '@container',
           containerClassName
         )}
@@ -321,6 +386,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
           className={cn('w-full caption-bottom text-start border-collapse font-sans text-sm', className)}
           {...tableProps}
         >
+          {caption && <TableCaption id={captionId}>{caption}</TableCaption>}
           {children}
         </table>
       </div>

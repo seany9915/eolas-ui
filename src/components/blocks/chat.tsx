@@ -104,7 +104,7 @@ export interface ChatMessagesProps extends React.HTMLAttributes<HTMLDivElement> 
 export const ChatMessages = React.forwardRef<HTMLDivElement, ChatMessagesProps>(
   ({ children, showScrollButton = true, className, ...props }, ref) => {
     return (
-      <div className="relative flex-1 min-h-0 flex flex-col">
+      <MessageScroller variant="default" className="flex-1 min-h-0">
         <MessageScrollerViewport
           ref={ref}
           className={cn('flex-1 min-h-0 w-full overflow-y-auto overscroll-contain relative scroll-smooth', className)}
@@ -115,7 +115,7 @@ export const ChatMessages = React.forwardRef<HTMLDivElement, ChatMessagesProps>(
           </MessageScrollerContent>
         </MessageScrollerViewport>
         {showScrollButton && <MessageScrollerButton />}
-      </div>
+      </MessageScroller>
     );
   }
 );
@@ -374,7 +374,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
           ref={ref}
           data-slot="chat"
           className={cn(
-            '@container relative flex flex-col w-full h-full min-h-120 overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
+            '@container relative flex flex-col size-full min-h-120 overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
             variantStyles[variant] ?? variantStyles.card,
             className
           )}

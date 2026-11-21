@@ -1,7 +1,7 @@
 {
   "name": "component-prototyping",
   "private": true,
-  "version": "4.1.0",
+  "version": "5.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit",
     "build:registry": "node scripts/build-registry.mjs && node scripts/generate-manifest.mjs",
     "registry:validate": "node scripts/validate-registry.mjs && node scripts/showcase-coverage.mjs",
+    "test:cli": "node scripts/test-cli.mjs",
+    "test:lint-hooks": "node scripts/test-lint-hooks.mjs",
     "check:coverage": "node scripts/showcase-coverage.mjs",
     "lint": "oxlint .",
     "preview": "vite preview"

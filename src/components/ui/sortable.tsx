@@ -32,14 +32,35 @@ export type SortableOrientation = 'vertical' | 'horizontal' | 'grid';
 interface SortableContextValue {
   orientation: SortableOrientation;
   hasOverlay: boolean;
+  prefersReducedMotion: boolean;
   registerOverlay: () => () => void;
 }
 
 const SortableContext = React.createContext<SortableContextValue>({
   orientation: 'vertical',
   hasOverlay: false,
+  prefersReducedMotion: false,
   registerOverlay: () => () => {},
 });
+
+function usePrefersReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() =>
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(media.matches);
+    const onChange = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
+
+  return prefersReducedMotion;
+}
 
 interface SortableItemContextValue {
   handleRef: (element: Element | null) => void;
@@ -88,6 +109,7 @@ export function SortableRoot({
   children,
   ...props
 }: SortableRootProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [overlayCount, setOverlayCount] = React.useState(0);
   const registerOverlay = React.useCallback(() => {
     setOverlayCount((count) => count + 1);
@@ -95,8 +117,8 @@ export function SortableRoot({
   }, []);
 
   const value = React.useMemo(
-    () => ({ orientation, hasOverlay: overlayCount > 0, registerOverlay }),
-    [orientation, overlayCount, registerOverlay]
+    () => ({ orientation, hasOverlay: overlayCount > 0, prefersReducedMotion, registerOverlay }),
+    [orientation, overlayCount, prefersReducedMotion, registerOverlay]
   );
   return (
     <SortableContext.Provider value={value}>
@@ -172,7 +194,7 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
     },
     forwardedRef
   ) => {
-    const { hasOverlay } = React.useContext(SortableContext);
+    const { hasOverlay, prefersReducedMotion } = React.useContext(SortableContext);
     const { ref, handleRef, isDragging, isDragSource, isDropTarget } = useSortable({
       id,
       index,
@@ -181,7 +203,7 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
       accept,
       disabled,
       data,
-      transition,
+      transition: transition !== undefined ? transition : prefersReducedMotion ? null : undefined,
       collisionDetector,
       collisionPriority,
       modifiers,
@@ -291,21 +313,11 @@ SortableHandle.displayName = 'Sortable.Handle';
 export type SortableOverlayProps = React.ComponentProps<typeof DragOverlay>;
 
 export function SortableOverlay({ className, dropAnimation, ...props }: SortableOverlayProps) {
-  const { registerOverlay } = React.useContext(SortableContext);
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+  const { registerOverlay, prefersReducedMotion } = React.useContext(SortableContext);
 
   React.useEffect(() => {
     return registerOverlay();
   }, [registerOverlay]);
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(media.matches);
-    const onChange = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
-    media.addEventListener('change', onChange);
-    return () => media.removeEventListener('change', onChange);
-  }, []);
 
   return (
     <DragOverlay

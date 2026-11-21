@@ -87,7 +87,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                 variant="soft"
                 colorRole="primary"
                 size="sm"
-              >Registry v4.1</Badge>
+              >Registry v5.0</Badge>
               <span className="font-mono text-xs px-2.5 py-1 rounded-md bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 Base UI (@base-ui/react)
               </span>

@@ -116,7 +116,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
               <div
                 role="status"
                 aria-live="polite"
-                className="flex h-full w-full items-center justify-center"
+                className="flex size-full items-center justify-center"
               >
                 <span className="sr-only">Loading chart data</span>
                 {skeletonShape === 'circle' ? (
@@ -124,7 +124,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                 ) : skeletonShape === 'gauge' ? (
                   <Skeleton className="size-40 @xs:size-48 rounded-full" />
                 ) : (
-                  <Skeleton className="h-full w-full rounded-none" />
+                  <Skeleton className="size-full rounded-none" />
                 )}
               </div>
             ) : isEmpty ? (

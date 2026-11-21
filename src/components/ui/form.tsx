@@ -13,12 +13,11 @@
  */
 import * as React from 'react';
 import { Form as BaseForm } from '@base-ui/react/form';
-import { cn } from '@/lib/utils';
+import { composeClassName } from '@/lib/utils';
 
 export interface FormProps<FormValues extends Record<string, any> = Record<string, any>>
   extends BaseForm.Props<FormValues> {
   children?: React.ReactNode;
-  className?: string;
 
   /**
    * WebMCP (Modern Web Guidance): Unique machine-readable tool identifier
@@ -106,7 +105,7 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
         onFormSubmit={onFormSubmit}
         onSubmit={onSubmit}
         onInvalidCapture={handleInvalidCapture}
-        className={cn('flex flex-col gap-4 w-full transition-colors duration-quick', className)}
+        className={composeClassName('flex flex-col gap-4 w-full transition-colors duration-quick', className)}
         {...webMcpProps}
         {...props}
       >

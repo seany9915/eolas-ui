@@ -12,12 +12,11 @@
  */
 import * as React from 'react';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface SeparatorProps extends React.ComponentPropsWithoutRef<typeof BaseSeparator> {
   orientation?: 'horizontal' | 'vertical';
   decorative?: boolean;
-  className?: string;
 }
 
 const SeparatorComponent = React.forwardRef<HTMLDivElement, SeparatorProps>(({
@@ -29,12 +28,16 @@ const SeparatorComponent = React.forwardRef<HTMLDivElement, SeparatorProps>(({
   return (
     <BaseSeparator
       ref={ref}
+      data-slot="separator"
       orientation={orientation}
       role={decorative ? 'none' : 'separator'}
       aria-hidden={decorative ? true : undefined}
-      className={cn(
-        'bg-outline-variant shrink-0',
-        orientation === 'horizontal' ? 'h-[1px] w-full my-2' : 'w-[1px] h-full mx-2 self-stretch',
+      aria-orientation={decorative ? undefined : orientation}
+      className={composeClassName(
+        cn(
+          'bg-outline-variant shrink-0',
+          orientation === 'horizontal' ? 'h-[1px] w-full' : 'w-[1px] h-full self-stretch'
+        ),
         className
       )}
       {...props}

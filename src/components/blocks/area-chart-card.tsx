@@ -7,7 +7,7 @@
  * Composes ChartCard and Chart primitives with smooth gradient fills and accessible tooltips.
  */
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartCard, type ChartCardProps, type ChartCardTrend } from '@/components/blocks/chart-card';
 import {
   ChartContainer,
@@ -38,6 +38,8 @@ export interface AreaChartCardProps
   series: AreaChartSeries[];
   config: ChartConfig;
   showLegend?: boolean;
+  /** Whether to render the numeric Y-axis scale. Defaults to `true`. */
+  showYAxis?: boolean;
   trend?: ChartCardTrend;
   /** Accessible chart summary announced to screen readers. Defaults to `title`. */
   chartLabel?: string;
@@ -53,6 +55,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
       series,
       config,
       showLegend,
+      showYAxis = true,
       trend,
       footer,
       action,
@@ -92,12 +95,12 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
           role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
-          className="aspect-auto h-full w-full"
+          className="aspect-auto size-full"
         >
           <AreaChart
             aria-label={chartLabel ?? title}
             data={data}
-            margin={{ left: 12, right: 12, top: 12, bottom: 0 }}
+            margin={{ left: showYAxis ? 0 : 12, right: 12, top: 12, bottom: 0 }}
           >
             <defs>
               {series.map((item) => (
@@ -131,6 +134,15 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
               minTickGap={16}
               className="text-xs text-on-surface-variant"
             />
+            {showYAxis && (
+              <YAxis
+                width={36}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={4}
+                className="text-xs text-on-surface-variant"
+              />
+            )}
             <ChartTooltip
               cursor={{
                 stroke: 'var(--color-outline-variant)',

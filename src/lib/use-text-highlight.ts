@@ -73,7 +73,7 @@ function setOwnerRanges(name: string, owner: symbol, ranges: Range[]) {
   publishHighlights(name);
 }
 
-function findNormalizedMatchRanges(
+export function findNormalizedMatchRanges(
   textContent: string,
   trimmedQuery: string,
   caseSensitive: boolean
@@ -154,17 +154,27 @@ export function useTextHighlight(
   const [isSupported, setIsSupported] = React.useState<boolean>(true);
   const [contentVersion, setContentVersion] = React.useState(0);
   const ownerRef = React.useRef<symbol>(Symbol('highlight-owner'));
+  const cachedTextNodesRef = React.useRef<Text[]>([]);
 
   const containerElement =
     containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
 
-  // Re-run the search when the container's text changes without the query changing
+  // Observe container content mutations (ignoring the sr-only live status region) so the cached
+  // text-node list refreshes only when container content changes rather than on every keystroke.
   React.useEffect(() => {
     const container =
       containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
     if (!container || typeof MutationObserver === 'undefined') return;
     let frame = 0;
-    const observer = new MutationObserver(() => {
+    const observer = new MutationObserver((mutations) => {
+      const hasContentMutation = mutations.some((mutation) => {
+        const targetEl =
+          mutation.target.nodeType === Node.ELEMENT_NODE
+            ? (mutation.target as Element)
+            : mutation.target.parentElement;
+        return !targetEl?.closest('[data-text-highlight-status]');
+      });
+      if (!hasContentMutation) return;
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => setContentVersion((v) => v + 1));
     });
@@ -174,6 +184,30 @@ export function useTextHighlight(
       observer.disconnect();
     };
   }, [containerTarget, containerElement]);
+
+  // Cache TreeWalker text nodes per container and content version to avoid full DOM walks on every keystroke
+  React.useEffect(() => {
+    const container =
+      containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
+    if (!container || typeof document === 'undefined') {
+      cachedTextNodesRef.current = [];
+      return;
+    }
+
+    const nodes: Text[] = [];
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) =>
+        node.parentElement?.closest('[data-text-highlight-status]')
+          ? NodeFilter.FILTER_REJECT
+          : NodeFilter.FILTER_ACCEPT,
+    });
+    let currentNode: Node | null = walker.nextNode();
+    while (currentNode) {
+      nodes.push(currentNode as Text);
+      currentNode = walker.nextNode();
+    }
+    cachedTextNodesRef.current = nodes;
+  }, [containerTarget, containerElement, contentVersion]);
 
   React.useEffect(() => {
     if (typeof window === 'undefined' || typeof CSS === 'undefined') {
@@ -205,27 +239,17 @@ export function useTextHighlight(
     const trimmedQuery = query.trim();
     const ranges: Range[] = [];
 
-    // Fast DOM text-node tree traversal
-    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
-      acceptNode: (node) =>
-        node.parentElement?.closest('[data-text-highlight-status]')
-          ? NodeFilter.FILTER_REJECT
-          : NodeFilter.FILTER_ACCEPT,
-    });
-    let currentNode: Node | null = walker.nextNode();
-
-    while (currentNode) {
-      const textContent = currentNode.textContent;
-      if (textContent) {
-        const offsets = findNormalizedMatchRanges(textContent, trimmedQuery, caseSensitive);
-        for (const [startOffset, endOffset] of offsets) {
-          const range = new Range();
-          range.setStart(currentNode, startOffset);
-          range.setEnd(currentNode, endOffset);
-          ranges.push(range);
-        }
+    for (const textNode of cachedTextNodesRef.current) {
+      if (!textNode.isConnected) continue;
+      const textContent = textNode.textContent;
+      if (!textContent) continue;
+      const offsets = findNormalizedMatchRanges(textContent, trimmedQuery, caseSensitive);
+      for (const [startOffset, endOffset] of offsets) {
+        const range = new Range();
+        range.setStart(textNode, startOffset);
+        range.setEnd(textNode, endOffset);
+        ranges.push(range);
       }
-      currentNode = walker.nextNode();
     }
 
     setOwnerRanges(highlightName, owner, ranges);

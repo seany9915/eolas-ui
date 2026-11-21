@@ -29,6 +29,8 @@ export interface TextsRevealProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   /** Whether the reveal is visible. Defaults to true. */
   show?: boolean;
+  /** Opt-in entrance animation on initial mount when `show` starts true. Defaults to false to avoid LCP flashes. */
+  animateOnMount?: boolean;
   className?: string;
 }
 
@@ -66,12 +68,12 @@ export const TextsRevealLine = React.forwardRef<HTMLDivElement, TextsRevealLineP
           ...style,
         }}
         className={cn(
-          'w-full will-change-[transform,opacity,filter]',
+          'w-full',
           isEntering &&
             'opacity-100 translate-y-0 blur-none transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
           isExiting &&
             'opacity-0 translate-y-0 blur-none transition-opacity duration-200 ease-out',
-          isInitialHidden && 'opacity-0 translate-y-3 blur-xs',
+          isInitialHidden && 'opacity-0 translate-y-3 blur-[var(--blur-medium)]',
           'motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
           className
         )}
@@ -86,10 +88,34 @@ export const TextsRevealLine = React.forwardRef<HTMLDivElement, TextsRevealLineP
 TextsRevealLine.displayName = 'TextsRevealLine';
 
 export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsRevealProps>(
-  ({ children, show = true, className, ...props }, ref) => {
-    const [hasEntered, setHasEntered] = React.useState(show);
+  ({ children, show = true, animateOnMount = false, className, ...props }, ref) => {
+    const [hasEntered, setHasEntered] = React.useState(show && !animateOnMount);
+    const [mounted, setMounted] = React.useState(!animateOnMount);
 
     React.useEffect(() => {
+      if (mounted) return;
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (prefersReducedMotion) {
+        setMounted(true);
+        if (show) setHasEntered(true);
+        return;
+      }
+
+      const raf = window.requestAnimationFrame(() => {
+        setMounted(true);
+        if (show) setHasEntered(true);
+      });
+      return () => window.cancelAnimationFrame(raf);
+    }, [mounted, show]);
+
+    const visible = show && mounted;
+
+    React.useEffect(() => {
+      if (!mounted) return;
       if (show) {
         setHasEntered(true);
       } else {
@@ -99,14 +125,14 @@ export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsReveal
         }, 200);
         return () => clearTimeout(timer);
       }
-    }, [show]);
+    }, [show, mounted]);
 
     return (
-      <TextsRevealContext.Provider value={{ show, hasEntered }}>
+      <TextsRevealContext.Provider value={{ show: visible, hasEntered }}>
         <div
           ref={ref}
           className={cn(
-            'flex flex-col gap-1 w-full select-none',
+            'flex flex-col gap-1 w-full',
             !show && 'pointer-events-none',
             className
           )}

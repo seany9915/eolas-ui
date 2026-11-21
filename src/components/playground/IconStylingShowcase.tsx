@@ -149,7 +149,7 @@ export const IconStylingShowcase: React.FC = () => {
           <div>
             <h3 className="font-heading text-xl font-bold text-on-surface">2. Soft Tonal Icon Containers (Tonal Icon Tiles)</h3>
             <p className="font-sans text-xs text-on-surface-variant">
-              Icon glyphs inside soft role-container washes (<code className="font-mono text-primary">primary-container</code>, <code className="font-mono text-primary">surface-container</code>) with charcoal (<code className="font-mono">#1a1c1e</code>) or brand blue glyphs. Delivers visual weight, clear structural framing, and 8.0:1+ contrast.
+              Icon glyphs inside soft role-container washes (<code className="font-mono text-primary">primary-container</code>, <code className="font-mono text-primary">surface-container</code>) with charcoal (<code className="font-mono">#1C1A18</code>) or brand blue glyphs. Delivers visual weight, clear structural framing, and 8.0:1+ contrast.
             </p>
           </div>
           <Badge variant="soft" colorRole="primary" size="sm">
@@ -205,7 +205,7 @@ export const IconStylingShowcase: React.FC = () => {
           <div>
             <h3 className="font-heading text-xl font-bold text-on-surface">3. Solid Tertiary-Amber Icon Badge (WCAG AA Contrast Solution)</h3>
             <p className="font-sans text-xs text-on-surface-variant">
-              Bare Sunny Amber (<code className="font-mono font-bold bg-tertiary-container text-on-tertiary-container px-1 rounded">#F9A825</code>) icon glyphs fail contrast (1.99:1) on white. <code className="font-mono font-bold">DESIGN.md</code> requires a solid amber badge with charcoal (<code className="font-mono">#1a1c1e</code>) icon inside.
+              Bare Sunny Amber (<code className="font-mono font-bold bg-tertiary-container text-on-tertiary-container px-1 rounded">#F9A825</code>) icon glyphs fail contrast (1.99:1) on white. <code className="font-mono font-bold">DESIGN.md</code> requires a solid amber badge with charcoal (<code className="font-mono">#1C1A18</code>) icon inside.
             </p>
           </div>
           <Badge variant="soft" colorRole="tertiary" size="sm">
@@ -230,7 +230,7 @@ export const IconStylingShowcase: React.FC = () => {
               </div>
               <div>
                 <p className="font-sans text-sm font-bold text-on-surface">Milestone Unlocked Badge</p>
-                <p className="font-sans text-xs text-on-surface-variant">Solid <code className="font-mono bg-tertiary-container text-on-tertiary-container px-1 rounded">tertiary</code> fill + <code className="font-mono">#1a1c1e</code> charcoal glyph inside.</p>
+                <p className="font-sans text-xs text-on-surface-variant">Solid <code className="font-mono bg-tertiary-container text-on-tertiary-container px-1 rounded">tertiary</code> fill + <code className="font-mono">#1C1A18</code> charcoal glyph inside.</p>
               </div>
             </div>
           </div>
@@ -263,7 +263,7 @@ export const IconStylingShowcase: React.FC = () => {
         <div className="border-b border-outline-variant pb-2">
           <h3 className="font-heading text-xl font-bold text-on-surface">3. Inverted Fill Accent Icons (Spotlight Charcoal Cards)</h3>
           <p className="font-sans text-xs text-on-surface-variant">
-            Solid charcoal <code className="font-mono text-on-surface">on-surface</code> (<code className="font-mono">#1a1c1e</code>) backdrop paired with <code className="font-mono bg-tertiary-container text-on-tertiary-container px-1 rounded">tertiary</code> (amber) or <code className="font-mono text-secondary">secondary</code> (emerald) icons. <code className="font-mono text-error">Electric Blue (primary)</code> is explicitly excluded due to ~2.97:1 contrast failure.
+            Solid charcoal <code className="font-mono text-on-surface">on-surface</code> (<code className="font-mono">#1C1A18</code>) backdrop paired with <code className="font-mono bg-tertiary-container text-on-tertiary-container px-1 rounded">tertiary</code> (amber) or <code className="font-mono text-secondary">secondary</code> (emerald) icons. <code className="font-mono text-error">Electric Blue (primary)</code> is explicitly excluded due to ~2.97:1 contrast failure.
           </p>
         </div>
 
@@ -347,7 +347,7 @@ export const IconStylingShowcase: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <InlineAlert title="Primary Brand Tip" role="neutral" icon="info">
-            Leading icon colored in Electric Blue (<code className="font-mono">#0052FF</code>).
+            Leading icon colored in Electric Blue (<code className="font-mono">#1B56E8</code>).
           </InlineAlert>
 
           <InlineAlert title="Clinical Strategy Guide" role="success" icon="lightbulb">

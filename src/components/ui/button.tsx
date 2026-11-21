@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export type ButtonVariant =
   | 'filled'
@@ -42,8 +42,7 @@ export type ButtonColorRole =
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
 export interface ButtonProps
-  extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'color' | 'className'> {
-  className?: string;
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseButton>, 'color'> {
   /** Button style variant. Prefer `'filled' | 'outline' | 'soft' | 'text'`; `'outlined'` and `'tonal'` are deprecated aliases. */
   variant?: ButtonVariant;
   colorRole?: ButtonColorRole;
@@ -66,6 +65,7 @@ export interface ButtonProps
 
 const baseStyles = cn(
   'inline-flex items-center justify-center gap-2 font-label text-sm font-semibold rounded cursor-pointer select-none touch-manipulation shrink-0 whitespace-nowrap',
+  '[&_svg:not([class*="size-"])]:size-4 [&_[data-icon=inline-start]]:-ms-0.5 [&_[data-icon=inline-end]]:-me-0.5',
   'transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
   'motion-reduce:active:scale-100 motion-reduce:transition-none',
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
@@ -77,7 +77,7 @@ const sizeStyles: Record<ButtonSize, string> = {
   sm: 'h-11 px-3.5 min-h-[44px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:ps-3 has-[>svg:first-child:not(:only-child)]:ps-3 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pe-3 has-[>svg:last-child:not(:only-child)]:pe-3', // Compact floor 44px; optical -2px on icon side
   md: 'h-12 px-5 min-h-[48px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:ps-4 has-[>svg:first-child:not(:only-child)]:ps-4 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pe-4 has-[>svg:last-child:not(:only-child)]:pe-4', // Button standard floor 48px; optical -4px on icon side
   lg: 'h-14 px-6 min-h-[56px] has-[>.material-symbols-outlined:first-child:not(:only-child)]:ps-5 has-[>svg:first-child:not(:only-child)]:ps-5 has-[>.material-symbols-outlined:last-child:not(:only-child)]:pe-5 has-[>svg:last-child:not(:only-child)]:pe-5', // Prominent hero floor 56px; optical -4px on icon side
-  icon: 'h-11 w-11 min-h-[44px] min-w-[44px] p-0 shrink-0 inline-flex items-center justify-center',
+  icon: 'size-11 min-h-[44px] min-w-[44px] p-0 shrink-0 inline-flex items-center justify-center',
 };
 
 const filledStyles: Record<ButtonColorRole, string> = {
@@ -93,7 +93,7 @@ const filledStyles: Record<ButtonColorRole, string> = {
 const softStyles: Record<ButtonColorRole, string> = {
   primary: 'bg-primary-container text-on-primary-container hover:brightness-95 active:brightness-90',
   secondary: 'bg-secondary-container text-on-secondary-container hover:brightness-95 active:brightness-90',
-  tertiary: 'bg-tertiary text-on-tertiary',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container hover:brightness-95 active:brightness-90',
   error: 'bg-error-container text-on-error-container hover:brightness-95 active:brightness-90',
   warning: 'bg-warning-container text-on-warning-container hover:brightness-95 active:brightness-90',
   success: 'bg-success-container text-on-success-container hover:brightness-95 active:brightness-90',
@@ -113,7 +113,7 @@ const outlinedStyles: Record<ButtonColorRole, string> = {
 const textStyles: Record<ButtonColorRole, string> = {
   primary: 'bg-transparent text-primary hover:bg-primary-container/30',
   secondary: 'bg-transparent text-secondary hover:bg-secondary-container/30',
-  tertiary: 'bg-tertiary text-on-tertiary', // forced fallback to filled for contrast
+  tertiary: 'bg-tertiary-container text-on-tertiary-container hover:brightness-95 active:brightness-90', // forced fallback to filled for contrast
   error: 'bg-transparent text-error hover:bg-error-container/30',
   warning: 'bg-transparent text-warning hover:bg-warning-container/30',
   success: 'bg-transparent text-success hover:bg-success-container/30',
@@ -154,9 +154,9 @@ export function buttonVariants({
     );
   }
 
-  // Ensure Sunny Amber (tertiary) always uses high-contrast filled container
+  // Ensure Sunny Amber (tertiary) uses high-contrast filled or soft container (never outline/text on light backgrounds)
   const safeVariant =
-    colorRole === 'tertiary' && normalizedVariant !== 'filled'
+    colorRole === 'tertiary' && normalizedVariant !== 'filled' && normalizedVariant !== 'soft'
       ? 'filled'
       : normalizedVariant;
 
@@ -201,10 +201,8 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isActuallyDisabled = disabled || loading;
     const isFocusableWhenDisabled =
       focusableWhenDisabled ?? (loading ? true : undefined);
-    const isNonButtonIntrinsicRender =
-      React.isValidElement(render) && typeof render.type === 'string' && render.type !== 'button';
-    const resolvedNativeButton = nativeButton ?? (isNonButtonIntrinsicRender ? false : true);
-    const resolvedType = type ?? (resolvedNativeButton ? 'button' : undefined);
+    const resolvedNativeButton = resolveNativeButton(render, nativeButton);
+    const resolvedType = type ?? (resolvedNativeButton === false ? undefined : 'button');
 
     return (
       <BaseButton
@@ -216,13 +214,15 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
         nativeButton={resolvedNativeButton}
         render={render}
         aria-busy={loading ? true : undefined}
-        className={buttonVariants({
-          variant,
-          colorRole,
-          size,
-          expandedTouchTarget,
-          className,
-        })}
+        className={composeClassName(
+          buttonVariants({
+            variant,
+            colorRole,
+            size,
+            expandedTouchTarget,
+          }),
+          className
+        )}
         {...props}
       >
         {loading && (

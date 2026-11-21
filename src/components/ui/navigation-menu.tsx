@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { NavigationMenu as BaseNavigationMenu } from '@base-ui/react/navigation-menu';
-import { cn, sanitizeUrl } from '@/lib/utils';
+import { cn, composeClassName, sanitizeUrl } from '@/lib/utils';
 import { Icon } from './icon';
 
 export interface NavigationSubItem {
@@ -34,13 +34,22 @@ export const NavigationMenuList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.List
     ref={ref}
-    className={cn('flex flex-1 h-full list-none items-center gap-2 px-1 bg-transparent w-full', className)}
+    data-slot="navigation-menu-list"
+    className={composeClassName('flex flex-1 h-full list-none items-center gap-2 px-1 bg-transparent w-full', className)}
     {...props}
   />
 ));
 NavigationMenuList.displayName = 'NavigationMenuList';
 
 export const NavigationMenuItemPrimitive = BaseNavigationMenu.Item;
+
+export const NavigationMenuItemComponent = React.forwardRef<
+  HTMLLIElement,
+  React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Item>
+>((props, ref) => (
+  <BaseNavigationMenu.Item ref={ref} data-slot="navigation-menu-item" {...props} />
+));
+NavigationMenuItemComponent.displayName = 'NavigationMenuItem';
 
 export interface NavigationMenuTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Trigger> {
@@ -53,15 +62,18 @@ export const NavigationMenuTrigger = React.forwardRef<
 >(({ className, children, active = false, ...props }, ref) => (
   <BaseNavigationMenu.Trigger
     ref={ref}
+    data-slot="navigation-menu-trigger"
     aria-current={active ? 'page' : undefined}
-    className={cn(
-      'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
-      'hover:text-on-surface hover:bg-surface-container/60',
-      'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container/40',
-      'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
-      active
-        ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
-        : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
+    className={composeClassName(
+      cn(
+        'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
+        'hover:text-on-surface hover:bg-surface-container/60',
+        'data-[popup-open]:text-primary data-[popup-open]:bg-surface-container/40',
+        'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+        active
+          ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
+          : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none'
+      ),
       className
     )}
     {...props}
@@ -77,15 +89,18 @@ export const NavigationMenuContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.Content
     ref={ref}
-    className={cn(
-      'h-full w-[calc(100vw-40px)] p-2 min-[500px]:w-max min-[500px]:min-w-[260px] min-[500px]:max-w-[420px]',
-      'transition-[opacity,transform,translate] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
-      'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
-      'data-[starting-style]:data-[activation-direction=left]:translate-x-[-20%]',
-      'data-[starting-style]:data-[activation-direction=right]:translate-x-[20%]',
-      'data-[ending-style]:data-[activation-direction=left]:translate-x-[20%]',
-      'data-[ending-style]:data-[activation-direction=right]:translate-x-[-20%]',
-      'motion-reduce:transition-none motion-reduce:transform-none',
+    data-slot="navigation-menu-content"
+    className={composeClassName(
+      cn(
+        'h-full w-[calc(100vw-40px)] p-2 min-[500px]:w-max min-[500px]:min-w-[260px] min-[500px]:max-w-[420px]',
+        'transition-[opacity,transform,translate] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
+        'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
+        'data-[starting-style]:data-[activation-direction=left]:translate-x-[-20%]',
+        'data-[starting-style]:data-[activation-direction=right]:translate-x-[20%]',
+        'data-[ending-style]:data-[activation-direction=left]:translate-x-[20%]',
+        'data-[ending-style]:data-[activation-direction=right]:translate-x-[-20%]',
+        'motion-reduce:transition-none motion-reduce:transform-none'
+      ),
       className
     )}
     {...props}
@@ -109,9 +124,10 @@ export const NavigationMenuLink = React.forwardRef<
   return (
     <BaseNavigationMenu.Link
       ref={ref}
+      data-slot="navigation-menu-link"
       active={active}
       href={safeHref}
-      className={cn(
+      className={composeClassName(
         isBar
           ? cn(
               'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
@@ -121,7 +137,7 @@ export const NavigationMenuLink = React.forwardRef<
               'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary'
             )
           : cn(
-              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded-md transition-colors cursor-pointer outline-none select-none',
+              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded transition-colors cursor-pointer outline-none select-none',
               active
                 ? 'bg-primary-container text-on-primary-container font-semibold'
                 : 'text-on-surface hover:bg-surface-container focus:bg-surface-container',
@@ -141,9 +157,10 @@ export const NavigationMenuPositioner = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.Positioner
     ref={ref}
+    data-slot="navigation-menu-positioner"
     sideOffset={8}
-    className={cn(
-      'h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-instant:transition-none z-50',
+    className={composeClassName(
+      'h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none z-50',
       className
     )}
     {...props}
@@ -157,13 +174,16 @@ export const NavigationMenuPopup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.Popup
     ref={ref}
-    className={cn(
-      'relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)]',
-      'rounded-lg bg-surface border border-outline-variant shadow-ambient outline-none',
-      'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
-      'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
-      'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)]',
-      'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+    data-slot="navigation-menu-popup"
+    className={composeClassName(
+      cn(
+        'relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)]',
+        'rounded-md bg-surface border border-outline-variant shadow-ambient outline-none',
+        'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
+        'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
+        'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)]',
+        'motion-reduce:transition-none motion-reduce:transform-none [[data-instant]_&]:transition-none [[data-instant]_&]:transform-none'
+      ),
       className
     )}
     {...props}
@@ -177,7 +197,8 @@ export const NavigationMenuViewport = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseNavigationMenu.Viewport
     ref={ref}
-    className={cn('relative h-full w-full overflow-hidden', className)}
+    data-slot="navigation-menu-viewport"
+    className={composeClassName('relative size-full overflow-hidden rounded-[inherit]', className)}
     {...props}
   />
 ));
@@ -189,10 +210,13 @@ export const NavigationMenuArrow = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseNavigationMenu.Arrow
     ref={ref}
-    className={cn(
-      'z-10 flex transition-[left,top] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none',
-      'data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
-      'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+    data-slot="navigation-menu-indicator"
+    className={composeClassName(
+      cn(
+        'z-10 flex transition-[left,top] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [[data-instant]_&]:transition-none [[data-instant]_&]:transform-none motion-reduce:transition-none',
+        'data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+      ),
       className
     )}
     {...props}
@@ -218,7 +242,8 @@ export const NavigationMenuIcon = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseNavigationMenu.Icon
     ref={ref}
-    className={cn(
+    data-slot="navigation-menu-icon"
+    className={composeClassName(
       'transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] group-data-[popup-open]:rotate-180 text-on-surface-variant',
       className
     )}
@@ -241,8 +266,8 @@ export interface NavigationMenuProps<Value = string>
   delay?: number;
   closeDelay?: number;
   orientation?: 'horizontal' | 'vertical';
+  side?: BaseNavigationMenu.Positioner.Props['side'];
   children?: React.ReactNode;
-  className?: string;
 }
 
 function NavigationMenuComponentInner<Value = string>(
@@ -257,6 +282,7 @@ function NavigationMenuComponentInner<Value = string>(
     delay = 50,
     closeDelay = 50,
     orientation = 'horizontal',
+    side,
     children,
     className,
     ...props
@@ -266,6 +292,7 @@ function NavigationMenuComponentInner<Value = string>(
   return (
     <BaseNavigationMenu.Root<Value>
       ref={ref}
+      data-slot="navigation-menu"
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
@@ -274,7 +301,7 @@ function NavigationMenuComponentInner<Value = string>(
       delay={delay}
       closeDelay={closeDelay}
       orientation={orientation}
-      className={cn('relative z-10 flex w-full min-w-0 h-full items-stretch', className)}
+      className={composeClassName('relative z-10 flex w-full min-w-0 h-full items-stretch', className)}
       {...props}
     >
       {children ? (
@@ -289,7 +316,7 @@ function NavigationMenuComponentInner<Value = string>(
 
               if (hasChildren) {
                 return (
-                  <BaseNavigationMenu.Item key={item.id} value={item.id as Value} className="relative h-full">
+                  <BaseNavigationMenu.Item key={item.id} data-slot="navigation-menu-item" value={item.id as Value} className="relative h-full">
                     <NavigationMenuTrigger active={isActive}>
                       {item.icon && (
                         <Icon name={item.icon} size="sm" className="leading-none" />
@@ -362,7 +389,7 @@ function NavigationMenuComponentInner<Value = string>(
               }
 
               return (
-                <BaseNavigationMenu.Item key={item.id} value={item.id as Value} className="h-full">
+                <BaseNavigationMenu.Item key={item.id} data-slot="navigation-menu-item" value={item.id as Value} className="h-full">
                   <NavigationMenuLink
                     href={item.href || `#${item.id}`}
                     variant="bar"
@@ -390,7 +417,7 @@ function NavigationMenuComponentInner<Value = string>(
           </NavigationMenuList>
 
           <BaseNavigationMenu.Portal>
-            <NavigationMenuPositioner>
+            <NavigationMenuPositioner side={side}>
               <NavigationMenuPopup>
                 <NavigationMenuArrow />
                 <NavigationMenuViewport />
@@ -411,7 +438,7 @@ export const NavigationMenuComponent = React.forwardRef(NavigationMenuComponentI
 export const NavigationMenu = Object.assign(NavigationMenuComponent, {
   Root: BaseNavigationMenu.Root,
   List: NavigationMenuList,
-  Item: BaseNavigationMenu.Item,
+  Item: NavigationMenuItemComponent,
   Trigger: NavigationMenuTrigger,
   Portal: BaseNavigationMenu.Portal,
   Positioner: NavigationMenuPositioner,
@@ -427,7 +454,7 @@ export const NavigationMenu = Object.assign(NavigationMenuComponent, {
 // Re-export Base UI primitives for compound composition
 export { BaseNavigationMenu };
 export const NavigationMenuRoot = BaseNavigationMenu.Root;
-export const NavigationMenuItem = BaseNavigationMenu.Item;
+export const NavigationMenuItem = NavigationMenuItemComponent;
 export const NavigationMenuPortal = BaseNavigationMenu.Portal;
 export const NavigationMenuBackdrop = BaseNavigationMenu.Backdrop;
 

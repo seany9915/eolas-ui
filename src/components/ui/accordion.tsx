@@ -14,7 +14,7 @@
  */
 import * as React from 'react';
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface AccordionItemData {
   id: string;
@@ -24,7 +24,6 @@ export interface AccordionItemData {
 }
 
 export interface AccordionItemProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Item> {
-  className?: string;
   children?: React.ReactNode;
 }
 
@@ -32,7 +31,8 @@ export const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps
   ({ className, children, ...props }, ref) => (
     <BaseAccordion.Item
       ref={ref}
-      className={cn('w-full border-b border-outline-variant last:border-b-0', className)}
+      data-slot="accordion-item"
+      className={composeClassName('w-full border-b border-outline-variant last:border-b-0', className)}
       {...props}
     >
       {children}
@@ -42,7 +42,6 @@ export const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps
 AccordionItem.displayName = 'AccordionItem';
 
 export interface AccordionHeaderProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Header> {
-  className?: string;
   children?: React.ReactNode;
 }
 
@@ -50,7 +49,8 @@ export const AccordionHeader = React.forwardRef<HTMLHeadingElement, AccordionHea
   ({ className, children, ...props }, ref) => (
     <BaseAccordion.Header
       ref={ref}
-      className={cn('flex w-full', className)}
+      data-slot="accordion-header"
+      className={composeClassName('flex w-full', className)}
       {...props}
     >
       {children}
@@ -61,7 +61,6 @@ AccordionHeader.displayName = 'AccordionHeader';
 
 export interface AccordionTriggerProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Trigger> {
   children: React.ReactNode;
-  className?: string;
   hideChevron?: boolean;
 }
 
@@ -69,10 +68,13 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
   ({ children, className, hideChevron = false, ...props }, ref) => (
     <BaseAccordion.Trigger
       ref={ref}
-      className={cn(
-        'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+      data-slot="accordion-trigger"
+      className={composeClassName(
+        cn(
+          'flex items-center justify-between w-full py-4 px-2 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded-md',
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        ),
         className
       )}
       {...props}
@@ -93,7 +95,6 @@ AccordionTrigger.displayName = 'AccordionTrigger';
 
 export interface AccordionPanelProps extends React.ComponentPropsWithoutRef<typeof BaseAccordion.Panel> {
   children?: React.ReactNode;
-  className?: string;
   contentClassName?: string;
   unstyled?: boolean;
 }
@@ -102,7 +103,8 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
   ({ children, className, contentClassName, unstyled = false, ...props }, ref) => (
     <BaseAccordion.Panel
       ref={ref}
-      className={cn(
+      data-slot="accordion-content"
+      className={composeClassName(
         "overflow-hidden h-[var(--accordion-panel-height)] transition-[height] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
         className
       )}
@@ -152,7 +154,6 @@ export interface AccordionProps
   hiddenUntilFound?: boolean;
   keepMounted?: boolean;
   children?: React.ReactNode;
-  className?: string;
 }
 
 const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
@@ -208,6 +209,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
   return (
     <BaseAccordion.Root
       ref={ref}
+      data-slot="accordion"
       value={normalizedValue}
       defaultValue={normalizedDefaultValue}
       onValueChange={handleValueChange}
@@ -217,9 +219,11 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
       disabled={disabled}
       hiddenUntilFound={hiddenUntilFound}
       keepMounted={keepMounted}
-      className={cn(
-        'w-full',
-        level === 2 && 'p-4 rounded-xl bg-surface-container border-none shadow-ambient',
+      className={composeClassName(
+        cn(
+          'w-full',
+          level === 2 && 'p-4 rounded-xl bg-surface-container border-none shadow-ambient'
+        ),
         className
       )}
       {...props}
@@ -229,6 +233,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
         : items?.map((item, idx) => (
             <BaseAccordion.Item
               key={item.id}
+              data-slot="accordion-item"
               value={item.id}
               disabled={item.disabled}
               className={cn(
@@ -237,7 +242,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
                 level === 2 && idx < (items?.length ?? 0) - 1 && 'border-b border-outline-variant/60'
               )}
             >
-              <BaseAccordion.Header className="flex">
+              <BaseAccordion.Header data-slot="accordion-header" className="flex">
                 <AccordionTrigger>{item.title}</AccordionTrigger>
               </BaseAccordion.Header>
               <AccordionPanel>{item.content}</AccordionPanel>

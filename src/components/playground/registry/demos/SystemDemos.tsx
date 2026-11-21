@@ -140,7 +140,11 @@ export const SchedulerDemo: React.FC<ComponentDemoProps> = () => {
     (item: string) => item.toLowerCase().includes(query.trim().toLowerCase()),
     [query]
   );
-  const { filtered, isFiltering } = useYieldingFilter(SCHEDULER_SAMPLE_ITEMS, predicate, 2);
+  const { filtered, isFiltering } = useYieldingFilter(
+    SCHEDULER_SAMPLE_ITEMS,
+    predicate,
+    { budgetMs: 8, deps: [query] }
+  );
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-4">

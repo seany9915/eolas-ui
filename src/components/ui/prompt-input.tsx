@@ -150,6 +150,7 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
   (
     {
       className,
+      style,
       onSubmit,
       onFilesPasted,
       history,
@@ -236,7 +237,11 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
         maxHeight={maxHeight}
         onSubmit={onSubmit ? handleSubmit : undefined}
         onFilesPasted={onFilesPasted}
-        className={cn('px-1.5 py-1 min-h-0', className)}
+        className={cn('px-1.5 py-1 min-w-0', className)}
+        style={{
+          minHeight: minRows ? `calc(${minRows}lh + 0.5rem)` : undefined,
+          ...style,
+        }}
         {...props}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -461,7 +466,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
   if (options.length === 0) {
     return (
       <Button
-        variant={isThinkingActive ? 'tonal' : 'ghost'}
+        variant={isThinkingActive ? 'soft' : 'ghost'}
         colorRole={isThinkingActive ? 'secondary' : 'neutral'}
         size="sm"
         disabled={disabled}
@@ -501,7 +506,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
     <Menu
       trigger={
         <Button
-          variant={isThinkingActive ? 'tonal' : 'ghost'}
+          variant={isThinkingActive ? 'soft' : 'ghost'}
           colorRole={isThinkingActive ? 'secondary' : 'neutral'}
           size="sm"
           disabled={disabled}
@@ -651,7 +656,7 @@ export const PromptInputToolToggle: React.FC<PromptInputToolToggleProps> = ({
   return (
     <Tooltip content={active ? activeLabel || `${label} (Active)` : `Enable ${label}`}>
       <Button
-        variant={active ? 'tonal' : 'ghost'}
+        variant={active ? 'soft' : 'ghost'}
         colorRole={active ? 'primary' : 'neutral'}
         size="sm"
         disabled={disabled}
@@ -696,7 +701,7 @@ export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
   return (
     <Tooltip content={isRecording ? 'Stop recording' : label}>
       <Button
-        variant={isRecording ? 'tonal' : 'ghost'}
+        variant={isRecording ? 'soft' : 'ghost'}
         colorRole={isRecording ? 'error' : 'neutral'}
         size="sm"
         disabled={disabled}
@@ -741,7 +746,7 @@ export const PromptInputStop: React.FC<PromptInputStopProps> = ({
 }) => (
   <Tooltip content={label}>
     <Button
-      variant="tonal"
+      variant="soft"
       colorRole="neutral"
       size="sm"
       onClick={onStop}

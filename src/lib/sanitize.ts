@@ -38,7 +38,7 @@ export const DEFAULT_ALLOWED_ELEMENTS = [
 ];
 
 export const DEFAULT_ALLOWED_ATTRIBUTES = [
-  'href', 'title', 'target', 'rel', 'class', 'id', 'aria-label', 'aria-describedby',
+  'href', 'title', 'target', 'rel', 'class', 'aria-label', 'aria-describedby',
 ];
 
 // Augment DOM interfaces for modern Sanitizer API
@@ -54,7 +54,17 @@ declare global {
   }
 }
 
-const URL_ATTRIBUTES = new Set(['href', 'src', 'xlink:href', 'formaction', 'action', 'cite', 'poster']);
+const URL_ATTRIBUTES = new Set([
+  'href',
+  'src',
+  'srcset',
+  'background',
+  'xlink:href',
+  'formaction',
+  'action',
+  'cite',
+  'poster',
+]);
 const ALLOWED_URL_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:']);
 const SAFE_DATA_IMAGE_RE = /^data:image\/(?:png|jpeg|jpg|gif|webp);base64,[a-z0-9+/=]+$/i;
 
@@ -93,15 +103,41 @@ function isDangerousUrl(rawValue: string): boolean {
   return true;
 }
 
+function isDangerousSrcset(rawValue: string): boolean {
+  const trimmed = rawValue.trim();
+  if (!trimmed) return false;
+  // Split candidates on commas that do not separate base64 data URI headers from payloads
+  const candidates = trimmed.split(/(?<!;base64),/);
+  return candidates.some((candidate) => {
+    const urlPart = candidate.trim().split(/\s+/)[0] ?? '';
+    return isDangerousUrl(urlPart);
+  });
+}
+
+function enforceBlankTargetRel(root: ParentNode): void {
+  const elements = root.querySelectorAll('[target]');
+  for (const el of elements) {
+    if (el.getAttribute('target')?.trim().toLowerCase() === '_blank') {
+      const existing = (el.getAttribute('rel') ?? '')
+        .split(/\s+/)
+        .map((token) => token.trim().toLowerCase())
+        .filter(Boolean);
+      const relSet = new Set(existing);
+      relSet.add('noopener');
+      relSet.add('noreferrer');
+      el.setAttribute('rel', Array.from(relSet).join(' '));
+    }
+  }
+}
+
 /**
  * Fallback sanitizer for environments where Element.setHTML() is not yet supported.
- * Strips active scripting elements, inline event handlers, and unsafe URL protocols.
+ * Strips active scripting elements, inline event handlers, and unsafe URL protocols,
+ * returning a live DocumentFragment so nodes can be inserted via replaceChildren()
+ * without re-serializing through innerHTML (preventing mXSS and Trusted Types errors).
  */
-function fallbackSanitize(html: string, config: SanitizeConfig = {}): string {
-  if (typeof window === 'undefined') {
-    return html.replace(/<[^>]*>?/gm, ''); // Server-side plain-text strip fallback
-  }
-
+function fallbackSanitizeToFragment(html: string, config: SanitizeConfig = {}): DocumentFragment {
+  const fragment = document.createDocumentFragment();
   const allowedTags = new Set((config.elements || DEFAULT_ALLOWED_ELEMENTS).map((t) => t.toLowerCase()));
   const allowedAttrs = new Set((config.attributes || DEFAULT_ALLOWED_ATTRIBUTES).map((a) => a.toLowerCase()));
   const replaceChildren = new Set((config.replaceWithChildrenElements || []).map((t) => t.toLowerCase()));
@@ -141,13 +177,24 @@ function fallbackSanitize(html: string, config: SanitizeConfig = {}): string {
         for (const attr of attrs) {
           const attrName = attr.name.toLowerCase();
 
-          if (
-            attrName.startsWith('on') ||
-            !allowedAttrs.has(attrName) ||
-            (URL_ATTRIBUTES.has(attrName) && isDangerousUrl(attr.value))
-          ) {
+          const isUnsafeUrlAttr =
+            URL_ATTRIBUTES.has(attrName) &&
+            (attrName === 'srcset' ? isDangerousSrcset(attr.value) : isDangerousUrl(attr.value));
+
+          if (attrName.startsWith('on') || !allowedAttrs.has(attrName) || isUnsafeUrlAttr) {
             el.removeAttribute(attr.name);
           }
+        }
+
+        if (el.getAttribute('target')?.trim().toLowerCase() === '_blank') {
+          const existing = (el.getAttribute('rel') ?? '')
+            .split(/\s+/)
+            .map((token) => token.trim().toLowerCase())
+            .filter(Boolean);
+          const relSet = new Set(existing);
+          relSet.add('noopener');
+          relSet.add('noreferrer');
+          el.setAttribute('rel', Array.from(relSet).join(' '));
         }
 
         cleanNode(el);
@@ -160,12 +207,15 @@ function fallbackSanitize(html: string, config: SanitizeConfig = {}): string {
   }
 
   cleanNode(doc.body);
-  return doc.body.innerHTML;
+  while (doc.body.firstChild) {
+    fragment.appendChild(document.adoptNode(doc.body.firstChild));
+  }
+  return fragment;
 }
 
 /**
  * Safely inserts untrusted HTML into a container element using the native Sanitizer API
- * when supported, falling back to a hardened parser.
+ * when supported, falling back to a hardened DOMParser fragment inserted via replaceChildren().
  */
 export function safeSetHtml(
   element: HTMLElement,
@@ -189,14 +239,16 @@ export function safeSetHtml(
           replaceWithChildrenElements: replaceList,
         },
       });
+      enforceBlankTargetRel(element);
       return;
     } catch {
       // If native Sanitizer throws due to experimental config variance, fall through
     }
   }
 
-  // Fallback
-  element.innerHTML = fallbackSanitize(untrustedHtml, config);
+  // Fallback: move sanitized nodes directly into a DocumentFragment without innerHTML assignment
+  const fragment = fallbackSanitizeToFragment(untrustedHtml, config);
+  element.replaceChildren(fragment);
 }
 
 /**
@@ -204,7 +256,7 @@ export function safeSetHtml(
  */
 export function sanitizeHtml(untrustedHtml: string, config: SanitizeConfig = {}): string {
   if (typeof document === 'undefined') {
-    return fallbackSanitize(untrustedHtml, config);
+    return untrustedHtml.replace(/<[^>]*>?/gm, ''); // Server-side plain-text strip fallback
   }
   const container = document.createElement('div');
   safeSetHtml(container, untrustedHtml, config);

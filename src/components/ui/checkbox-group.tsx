@@ -16,7 +16,7 @@ import * as React from 'react';
 import { CheckboxGroup as BaseCheckboxGroup } from '@base-ui/react/checkbox-group';
 import { Checkbox } from './checkbox';
 import { Icon } from './icon';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface CheckboxGroupOption {
   value: string;
@@ -71,7 +71,7 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
         disabled={disabled}
         aria-labelledby={labelId}
         aria-describedby={descId}
-        className={cn('w-full', className)}
+        className={composeClassName('w-full', className)}
         {...props}
       >
         {(label || description) && (

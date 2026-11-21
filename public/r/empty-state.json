@@ -4,6 +4,9 @@
   "type": "registry:ui",
   "title": "Empty State",
   "description": "EmptyState primitive (backward-compatibility alias for Empty).",
+  "categories": [
+    "feedback"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/empty.json"
   ],

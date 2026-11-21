@@ -20,6 +20,12 @@ import { cn } from '@/lib/utils';
 export interface TextSwapProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** The current text or string value to display */
   children: React.ReactNode;
+  /**
+   * Stable identity key used to detect state swaps.
+   * Defaults to `children` when primitive (`string | number`).
+   * Provide `swapKey` when rendering JSX children so parent re-renders do not replay the swap.
+   */
+  swapKey?: string | number;
   /** Custom duration in milliseconds. Defaults to 150ms (--text-swap-dur / --duration-quick). */
   duration?: number;
   /** Vertical displacement in pixels. Defaults to 4px (--text-swap-translate-y). */
@@ -30,11 +36,12 @@ export interface TextSwapProps extends React.HTMLAttributes<HTMLSpanElement> {
 type SwapPhase = 'idle' | 'exit' | 'enter-start' | 'enter';
 
 export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
-  ({ children, duration = 150, translateY = 4, className, style, ...props }, ref) => {
+  ({ children, swapKey, duration = 150, translateY = 4, className, style, ...props }, ref) => {
     const [displayedText, setDisplayedText] = React.useState<React.ReactNode>(children);
     const [phase, setPhase] = React.useState<SwapPhase>('idle');
     const spanRef = React.useRef<HTMLSpanElement | null>(null);
     const durationRef = React.useRef(duration);
+    const latestChildrenRef = React.useRef(children);
 
     const exitTimerRef = React.useRef<number | null>(null);
     const settleTimerRef = React.useRef<number | null>(null);
@@ -44,6 +51,10 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
     React.useEffect(() => {
       durationRef.current = duration;
     }, [duration]);
+
+    React.useEffect(() => {
+      latestChildrenRef.current = children;
+    });
 
     const clearScheduledTimers = React.useCallback(() => {
       if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
@@ -73,15 +84,23 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
       [ref]
     );
 
-    const prevChildrenRef = React.useRef(children);
+    const resolvedKey: string | number | undefined =
+      swapKey !== undefined
+        ? swapKey
+        : typeof children === 'string' || typeof children === 'number'
+          ? children
+          : undefined;
+
+    const prevKeyRef = React.useRef<string | number | undefined>(resolvedKey);
 
     React.useEffect(() => {
-      if (children !== prevChildrenRef.current) {
-        prevChildrenRef.current = children;
+      if (resolvedKey !== prevKeyRef.current) {
+        prevKeyRef.current = resolvedKey;
 
         // Check prefers-reduced-motion
         const prefersReducedMotion =
           typeof window !== 'undefined' &&
+          typeof window.matchMedia === 'function' &&
           window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         clearScheduledTimers();
@@ -99,7 +118,7 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
 
         exitTimerRef.current = window.setTimeout(() => {
           // Phase 2: Swap text and commit enter-start frame before animating in
-          setDisplayedText(children);
+          setDisplayedText(latestChildrenRef.current);
           setPhase('enter-start');
 
           rafRef.current = requestAnimationFrame(() => {
@@ -111,8 +130,10 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
             });
           });
         }, swapDuration);
+      } else if (phase === 'idle') {
+        setDisplayedText(children);
       }
-    }, [children, clearScheduledTimers]);
+    }, [resolvedKey, children, phase, clearScheduledTimers]);
 
     const isExit = phase === 'exit';
     const isEnterStart = phase === 'enter-start';
@@ -121,7 +142,7 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
       <span
         ref={setRefs}
         className={cn(
-          'inline-block select-none will-change-[transform,filter,opacity]',
+          'inline-block select-none',
           isEnterStart
             ? 'transition-none'
             : 'transition-[transform,filter,opacity] ease-in-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',

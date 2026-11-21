@@ -39,7 +39,7 @@ function linearizeChannel(channel255: number): number {
 }
 
 /**
- * Computes a high-contrast fallback text color (`#1a1c1e` or `#ffffff`) for a hex/rgb background.
+ * Computes a high-contrast fallback text color (`#1C1A18` or `#ffffff`) for a hex/rgb background.
  * Native `contrast-color(var(--dynamic-bg))` overrides this in supporting browsers via `.contrast-auto`.
  */
 export function getContrastInk(backgroundColor: string): string {
@@ -50,10 +50,10 @@ export function getContrastInk(backgroundColor: string): string {
     0.7152 * linearizeChannel(rgb[1]) +
     0.0722 * linearizeChannel(rgb[2]);
   const darkInkLuminance =
-    0.2126 * linearizeChannel(26) +
-    0.7152 * linearizeChannel(28) +
-    0.0722 * linearizeChannel(30);
+    0.2126 * linearizeChannel(28) +
+    0.7152 * linearizeChannel(26) +
+    0.0722 * linearizeChannel(24);
   const contrastWithDark = (luminance + 0.05) / (darkInkLuminance + 0.05);
   const contrastWithWhite = 1.05 / (luminance + 0.05);
-  return contrastWithDark >= contrastWithWhite ? '#1a1c1e' : '#ffffff';
+  return contrastWithDark >= contrastWithWhite ? '#1C1A18' : '#ffffff';
 }

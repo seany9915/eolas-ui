@@ -145,7 +145,7 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
             jumpEvery={effectiveJumpEvery}
             interactive={effectiveInteractive}
             paused={isPaused}
-            className="w-full h-full object-contain"
+            className="size-full object-contain"
           />
         </div>
 

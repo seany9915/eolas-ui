@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@/components/ui/icon';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 type SidebarButtonClassName = React.ComponentPropsWithoutRef<typeof BaseButton>['className'];
 
@@ -272,7 +272,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           <BaseDrawer.Portal>
             <BaseDrawer.Backdrop
               data-slot="sidebar-backdrop"
-              className="fixed inset-0 bg-on-surface/40 backdrop-blur-[2px] z-50 transition-opacity duration-[var(--duration-slow)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]"
+              className="fixed inset-0 bg-on-surface/40 backdrop-blur-[2px] z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-slow)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none"
             />
             <BaseDrawer.Viewport
               data-slot="sidebar-viewport"
@@ -283,11 +283,13 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
             >
               <BaseDrawer.Popup
                 data-slot="sidebar-popup"
-                className={cn(
-                  'w-[var(--sidebar-width-mobile)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-y-auto outline-none transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-                  side === 'right'
-                    ? 'border-l-2 border-outline-variant data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
-                    : 'border-r-2 border-outline-variant data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
+                className={composeClassName(
+                  [
+                    'w-[var(--sidebar-width-mobile)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-y-auto outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                    side === 'right'
+                      ? 'border-l-2 border-outline-variant data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
+                      : 'border-r-2 border-outline-variant data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
+                  ],
                   className
                 )}
               >
@@ -300,7 +302,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                     data-slot="sidebar"
                     data-sidebar="sidebar"
                     data-mobile="true"
-                    className="flex h-full w-full flex-col bg-surface"
+                    className="flex size-full flex-col bg-surface"
                   >
                     {children}
                   </div>
@@ -334,7 +336,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
-              ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4))]'
+              ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem)]'
               : 'group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]'
           )}
         />
@@ -348,9 +350,9 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
               ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] border-r border-outline-variant'
               : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] border-l border-outline-variant',
             variant === 'floating'
-              ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]'
+              ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
               : variant === 'inset'
-              ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]'
+              ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
               : 'group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]',
             className,
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
@@ -364,7 +366,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
             data-slot="sidebar-inner"
             data-sidebar="sidebar"
             className={cn(
-              'flex h-full w-full flex-col bg-surface',
+              'flex size-full flex-col bg-surface',
               variant === 'floating' && 'rounded-lg border border-outline-variant shadow-ambient',
               variant === 'inset' && 'rounded-lg border border-outline-variant'
             )}
@@ -399,7 +401,7 @@ export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTrigger
           variant="text"
           size="icon"
           aria-label="Toggle Sidebar"
-          className={cn(
+          className={composeClassName(
             'size-11 min-h-[44px] min-w-[44px] rounded-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
             className
           )}
@@ -423,8 +425,8 @@ SidebarTrigger.displayName = 'SidebarTrigger';
  * -----------------------------------------------------------------------------------------------*/
 export const SidebarRail = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof BaseButton>
+>(({ className, render, nativeButton, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -436,13 +438,17 @@ export const SidebarRail = React.forwardRef<
         aria-label="Toggle Sidebar"
         tabIndex={-1}
         onClick={toggleSidebar}
-        className={cn(
-          'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-[background-color,transform,left,right] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex cursor-ew-resize',
-          '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
-          '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-          'hover:group-data-[collapsible=offcanvas]:bg-surface group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
-          '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
-          '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
+        className={composeClassName(
+          [
+            'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-[background-color,transform,left,right] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex cursor-ew-resize',
+            '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
+            '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
+            'hover:group-data-[collapsible=offcanvas]:bg-surface group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
+            '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
+            '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
+          ],
           className
         )}
         {...props}
@@ -497,8 +503,8 @@ export const SidebarInput = React.forwardRef<
       ref={ref}
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn(
-        'h-10 w-full bg-surface-container/60 border-outline-variant shadow-none focus-visible:outline-2 focus-visible:outline-primary',
+      className={composeClassName(
+        'h-10 w-full bg-surface border-outline shadow-none focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         className
       )}
       {...props}
@@ -560,7 +566,7 @@ export const SidebarSeparator = React.forwardRef<
       ref={ref}
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn('mx-2 w-auto bg-outline-variant/60', className)}
+      className={composeClassName('mx-2 w-auto bg-outline-variant/60', className)}
       {...props}
     />
   );
@@ -647,7 +653,7 @@ export interface SidebarGroupActionProps extends React.ButtonHTMLAttributes<HTML
 export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGroupActionProps>(
   ({ className, render, ...props }, ref) => {
     const classes = cn(
-      'absolute end-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
+      'absolute end-3 top-3 flex size-6 items-center justify-center rounded p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2 after:content-[\'\']',
       'group-data-[collapsible=icon]:hidden',
       className
     );
@@ -788,6 +794,7 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
       tooltip,
       className,
       render,
+      nativeButton,
       children,
       ...props
     },
@@ -799,11 +806,6 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
       variant,
       size,
     });
-
-    const computedClassName =
-      typeof className === 'function'
-        ? (buttonState: Parameters<typeof className>[0]) => cn(baseVariantClasses, className(buttonState))
-        : cn(baseVariantClasses, className);
 
     const {
       ['aria-current']: ariaCurrent,
@@ -819,7 +821,8 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
         data-active={isActive}
         aria-current={ariaCurrent ?? (isActive ? 'page' : undefined)}
         render={render}
-        className={computedClassName}
+        nativeButton={resolveNativeButton(render, nativeButton)}
+        className={composeClassName(baseVariantClasses, className)}
         {...restProps}
       >
         {children}
@@ -854,8 +857,8 @@ export interface SidebarMenuActionProps
 }
 
 export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
-  ({ className, showOnHover = false, children, ...props }, ref) => {
-    const classes = cn(
+  ({ className, showOnHover = false, render, nativeButton, children, ...props }, ref) => {
+    const baseClasses = cn(
       'absolute end-1 top-2 flex aspect-square w-7 items-center justify-center rounded-md p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'after:absolute after:-inset-2 md:after:hidden',
       'peer-data-[size=sm]/menu-button:top-1',
@@ -863,8 +866,7 @@ export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenu
       'peer-data-[size=lg]/menu-button:top-2',
       'group-data-[collapsible=icon]:hidden',
       showOnHover &&
-        'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[popup-open]:opacity-100 md:opacity-0 transition-opacity',
-      className
+        'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[popup-open]:opacity-100 md:opacity-0 transition-opacity'
     );
 
     return (
@@ -872,7 +874,9 @@ export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenu
         ref={ref}
         data-slot="sidebar-menu-action"
         data-sidebar="menu-action"
-        className={classes}
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
+        className={composeClassName(baseClasses, className)}
         {...props}
       >
         {children}
@@ -986,6 +990,7 @@ export const SidebarMenuSubButton = React.forwardRef<
       isActive = false,
       className,
       render,
+      nativeButton,
       children,
       ...props
     },
@@ -997,7 +1002,7 @@ export const SidebarMenuSubButton = React.forwardRef<
     }[size];
 
     const baseClasses = cn(
-      'flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md font-label text-start outline-none transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] select-none cursor-pointer',
+      'flex w-full min-w-0 items-center gap-2 rounded font-label text-start outline-none transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] select-none cursor-pointer',
       'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
       '[&>span:last-child]:truncate',
       isActive
@@ -1005,11 +1010,6 @@ export const SidebarMenuSubButton = React.forwardRef<
         : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium',
       sizeClasses
     );
-
-    const computedClassName =
-      typeof className === 'function'
-        ? (buttonState: Parameters<typeof className>[0]) => cn(baseClasses, className(buttonState))
-        : cn(baseClasses, className);
 
     return (
       <BaseButton
@@ -1019,7 +1019,8 @@ export const SidebarMenuSubButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         render={render}
-        className={computedClassName}
+        nativeButton={resolveNativeButton(render, nativeButton)}
+        className={composeClassName(baseClasses, className)}
         {...props}
       >
         {children}

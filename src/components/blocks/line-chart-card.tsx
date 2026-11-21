@@ -39,6 +39,8 @@ export interface LineChartCardProps
   series: LineChartSeries[];
   config: ChartConfig;
   showLegend?: boolean;
+  /** Whether to render the numeric Y-axis scale. Defaults to `true`. */
+  showYAxis?: boolean;
   trend?: ChartCardTrend;
   /** Accessible chart summary announced to screen readers. Defaults to `title`. */
   chartLabel?: string;
@@ -54,6 +56,7 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
       series,
       config,
       showLegend,
+      showYAxis = true,
       trend,
       footer,
       action,
@@ -91,12 +94,12 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
           role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
-          className="aspect-auto h-full w-full"
+          className="aspect-auto size-full"
         >
           <LineChart
             aria-label={chartLabel ?? title}
             data={data}
-            margin={{ left: 16, right: 16, top: 12, bottom: 0 }}
+            margin={{ left: showYAxis ? 0 : 16, right: 16, top: 12, bottom: 0 }}
           >
             <CartesianGrid vertical={false} />
             <XAxis
@@ -108,7 +111,14 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
               minTickGap={16}
               className="text-xs text-on-surface-variant"
             />
-            <YAxis hide />
+            <YAxis
+              hide={!showYAxis}
+              width={showYAxis ? 36 : 0}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={4}
+              className="text-xs text-on-surface-variant"
+            />
             <ChartTooltip
               cursor={{
                 stroke: 'var(--color-outline-variant)',

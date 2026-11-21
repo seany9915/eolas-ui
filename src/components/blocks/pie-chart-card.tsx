@@ -208,7 +208,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
           role="figure"
           aria-label={chartLabel ?? title}
           config={resolvedConfig}
-          className="aspect-auto h-full w-full"
+          className="aspect-auto size-full"
         >
           <PieChart aria-label={chartLabel ?? title}>
             <ChartTooltip
@@ -219,8 +219,8 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
               data={normalizedData}
               dataKey={dataKey}
               nameKey={nameKey}
-              innerRadius={60}
-              outerRadius={85}
+              innerRadius="58%"
+              outerRadius="82%"
               strokeWidth={2}
               stroke="var(--color-surface)"
               shape={(shapeProps: PieSectorShapeProps) => {
@@ -278,7 +278,9 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                           y={(viewBox.cy || 0) + 20}
                           className="fill-on-surface-variant text-xs font-sans font-medium"
                         >
-                          {displayLabel}
+                          {typeof displayLabel === 'string' && displayLabel.length > 18
+                            ? `${displayLabel.slice(0, 17).trimEnd()}…`
+                            : displayLabel}
                         </tspan>
                       </text>
                     );

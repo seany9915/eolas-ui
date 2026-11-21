@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Queue composite block.
+ * Queue primitive.
  *
  * Layer: Primitive (`src/components/ui/`)
  * Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`).
@@ -134,7 +134,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
             'flex size-5 shrink-0 items-center justify-center text-xs select-none',
             isRunning && 'text-on-surface-variant animate-spin motion-reduce:animate-none',
             isCompleted && 'text-success',
-            status === 'pending' && 'text-outline/70',
+            status === 'pending' && 'text-on-surface-variant',
             description && 'mt-0.5'
           )}
           aria-hidden="true"

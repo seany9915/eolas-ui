@@ -3,7 +3,10 @@
   "name": "thinking-orb",
   "type": "registry:ui",
   "title": "Thinking Orb",
-  "description": "Eolas UI Thinking Orb component built on Base UI and DESIGN.md design tokens.",
+  "description": "Animated visual indicator representing active AI reasoning and streaming state, with accessible reduced-motion fallback.",
+  "categories": [
+    "clinical-ai"
+  ],
   "dependencies": [
     "thinking-orbs"
   ],

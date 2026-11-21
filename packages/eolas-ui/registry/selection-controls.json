@@ -4,6 +4,9 @@
   "type": "registry:ui",
   "title": "Selection Controls",
   "description": "Re-exports selection control primitives for backward compatibility.",
+  "categories": [
+    "inputs"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/checkbox.json",
     "https://seany9915.github.io/eolas-ui/r/checkbox-group.json",

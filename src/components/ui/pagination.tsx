@@ -11,6 +11,7 @@ export const PaginationRoot = React.forwardRef<HTMLElement, PaginationProps>(
   ({ className, ...props }, ref) => (
     <nav
       ref={ref}
+      data-slot="pagination"
       role="navigation"
       aria-label="Pagination"
       className={cn('@container mx-auto flex w-full justify-center', className)}
@@ -26,6 +27,7 @@ export const PaginationContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ul
     ref={ref}
+    data-slot="pagination-content"
     className={cn('flex flex-row flex-wrap items-center justify-center gap-1.5 @sm:gap-2', className)}
     {...props}
   />
@@ -36,7 +38,7 @@ export const PaginationItem = React.forwardRef<
   HTMLLIElement,
   React.ComponentPropsWithoutRef<'li'>
 >(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn('list-none', className)} {...props} />
+  <li ref={ref} data-slot="pagination-item" className={cn('list-none', className)} {...props} />
 ));
 PaginationItem.displayName = 'PaginationItem';
 
@@ -61,10 +63,12 @@ export const PaginationLink = React.forwardRef<
   return (
     <Button
       ref={ref}
+      data-slot="pagination-link"
+      data-active={isActive ? 'true' : undefined}
       nativeButton={isLink ? false : undefined}
       render={isLink ? <a href={safeHref} aria-current={isActive ? 'page' : undefined} /> : undefined}
       aria-current={!isLink && isActive ? 'page' : undefined}
-      variant={isActive ? 'filled' : 'outlined'}
+      variant={isActive ? 'filled' : 'outline'}
       colorRole={isActive ? 'primary' : 'neutral'}
       size={size}
       className={cn(
@@ -92,6 +96,7 @@ export const PaginationPrevious = React.forwardRef<
 }, ref) => (
   <PaginationLink
     ref={ref}
+    data-slot="pagination-previous"
     aria-label="Go to previous page"
     className={cn('gap-1 ps-2.5 pe-3.5', className)}
     {...props}
@@ -112,6 +117,7 @@ export const PaginationNext = React.forwardRef<
 }, ref) => (
   <PaginationLink
     ref={ref}
+    data-slot="pagination-next"
     aria-label="Go to next page"
     className={cn('gap-1 ps-3.5 pe-2.5', className)}
     {...props}
@@ -131,6 +137,7 @@ export const PaginationEllipsis = React.forwardRef<
 }, ref) => (
   <span
     ref={ref}
+    data-slot="pagination-ellipsis"
     className={cn(
       'flex size-11 items-center justify-center font-sans text-on-surface-variant select-none',
       className

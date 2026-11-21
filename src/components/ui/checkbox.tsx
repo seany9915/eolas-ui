@@ -14,7 +14,7 @@
  */
 import * as React from 'react';
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 import { Icon } from './icon';
 
 export interface CheckboxProps
@@ -62,10 +62,13 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
 
     const isIndeterminate = indeterminate ?? (checked === 'indeterminate');
     const isChecked = checked === 'indeterminate' ? false : checked;
+    const hasOuterWrapper = Boolean(label || description || errorText);
+    const isClassNameFn = typeof className === 'function';
 
     const checkboxNode = (
       <BaseCheckbox.Root
         ref={ref}
+        data-slot="checkbox"
         id={checkboxId}
         value={value}
         name={name}
@@ -79,20 +82,23 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
         onCheckedChange={onCheckedChange}
         disabled={disabled}
         inputRef={inputRef}
-        className={cn(
-          'relative size-5 rounded-xs border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
-          'data-[checked]:bg-primary data-[checked]:border-primary text-on-primary',
-          'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary text-on-primary',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-          'data-[disabled]:bg-surface-container/40 data-[disabled]:border-outline-variant data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
-          error ? 'border-error focus-visible:outline-error' : 'border-outline-variant hover:border-outline',
-          !label && className
+        className={composeClassName(
+          cn(
+            'relative size-5 rounded-sm border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
+            'data-[checked]:bg-primary data-[checked]:border-primary text-on-primary',
+            'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary text-on-primary',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+            'data-[disabled]:bg-surface-container/40 data-[disabled]:border-outline-variant data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
+            error ? 'border-error focus-visible:outline-error' : 'border-outline hover:border-on-surface'
+          ),
+          !hasOuterWrapper || isClassNameFn ? className : undefined
         )}
         {...props}
         aria-invalid={error ? true : props['aria-invalid']}
         aria-describedby={describedBy}
       >
         {children ?? <BaseCheckbox.Indicator
+          data-slot="checkbox-indicator"
           render={(indicatorProps, state) => (
             <span
               {...indicatorProps}
@@ -124,7 +130,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
     if (!label) {
       if (!descriptionNode && !errorNode) return checkboxNode;
       return (
-        <div className={cn('flex flex-col', className)}>
+        <div className={cn('flex flex-col', !isClassNameFn ? className : undefined)}>
           {checkboxNode}
           {descriptionNode}
           {errorNode}
@@ -142,7 +148,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
             : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-container/30',
           'has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-60 has-[[data-disabled]]:hover:bg-transparent',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
-          className
+          !isClassNameFn ? className : undefined
         )}
       >
         <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">

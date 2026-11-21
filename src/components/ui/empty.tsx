@@ -50,7 +50,8 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
     ref
   ) => {
     const isFlush = variant === 'flush' || variant === 'unboxed';
-    const isDashed = variant === 'default' || variant === 'dashed';
+    const isDashed = variant === 'dashed';
+    const isDefault = variant === 'default';
 
     // If compound children are provided, render children inside the styled container
     if (children) {
@@ -59,7 +60,8 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
           ref={ref}
           data-slot="empty"
           className={cn(
-            'flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
+            '@container flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
+            isDefault && 'rounded-lg bg-surface border border-outline-variant',
             isDashed && 'rounded-lg bg-surface border border-dashed border-outline-variant',
             isFlush && 'border-none bg-transparent shadow-none',
             className
@@ -77,7 +79,8 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
         ref={ref}
         data-slot="empty"
         className={cn(
-          'flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
+          '@container flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
+          isDefault && 'rounded-lg bg-surface border border-outline-variant',
           isDashed && 'rounded-lg bg-surface border border-dashed border-outline-variant',
           isFlush && 'border-none bg-transparent shadow-none',
           className

@@ -1,6 +1,29 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "extends": ["./packages/eolas-ui/lint/oxlintrc.json"],
+  "overrides": [
+    {
+      "files": [
+        "**/playground/**",
+        "**/showcase/**",
+        "**/*Showcase*/**",
+        "**/*Showcase.tsx"
+      ],
+      "rules": {
+        "shadcn/no-restyle": "off",
+        "shadcn/no-arbitrary-values": "off",
+        "shadcn/no-inline-styles": "off",
+        "shadcn/require-static-classes": "off",
+        "shadcn/no-raw-colors": ["error", { "scanAllStrings": false }],
+        "eolas/no-raw-html-controls": "off",
+        "eolas/no-static-clickable-elements": "off",
+        "jsx-a11y/anchor-has-content": "off",
+        "jsx-a11y/control-has-associated-label": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/click-events-have-key-events": "off"
+      }
+    }
+  ],
   "ignorePatterns": [
     "dist/**",
     "public/**",

@@ -7,6 +7,15 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REGISTRY_DIR = path.resolve(__dirname, '../registry');
+const PACKAGE_JSON_PATH = path.resolve(__dirname, '../package.json');
+
+const CLI_VERSION = (() => {
+  try {
+    return JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, 'utf8')).version || '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+})();
 
 const DEPRECATED_ITEMS = new Set([
   'selection-controls',
@@ -26,6 +35,8 @@ const KNOWN_FLAGS = new Set([
   '--all',
   '-a',
   '--include-deprecated',
+  '--version',
+  '-v',
 ]);
 
 const args = process.argv.slice(2);
@@ -33,20 +44,29 @@ const command = args[0];
 
 function printHelp() {
   console.log(`
-eolas-ui - Private Base UI Component Registry CLI
+eolas-ui v${CLI_VERSION} - Base UI Component Registry CLI
 
 USAGE:
   npx @seany9915/eolas-ui add <item-name...> [--overwrite] [--dry-run]
   npx @seany9915/eolas-ui add --all [--overwrite] [--dry-run] [--include-deprecated]
   npx @seany9915/eolas-ui sync [--all] [--dry-run] [--include-deprecated]
   npx @seany9915/eolas-ui list
+  npx @seany9915/eolas-ui --version
+
+NOTES:
+  --all installs all non-deprecated UI primitives, composite blocks, and utilities
+  (pass --include-deprecated to also include legacy compatibility items).
+  Presets (theme, design-md, agent-rules, lint) can be added explicitly via \`add\`
+  and are automatically updated by \`sync\` once installed in your project.
 
 EXAMPLES:
   npx @seany9915/eolas-ui add button dialog select
-  npx @seany9915/eolas-ui add design-md agent-rules lint theme
+  npx @seany9915/eolas-ui add @eolas/button
+  npx @seany9915/eolas-ui add theme design-md agent-rules lint
   npx @seany9915/eolas-ui add tabs --overwrite
   npx @seany9915/eolas-ui add data-table --dry-run
   npx @seany9915/eolas-ui sync --dry-run
+  npx @seany9915/eolas-ui sync --all
   npx @seany9915/eolas-ui list
 `);
 }
@@ -110,17 +130,115 @@ function stripJsonCommentsAndTrailingCommas(text) {
   return out.replace(/,\s*([}\]])/g, '$1');
 }
 
+function resolveTsconfigFile(fromDir, spec) {
+  if (typeof spec !== 'string' || !spec.trim()) return null;
+  const candidate = path.resolve(fromDir, spec);
+  if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+    return candidate;
+  }
+  if (!candidate.endsWith('.json') && fs.existsSync(`${candidate}.json`) && fs.statSync(`${candidate}.json`).isFile()) {
+    return `${candidate}.json`;
+  }
+  if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+    const tsInDir = path.join(candidate, 'tsconfig.json');
+    if (fs.existsSync(tsInDir) && fs.statSync(tsInDir).isFile()) return tsInDir;
+    const jsInDir = path.join(candidate, 'jsconfig.json');
+    if (fs.existsSync(jsInDir) && fs.statSync(jsInDir).isFile()) return jsInDir;
+  }
+  return null;
+}
+
+function loadTsconfigRecursive(configPath, ancestorChain = new Set(), refVisited = new Set()) {
+  const absPath = path.resolve(configPath);
+  if (ancestorChain.has(absPath)) {
+    return { baseUrlAbs: null, entries: [] };
+  }
+
+  let parsed;
+  try {
+    const raw = fs.readFileSync(absPath, 'utf8');
+    parsed = JSON.parse(stripJsonCommentsAndTrailingCommas(raw));
+  } catch {
+    return { baseUrlAbs: null, entries: [] };
+  }
+
+  const nextAncestors = new Set(ancestorChain);
+  nextAncestors.add(absPath);
+  refVisited.add(absPath);
+
+  const configDir = path.dirname(absPath);
+  let inheritedBaseUrlAbs = null;
+  const entryMap = new Map();
+
+  // Follow `extends` (string or array of strings)
+  const extendsList = Array.isArray(parsed?.extends)
+    ? parsed.extends
+    : typeof parsed?.extends === 'string'
+      ? [parsed.extends]
+      : [];
+
+  for (const ext of extendsList) {
+    const extPath = resolveTsconfigFile(configDir, ext);
+    if (!extPath) continue;
+    const parent = loadTsconfigRecursive(extPath, nextAncestors, refVisited);
+    if (parent.baseUrlAbs) {
+      inheritedBaseUrlAbs = parent.baseUrlAbs;
+    }
+    for (const entry of parent.entries) {
+      entryMap.set(entry.pattern, entry);
+    }
+  }
+
+  // Own compilerOptions.baseUrl and compilerOptions.paths
+  const ownBaseUrl = parsed?.compilerOptions?.baseUrl;
+  const effectiveBaseUrlAbs =
+    typeof ownBaseUrl === 'string' && ownBaseUrl.trim()
+      ? path.resolve(configDir, ownBaseUrl)
+      : inheritedBaseUrlAbs;
+
+  const pathsRoot = effectiveBaseUrlAbs || configDir;
+  const ownPaths = parsed?.compilerOptions?.paths;
+  if (ownPaths && typeof ownPaths === 'object') {
+    for (const [pattern, targets] of Object.entries(ownPaths)) {
+      entryMap.set(pattern, { pattern, targets, resolveRoot: pathsRoot });
+    }
+  }
+
+  // Follow `references` (e.g., Vite tsconfig.json -> tsconfig.app.json)
+  if (Array.isArray(parsed?.references)) {
+    for (const ref of parsed.references) {
+      if (!ref || typeof ref.path !== 'string') continue;
+      const refPath = resolveTsconfigFile(configDir, ref.path);
+      if (!refPath || refVisited.has(path.resolve(refPath))) continue;
+      const refData = loadTsconfigRecursive(refPath, nextAncestors, refVisited);
+      for (const entry of refData.entries) {
+        if (!entryMap.has(entry.pattern)) {
+          entryMap.set(entry.pattern, entry);
+        }
+      }
+    }
+  }
+
+  return {
+    baseUrlAbs: effectiveBaseUrlAbs,
+    entries: Array.from(entryMap.values()),
+  };
+}
+
 function loadTsconfigPaths(cwd) {
   const tsconfigPath = path.resolve(cwd, 'tsconfig.json');
-  if (!fs.existsSync(tsconfigPath)) return null;
-  try {
-    const raw = fs.readFileSync(tsconfigPath, 'utf8');
-    const parsed = JSON.parse(stripJsonCommentsAndTrailingCommas(raw));
-    const paths = parsed?.compilerOptions?.paths;
-    return paths && typeof paths === 'object' ? paths : null;
-  } catch {
-    return null;
-  }
+  const jsconfigPath = path.resolve(cwd, 'jsconfig.json');
+  const rootConfig = fs.existsSync(tsconfigPath)
+    ? tsconfigPath
+    : fs.existsSync(jsconfigPath)
+      ? jsconfigPath
+      : null;
+
+  if (!rootConfig) return null;
+
+  const result = loadTsconfigRecursive(rootConfig);
+  if (result.entries.length === 0 && !result.baseUrlAbs) return null;
+  return result;
 }
 
 function getUiAlias(componentsConfig) {
@@ -173,44 +291,54 @@ function rewriteImports(content, filePath, componentsConfig) {
   return next;
 }
 
-function resolveFromTsconfigPaths(rawAlias, tsconfigPaths) {
-  if (!tsconfigPaths) return null;
-  for (const [pattern, targets] of Object.entries(tsconfigPaths)) {
+function resolveFromTsconfigPaths(rawAlias, tsconfigPaths, cwd) {
+  if (!tsconfigPaths || !Array.isArray(tsconfigPaths.entries)) return null;
+
+  const sortedEntries = [...tsconfigPaths.entries].sort((a, b) => {
+    const aWild = a.pattern.includes('*');
+    const bWild = b.pattern.includes('*');
+    if (aWild !== bWild) return aWild ? 1 : -1;
+    return b.pattern.length - a.pattern.length;
+  });
+
+  for (const { pattern, targets, resolveRoot } of sortedEntries) {
     if (!Array.isArray(targets) || targets.length === 0) continue;
     const firstTarget = targets[0];
     if (typeof firstTarget !== 'string') continue;
 
+    let mapped = null;
     if (pattern.endsWith('/*') && firstTarget.endsWith('/*')) {
       const prefix = pattern.slice(0, -1);
-      const targetPrefix = firstTarget.slice(0, -1).replace(/^\.\//, '');
+      const targetPrefix = firstTarget.slice(0, -1);
       if (rawAlias.startsWith(prefix)) {
-        return `${targetPrefix}${rawAlias.slice(prefix.length)}`;
-      }
-      if (rawAlias === prefix.slice(0, -1)) {
-        return targetPrefix.replace(/\/+$/, '');
+        mapped = `${targetPrefix}${rawAlias.slice(prefix.length)}`;
+      } else if (rawAlias === prefix.slice(0, -1)) {
+        mapped = targetPrefix.replace(/\/+$/, '') || '.';
       }
     } else if (pattern === rawAlias) {
-      return firstTarget.replace(/^\.\//, '');
+      mapped = firstTarget;
+    }
+
+    if (mapped !== null) {
+      const absTarget = path.resolve(resolveRoot, mapped);
+      return path.relative(cwd, absTarget).replace(/\\/g, '/');
     }
   }
   return null;
 }
 
-function resolveAlias(rawAlias, fallback, { hasSrc, tsconfigPaths }) {
+function resolveAlias(rawAlias, fallback, { cwd, hasSrc, tsconfigPaths }) {
   const defaultSrc = hasSrc ? 'src' : '';
   if (!rawAlias) return path.join(defaultSrc, fallback);
 
-  const tsMapped = resolveFromTsconfigPaths(rawAlias, tsconfigPaths);
+  const tsMapped = resolveFromTsconfigPaths(rawAlias, tsconfigPaths, cwd);
   if (tsMapped !== null) {
     return tsMapped;
   }
 
-  if (rawAlias.startsWith('@/')) {
+  if (rawAlias.startsWith('@/') || rawAlias.startsWith('~/')) {
     const stripped = rawAlias.slice(2);
     return hasSrc && !stripped.startsWith('src/') ? path.join('src', stripped) : stripped;
-  }
-  if (rawAlias.startsWith('~/')) {
-    return rawAlias.slice(2);
   }
   return rawAlias;
 }
@@ -223,6 +351,35 @@ function getFallbackTarget(file, itemType) {
   if (kind === 'registry:lib') return `@lib/${baseName}`;
   if (kind === 'registry:hook') return `@hooks/${baseName}`;
   return file.path || baseName;
+}
+
+const THEME_TARGET_NAMES = new Set([
+  '~/src/eolas-theme.css',
+  '~/src/globals.css',
+  'styles/eolas-theme.css',
+  'styles/globals.css',
+  'globals.css',
+]);
+
+function getThemeCandidatePaths(cwd, componentsConfig) {
+  const candidates = [];
+  if (componentsConfig?.tailwind?.css) {
+    candidates.push(path.resolve(cwd, componentsConfig.tailwind.css));
+  }
+  for (const rel of [
+    'src/eolas-theme.css',
+    'src/globals.css',
+    'src/styles/globals.css',
+    'src/app/globals.css',
+    'app/globals.css',
+    'styles/globals.css',
+    'src/index.css',
+    'globals.css',
+  ]) {
+    const abs = path.resolve(cwd, rel);
+    if (!candidates.includes(abs)) candidates.push(abs);
+  }
+  return candidates;
 }
 
 function resolveDestPath(file, itemType, componentsConfig, ctx) {
@@ -256,19 +413,11 @@ function resolveDestPath(file, itemType, componentsConfig, ctx) {
   }
 
   // Smart resolution for theme stylesheet target
-  if (target === '~/src/globals.css' || target === 'styles/globals.css' || target === 'globals.css') {
+  if (THEME_TARGET_NAMES.has(target)) {
     if (componentsConfig?.tailwind?.css) {
       destPath = path.resolve(cwd, componentsConfig.tailwind.css);
     } else {
-      const candidates = [
-        path.resolve(cwd, 'src/globals.css'),
-        path.resolve(cwd, 'src/styles/globals.css'),
-        path.resolve(cwd, 'src/app/globals.css'),
-        path.resolve(cwd, 'app/globals.css'),
-        path.resolve(cwd, 'styles/globals.css'),
-        path.resolve(cwd, 'src/index.css'),
-        path.resolve(cwd, 'globals.css'),
-      ];
+      const candidates = getThemeCandidatePaths(cwd, null);
       const existing = candidates.find((p) => fs.existsSync(p));
       if (existing) destPath = existing;
     }
@@ -278,9 +427,11 @@ function resolveDestPath(file, itemType, componentsConfig, ctx) {
 }
 
 function normalizeRegistryDep(dep) {
-  return dep
+  return String(dep)
+    .trim()
     .replace(/#.*$/, '')
-    .replace(/^https?:\/\/[^/]+\/eolas-ui\/r\//, '')
+    .replace(/\?.*$/, '')
+    .replace(/^https?:\/\/.+\/r\//, '')
     .replace(/\.json$/, '')
     .replace(/^(?:@seany9915\/eolas-ui|seany9915\/eolas-ui|@eolas)\//, '');
 }
@@ -337,9 +488,10 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
   const tsconfigPaths = loadTsconfigPaths(cwd);
   const ctx = { cwd, hasSrc, tsconfigPaths };
 
-  const queue = [...componentNames];
+  // Phase 1: Validate and resolve the complete item + dependency graph in memory before touching disk
+  const queue = componentNames.map(normalizeRegistryDep);
   const processed = new Set();
-  const installedFiles = [];
+  const resolvedItems = [];
   const missing = [];
   const requiredDeps = new Set();
   const requiredDevDeps = new Set();
@@ -364,6 +516,7 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
     }
 
     const data = JSON.parse(fs.readFileSync(compFile, 'utf8'));
+    resolvedItems.push(data);
 
     if (Array.isArray(data.dependencies)) {
       for (const dep of data.dependencies) requiredDeps.add(dep);
@@ -375,7 +528,6 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
       docsNotes.push({ name: data.name, docs: data.docs.trim() });
     }
 
-    // Queue internal registry dependencies
     if (Array.isArray(data.registryDependencies)) {
       for (const dep of data.registryDependencies) {
         const normalizedDep = normalizeRegistryDep(dep);
@@ -384,10 +536,18 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
         }
       }
     }
+  }
 
+  if (missing.length > 0) {
+    console.error(`\nFailed: could not resolve ${missing.join(', ')}. No files were written.`);
+    process.exit(1);
+  }
+
+  // Phase 2: Write (or preview) files after full graph validation succeeds
+  const installedFiles = [];
+  for (const data of resolvedItems) {
     if (!Array.isArray(data.files)) continue;
 
-    // Write item files
     for (const file of data.files) {
       const destPath = resolveDestPath(file, data.type, componentsConfig, ctx);
       const relDest = path.relative(cwd, destPath).replace(/\\/g, '/');
@@ -415,12 +575,7 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
     }
   }
 
-  if (missing.length > 0) {
-    console.error(`\nFailed: could not resolve ${missing.join(', ')}.`);
-    process.exit(1);
-  }
-
-  console.log(`\n${dryRun ? '[dry-run] Would process' : 'Successfully processed'} ${processed.size} items/dependencies (${installedFiles.length} file(s)).`);
+  console.log(`\n${dryRun ? '[dry-run] Would process' : 'Successfully processed'} ${resolvedItems.length} items/dependencies (${installedFiles.length} file(s)).`);
   if (requiredDeps.size > 0) {
     console.log(`Required dependencies:\n  npm install ${Array.from(requiredDeps).sort().join(' ')}`);
   }
@@ -436,11 +591,26 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
   console.log('');
 }
 
+function hasEolasThemeSignature(filePath) {
+  if (!fs.existsSync(filePath)) return false;
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    return (
+      content.includes('--surface-container-low') ||
+      content.includes('Eolas High-Contrast') ||
+      content.includes('data-surface="inverted"')
+    );
+  } catch {
+    return false;
+  }
+}
+
 function detectInstalledItems(items, cwd) {
   const componentsConfig = loadComponentsConfig(cwd);
   const hasSrc = fs.existsSync(path.resolve(cwd, 'src'));
   const tsconfigPaths = loadTsconfigPaths(cwd);
   const ctx = { cwd, hasSrc, tsconfigPaths };
+  const catalogNames = new Set(items.map((i) => i.name));
 
   const installed = [];
   for (const item of items) {
@@ -458,12 +628,58 @@ function detectInstalledItems(items, cwd) {
       installed.push(item.name);
     }
   }
+
+  // Detect installed non-component presets (theme, design-md, agent-rules, lint)
+  if (catalogNames.has('theme')) {
+    const themeCandidates = getThemeCandidatePaths(cwd, componentsConfig);
+    if (themeCandidates.some((candidate) => hasEolasThemeSignature(candidate))) {
+      installed.push('theme');
+    }
+  }
+
+  if (catalogNames.has('design-md')) {
+    const designMdPath = path.resolve(cwd, 'DESIGN.md');
+    if (fs.existsSync(designMdPath)) {
+      try {
+        if (fs.readFileSync(designMdPath, 'utf8').includes('Eolas')) {
+          installed.push('design-md');
+        }
+      } catch {
+        // Ignore unreadable DESIGN.md
+      }
+    }
+  }
+
+  if (catalogNames.has('agent-rules')) {
+    if (fs.existsSync(path.resolve(cwd, '.agents/rules/00-core-contract.md'))) {
+      installed.push('agent-rules');
+    }
+  }
+
+  if (catalogNames.has('lint')) {
+    const lintIndexPath = path.resolve(cwd, 'lint/index.mjs');
+    const oxlintPath = path.resolve(cwd, '.oxlintrc.json');
+    let hasLint = fs.existsSync(lintIndexPath);
+    if (!hasLint && fs.existsSync(oxlintPath)) {
+      try {
+        hasLint = fs.readFileSync(oxlintPath, 'utf8').includes('./lint/index.mjs');
+      } catch {
+        hasLint = false;
+      }
+    }
+    if (hasLint) {
+      installed.push('lint');
+    }
+  }
+
   return installed;
 }
 
 // CLI Dispatcher
 if (!command || command === '--help' || command === '-h' || command === 'help') {
   printHelp();
+} else if (command === '--version' || command === '-v' || command === 'version') {
+  console.log(CLI_VERSION);
 } else if (command === 'list') {
   listComponents();
 } else if (command === 'sync') {
@@ -492,9 +708,9 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
       addComponents(detected, { overwrite: true, dryRun });
     } else {
       console.log(
-        `No existing Eolas UI components detected; ${dryRun ? 'previewing' : 'installing'} all ${nonDeprecatedNames.length} non-deprecated items (pass --all to force full catalog sync explicitly)...\n`
+        'No installed Eolas UI items detected in this project. Run `eolas-ui add <item...>` to install specific items, or `eolas-ui sync --all` to install the full catalog.'
       );
-      addComponents(nonDeprecatedNames, { overwrite: true, dryRun });
+      process.exit(0);
     }
   }
 } else if (command === 'add') {

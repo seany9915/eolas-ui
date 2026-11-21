@@ -171,6 +171,8 @@ export interface QuestionnaireChoiceContextValue {
   shortcutKey?: string;
   disabled?: boolean;
   description?: React.ReactNode;
+  labelId: string;
+  descriptionId: string;
 }
 
 const QuestionnaireChoiceContext = React.createContext<QuestionnaireChoiceContextValue | null>(null);
@@ -1204,6 +1206,10 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
       }
     }
 
+    const choiceUid = React.useId();
+    const labelId = `${choiceUid}-label`;
+    const descriptionId = `${choiceUid}-desc`;
+
     const choiceContextValue: QuestionnaireChoiceContextValue = {
       value,
       isSelected,
@@ -1211,6 +1217,8 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
       shortcutKey,
       disabled,
       description,
+      labelId,
+      descriptionId,
     };
 
     return (
@@ -1220,6 +1228,8 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
           role={isMultiple ? 'checkbox' : 'radio'}
           aria-checked={isSelected}
           aria-disabled={disabled}
+          aria-labelledby={props['aria-labelledby'] ?? (label !== undefined || !children ? labelId : undefined)}
+          aria-describedby={props['aria-describedby'] ?? (description ? descriptionId : undefined)}
           tabIndex={tabIndex}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
@@ -1233,10 +1243,10 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
             // Focus vs Selection Distinction per DESIGN.md:
             // Floating 2px focus ring with outline-offset: 2px
             'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-            // Active selection uses flush 2px border + surface wash
+            // Constant 2px border eliminates 1px layout shift when toggling selection
             isSelected
-              ? 'border-2 border-primary bg-primary-container text-on-primary-container'
-              : 'border border-outline bg-surface hover:bg-surface-container text-on-surface',
+              ? 'border-2 border-primary bg-primary-container text-on-surface'
+              : 'border-2 border-outline-variant bg-surface hover:border-outline hover:bg-surface-container text-on-surface',
             disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
             className
           )}
@@ -1281,7 +1291,7 @@ export const QuestionnaireChoiceInput: React.FC<QuestionnaireChoiceInputProps> =
       data-checked={isSelected ? '' : undefined}
       className={cn(
         'relative flex items-center justify-center shrink-0 mt-0.5 transition-colors duration-quick ease-standard motion-reduce:transition-none',
-        isMultiple ? 'size-5 rounded-xs' : 'size-5 rounded-full',
+        isMultiple ? 'size-5 rounded-sm' : 'size-5 rounded-full',
         isSelected
           ? isMultiple
             ? 'border-2 border-primary bg-primary text-on-primary'
@@ -1318,24 +1328,19 @@ export const QuestionnaireChoiceLabel: React.FC<QuestionnaireChoiceLabelProps> =
 }) => {
   const choiceContext = useQuestionnaireChoice();
   const desc = description ?? choiceContext?.description;
-  const isSelected = choiceContext?.isSelected ?? false;
 
   return (
     <div className={cn('flex flex-col flex-1 text-start min-w-0', className)} {...props}>
       <span
-        className={cn(
-          'font-sans text-base font-medium select-none leading-snug',
-          isSelected ? 'text-on-primary-container' : 'text-on-surface'
-        )}
+        id={choiceContext?.labelId}
+        className="font-sans text-base font-medium select-none leading-snug text-on-surface"
       >
         {children}
       </span>
       {desc && (
         <span
-          className={cn(
-            'font-sans text-sm select-none mt-0.5 leading-normal',
-            isSelected ? 'text-on-primary-container/90' : 'text-on-surface-variant'
-          )}
+          id={choiceContext?.descriptionId}
+          className="font-sans text-sm select-none mt-0.5 leading-normal text-on-surface-variant"
         >
           {desc}
         </span>

@@ -21,7 +21,62 @@ const STATIC_CLICKABLE_TAGS = new Set([
   'footer',
   'p',
   'img',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'ul',
+  'ol',
+  'figure',
+  'main',
+  'aside',
+  'nav',
+  'table',
+  'th',
+  'dt',
+  'dd',
 ]);
+
+const INTERACTIVE_ARIA_ROLES = new Set([
+  'button',
+  'link',
+  'menuitem',
+  'menuitemcheckbox',
+  'menuitemradio',
+  'option',
+  'radio',
+  'switch',
+  'tab',
+  'treeitem',
+  'checkbox',
+  'gridcell',
+  'row',
+  'combobox',
+  'listbox',
+  'slider',
+  'spinbutton',
+  'textbox',
+  'searchbox',
+]);
+
+const LIGHT_SURFACE_TERTIARY_UTILITIES = new Set([
+  'text-tertiary',
+  'border-tertiary',
+  'border-s-tertiary',
+  'border-e-tertiary',
+  'border-t-tertiary',
+  'border-b-tertiary',
+  'border-x-tertiary',
+  'border-y-tertiary',
+  'border-l-tertiary',
+  'border-r-tertiary',
+  'ring-tertiary',
+  'outline-tertiary',
+]);
+
+const MAX_CLASS_BRANCHES = 32;
 
 const NON_TEXT_INPUT_TYPES = new Set([
   'checkbox',
@@ -244,16 +299,18 @@ function collectCalleeNames(node, visitorKeys, out = new Set()) {
 }
 
 function getFunctionExpressionFromInit(init) {
-  const unwrapped = unwrapTypeExpr(init);
-  if (!unwrapped) return null;
-  if (unwrapped.type === 'ArrowFunctionExpression' || unwrapped.type === 'FunctionExpression') {
-    return unwrapped;
-  }
-  if (unwrapped.type === 'CallExpression' && unwrapped.arguments?.length > 0) {
-    const firstArg = unwrapTypeExpr(unwrapped.arguments[0]);
-    if (firstArg?.type === 'ArrowFunctionExpression' || firstArg?.type === 'FunctionExpression') {
-      return firstArg;
+  let curr = unwrapTypeExpr(init);
+  let depth = 0;
+  while (curr && depth < 8) {
+    if (curr.type === 'ArrowFunctionExpression' || curr.type === 'FunctionExpression') {
+      return curr;
     }
+    if (curr.type === 'CallExpression' && curr.arguments?.length > 0) {
+      curr = unwrapTypeExpr(curr.arguments[0]);
+      depth += 1;
+      continue;
+    }
+    break;
   }
   return null;
 }
@@ -300,11 +357,13 @@ function isKeyAccessExpr(node, destructuredKeyNames) {
   return expr.type === 'Identifier' && destructuredKeyNames.has(expr.name);
 }
 
+const EQUALITY_OPERATORS = new Set(['===', '==', '!==', '!=']);
+
 function astChecksEnterKey(fnNode, visitorKeys) {
   if (!fnNode) return false;
   const keyNames = collectDestructuredPropNames(fnNode, 'key', visitorKeys);
   return walkAst(fnNode, visitorKeys, (curr) => {
-    if (curr.type === 'BinaryExpression' && (curr.operator === '===' || curr.operator === '==')) {
+    if (curr.type === 'BinaryExpression' && EQUALITY_OPERATORS.has(curr.operator)) {
       const leftIsKey = isKeyAccessExpr(curr.left, keyNames);
       const rightIsKey = isKeyAccessExpr(curr.right, keyNames);
       if (leftIsKey && getStaticStringFromExpr(curr.right) === 'Enter') return true;
@@ -322,11 +381,23 @@ function astChecksEnterKey(fnNode, visitorKeys) {
 function astChecksReactImeComposing(fnNode, visitorKeys) {
   if (!fnNode) return false;
   const keyCodeNames = collectDestructuredPropNames(fnNode, 'keyCode', visitorKeys);
-  const keyCodeEqOps = new Set(['===', '!==', '==', '!=']);
 
   return walkAst(fnNode, visitorKeys, (curr) => {
     if (curr.type === 'MemberExpression' && getMemberPropertyName(curr) === 'isComposing') {
       if (isNativeEventAccess(curr.object)) return true;
+    }
+    if (curr.type === 'ObjectPattern') {
+      for (const prop of curr.properties || []) {
+        if (prop.type !== 'Property') continue;
+        if (getPropertyKeyName(prop.key, prop.computed) !== 'nativeEvent') continue;
+        const nestedPattern = prop.value?.type === 'AssignmentPattern' ? prop.value.left : prop.value;
+        if (nestedPattern?.type === 'ObjectPattern') {
+          const hasIsComposing = (nestedPattern.properties || []).some(
+            (sub) => sub.type === 'Property' && getPropertyKeyName(sub.key, sub.computed) === 'isComposing'
+          );
+          if (hasIsComposing) return true;
+        }
+      }
     }
     if (
       curr.type === 'VariableDeclarator' &&
@@ -338,7 +409,7 @@ function astChecksReactImeComposing(fnNode, visitorKeys) {
       );
       if (hasIsComposing) return true;
     }
-    if (curr.type === 'BinaryExpression' && keyCodeEqOps.has(curr.operator)) {
+    if (curr.type === 'BinaryExpression' && EQUALITY_OPERATORS.has(curr.operator)) {
       const leftExpr = unwrapTypeExpr(curr.left);
       const rightExpr = unwrapTypeExpr(curr.right);
       const leftIsKeyCode =
@@ -384,7 +455,7 @@ function splitTailwindTokens(str) {
       else if (rawToken[i] === ':' && bracketDepth === 0) lastColon = i;
     }
     const variant = lastColon === -1 ? '' : rawToken.slice(0, lastColon);
-    const afterVariant = (lastColon === -1 ? rawToken : rawToken.slice(lastColon + 1)).replace(/^!/, '');
+    const afterVariant = (lastColon === -1 ? rawToken : rawToken.slice(lastColon + 1)).replace(/^!|!$/g, '');
     const slashIdx = findOpacitySlash(afterVariant);
     const base = slashIdx === -1 ? afterVariant : afterVariant.slice(0, slashIdx);
     tokens.push({
@@ -398,23 +469,88 @@ function splitTailwindTokens(str) {
   return tokens;
 }
 
-function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
+function isTrackableClassInit(exprNode) {
+  const expr = unwrapTypeExpr(exprNode);
+  if (!expr) return false;
+  if (expr.type === 'Literal' && typeof expr.value === 'string') return true;
+  if (expr.type === 'TemplateLiteral') return true;
+  if (expr.type === 'Identifier') return true;
+  if (expr.type === 'CallExpression') {
+    return CLASS_HELPER_NAMES.has(getCalleeName(expr.callee));
+  }
+  if (expr.type === 'ConditionalExpression') {
+    return isTrackableClassInit(expr.consequent) || isTrackableClassInit(expr.alternate);
+  }
+  if (expr.type === 'LogicalExpression') {
+    return isTrackableClassInit(expr.left) || isTrackableClassInit(expr.right);
+  }
+  if (expr.type === 'BinaryExpression' && expr.operator === '+') {
+    return isTrackableClassInit(expr.left) || isTrackableClassInit(expr.right);
+  }
+  if (expr.type === 'ArrayExpression') {
+    return (expr.elements || []).some((el) => el && isTrackableClassInit(el.type === 'SpreadElement' ? el.argument : el));
+  }
+  return false;
+}
+
+function markNestedHelperCalls(node, visitorKeys, targetSet) {
+  if (!node || typeof node !== 'object') return;
+  if (
+    node.type === 'ArrowFunctionExpression' ||
+    node.type === 'FunctionExpression' ||
+    node.type === 'FunctionDeclaration' ||
+    node.type === 'JSXElement' ||
+    node.type === 'JSXFragment'
+  ) {
+    return;
+  }
+  if (node.type === 'CallExpression' && CLASS_HELPER_NAMES.has(getCalleeName(node.callee))) {
+    targetSet.add(node);
+  }
+  const keys = visitorKeys[node.type] || Object.keys(node);
+  for (const key of keys) {
+    if (key === 'parent' || key === 'loc' || key === 'range' || key === 'tokens' || key === 'comments') continue;
+    const child = node[key];
+    if (Array.isArray(child)) {
+      for (const item of child) {
+        if (item && typeof item.type === 'string') {
+          markNestedHelperCalls(item, visitorKeys, targetSet);
+        }
+      }
+    } else if (child && typeof child.type === 'string') {
+      markNestedHelperCalls(child, visitorKeys, targetSet);
+    }
+  }
+}
+
+function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = [], resolveVar = null, seenVars = new Set(), overrideNode = null) {
   const expr = unwrapTypeExpr(exprNode);
   if (!expr) return groups;
 
+  if (expr.type === 'Identifier' && resolveVar) {
+    if (seenVars.has(expr.name)) return groups;
+    const binding = resolveVar(expr.name);
+    if (binding) {
+      seenVars.add(expr.name);
+      extractClassGroupsFromExpr(binding.init, visitedCalls, groups, resolveVar, seenVars, overrideNode || exprNode);
+      seenVars.delete(expr.name);
+    }
+    return groups;
+  }
+
   const direct = getStaticStringFromExpr(expr);
   if (direct !== null) {
-    groups.push({ text: direct, node: exprNode });
+    groups.push({ text: direct, node: overrideNode || exprNode });
     return groups;
   }
 
   if (expr.type === 'TemplateLiteral') {
     const quasisText = expr.quasis.map((q) => q.value?.cooked ?? '').join(' ');
     if (quasisText.trim()) {
-      groups.push({ text: quasisText, node: expr });
+      groups.push({ text: quasisText, node: overrideNode || expr });
     }
     for (const sub of expr.expressions || []) {
-      extractClassGroupsFromExpr(sub, visitedCalls, groups);
+      extractClassGroupsFromExpr(sub, visitedCalls, groups, resolveVar, seenVars, overrideNode);
     }
     return groups;
   }
@@ -423,25 +559,25 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
     const leftStatic = getStaticStringFromExpr(expr.left);
     const rightStatic = getStaticStringFromExpr(expr.right);
     if (leftStatic !== null && rightStatic !== null) {
-      groups.push({ text: `${leftStatic}${rightStatic}`, node: expr });
+      groups.push({ text: `${leftStatic}${rightStatic}`, node: overrideNode || expr });
       return groups;
     }
-    extractClassGroupsFromExpr(expr.left, visitedCalls, groups);
-    extractClassGroupsFromExpr(expr.right, visitedCalls, groups);
+    extractClassGroupsFromExpr(expr.left, visitedCalls, groups, resolveVar, seenVars, overrideNode);
+    extractClassGroupsFromExpr(expr.right, visitedCalls, groups, resolveVar, seenVars, overrideNode);
     return groups;
   }
 
   if (expr.type === 'ConditionalExpression') {
-    extractClassGroupsFromExpr(expr.consequent, visitedCalls, groups);
-    extractClassGroupsFromExpr(expr.alternate, visitedCalls, groups);
+    extractClassGroupsFromExpr(expr.consequent, visitedCalls, groups, resolveVar, seenVars, overrideNode);
+    extractClassGroupsFromExpr(expr.alternate, visitedCalls, groups, resolveVar, seenVars, overrideNode);
     return groups;
   }
 
   if (expr.type === 'LogicalExpression') {
     if (expr.operator === '||' || expr.operator === '??') {
-      extractClassGroupsFromExpr(expr.left, visitedCalls, groups);
+      extractClassGroupsFromExpr(expr.left, visitedCalls, groups, resolveVar, seenVars, overrideNode);
     }
-    extractClassGroupsFromExpr(expr.right, visitedCalls, groups);
+    extractClassGroupsFromExpr(expr.right, visitedCalls, groups, resolveVar, seenVars, overrideNode);
     return groups;
   }
 
@@ -450,18 +586,18 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
     for (const elem of expr.elements || []) {
       if (!elem) continue;
       if (elem.type === 'SpreadElement') {
-        extractClassGroupsFromExpr(elem.argument, visitedCalls, groups);
+        extractClassGroupsFromExpr(elem.argument, visitedCalls, groups, resolveVar, seenVars, overrideNode);
         continue;
       }
       const staticVal = getStaticStringFromExpr(elem);
       if (staticVal !== null) {
         unconditionalParts.push(staticVal);
       } else {
-        extractClassGroupsFromExpr(elem, visitedCalls, groups);
+        extractClassGroupsFromExpr(elem, visitedCalls, groups, resolveVar, seenVars, overrideNode);
       }
     }
     if (unconditionalParts.length > 0) {
-      groups.push({ text: unconditionalParts.join(' '), node: expr });
+      groups.push({ text: unconditionalParts.join(' '), node: overrideNode || expr });
     }
     return groups;
   }
@@ -471,7 +607,7 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
       if (prop.type !== 'Property') continue;
       const keyName = getPropertyKeyName(prop.key, prop.computed);
       if (keyName) {
-        groups.push({ text: keyName, node: prop.key });
+        groups.push({ text: keyName, node: overrideNode || prop.key });
       }
     }
     return groups;
@@ -485,7 +621,7 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
     if (calleeName === 'cva') {
       const [baseArg, configArg] = expr.arguments || [];
       if (baseArg) {
-        extractClassGroupsFromExpr(baseArg, visitedCalls, groups);
+        extractClassGroupsFromExpr(baseArg, visitedCalls, groups, resolveVar, seenVars, overrideNode);
       }
       const config = unwrapTypeExpr(configArg);
       if (config?.type === 'ObjectExpression') {
@@ -501,7 +637,7 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
                 if (optionsObj?.type === 'ObjectExpression') {
                   for (const optProp of optionsObj.properties || []) {
                     if (optProp.type === 'Property') {
-                      extractClassGroupsFromExpr(optProp.value, visitedCalls, groups);
+                      extractClassGroupsFromExpr(optProp.value, visitedCalls, groups, resolveVar, seenVars, overrideNode);
                     }
                   }
                 }
@@ -517,7 +653,7 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
                   if (itemProp.type !== 'Property') continue;
                   const itemKey = getPropertyKeyName(itemProp.key, itemProp.computed);
                   if (itemKey === 'class' || itemKey === 'className') {
-                    extractClassGroupsFromExpr(itemProp.value, visitedCalls, groups);
+                    extractClassGroupsFromExpr(itemProp.value, visitedCalls, groups, resolveVar, seenVars, overrideNode);
                   }
                 }
               }
@@ -531,7 +667,7 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
     const unconditionalParts = [];
     for (const arg of expr.arguments || []) {
       if (arg.type === 'SpreadElement') {
-        extractClassGroupsFromExpr(arg.argument, visitedCalls, groups);
+        extractClassGroupsFromExpr(arg.argument, visitedCalls, groups, resolveVar, seenVars, overrideNode);
         continue;
       }
       const staticVal = getStaticStringFromExpr(arg);
@@ -543,30 +679,336 @@ function extractClassGroupsFromExpr(exprNode, visitedCalls, groups = []) {
           const quasisText = inner.quasis.map((q) => q.value?.cooked ?? '').join(' ');
           if (quasisText.trim()) unconditionalParts.push(quasisText);
           for (const sub of inner.expressions) {
-            extractClassGroupsFromExpr(sub, visitedCalls, groups);
+            extractClassGroupsFromExpr(sub, visitedCalls, groups, resolveVar, seenVars, overrideNode);
           }
         } else {
-          extractClassGroupsFromExpr(arg, visitedCalls, groups);
+          extractClassGroupsFromExpr(arg, visitedCalls, groups, resolveVar, seenVars, overrideNode);
         }
       }
     }
     if (unconditionalParts.length > 0) {
-      groups.push({ text: unconditionalParts.join(' '), node: expr });
+      groups.push({ text: unconditionalParts.join(' '), node: overrideNode || expr });
     }
   }
 
   return groups;
 }
 
-function extractClassGroupsFromAttr(attr, visitedCalls) {
+function extractClassGroupsFromAttr(attr, visitedCalls, resolveVar = null) {
   if (!attr || !attr.value) return [];
   if (attr.value.type === 'Literal' && typeof attr.value.value === 'string') {
     return [{ text: attr.value.value, node: attr.value }];
   }
   if (attr.value.type === 'JSXExpressionContainer') {
-    return extractClassGroupsFromExpr(attr.value.expression, visitedCalls);
+    return extractClassGroupsFromExpr(attr.value.expression, visitedCalls, [], resolveVar);
   }
   return [];
+}
+
+function getSimpleExprPath(node) {
+  const expr = unwrapTypeExpr(node);
+  if (!expr) return null;
+  if (expr.type === 'Identifier') return expr.name;
+  if (expr.type === 'MemberExpression' && !expr.computed && expr.property?.type === 'Identifier') {
+    const objPath = getSimpleExprPath(expr.object);
+    return objPath ? `${objPath}.${expr.property.name}` : null;
+  }
+  return null;
+}
+
+function getConditionSignature(node) {
+  const expr = unwrapTypeExpr(node);
+  if (!expr) return null;
+  if (expr.type === 'UnaryExpression' && expr.operator === '!') {
+    const inner = getConditionSignature(expr.argument);
+    return inner ? { key: inner.key, negated: !inner.negated } : null;
+  }
+  const simplePath = getSimpleExprPath(expr);
+  if (simplePath) {
+    return { key: `path:${simplePath}`, negated: false };
+  }
+  return null;
+}
+
+function combineBranches(branchesA, branchesB, maxBranches = MAX_CLASS_BRANCHES) {
+  if (!branchesA || branchesA.length === 0) return branchesB || [];
+  if (!branchesB || branchesB.length === 0) return branchesA;
+  const out = [];
+  for (const a of branchesA) {
+    for (const b of branchesB) {
+      if (out.length >= maxBranches) return out;
+      const text = a.text && b.text ? `${a.text} ${b.text}` : a.text || b.text;
+      out.push({ text, node: a.node || b.node });
+    }
+  }
+  return out;
+}
+
+const INVERTED_GUARD_NAME_RE = /(?:^|_)(?:is)?(?:inverted|dark|spotlight)(?:$|_)/i;
+
+function isInvertedConditionExpr(node) {
+  const expr = unwrapTypeExpr(node);
+  if (!expr) return false;
+  if (expr.type === 'Identifier') {
+    return INVERTED_GUARD_NAME_RE.test(expr.name);
+  }
+  if (expr.type === 'MemberExpression') {
+    const prop = getMemberPropertyName(expr);
+    return Boolean(prop && INVERTED_GUARD_NAME_RE.test(prop));
+  }
+  if (expr.type === 'BinaryExpression' && (expr.operator === '===' || expr.operator === '==')) {
+    const leftStr = getStaticStringFromExpr(expr.left);
+    const rightStr = getStaticStringFromExpr(expr.right);
+    if (leftStr === 'inverted' || leftStr === 'spotlight' || leftStr === 'dark') return true;
+    if (rightStr === 'inverted' || rightStr === 'spotlight' || rightStr === 'dark') return true;
+  }
+  if (expr.type === 'LogicalExpression') {
+    if (expr.operator === '&&') {
+      return isInvertedConditionExpr(expr.left) || isInvertedConditionExpr(expr.right);
+    }
+    if (expr.operator === '||') {
+      return isInvertedConditionExpr(expr.left) && isInvertedConditionExpr(expr.right);
+    }
+  }
+  return false;
+}
+
+function isNegatedInvertedConditionExpr(node) {
+  const expr = unwrapTypeExpr(node);
+  return Boolean(expr?.type === 'UnaryExpression' && expr.operator === '!' && isInvertedConditionExpr(expr.argument));
+}
+
+function extractClassBranchesFromExpr(exprNode, opts = {}) {
+  const {
+    visitedCalls = null,
+    resolveVar = null,
+    seenVars = new Set(),
+    rootNode = null,
+    skipInvertedBranches = false,
+  } = opts;
+  const expr = unwrapTypeExpr(exprNode);
+  const reportNode = rootNode || exprNode;
+  const childOpts = { visitedCalls, resolveVar, seenVars, rootNode: reportNode, skipInvertedBranches };
+  if (!expr) return [{ text: '', node: reportNode }];
+
+  if (expr.type === 'Identifier') {
+    if (resolveVar && !seenVars.has(expr.name)) {
+      const binding = resolveVar(expr.name);
+      if (binding) {
+        seenVars.add(expr.name);
+        const result = extractClassBranchesFromExpr(binding.init, childOpts);
+        seenVars.delete(expr.name);
+        return result;
+      }
+    }
+    return [{ text: '', node: reportNode }];
+  }
+
+  const direct = getStaticStringFromExpr(expr);
+  if (direct !== null) {
+    return [{ text: direct, node: reportNode }];
+  }
+
+  if (expr.type === 'TemplateLiteral') {
+    const quasisText = expr.quasis.map((q) => q.value?.cooked ?? '').join(' ').trim();
+    let acc = [{ text: quasisText, node: reportNode }];
+    for (const sub of expr.expressions || []) {
+      acc = combineBranches(acc, extractClassBranchesFromExpr(sub, childOpts));
+    }
+    return acc;
+  }
+
+  if (expr.type === 'BinaryExpression' && expr.operator === '+') {
+    const leftStatic = getStaticStringFromExpr(expr.left);
+    const rightStatic = getStaticStringFromExpr(expr.right);
+    if (leftStatic !== null && rightStatic !== null) {
+      return [{ text: `${leftStatic}${rightStatic}`, node: reportNode }];
+    }
+    return combineBranches(
+      extractClassBranchesFromExpr(expr.left, childOpts),
+      extractClassBranchesFromExpr(expr.right, childOpts)
+    );
+  }
+
+  if (expr.type === 'ConditionalExpression') {
+    const cons =
+      skipInvertedBranches && isInvertedConditionExpr(expr.test)
+        ? [{ text: '', node: reportNode }]
+        : extractClassBranchesFromExpr(expr.consequent, childOpts);
+    const alt =
+      skipInvertedBranches && isNegatedInvertedConditionExpr(expr.test)
+        ? [{ text: '', node: reportNode }]
+        : extractClassBranchesFromExpr(expr.alternate, childOpts);
+    return [...cons, ...alt].slice(0, MAX_CLASS_BRANCHES);
+  }
+
+  if (expr.type === 'LogicalExpression') {
+    if (expr.operator === '&&') {
+      if (skipInvertedBranches && isInvertedConditionExpr(expr.left)) {
+        return [{ text: '', node: reportNode }];
+      }
+      const right = extractClassBranchesFromExpr(expr.right, childOpts);
+      return [{ text: '', node: reportNode }, ...right].slice(0, MAX_CLASS_BRANCHES);
+    }
+    if (expr.operator === '||' || expr.operator === '??') {
+      const left = extractClassBranchesFromExpr(expr.left, childOpts);
+      const right = extractClassBranchesFromExpr(expr.right, childOpts);
+      return [...left, ...right].slice(0, MAX_CLASS_BRANCHES);
+    }
+    return [{ text: '', node: reportNode }];
+  }
+
+  if (expr.type === 'ArrayExpression') {
+    let acc = [{ text: '', node: reportNode }];
+    for (const elem of expr.elements || []) {
+      if (!elem) continue;
+      const target = elem.type === 'SpreadElement' ? elem.argument : elem;
+      acc = combineBranches(acc, extractClassBranchesFromExpr(target, childOpts));
+    }
+    return acc;
+  }
+
+  if (expr.type === 'ObjectExpression') {
+    const alwaysOn = [];
+    const byCondKey = new Map();
+    const dynamicIndependent = [];
+
+    for (const prop of expr.properties || []) {
+      if (prop.type !== 'Property') continue;
+      const keyName = getPropertyKeyName(prop.key, prop.computed);
+      if (!keyName) continue;
+
+      const val = unwrapTypeExpr(prop.value);
+      if (val?.type === 'Literal') {
+        if (val.value) alwaysOn.push(keyName);
+        continue;
+      }
+      if (val?.type === 'Identifier' && val.name === 'undefined') continue;
+      if (skipInvertedBranches && isInvertedConditionExpr(val)) continue;
+
+      const sig = getConditionSignature(val);
+      if (sig) {
+        let bucket = byCondKey.get(sig.key);
+        if (!bucket) {
+          bucket = { pos: [], neg: [] };
+          byCondKey.set(sig.key, bucket);
+        }
+        if (sig.negated) bucket.neg.push(keyName);
+        else bucket.pos.push(keyName);
+      } else {
+        dynamicIndependent.push(keyName);
+      }
+    }
+
+    let acc = [{ text: alwaysOn.join(' '), node: reportNode }];
+    const singleSideGroups = [];
+
+    for (const bucket of byCondKey.values()) {
+      if (bucket.pos.length > 0 && bucket.neg.length > 0) {
+        acc = combineBranches(acc, [
+          { text: bucket.pos.join(' '), node: reportNode },
+          { text: bucket.neg.join(' '), node: reportNode },
+        ]);
+      } else {
+        const keys = bucket.pos.length > 0 ? bucket.pos : bucket.neg;
+        if (keys.length > 0) singleSideGroups.push(keys.join(' '));
+      }
+    }
+    for (const key of dynamicIndependent) {
+      singleSideGroups.push(key);
+    }
+
+    if (singleSideGroups.length <= 4) {
+      for (const groupText of singleSideGroups) {
+        acc = combineBranches(acc, [
+          { text: '', node: reportNode },
+          { text: groupText, node: reportNode },
+        ]);
+      }
+    } else {
+      const combinedOptions = [
+        { text: '', node: reportNode },
+        { text: singleSideGroups.join(' '), node: reportNode },
+        ...singleSideGroups.map((groupText) => ({ text: groupText, node: reportNode })),
+      ];
+      acc = combineBranches(acc, combinedOptions);
+    }
+
+    return acc;
+  }
+
+  if (expr.type === 'CallExpression') {
+    const calleeName = getCalleeName(expr.callee);
+    if (!CLASS_HELPER_NAMES.has(calleeName)) return [{ text: '', node: reportNode }];
+    visitedCalls?.add(expr);
+
+    if (calleeName === 'cva') {
+      const [baseArg, configArg] = expr.arguments || [];
+      const baseBranches = baseArg
+        ? extractClassBranchesFromExpr(baseArg, childOpts)
+        : [{ text: '', node: reportNode }];
+      const out = [...baseBranches];
+      const config = unwrapTypeExpr(configArg);
+      if (config?.type === 'ObjectExpression') {
+        for (const prop of config.properties || []) {
+          if (prop.type !== 'Property') continue;
+          const propName = getPropertyKeyName(prop.key, prop.computed);
+          if (propName === 'variants') {
+            const variantsObj = unwrapTypeExpr(prop.value);
+            if (variantsObj?.type === 'ObjectExpression') {
+              for (const groupProp of variantsObj.properties || []) {
+                if (groupProp.type !== 'Property') continue;
+                const optionsObj = unwrapTypeExpr(groupProp.value);
+                if (optionsObj?.type === 'ObjectExpression') {
+                  for (const optProp of optionsObj.properties || []) {
+                    if (optProp.type !== 'Property') continue;
+                    const optBranches = extractClassBranchesFromExpr(optProp.value, {
+                      ...childOpts,
+                      rootNode: optProp.value,
+                    });
+                    for (const combined of combineBranches(baseBranches, optBranches)) {
+                      out.push({ text: combined.text, node: optProp.value });
+                    }
+                  }
+                }
+              }
+            }
+          } else if (propName === 'compoundVariants') {
+            const compoundArr = unwrapTypeExpr(prop.value);
+            if (compoundArr?.type === 'ArrayExpression') {
+              for (const item of compoundArr.elements || []) {
+                const itemObj = unwrapTypeExpr(item);
+                if (itemObj?.type !== 'ObjectExpression') continue;
+                for (const itemProp of itemObj.properties || []) {
+                  if (itemProp.type !== 'Property') continue;
+                  const itemKey = getPropertyKeyName(itemProp.key, itemProp.computed);
+                  if (itemKey === 'class' || itemKey === 'className') {
+                    const cvBranches = extractClassBranchesFromExpr(itemProp.value, {
+                      ...childOpts,
+                      rootNode: itemProp.value,
+                    });
+                    for (const combined of combineBranches(baseBranches, cvBranches)) {
+                      out.push({ text: combined.text, node: itemProp.value });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return out;
+    }
+
+    let acc = [{ text: '', node: reportNode }];
+    for (const arg of expr.arguments || []) {
+      const target = arg.type === 'SpreadElement' ? arg.argument : arg;
+      acc = combineBranches(acc, extractClassBranchesFromExpr(target, childOpts));
+    }
+    return acc;
+  }
+
+  return [{ text: '', node: reportNode }];
 }
 
 function getInlineStyleProperties(attr, targetKeys) {
@@ -587,26 +1029,146 @@ function getInlineStyleProperties(attr, targetKeys) {
   return matches;
 }
 
-function createClassGroupVisitor(onGroups) {
-  return (context) => {
-    const visitedCalls = new WeakSet();
-    return {
-      JSXAttribute(node) {
-        const attrName = node.name?.name;
-        if (attrName !== 'className' && attrName !== 'class') return;
-        const groups = extractClassGroupsFromAttr(node, visitedCalls);
-        if (groups.length > 0) onGroups(context, groups, node);
-      },
-      CallExpression(node) {
-        if (visitedCalls.has(node)) return;
-        const calleeName = getCalleeName(node.callee);
-        if (!CLASS_HELPER_NAMES.has(calleeName)) return;
-        visitedCalls.add(node);
-        const groups = extractClassGroupsFromExpr(node, visitedCalls);
-        if (groups.length > 0) onGroups(context, groups, node);
-      },
-    };
+function mergeVisitors(base, extra) {
+  if (!extra) return base;
+  const merged = { ...base };
+  for (const [key, fn] of Object.entries(extra)) {
+    if (merged[key]) {
+      const prev = merged[key];
+      merged[key] = (node) => {
+        prev(node);
+        fn(node);
+      };
+    } else {
+      merged[key] = fn;
+    }
+  }
+  return merged;
+}
+
+function createClassRuleVisitor(context, { captureContext = null, onCheckExpr, createExtra = null }) {
+  const sourceCode = context.sourceCode ?? context.getSourceCode();
+  const visitorKeys = sourceCode.visitorKeys || {};
+  const scopeStack = [];
+  const visitedCalls = new WeakSet();
+  const deferredHelperCalls = new WeakSet();
+  const pendingChecks = [];
+  const deferredEntries = [];
+
+  const pushScope = () => {
+    scopeStack.push(new Map());
   };
+  const popScope = () => {
+    scopeStack.pop();
+  };
+  const lookupVar = (name, chain, markConsumed = false) => {
+    for (let i = chain.length - 1; i >= 0; i--) {
+      const entry = chain[i].get(name);
+      if (entry) {
+        if (markConsumed) entry.consumed = true;
+        return entry;
+      }
+    }
+    return null;
+  };
+  const lookupCurrentVar = (name) => lookupVar(name, scopeStack, false);
+
+  const baseVisitors = {
+    Program: pushScope,
+    'Program:exit'() {
+      for (const check of pendingChecks) {
+        const resolveVar = (name) => lookupVar(name, check.scopeChain, true);
+        onCheckExpr({
+          expr: check.expr,
+          rootNode: check.rootNode,
+          visitedCalls,
+          resolveVar,
+          snapshot: check.snapshot,
+        });
+      }
+      for (let i = deferredEntries.length - 1; i >= 0; i--) {
+        const entry = deferredEntries[i];
+        if (entry.consumed) continue;
+        entry.consumed = true;
+        const resolveVar = (name) => lookupVar(name, entry.scopeChain, true);
+        onCheckExpr({
+          expr: entry.init,
+          rootNode: entry.init,
+          visitedCalls,
+          resolveVar,
+          snapshot: entry.snapshot,
+        });
+      }
+      popScope();
+    },
+    BlockStatement: pushScope,
+    'BlockStatement:exit': popScope,
+    FunctionDeclaration: pushScope,
+    'FunctionDeclaration:exit': popScope,
+    FunctionExpression: pushScope,
+    'FunctionExpression:exit': popScope,
+    ArrowFunctionExpression: pushScope,
+    'ArrowFunctionExpression:exit': popScope,
+    VariableDeclaration(node) {
+      if (node.kind !== 'const' || scopeStack.length === 0) return;
+      const currentScope = scopeStack[scopeStack.length - 1];
+      for (const decl of node.declarations || []) {
+        if (decl.id?.type !== 'Identifier' || !decl.init) continue;
+        const unwrapped = unwrapTypeExpr(decl.init);
+        if (!isTrackableClassInit(unwrapped)) continue;
+        const isHelperCall =
+          unwrapped?.type === 'CallExpression' && CLASS_HELPER_NAMES.has(getCalleeName(unwrapped.callee));
+        const entry = {
+          name: decl.id.name,
+          init: decl.init,
+          isHelperCall,
+          consumed: false,
+          scopeChain: [...scopeStack],
+          snapshot: captureContext ? captureContext() : null,
+        };
+        currentScope.set(decl.id.name, entry);
+        if (isHelperCall) {
+          markNestedHelperCalls(decl.init, visitorKeys, deferredHelperCalls);
+          deferredEntries.push(entry);
+        }
+      }
+    },
+    JSXAttribute(node) {
+      const attrName = node.name?.name;
+      if (attrName !== 'className' && attrName !== 'class' || !node.value) return;
+      if (node.value.type === 'Literal' && typeof node.value.value === 'string') {
+        pendingChecks.push({
+          expr: node.value,
+          rootNode: node.value,
+          scopeChain: [...scopeStack],
+          snapshot: captureContext ? captureContext() : null,
+        });
+      } else if (node.value.type === 'JSXExpressionContainer' && node.value.expression) {
+        markNestedHelperCalls(node.value.expression, visitorKeys, visitedCalls);
+        pendingChecks.push({
+          expr: node.value.expression,
+          rootNode: node.value.expression,
+          scopeChain: [...scopeStack],
+          snapshot: captureContext ? captureContext() : null,
+        });
+      }
+    },
+    CallExpression(node) {
+      if (visitedCalls.has(node) || deferredHelperCalls.has(node)) return;
+      const calleeName = getCalleeName(node.callee);
+      if (!CLASS_HELPER_NAMES.has(calleeName)) return;
+      markNestedHelperCalls(node, visitorKeys, visitedCalls);
+      pendingChecks.push({
+        expr: node,
+        rootNode: node,
+        scopeChain: [...scopeStack],
+        snapshot: captureContext ? captureContext() : null,
+      });
+    },
+  };
+
+  const extraVisitors = createExtra ? createExtra({ lookupCurrentVar }) : null;
+  return mergeVisitors(baseVisitors, extraVisitors);
 }
 
 function findTripleTintHueInTokens(tokens) {
@@ -650,7 +1212,7 @@ function findTripleTintHueInTokens(tokens) {
   return null;
 }
 
-function isInvertedOpeningElement(openingNode) {
+function isInvertedOpeningElement(openingNode, resolveVar = null) {
   if (!openingNode) return false;
   const attrs = openingNode.attributes || [];
   for (const attr of attrs) {
@@ -660,11 +1222,13 @@ function isInvertedOpeningElement(openingNode) {
       const val = getStaticStringFromAttr(attr);
       if (val === 'inverted' || val === 'spotlight') return true;
     } else if (attrName === 'variant') {
-      if (getStaticStringFromAttr(attr) === 'inverted') return true;
+      const val = getStaticStringFromAttr(attr);
+      if (val === 'inverted' || val === 'spotlight') return true;
     } else if (attrName === 'data-surface' || attrName === 'data-prominence') {
-      if (getStaticStringFromAttr(attr) === 'inverted') return true;
+      const val = getStaticStringFromAttr(attr);
+      if (val === 'inverted' || val === 'spotlight') return true;
     } else if (attrName === 'className' || attrName === 'class') {
-      const groups = extractClassGroupsFromAttr(attr, null);
+      const groups = extractClassGroupsFromAttr(attr, null, resolveVar);
       for (const group of groups) {
         for (const token of splitTailwindTokens(group.text)) {
           if (token.variant === '' && !token.hasOpacity && INVERTED_BG_TOKENS.has(token.base)) {
@@ -768,7 +1332,8 @@ export const plugin = {
           Program: pushScope,
           'Program:exit'() {
             for (const { attr, scopeChain } of onKeyDownEntries) {
-              const expr = attr.value.expression;
+              const expr = unwrapTypeExpr(attr.value.expression);
+              if (!expr) continue;
               if (astChecksReactImeComposing(expr, visitorKeys)) {
                 continue;
               }
@@ -864,8 +1429,21 @@ export const plugin = {
             if (!hasOnClick) return;
 
             const roleAttr = attrs.find((a) => a.type === 'JSXAttribute' && a.name?.name === 'role');
-            const roleVal = getStaticStringFromAttr(roleAttr)?.toLowerCase();
-            const hasInteractiveRole = Boolean(roleAttr) && roleVal !== 'presentation' && roleVal !== 'none';
+            const roleVal = getStaticStringFromAttr(roleAttr)?.trim().toLowerCase();
+            let hasInteractiveRole = false;
+            if (roleAttr) {
+              if (roleVal) {
+                hasInteractiveRole = roleVal.split(/\s+/).some((r) => INTERACTIVE_ARIA_ROLES.has(r));
+              } else if (roleAttr.value?.type === 'JSXExpressionContainer') {
+                const candidates = collectStaticStringsFromExpr(roleAttr.value.expression);
+                hasInteractiveRole =
+                  candidates.length > 0
+                    ? candidates.every((c) =>
+                        c.trim().toLowerCase().split(/\s+/).some((r) => INTERACTIVE_ARIA_ROLES.has(r))
+                      )
+                    : true;
+              }
+            }
 
             const tabIndexAttr = attrs.find((a) => a.type === 'JSXAttribute' && a.name?.name === 'tabIndex');
             let hasValidTabIndex = false;
@@ -926,6 +1504,18 @@ export const plugin = {
             }
           },
           'JSXElement:exit'() {
+            if (renderElementDepthStack.length > 0) {
+              const topIdx = renderElementDepthStack.length - 1;
+              renderElementDepthStack[topIdx] = Math.max(0, renderElementDepthStack[topIdx] - 1);
+            }
+          },
+          JSXFragment() {
+            if (renderElementDepthStack.length > 0) {
+              const topIdx = renderElementDepthStack.length - 1;
+              renderElementDepthStack[topIdx] += 1;
+            }
+          },
+          'JSXFragment:exit'() {
             if (renderElementDepthStack.length > 0) {
               const topIdx = renderElementDepthStack.length - 1;
               renderElementDepthStack[topIdx] = Math.max(0, renderElementDepthStack[topIdx] - 1);
@@ -1096,76 +1686,87 @@ export const plugin = {
         },
         schema: [],
       },
-      create: createClassGroupVisitor((context, groups) => {
-        for (const group of groups) {
-          const hue = findTripleTintHueInTokens(splitTailwindTokens(group.text));
-          if (hue) {
-            context.report({
-              node: group.node,
-              message: `Triple-tint monochrome pattern ("bg-${hue}*", "border-${hue}*", and "text-${hue}*" share one hue). Use Filled, Outline + neutral surface, or Soft Wash (*-container + on-*-container + border-transparent).`,
-            });
-          }
-        }
-      }),
+      create(context) {
+        return createClassRuleVisitor(context, {
+          onCheckExpr({ expr, rootNode, visitedCalls, resolveVar }) {
+            const branches = extractClassBranchesFromExpr(expr, { visitedCalls, resolveVar, rootNode });
+            const reportedNodes = new WeakSet();
+            for (const branch of branches) {
+              if (!branch.text || reportedNodes.has(branch.node)) continue;
+              const hue = findTripleTintHueInTokens(splitTailwindTokens(branch.text));
+              if (hue) {
+                reportedNodes.add(branch.node);
+                context.report({
+                  node: branch.node,
+                  message: `Triple-tint monochrome pattern ("bg-${hue}*", "border-${hue}*", and "text-${hue}*" share one hue). Use Filled, Outline + neutral surface, or Soft Wash (*-container + on-*-container + border-transparent).`,
+                });
+              }
+            }
+          },
+        });
+      },
     },
     'no-light-surface-tertiary': {
       meta: {
         type: 'problem',
         docs: {
           description:
-            'Disallow Sunny Amber text-tertiary and border-tertiary on light surfaces (fails WCAG AA 1.99:1 contrast).',
+            'Disallow Sunny Amber text-tertiary, border-*-tertiary, ring-tertiary, and outline-tertiary on light surfaces (fails WCAG AA 1.99:1 contrast).',
         },
         schema: [],
       },
       create(context) {
         let invertedDepth = 0;
         const invertedStack = [];
-        const visitedCalls = new WeakSet();
         const message =
-          'Sunny Amber (`text-tertiary` / `border-tertiary`) is banned on light surfaces (fails WCAG AA 1.99:1). Use `tertiary` only for solid fills with neutral text, `*-container` washes, or inside inverted dark surfaces (`inverted:text-tertiary`).';
+          'Sunny Amber (`text-tertiary` / `border-*-tertiary` / `ring-tertiary` / `outline-tertiary`) is banned on light surfaces (fails WCAG AA 1.99:1). Use `tertiary` only for solid fills with neutral text, `*-container` washes, or inside inverted dark surfaces (`inverted:text-tertiary`).';
 
-        const checkGroups = (groups) => {
-          if (invertedDepth > 0) return;
-          for (const group of groups) {
-            const tokens = splitTailwindTokens(group.text);
-            const hasSolidBgTertiaryForVariant = (variant) =>
-              tokens.some((t) => t.variant === variant && t.base === 'bg-tertiary' && !t.hasOpacity);
+        return createClassRuleVisitor(context, {
+          captureContext: () => ({ inverted: invertedDepth > 0 }),
+          onCheckExpr({ expr, rootNode, visitedCalls, resolveVar, snapshot }) {
+            const branches = extractClassBranchesFromExpr(expr, {
+              visitedCalls,
+              resolveVar,
+              rootNode,
+              skipInvertedBranches: true,
+            });
+            if (snapshot?.inverted) return;
+            const reportedNodes = new WeakSet();
 
-            for (const token of tokens) {
-              if (token.base !== 'text-tertiary' && token.base !== 'border-tertiary') continue;
-              if (hasInvertedVariantPrefix(token.variant)) continue;
-              if (token.base === 'border-tertiary' && !token.hasOpacity && hasSolidBgTertiaryForVariant(token.variant)) {
-                continue;
+            for (const branch of branches) {
+              if (!branch.text || reportedNodes.has(branch.node)) continue;
+              const tokens = splitTailwindTokens(branch.text);
+              const hasSolidBgTertiaryForVariant = (variant) =>
+                tokens.some((t) => t.variant === variant && t.base === 'bg-tertiary' && !t.hasOpacity);
+
+              for (const token of tokens) {
+                if (!LIGHT_SURFACE_TERTIARY_UTILITIES.has(token.base)) continue;
+                if (hasInvertedVariantPrefix(token.variant)) continue;
+                const isBorderTertiary =
+                  token.base === 'border-tertiary' ||
+                  (token.base.startsWith('border-') && token.base.endsWith('-tertiary'));
+                if (isBorderTertiary && !token.hasOpacity && hasSolidBgTertiaryForVariant(token.variant)) {
+                  continue;
+                }
+                reportedNodes.add(branch.node);
+                context.report({ node: branch.node, message });
+                break;
               }
-              context.report({ node: group.node, message });
-              break;
-            }
-          }
-        };
-
-        return {
-          JSXElement(node) {
-            const isInverted = isInvertedOpeningElement(node.openingElement);
-            invertedStack.push(isInverted);
-            if (isInverted) invertedDepth += 1;
-          },
-          'JSXElement:exit'() {
-            if (invertedStack.pop()) {
-              invertedDepth = Math.max(0, invertedDepth - 1);
             }
           },
-          JSXAttribute(node) {
-            const attrName = node.name?.name;
-            if (attrName !== 'className' && attrName !== 'class') return;
-            checkGroups(extractClassGroupsFromAttr(node, visitedCalls));
-          },
-          CallExpression(node) {
-            if (visitedCalls.has(node)) return;
-            if (!CLASS_HELPER_NAMES.has(getCalleeName(node.callee))) return;
-            visitedCalls.add(node);
-            checkGroups(extractClassGroupsFromExpr(node, visitedCalls));
-          },
-        };
+          createExtra: ({ lookupCurrentVar }) => ({
+            JSXElement(node) {
+              const isInverted = isInvertedOpeningElement(node.openingElement, lookupCurrentVar);
+              invertedStack.push(isInverted);
+              if (isInverted) invertedDepth += 1;
+            },
+            'JSXElement:exit'() {
+              if (invertedStack.pop()) {
+                invertedDepth = Math.max(0, invertedDepth - 1);
+              }
+            },
+          }),
+        });
       },
     },
     'no-transition-all': {
@@ -1177,40 +1778,31 @@ export const plugin = {
         schema: [],
       },
       create(context) {
-        const visitedCalls = new WeakSet();
         const styleKeys = new Set(['transition', 'transitionProperty']);
         const message =
           'Blanket `transition-all` is banned per DESIGN.md Motion Law. Declare explicit targeted properties (e.g. `transition-[box-shadow,border-color,background-color,transform]`).';
 
-        const checkGroups = (groups) => {
-          for (const group of groups) {
-            const tokens = splitTailwindTokens(group.text);
-            if (tokens.some((t) => t.base === 'transition-all')) {
-              context.report({ node: group.node, message });
+        return createClassRuleVisitor(context, {
+          onCheckExpr({ expr, visitedCalls, resolveVar }) {
+            const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
+            for (const group of groups) {
+              const tokens = splitTailwindTokens(group.text);
+              if (tokens.some((t) => t.base === 'transition-all')) {
+                context.report({ node: group.node, message });
+              }
             }
-          }
-        };
-
-        return {
-          JSXAttribute(node) {
-            const attrName = node.name?.name;
-            if (attrName === 'className' || attrName === 'class') {
-              checkGroups(extractClassGroupsFromAttr(node, visitedCalls));
-            } else if (attrName === 'style') {
+          },
+          createExtra: () => ({
+            JSXAttribute(node) {
+              if (node.name?.name !== 'style') return;
               for (const prop of getInlineStyleProperties(node, styleKeys)) {
                 if (/\ball\b/i.test(prop.value)) {
                   context.report({ node: prop.node, message });
                 }
               }
-            }
-          },
-          CallExpression(node) {
-            if (visitedCalls.has(node)) return;
-            if (!CLASS_HELPER_NAMES.has(getCalleeName(node.callee))) return;
-            visitedCalls.add(node);
-            checkGroups(extractClassGroupsFromExpr(node, visitedCalls));
-          },
-        };
+            },
+          }),
+        });
       },
     },
     'no-spring-easing': {
@@ -1225,7 +1817,6 @@ export const plugin = {
         const baseFile = path.basename(getFilename(context));
         if (CELEBRATORY_NAME_RE.test(baseFile)) return {};
 
-        const visitedCalls = new WeakSet();
         const fnNameStack = [];
         const styleKeys = new Set([
           'transition',
@@ -1238,57 +1829,50 @@ export const plugin = {
 
         const isInsideCelebratoryComponent = () => fnNameStack.some((n) => CELEBRATORY_NAME_RE.test(n));
 
-        const checkGroups = (groups) => {
-          if (isInsideCelebratoryComponent()) return;
-          for (const group of groups) {
-            const tokens = splitTailwindTokens(group.text);
-            const hasViolation = tokens.some(
-              (t) => SPRING_EASING_CLASS_RE.test(t.base) || SPRING_EASING_VAR_RE.test(t.raw)
-            );
-            if (hasViolation) {
-              context.report({ node: group.node, message });
-            }
-          }
-        };
-
-        return {
-          FunctionDeclaration(node) {
-            fnNameStack.push(node.id?.name || '');
-          },
-          'FunctionDeclaration:exit'() {
-            fnNameStack.pop();
-          },
-          VariableDeclarator(node) {
-            const fnNode = getFunctionExpressionFromInit(node.init);
-            if (fnNode && node.id?.type === 'Identifier') {
-              fnNameStack.push(node.id.name);
+        return createClassRuleVisitor(context, {
+          captureContext: () => ({ celebratory: isInsideCelebratoryComponent() }),
+          onCheckExpr({ expr, visitedCalls, resolveVar, snapshot }) {
+            const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
+            if (snapshot?.celebratory) return;
+            for (const group of groups) {
+              const tokens = splitTailwindTokens(group.text);
+              const hasViolation = tokens.some(
+                (t) => SPRING_EASING_CLASS_RE.test(t.base) || SPRING_EASING_VAR_RE.test(t.raw)
+              );
+              if (hasViolation) {
+                context.report({ node: group.node, message });
+              }
             }
           },
-          'VariableDeclarator:exit'(node) {
-            const fnNode = getFunctionExpressionFromInit(node.init);
-            if (fnNode && node.id?.type === 'Identifier') {
+          createExtra: () => ({
+            FunctionDeclaration(node) {
+              fnNameStack.push(node.id?.name || '');
+            },
+            'FunctionDeclaration:exit'() {
               fnNameStack.pop();
-            }
-          },
-          JSXAttribute(node) {
-            const attrName = node.name?.name;
-            if (attrName === 'className' || attrName === 'class') {
-              checkGroups(extractClassGroupsFromAttr(node, visitedCalls));
-            } else if (attrName === 'style' && !isInsideCelebratoryComponent()) {
+            },
+            VariableDeclarator(node) {
+              const fnNode = getFunctionExpressionFromInit(node.init);
+              if (fnNode && node.id?.type === 'Identifier') {
+                fnNameStack.push(node.id.name);
+              }
+            },
+            'VariableDeclarator:exit'(node) {
+              const fnNode = getFunctionExpressionFromInit(node.init);
+              if (fnNode && node.id?.type === 'Identifier') {
+                fnNameStack.pop();
+              }
+            },
+            JSXAttribute(node) {
+              if (node.name?.name !== 'style' || isInsideCelebratoryComponent()) return;
               for (const prop of getInlineStyleProperties(node, styleKeys)) {
                 if (SPRING_EASING_VAR_RE.test(prop.value)) {
                   context.report({ node: prop.node, message });
                 }
               }
-            }
-          },
-          CallExpression(node) {
-            if (visitedCalls.has(node)) return;
-            if (!CLASS_HELPER_NAMES.has(getCalleeName(node.callee))) return;
-            visitedCalls.add(node);
-            checkGroups(extractClassGroupsFromExpr(node, visitedCalls));
-          },
-        };
+            },
+          }),
+        });
       },
     },
     'no-uppercase': {
@@ -1300,40 +1884,31 @@ export const plugin = {
         schema: [],
       },
       create(context) {
-        const visitedCalls = new WeakSet();
         const styleKeys = new Set(['textTransform']);
         const message =
           'All-caps `uppercase` styling is banned per DESIGN.md. Use sentence case on labels, badges, buttons, and headers.';
 
-        const checkGroups = (groups) => {
-          for (const group of groups) {
-            const tokens = splitTailwindTokens(group.text);
-            if (tokens.some((t) => t.base === 'uppercase')) {
-              context.report({ node: group.node, message });
+        return createClassRuleVisitor(context, {
+          onCheckExpr({ expr, visitedCalls, resolveVar }) {
+            const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
+            for (const group of groups) {
+              const tokens = splitTailwindTokens(group.text);
+              if (tokens.some((t) => t.base === 'uppercase')) {
+                context.report({ node: group.node, message });
+              }
             }
-          }
-        };
-
-        return {
-          JSXAttribute(node) {
-            const attrName = node.name?.name;
-            if (attrName === 'className' || attrName === 'class') {
-              checkGroups(extractClassGroupsFromAttr(node, visitedCalls));
-            } else if (attrName === 'style') {
+          },
+          createExtra: () => ({
+            JSXAttribute(node) {
+              if (node.name?.name !== 'style') return;
               for (const prop of getInlineStyleProperties(node, styleKeys)) {
                 if (prop.value.trim().toLowerCase() === 'uppercase') {
                   context.report({ node: prop.node, message });
                 }
               }
-            }
-          },
-          CallExpression(node) {
-            if (visitedCalls.has(node)) return;
-            if (!CLASS_HELPER_NAMES.has(getCalleeName(node.callee))) return;
-            visitedCalls.add(node);
-            checkGroups(extractClassGroupsFromExpr(node, visitedCalls));
-          },
-        };
+            },
+          }),
+        });
       },
     },
     'no-unsafe-type-cast': {

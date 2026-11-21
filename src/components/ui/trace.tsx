@@ -23,7 +23,7 @@ import { Icon } from './icon';
 import { Button } from './button';
 import { ShimmerText } from './shimmer-text';
 import { useChatMessageContext } from './chat-message-context';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type TraceStatus =
   | 'default'
@@ -150,7 +150,7 @@ export const TraceLine = React.forwardRef<HTMLDivElement, TraceLineProps>(
           className={cn(
             'flex items-center gap-2.5 px-3.5 py-2.5 min-h-[44px] text-xs font-sans text-on-surface transition-colors w-full',
             '[[data-slot=trace-collapsible-trigger]_&]:px-0 [[data-slot=trace-collapsible-trigger]_&]:py-0 [[data-slot=trace-collapsible-trigger]_&]:min-h-0',
-            status === 'pending' && 'opacity-70 text-on-surface-variant',
+            status === 'pending' && 'text-on-surface-variant',
             status === 'error' && 'text-error',
             className
           )}
@@ -229,8 +229,8 @@ export const TraceIcon = React.forwardRef<HTMLSpanElement, TraceIconProps>(
                 resolvedStatus === 'running' && 'text-on-surface-variant',
                 resolvedStatus === 'warning' && 'text-warning',
                 resolvedStatus === 'error' && 'text-error',
-                resolvedStatus === 'pending' && 'text-outline/70',
-                resolvedStatus === 'cancelled' && 'text-on-surface-variant/70',
+                resolvedStatus === 'pending' && 'text-on-surface-variant',
+                resolvedStatus === 'cancelled' && 'text-on-surface-variant',
                 resolvedStatus === 'default' && 'text-on-surface-variant'
               ),
           className
@@ -298,7 +298,7 @@ export const TraceBadge = React.forwardRef<HTMLSpanElement, TraceBadgeProps>(
           resolvedStatus === 'warning' && 'bg-warning-container text-on-warning-container',
           resolvedStatus === 'error' && 'bg-error-container text-on-error-container',
           resolvedStatus === 'pending' && 'bg-surface-container text-on-surface-variant/90 border border-outline/40',
-          resolvedStatus === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 line-through',
+          resolvedStatus === 'cancelled' && 'bg-surface-container text-on-surface-variant line-through',
           resolvedStatus === 'default' && 'bg-surface-container text-on-surface-variant',
           className
         )}
@@ -397,7 +397,6 @@ TraceDescription.displayName = 'Trace.Description';
 export interface TraceCollapsibleProps
   extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Root> {
   children?: React.ReactNode;
-  className?: string;
 }
 
 export const TraceCollapsible = React.forwardRef<HTMLDivElement, TraceCollapsibleProps>(
@@ -410,7 +409,7 @@ export const TraceCollapsible = React.forwardRef<HTMLDivElement, TraceCollapsibl
         onOpenChange={onOpenChange}
         disabled={disabled}
         data-slot="trace-collapsible"
-        className={cn('group/trace-item w-full', className)}
+        className={composeClassName('group/trace-item w-full', className)}
         {...props}
       >
         {children}
@@ -423,7 +422,6 @@ TraceCollapsible.displayName = 'Trace.Collapsible';
 export interface TraceCollapsibleTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Trigger> {
   children: React.ReactNode;
-  className?: string;
   hideChevron?: boolean;
 }
 
@@ -435,11 +433,13 @@ export const TraceCollapsibleTrigger = React.forwardRef<
     <BaseCollapsible.Trigger
       ref={ref}
       data-slot="trace-collapsible-trigger"
-      className={cn(
-        'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start',
-        'hover:bg-surface-container/40 transition-colors',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-        'disabled:cursor-not-allowed disabled:opacity-60',
+      className={composeClassName(
+        cn(
+          'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start',
+          'hover:bg-surface-container/40 transition-colors',
+          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'disabled:cursor-not-allowed disabled:opacity-60'
+        ),
         className
       )}
       {...props}
@@ -447,7 +447,7 @@ export const TraceCollapsibleTrigger = React.forwardRef<
       <div className="flex-1 min-w-0 flex items-center gap-2.5">{children}</div>
       {!hideChevron && (
         <span
-          className="flex items-center justify-center size-5 ms-2 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 group-data-[open]:rotate-180 group-data-[state=open]:rotate-180 transition-transform duration-quick ease-standard motion-reduce:transition-none"
+          className="flex items-center justify-center size-5 ms-2 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none"
           aria-hidden="true"
         >
           <Icon name="expand_more" size="xs" className="inline-flex items-center justify-center" />
@@ -461,7 +461,6 @@ TraceCollapsibleTrigger.displayName = 'Trace.CollapsibleTrigger';
 export interface TraceCollapsibleContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseCollapsible.Panel> {
   children?: React.ReactNode;
-  className?: string;
   unstyled?: boolean;
   variant?: 'default' | 'flush' | 'unboxed';
 }
@@ -478,7 +477,10 @@ export const TraceCollapsibleContent = React.forwardRef<
       <BaseCollapsible.Panel
         ref={ref}
         data-slot="trace-collapsible-content"
-        className="overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-quick ease-standard motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden"
+        className={composeClassName(
+          "overflow-hidden h-[var(--collapsible-panel-height)] transition-[height] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:h-0 data-[ending-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
+          typeof className === 'function' ? className : undefined
+        )}
         {...props}
       >
         <div
@@ -490,7 +492,7 @@ export const TraceCollapsibleContent = React.forwardRef<
               : isUnboxed
               ? 'p-0 text-sm font-sans text-on-surface-variant leading-relaxed'
               : 'px-3.5 py-2.5 border-t border-outline-variant/30 text-sm font-sans text-on-surface-variant leading-relaxed',
-            className
+            typeof className === 'string' ? className : undefined
           )}
         >
           {children}

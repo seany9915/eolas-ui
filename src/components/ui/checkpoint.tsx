@@ -21,19 +21,60 @@ import { Badge } from './badge';
 import { Separator } from './separator';
 import { cn } from '@/lib/utils';
 
+export type CheckpointVariant = 'default' | 'separator' | 'border';
+export type MarkerVariant = CheckpointVariant;
+
 export interface CheckpointRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: CheckpointVariant;
   children?: React.ReactNode;
   className?: string;
 }
 
 const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ variant = 'separator', children, className, role, ...props }, ref) => {
+    if (variant === 'default') {
+      return (
+        <div
+          ref={ref}
+          role={role}
+          data-slot="marker"
+          data-variant="default"
+          className={cn(
+            'flex items-center justify-center gap-2 w-full py-2 px-3 text-xs text-on-surface-variant select-none',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    if (variant === 'border') {
+      return (
+        <div
+          ref={ref}
+          role={role}
+          data-slot="marker"
+          data-variant="border"
+          className={cn(
+            'flex items-center gap-2 w-full py-2.5 px-3 border-b border-outline-variant/60 text-xs text-on-surface-variant select-none',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+
     return (
       <div
         ref={ref}
-        role="region"
-        aria-label="Conversation checkpoint"
+        role={role ?? 'region'}
+        aria-label={props['aria-label'] ?? 'Conversation checkpoint'}
         data-slot="checkpoint-root"
+        data-variant="separator"
         className={cn(
           'relative flex items-center justify-center w-full py-4 my-2 select-none',
           className
@@ -52,21 +93,24 @@ CheckpointRoot.displayName = 'Checkpoint.Root';
 
 export interface CheckpointIconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name?: string;
+  children?: React.ReactNode;
   className?: string;
 }
 
 const CheckpointIcon: React.FC<CheckpointIconProps> = ({
   name = 'bookmark',
+  children,
   className,
   ...props
 }) => {
   return (
     <span
-      className={cn('flex items-center justify-center text-primary shrink-0', className)}
+      data-slot="marker-icon"
+      className={cn('flex items-center justify-center text-primary shrink-0 [&>svg]:size-3.5', className)}
       aria-hidden="true"
       {...props}
     >
-      <Icon name={name} size="xs" />
+      {children ?? <Icon name={name} size="xs" />}
     </span>
   );
 };
@@ -84,6 +128,7 @@ const CheckpointTitle: React.FC<CheckpointTitleProps> = ({
 }) => {
   return (
     <span
+      data-slot="marker-content"
       className={cn('font-sans font-medium text-xs text-on-surface whitespace-nowrap', className)}
       {...props}
     >
@@ -188,13 +233,14 @@ CheckpointTrigger.displayName = 'Checkpoint.Trigger';
 /* -------------------------------------------------------------------------------------------------
  * Full Checkpoint Composition Component
  * -----------------------------------------------------------------------------------------------*/
-export interface CheckpointProps {
+export interface CheckpointProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: string;
   turn?: number;
   timestamp?: number | string;
   onRestore?: () => void;
   restoreLabel?: string;
   tag?: string;
+  variant?: CheckpointVariant;
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -209,6 +255,7 @@ const CheckpointComponent = React.forwardRef<HTMLDivElement, CheckpointProps>(
       onRestore,
       restoreLabel = 'Restore',
       tag,
+      variant = 'separator',
       disabled = false,
       className,
       children,
@@ -220,7 +267,7 @@ const CheckpointComponent = React.forwardRef<HTMLDivElement, CheckpointProps>(
     const displayLabel = label || defaultLabel;
 
     return (
-      <CheckpointRoot ref={ref} className={className} {...props}>
+      <CheckpointRoot ref={ref} variant={variant} className={className} {...props}>
         {children ? (
           children
         ) : (
@@ -252,6 +299,26 @@ const CheckpointComponent = React.forwardRef<HTMLDivElement, CheckpointProps>(
 CheckpointComponent.displayName = 'Checkpoint';
 
 /* -------------------------------------------------------------------------------------------------
+ * Marker (shadcn AI Elements Marker primitive, defaulting to plain row)
+ * -----------------------------------------------------------------------------------------------*/
+export interface MarkerProps extends CheckpointRootProps {}
+
+const MarkerRoot = React.forwardRef<HTMLDivElement, MarkerProps>(
+  ({ variant = 'default', ...props }, ref) => {
+    return <CheckpointRoot ref={ref} variant={variant} {...props} />;
+  }
+);
+MarkerRoot.displayName = 'Marker';
+
+const Marker = Object.assign(MarkerRoot, {
+  Icon: CheckpointIcon,
+  Content: CheckpointTitle,
+  Button: CheckpointTrigger,
+  Timestamp: CheckpointTimestamp,
+  Separator,
+});
+
+/* -------------------------------------------------------------------------------------------------
  * Compound Export
  * -----------------------------------------------------------------------------------------------*/
 export const Checkpoint = Object.assign(CheckpointComponent, {
@@ -276,7 +343,7 @@ export {
   CheckpointTrigger,
   Separator as CheckpointSeparator,
   // shadcn AI Elements direct aliases
-  CheckpointRoot as Marker,
+  Marker,
   CheckpointTitle as MarkerContent,
   CheckpointTrigger as MarkerButton,
   CheckpointIcon as MarkerIcon,

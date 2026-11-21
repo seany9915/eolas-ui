@@ -1,0 +1,201 @@
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+const ROOT = process.cwd();
+const CLI_PATH = path.resolve(ROOT, 'packages/eolas-ui/bin/eolas-ui.js');
+const CLI_PKG = JSON.parse(fs.readFileSync(path.resolve(ROOT, 'packages/eolas-ui/package.json'), 'utf8'));
+
+function runCli(args, cwd) {
+  return spawnSync(process.execPath, [CLI_PATH, ...args], {
+    cwd,
+    encoding: 'utf8',
+    env: process.env,
+  });
+}
+
+function withTempWorkspace(fn) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'eolas-ui-cli-test-'));
+  try {
+    fn(dir);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+function writeJson(filePath, data) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+}
+
+function listFilesRecursive(dir, base = dir) {
+  if (!fs.existsSync(dir)) return [];
+  const results = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const abs = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...listFilesRecursive(abs, base));
+    } else {
+      results.push(path.relative(base, abs).replace(/\\/g, '/'));
+    }
+  }
+  return results.sort();
+}
+
+const tests = [];
+function test(name, fn) {
+  tests.push({ name, fn });
+}
+
+test('1. --version and -v print package version and exit 0', () => {
+  withTempWorkspace((dir) => {
+    for (const flag of ['--version', '-v']) {
+      const res = runCli([flag], dir);
+      assert.equal(res.status, 0, `${flag} failed: ${res.stderr}`);
+      assert.equal(res.stdout.trim(), CLI_PKG.version);
+    }
+  });
+});
+
+test('2. Vite tsconfig.json references resolve @ui and ~/* into src/...', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    writeJson(path.join(dir, 'tsconfig.json'), {
+      files: [],
+      references: [{ path: './tsconfig.app.json' }],
+    });
+    writeJson(path.join(dir, 'tsconfig.app.json'), {
+      compilerOptions: {
+        paths: {
+          '@ui/*': ['./src/components/ui/*'],
+          '~/*': ['./src/*'],
+        },
+      },
+    });
+    writeJson(path.join(dir, 'components.json'), {
+      aliases: {
+        components: '~/components',
+        ui: '@ui',
+        lib: '~/lib',
+        utils: '~/lib/utils',
+      },
+    });
+
+    const res = runCli(['add', 'button'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.equal(fs.existsSync(path.join(dir, 'src/components/ui/button.tsx')), true, 'button.tsx should be written under src/components/ui/');
+    assert.equal(fs.existsSync(path.join(dir, 'src/lib/utils.ts')), true, 'utils.ts should be written under src/lib/');
+    assert.equal(fs.existsSync(path.join(dir, '@ui')), false, 'must NOT create literal @ui/ directory at root');
+  });
+});
+
+test('3. tsconfig.json baseUrl "./src" + "@/*": ["./*"] writes into src/components/ui/button.tsx and src/lib/utils.ts', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    writeJson(path.join(dir, 'tsconfig.json'), {
+      compilerOptions: {
+        baseUrl: './src',
+        paths: {
+          '@/*': ['./*'],
+        },
+      },
+    });
+    writeJson(path.join(dir, 'components.json'), {
+      aliases: {
+        components: '@/components',
+        ui: '@/components/ui',
+        lib: '@/lib',
+        utils: '@/lib/utils',
+      },
+    });
+
+    const res = runCli(['add', 'button'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.equal(fs.existsSync(path.join(dir, 'src/components/ui/button.tsx')), true);
+    assert.equal(fs.existsSync(path.join(dir, 'src/lib/utils.ts')), true);
+    assert.equal(fs.existsSync(path.join(dir, 'components/ui/button.tsx')), false, 'must NOT write outside src/');
+  });
+});
+
+test('4. eolas-ui add @eolas/button normalizes namespace and succeeds', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    const res = runCli(['add', '@eolas/button'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.equal(fs.existsSync(path.join(dir, 'src/components/ui/button.tsx')), true);
+    assert.equal(fs.existsSync(path.join(dir, 'src/lib/utils.ts')), true);
+  });
+});
+
+test('5. eolas-ui add button does-not-exist exits non-zero and writes 0 files', () => {
+  withTempWorkspace((dir) => {
+    const res = runCli(['add', 'button', 'does-not-exist'], dir);
+    assert.notEqual(res.status, 0, 'Expected non-zero exit code for invalid item');
+    const files = listFilesRecursive(dir);
+    assert.deepEqual(files, [], `Expected 0 files written on failed pre-validation, found: ${files.join(', ')}`);
+  });
+});
+
+test('6. eolas-ui sync in empty workspace exits 0 and writes 0 files', () => {
+  withTempWorkspace((dir) => {
+    const res = runCli(['sync'], dir);
+    assert.equal(res.status, 0, `Expected exit 0, got ${res.status}: ${res.stderr}`);
+    assert.match(res.stdout, /No installed Eolas UI items detected/i);
+    const files = listFilesRecursive(dir);
+    assert.deepEqual(files, [], `Expected 0 files written when nothing installed, found: ${files.join(', ')}`);
+  });
+});
+
+test('7. eolas-ui sync --dry-run detects and plans updates for button, theme, lint, and agent-rules', () => {
+  withTempWorkspace((dir) => {
+    writeJson(path.join(dir, 'components.json'), {
+      tailwind: { css: 'src/eolas-theme.css' },
+      aliases: {
+        components: '@/components',
+        ui: '@/components/ui',
+        lib: '@/lib',
+        utils: '@/lib/utils',
+      },
+    });
+    fs.mkdirSync(path.join(dir, 'src/components/ui'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src/components/ui/button.tsx'), '// existing button\n', 'utf8');
+    fs.writeFileSync(
+      path.join(dir, 'src/eolas-theme.css'),
+      ':root { --surface-container-low: #f7f9fa; }\n',
+      'utf8'
+    );
+    fs.mkdirSync(path.join(dir, 'lint'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'lint/index.mjs'), '// existing lint plugin\n', 'utf8');
+    fs.mkdirSync(path.join(dir, '.agents/rules'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.agents/rules/00-core-contract.md'), '# Core Contract\n', 'utf8');
+
+    const res = runCli(['sync', '--dry-run'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.match(res.stdout, /4 installed Eolas UI item\(s\)/);
+    assert.match(res.stdout, /src\/components\/ui\/button\.tsx/);
+    assert.match(res.stdout, /src\/eolas-theme\.css/);
+    assert.match(res.stdout, /lint\/index\.mjs/);
+    assert.match(res.stdout, /\.agents\/rules\/00-core-contract\.md/);
+  });
+});
+
+console.log('=== Running Eolas UI CLI Test Suite ===\n');
+let passed = 0;
+for (const t of tests) {
+  try {
+    t.fn();
+    console.log(`  PASS  ${t.name}`);
+    passed += 1;
+  } catch (err) {
+    console.error(`  FAIL  ${t.name}`);
+    console.error(`        ${err instanceof Error ? err.message : String(err)}`);
+    process.exitCode = 1;
+  }
+}
+
+console.log(`\n${passed}/${tests.length} CLI tests passed.`);
+if (passed !== tests.length) {
+  process.exit(1);
+}

@@ -23,7 +23,7 @@
 import * as React from 'react';
 import { Input as BaseInput } from '@base-ui/react/input';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type InputSize = 'sm' | 'md' | 'lg';
 
@@ -145,22 +145,24 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
             hasTrailing ? (showClear || trailingAction ? 'pe-14' : 'pe-12') : 'pe-4'
           );
 
-    const inputClasses = cn(
-      // Concentric radius & Base styling conforming to DESIGN.md
-      'w-full rounded-lg bg-surface text-on-surface font-sans transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
-      sizeClasses,
-      paddingClasses,
-      // 1px outline border with flush 2px focus ring and negative 1px offset (DESIGN.md line 379)
-      'border border-outline hover:border-on-surface-variant/80',
-      'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-      '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:appearance-none',
-      'placeholder:text-on-surface-variant/80',
-      'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-      'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
-      'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
-      'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error',
-      'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
-      Boolean(error) && 'border-error focus-visible:border-error focus-visible:outline-error',
+    const inputClasses = composeClassName(
+      cn(
+        // Concentric radius & Base styling conforming to DESIGN.md (rounded = 0.5rem / 8px)
+        'w-full rounded bg-surface text-on-surface font-sans transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none',
+        sizeClasses,
+        paddingClasses,
+        // 1px outline border with flush 2px focus ring and negative 1px offset (DESIGN.md line 379)
+        'border border-outline hover:border-on-surface-variant/80',
+        'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+        '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:appearance-none',
+        'placeholder:text-on-surface-variant/80',
+        'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
+        'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error',
+        'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',
+        Boolean(error) && 'border-error focus-visible:border-error focus-visible:outline-error'
+      ),
       className
     );
 

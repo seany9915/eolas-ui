@@ -3,7 +3,10 @@
   "name": "direction-provider",
   "type": "registry:ui",
   "title": "Direction Provider",
-  "description": "Eolas UI Direction Provider component built on Base UI and DESIGN.md design tokens.",
+  "description": "Reading direction (LTR/RTL) context provider synchronizing Base UI layout and keyboard behavior across descendant controls.",
+  "categories": [
+    "system"
+  ],
   "dependencies": [
     "@base-ui/react"
   ],

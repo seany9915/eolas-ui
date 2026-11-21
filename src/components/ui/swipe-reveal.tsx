@@ -25,8 +25,37 @@ export interface SwipeRevealProps extends React.HTMLAttributes<HTMLDivElement> {
   leadingActions?: React.ReactNode;
   /** When true, disables swipe-to-reveal track interaction */
   disabled?: boolean;
+  /** Renders an accessible visible toggle button for non-swipe / keyboard access (WCAG 2.5.1) */
+  showToggle?: boolean;
+  /** Accessible label for the optional toggle button. Defaults to 'Row actions' */
+  toggleLabel?: string;
   /** Optional callback fired when the revealed panel opens or closes */
   onOpenChange?: (open: boolean) => void;
+}
+
+type SwipeRevealOpenSide = 'none' | 'start' | 'end';
+
+interface SwipeRevealContextValue {
+  openSide: SwipeRevealOpenSide;
+  isOpen: boolean;
+}
+
+const SwipeRevealContext = React.createContext<SwipeRevealContextValue>({
+  openSide: 'none',
+  isOpen: false,
+});
+
+const SwipeRevealPanelSideContext = React.createContext<'start' | 'end' | null>(null);
+
+function getPreferredScrollBehavior(): ScrollBehavior {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return 'instant';
+  }
+  return 'smooth';
 }
 
 export const SwipeRevealContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -54,18 +83,25 @@ export interface SwipeRevealPanelProps extends React.HTMLAttributes<HTMLDivEleme
 
 export const SwipeRevealPanel = React.forwardRef<HTMLDivElement, SwipeRevealPanelProps>(
   ({ className, side = 'end', children, ...props }, ref) => {
+    const { openSide } = React.useContext(SwipeRevealContext);
+    const isPanelOpen = openSide === side;
+
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'flex items-stretch shrink-0',
-          side === 'start' ? '[scroll-snap-align:start]' : '[scroll-snap-align:end]',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <SwipeRevealPanelSideContext.Provider value={side}>
+        <div
+          ref={ref}
+          aria-hidden={!isPanelOpen || undefined}
+          data-open={isPanelOpen ? '' : undefined}
+          className={cn(
+            'flex items-stretch shrink-0',
+            side === 'start' ? '[scroll-snap-align:start]' : '[scroll-snap-align:end]',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </SwipeRevealPanelSideContext.Provider>
     );
   }
 );
@@ -77,7 +113,11 @@ export interface SwipeRevealActionProps extends React.ComponentPropsWithoutRef<t
 }
 
 export const SwipeRevealAction = React.forwardRef<HTMLButtonElement, SwipeRevealActionProps>(
-  ({ className, variant = 'surface', children, ...props }, ref) => {
+  ({ className, variant = 'surface', tabIndex, 'aria-hidden': ariaHiddenProp, children, ...props }, ref) => {
+    const { openSide, isOpen } = React.useContext(SwipeRevealContext);
+    const panelSide = React.useContext(SwipeRevealPanelSideContext);
+    const isRevealed = panelSide !== null ? openSide === panelSide : isOpen;
+
     const variantStyles = {
       primary: 'bg-primary text-on-primary hover:bg-primary/90',
       secondary: 'bg-secondary text-on-secondary hover:bg-secondary/90',
@@ -89,6 +129,8 @@ export const SwipeRevealAction = React.forwardRef<HTMLButtonElement, SwipeReveal
       <BaseButton
         ref={ref}
         type="button"
+        tabIndex={tabIndex ?? (isRevealed ? 0 : -1)}
+        aria-hidden={ariaHiddenProp ?? (!isRevealed ? true : undefined)}
         className={cn(
           'min-w-[48px] min-h-[44px] px-4 flex items-center justify-center font-label text-sm font-semibold cursor-pointer select-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors duration-[var(--duration-quick)]',
@@ -113,6 +155,8 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
       actions,
       leadingActions,
       disabled = false,
+      showToggle = false,
+      toggleLabel = 'Row actions',
       onOpenChange,
       ...props
     },
@@ -120,6 +164,47 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
   ) => {
     const scrollerRef = React.useRef<HTMLDivElement>(null);
     const contentRef = React.useRef<HTMLDivElement>(null);
+    const startPanelRef = React.useRef<HTMLDivElement>(null);
+    const endPanelRef = React.useRef<HTMLDivElement>(null);
+    const onOpenChangeRef = React.useRef(onOpenChange);
+    onOpenChangeRef.current = onOpenChange;
+
+    const panelId = React.useId();
+    const [openSide, setOpenSide] = React.useState<SwipeRevealOpenSide>('none');
+    const openSideRef = React.useRef<SwipeRevealOpenSide>('none');
+    const isOpen = openSide !== 'none';
+
+    const hasLeading = Boolean(leadingActions);
+    const hasTrailing = Boolean(actions);
+
+    const scrollToContent = React.useCallback((behavior: ScrollBehavior = getPreferredScrollBehavior()) => {
+      const scroller = scrollerRef.current;
+      const content = contentRef.current;
+      if (!scroller || !content) return;
+      const delta = content.getBoundingClientRect().left - scroller.getBoundingClientRect().left;
+      if (Math.abs(delta) > 0.5) {
+        scroller.scrollBy({ left: delta, behavior });
+      }
+    }, []);
+
+    const scrollToPanel = React.useCallback(
+      (side: 'start' | 'end', behavior: ScrollBehavior = getPreferredScrollBehavior()) => {
+        const scroller = scrollerRef.current;
+        const panel = side === 'start' ? startPanelRef.current : endPanelRef.current;
+        if (!scroller || !panel) return;
+        const scrollerRect = scroller.getBoundingClientRect();
+        const panelRect = panel.getBoundingClientRect();
+        const isRtl = getComputedStyle(scroller).direction === 'rtl';
+        const alignToStartEdge = (side === 'start' && !isRtl) || (side === 'end' && isRtl);
+        const delta = alignToStartEdge
+          ? panelRect.left - scrollerRect.left
+          : panelRect.right - scrollerRect.right;
+        if (Math.abs(delta) > 0.5) {
+          scroller.scrollBy({ left: delta, behavior });
+        }
+      },
+      []
+    );
 
     // Snap content back into view on keyboard focus inside the content pane
     React.useEffect(() => {
@@ -128,12 +213,8 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
 
       const handleFocusIn = (event: FocusEvent) => {
         const target = event.target as HTMLElement | null;
-        const scroller = scrollerRef.current;
-        if (target && target.matches(':focus-visible') && scroller) {
-          scroller.scrollTo({
-            left: content.offsetLeft,
-            behavior: 'smooth',
-          });
+        if (target && target.matches(':focus-visible') && !target.hasAttribute('data-swipe-toggle')) {
+          scrollToContent();
         }
       };
 
@@ -141,33 +222,57 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
       return () => {
         content.removeEventListener('focusin', handleFocusIn);
       };
-    }, [onOpenChange]);
+    }, [scrollToContent]);
 
-    const hasLeading = Boolean(leadingActions);
-    const hasTrailing = Boolean(actions);
-
-    // Report real open/closed state as the user swipes the content away from its resting position
-    const isOpenRef = React.useRef(false);
+    // Report real open/closed state in both LTR and RTL using getBoundingClientRect() deltas
     React.useEffect(() => {
       const scroller = scrollerRef.current;
       const content = contentRef.current;
       if (!scroller || !content) return;
-      const handleScroll = () => {
-        const open = Math.abs(scroller.scrollLeft - content.offsetLeft) > 8;
-        if (open !== isOpenRef.current) {
-          isOpenRef.current = open;
-          onOpenChange?.(open);
+
+      let isRtl = getComputedStyle(scroller).direction === 'rtl';
+
+      const updateOpenSide = () => {
+        const deltaLeft = content.getBoundingClientRect().left - scroller.getBoundingClientRect().left;
+        let nextSide: SwipeRevealOpenSide = 'none';
+        if (deltaLeft > 8) {
+          nextSide = isRtl ? 'end' : 'start';
+        } else if (deltaLeft < -8) {
+          nextSide = isRtl ? 'start' : 'end';
+        }
+
+        if (nextSide !== openSideRef.current) {
+          const prevOpen = openSideRef.current !== 'none';
+          const nextOpen = nextSide !== 'none';
+          openSideRef.current = nextSide;
+          setOpenSide(nextSide);
+          if (prevOpen !== nextOpen) {
+            onOpenChangeRef.current?.(nextOpen);
+          }
         }
       };
-      scroller.addEventListener('scroll', handleScroll, { passive: true });
-      return () => scroller.removeEventListener('scroll', handleScroll);
-    }, [onOpenChange]);
+
+      const handleResize = () => {
+        isRtl = getComputedStyle(scroller).direction === 'rtl';
+        updateOpenSide();
+      };
+
+      scroller.addEventListener('scroll', updateOpenSide, { passive: true });
+      let ro: ResizeObserver | undefined;
+      if (typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver(handleResize);
+        ro.observe(scroller);
+      }
+
+      return () => {
+        scroller.removeEventListener('scroll', updateOpenSide);
+        ro?.disconnect();
+      };
+    }, []);
 
     // Initial mount fallback for browsers without CSS scroll-initial-target: nearest
     React.useEffect(() => {
-      const scroller = scrollerRef.current;
-      const content = contentRef.current;
-      if (!scroller || !content || !hasLeading) return;
+      if (!hasLeading) return;
       if (
         typeof CSS !== 'undefined' &&
         typeof CSS.supports === 'function' &&
@@ -175,8 +280,19 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
       ) {
         return;
       }
-      scroller.scrollTo({ left: content.offsetLeft, behavior: 'instant' });
-    }, [hasLeading]);
+      scrollToContent('instant');
+    }, [hasLeading, scrollToContent]);
+
+    const handleToggleActions = React.useCallback(() => {
+      if (disabled) return;
+      if (openSideRef.current !== 'none') {
+        scrollToContent();
+      } else if (hasTrailing) {
+        scrollToPanel('end');
+      } else if (hasLeading) {
+        scrollToPanel('start');
+      }
+    }, [disabled, hasLeading, hasTrailing, scrollToContent, scrollToPanel]);
 
     const gridColumns = hasLeading && hasTrailing
       ? 'grid-cols-[max-content_100%_max-content]'
@@ -184,38 +300,66 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
         ? 'grid-cols-[max-content_100%]'
         : 'grid-cols-[100%_max-content]';
 
+    const toggleControlsId = hasTrailing ? `${panelId}-end` : `${panelId}-start`;
+    const contextValue = React.useMemo(() => ({ openSide, isOpen }), [openSide, isOpen]);
+
     return (
-      <div
-        ref={(node) => {
-          scrollerRef.current = node;
-          if (typeof ref === 'function') ref(node);
-          else if (ref) ref.current = node;
-        }}
-        className={cn(
-          'relative swipe-reveal-scroller grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-webkit-overflow-scrolling:touch] scroll-smooth',
-          gridColumns,
-          disabled && 'overflow-x-hidden',
-          'rounded-md border border-outline-variant/50 shadow-ambient',
-          className
-        )}
-        {...props}
-      >
-        {leadingActions && (
-          <SwipeRevealPanel side="start">
-            {leadingActions}
-          </SwipeRevealPanel>
-        )}
+      <SwipeRevealContext.Provider value={contextValue}>
+        <div
+          ref={(node) => {
+            scrollerRef.current = node;
+            if (typeof ref === 'function') ref(node);
+            else if (ref) ref.current = node;
+          }}
+          className={cn(
+            'relative swipe-reveal-scroller grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] motion-safe:scroll-smooth',
+            gridColumns,
+            disabled && 'overflow-x-hidden',
+            'rounded-md border border-outline-variant/50 shadow-ambient',
+            className
+          )}
+          {...props}
+        >
+          {leadingActions && (
+            <SwipeRevealPanel ref={startPanelRef} id={`${panelId}-start`} side="start">
+              {leadingActions}
+            </SwipeRevealPanel>
+          )}
 
-        <SwipeRevealContent ref={contentRef}>
-          {children}
-        </SwipeRevealContent>
+          <SwipeRevealContent
+            ref={contentRef}
+            className={cn(showToggle && (hasTrailing || hasLeading) && 'flex items-center justify-between gap-2')}
+          >
+            {showToggle && (hasTrailing || hasLeading) ? (
+              <>
+                <div className="min-w-0 flex-1">{children}</div>
+                <BaseButton
+                  type="button"
+                  data-swipe-toggle=""
+                  disabled={disabled}
+                  aria-expanded={isOpen}
+                  aria-controls={toggleControlsId}
+                  aria-label={toggleLabel}
+                  onClick={handleToggleActions}
+                  className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container cursor-pointer transition-colors duration-[var(--duration-quick)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+                    {isOpen ? 'close' : 'more_vert'}
+                  </span>
+                </BaseButton>
+              </>
+            ) : (
+              children
+            )}
+          </SwipeRevealContent>
 
-        {actions && (
-          <SwipeRevealPanel side="end">
-            {actions}
-          </SwipeRevealPanel>
-        )}
-      </div>
+          {actions && (
+            <SwipeRevealPanel ref={endPanelRef} id={`${panelId}-end`} side="end">
+              {actions}
+            </SwipeRevealPanel>
+          )}
+        </div>
+      </SwipeRevealContext.Provider>
     );
   }
 );

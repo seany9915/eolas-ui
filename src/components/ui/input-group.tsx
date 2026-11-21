@@ -29,7 +29,7 @@ import { useRender } from '@base-ui/react/use-render';
 import { Input as BaseInput } from '@base-ui/react/input';
 import { Button, type ButtonProps, type ButtonVariant, type ButtonColorRole } from './button';
 import { Textarea as BaseTextareaPrimitive } from './textarea';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 // ============================================================================
 // InputGroup Root
@@ -72,8 +72,8 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
     const isGhost = variant === 'ghost' || variant === 'unboxed';
     const isFloating = floating || variant === 'floating';
 
-    // Corner radius: standard form containers use 16px (rounded-lg) per DESIGN.md
-    const roundedClass = isGhost ? 'rounded-none' : 'rounded-lg';
+    // Corner radius: standard form containers use 8px (rounded) per DESIGN.md
+    const roundedClass = isGhost ? 'rounded-none' : 'rounded';
 
     // Height sizing for horizontal single-line input controls (DESIGN.md lines 368-372)
     const sizeMinHeight = {
@@ -149,13 +149,15 @@ export const InputGroupInput = React.forwardRef<HTMLInputElement, InputGroupInpu
         data-slot="input-group-input"
         data-slot-control="true"
         disabled={disabled ?? groupDisabled}
-        className={cn(
-          'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
-          size === 'sm' ? 'text-sm' : 'text-base',
-          '[[data-slot=input-group-addon]+&]:ps-1.5',
-          '[&:has(+[data-slot=input-group-addon])]:pe-1.5',
-          'placeholder:text-on-surface-variant/80',
-          'disabled:cursor-not-allowed disabled:text-on-surface-variant/60',
+        className={composeClassName(
+          cn(
+            'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
+            size === 'sm' ? 'text-sm' : 'text-base',
+            '[[data-slot=input-group-addon]+&]:ps-1.5',
+            '[&:has(+[data-slot=input-group-addon])]:pe-1.5',
+            'placeholder:text-on-surface-variant/80',
+            'disabled:cursor-not-allowed disabled:text-on-surface-variant/60'
+          ),
           className
         )}
         {...props}
@@ -215,7 +217,8 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
       const isImeComposing =
         e.nativeEvent.isComposing ||
         e.keyCode === 229 ||
-        performance.now() - lastCompositionEndRef.current < 50;
+        (lastCompositionEndRef.current > 0 &&
+          performance.now() - lastCompositionEndRef.current < 50);
       if (e.key === 'Enter' && !e.shiftKey && !isImeComposing) {
         e.preventDefault();
         onSubmit();
@@ -281,7 +284,8 @@ export const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, InputGro
       />
     );
   }
-);InputGroupTextarea.displayName = 'InputGroupTextarea';
+);
+InputGroupTextarea.displayName = 'InputGroupTextarea';
 
 // ============================================================================
 // InputGroupAddon
@@ -302,7 +306,7 @@ export interface InputGroupAddonProps extends React.HTMLAttributes<HTMLDivElemen
 }
 
 export const InputGroupAddon = React.forwardRef<HTMLDivElement, InputGroupAddonProps>(
-  ({ className, align = 'inline-start', render, children, ...props }, ref) => {
+  ({ className, align = 'inline-start', render, children, onClick, ...props }, ref) => {
     const alignClasses = cn(
       align === 'inline-start' && 'order-first flex items-center gap-1.5 ps-3 pe-1 text-on-surface-variant select-none shrink-0',
       align === 'inline-end' && 'order-last flex items-center gap-1.5 pe-3 ps-1 ms-auto text-on-surface-variant select-none shrink-0',
@@ -310,14 +314,28 @@ export const InputGroupAddon = React.forwardRef<HTMLDivElement, InputGroupAddonP
       align === 'block-end' && 'order-last flex flex-wrap items-center justify-between gap-2 px-3 pb-2.5 pt-1 mt-auto w-full text-on-surface-variant'
     );
 
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      onClick?.(e);
+      if (e.defaultPrevented) return;
+      if ((e.target as HTMLElement).closest('button, a, [role="button"]')) return;
+      e.currentTarget
+        .closest('[data-slot="input-group"]')
+        ?.querySelector<HTMLInputElement | HTMLTextAreaElement>(
+          'input:not(:disabled), textarea:not(:disabled)'
+        )
+        ?.focus();
+    };
+
     return useRender({
       render,
       ref,
       defaultTagName: 'div',
       props: {
+        role: 'group',
         'data-slot': 'input-group-addon',
         'data-align': align,
         className: cn(alignClasses, className),
+        onClick: handleClick,
         children,
         ...props,
       },
@@ -378,7 +396,7 @@ export const InputGroupButton = React.forwardRef<HTMLButtonElement, InputGroupBu
         size={buttonSize as ButtonProps['size']}
         data-slot="input-group-button"
         expandedTouchTarget
-        className={cn(sizeClasses, className)}
+        className={composeClassName(sizeClasses, className)}
         {...props}
       >
         {children}

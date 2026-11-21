@@ -30,7 +30,7 @@ export type BadgeVariant =
   /** @deprecated Use `'outline'` instead. Kept for backwards compatibility. */
   | 'outlined'
   | 'default' // shadcn alias for filled
-  | 'secondary' // shadcn alias for outline
+  | 'secondary' // shadcn alias for neutral soft
   | 'destructive'; // shadcn alias for error
 
 export type BadgeColorRole =
@@ -84,7 +84,7 @@ const softStyles: Record<BadgeColorRole, string> = {
 };
 
 const sizeStyles: Record<BadgeSize, string> = {
-  sm: 'h-5 px-2 text-[11px] leading-none gap-1 [&>svg]:size-3 [&>[data-icon]]:size-3 [&_.material-symbols-outlined]:!text-[13px] [&_.material-symbols-outlined]:!leading-none',
+  sm: 'h-5 px-2 text-xs leading-none gap-1 [&>svg]:size-3.5 [&>[data-icon]]:size-3.5 [&_.material-symbols-outlined]:!text-[14px] [&_.material-symbols-outlined]:!leading-none',
   md: 'h-6 px-2.5 text-xs leading-none gap-1.5 [&>svg]:size-3.5 [&>[data-icon]]:size-3.5 [&_.material-symbols-outlined]:!text-[15px] [&_.material-symbols-outlined]:!leading-none',
   lg: 'h-7 px-3 text-sm leading-none gap-2 [&>svg]:size-4 [&>[data-icon]]:size-4 [&_.material-symbols-outlined]:!text-[17px] [&_.material-symbols-outlined]:!leading-none',
 };
@@ -103,6 +103,9 @@ export function badgeVariants({
   if (variant === 'destructive') {
     resolvedColorRole = 'error';
     normalizedVariant = 'filled';
+  } else if (variant === 'secondary') {
+    resolvedColorRole = 'neutral';
+    normalizedVariant = 'soft';
   } else if (variant === 'default' || variant === 'filled') {
     normalizedVariant = 'filled';
   } else if (variant === 'soft' || variant === 'tonal') {
@@ -178,7 +181,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
           <span
             data-icon="dot"
             className={cn(
-              'w-1.5 h-1.5 rounded-full shrink-0',
+              'size-1.5 rounded-full shrink-0',
               variant === 'filled' ? 'bg-current opacity-80' : 'bg-current'
             )}
             aria-hidden="true"

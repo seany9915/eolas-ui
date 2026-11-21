@@ -382,7 +382,7 @@ const MessageScrollerContainer = React.forwardRef<HTMLDivElement, MessageScrolle
         ref={ref}
         data-slot="message-scroller"
         className={cn(
-          'relative flex flex-col w-full h-full overflow-hidden',
+          'relative flex flex-col size-full overflow-hidden',
           variant === 'container' && 'bg-surface-container/20',
           variant === 'canvas' && 'bg-background',
           className
@@ -451,7 +451,7 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
     },
     ref
   ) => {
-    const { viewportRef, contentRef, attachViewport, pendingScroll } = useMessageScroller();
+    const { viewportRef, contentRef, attachViewport, pendingScroll, scrollable } = useMessageScroller();
     const prevFirstItemRef = React.useRef<{ el: HTMLElement; offsetTop: number } | null>(null);
 
     // Track the first message item so prepended history preserves scroll without shifting streamed appends
@@ -497,10 +497,16 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
         ref={mergedRef}
         data-slot="message-scroller-viewport"
         data-pending-scroll={pendingScroll ? '' : undefined}
+        data-scrollable-start={scrollable.start ? '' : undefined}
+        data-scrollable-end={scrollable.end ? '' : undefined}
         aria-label={ariaLabel}
         className={cn(
-          'flex-1 w-full overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+          'flex-1 w-full overflow-y-auto overscroll-contain data-[pending-scroll]:invisible focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
           '[scrollbar-width:thin] [scrollbar-color:var(--outline-variant)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant [&::-webkit-scrollbar-track]:bg-transparent',
+          (scrollable.start || scrollable.end) &&
+            '[mask-image:linear-gradient(to_bottom,transparent_0,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent_100%)]',
+          scrollable.start ? '[--fade-top:24px]' : '[--fade-top:0px]',
+          scrollable.end ? '[--fade-bottom:24px]' : '[--fade-bottom:0px]',
           className
         )}
         tabIndex={0}

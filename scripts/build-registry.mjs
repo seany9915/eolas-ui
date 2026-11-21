@@ -1,5 +1,6 @@
 import nodeFs from 'node:fs';
 import path from 'node:path';
+import { CATEGORY_MAP, DESCRIPTION_OVERRIDES, stripComments } from './registry-meta.mjs';
 
 // Normalise CRLF to LF so generated JSON is identical regardless of each machine's git line-ending settings.
 const fs = {
@@ -20,6 +21,7 @@ const PKG_REGISTRY = path.resolve('packages/eolas-ui/registry');
 const EOLAS_REGISTRY_BASE_URL = (
   process.env.EOLAS_REGISTRY_BASE_URL || 'https://seany9915.github.io/eolas-ui/r'
 ).replace(/\/+$/, '');
+const EOLAS_GITHUB_REGISTRY = 'seany9915/eolas-ui';
 
 if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -29,6 +31,17 @@ const formatRegistryDep = (dep) =>
   dep.startsWith('@') || dep.startsWith('http')
     ? dep
     : `${EOLAS_REGISTRY_BASE_URL}/${dep}.json`;
+
+const formatSourceRegistryDep = (dep) => {
+  const prefix = `${EOLAS_REGISTRY_BASE_URL}/`;
+  if (dep.startsWith(prefix)) {
+    return `${EOLAS_GITHUB_REGISTRY}/${dep.slice(prefix.length).replace(/\.json$/, '')}`;
+  }
+  return dep;
+};
+
+const getCategory = (name, type) =>
+  CATEGORY_MAP[name] || (type === 'registry:block' ? 'blocks' : type === 'registry:lib' ? 'system' : 'layout');
 
 const TITLE_ACRONYMS = {
   ai: 'AI',
@@ -55,10 +68,6 @@ function formatTitle(name) {
     .split('-')
     .map((s) => TITLE_ACRONYMS[s] || s.charAt(0).toUpperCase() + s.slice(1))
     .join(' ');
-}
-
-function stripComments(src) {
-  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 }
 
 function detectNpmDeps(content) {
@@ -100,7 +109,9 @@ function parseComponentDoc(content, name) {
   if (!match) {
     return {
       title: humanTitle,
-      description: `Eolas UI ${humanTitle} component built on Base UI and DESIGN.md design tokens.`,
+      description:
+        DESCRIPTION_OVERRIDES[name] ||
+        `Eolas UI ${humanTitle} component built on Base UI and DESIGN.md design tokens.`,
       taxonomy: [],
     };
   }
@@ -115,7 +126,7 @@ function parseComponentDoc(content, name) {
 
   const bareNameRe = new RegExp(`^${name.replace(/-/g, '')}$`, 'i');
   const stopDescRe =
-    /^(?:TAXONOMY|USAGE|ANATOMY|FEATURES|Layer:|Foundation:|Platform Reference:|Base UI Documentation:|Base UI Ecosystem Documentation:|Shadcn UI Reference:|Base UI Integration:|Aligned with|Full API and feature parity|Dedicated modular files|Canonical primitive)/i;
+    /^(?:TAXONOMY|USAGE|ANATOMY|FEATURES|Layer:|Foundation:|Platform Reference:|Base UI Documentation:|Base UI Ecosystem Documentation:|Shadcn UI Reference:|Base UI Integration:|Aligned with|Full API(?: reference)? and feature parity|Dedicated modular files|Canonical primitive)/i;
 
   for (const line of cleanDoc) {
     if (/TAXONOMY|USAGE/i.test(line)) {
@@ -155,24 +166,8 @@ function parseComponentDoc(content, name) {
 
   return {
     title: humanTitle,
-    description,
+    description: DESCRIPTION_OVERRIDES[name] || description,
     taxonomy: taxonomyLines,
-  };
-}
-
-function extractCssVars(globalsCss) {
-  const parseDeclarations = (regex) => {
-    const vars = {};
-    for (const match of globalsCss.matchAll(regex)) {
-      for (const decl of match[1].matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/gi)) {
-        vars[decl[1]] = decl[2].replace(/\s+/g, ' ').trim();
-      }
-    }
-    return vars;
-  };
-  return {
-    theme: parseDeclarations(/@theme(?:\s+static)?\s*\{([\s\S]*?)\}/g),
-    light: parseDeclarations(/(?:^|\n):root\s*\{([\s\S]*?)\n\}/g),
   };
 }
 
@@ -182,6 +177,7 @@ function toCatalogSummary(item) {
     type: item.type,
     title: item.title,
     description: item.description,
+    ...(item.categories && item.categories.length > 0 ? { categories: item.categories } : {}),
     ...(item.dependencies && item.dependencies.length > 0 ? { dependencies: item.dependencies } : {}),
     ...(item.devDependencies && item.devDependencies.length > 0 ? { devDependencies: item.devDependencies } : {}),
     ...(item.registryDependencies && item.registryDependencies.length > 0
@@ -192,6 +188,7 @@ function toCatalogSummary(item) {
       type: f.type,
       ...(f.target ? { target: f.target } : {}),
     })),
+    ...(item.cssVars ? { cssVars: item.cssVars } : {}),
     ...(item.meta ? { meta: item.meta } : {}),
     ...(item.docs ? { docs: item.docs } : {}),
   };
@@ -217,7 +214,8 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
     type: 'registry:lib',
     title: 'Eolas UI Utilities',
     description:
-      'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
+      'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
+    categories: [getCategory('utils', 'registry:lib')],
     dependencies: detectNpmDeps(utilsContent),
     files: [
       {
@@ -252,6 +250,7 @@ for (const libFile of standaloneLibs) {
     type: 'registry:lib',
     title: docMeta.title,
     description: docMeta.description,
+    categories: [getCategory(libName, 'registry:lib')],
     ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
     ...(libRegDeps.length > 0 ? { registryDependencies: libRegDeps } : {}),
     files: [
@@ -271,7 +270,6 @@ for (const libFile of standaloneLibs) {
 const GLOBALS_CSS = path.resolve('src/globals.css');
 if (fs.existsSync(GLOBALS_CSS)) {
   const globalsContent = fs.readFileSync(GLOBALS_CSS, 'utf8');
-  const cssVars = extractCssVars(globalsContent);
   const themeItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: 'theme',
@@ -279,16 +277,16 @@ if (fs.existsSync(GLOBALS_CSS)) {
     title: 'Eolas UI Clinical Theme',
     description:
       'Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, Google Fonts & Material Symbols imports, and motion tokens conforming to DESIGN.md.',
-    docs: 'Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface="inverted"]). Import this stylesheet in your application entry point (e.g. src/main.tsx or app/layout.tsx).',
+    categories: [getCategory('theme', 'registry:file')],
+    docs: 'Includes Google Fonts @import rules for Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined, plus Tailwind CSS v4 @theme tokens and descendant-scoped inverted surface rules ([data-surface="inverted"]). `npx shadcn@latest add @eolas/theme` writes the full Tailwind CSS v4 stylesheet to `src/eolas-theme.css` (import it from your entry point or main CSS file); `eolas-ui add theme` automatically writes to your `components.json` `tailwind.css` path when configured.',
     files: [
       {
-        path: 'styles/globals.css',
+        path: 'styles/eolas-theme.css',
         content: globalsContent,
         type: 'registry:file',
-        target: '~/src/globals.css',
+        target: '~/src/eolas-theme.css',
       },
     ],
-    cssVars,
   };
   fs.writeFileSync(path.join(OUT_DIR, 'theme.json'), JSON.stringify(themeItem, null, 2));
   registryItems.push(toCatalogSummary(themeItem));
@@ -306,6 +304,7 @@ if (hasDesignMd) {
     title: 'Eolas UI Design System Spec (DESIGN.md)',
     description:
       'Canonical design tokens, color roles, surface hierarchy, typography, and motion rules for AI agents and developers.',
+    categories: [getCategory('design-md', 'registry:file')],
     files: [
       {
         path: 'DESIGN.md',
@@ -354,6 +353,7 @@ if (hasRequiredAgentSources) {
     title: 'Eolas UI Agent Rules & Anti-Pattern Checker',
     description:
       'Strict architectural contracts, AGENTS.md, Antigravity hooks, DESIGN.md tokens, and anti-pattern enforcement scripts for AI agents and developers.',
+    categories: [getCategory('agent-rules', 'registry:item')],
     docs: 'For full AST lint enforcement (nested Card, sparkle icons, triple-tint, tertiary contrast, transition-all, spring easing, uppercase, unsafe type casts), also run: npx shadcn@latest add @eolas/lint (or npx @seany9915/eolas-ui add lint).',
     ...(hasDesignMd ? { registryDependencies: [formatRegistryDep('design-md')] } : {}),
     files: agentFiles,
@@ -365,6 +365,9 @@ if (hasRequiredAgentSources) {
   const existingAgentRules = path.join(OUT_DIR, 'agent-rules.json');
   if (fs.existsSync(existingAgentRules)) {
     const existing = JSON.parse(fs.readFileSync(existingAgentRules, 'utf8'));
+    if (!existing.categories || existing.categories.length === 0) {
+      existing.categories = [getCategory('agent-rules', 'registry:item')];
+    }
     console.warn('.agents/ sources not found: keeping existing agent-rules.json unchanged.');
     registryItems.push(toCatalogSummary(existing));
   }
@@ -394,6 +397,7 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
     type: 'registry:item',
     title: 'Eolas UI Lint',
     description: '@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts.',
+    categories: [getCategory('lint', 'registry:item')],
     docs: 'Run "npx oxlint ." to enforce Eolas UI and @shadcn/lint contracts. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json.',
     devDependencies: ['@shadcn/lint', 'oxlint'],
     files: [
@@ -422,13 +426,14 @@ console.log(`Found ${uiFiles.length} UI files to catalog.`);
 for (const file of uiFiles) {
   const name = file.replace('.tsx', '');
   const content = fs.readFileSync(path.join(UI_DIR, file), 'utf8');
+  const cleanContent = stripComments(content);
   const docMeta = parseComponentDoc(content, name);
 
-  // Detect internal UI component dependencies
+  // Detect internal UI component dependencies (from comment-stripped source)
   const internalDeps = [];
   const regex = /from\s+['"](?:\.\/|@\/components\/ui\/)([^'"]+)['"]/g;
   let m;
-  while ((m = regex.exec(content)) !== null) {
+  while ((m = regex.exec(cleanContent)) !== null) {
     if (m[1] && m[1] !== name) {
       internalDeps.push(m[1]);
     }
@@ -444,6 +449,7 @@ for (const file of uiFiles) {
     type: 'registry:ui',
     title: docMeta.title,
     description: docMeta.description,
+    categories: [getCategory(name, 'registry:ui')],
     ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
     ...(regDeps.length > 0 ? { registryDependencies: regDeps } : {}),
     files: [
@@ -469,13 +475,14 @@ if (fs.existsSync(BLOCKS_DIR)) {
   for (const file of blockFiles) {
     const name = file.replace('.tsx', '');
     const content = fs.readFileSync(path.join(BLOCKS_DIR, file), 'utf8');
+    const cleanContent = stripComments(content);
     const docMeta = parseComponentDoc(content, name);
 
-    // Detect internal component dependencies (from UI and blocks)
+    // Detect internal component dependencies (from comment-stripped UI and block imports)
     const internalDeps = [];
     const regex = /from\s+['"](?:\.\.\/ui\/|@\/components\/ui\/|\.\/|@\/components\/blocks\/)([^'"]+)['"]/g;
     let m;
-    while ((m = regex.exec(content)) !== null) {
+    while ((m = regex.exec(cleanContent)) !== null) {
       if (m[1] && m[1] !== name) {
         const cleanDep = m[1].replace(/^\.\//, '').split('/')[0];
         internalDeps.push(cleanDep);
@@ -492,6 +499,7 @@ if (fs.existsSync(BLOCKS_DIR)) {
       type: 'registry:block',
       title: docMeta.title,
       description: docMeta.description,
+      categories: [getCategory(name, 'registry:block')],
       ...(npmDeps.length > 0 ? { dependencies: npmDeps } : {}),
       ...(regDeps.length > 0 ? { registryDependencies: regDeps } : {}),
       files: [
@@ -539,7 +547,7 @@ function mapRegistryFilePathToRepoSource(regFilePath) {
   if (regFilePath.startsWith('lib/')) {
     return `src/${regFilePath}`;
   }
-  if (regFilePath.startsWith('styles/')) {
+  if (regFilePath === 'styles/eolas-theme.css' || regFilePath.startsWith('styles/')) {
     return 'src/globals.css';
   }
   if (regFilePath === 'hooks.json') {
@@ -558,21 +566,25 @@ const rootItems = registryItems.map((item) => {
   const itemFile = path.join(OUT_DIR, `${item.name}.json`);
   if (!fs.existsSync(itemFile)) return item;
   const fullItem = JSON.parse(fs.readFileSync(itemFile, 'utf8'));
+  const sourceRegDeps =
+    fullItem.registryDependencies && fullItem.registryDependencies.length > 0
+      ? fullItem.registryDependencies.map(formatSourceRegistryDep)
+      : [];
   return {
     name: fullItem.name,
     type: fullItem.type,
     title: fullItem.title,
     description: fullItem.description,
+    ...(fullItem.categories && fullItem.categories.length > 0 ? { categories: fullItem.categories } : {}),
     ...(fullItem.dependencies && fullItem.dependencies.length > 0 ? { dependencies: fullItem.dependencies } : {}),
     ...(fullItem.devDependencies && fullItem.devDependencies.length > 0 ? { devDependencies: fullItem.devDependencies } : {}),
-    ...(fullItem.registryDependencies && fullItem.registryDependencies.length > 0
-      ? { registryDependencies: fullItem.registryDependencies }
-      : {}),
+    ...(sourceRegDeps.length > 0 ? { registryDependencies: sourceRegDeps } : {}),
     files: (fullItem.files || []).map((f) => ({
       path: mapRegistryFilePathToRepoSource(f.path),
       type: f.type,
       ...(f.target ? { target: f.target } : {}),
     })),
+    ...(fullItem.cssVars ? { cssVars: fullItem.cssVars } : {}),
     ...(fullItem.meta ? { meta: fullItem.meta } : {}),
     ...(fullItem.docs ? { docs: fullItem.docs } : {}),
   };

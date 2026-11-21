@@ -12,7 +12,7 @@
    - **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` (for custom-styled bare buttons).
 3. **API preservation:** Never erode component APIs, strip `ref` / `render` props, drop compound subcomponents, or downgrade primitives to `<div>`/`<button>`.
 4. **Always-on guardrails (see `.agents/rules/anti-patterns.md`):**
-   - No triple-tint chips; use `*-container` + ultra-dark `on-*-container` on pills, `#1a1c1e` on callouts/cards.
+   - No triple-tint chips; use `*-container` + ultra-dark `on-*-container` on pills, `#1C1A18` on callouts/cards.
    - Focus (`outline-offset: 2px`) vs. selection (flush `2px` border + surface wash).
    - No `space-y-*`/`space-x-*` (use `flex gap-*` / `grid gap-*`); no `mr-*`/`ml-*` on `<Icon>`; use `size-*` and `truncate`.
    - Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>`; use `<InputGroup>` instead of absolute input buttons.

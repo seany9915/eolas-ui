@@ -16,8 +16,15 @@
  */
 import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
-import { cn } from '@/lib/utils';
-import { Dialog } from './dialog';
+import { cn, composeClassName } from '@/lib/utils';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from './dialog';
+import { Icon } from './icon';
 
 export interface CommandProps
   extends React.ComponentPropsWithoutRef<typeof CommandPrimitive> {}
@@ -30,7 +37,7 @@ const CommandRoot = React.forwardRef<
     ref={ref}
     data-slot="command"
     className={cn(
-      'flex h-full w-full flex-col overflow-hidden rounded-lg bg-surface text-on-surface',
+      'flex size-full flex-col overflow-hidden rounded-lg bg-surface text-on-surface',
       className
     )}
     {...props}
@@ -45,12 +52,13 @@ export interface CommandDialogProps {
   children?: React.ReactNode;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  className?: string;
-  containerClassName?: string;
+  showCloseButton?: boolean;
+  className?: React.ComponentPropsWithoutRef<typeof DialogContent>['className'];
+  containerClassName?: React.ComponentPropsWithoutRef<typeof DialogContent>['containerClassName'];
   modal?: boolean | 'trap-focus';
   disablePointerDismissal?: boolean;
-  initialFocus?: React.ComponentPropsWithoutRef<typeof Dialog.Popup>['initialFocus'];
-  finalFocus?: React.ComponentPropsWithoutRef<typeof Dialog.Popup>['finalFocus'];
+  initialFocus?: React.ComponentPropsWithoutRef<typeof DialogContent>['initialFocus'];
+  finalFocus?: React.ComponentPropsWithoutRef<typeof DialogContent>['finalFocus'];
 }
 
 export function CommandDialog({
@@ -59,6 +67,7 @@ export function CommandDialog({
   onOpenChange,
   title = 'Command menu',
   description,
+  showCloseButton = false,
   children,
   className,
   containerClassName,
@@ -68,35 +77,38 @@ export function CommandDialog({
   finalFocus,
 }: CommandDialogProps): React.JSX.Element {
   return (
-    <Dialog.Root
+    <Dialog
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
       modal={modal}
       disablePointerDismissal={disablePointerDismissal}
     >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-0 data-[ending-style]:duration-100 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
-        <Dialog.Viewport className={cn('fixed inset-0 z-50 p-4 flex items-center justify-center', containerClassName)}>
-          <Dialog.Popup
-            initialFocus={initialFocus}
-            finalFocus={finalFocus}
-            className={cn(
-              'w-full max-w-xl overflow-hidden p-0 rounded-lg bg-surface border border-outline-variant shadow-modal will-change-[opacity,transform] overscroll-contain transition-[opacity,transform] duration-0 data-[ending-style]:duration-100 data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-              className
-            )}
+      <DialogContent
+        size="xl"
+        data-slot="command-dialog"
+        containerClassName={containerClassName}
+        initialFocus={initialFocus}
+        finalFocus={finalFocus}
+        className={composeClassName('relative overflow-hidden p-0', className)}
+      >
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        {description && (
+          <DialogDescription className="sr-only">{description}</DialogDescription>
+        )}
+        {showCloseButton && (
+          <DialogClose
+            aria-label="Close command menu"
+            className="absolute top-1 end-1 z-10"
           >
-            <Dialog.Title className="sr-only">{title}</Dialog.Title>
-            {description && (
-              <Dialog.Description className="sr-only">{description}</Dialog.Description>
-            )}
-            <CommandRoot className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:font-label [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-on-surface-variant [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]]:px-3 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]]:min-h-[44px]">
-              {children}
-            </CommandRoot>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
+            <Icon name="close" size="sm" aria-hidden="true" />
+          </DialogClose>
+        )}
+        <CommandRoot className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:font-label [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-on-surface-variant [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]]:px-3 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-3 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]]:min-h-[44px]">
+          {children}
+        </CommandRoot>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -112,7 +124,7 @@ export const CommandInput = React.forwardRef<
 >(({ className, icon, wrapperClassName, ...props }, ref) => (
   <div
     data-slot="command-input-wrapper"
-    className={cn('flex items-center gap-2 rounded-t-[inherit] border-b border-outline-variant px-3 focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary', wrapperClassName)}
+    className={cn('flex items-center gap-2 rounded-t-[inherit] border-b border-outline-variant px-3 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary', wrapperClassName)}
     cmdk-input-wrapper=""
   >
     {icon ?? (
@@ -142,6 +154,7 @@ export const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
+    data-slot="command-list"
     className={cn(
       'max-h-[min(300px,60vh)] overflow-y-auto overflow-x-hidden p-1 overscroll-contain scroll-py-1',
       className
@@ -157,6 +170,7 @@ export const CommandEmpty = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
+    data-slot="command-empty"
     className={cn('py-6 text-center text-sm font-sans text-on-surface-variant', className)}
     {...props}
   />
@@ -169,6 +183,7 @@ export const CommandGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
+    data-slot="command-group"
     className={cn(
       'text-on-surface [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-label [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-on-surface-variant',
       className
@@ -184,6 +199,7 @@ export const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
+    data-slot="command-separator"
     className={cn('-mx-1 my-1 h-px bg-outline-variant', className)}
     {...props}
   />
@@ -199,8 +215,9 @@ export const CommandItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
+    data-slot="command-item"
     className={cn(
-      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container/60 data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container/60 aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
+      'relative flex cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container/60 data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container/60 aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
       className
     )}
     {...props}
@@ -208,18 +225,20 @@ export const CommandItem = React.forwardRef<
 ));
 CommandItem.displayName = CommandPrimitive.Item.displayName;
 
-export const CommandShortcut = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLSpanElement>): React.JSX.Element => (
+export const CommandShortcut = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
   <span
+    ref={ref}
+    data-slot="command-shortcut"
     className={cn(
       'ms-auto font-mono text-xs tracking-widest text-on-surface-variant',
       className
     )}
     {...props}
   />
-);
+));
 CommandShortcut.displayName = 'CommandShortcut';
 
 export const CommandLoading = React.forwardRef<
@@ -228,6 +247,7 @@ export const CommandLoading = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Loading
     ref={ref}
+    data-slot="command-loading"
     className={cn('py-6 text-center text-sm font-sans text-on-surface-variant', className)}
     {...props}
   />

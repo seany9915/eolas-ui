@@ -357,7 +357,7 @@ const ConfirmationDeny: React.FC<ConfirmationDenyProps> = ({
 }) => {
   return (
     <Button
-      variant="outlined"
+      variant="outline"
       colorRole="neutral"
       size="sm"
       disabled={disabled}
@@ -378,7 +378,7 @@ export interface ConfirmationActionProps extends React.ComponentPropsWithoutRef<
 }
 
 export const ConfirmationAction = React.forwardRef<HTMLButtonElement, ConfirmationActionProps>(
-  ({ children, className, variant = 'outlined', colorRole = 'neutral', size = 'sm', ...props }, ref) => {
+  ({ children, className, variant = 'outline', colorRole = 'neutral', size = 'sm', ...props }, ref) => {
     return (
       <Button
         ref={ref}

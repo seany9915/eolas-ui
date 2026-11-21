@@ -68,6 +68,9 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
   ) => {
     const sentinelRef = React.useRef<HTMLDivElement>(null);
     const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const onStuckChangeRef = React.useRef(onStuckChange);
+    onStuckChangeRef.current = onStuckChange;
+
     const [isStuckFallback, setIsStuckFallback] = React.useState<boolean>(false);
     const [supportsScrollState, setSupportsScrollState] = React.useState<boolean>(false);
 
@@ -76,6 +79,8 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
         setSupportsScrollState(CSS.supports('container-type', 'scroll-state'));
       }
     }, []);
+
+    const needsJsTracking = !supportsScrollState || Boolean(onStuckChange) || Boolean(stuckClassName);
 
     const setContainerRef = React.useCallback(
       (node: HTMLDivElement | null) => {
@@ -90,16 +95,46 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
     );
 
     React.useEffect(() => {
-      const sentinel = sentinelRef.current;
-      if (!sentinel) return;
-
-      // Skip IntersectionObserver in browsers supporting scroll-state unless JS hooks are requested
-      if (supportsScrollState && !onStuckChange && !stuckClassName) {
+      if (!needsJsTracking) {
         setIsStuckFallback(false);
         return;
       }
 
-      const root = getScrollParent(containerRef.current?.parentNode ?? null);
+      const container = containerRef.current;
+      const sentinel = sentinelRef.current;
+      if (!container || !sentinel) return;
+
+      const root = getScrollParent(container.parentNode ?? null);
+      const sentinelContainedInRoot =
+        !root ||
+        (sentinel.offsetParent instanceof Node && root.contains(sentinel.offsetParent));
+
+      // If an inner scroll container is not positioned (static), an out-of-flow absolute sentinel
+      // would anchor outside `root`; fall back to a passive scroll check against the sticky container.
+      if (root && !sentinelContainedInRoot) {
+        let rafId = 0;
+        const checkStuck = () => {
+          const rootTop = root.getBoundingClientRect().top;
+          const containerTop = container.getBoundingClientRect().top;
+          const stuck = root.scrollTop > 0 && containerTop <= rootTop + topOffset + 1;
+          setIsStuckFallback((prev) => {
+            if (prev !== stuck) {
+              onStuckChangeRef.current?.(stuck);
+            }
+            return stuck;
+          });
+        };
+        const handleScroll = () => {
+          cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(checkStuck);
+        };
+        checkStuck();
+        root.addEventListener('scroll', handleScroll, { passive: true });
+        return () => {
+          cancelAnimationFrame(rafId);
+          root.removeEventListener('scroll', handleScroll);
+        };
+      }
 
       const observer = new IntersectionObserver(
         ([entry]) => {
@@ -107,7 +142,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
           const stuck = !entry.isIntersecting && entry.boundingClientRect.bottom <= rootTop + 1;
           setIsStuckFallback((prev) => {
             if (prev !== stuck) {
-              onStuckChange?.(stuck);
+              onStuckChangeRef.current?.(stuck);
             }
             return stuck;
           });
@@ -124,40 +159,47 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
       return () => {
         observer.disconnect();
       };
-    }, [topOffset, onStuckChange, stuckClassName, supportsScrollState]);
+    }, [topOffset, needsJsTracking]);
+
+    const stickyElement = (
+      <div
+        ref={setContainerRef}
+        className={cn('sticky-scroll-container w-full', className)}
+        style={{
+          top: `${topOffset}px`,
+          zIndex,
+          ...style,
+        }}
+        {...props}
+      >
+        {/* Inner presentation wrapper queried by @container scroll-state(stuck: top) */}
+        <div
+          className={cn(
+            'sticky-nav-inner w-full transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+            isStuckFallback && (!supportsScrollState ? cn('is-stuck', stuckClassName) : stuckClassName),
+            innerClassName
+          )}
+        >
+          {children}
+        </div>
+      </div>
+    );
+
+    // Pure CSS scroll-state path: render sticky container directly (zero sentinel, zero display: contents)
+    if (!needsJsTracking) {
+      return stickyElement;
+    }
 
     return (
-      <div className="contents">
-        {/* Invisible 1px zero-layout-impact sentinel placed immediately before the sticky container */}
+      <>
+        {/* Out-of-flow 1px sentinel so it never participates in parent flex/grid gap calculations */}
         <div
           ref={sentinelRef}
           aria-hidden="true"
-          className="h-px -mb-px w-full p-0 opacity-0 pointer-events-none"
+          className="absolute top-0 inset-x-0 h-px p-0 opacity-0 pointer-events-none"
         />
-
-        {/* Outer scroll-state container */}
-        <div
-          ref={setContainerRef}
-          className={cn('sticky-scroll-container w-full', className)}
-          style={{
-            top: `${topOffset}px`,
-            zIndex,
-            ...style,
-          }}
-          {...props}
-        >
-          {/* Inner presentation wrapper queried by @container sticky-nav scroll-state(stuck: top) */}
-          <div
-            className={cn(
-              'sticky-nav-inner w-full transition-[background-color,border-color,box-shadow] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-              isStuckFallback && (!supportsScrollState ? cn('is-stuck', stuckClassName) : stuckClassName),
-              innerClassName
-            )}
-          >
-            {children}
-          </div>
-        </div>
-      </div>
+        {stickyElement}
+      </>
     );
   }
 );

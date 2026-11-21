@@ -3,7 +3,10 @@
   "name": "csp-provider",
   "type": "registry:ui",
   "title": "CSP Provider",
-  "description": "Eolas UI CSP Provider component built on Base UI and DESIGN.md design tokens.",
+  "description": "Content Security Policy provider forwarding a cryptographic nonce to Base UI portals and dynamic style elements.",
+  "categories": [
+    "system"
+  ],
   "dependencies": [
     "@base-ui/react"
   ],

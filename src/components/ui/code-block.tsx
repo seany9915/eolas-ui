@@ -24,34 +24,62 @@ import { announce } from '@/lib/announce';
 import { cn } from '@/lib/utils';
 
 /* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+export type CodeBlockSize = 'sm' | 'default';
+export type CodeBlockVariant = 'default' | 'flush' | 'ghost' | 'destructive';
+export type CodeBlockLineVariant = 'added' | 'removed' | 'highlighted';
+
+interface CodeBlockContextValue {
+  size: CodeBlockSize;
+  variant: CodeBlockVariant;
+}
+
+const CodeBlockContext = React.createContext<CodeBlockContextValue>({
+  size: 'default',
+  variant: 'default',
+});
+
+/* -------------------------------------------------------------------------------------------------
  * CodeBlock (Root Container)
  * -----------------------------------------------------------------------------------------------*/
 export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   className?: string;
   language?: string;
-  variant?: 'default' | 'flush' | 'ghost';
+  size?: CodeBlockSize;
+  variant?: CodeBlockVariant;
 }
 
 const CodeBlockRoot = React.forwardRef<HTMLDivElement, CodeBlockProps>(
-  ({ children, className, language, variant = 'default', ...props }, ref) => {
+  ({ children, className, language, size = 'default', variant = 'default', ...props }, ref) => {
+    const contextValue = React.useMemo<CodeBlockContextValue>(
+      () => ({ size, variant }),
+      [size, variant]
+    );
+
     return (
-      <div
-        ref={ref}
-        data-slot="code-block"
-        data-language={language}
-        className={cn(
-          '@container relative w-full font-mono text-xs overflow-hidden',
-          'transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-          variant === 'default' && 'rounded-lg border border-outline-variant bg-surface-container/60',
-          variant === 'flush' && 'rounded-sm border-none bg-surface-container/60',
-          variant === 'ghost' && 'rounded-sm border-none bg-transparent',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <CodeBlockContext.Provider value={contextValue}>
+        <div
+          ref={ref}
+          data-slot="code-block"
+          data-language={language}
+          data-size={size}
+          data-variant={variant}
+          className={cn(
+            '@container group/code-block relative w-full font-mono text-xs overflow-hidden',
+            'transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            variant === 'default' && 'rounded-lg border border-outline-variant bg-surface-container/60',
+            variant === 'destructive' && 'rounded-lg border border-error/40 bg-error-container/30 text-on-surface',
+            variant === 'flush' && 'rounded-sm border-none bg-surface-container/60',
+            variant === 'ghost' && 'rounded-sm border-none bg-transparent',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </CodeBlockContext.Provider>
     );
   }
 );
@@ -67,12 +95,18 @@ export interface CodeBlockHeaderProps extends React.HTMLAttributes<HTMLDivElemen
 
 export const CodeBlockHeader = React.forwardRef<HTMLDivElement, CodeBlockHeaderProps>(
   ({ children, className, ...props }, ref) => {
+    const { size, variant } = React.useContext(CodeBlockContext);
+
     return (
       <div
         ref={ref}
         data-slot="code-block-header"
         className={cn(
-          'flex items-center justify-between px-3.5 py-2 border-b border-outline-variant/40 bg-surface-container min-h-10',
+          'flex items-center justify-between border-b',
+          size === 'sm' ? 'px-3 py-1.5 min-h-8' : 'px-3.5 py-2 min-h-10',
+          variant === 'destructive'
+            ? 'border-error/30 bg-error-container/40'
+            : 'border-outline-variant/40 bg-surface-container',
           className
         )}
         {...props}
@@ -126,7 +160,9 @@ export const CodeBlockActions = React.forwardRef<HTMLDivElement, CodeBlockAction
         data-floating={floating ? '' : undefined}
         className={cn(
           'flex items-center gap-1.5 shrink-0',
-          floating ? 'absolute top-2 end-2' : 'ms-auto',
+          floating
+            ? 'absolute top-2 end-2 opacity-0 group-hover/code-block:opacity-100 focus-within:opacity-100 transition-opacity duration-quick motion-reduce:transition-none'
+            : 'ms-auto',
           className
         )}
         {...props}
@@ -198,22 +234,54 @@ CodeBlockCopyButton.displayName = 'CodeBlockCopyButton';
 export interface CodeBlockContentProps extends React.HTMLAttributes<HTMLPreElement> {
   children?: React.ReactNode;
   className?: string;
+  wrap?: boolean;
+  lineNumbers?: boolean;
+  startLine?: number;
 }
 
 export const CodeBlockContent = React.forwardRef<HTMLPreElement, CodeBlockContentProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, wrap = false, lineNumbers = false, startLine = 1, ...props }, ref) => {
+    const { size, variant } = React.useContext(CodeBlockContext);
+
+    const renderedChildren = React.useMemo(() => {
+      if (!lineNumbers) return children;
+      if (typeof children === 'string') {
+        return children.split('\n').map((line, index) => (
+          <CodeBlockLine key={index} lineNumber={startLine + index}>
+            {line.length > 0 ? line : ' '}
+          </CodeBlockLine>
+        ));
+      }
+      let lineIndex = 0;
+      return React.Children.map(children, (child) => {
+        if (React.isValidElement<CodeBlockLineProps>(child) && child.type === CodeBlockLine) {
+          const currentLine = startLine + lineIndex;
+          lineIndex += 1;
+          return child.props.lineNumber === undefined
+            ? React.cloneElement(child, { lineNumber: currentLine })
+            : child;
+        }
+        return child;
+      });
+    }, [children, lineNumbers, startLine]);
+
     return (
       <pre
         ref={ref}
         data-slot="code-block-content"
+        data-wrap={wrap ? '' : undefined}
+        data-line-numbers={lineNumbers ? '' : undefined}
         className={cn(
-          'p-3.5 overflow-x-auto font-mono text-[11px] leading-relaxed text-on-surface selection:bg-primary-container selection:text-on-primary-container',
-          '[scrollbar-width:thin] [scrollbar-color:theme(colors.outline-variant/60)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant/60 [&::-webkit-scrollbar-track]:bg-transparent',
+          'overflow-x-auto font-mono leading-relaxed selection:bg-primary-container selection:text-on-primary-container',
+          size === 'sm' ? 'p-2.5 text-xs' : 'p-3.5 text-xs',
+          variant === 'destructive' ? 'text-on-error-container' : 'text-on-surface',
+          wrap && 'whitespace-pre-wrap break-words [&_[data-slot=code-block-line]]:min-w-0',
+          '[scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--outline-variant)_60%,transparent)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant/60 [&::-webkit-scrollbar-track]:bg-transparent',
           className
         )}
         {...props}
       >
-        {children}
+        {renderedChildren}
       </pre>
     );
   }
@@ -225,22 +293,31 @@ CodeBlockContent.displayName = 'CodeBlockContent';
  * -----------------------------------------------------------------------------------------------*/
 export interface CodeBlockLineProps extends React.HTMLAttributes<HTMLDivElement> {
   lineNumber?: number;
+  variant?: CodeBlockLineVariant;
   children?: React.ReactNode;
   className?: string;
 }
 
 export const CodeBlockLine = React.forwardRef<HTMLDivElement, CodeBlockLineProps>(
-  ({ lineNumber, children, className, ...props }, ref) => {
+  ({ lineNumber, variant, children, className, ...props }, ref) => {
     return (
       <div
         ref={ref}
         data-slot="code-block-line"
-        className={cn('flex items-baseline gap-3 min-w-max hover:bg-surface-container/30 px-1 rounded-sm', className)}
+        data-variant={variant}
+        className={cn(
+          'flex items-baseline gap-3 min-w-max px-1 rounded-sm',
+          variant === 'added' && 'bg-success-container/40 text-on-surface',
+          variant === 'removed' && 'bg-error-container/40 text-on-surface',
+          variant === 'highlighted' && 'bg-primary-container/50 text-on-surface',
+          !variant && 'hover:bg-surface-container/30',
+          className
+        )}
         {...props}
       >
         {lineNumber !== undefined && (
           <span
-            className="w-6 shrink-0 font-mono text-[10px] tabular-nums text-on-surface-variant/50 text-end select-none"
+            className="w-6 shrink-0 font-mono text-xs tabular-nums text-on-surface-variant/75 text-end select-none"
             aria-hidden="true"
           >
             {lineNumber}
@@ -263,12 +340,18 @@ export interface CodeBlockFooterProps extends React.HTMLAttributes<HTMLDivElemen
 
 export const CodeBlockFooter = React.forwardRef<HTMLDivElement, CodeBlockFooterProps>(
   ({ children, className, ...props }, ref) => {
+    const { size, variant } = React.useContext(CodeBlockContext);
+
     return (
       <div
         ref={ref}
         data-slot="code-block-footer"
         className={cn(
-          'px-3.5 py-1.5 border-t border-outline-variant/40 bg-surface-container/60 font-sans text-[11px] text-on-surface-variant flex items-center justify-between',
+          'border-t font-sans text-xs text-on-surface-variant flex items-center justify-between',
+          size === 'sm' ? 'px-3 py-1' : 'px-3.5 py-1.5',
+          variant === 'destructive'
+            ? 'border-error/30 bg-error-container/40'
+            : 'border-outline-variant/40 bg-surface-container/60',
           className
         )}
         {...props}

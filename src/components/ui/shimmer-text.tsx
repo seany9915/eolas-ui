@@ -57,6 +57,7 @@ export const ShimmerText = React.forwardRef<HTMLElement, ShimmerTextProps>(
           'inline-block font-sans text-on-surface-variant',
           active && 'animate-shimmer-sweep',
           'motion-reduce:animate-none motion-reduce:bg-none! motion-reduce:text-on-surface-variant! motion-reduce:[-webkit-text-fill-color:currentColor]!',
+          'forced-colors:animate-none forced-colors:[color:CanvasText]! forced-colors:[-webkit-text-fill-color:CanvasText]! forced-colors:[background-image:none]!',
           className
         )}
         style={{

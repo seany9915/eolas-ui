@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Plan composite block.
+ * Plan primitive.
  *
  * Layer: Primitive (`src/components/ui/`)
  * Foundation: Built strictly from `Trace` primitives (`src/components/ui/trace.tsx`)

@@ -235,12 +235,18 @@ function main(input) {
   const relLower = relPath.toLowerCase();
 
   const { primitiveDirs, blockDirs } = getConfiguredDirs(workspaceRoot);
-  const inventory = buildPrimitiveInventory(workspaceRoot, primitiveDirs);
-  if (!inventory.dir) {
+  const inventory = buildComponentInventory(workspaceRoot, primitiveDirs);
+  const blockInventory = buildComponentInventory(workspaceRoot, blockDirs);
+  if (!inventory.dir && !blockInventory.dir) {
     return respond({ decision: 'allow' });
   }
 
-  const existingSet = new Set(inventory.names.map((n) => n.toLowerCase()));
+  const existingSet = new Set([
+    ...inventory.names.map((n) => n.toLowerCase()),
+    ...blockInventory.names.map((n) => n.toLowerCase()),
+  ]);
+  const uiSet = new Set(inventory.names.map((n) => n.toLowerCase()));
+  const blockSet = new Set(blockInventory.names.map((n) => n.toLowerCase()));
   const baseName = path.basename(relPath).replace(/\.(tsx|jsx)$/i, '');
   const kebabName = toKebabCase(baseName);
   const strippedKebab = kebabName.replace(/^(?:custom|base|my|ui|app)-/, '');
@@ -248,7 +254,7 @@ function main(input) {
   const isExcludedFromDuplicateCheck = /(?:^|\/)(?:blocks|playground|demos)\//i.test(relLower);
   const isInComponentScope = /^(?:src\/|(?:components|features|views|ui|primitives)\/)/i.test(relLower);
 
-  // 1. Duplicate / synonym primitive check across src/ (including src/components/ui/, features/, views/)
+  // 1. Duplicate / synonym primitive & block check across src/ (including src/components/ui/, features/, views/)
   if (isInComponentScope && !isExcludedFromDuplicateCheck) {
     const matches = new Set();
     for (const candidate of [kebabName, strippedKebab]) {
@@ -265,12 +271,16 @@ function main(input) {
 
     if (matches.size > 0) {
       const matchedList = [...matches];
+      const matchedDirs = [];
+      if (inventory.dir && matchedList.some((m) => uiSet.has(m))) matchedDirs.push(inventory.dir);
+      if (blockInventory.dir && matchedList.some((m) => blockSet.has(m))) matchedDirs.push(blockInventory.dir);
+      const locationLabel = matchedDirs.join(' / ') || inventory.dir || blockInventory.dir;
       return respond({
         decision: 'force_ask',
         reason:
           `Primitive-check gate requires confirmation:\n` +
-          `New component "${targetFile}" appears to overlap with existing primitive(s) in ${inventory.dir}: ${matchedList.join(', ')}.\n` +
-          `Rule: Reuse or extend the existing primitive (${matchedList.join(', ')}) instead of creating a duplicate — see .agents/rules/component-library.md.`,
+          `New component "${targetFile}" appears to overlap with existing component(s) in ${locationLabel}: ${matchedList.join(', ')}.\n` +
+          `Rule: Reuse or extend the existing component (${matchedList.join(', ')}) instead of creating a duplicate — see .agents/rules/component-library.md.`,
       });
     }
   }
@@ -284,14 +294,15 @@ function main(input) {
     const isInsideAllowedDir = allowedDirsLower.some((dirPrefix) => relLower.startsWith(dirPrefix));
 
     if (!isInsideAllowedDir) {
-      const sample = inventory.names.slice(0, 12).join(', ');
-      const extraCount = inventory.names.length > 12 ? ` (+${inventory.names.length - 12} more)` : '';
+      const primaryInventory = inventory.dir ? inventory : blockInventory;
+      const sample = primaryInventory.names.slice(0, 12).join(', ');
+      const extraCount = primaryInventory.names.length > 12 ? ` (+${primaryInventory.names.length - 12} more)` : '';
       return respond({
         decision: 'force_ask',
         reason:
           `Primitive-check gate requires confirmation:\n` +
           `New component "${targetFile}" sits directly under top-level components/ outside ui/, blocks/, or playground/.\n` +
-          `Place reusable primitives in ${inventory.dir} (${inventory.names.length} existing: ${sample}${extraCount}), composite assemblies in src/components/blocks/, or domain components in src/features/ or src/views/.`,
+          `Place reusable primitives in ${primaryInventory.dir} (${primaryInventory.names.length} existing: ${sample}${extraCount}), composite assemblies in src/components/blocks/, or domain components in src/features/ or src/views/.`,
       });
     }
   }
@@ -299,14 +310,38 @@ function main(input) {
   return respond({ decision: 'allow' });
 }
 
-function buildPrimitiveInventory(workspaceRoot, primitiveDirs) {
-  for (const dir of primitiveDirs) {
+function collectComponentNames(rootDir, currentDir = rootDir, names = new Set()) {
+  let entries;
+  try {
+    entries = fs.readdirSync(currentDir, { withFileTypes: true });
+  } catch {
+    return names;
+  }
+  for (const entry of entries) {
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+    const fullPath = path.join(currentDir, entry.name);
+    if (entry.isDirectory()) {
+      collectComponentNames(rootDir, fullPath, names);
+    } else if (entry.isFile() && /\.(?:tsx|jsx|ts|js)$/i.test(entry.name)) {
+      if (/\.(?:test|spec|stories)\.[jt]sx?$/i.test(entry.name)) continue;
+      const stem = entry.name.replace(/\.(?:tsx|jsx|ts|js)$/i, '');
+      if (stem.toLowerCase() === 'index') {
+        if (currentDir !== rootDir) {
+          names.add(toKebabCase(path.basename(currentDir)));
+        }
+      } else {
+        names.add(toKebabCase(stem));
+      }
+    }
+  }
+  return names;
+}
+
+function buildComponentInventory(workspaceRoot, candidateDirs) {
+  for (const dir of candidateDirs) {
     const absoluteDir = path.join(workspaceRoot, dir);
     if (fs.existsSync(absoluteDir) && fs.statSync(absoluteDir).isDirectory()) {
-      const names = fs
-        .readdirSync(absoluteDir)
-        .filter((f) => /\.(tsx|jsx|ts|js)$/i.test(f))
-        .map((f) => f.replace(/\.(tsx|jsx|ts|js)$/i, ''));
+      const names = [...collectComponentNames(absoluteDir)].sort();
       return { dir, names };
     }
   }

@@ -4,6 +4,9 @@
   "type": "registry:block",
   "title": "App Shell",
   "description": "AppShell composite block.",
+  "categories": [
+    "blocks"
+  ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/utils.json",
     "https://seany9915.github.io/eolas-ui/r/sidebar.json",

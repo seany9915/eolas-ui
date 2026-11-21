@@ -291,7 +291,7 @@ export const NavigationMenuDemo: React.FC<ComponentDemoProps> = () => {
       </div>
 
       {/* Destination Content View */}
-      <div className="p-6 bg-surface min-h-[140px] flex flex-col gap-2">
+      <div className="p-6 bg-surface min-h-[140px] flex flex-col gap-2 rounded-b-[11px]">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-semibold text-primary">
             Active Section
@@ -347,7 +347,6 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
                     Speech Portal
                   </span>
                 </div>
-                <SidebarTrigger />
               </div>
             </SidebarHeader>
 

@@ -33,7 +33,9 @@ export interface ReadingProgressProps
   position?: ReadingProgressPosition;
   /** Whether to render a small floating percentage pill */
   showPercentage?: boolean;
-  /** Accessible label for screen readers */
+  /** Opt-in screen reader announcement (role="progressbar" with throttled updates). Defaults to false (decorative aria-hidden="true"). */
+  announceProgress?: boolean;
+  /** Accessible label for screen readers when announceProgress is enabled */
   label?: string;
   className?: string;
   trackClassName?: string;
@@ -68,29 +70,46 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
       height = 'sm',
       position = 'fixed',
       showPercentage = false,
+      announceProgress = false,
       label = 'Reading progress',
       className,
       trackClassName,
       indicatorClassName,
       format,
       locale,
+      'aria-hidden': ariaHiddenProp,
       ...props
     },
     ref
   ) => {
     const [progress, setProgress] = React.useState(0);
+    const [announcedProgress, setAnnouncedProgress] = React.useState(0);
     const [supportsCssScrollTimeline, setSupportsCssScrollTimeline] = React.useState(false);
+    const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
-    // Feature-detect CSS scroll-driven animations
+    // Feature-detect CSS scroll-driven animations & reduced-motion preference
     React.useEffect(() => {
-      if (typeof window !== 'undefined' && 'CSS' in window && typeof CSS.supports === 'function') {
+      if (typeof window === 'undefined') return;
+      if ('CSS' in window && typeof CSS.supports === 'function') {
         const isSupported = CSS.supports('(animation-timeline: scroll()) and (animation-range: 0% 100%)');
         setSupportsCssScrollTimeline(isSupported);
+      }
+      if (typeof window.matchMedia === 'function') {
+        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        setPrefersReducedMotion(mediaQuery.matches);
+        const onChange = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
+        mediaQuery.addEventListener('change', onChange);
+        return () => mediaQuery.removeEventListener('change', onChange);
       }
     }, []);
 
     const hasTargetRef = Boolean(targetRef);
-    const useCssDriven = supportsCssScrollTimeline && !hasTargetRef && !showPercentage;
+    const useCssDriven =
+      supportsCssScrollTimeline &&
+      !hasTargetRef &&
+      !showPercentage &&
+      !announceProgress &&
+      !prefersReducedMotion;
 
     // Scroll tracker: skips window listener completely when compositor CSS scroll-driven animation is active
     React.useEffect(() => {
@@ -99,20 +118,46 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
       }
 
       let rafId = 0;
+      let lastAnnouncedTime = 0;
+      let throttleTimerId: ReturnType<typeof setTimeout> | undefined;
+      const ANNOUNCE_THROTTLE_MS = 250;
+
+      const commitAnnounced = (rounded: number) => {
+        lastAnnouncedTime = Date.now();
+        setAnnouncedProgress(rounded);
+      };
 
       const updateProgress = () => {
         const customEl = targetRef?.current;
+        let pct = 0;
         if (customEl) {
           const totalHeight = customEl.scrollHeight - customEl.clientHeight;
           const currentScroll = Math.max(0, customEl.scrollTop);
-          const pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
-          setProgress(Math.round(pct));
+          pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
         } else {
           const scrollElement = document.scrollingElement || document.documentElement;
           const totalHeight = scrollElement.scrollHeight - window.innerHeight;
           const currentScroll = Math.max(0, window.scrollY || scrollElement.scrollTop);
-          const pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
-          setProgress(Math.round(pct));
+          pct = totalHeight > 0 ? Math.min(100, Math.max(0, (currentScroll / totalHeight) * 100)) : 0;
+        }
+
+        const rounded = Math.round(pct);
+        setProgress(rounded);
+
+        if (announceProgress) {
+          const now = Date.now();
+          if (rounded === 0 || rounded === 100 || now - lastAnnouncedTime >= ANNOUNCE_THROTTLE_MS) {
+            if (throttleTimerId !== undefined) {
+              clearTimeout(throttleTimerId);
+              throttleTimerId = undefined;
+            }
+            commitAnnounced(rounded);
+          } else if (throttleTimerId === undefined) {
+            throttleTimerId = setTimeout(() => {
+              throttleTimerId = undefined;
+              commitAnnounced(rounded);
+            }, ANNOUNCE_THROTTLE_MS - (now - lastAnnouncedTime));
+          }
         }
       };
 
@@ -129,20 +174,25 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
 
       return () => {
         cancelAnimationFrame(rafId);
+        if (throttleTimerId !== undefined) clearTimeout(throttleTimerId);
         target.removeEventListener('scroll', handleScroll);
       };
-    }, [targetRef, useCssDriven]);
+    }, [targetRef, useCssDriven, announceProgress]);
 
     const colors = colorStyles[colorRole] || colorStyles.primary;
+    const isDecorative = !announceProgress;
+    const resolvedAriaHidden = ariaHiddenProp ?? (isDecorative ? true : undefined);
+    const rootValue = announceProgress ? announcedProgress : progress;
 
     return (
       <BaseProgress.Root
         ref={ref}
-        value={progress}
+        value={rootValue}
         max={100}
         min={0}
         format={format}
         locale={locale}
+        aria-hidden={resolvedAriaHidden}
         className={cn(
           positionClasses[position],
           'w-full select-none pointer-events-none',
@@ -150,9 +200,11 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         )}
         {...props}
       >
-        <BaseProgress.Label className="sr-only">
-          {label}
-        </BaseProgress.Label>
+        {announceProgress && (
+          <BaseProgress.Label className="sr-only">
+            {label}
+          </BaseProgress.Label>
+        )}
 
         {/* Reading progress track bar */}
         <div className={cn('w-full overflow-hidden', heightClasses[height], colors.track, trackClassName)}>

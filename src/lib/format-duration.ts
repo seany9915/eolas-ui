@@ -3,7 +3,7 @@
 /**
  * Duration Formatting Utility and Hook
  *
- * Platform Reference: Modern Web Guidance (MWG: format-human-readable-durations)
+ * Platform Reference: Modern Web Guidance (MWG: calculate-event-differentials)
  *
  * Localizes time durations (e.g. clinical appointment lengths, exercise intervals, rehabilitation timers)
  * using the standard `Intl.DurationFormat` API (Baseline Newly Available since March 2025 across
@@ -25,7 +25,7 @@ export interface DurationUnits {
 }
 
 export interface DurationFormatOptions {
-  /** Locale identifier (e.g. 'en-US', 'en-GB', 'fr-FR'). Defaults to browser locale or 'en-GB' */
+  /** Locale identifier (e.g. 'en-US', 'en-GB', 'fr-FR'). Defaults to the browser/runtime locale (`undefined`). */
   locale?: string;
   /** Visual presentation style. 'long' ("1 hour and 30 minutes"), 'short' ("1 hr, 30 min"), 'narrow' ("1h 30m"), or 'digital' ("1:30:00") */
   style?: 'long' | 'short' | 'narrow' | 'digital';
@@ -52,20 +52,57 @@ declare global {
  * Fallback duration formatter for environments without Intl.DurationFormat
  */
 function manualFormatDuration(duration: DurationUnits, style: 'long' | 'short' | 'narrow' | 'digital'): string {
-  const parts: string[] = [];
-  const { hours = 0, minutes = 0, seconds = 0, days = 0 } = duration;
+  const {
+    years = 0,
+    months = 0,
+    weeks = 0,
+    days = 0,
+    hours = 0,
+    minutes = 0,
+    seconds = 0,
+    milliseconds = 0,
+  } = duration;
 
   if (style === 'digital') {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    if (hours > 0) {
-      return `${hours}:${pad(minutes)}:${pad(seconds)}`;
-    }
-    return `${minutes}:${pad(seconds)}`;
+    const pad2 = (n: number) => String(Math.abs(n)).padStart(2, '0');
+    const pad3 = (n: number) => String(Math.abs(n)).padStart(3, '0');
+    const prefix: string[] = [];
+    if (years > 0) prefix.push(`${years} yr${years === 1 ? '' : 's'}`);
+    if (months > 0) prefix.push(`${months} mo${months === 1 ? '' : 's'}`);
+    if (weeks > 0) prefix.push(`${weeks} wk${weeks === 1 ? '' : 's'}`);
+    if (days > 0) prefix.push(`${days} day${days === 1 ? '' : 's'}`);
+
+    const msSuffix = milliseconds > 0 ? `.${pad3(milliseconds)}` : '';
+    const clock =
+      hours > 0
+        ? `${hours}:${pad2(minutes)}:${pad2(seconds)}${msSuffix}`
+        : `${minutes}:${pad2(seconds)}${msSuffix}`;
+
+    return prefix.length > 0 ? `${prefix.join(', ')}, ${clock}` : clock;
+  }
+
+  const parts: string[] = [];
+
+  if (years > 0) {
+    if (style === 'narrow') parts.push(`${years}y`);
+    else if (style === 'short') parts.push(`${years} yr${years === 1 ? '' : 's'}`);
+    else parts.push(`${years} year${years === 1 ? '' : 's'}`);
+  }
+
+  if (months > 0) {
+    if (style === 'narrow') parts.push(`${months}mo`);
+    else if (style === 'short') parts.push(`${months} mo${months === 1 ? '' : 's'}`);
+    else parts.push(`${months} month${months === 1 ? '' : 's'}`);
+  }
+
+  if (weeks > 0) {
+    if (style === 'narrow') parts.push(`${weeks}w`);
+    else if (style === 'short') parts.push(`${weeks} wk${weeks === 1 ? '' : 's'}`);
+    else parts.push(`${weeks} week${weeks === 1 ? '' : 's'}`);
   }
 
   if (days > 0) {
     if (style === 'narrow') parts.push(`${days}d`);
-    else if (style === 'short') parts.push(`${days} day${days === 1 ? '' : 's'}`);
     else parts.push(`${days} day${days === 1 ? '' : 's'}`);
   }
 
@@ -81,10 +118,21 @@ function manualFormatDuration(duration: DurationUnits, style: 'long' | 'short' |
     else parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
   }
 
-  if (seconds > 0 || parts.length === 0) {
+  if (seconds > 0) {
     if (style === 'narrow') parts.push(`${seconds}s`);
     else if (style === 'short') parts.push(`${seconds} sec`);
     else parts.push(`${seconds} second${seconds === 1 ? '' : 's'}`);
+  }
+
+  if (milliseconds > 0) {
+    if (style === 'narrow' || style === 'short') parts.push(`${milliseconds} ms`);
+    else parts.push(`${milliseconds} millisecond${milliseconds === 1 ? '' : 's'}`);
+  }
+
+  if (parts.length === 0) {
+    if (style === 'narrow') parts.push('0s');
+    else if (style === 'short') parts.push('0 sec');
+    else parts.push('0 seconds');
   }
 
   if (style === 'long' && parts.length > 1) {
@@ -102,7 +150,7 @@ export function formatDuration(
   duration: DurationUnits,
   options: DurationFormatOptions = {}
 ): string {
-  const { locale = 'en-GB', style = 'long' } = options;
+  const { locale = undefined, style = 'long' } = options;
 
   if (typeof Intl !== 'undefined' && Intl.DurationFormat) {
     try {

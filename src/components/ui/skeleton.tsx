@@ -115,8 +115,13 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
       props: {
         'data-slot': 'skeleton-reveal',
         style: revealStyle,
+        // Overlay both layers in a single-cell CSS Grid to avoid frame-1 container height snaps.
         // Clip only while cross-fading so focus rings on settled loaded content never clip.
-        className: cn('relative w-full', (loading || isTransitioning) && 'overflow-hidden', className),
+        className: cn(
+          'relative grid w-full [&>*]:[grid-area:1/1]',
+          (loading || isTransitioning) && 'overflow-hidden',
+          className
+        ),
         children: (
           <>
             {/* Skeleton Layer */}
@@ -124,10 +129,10 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
               aria-hidden={!loading}
               inert={!loading}
               className={cn(
-                'w-full transition-[opacity,filter] duration-[var(--reveal-dur,var(--duration-slow))] ease-[var(--ease-in-out)] motion-reduce:transition-none',
+                'w-full min-w-0 transition-[opacity,filter] duration-[var(--reveal-dur,var(--duration-slow))] ease-[var(--ease-in-out)] motion-reduce:transition-none',
                 loading
                   ? 'opacity-100 filter-none pointer-events-auto'
-                  : 'absolute inset-0 overflow-hidden opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
+                  : 'opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
               )}
             >
               {skeleton}
@@ -138,9 +143,9 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
               aria-hidden={loading}
               inert={loading}
               className={cn(
-                'w-full transition-[opacity,filter] duration-[var(--reveal-dur,var(--duration-slow))] ease-[var(--ease-in-out)] motion-reduce:transition-none',
+                'w-full min-w-0 transition-[opacity,filter] duration-[var(--reveal-dur,var(--duration-slow))] ease-[var(--ease-in-out)] motion-reduce:transition-none',
                 loading
-                  ? 'absolute inset-0 overflow-hidden opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
+                  ? 'opacity-0 blur-[var(--blur-small,2px)] pointer-events-none'
                   : 'opacity-100 filter-none pointer-events-auto'
               )}
             >

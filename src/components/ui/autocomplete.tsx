@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export interface AutocompleteOption {
   value: string;
@@ -149,18 +149,18 @@ export interface AutocompleteProps<ItemValue = AutocompleteOption>
   error?: boolean | string;
   container?: BaseAutocomplete.Portal.Props['container'];
   anchor?: BaseAutocomplete.Positioner.Props['anchor'];
-  side?: 'top' | 'bottom' | 'left' | 'right';
-  align?: 'start' | 'center' | 'end';
-  sideOffset?: number;
-  alignOffset?: number;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  side?: BaseAutocomplete.Positioner.Props['side'];
+  align?: BaseAutocomplete.Positioner.Props['align'];
+  sideOffset?: BaseAutocomplete.Positioner.Props['sideOffset'];
+  alignOffset?: BaseAutocomplete.Positioner.Props['alignOffset'];
+  collisionPadding?: BaseAutocomplete.Positioner.Props['collisionPadding'];
   collisionBoundary?: BaseAutocomplete.Positioner.Props['collisionBoundary'];
   collisionAvoidance?: BaseAutocomplete.Positioner.Props['collisionAvoidance'];
-  positionerClassName?: string;
-  popupClassName?: string;
-  listClassName?: string;
-  inputGroupClassName?: string;
-  inputClassName?: string;
+  positionerClassName?: BaseAutocomplete.Positioner.Props['className'];
+  popupClassName?: BaseAutocomplete.Popup.Props['className'];
+  listClassName?: BaseAutocomplete.List.Props['className'];
+  inputGroupClassName?: BaseAutocomplete.InputGroup.Props['className'];
+  inputClassName?: BaseAutocomplete.Input.Props['className'];
   emptyMessage?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
   inputRef?: React.Ref<HTMLInputElement>;
@@ -472,17 +472,19 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
       <AutocompleteList className={listClassName}>
         {normalizedGroups && normalizedGroups.length > 0 ? (
           (group: AutocompleteGroupOption) => (
-            <AutocompleteGroup key={group.label}>
-              <AutocompleteGroupLabel>{group.label}</AutocompleteGroupLabel>
-              {(group.items || group.options || []).map((opt) => (
-                <AutocompleteItem
-                  key={opt.value}
-                  value={opt}
-                  disabled={opt.disabled}
-                >
-                  <span className="truncate">{opt.label}</span>
-                </AutocompleteItem>
-              ))}
+            <AutocompleteGroup key={group.label} items={group.items}>
+              {group.label && <AutocompleteGroupLabel>{group.label}</AutocompleteGroupLabel>}
+              <BaseAutocomplete.Collection>
+                {(opt: AutocompleteOption) => (
+                  <AutocompleteItem
+                    key={opt.value}
+                    value={opt}
+                    disabled={opt.disabled}
+                  >
+                    <span className="truncate">{opt.label}</span>
+                  </AutocompleteItem>
+                )}
+              </BaseAutocomplete.Collection>
             </AutocompleteGroup>
           )
         ) : (
@@ -501,9 +503,11 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
 
     const inputGroupElement = (
       <AutocompleteInputGroup
-        className={cn(
-          error && 'border-error focus-within:border-error focus-within:outline-error',
-          disabled && 'bg-surface-container/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
+        className={composeClassName(
+          [
+            error && 'border-error focus-within:border-error focus-within:outline-error',
+            disabled && 'bg-surface-container/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
+          ],
           inputGroupClassName
         )}
       >
@@ -520,7 +524,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
           data-slot="autocomplete-input"
           ref={inputRef}
           id={autocompleteId}
-          name={name || autocompleteId}
+          name={name}
           placeholder={placeholder}
           disabled={disabled}
           readOnly={readOnly}
@@ -528,16 +532,18 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
           autoComplete={autoComplete}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
-          className={cn(
-            'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 outline-none transition-[border-color,box-shadow]',
-            'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-            '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0',
-            size === 'sm' && 'h-11 min-h-[44px] text-xs',
-            size === 'md' && 'h-12 min-h-[48px] text-sm',
-            size === 'lg' && 'h-14 min-h-[56px] text-base',
-            hasLeading ? 'ps-1' : 'ps-3.5',
-            clearable || showTrigger || hasTrailing ? 'pe-2' : 'pe-3.5',
-            'disabled:cursor-not-allowed',
+          className={composeClassName(
+            [
+              'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none transition-[border-color,box-shadow]',
+              'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+              '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0',
+              size === 'sm' && 'h-11 min-h-[44px] text-xs',
+              size === 'md' && 'h-12 min-h-[48px] text-sm',
+              size === 'lg' && 'h-14 min-h-[56px] text-base',
+              hasLeading ? 'ps-1' : 'ps-3.5',
+              clearable || showTrigger || hasTrailing ? 'pe-2' : 'pe-3.5',
+              'disabled:cursor-not-allowed',
+            ],
             inputClassName
           )}
         />
@@ -563,7 +569,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
               collisionPadding={collisionPadding}
               collisionBoundary={collisionBoundary}
               collisionAvoidance={collisionAvoidance}
-              className={cn('z-50 outline-none', positionerClassName)}
+              className={composeClassName('z-50 outline-none', positionerClassName)}
             >
               <AutocompletePopup className={popupClassName}>
                 <AutocompleteEmpty>{emptyMessage}</AutocompleteEmpty>
@@ -576,7 +582,12 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
     );
 
     const inlineListElement = inline && (
-      <div className={cn('mt-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant shadow-sm', popupClassName)}>
+      <div
+        className={cn(
+          'mt-1.5 flex flex-col overflow-hidden p-1 rounded-md bg-surface border border-outline-variant shadow-card',
+          typeof popupClassName === 'string' ? popupClassName : undefined
+        )}
+      >
         <AutocompleteEmpty>{emptyMessage}</AutocompleteEmpty>
         {listContent}
       </div>
@@ -622,7 +633,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
             disabled={disabled}
             readOnly={readOnly}
             required={required}
-            name={name || autocompleteId}
+            name={name}
             id={autocompleteId}
             form={form}
             actionsRef={actionsRef}
@@ -675,7 +686,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
           disabled={disabled}
           readOnly={readOnly}
           required={required}
-          name={name || autocompleteId}
+          name={name}
           id={autocompleteId}
           form={form}
           actionsRef={actionsRef}
@@ -735,12 +746,14 @@ export const AutocompleteInputGroup = React.forwardRef<
   <BaseAutocomplete.InputGroup
     data-slot="autocomplete-input-group"
     ref={ref}
-    className={cn(
-      'relative flex items-center w-full rounded-md border border-outline bg-surface transition-[border-color,outline-color]',
-      'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
-      'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
-      'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
-      'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
+    className={composeClassName(
+      [
+        'relative flex items-center w-full rounded border border-outline bg-surface transition-[border-color,outline-color]',
+        'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
+        'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
+        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
+      ],
       className
     )}
     {...props}
@@ -760,14 +773,16 @@ export const AutocompleteInput = React.forwardRef<
   <BaseAutocomplete.Input
     data-slot="autocomplete-input"
     ref={ref}
-    className={cn(
-      'w-full rounded-md border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/60 transition-[border-color,box-shadow]',
-      'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-      '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0',
-      size === 'sm' && 'h-11 min-h-[44px] text-xs',
-      size === 'md' && 'h-12 min-h-[48px] text-sm',
-      size === 'lg' && 'h-14 min-h-[56px] text-base',
-      'disabled:cursor-not-allowed',
+    className={composeClassName(
+      [
+        'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 transition-[border-color,box-shadow]',
+        'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+        '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0',
+        size === 'sm' && 'h-11 min-h-[44px] text-xs',
+        size === 'md' && 'h-12 min-h-[48px] text-sm',
+        size === 'lg' && 'h-14 min-h-[56px] text-base',
+        'disabled:cursor-not-allowed',
+      ],
       className
     )}
     {...props}
@@ -781,10 +796,12 @@ export const AutocompleteTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Trigger
     ref={ref}
-    className={cn(
-      'relative size-7 min-w-[28px] min-h-[28px] rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
-      'data-[popup-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-      'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+    className={composeClassName(
+      [
+        'relative size-7 min-w-[28px] min-h-[28px] rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
+        'data-[popup-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+      ],
       className
     )}
     aria-label="Show suggestions"
@@ -805,7 +822,7 @@ export const AutocompleteIcon = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Icon
     ref={ref}
-    className={cn('shrink-0 text-on-surface-variant flex items-center justify-center select-none', className)}
+    className={composeClassName('shrink-0 text-on-surface-variant flex items-center justify-center select-none', className)}
     {...props}
   >
     {children ?? (
@@ -823,11 +840,13 @@ export const AutocompleteClear = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Clear
     ref={ref}
-    className={cn(
-      'relative size-7 min-w-[28px] min-h-[28px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
-      'transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-      'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
-      'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+    className={composeClassName(
+      [
+        'relative size-7 min-w-[28px] min-h-[28px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
+        'transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+        'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
+        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+      ],
       className
     )}
     aria-label="Clear input"
@@ -850,7 +869,7 @@ export const AutocompletePositioner = React.forwardRef<
     ref={ref}
     sideOffset={sideOffset}
     collisionPadding={collisionPadding}
-    className={cn('z-50 outline-none', className)}
+    className={composeClassName('z-50 outline-none', className)}
     {...props}
   />
 ));
@@ -862,11 +881,13 @@ export const AutocompletePopup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseAutocomplete.Popup
     ref={ref}
-    className={cn(
-      'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] p-1.5 rounded-lg bg-surface border border-outline-variant shadow-ambient',
-      'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
-      'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
-      'motion-reduce:transition-none motion-reduce:transform-none z-50',
+    className={composeClassName(
+      [
+        'min-w-[var(--anchor-width,200px)] max-w-[var(--available-width)] max-h-[var(--available-height)] flex flex-col overflow-hidden p-1 rounded-md bg-surface border border-outline-variant shadow-ambient',
+        'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)]',
+        'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)]',
+        'motion-reduce:transition-none motion-reduce:transform-none z-50',
+      ],
       className
     )}
     {...props}
@@ -880,9 +901,13 @@ export const AutocompleteArrow = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Arrow
     ref={ref}
-    className={cn(
-      'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
-      'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+    className={composeClassName(
+      [
+        'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px]',
+        'data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90',
+        'data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90',
+      ],
       className
     )}
     {...props}
@@ -908,7 +933,7 @@ export const AutocompleteBackdrop = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseAutocomplete.Backdrop
     ref={ref}
-    className={cn(
+    className={composeClassName(
       'fixed inset-0 z-40 bg-on-surface/40 backdrop-blur-[2px] transition-opacity duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
       className
     )}
@@ -923,9 +948,11 @@ export const AutocompleteEmpty = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Empty
     ref={ref}
-    className={cn(
-      'px-3 py-2.5 font-sans text-sm text-on-surface-variant select-none',
-      'empty:p-0 empty:m-0 empty:h-0 empty:min-h-0 empty:border-0 overflow-hidden',
+    className={composeClassName(
+      [
+        'px-3 py-2.5 font-sans text-sm text-on-surface-variant select-none',
+        'empty:p-0 empty:m-0 empty:h-0 empty:min-h-0 empty:border-0 overflow-hidden',
+      ],
       className
     )}
     {...props}
@@ -941,8 +968,8 @@ export const AutocompleteList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseAutocomplete.List
     ref={ref}
-    className={cn(
-      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 flex flex-col gap-0.5 outline-none data-[empty]:p-0',
+    className={composeClassName(
+      'min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-0.5 scroll-py-1 flex flex-col gap-1 outline-none [scrollbar-width:thin] data-[empty]:p-0',
       className
     )}
     {...props}
@@ -958,11 +985,13 @@ export const AutocompleteItem = React.forwardRef<
   return (
     <BaseAutocomplete.Item
       ref={ref}
-      className={cn(
-        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-md font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
-        'hover:bg-surface-container hover:text-on-surface',
-        'data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
-        'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+      className={composeClassName(
+        [
+          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+          'hover:bg-surface-container hover:text-on-surface',
+          'data-[highlighted]:bg-surface-container data-[highlighted]:text-on-surface',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+        ],
         className
       )}
       {...props}
@@ -982,7 +1011,7 @@ export const AutocompleteGroup = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.Group>,
   React.ComponentPropsWithoutRef<typeof BaseAutocomplete.Group>
 >(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Group ref={ref} className={cn('py-1', className)} {...props} />
+  <BaseAutocomplete.Group ref={ref} className={composeClassName('flex flex-col gap-1 py-1', className)} {...props} />
 ));
 AutocompleteGroup.displayName = 'AutocompleteGroup';
 
@@ -992,7 +1021,7 @@ export const AutocompleteGroupLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseAutocomplete.GroupLabel
     ref={ref}
-    className={cn(
+    className={composeClassName(
       'sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none',
       className
     )}
@@ -1007,7 +1036,7 @@ export const AutocompleteSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseAutocomplete.Separator
     ref={ref}
-    className={cn('h-px my-1 bg-outline-variant/60 -mx-1', className)}
+    className={composeClassName('h-px my-1 bg-outline-variant/60 -mx-1', className)}
     {...props}
   />
 ));
@@ -1017,7 +1046,7 @@ export const AutocompleteRow = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.Row>,
   React.ComponentPropsWithoutRef<typeof BaseAutocomplete.Row>
 >(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Row ref={ref} className={cn('flex items-center gap-1', className)} {...props} />
+  <BaseAutocomplete.Row ref={ref} className={composeClassName('flex items-center gap-1', className)} {...props} />
 ));
 AutocompleteRow.displayName = 'AutocompleteRow';
 
@@ -1025,7 +1054,7 @@ export const AutocompleteStatus = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.Status>,
   React.ComponentPropsWithoutRef<typeof BaseAutocomplete.Status>
 >(({ className, ...props }, ref) => (
-  <BaseAutocomplete.Status ref={ref} className={cn('sr-only', className)} {...props} />
+  <BaseAutocomplete.Status ref={ref} className={composeClassName('sr-only', className)} {...props} />
 ));
 AutocompleteStatus.displayName = 'AutocompleteStatus';
 
@@ -1033,14 +1062,14 @@ export interface AutocompleteContentProps extends React.ComponentPropsWithoutRef
   container?: BaseAutocomplete.Portal.Props['container'];
   keepMounted?: boolean;
   anchor?: BaseAutocomplete.Positioner.Props['anchor'];
-  side?: 'top' | 'bottom' | 'left' | 'right';
-  align?: 'start' | 'center' | 'end';
-  sideOffset?: number;
-  alignOffset?: number;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  side?: BaseAutocomplete.Positioner.Props['side'];
+  align?: BaseAutocomplete.Positioner.Props['align'];
+  sideOffset?: BaseAutocomplete.Positioner.Props['sideOffset'];
+  alignOffset?: BaseAutocomplete.Positioner.Props['alignOffset'];
+  collisionPadding?: BaseAutocomplete.Positioner.Props['collisionPadding'];
   collisionBoundary?: BaseAutocomplete.Positioner.Props['collisionBoundary'];
   collisionAvoidance?: BaseAutocomplete.Positioner.Props['collisionAvoidance'];
-  positionerClassName?: string;
+  positionerClassName?: BaseAutocomplete.Positioner.Props['className'];
   hasArrow?: boolean;
 }
 
@@ -1078,7 +1107,7 @@ export const AutocompleteContent = React.forwardRef<
         collisionPadding={collisionPadding}
         collisionBoundary={collisionBoundary}
         collisionAvoidance={collisionAvoidance}
-        className={cn('z-50 outline-none', positionerClassName)}
+        className={composeClassName('z-50 outline-none', positionerClassName)}
       >
         <AutocompletePopup ref={ref} className={className} {...props}>
           {hasArrow && <AutocompleteArrow />}
