@@ -38,7 +38,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
   selectedId,
   onSelect,
   activeCategory,
-  onCategoryChange: _onCategoryChange,
+  onCategoryChange,
   tierFilter,
   onTierFilterChange,
   searchQuery,
@@ -155,6 +155,25 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
           onClear={() => onSearchChange('')}
           className="w-full text-xs"
         />
+
+        {/* Active Category Filter Pill */}
+        {activeCategory !== 'all' && (
+          <div className="flex items-center justify-between gap-2 px-2 py-1 rounded bg-primary-container text-on-primary-container text-xs">
+            <span className="font-label font-semibold truncate capitalize">
+              Category: {activeCategory}
+            </span>
+            <Button
+              size="sm"
+              variant="text"
+              colorRole="neutral"
+              onClick={() => onCategoryChange('all')}
+              className="text-xs px-2 min-h-8 h-8"
+              aria-label="Clear category filter"
+            >
+              Clear
+            </Button>
+          </div>
+        )}
 
         {/* Tier Filter Segments */}
         <ToggleGroup

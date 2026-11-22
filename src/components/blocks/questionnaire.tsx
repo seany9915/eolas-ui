@@ -1228,6 +1228,7 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
           role={isMultiple ? 'checkbox' : 'radio'}
           aria-checked={isSelected}
           aria-disabled={disabled}
+          aria-keyshortcuts={shortcutKey ? shortcutKey.toUpperCase() : undefined}
           aria-labelledby={props['aria-labelledby'] ?? (label !== undefined || !children ? labelId : undefined)}
           aria-describedby={props['aria-describedby'] ?? (description ? descriptionId : undefined)}
           tabIndex={tabIndex}
@@ -1367,7 +1368,7 @@ export const QuestionnaireChoiceShortcut: React.FC<QuestionnaireChoiceShortcutPr
   if (!shortcutKey) return null;
 
   return (
-    <Kbd size="sm" className={cn('shrink-0 select-none', className)} {...props}>
+    <Kbd aria-hidden="true" size="sm" className={cn('shrink-0 select-none', className)} {...props}>
       {shortcutKey}
     </Kbd>
   );

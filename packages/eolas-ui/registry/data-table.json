@@ -8,7 +8,7 @@
     "blocks"
   ],
   "dependencies": [
-    "@tanstack/react-table"
+    "@tanstack/react-table@^9.0.0"
   ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/utils.json",

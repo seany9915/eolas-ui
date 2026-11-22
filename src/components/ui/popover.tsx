@@ -33,6 +33,7 @@ export interface PopoverProps<Payload = unknown> {
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  anchor?: BasePopover.Positioner.Props['anchor'];
   initialFocus?: BasePopover.Popup.Props['initialFocus'];
   finalFocus?: BasePopover.Popup.Props['finalFocus'];
   actionsRef?: React.RefObject<BasePopover.Root.Actions | null>;
@@ -67,6 +68,7 @@ function PopoverComponentInner<Payload = unknown>(
     sideOffset = 8,
     alignOffset,
     collisionPadding = 8,
+    anchor,
     initialFocus,
     finalFocus,
     actionsRef,
@@ -126,6 +128,7 @@ function PopoverComponentInner<Payload = unknown>(
 
   const renderContentNode = (renderProps: { payload: Payload | undefined }) => (
     <BasePopover.Positioner
+      anchor={anchor}
       side={side}
       align={align}
       sideOffset={sideOffset}
@@ -182,17 +185,19 @@ function PopoverComponentInner<Payload = unknown>(
     >
       {(renderProps) => (
         <>
-          <BasePopover.Trigger
-            id={popoverId}
-            data-slot="popover-trigger"
-            render={React.isValidElement(trigger) ? trigger : undefined}
-            nativeButton={resolveNativeButton(trigger)}
-            openOnHover={openOnHover}
-            delay={delay}
-            closeDelay={closeDelay}
-          >
-            {!React.isValidElement(trigger) ? trigger : undefined}
-          </BasePopover.Trigger>
+          {trigger !== undefined && (
+            <BasePopover.Trigger
+              id={popoverId}
+              data-slot="popover-trigger"
+              render={React.isValidElement(trigger) ? trigger : undefined}
+              nativeButton={resolveNativeButton(trigger)}
+              openOnHover={openOnHover}
+              delay={delay}
+              closeDelay={closeDelay}
+            >
+              {!React.isValidElement(trigger) ? trigger : undefined}
+            </BasePopover.Trigger>
+          )}
           {portal ? (
             <BasePopover.Portal keepMounted={keepMounted}>
               {isModalBackdrop && (
@@ -266,6 +271,7 @@ export interface PopoverContentProps
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  anchor?: BasePopover.Positioner.Props['anchor'];
   showArrow?: boolean;
   containerClassName?: BasePopover.Positioner.Props['className'];
   portal?: boolean;
@@ -282,6 +288,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
       sideOffset = 8,
       alignOffset,
       collisionPadding = 8,
+      anchor,
       showArrow = true,
       containerClassName,
       portal = true,
@@ -292,6 +299,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
   ) => {
     const content = (
       <BasePopover.Positioner
+        anchor={anchor}
         side={side}
         align={align}
         sideOffset={sideOffset}

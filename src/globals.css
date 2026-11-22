@@ -1325,7 +1325,6 @@ select:autofill {
 /* Swipe-to-reveal scroll container & initial target (MWG: swipe-to-reveal) */
 .swipe-reveal-scroller {
   overscroll-behavior: auto;
-  overscroll-behavior: chain;
 }
 
 .swipe-reveal-content {
@@ -1431,10 +1430,17 @@ select:autofill {
   align-items: baseline;
   gap: 0.5em;
 
-  & > svg,
-  & > .material-symbols-outlined {
+  & > svg {
     flex: none;
     block-size: 1cap;
+    inline-size: auto;
+  }
+
+  & > .material-symbols-outlined {
+    flex: none;
+    font-size: 1.15cap;
+    line-height: 1;
+    block-size: auto;
     inline-size: auto;
   }
 }
@@ -1625,97 +1631,71 @@ select:autofill {
  * Supports both standalone `data-density` attributes and inherited `@container style(--density)` cascades. */
 [data-density="compact"] {
   --density: compact;
+  --density-table-cell-px: 0.75rem;
+  --density-table-cell-py: 0.5rem;
+  --density-table-row-min-h: 2.75rem;
+  --density-card-padding: 1rem;
+  --density-list-items-padding: 0.25rem;
+  --density-detail-body-padding: 0.75rem;
 }
 
 [data-density="comfortable"] {
   --density: comfortable;
+  --density-table-cell-px: 1rem;
+  --density-table-cell-py: 0.875rem;
+  --density-table-row-min-h: 3.5rem;
+  --density-card-padding: 1.5rem;
+  --density-list-items-padding: 0.5rem;
+  --density-detail-body-padding: 1.5rem;
 }
 
 [data-density="spacious"] {
   --density: spacious;
+  --density-table-cell-px: 1.5rem;
+  --density-table-cell-py: 1rem;
+  --density-table-row-min-h: 4rem;
+  --density-card-padding: 2rem;
+  --density-list-items-padding: 0.75rem;
+  --density-detail-body-padding: 2rem;
 }
 
-:where([data-density="compact"] [data-slot="table-head"]),
-:where([data-density="compact"] [data-slot="table-cell"]) {
-  padding-inline: 0.75rem;
-  padding-block: 0.5rem;
-}
-
-:where([data-density="compact"] [data-slot="table-row"]) {
-  min-height: 2.75rem;
-}
-
-:where([data-density="spacious"] [data-slot="table-head"]),
-:where([data-density="spacious"] [data-slot="table-cell"]) {
-  padding-inline: 1.5rem;
-  padding-block: 1rem;
-}
-
-:where([data-density="spacious"] [data-slot="table-row"]) {
-  min-height: 4rem;
-}
-
-:where([data-slot="card"][data-density="compact"]) {
-  padding: 1rem;
-}
-
-:where([data-slot="card"][data-density="spacious"]) {
-  padding: 2rem;
-}
-
-:where([data-slot="list-detail-block"][data-density="compact"] [data-slot="list-items"]) {
-  padding: 0.25rem;
-}
-
-:where([data-slot="list-detail-block"][data-density="compact"] [data-slot="detail-body"]) {
-  padding: 0.75rem;
-}
-
-:where([data-slot="list-detail-block"][data-density="spacious"] [data-slot="list-items"]) {
-  padding: 0.75rem;
-}
-
-:where([data-slot="list-detail-block"][data-density="spacious"] [data-slot="detail-body"]) {
-  padding: 2rem;
-}
-
-@container style(--density: compact) {
-  :where([data-slot="table-container"]:not([data-density]) [data-slot="table-head"]),
-  :where([data-slot="table-container"]:not([data-density]) [data-slot="table-cell"]) {
-    padding-inline: 0.75rem;
-    padding-block: 0.5rem;
+@layer components {
+  :where([data-slot="list-detail-block"] [data-slot="list-items"]) {
+    padding: var(--density-list-items-padding, 0.5rem);
   }
-  :where([data-slot="table-container"]:not([data-density]) [data-slot="table-row"]) {
-    min-height: 2.75rem;
-  }
-  :where([data-slot="card"]:not([data-density])) {
-    padding: 1rem;
-  }
-  :where([data-slot="list-detail-block"]:not([data-density]) [data-slot="list-items"]) {
-    padding: 0.25rem;
-  }
-  :where([data-slot="list-detail-block"]:not([data-density]) [data-slot="detail-body"]) {
-    padding: 0.75rem;
-  }
-}
 
-@container style(--density: spacious) {
-  :where([data-slot="table-container"]:not([data-density]) [data-slot="table-head"]),
-  :where([data-slot="table-container"]:not([data-density]) [data-slot="table-cell"]) {
-    padding-inline: 1.5rem;
-    padding-block: 1rem;
+  :where([data-slot="list-detail-block"] [data-slot="detail-body"]) {
+    padding: var(--density-detail-body-padding, 1rem);
   }
-  :where([data-slot="table-container"]:not([data-density]) [data-slot="table-row"]) {
-    min-height: 4rem;
+
+  @container style(--density: compact) {
+    :where([data-slot="table-container"]:not([data-density])) {
+      --density-table-cell-px: 0.75rem;
+      --density-table-cell-py: 0.5rem;
+      --density-table-row-min-h: 2.75rem;
+    }
+    :where([data-slot="card"]:not([data-density])) {
+      --density-card-padding: 1rem;
+    }
+    :where([data-slot="list-detail-block"]:not([data-density])) {
+      --density-list-items-padding: 0.25rem;
+      --density-detail-body-padding: 0.75rem;
+    }
   }
-  :where([data-slot="card"]:not([data-density])) {
-    padding: 2rem;
-  }
-  :where([data-slot="list-detail-block"]:not([data-density]) [data-slot="list-items"]) {
-    padding: 0.75rem;
-  }
-  :where([data-slot="list-detail-block"]:not([data-density]) [data-slot="detail-body"]) {
-    padding: 2rem;
+
+  @container style(--density: spacious) {
+    :where([data-slot="table-container"]:not([data-density])) {
+      --density-table-cell-px: 1.5rem;
+      --density-table-cell-py: 1rem;
+      --density-table-row-min-h: 4rem;
+    }
+    :where([data-slot="card"]:not([data-density])) {
+      --density-card-padding: 2rem;
+    }
+    :where([data-slot="list-detail-block"]:not([data-density])) {
+      --density-list-items-padding: 0.75rem;
+      --density-detail-body-padding: 2rem;
+    }
   }
 }
 

@@ -50,7 +50,7 @@ Every refactored component MUST pass this checklist with 100% compliance:
 - **3-Level Containment Model**:
   1. **Low Prominence (`background` canvas + dividers)**: `bg-background` (`oklch(0.96 0.004 82)`) with clean hairline `border-outline-variant` (`#C9C7C3`) dividers, typography, and whitespace.
   2. **Medium Prominence (Cards & Recessed Grouping)**: White `bg-surface` borderless cards (`border border-transparent shadow-card`); `bg-surface-container-low` inset panes strictly inside white cards; `bg-surface-container-high` (`oklch(0.92 0.005 82)`) for recessed control tracks paired with `border-outline` (`#706E6B`) when an interactive boundary is needed.
-  3. **High Prominence (`prominence="inverted"` / `prominence="filled"`)**: Dark charcoal `#1C1A18` (`[data-surface="inverted"]`) or solid brand fills for focal milestones.
+  3. **High Prominence (`prominence="inverted"` / `prominence="filled"`)**: Dark Stone `#2F2E2B` (`bg-neutral`, `[data-surface="inverted"]`) or solid brand fills for focal milestones.
 - **No Card Soup**: Do not wrap every piece of content in individual cards or nest cards inside cards.
 - **No `surface-container-low` on canvas without a border, or low-contrast `outline-variant` boundaries on interactive controls**: Interactive inputs/controls must use `outline` (`#706E6B`) for 3:1+ non-text contrast (WCAG SC 1.4.11).
 - **No Asymmetric Card Borders**: Never use single-sided accent borders on rounded cards (`rounded-lg`/`rounded-md`). Reserve asymmetric `rounded-s-none rounded-e` + `4px` start bar (`border-s-4` / `start-0 w-1`) strictly for `<InlineAlert />` (`src/components/ui/inline-alert.tsx`) and `<Toast />`; use `<ClinicianTip />` (`src/components/ui/clinician-tip.tsx`) for routine tips.

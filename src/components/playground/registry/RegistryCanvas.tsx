@@ -72,8 +72,15 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
   return (
     <section
       aria-labelledby="component-canvas-heading"
-      className={cn('w-full space-y-6', className)}
+      className={cn('w-full', className)}
     >
+      <TabsRoot
+        value={activeTab}
+        onValueChange={(val) => setActiveTab(val as string)}
+        variant="segmented"
+        size="sm"
+        className="flex flex-col gap-6"
+      >
       {/* Component Header Bar */}
       <Card className="p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -169,27 +176,20 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
         {/* Canvas Toolbar & Tabs via Base UI Tabs and ToggleGroup */}
         <div className="mt-5 pt-4 border-t border-outline-variant flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
           {/* Base UI Tabs List */}
-          <TabsRoot
-            value={activeTab}
-            onValueChange={(val) => setActiveTab(val as string)}
-            variant="segmented"
-            size="sm"
-          >
-            <TabsList>
-              <Tab value="preview">
-                <Icon name="visibility" size="xs" />
-                Preview & Sandbox
-              </Tab>
-              <Tab value="code">
-                <Icon name="code" size="xs" />
-                Code & Usage
-              </Tab>
-              <Tab value="contract">
-                <Icon name="verified" size="xs" />
-                Contract & A11y
-              </Tab>
-            </TabsList>
-          </TabsRoot>
+          <TabsList>
+            <Tab value="preview">
+              <Icon name="visibility" size="xs" />
+              Preview & Sandbox
+            </Tab>
+            <Tab value="code">
+              <Icon name="code" size="xs" />
+              Code & Usage
+            </Tab>
+            <Tab value="contract">
+              <Icon name="verified" size="xs" />
+              Contract & A11y
+            </Tab>
+          </TabsList>
 
           {/* Viewport & Direction Controls via Base UI ToggleGroup */}
           <div className="flex flex-wrap items-center gap-3 self-start sm:self-end xl:self-auto max-w-full">
@@ -234,7 +234,6 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
       </Card>
 
       {/* Main Content Area via Base UI TabsPanels */}
-      <TabsRoot value={activeTab} onValueChange={(val) => setActiveTab(val as string)}>
         <TabsPanel value="preview">
           <div className="space-y-3">
             {/* Sandbox Ruler & Semantic Viewport Indicator - NO static status dots */}

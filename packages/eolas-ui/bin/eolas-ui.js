@@ -49,7 +49,7 @@ eolas-ui v${CLI_VERSION} - Base UI Component Registry CLI
 USAGE:
   npx @seany9915/eolas-ui add <item-name...> [--overwrite] [--dry-run]
   npx @seany9915/eolas-ui add --all [--overwrite] [--dry-run] [--include-deprecated]
-  npx @seany9915/eolas-ui sync [--all] [--dry-run] [--include-deprecated]
+  npx @seany9915/eolas-ui sync [item-name...] [--all] [--dry-run] [--include-deprecated]
   npx @seany9915/eolas-ui list
   npx @seany9915/eolas-ui --version
 
@@ -252,6 +252,21 @@ function getUiAlias(componentsConfig) {
   return null;
 }
 
+function getLibAlias(componentsConfig) {
+  const trimSlash = (val) => val.replace(/\/+$/, '');
+  if (componentsConfig?.aliases?.lib) {
+    return trimSlash(componentsConfig.aliases.lib);
+  }
+  if (componentsConfig?.aliases?.utils) {
+    const normalizedUtils = trimSlash(componentsConfig.aliases.utils);
+    const lastSlash = normalizedUtils.lastIndexOf('/');
+    if (lastSlash > 0) {
+      return normalizedUtils.slice(0, lastSlash);
+    }
+  }
+  return null;
+}
+
 function rewriteImports(content, filePath, componentsConfig) {
   if (!/\.(tsx?|jsx?|mjs)$/i.test(filePath)) return content;
   const aliases = componentsConfig?.aliases;
@@ -261,7 +276,7 @@ function rewriteImports(content, filePath, componentsConfig) {
   const trimSlash = (val) => val.replace(/\/+$/, '');
 
   const utilsAlias = aliases.utils ? trimSlash(aliases.utils) : null;
-  const libAlias = aliases.lib ? trimSlash(aliases.lib) : null;
+  const libAlias = getLibAlias(componentsConfig);
   const componentsAlias = aliases.components ? trimSlash(aliases.components) : null;
   const uiAlias = getUiAlias(componentsConfig);
 
@@ -307,13 +322,14 @@ function resolveFromTsconfigPaths(rawAlias, tsconfigPaths, cwd) {
     if (typeof firstTarget !== 'string') continue;
 
     let mapped = null;
-    if (pattern.endsWith('/*') && firstTarget.endsWith('/*')) {
-      const prefix = pattern.slice(0, -1);
-      const targetPrefix = firstTarget.slice(0, -1);
-      if (rawAlias.startsWith(prefix)) {
-        mapped = `${targetPrefix}${rawAlias.slice(prefix.length)}`;
-      } else if (rawAlias === prefix.slice(0, -1)) {
-        mapped = targetPrefix.replace(/\/+$/, '') || '.';
+    if (pattern.includes('*') && firstTarget.includes('*')) {
+      const [patPrefix, patSuffix] = pattern.split('*');
+      const [tgtPrefix, tgtSuffix] = firstTarget.split('*');
+      if (rawAlias.startsWith(patPrefix) && rawAlias.endsWith(patSuffix)) {
+        const matched = rawAlias.slice(patPrefix.length, rawAlias.length - patSuffix.length);
+        mapped = `${tgtPrefix}${matched}${tgtSuffix}`;
+      } else if (patSuffix === '' && patPrefix.endsWith('/') && rawAlias === patPrefix.slice(0, -1)) {
+        mapped = tgtPrefix.replace(/\/+$/, '') || '.';
       }
     } else if (pattern === rawAlias) {
       mapped = firstTarget;
@@ -339,6 +355,10 @@ function resolveAlias(rawAlias, fallback, { cwd, hasSrc, tsconfigPaths }) {
   if (rawAlias.startsWith('@/') || rawAlias.startsWith('~/')) {
     const stripped = rawAlias.slice(2);
     return hasSrc && !stripped.startsWith('src/') ? path.join('src', stripped) : stripped;
+  }
+  if (tsconfigPaths?.baseUrlAbs && !rawAlias.startsWith('.') && !path.isAbsolute(rawAlias)) {
+    const absTarget = path.resolve(tsconfigPaths.baseUrlAbs, rawAlias);
+    return path.relative(cwd, absTarget).replace(/\\/g, '/');
   }
   return rawAlias;
 }
@@ -401,7 +421,7 @@ function resolveDestPath(file, itemType, componentsConfig, ctx) {
     const alias = resolveAlias(componentsConfig?.aliases?.components, 'components', ctx);
     destPath = path.resolve(cwd, alias, target.slice(12));
   } else if (target.startsWith('@lib/')) {
-    const alias = resolveAlias(componentsConfig?.aliases?.lib, 'lib', ctx);
+    const alias = resolveAlias(getLibAlias(componentsConfig), 'lib', ctx);
     destPath = path.resolve(cwd, alias, target.slice(5));
   } else if (target.startsWith('@hooks/')) {
     const alias = resolveAlias(componentsConfig?.aliases?.hooks, 'hooks', ctx);
@@ -412,15 +432,24 @@ function resolveDestPath(file, itemType, componentsConfig, ctx) {
     destPath = path.resolve(baseDir, target);
   }
 
-  // Smart resolution for theme stylesheet target
+  // Smart resolution for theme stylesheet target (never hijack an existing non-Eolas stylesheet)
   if (THEME_TARGET_NAMES.has(target)) {
     if (componentsConfig?.tailwind?.css) {
-      destPath = path.resolve(cwd, componentsConfig.tailwind.css);
+      const configuredCss = path.resolve(cwd, componentsConfig.tailwind.css);
+      if (!fs.existsSync(configuredCss) || hasEolasThemeSignature(configuredCss)) {
+        destPath = configuredCss;
+      }
     } else {
       const candidates = getThemeCandidatePaths(cwd, null);
       const existing = candidates.find((p) => hasEolasThemeSignature(p));
       if (existing) destPath = existing;
     }
+  }
+
+  // Guard against path traversal outside workspace root
+  const relToCwd = path.relative(cwd, destPath);
+  if (relToCwd.startsWith('..') || path.isAbsolute(relToCwd)) {
+    throw new Error(`Refusing to resolve target outside workspace root: "${destPath}"`);
   }
 
   return destPath;
@@ -575,12 +604,13 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
     }
   }
 
+  const formatInstallSpec = (spec) => (/[\^~><\s]/.test(spec) ? `"${spec}"` : spec);
   console.log(`\n${dryRun ? '[dry-run] Would process' : 'Successfully processed'} ${resolvedItems.length} items/dependencies (${installedFiles.length} file(s)).`);
   if (requiredDeps.size > 0) {
-    console.log(`Required dependencies:\n  npm install ${Array.from(requiredDeps).sort().join(' ')}`);
+    console.log(`Required dependencies:\n  npm install ${Array.from(requiredDeps).sort().map(formatInstallSpec).join(' ')}`);
   }
   if (requiredDevDeps.size > 0) {
-    console.log(`Required devDependencies:\n  npm install -D ${Array.from(requiredDevDeps).sort().join(' ')}`);
+    console.log(`Required devDependencies:\n  npm install -D ${Array.from(requiredDevDeps).sort().map(formatInstallSpec).join(' ')}`);
   }
   if (docsNotes.length > 0) {
     console.log('\nSetup notes:');
@@ -617,7 +647,6 @@ function detectInstalledItems(items, cwd) {
     if (item.type !== 'registry:ui' && item.type !== 'registry:block' && item.type !== 'registry:lib') {
       continue;
     }
-    if (item.name === 'utils') continue;
     const itemFile = path.join(REGISTRY_DIR, `${item.name}.json`);
     if (!fs.existsSync(itemFile)) continue;
     const data = JSON.parse(fs.readFileSync(itemFile, 'utf8'));
@@ -625,6 +654,16 @@ function detectInstalledItems(items, cwd) {
     if (!primaryFile) continue;
     const destPath = resolveDestPath(primaryFile, data.type, componentsConfig, ctx);
     if (fs.existsSync(destPath)) {
+      if (item.name === 'utils') {
+        try {
+          const utilsSrc = fs.readFileSync(destPath, 'utf8');
+          if (!utilsSrc.includes('composeClassName') && !utilsSrc.includes('resolveNativeButton')) {
+            continue;
+          }
+        } catch {
+          continue;
+        }
+      }
       installed.push(item.name);
     }
   }
@@ -685,6 +724,7 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
 } else if (command === 'sync') {
   const flags = args.slice(1).filter((a) => a.startsWith('-'));
   warnUnknownFlags(flags);
+  const requestedNames = args.slice(1).filter((a) => !a.startsWith('-'));
   const dryRun = flags.includes('--dry-run');
   const syncAll = flags.includes('--all') || flags.includes('-a');
   const includeDeprecated = flags.includes('--include-deprecated');
@@ -702,11 +742,14 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
     const installedPresets = detectInstalledItems(items, process.cwd()).filter((name) =>
       ['theme', 'design-md', 'agent-rules', 'lint'].includes(name)
     );
-    const syncTargets = Array.from(new Set([...nonDeprecatedNames, ...installedPresets]));
+    const syncTargets = Array.from(new Set([...nonDeprecatedNames, ...installedPresets, ...requestedNames]));
     console.log(
       `${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} all ${nonDeprecatedNames.length} Eolas UI components, blocks, and utilities${installedPresets.length > 0 ? ` plus ${installedPresets.length} installed preset(s) (${installedPresets.join(', ')})` : ''}...\n`
     );
     addComponents(syncTargets, { overwrite: true, dryRun });
+  } else if (requestedNames.length > 0) {
+    console.log(`${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} ${requestedNames.length} specified Eolas UI item(s) and their dependencies...\n`);
+    addComponents(requestedNames, { overwrite: true, dryRun });
   } else {
     const detected = detectInstalledItems(items, process.cwd());
     if (detected.length > 0) {
@@ -736,7 +779,9 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
           (includeDeprecated || !DEPRECATED_ITEMS.has(i.name))
       )
       .map((i) => i.name);
-    addComponents(allComponentNames, { overwrite, dryRun });
+    const extraNames = names.filter((n) => n !== 'all');
+    const combinedNames = Array.from(new Set([...allComponentNames, ...extraNames]));
+    addComponents(combinedNames, { overwrite, dryRun });
   } else {
     addComponents(names, { overwrite, dryRun });
   }

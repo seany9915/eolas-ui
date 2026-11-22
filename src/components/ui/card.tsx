@@ -70,7 +70,7 @@ const CardContext = React.createContext<CardContextValue>({
 });
 
 const sizeStyles: Record<CardSize, string> = {
-  default: 'p-6',
+  default: 'p-[var(--density-card-padding,1.5rem)]',
   sm: 'p-4',
 };
 
@@ -105,7 +105,7 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
 
   const baseStyles = cn(
     sizeStyles[size] ?? sizeStyles.default,
-    'rounded-[1rem] transition-[box-shadow,border-color,background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] relative motion-reduce:transition-none'
+    'rounded-[1rem] transition-[box-shadow,border-color,background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] relative motion-reduce:transition-none has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary'
   );
 
   // Body copy uses warm off-white (text-on-neutral) on dark stone (bg-neutral) to avoid glare; tertiary accents apply to headlines/icons

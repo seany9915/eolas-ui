@@ -82,14 +82,15 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
       style={{ '--sidebar-width': '18.5rem', '--sidebar-width-mobile': '20rem' } as React.CSSProperties}
     >
       {/* Mobile Topbar for Sidebar Toggle (< lg screens) */}
-      <div className="lg:hidden w-full flex items-center justify-between p-3.5 border-b border-outline-variant bg-surface sticky top-0 z-30">
+      <div className="lg:hidden w-full flex items-center justify-between p-3.5 border-b border-outline-variant bg-surface sticky top-18 z-30">
         <Button
           size="sm"
-          variant="outlined"
+          variant="outline"
+          colorRole="neutral"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="text-xs h-8 font-medium"
+          className="text-xs font-medium"
         >
-          <Icon name={isSidebarOpen ? 'close' : 'menu'} size="xs" className="mr-1.5" />
+          <Icon name={isSidebarOpen ? 'close' : 'menu'} size="xs" />
           {isSidebarOpen ? 'Close Menu' : 'Browse Components'}
         </Button>
         {selectedEntry ? (

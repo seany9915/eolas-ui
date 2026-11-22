@@ -178,26 +178,36 @@ export function useYieldingFilter<T>(
   const [isFiltering, setIsFiltering] = React.useState(false);
   const predicateRef = React.useRef(predicate);
   const prevDepsRef = React.useRef<React.DependencyList | undefined>(undefined);
-  const depsVersionRef = React.useRef(0);
-
-  if (resolvedDeps !== undefined) {
-    const prev = prevDepsRef.current;
-    const hasChanged =
-      !prev ||
-      prev.length !== resolvedDeps.length ||
-      resolvedDeps.some((value, index) => !Object.is(value, prev[index]));
-    if (hasChanged) {
-      depsVersionRef.current += 1;
-      prevDepsRef.current = resolvedDeps;
-    }
-  }
-  const depsVersion = depsVersionRef.current;
+  const prevItemsRef = React.useRef<T[] | undefined>(undefined);
+  const prevBudgetRef = React.useRef<number | undefined>(undefined);
+  const runIdRef = React.useRef(0);
 
   React.useEffect(() => {
     predicateRef.current = predicate;
   }, [predicate]);
 
   React.useEffect(() => {
+    const itemsChanged = !Object.is(prevItemsRef.current, items);
+    const budgetChanged = !Object.is(prevBudgetRef.current, budgetMs);
+    let depsChanged = false;
+
+    if (resolvedDeps !== undefined) {
+      const prev = prevDepsRef.current;
+      depsChanged =
+        !prev ||
+        prev.length !== resolvedDeps.length ||
+        resolvedDeps.some((value, index) => !Object.is(value, prev[index]));
+    }
+
+    if (!itemsChanged && !budgetChanged && !depsChanged) {
+      return;
+    }
+
+    prevItemsRef.current = items;
+    prevBudgetRef.current = budgetMs;
+    prevDepsRef.current = resolvedDeps;
+
+    const currentRunId = ++runIdRef.current;
     let active = true;
     setIsFiltering(true);
 
@@ -206,7 +216,7 @@ export function useYieldingFilter<T>(
       let sliceStart = getNow();
 
       for (let i = 0; i < items.length; i++) {
-        if (!active) return;
+        if (!active || runIdRef.current !== currentRunId) return;
         if (predicateRef.current(items[i])) {
           matched.push(items[i]);
         }
@@ -215,20 +225,22 @@ export function useYieldingFilter<T>(
           sliceStart = getNow();
         }
       }
-      if (active) {
+      if (active && runIdRef.current === currentRunId) {
         setFiltered(matched);
         setIsFiltering(false);
       }
     }
 
     runFilter().catch(() => {
-      if (active) setIsFiltering(false);
+      if (active && runIdRef.current === currentRunId) {
+        setIsFiltering(false);
+      }
     });
 
     return () => {
       active = false;
     };
-  }, [items, budgetMs, depsVersion]);
+  }, [items, budgetMs, resolvedDeps]);
 
   return { filtered, isFiltering };
 }

@@ -57,8 +57,8 @@ const PRIMITIVE_SYNONYMS = {
   typeahead: ['autocomplete', 'combobox'],
   'search-input': ['input-group', 'autocomplete'],
   'file-upload': ['attachment'],
-  'side-panel': ['drawer', 'sheet', 'sidebar'],
-  'slide-over': ['drawer', 'sheet', 'sidebar'],
+  'side-panel': ['drawer', 'sidebar'],
+  'slide-over': ['drawer', 'sidebar'],
 };
 
 let raw = '';

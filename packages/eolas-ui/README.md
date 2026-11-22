@@ -40,6 +40,9 @@ npx @seany9915/eolas-ui sync --dry-run
 # Update only already-installed items (components, blocks, utilities, theme, design-md, agent-rules, lint)
 npx @seany9915/eolas-ui sync
 
+# Update specific items (and their dependencies) in place
+npx @seany9915/eolas-ui sync button dialog
+
 # Explicitly sync the full non-deprecated catalog (or include deprecated compatibility items)
 npx @seany9915/eolas-ui sync --all
 npx @seany9915/eolas-ui sync --all --include-deprecated
@@ -49,7 +52,7 @@ npx @seany9915/eolas-ui add tabs --overwrite
 ```
 
 ### 3. Fonts & Material Symbols Icons
-Installing `theme` writes the Tailwind CSS v4 stylesheet (to your `components.json` `tailwind.css` path when configured, or `src/eolas-theme.css` without overwriting an existing non-Eolas `src/index.css`).
+Installing `theme` writes the Tailwind CSS v4 stylesheet to `src/eolas-theme.css` without overwriting an existing non-Eolas `src/index.css`. Import it inside your main Tailwind CSS entry file (`@import "./eolas-theme.css";` in your `components.json` `tailwind.css` file) — or point `components.json`'s `tailwind.css` directly to `src/eolas-theme.css` — so both Tailwind v4 `@theme` resolution and `@shadcn/lint` (`shadcn/no-unknown-classes`) discover all Eolas tokens.
 
 Fonts (`Atkinson Hyperlegible Next`, `Lexend`, `Roboto Mono`) and `Material Symbols Outlined` are loaded non-blocking via `<link>` tags rather than render-blocking CSS `@import` rules. Add these to your HTML `<head>`:
 

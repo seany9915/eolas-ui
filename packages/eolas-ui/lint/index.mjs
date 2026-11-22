@@ -1711,7 +1711,7 @@ export const plugin = {
         type: 'problem',
         docs: {
           description:
-            'Disallow Sunny Amber text-tertiary, border-*-tertiary, ring-tertiary, and outline-tertiary on light surfaces (fails WCAG AA 1.99:1 contrast).',
+            'Disallow Sunny Amber text-tertiary, border-*-tertiary, ring-tertiary, and outline-tertiary on light surfaces (fails WCAG AA 1.97:1 contrast).',
         },
         schema: [],
       },
@@ -1719,7 +1719,7 @@ export const plugin = {
         let invertedDepth = 0;
         const invertedStack = [];
         const message =
-          'Sunny Amber (`text-tertiary` / `border-*-tertiary` / `ring-tertiary` / `outline-tertiary`) is banned on light surfaces (fails WCAG AA 1.99:1). Use `tertiary` only for solid fills with neutral text, `*-container` washes, or inside inverted dark surfaces (`inverted:text-tertiary`).';
+          'Sunny Amber (`text-tertiary` / `border-*-tertiary` / `ring-tertiary` / `outline-tertiary`) is banned on light surfaces (fails WCAG AA 1.97:1). Use `tertiary` only for solid fills with neutral text, `*-container` washes, or inside inverted dark surfaces (`inverted:text-tertiary`).';
 
         return createClassRuleVisitor(context, {
           captureContext: () => ({ inverted: invertedDepth > 0 }),

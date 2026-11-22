@@ -57,8 +57,10 @@ import { cn } from '@/lib/utils';
 
 export const ApprovalCardDemo: React.FC<ComponentDemoProps> = () => {
   const [selected, setSelected] = React.useState('opt-1');
+  const [customInput, setCustomInput] = React.useState('');
+  const [confirmed, setConfirmed] = React.useState(false);
   return (
-    <div className="w-full max-w-xl mx-auto py-6">
+    <div className="w-full max-w-xl mx-auto py-6 flex flex-col gap-3">
       <ApprovalCard
         title="Update Weekly Practice Plan"
         description="Select the target sound set for this week's practice sessions."
@@ -67,11 +69,19 @@ export const ApprovalCardDemo: React.FC<ComponentDemoProps> = () => {
           { id: 'opt-2', label: 'S-Blend Syllables', description: '10 minutes daily with picture cards' },
         ]}
         selectedOptionId={selected}
-        onSelectOption={setSelected}
+        onSelectOption={(id) => {
+          setSelected(id);
+          setConfirmed(false);
+        }}
+        customInputValue={customInput}
+        onCustomInputChange={(val) => {
+          setCustomInput(val);
+          setConfirmed(false);
+        }}
         stepCurrent={1}
         stepTotal={2}
-        confirmLabel="Confirm Practice Plan"
-        onConfirm={() => {}}
+        confirmLabel={confirmed ? 'Plan Confirmed' : 'Confirm Practice Plan'}
+        onConfirm={() => setConfirmed(true)}
       />
     </div>
   );
@@ -128,18 +138,25 @@ export const DeleteConfirmationDialogDemo: React.FC<ComponentDemoProps> = () => 
 
 export const FilterToolbarDemo: React.FC<ComponentDemoProps> = () => {
   const [q, setQ] = React.useState('');
+  const [status, setStatus] = React.useState('all');
   return (
     <div className="w-full max-w-3xl mx-auto py-6">
       <FilterToolbar
         searchQuery={q}
         onSearchChange={setQ}
-        onReset={() => setQ('')}
+        onReset={() => {
+          setQ('');
+          setStatus('all');
+        }}
+        onFilterChange={(groupId, value) => {
+          if (groupId === 'status') setStatus(value);
+        }}
         searchPlaceholder="Filter learners by name or ID..."
         filterGroups={[
           {
             id: 'status',
             label: 'Status',
-            value: 'all',
+            value: status,
             defaultValue: 'all',
             options: [
               { value: 'all', label: 'All Statuses' },

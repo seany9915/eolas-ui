@@ -70,7 +70,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
       selectedOptionId,
       onSelectOption,
       allowCustomInput = true,
-      customInputValue = '',
+      customInputValue,
       onCustomInputChange,
       customInputPlaceholder = 'Something else…',
       stepCurrent,
@@ -87,15 +87,22 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
     ref
   ) => {
     const [internalSelectedId, setInternalSelectedId] = React.useState<string | undefined>();
+    const [internalCustomInput, setInternalCustomInput] = React.useState('');
     const selectedId = selectedOptionId ?? internalSelectedId;
+    const resolvedCustomInput = customInputValue ?? internalCustomInput;
     const choices = options.filter((opt) => opt.id !== APPROVAL_CARD_CUSTOM_OPTION_ID);
     const customInput = (
       <Field.Root>
         <Field.Label className="sr-only">Custom answer</Field.Label>
         <Input
           type="text"
-          value={customInputValue}
-          onChange={(e) => onCustomInputChange?.(e.target.value)}
+          value={resolvedCustomInput}
+          onChange={(e) => {
+            if (customInputValue === undefined) {
+              setInternalCustomInput(e.target.value);
+            }
+            onCustomInputChange?.(e.target.value);
+          }}
           placeholder={customInputPlaceholder}
           className="w-full"
         />

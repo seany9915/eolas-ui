@@ -8,7 +8,7 @@
     "layout"
   ],
   "dependencies": [
-    "react-resizable-panels"
+    "react-resizable-panels@^4.0.0"
   ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/utils.json"

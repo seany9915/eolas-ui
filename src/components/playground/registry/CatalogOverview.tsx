@@ -222,7 +222,9 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             </div>
             <h3 className="font-heading text-base font-bold text-on-surface">No components found</h3>
             <p className="font-sans text-sm text-on-surface-variant max-w-md mx-auto">
-              No components match &ldquo;{search}&rdquo; in the selected filter. Try adjusting your search query or selecting a different category.
+              {search.trim()
+                ? `No components match "${search.trim()}" in the selected filter. Try adjusting your search query or selecting a different category.`
+                : 'No components match the selected filter. Try selecting a different tier or category.'}
             </p>
           </div>
         ) : (

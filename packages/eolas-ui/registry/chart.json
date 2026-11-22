@@ -8,7 +8,8 @@
     "layout"
   ],
   "dependencies": [
-    "recharts"
+    "react-is",
+    "recharts@^3.0.0"
   ],
   "registryDependencies": [
     "https://seany9915.github.io/eolas-ui/r/utils.json"

@@ -28,12 +28,12 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Stacked vertical icon-over-text utility buttons** → **Use:** Inline icon left of label.
 - **Banned: Card Soup / Metric Card Grids ("Card Grid Rain") / nested cards** → **Use:** Low-prominence typography/dividers, tables, definition lists, or accordions; never nest `<Card>` inside `<Card>`.
 - **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (`variant="unboxed"` inside cards; `variant="surface"` or `variant="inset"` on canvas).
-- **Banned: `surface-variant` fill + `outline-variant` border** (1.31:1 contrast) → **Use:** `outline` (`#706E6B`) border when a neutral fill needs a boundary.
+- **Banned: `surface-container-low` / `surface-container-high` fill + `outline-variant` border** (low contrast) → **Use:** `outline` (`#706E6B`) border when a neutral fill needs a boundary.
 - **Banned: Single-sided accent borders on rounded cards** → **Use:** Borderless `border border-transparent` standard cards; reserve `rounded-s-none rounded-e` + `border-s-4` strictly for `<InlineAlert />` and `<Toast />`.
 - **Banned: Div Soup / toxic wrapper-itis** (`<Box>`, `<Flex>`, `<Spacer>`, redundant `<div>`/`<>`) → **Use:** Direct classes on semantic elements or plain layout `<div>`s (`flex`/`grid`).
 - **Banned: Desktop FABs** → **Use:** Inline actions, side-drawers, or page headers.
 - **Banned: Viewport breakpoints (`sm:`, `md:`, `lg:`) inside reusable components** → **Use:** `@container` on a defined-width wrapper `<div>` (`w-full` or grid cell, never `<table>`/`<tr>`/auto-sized flex) + `@sm:`/`@md:`/`@lg:`. Reserve viewport queries for page shells.
-- **Banned: Left-aligned numeric table columns** → **Use:** `text-right` + `tabular-nums` / `font-mono` on numeric `<th>` and `<td>` (or `numeric: true` on `<Table />`).
+- **Banned: Start-aligned numeric table columns** → **Use:** `text-end` + `tabular-nums` / `font-mono` on numeric `<th>` and `<td>` (or `numeric: true` on `<Table />`).
 - **Banned: Arbitrary or `0px` clamped nested radii in padded cards** → **Use:** $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ for nested media/panels (clamping to `rounded` / `8px`; tight `p-1` segmented shells still use `rounded-sm` / `4px`).
 - **Banned: Mismatched input + button heights or asymmetric icon insets** → **Use:** Identical height tiers (`sm`: 44px, `md`: 48px, `lg`: 56px), `shrink-0 whitespace-nowrap` on buttons, and symmetric icon padding.
 
@@ -47,12 +47,12 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 
 ## Code Quality, Overlays & Component Library
 - **Banned: Placeholder stubs (`// TODO`) or `any` / `@ts-ignore` / `as unknown as T`** → **Use:** Complete runnable code (or `throw new Error('Not implemented: ...')`) and strict types / `zod`.
-- **Banned: Titleless overlays or manual `z-index` (`z-50`, `z-9999`) outside `ui/` portal primitives** → **Use:** `<DialogTitle>` / `<DrawerTitle>` / `<SheetTitle>` (or `sr-only`) and let `src/components/ui/` portal primitives handle stacking.
+- **Banned: Titleless overlays or manual `z-index` (`z-50`, `z-9999`) outside `ui/` portal primitives** → **Use:** `<DialogTitle>` / `<DrawerTitle>` (or `sr-only`) and let `src/components/ui/` portal primitives handle stacking.
 - **Banned: Heavy blurs for simple inputs or bloated multi-tier headers** → **Use:** Inline editing / side panels and consolidated top navigation.
 - **Banned: Manual `relative`/`absolute` buttons inside inputs** → **Use:** `<InputGroup>` + `<InputGroupAddon>` + `<InputGroupButton>`.
 - **Banned: Looped `<Button>` arrays for mode/filter bars** → **Use:** `<ToggleGroup>` (`role="radiogroup"` or `role="group"`).
 - **Banned: Ungrouped `*Item` in `Select` / `Menu` / `ContextMenu`** → **Use:** `<Select.Group>`, `<Menu.Group>`, `<ContextMenu.Group>`.
-- **Banned: Arbitrary theme/color/font overrides via `className` at call sites** (`bg-red-500`, `font-serif`) → **Use:** `variant`, `colorRole`, `prominence`, `size` props. (Layout classes and structural docking resets like `rounded-none`, `border-0`, `bg-transparent` are allowed.)
+- **Banned: Arbitrary theme/color/border/radius/font overrides via `className` at call sites** (`bg-red-500`, `font-serif`) → **Use:** `variant`, `colorRole`, `prominence`, `size` props (enforced by Oxlint `shadcn/no-restyle`). Layout classes (`w-full`, `max-w-md`, `mt-4`, `shrink-0`) are allowed.
 - **Banned: Pending approvals inside `<Trace>`** → **Use:** Standalone `<Confirmation>` blocks in the chat stream.
 - **Banned: Ad-hoc `@keyframes` / gradient sweeps** → **Use:** `<ShimmerText>` or `<Skeleton>` / `<Skeleton.Reveal>`.
 - **Banned: Trigger downgrades (`render={<span />}`)** → **Use:** Semantic `<button>` triggers ("Behavior Wraps the Line").
@@ -60,8 +60,8 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Registry bloat** (domain views or auth/SSE flows in `components/blocks/`) → **Use:** `src/features/` or `src/views/`.
 
 ## Shadows & Motion
-- **Banned: Single-layer muddy shadows, pure black shadows, `shadow-xs`..`2xl` slop, faux `box-shadow` border rings, or shadows on flat controls** → **Use:** `shadow-ambient`, `shadow-ambient-hover`, `shadow-modal` (ink-tinted `rgba(26,28,30,...)`), and real CSS borders for `forced-colors` safety.
+- **Banned: Single-layer muddy shadows, pure black shadows, `shadow-xs`..`2xl` slop, faux `box-shadow` border rings, or shadows on flat controls** → **Use:** `shadow-ambient`, `shadow-ambient-hover`, `shadow-modal` (warm ink-tinted `rgba(28, 26, 24, ...)`), and real CSS borders for `forced-colors` safety.
 - **Banned: `transition-all` on containers** → **Use:** Explicit `transition-[box-shadow,border-color,background-color,transform]`, `transition-[opacity,transform]` (overlays), or `transition-[height]` (accordions).
 - **Banned: `filter: blur()` on large text overlays** → **Use:** `opacity` + `transform` on overlays; reserve `--blur-*` for micro-primitives.
 - **Banned: Bounce/spring easing on standard UI chrome or double-bounce on checkboxes/switches** → **Use:** `--ease-standard` (`150ms` micro-transitions on high-frequency controls); reserve bounce for celebratory `SuccessCheck`.
-- **Banned: Uncapped staggers (> 5 items / > 200ms), missing `prefers-reduced-motion`, or sub-44px dismiss buttons** → **Use:** 40ms stagger capped at 5 items, `motion-reduce:transition-none`, and `min-w-[44px] min-h-[44px]` dismiss targets.
+- **Banned: Uncapped staggers (> 5 items / > 200ms), missing `prefers-reduced-motion`, or sub-44px dismiss buttons** → **Use:** 40ms stagger capped at 5 items, `motion-reduce:transition-none`, and `min-w-11 min-h-11` (`44px`) dismiss targets.

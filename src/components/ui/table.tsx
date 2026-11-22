@@ -121,7 +121,7 @@ export const TableRow = React.forwardRef<
     ref={ref}
     data-slot="table-row"
     className={cn(
-      'border-b border-outline-variant transition-colors hover:bg-state-hover data-[state=selected]:bg-surface-container data-[state=selected]:hover:bg-surface-container-high min-h-14 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+      'border-b border-outline-variant transition-colors hover:bg-state-hover data-[state=selected]:bg-surface-container data-[state=selected]:hover:bg-surface-container-high min-h-[var(--density-table-row-min-h,3.5rem)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
       className
     )}
     {...props}
@@ -138,7 +138,7 @@ export const TableHead = React.forwardRef<
     scope={scope}
     data-slot="table-head"
     className={cn(
-      'h-12 px-4 text-start align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.75rem)] text-start align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}
@@ -154,7 +154,7 @@ export const TableCell = React.forwardRef<
     ref={ref}
     data-slot="table-cell"
     className={cn(
-      'px-4 py-3.5 align-middle text-on-surface font-sans text-sm [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] align-middle text-on-surface font-sans text-sm [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}

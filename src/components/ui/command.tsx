@@ -86,6 +86,7 @@ export function CommandDialog({
     >
       <DialogContent
         size="xl"
+        showCloseButton={false}
         data-slot="command-dialog"
         containerClassName={containerClassName}
         initialFocus={initialFocus}

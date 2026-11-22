@@ -8,6 +8,23 @@ const customTwMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       'border-w': ['border-default', 'border-emphasis', 'border-accent'],
+      shadow: [
+        'shadow-card',
+        'shadow-toggle',
+        'shadow-ambient',
+        'shadow-ambient-hover',
+        'shadow-modal',
+      ],
+      duration: [
+        'duration-stagger',
+        'duration-instant',
+        'duration-micro',
+        'duration-quick',
+        'duration-fast',
+        'duration-medium',
+        'duration-slow',
+        'duration-emphasis',
+      ],
       'font-size': [
         'text-display-lg',
         'text-display-sm',

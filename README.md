@@ -23,7 +23,7 @@ Install `@eolas/theme` before adding components so semantic color roles, surface
 npx shadcn@latest add @eolas/theme
 ```
 
-This writes the complete Tailwind CSS v4 theme to `src/eolas-theme.css` without overwriting your existing stylesheet. Import it in your application entry point (for example, `import './eolas-theme.css'` in `src/main.tsx`) or main CSS file, and add the non-blocking Google Fonts & Material Symbols `<link>` tags to your HTML `<head>`:
+This writes the complete Tailwind CSS v4 theme to `src/eolas-theme.css` without overwriting your existing stylesheet. Import it **inside your main Tailwind CSS entry file** (the `tailwind.css` path in `components.json`, e.g., `@import "./eolas-theme.css";` in `src/index.css`) — or point `components.json`'s `tailwind.css` directly to `src/eolas-theme.css` — so both Tailwind v4 `@theme` resolution and `@shadcn/lint` (`shadcn/no-unknown-classes`) discover all Eolas tokens. Then add the non-blocking Google Fonts & Material Symbols `<link>` tags to your HTML `<head>`:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com" />

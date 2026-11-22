@@ -332,7 +332,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           </div>
 
           {/* List Items Container with Roving Arrow-Key Focus */}
-          <div data-slot="list-items" className="flex-1 overflow-y-auto p-2 flex flex-col">
+          <div data-slot="list-items" className="flex-1 overflow-y-auto flex flex-col">
             {searchable && hasSearchQuery && (
               <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {filteredItems.length === 0
@@ -517,7 +517,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               )}
 
               {/* Detail Body */}
-              <div data-slot="detail-body" className="flex-1 p-4 @md:p-6 overflow-y-auto">
+              <div data-slot="detail-body" className="flex-1 overflow-y-auto">
                 <div className="@container w-full">
                   {renderDetail ? (
                     renderDetail(selectedItem)

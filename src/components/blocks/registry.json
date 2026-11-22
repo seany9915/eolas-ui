@@ -68,7 +68,8 @@
         "blocks"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/chart-card",
@@ -91,7 +92,8 @@
         "blocks"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/chart-card",
@@ -173,7 +175,7 @@
         "blocks"
       ],
       "dependencies": [
-        "@tanstack/react-table"
+        "@tanstack/react-table@^9.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils",
@@ -260,7 +262,8 @@
         "blocks"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/chart-card",
@@ -343,7 +346,8 @@
         "blocks"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils",
@@ -400,7 +404,8 @@
         "blocks"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/chart-card",
@@ -423,7 +428,8 @@
         "blocks"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/chart-card",

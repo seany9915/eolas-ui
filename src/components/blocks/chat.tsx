@@ -422,16 +422,16 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                             />
                           </MessageScrollerItem>
                         )}
-                        {isFloating && (
-                          <div
-                            className={cn(
-                              'shrink-0 select-none pointer-events-none',
-                              normalizedSuggestions.length > 0 ? 'h-48' : 'h-32'
-                            )}
-                            aria-hidden="true"
-                          />
-                        )}
                       </>
+                    )}
+                    {isFloating && (
+                      <div
+                        className={cn(
+                          'shrink-0 select-none pointer-events-none',
+                          normalizedSuggestions.length > 0 ? 'h-48' : 'h-32'
+                        )}
+                        aria-hidden="true"
+                      />
                     )}
                   </MessageScrollerContent>
                 </MessageScrollerViewport>

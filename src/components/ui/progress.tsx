@@ -124,8 +124,8 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
           <BaseProgress.Indicator
             data-slot="progress-indicator"
             className={cn(
-              'h-full bg-primary transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:animate-none',
-              'data-[indeterminate]:w-full data-[indeterminate]:animate-pulse'
+              'h-full bg-primary transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+              'data-[indeterminate]:w-full motion-safe:data-[indeterminate]:animate-pulse'
             )}
           />
         </BaseProgress.Track>

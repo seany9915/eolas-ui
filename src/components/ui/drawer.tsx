@@ -112,7 +112,7 @@ export interface DrawerCloseButtonProps
   extends React.ComponentPropsWithoutRef<typeof BaseDrawer.Close> {}
 
 export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerCloseButtonProps>(
-  ({ className, children, render, nativeButton, ...props }, ref) => (
+  ({ className, children, render, nativeButton, 'aria-label': ariaLabel, ...props }, ref) => (
     <BaseDrawer.Close
       ref={ref}
       data-slot="drawer-close"
@@ -126,7 +126,7 @@ export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerClose
               className
             )
       }
-      aria-label="Close drawer"
+      aria-label={ariaLabel ?? (!render && !children ? 'Close drawer' : undefined)}
       {...props}
     >
       {children || (
@@ -223,7 +223,7 @@ export const DrawerBackdrop = React.forwardRef<
     ref={ref}
     data-slot="drawer-overlay"
     className={composeClassName(
-      'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-slow)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]',
+      'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]',
       className
     )}
     {...props}

@@ -70,6 +70,17 @@ function formatTitle(name) {
     .join(' ');
 }
 
+const NPM_DEP_VERSION_RANGES = {
+  '@tanstack/react-table': '^9.0.0',
+  'react-resizable-panels': '^4.0.0',
+  'react-day-picker': '^10.0.0',
+  recharts: '^3.0.0',
+};
+
+const NPM_PEER_DEPS = {
+  recharts: ['react-is'],
+};
+
 function detectNpmDeps(content) {
   const clean = stripComments(content);
   const deps = new Set();
@@ -83,7 +94,11 @@ function detectNpmDeps(content) {
       if (!spec || spec.startsWith('@/') || spec.startsWith('~/') || spec.startsWith('node:')) continue;
       const pkg = spec.startsWith('@') ? spec.split('/').slice(0, 2).join('/') : spec.split('/')[0];
       if (pkg === 'react' || pkg === 'react-dom') continue;
-      deps.add(pkg);
+      const range = NPM_DEP_VERSION_RANGES[pkg];
+      deps.add(range ? `${pkg}@${range}` : pkg);
+      if (NPM_PEER_DEPS[pkg]) {
+        for (const peer of NPM_PEER_DEPS[pkg]) deps.add(peer);
+      }
     }
   }
   return Array.from(deps).sort();
@@ -92,11 +107,20 @@ function detectNpmDeps(content) {
 function detectLibDeps(content, excludeName = null) {
   const clean = stripComments(content);
   const deps = new Set();
-  for (const match of clean.matchAll(/from\s+['"]@\/lib\/([^'"]+)['"]/g)) {
-    const libName = match[1].replace(/\.ts$/, '');
-    if (!libName || libName === excludeName) continue;
-    if (fs.existsSync(path.join(LIB_DIR, `${libName}.ts`))) {
-      deps.add(libName);
+  const libPatterns = [
+    /(?:from|import)\s+['"](?:@\/lib\/|\.\.\/\.\.\/lib\/)([^'"]+)['"]/g,
+    /\bimport\s*\(\s*['"](?:@\/lib\/|\.\.\/\.\.\/lib\/)([^'"]+)['"]\s*\)/g,
+  ];
+  if (excludeName) {
+    libPatterns.push(/(?:from|import)\s+['"]\.\/([^'"]+)['"]/g);
+  }
+  for (const re of libPatterns) {
+    for (const match of clean.matchAll(re)) {
+      const libName = match[1].replace(/\.(ts|tsx|js|mjs)$/, '');
+      if (!libName || libName === excludeName) continue;
+      if (fs.existsSync(path.join(LIB_DIR, `${libName}.ts`))) {
+        deps.add(libName);
+      }
     }
   }
   return Array.from(deps);
@@ -278,7 +302,7 @@ if (fs.existsSync(GLOBALS_CSS)) {
     description:
       'Tailwind CSS v4 theme, design tokens, color roles, surface hierarchies, and motion tokens conforming to DESIGN.md.',
     categories: [getCategory('theme', 'registry:file')],
-    docs: 'Tailwind CSS v4 @theme tokens, semantic color roles, surface hierarchy, and descendant-scoped inverted surface rules ([data-surface="inverted"]). `npx shadcn@latest add @eolas/theme` writes to `src/eolas-theme.css`; `eolas-ui add theme` writes to your `components.json` `tailwind.css` path when configured (or `src/eolas-theme.css` otherwise). Load Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined non-blocking via <link rel="stylesheet"> in your document <head> (see README.md).',
+    docs: 'Tailwind CSS v4 @theme tokens, semantic color roles, surface hierarchy, and descendant-scoped inverted surface rules ([data-surface="inverted"]). Writes to `src/eolas-theme.css` (without overwriting an existing non-Eolas stylesheet). Import it inside your main Tailwind CSS entry file (`@import "./eolas-theme.css";` in your `components.json` `tailwind.css` file) — or point `tailwind.css` directly to `src/eolas-theme.css` — so both Tailwind v4 and `@shadcn/lint` resolve all Eolas tokens. Load Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined non-blocking via <link rel="stylesheet"> in your document <head> (see README.md).',
     files: [
       {
         path: 'styles/eolas-theme.css',
@@ -398,7 +422,7 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
     title: 'Eolas UI Lint',
     description: '@shadcn/lint and Eolas UI Oxlint config for Base UI design contracts.',
     categories: [getCategory('lint', 'registry:item')],
-    docs: 'Run "npx oxlint ." to enforce Eolas UI and @shadcn/lint contracts. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json.',
+    docs: 'Run "npx oxlint ." to enforce Eolas UI and @shadcn/lint contracts. Ensure your `components.json` `tailwind.css` file imports `./eolas-theme.css` (or points directly to `src/eolas-theme.css`) so `shadcn/no-unknown-classes` recognizes Eolas tokens. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json.',
     devDependencies: ['@shadcn/lint', 'oxlint'],
     files: [
       {
@@ -434,8 +458,9 @@ for (const file of uiFiles) {
   const regex = /from\s+['"](?:\.\/|@\/components\/ui\/)([^'"]+)['"]/g;
   let m;
   while ((m = regex.exec(cleanContent)) !== null) {
-    if (m[1] && m[1] !== name) {
-      internalDeps.push(m[1]);
+    const depName = m[1]?.replace(/\.(tsx?|jsx?)$/, '');
+    if (depName && depName !== name) {
+      internalDeps.push(depName);
     }
   }
 

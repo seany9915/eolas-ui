@@ -223,10 +223,20 @@ export const InteractiveColorPairChecker: React.FC = () => {
   const selectOptions = React.useMemo(
     () =>
       DESIGN_SYSTEM_COLORS.map((c) => ({
-        value: c.hex,
+        value: c.name,
         label: `${c.label} (${c.hex})`,
       })),
     []
+  );
+
+  const fgTokenName = React.useMemo(
+    () => DESIGN_SYSTEM_COLORS.find((c) => c.hex.toLowerCase() === fg.toLowerCase())?.name ?? '',
+    [fg]
+  );
+
+  const bgTokenName = React.useMemo(
+    () => DESIGN_SYSTEM_COLORS.find((c) => c.hex.toLowerCase() === bg.toLowerCase())?.name ?? '',
+    [bg]
   );
 
   return (
@@ -254,43 +264,51 @@ export const InteractiveColorPairChecker: React.FC = () => {
 
       {/* Inputs for FG and BG */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="font-label text-xs font-semibold text-on-surface">Foreground (Text Ink)</label>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="contrast-fg-input" className="font-label text-xs font-semibold text-on-surface">Foreground (Text Ink)</label>
           <div className="flex gap-2">
             <Input
+              id="contrast-fg-input"
               value={fg}
               onChange={(e) => setFg(e.target.value)}
               placeholder="#1C1A18"
               size="sm"
               className="font-mono"
             />
-            <div className="w-10 h-10 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: fg }} />
+            <div className="size-10 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: fg }} />
           </div>
           <Select
             placeholder="Select a token..."
             options={selectOptions}
-            value={fg}
-            onChange={(val) => val && setFg(val)}
+            value={fgTokenName}
+            onChange={(name) => {
+              const found = DESIGN_SYSTEM_COLORS.find((c) => c.name === name);
+              if (found) setFg(found.hex);
+            }}
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="font-label text-xs font-semibold text-on-surface">Background (Surface Fill)</label>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="contrast-bg-input" className="font-label text-xs font-semibold text-on-surface">Background (Surface Fill)</label>
           <div className="flex gap-2">
             <Input
+              id="contrast-bg-input"
               value={bg}
               onChange={(e) => setBg(e.target.value)}
               placeholder="#FFFFFF"
               size="sm"
               className="font-mono"
             />
-            <div className="w-10 h-10 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: bg }} />
+            <div className="size-10 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: bg }} />
           </div>
           <Select
             placeholder="Select a token..."
             options={selectOptions}
-            value={bg}
-            onChange={(val) => val && setBg(val)}
+            value={bgTokenName}
+            onChange={(name) => {
+              const found = DESIGN_SYSTEM_COLORS.find((c) => c.name === name);
+              if (found) setBg(found.hex);
+            }}
           />
         </div>
       </div>

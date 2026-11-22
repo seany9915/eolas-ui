@@ -236,10 +236,10 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
     const isEmbedded =
       embedded ??
       contextEmbedded ??
-      className?.includes('h-full') ??
-      className?.includes('relative') ??
-      className?.includes('absolute') ??
-      false;
+      (className?.includes('h-full') ||
+        className?.includes('relative') ||
+        className?.includes('absolute') ||
+        false);
     const desktopVisibleClass = mobileBreakpoint <= 640 ? 'hidden sm:block' : 'hidden md:block';
     const desktopFlexClass = mobileBreakpoint <= 640 ? 'hidden sm:flex' : 'hidden md:flex';
 
@@ -272,7 +272,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           <BaseDrawer.Portal>
             <BaseDrawer.Backdrop
               data-slot="sidebar-backdrop"
-              className="fixed inset-0 bg-on-surface/40 backdrop-blur-[2px] z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-slow)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none"
+              className="fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none"
             />
             <BaseDrawer.Viewport
               data-slot="sidebar-viewport"
@@ -285,7 +285,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                 data-slot="sidebar-popup"
                 className={composeClassName(
                   [
-                    'w-[var(--sidebar-width-mobile)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-y-auto outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-slow)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                    'w-[var(--sidebar-width-mobile)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-y-auto outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
                     side === 'right'
                       ? 'border-l-2 border-outline-variant data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
                       : 'border-r-2 border-outline-variant data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
@@ -391,9 +391,13 @@ export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTrigger
   ({ className, onClick, icon, children, ...props }, ref) => {
     const { toggleSidebar, state, isMobile, isEmbedded, openMobile } = useSidebar();
     const isOpen = isMobile && !isEmbedded ? openMobile : state === 'expanded';
+    const shortcutLabel =
+      typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent)
+        ? '⌘B'
+        : 'Ctrl+B';
 
     return (
-      <Tooltip content="Toggle Sidebar (Ctrl+B)">
+      <Tooltip content={`Toggle Sidebar (${shortcutLabel})`}>
         <Button
           ref={ref}
           data-slot="sidebar-trigger"
@@ -401,6 +405,7 @@ export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTrigger
           variant="text"
           size="icon"
           aria-label="Toggle Sidebar"
+          aria-keyshortcuts="Control+B Meta+B"
           className={composeClassName(
             'size-11 min-h-[44px] min-w-[44px] rounded text-on-surface-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
             className
@@ -427,7 +432,8 @@ export const SidebarRail = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof BaseButton>
 >(({ className, render, nativeButton, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, mobileBreakpoint } = useSidebar();
+  const desktopFlexClass = mobileBreakpoint <= 640 ? 'sm:flex' : 'md:flex';
 
   return (
     <Tooltip content="Toggle Sidebar">
@@ -442,7 +448,8 @@ export const SidebarRail = React.forwardRef<
         nativeButton={resolveNativeButton(render, nativeButton)}
         className={composeClassName(
           [
-            'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-[background-color,transform,left,right] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex cursor-ew-resize',
+            'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-[background-color,transform,left,right] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-right-4 group-data-[side=right]:left-0 cursor-ew-resize',
+            desktopFlexClass,
             '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
             '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
             'hover:group-data-[collapsible=offcanvas]:bg-surface group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',

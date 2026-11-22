@@ -300,7 +300,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast."
     ],
     "dependencies": [
-      "react-day-picker"
+      "react-day-picker@^10.0.0"
     ],
     "importStatement": "import { Calendar } from '@/components/ui/calendar';",
     "shadcnCommand": "npx shadcn@latest add @eolas/calendar",
@@ -375,7 +375,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "DESIGN.md Token Primitive",
     "sourcePath": "src/components/ui/chart.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { Chart } from '@/components/ui/chart';",
     "shadcnCommand": "npx shadcn@latest add @eolas/chart",
@@ -1450,7 +1451,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Follows DESIGN.md Tier B tokens: hairline 1px track (outline-variant), 12px touch-safe hit area, refined capsule pill drag handle (rounded-full, bg-surface, primary hover/active feedback), and floating 2px focus ring."
     ],
     "dependencies": [
-      "react-resizable-panels"
+      "react-resizable-panels@^4.0.0"
     ],
     "importStatement": "import { Resizable } from '@/components/ui/resizable';",
     "shadcnCommand": "npx shadcn@latest add @eolas/resizable",
@@ -2197,7 +2198,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/area-chart-card.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { AreaChartCard } from '@/components/blocks/area-chart-card';",
     "shadcnCommand": "npx shadcn@latest add @eolas/area-chart-card",
@@ -2213,7 +2215,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/bar-chart-card.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { BarChartCard } from '@/components/blocks/bar-chart-card';",
     "shadcnCommand": "npx shadcn@latest add @eolas/bar-chart-card",
@@ -2269,7 +2272,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Exports both all-in-one <DataTable /> and composable subcomponents: DataTableColumnHeader, DataTablePagination, DataTableViewOptions, DataTableFacetedFilter, DataTableToolbar, DataTableRowActions, createSelectColumn, createActionsColumn."
     ],
     "dependencies": [
-      "@tanstack/react-table"
+      "@tanstack/react-table@^9.0.0"
     ],
     "importStatement": "import { DataTable } from '@/components/blocks/data-table';",
     "shadcnCommand": "npx shadcn@latest add @eolas/data-table",
@@ -2314,7 +2317,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/line-chart-card.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { LineChartCard } from '@/components/blocks/line-chart-card';",
     "shadcnCommand": "npx shadcn@latest add @eolas/line-chart-card",
@@ -2369,7 +2373,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/pie-chart-card.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { PieChartCard } from '@/components/blocks/pie-chart-card';",
     "shadcnCommand": "npx shadcn@latest add @eolas/pie-chart-card",
@@ -2404,7 +2409,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/radar-chart-card.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { RadarChartCard } from '@/components/blocks/radar-chart-card';",
     "shadcnCommand": "npx shadcn@latest add @eolas/radar-chart-card",
@@ -2420,7 +2426,8 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "Composite Block",
     "sourcePath": "src/components/blocks/radial-chart-card.tsx",
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "importStatement": "import { RadialChartCard } from '@/components/blocks/radial-chart-card';",
     "shadcnCommand": "npx shadcn@latest add @eolas/radial-chart-card",

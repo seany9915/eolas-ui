@@ -40,7 +40,7 @@ Never erode component APIs, strip `ref` / Base UI `render` props, drop compound 
 | Component architecture, Base UI, navigation taxonomy | [component-library.md](./component-library.md) |
 | Banned visual/code/copy patterns | [anti-patterns.md](./anti-patterns.md) |
 | Color/type/spacing/motion tokens & component specs | project-root `DESIGN.md` |
-| Adding/styling shadcn & Base UI components or applying `DESIGN.md` | `shadcn` skill + `DESIGN.md` |
+| Adding/installing registry items via shadcn CLI | `shadcn` CLI (`npx shadcn@latest add @eolas/...`) — **never** use generic shadcn/Lucide styling patterns; always follow `DESIGN.md` + `design-system.md` |
 | Responsive layout, RTL/i18n spacing, or worst-case UI stress testing | `better-layout` / `break-ui` skills |
 | Motion implementation / tuning | `DESIGN.md` Motion section + `src/globals.css` & `src/components/ui/` motion primitives |
 | Live a11y/browser debugging | `a11y-debugging` / `chrome-devtools` skills + Chrome DevTools MCP |

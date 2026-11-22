@@ -27,7 +27,7 @@ function main(input) {
   if (!/\.(tsx|jsx|css|ts|js)$/i.test(targetFile)) {
     return respond({ decision: 'allow' });
   }
-  if (/(?:globals|index)\.css$|tailwind\.config\.[cm]?[jt]s$/i.test(targetFile)) {
+  if (/(?:globals|index|eolas-theme)\.css$|tailwind\.config\.[cm]?[jt]s$/i.test(targetFile)) {
     return respond({ decision: 'allow' });
   }
   if (/\.(?:test|spec)\.[jt]sx?$/i.test(targetFile) || /AntiPatternAuditBench\.tsx$/i.test(targetFile)) {
@@ -112,12 +112,14 @@ function stripComments(code) {
 const STUB_RE =
   /\/\/\s*(?:TODO:?\s*implement|\.\.\.\s*rest of|handle other cases|insert logic here)|\/\*\s*\.\.\.\s*\*\/|\{\/\*\s*\.\.\.\s*rest of[^*]*\*\/\}/i;
 const EMOJI_RE = /\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F/u;
-const AI_BUZZWORDS = 'delve|tapestry|unleash|elevate|spearhead|testament|enclave|telemetric|apparatus';
+const AI_BUZZWORDS = 'delve|tapestry|unleash|elevate|spearhead|testament|enclave|telemetric|apparatus|seamless';
 const PROP_JARGON = 'committed to|unconstrained|hydrated|synchronized|telemetry|matrix|repository';
 const UI_PROP_NAMES = '(?:label|title|description|placeholder|heading|alt|aria-label|emptyText|helperText)';
 
 const PROP_BUZZWORD_RE = new RegExp(`\\b${UI_PROP_NAMES}\\s*=\\s*["'][^"']*?\\b(?:${AI_BUZZWORDS})\\b`, 'i');
 const PROP_JARGON_RE = new RegExp(`\\b${UI_PROP_NAMES}\\s*=\\s*["'][^"']*?\\b(?:${PROP_JARGON})\\b`, 'i');
+const JSX_TEXT_BUZZWORD_RE = new RegExp(`<[A-Za-z][A-Za-z0-9._-]*(?:\\s[^<>]*)?>[^<{}]*?\\b(?:${AI_BUZZWORDS})\\b[^<{}]*</[A-Za-z][A-Za-z0-9._-]*>`, 'i');
+const JSX_TEXT_JARGON_RE = new RegExp(`<[A-Za-z][A-Za-z0-9._-]*(?:\\s[^<>]*)?>[^<{}]*?\\b(?:${PROP_JARGON})\\b[^<{}]*</[A-Za-z][A-Za-z0-9._-]*>`, 'i');
 
 function scan(content, targetFile) {
   const violations = [];
@@ -133,11 +135,11 @@ function scan(content, targetFile) {
     if (EMOJI_RE.test(stripped)) {
       violations.push('Found a decorative emoji character. Anti-patterns rule bans emojis in UI copy — use Material Symbols via <Icon>.');
     }
-    if (PROP_BUZZWORD_RE.test(stripped)) {
-      violations.push('Found banned AI cliché vocabulary ("delve", "tapestry", "unleash", "elevate", "enclave", "apparatus", etc.) in UI copy. Write in plain everyday English.');
+    if (PROP_BUZZWORD_RE.test(stripped) || JSX_TEXT_BUZZWORD_RE.test(stripped)) {
+      violations.push('Found banned AI cliché vocabulary ("delve", "tapestry", "unleash", "elevate", "seamless", "enclave", "apparatus", etc.) in UI copy. Write in plain everyday English.');
     }
-    if (PROP_JARGON_RE.test(stripped)) {
-      violations.push('Found dev/database/CSS jargon in UI copy ("committed to", "unconstrained", "synchronized", "telemetry", "matrix", "repository"). Describe user outcomes in plain English.');
+    if (PROP_JARGON_RE.test(stripped) || JSX_TEXT_JARGON_RE.test(stripped)) {
+      violations.push('Found dev/database/CSS jargon in UI copy ("committed to", "unconstrained", "synchronized", "telemetry", "affordance", "matrix", "repository"). Describe user outcomes in plain English.');
     }
   }
 
@@ -148,8 +150,8 @@ function scan(content, targetFile) {
     if (/transition(?:-property)?\s*:\s*all\b/i.test(stripped)) {
       violations.push('Found `transition: all` / `transition-property: all` in CSS. Declare explicit targeted properties.');
     }
-    if (/--ease-spring\b/.test(stripped)) {
-      violations.push('Found `--ease-spring` in CSS outside globals.css. Standard UI chrome must use `--ease-standard`.');
+    if (/--ease-(?:spring|bounce)\b/.test(stripped)) {
+      violations.push('Found `--ease-spring` or `--ease-bounce` in CSS outside theme stylesheets. Standard UI chrome must use `--ease-standard`.');
     }
   }
 

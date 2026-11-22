@@ -211,7 +211,7 @@
         "target": "~/src/eolas-theme.css"
       }
     ],
-    "docs": "Tailwind CSS v4 @theme tokens, semantic color roles, surface hierarchy, and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). `npx shadcn@latest add @eolas/theme` writes to `src/eolas-theme.css`; `eolas-ui add theme` writes to your `components.json` `tailwind.css` path when configured (or `src/eolas-theme.css` otherwise). Load Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined non-blocking via <link rel=\"stylesheet\"> in your document <head> (see README.md)."
+    "docs": "Tailwind CSS v4 @theme tokens, semantic color roles, surface hierarchy, and descendant-scoped inverted surface rules ([data-surface=\"inverted\"]). Writes to `src/eolas-theme.css` (without overwriting an existing non-Eolas stylesheet). Import it inside your main Tailwind CSS entry file (`@import \"./eolas-theme.css\";` in your `components.json` `tailwind.css` file) — or point `tailwind.css` directly to `src/eolas-theme.css` — so both Tailwind v4 and `@shadcn/lint` resolve all Eolas tokens. Load Atkinson Hyperlegible Next, Lexend, Roboto Mono, and Material Symbols Outlined non-blocking via <link rel=\"stylesheet\"> in your document <head> (see README.md)."
   },
   {
     "name": "design-md",
@@ -318,7 +318,7 @@
         "target": "~/.oxlintrc.json"
       }
     ],
-    "docs": "Run \"npx oxlint .\" to enforce Eolas UI and @shadcn/lint contracts. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json."
+    "docs": "Run \"npx oxlint .\" to enforce Eolas UI and @shadcn/lint contracts. Ensure your `components.json` `tailwind.css` file imports `./eolas-theme.css` (or points directly to `src/eolas-theme.css`) so `shadcn/no-unknown-classes` recognizes Eolas tokens. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json."
   },
   {
     "name": "accordion",
@@ -608,7 +608,7 @@
       "inputs"
     ],
     "dependencies": [
-      "react-day-picker"
+      "react-day-picker@^10.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
@@ -725,7 +725,8 @@
       "layout"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
@@ -2251,7 +2252,7 @@
       "layout"
     ],
     "dependencies": [
-      "react-resizable-panels"
+      "react-resizable-panels@^4.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json"
@@ -3313,7 +3314,8 @@
       "blocks"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
@@ -3336,7 +3338,8 @@
       "blocks"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
@@ -3418,7 +3421,7 @@
       "blocks"
     ],
     "dependencies": [
-      "@tanstack/react-table"
+      "@tanstack/react-table@^9.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -3505,7 +3508,8 @@
       "blocks"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
@@ -3588,7 +3592,8 @@
       "blocks"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
@@ -3645,7 +3650,8 @@
       "blocks"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",
@@ -3668,7 +3674,8 @@
       "blocks"
     ],
     "dependencies": [
-      "recharts"
+      "react-is",
+      "recharts@^3.0.0"
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/chart-card.json",

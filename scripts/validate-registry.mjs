@@ -111,7 +111,7 @@ function extractInternalImports(content, itemType) {
       if (fs.existsSync(path.join(LIB_DIR, `${libName}.ts`))) {
         refs.add(libName);
       }
-    } else if (spec.startsWith('./') && (itemType === 'registry:ui' || itemType === 'registry:block')) {
+    } else if (spec.startsWith('./') && (itemType === 'registry:ui' || itemType === 'registry:block' || itemType === 'registry:lib')) {
       refs.add(spec.slice(2).split('/')[0].replace(/\.(tsx?|jsx?)$/, ''));
     } else if (spec.startsWith('../ui/')) {
       refs.add(spec.slice('../ui/'.length).split('/')[0].replace(/\.(tsx?|jsx?)$/, ''));
@@ -270,7 +270,19 @@ for (const file of itemFiles) {
     errs.push('Missing non-empty "categories" array');
   }
 
-  const declaredNpmDeps = new Set(Array.isArray(item.dependencies) ? item.dependencies : []);
+const ALLOWED_PEER_DEPS = {
+  recharts: new Set(['react-is']),
+};
+
+function stripNpmVersion(spec) {
+  if (typeof spec !== 'string') return spec;
+  const idx = spec.startsWith('@') ? spec.indexOf('@', 1) : spec.indexOf('@');
+  return idx > 0 ? spec.slice(0, idx) : spec;
+}
+
+  const declaredNpmDeps = new Set(
+    (Array.isArray(item.dependencies) ? item.dependencies : []).map(stripNpmVersion)
+  );
   const normalizedRegDeps = new Set(
     (Array.isArray(item.registryDependencies) ? item.registryDependencies : []).map(normalizeBuiltDep)
   );
@@ -349,8 +361,15 @@ for (const file of itemFiles) {
 
   // Check for extra/phantom dependencies or registryDependencies on TS/TSX source items
   if (isSourceModuleItem) {
+    const allowedPeers = new Set();
+    for (const pkg of actualNpmDeps) {
+      const peers = ALLOWED_PEER_DEPS[pkg];
+      if (peers) {
+        for (const peer of peers) allowedPeers.add(peer);
+      }
+    }
     for (const declaredPkg of declaredNpmDeps) {
-      if (!actualNpmDeps.has(declaredPkg)) {
+      if (!actualNpmDeps.has(declaredPkg) && !allowedPeers.has(declaredPkg)) {
         errs.push(`Extra/phantom npm dependency "${declaredPkg}" is declared but not imported`);
       }
     }

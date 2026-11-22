@@ -289,7 +289,7 @@
         "inputs"
       ],
       "dependencies": [
-        "react-day-picker"
+        "react-day-picker@^10.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils"
@@ -406,7 +406,8 @@
         "layout"
       ],
       "dependencies": [
-        "recharts"
+        "react-is",
+        "recharts@^3.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils"
@@ -1932,7 +1933,7 @@
         "layout"
       ],
       "dependencies": [
-        "react-resizable-panels"
+        "react-resizable-panels@^4.0.0"
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils"

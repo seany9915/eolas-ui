@@ -143,11 +143,13 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
           !isClassNameFn ? className : undefined
         )}
       >
-        <label
-          htmlFor={switchId}
-          className="font-sans text-sm font-medium text-on-surface cursor-pointer select-none flex flex-col flex-1"
-        >
-          <span>{label}</span>
+        <div className="flex flex-col flex-1">
+          <label
+            htmlFor={switchId}
+            className="font-sans text-sm font-medium text-on-surface cursor-pointer select-none"
+          >
+            {label}
+          </label>
           {description && (
             <span id={descriptionId} className="font-sans text-sm text-on-surface-variant font-normal mt-0.5">
               {description}
@@ -161,7 +163,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
               <span>{error}</span>
             </span>
           )}
-        </label>
+        </div>
         {switchNode}
       </div>
     );

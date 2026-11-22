@@ -230,7 +230,7 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         {/* Optional floating reading percentage pill */}
         {showPercentage && (
           <div className="absolute top-3 end-4 pointer-events-auto">
-            <span className="font-mono text-xs font-semibold tabular-nums text-on-surface bg-surface/90 backdrop-blur-sm border border-outline-variant px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1.5">
+            <span className="font-mono text-xs font-semibold tabular-nums text-on-surface bg-surface/90 backdrop-blur-sm border border-outline-variant px-2.5 py-1 rounded-full shadow-card flex items-center gap-1.5">
               <span className={cn('size-1.5 rounded-full', colors.indicator)} aria-hidden="true" />
               <BaseProgress.Value>
                 {(formatted, val) => formatted || `${val ?? progress}%`}

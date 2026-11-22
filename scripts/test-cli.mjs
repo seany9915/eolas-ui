@@ -213,6 +213,76 @@ test('9. eolas-ui sync --all --dry-run also updates already-installed presets', 
   });
 });
 
+test('10. omitting aliases.lib derives lib alias from aliases.utils and rewrites @/lib/* imports', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    writeJson(path.join(dir, 'components.json'), {
+      aliases: {
+        components: '~/components',
+        ui: '~/components/ui',
+        utils: '~/lib/utils',
+      },
+    });
+
+    const res = runCli(['add', 'chip'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.equal(fs.existsSync(path.join(dir, 'src/lib/contrast.ts')), true, 'contrast.ts should be written under src/lib/');
+    const chipSrc = fs.readFileSync(path.join(dir, 'src/components/ui/chip.tsx'), 'utf8');
+    assert.match(chipSrc, /['"]~\/lib\/contrast['"]/, 'Expected @/lib/contrast to be rewritten to ~/lib/contrast');
+    assert.doesNotMatch(chipSrc, /['"]@\/lib\/contrast['"]/, 'Must not leave broken @/lib/contrast import');
+  });
+});
+
+test('11. eolas-ui sync <item> updates only the specified item without overwriting other installed items', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src/components/ui'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src/components/ui/button.tsx'), '// stale button\n', 'utf8');
+    fs.writeFileSync(path.join(dir, 'src/components/ui/badge.tsx'), '// custom badge\n', 'utf8');
+
+    const res = runCli(['sync', 'button'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.doesNotMatch(fs.readFileSync(path.join(dir, 'src/components/ui/button.tsx'), 'utf8'), /stale button/);
+    assert.equal(fs.readFileSync(path.join(dir, 'src/components/ui/badge.tsx'), 'utf8'), '// custom badge\n');
+  });
+});
+
+test('12. eolas-ui add --all theme --dry-run includes extra positional items alongside full catalog', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    const res = runCli(['add', '--all', 'theme', '--dry-run'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.match(res.stdout, /src\/eolas-theme\.css/);
+  });
+});
+
+test('13. eolas-ui add theme does not overwrite or skip existing non-Eolas components.json tailwind.css', () => {
+  withTempWorkspace((dir) => {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src/index.css'), '@import "tailwindcss";\n/* app styles */\n', 'utf8');
+    writeJson(path.join(dir, 'components.json'), {
+      tailwind: { css: 'src/index.css' },
+      aliases: { components: '@/components', ui: '@/components/ui', utils: '@/lib/utils' },
+    });
+
+    const res = runCli(['add', 'theme'], dir);
+    assert.equal(res.status, 0, `CLI exited ${res.status}:\n${res.stdout}\n${res.stderr}`);
+    assert.equal(fs.existsSync(path.join(dir, 'src/eolas-theme.css')), true, 'Expected src/eolas-theme.css to be created');
+    assert.match(fs.readFileSync(path.join(dir, 'src/index.css'), 'utf8'), /app styles/, 'Existing src/index.css must remain untouched');
+  });
+});
+
+test('14. path traversal in components.json aliases is rejected without writing outside workspace', () => {
+  withTempWorkspace((dir) => {
+    writeJson(path.join(dir, 'components.json'), {
+      aliases: { ui: '../../escaped-ui', utils: '@/lib/utils' },
+    });
+
+    const res = runCli(['add', 'button'], dir);
+    assert.notEqual(res.status, 0, 'Expected non-zero exit code for path traversal');
+    assert.match(res.stderr, /outside workspace root/i);
+  });
+});
+
 console.log('=== Running Eolas UI CLI Test Suite ===\n');
 let passed = 0;
 for (const t of tests) {
