@@ -170,7 +170,15 @@ DrawerClose.displayName = 'DrawerClose';
 // Standard layout slots
 export const DrawerHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="drawer-header" className={cn('flex flex-col gap-1.5 text-start mb-4', className)} {...props} />
+    <div
+      ref={ref}
+      data-slot="drawer-header"
+      className={cn(
+        'grid auto-rows-min items-start gap-1.5 text-start mb-4 has-[>[data-slot=drawer-close]]:grid-cols-[1fr_auto] [&>[data-slot=drawer-close]]:col-start-2 [&>[data-slot=drawer-close]]:row-start-1 [&>[data-slot=drawer-close]]:self-start [&>[data-slot=drawer-close]]:justify-self-end has-[>[data-slot=drawer-description]]:[&>[data-slot=drawer-close]]:row-span-2',
+        className
+      )}
+      {...props}
+    />
   )
 );
 DrawerHeader.displayName = 'DrawerHeader';

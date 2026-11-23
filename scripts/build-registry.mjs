@@ -443,6 +443,35 @@ if (fs.existsSync(LINT_INDEX) && fs.existsSync(LINT_OXLINT_CONFIG)) {
   registryItems.push(toCatalogSummary(lintItem));
 }
 
+// Eolas Brand Logos item (logos.json)
+const LOGOS_DIR = path.resolve('public/logos');
+if (fs.existsSync(LOGOS_DIR)) {
+  const logoFiles = fs
+    .readdirSync(LOGOS_DIR)
+    .filter((f) => f.endsWith('.svg'))
+    .sort();
+  if (logoFiles.length > 0) {
+    const logosItem = {
+      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+      name: 'logos',
+      type: 'registry:item',
+      title: 'Eolas Brand Logos',
+      description:
+        'Official Eolas SVG brand marks (stacked primary mark, horizontal lockups, pictorial marks, and wordmarks) aligned with DESIGN.md color tokens.',
+      categories: [getCategory('logos', 'registry:item')],
+      docs: 'Installs all Eolas SVG brand marks into `public/logos/`. Reference them via `/logos/horizontal-lockup.svg` (or `assetUrl(\'/logos/horizontal-lockup.svg\')` for subpath deployments).',
+      files: logoFiles.map((file) => ({
+        path: `logos/${file}`,
+        content: fs.readFileSync(path.join(LOGOS_DIR, file), 'utf8'),
+        type: 'registry:file',
+        target: `~/public/logos/${file}`,
+      })),
+    };
+    fs.writeFileSync(path.join(OUT_DIR, 'logos.json'), JSON.stringify(logosItem, null, 2));
+    registryItems.push(toCatalogSummary(logosItem));
+  }
+}
+
 // 1. Scan src/components/ui for all .tsx files
 const uiFiles = fs.readdirSync(UI_DIR).filter((f) => f.endsWith('.tsx')).sort();
 console.log(`Found ${uiFiles.length} UI files to catalog.`);
@@ -583,6 +612,9 @@ function mapRegistryFilePathToRepoSource(regFilePath) {
   }
   if (regFilePath.startsWith('lint/')) {
     return `packages/eolas-ui/${regFilePath}`;
+  }
+  if (regFilePath.startsWith('logos/')) {
+    return `public/${regFilePath}`;
   }
   return regFilePath;
 }

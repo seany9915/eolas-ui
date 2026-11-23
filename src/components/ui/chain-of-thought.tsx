@@ -59,12 +59,13 @@ export interface ChainOfThoughtStepProps extends React.HTMLAttributes<HTMLDivEle
   status?: TraceStatus;
   icon?: string;
   duration?: string | number;
+  wrap?: boolean;
   children?: React.ReactNode;
   className?: string;
 }
 
 export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThoughtStepProps>(
-  ({ title, description, status = 'complete', icon, duration, children, className, ...props }, ref) => {
+  ({ title, description, status = 'complete', icon, duration, wrap = false, children, className, ...props }, ref) => {
     const formattedDuration =
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
@@ -72,14 +73,19 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
       <TraceLine
         ref={ref}
         status={status}
-        className={cn(description ? 'items-start py-2' : 'items-center', className)}
+        className={cn(description || wrap ? 'items-start py-2' : 'items-center', className)}
         {...props}
       >
-        <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
+        <TraceIcon name={icon} status={status} className={description || wrap ? 'mt-0.5' : undefined} />
         <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
-          <TraceTitle className="truncate">{title}</TraceTitle>
+          <TraceTitle wrap={wrap}>{title}</TraceTitle>
           {description && (
-            <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
+            <span
+              className={cn(
+                'font-sans text-xs text-on-surface-variant mt-0.5 leading-normal',
+                wrap ? 'whitespace-normal break-words' : 'truncate'
+              )}
+            >
               {description}
             </span>
           )}

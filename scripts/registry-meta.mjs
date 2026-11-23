@@ -161,6 +161,7 @@ export const CATEGORY_MAP = {
   'design-md': 'system',
   'agent-rules': 'system',
   lint: 'system',
+  logos: 'system',
 };
 
 export const DEPRECATED_ITEMS = {

@@ -16,6 +16,7 @@
  *   - Pattern 2 (outline): 1px border in color role + neutral white surface fill + colored text.
  *   - Pattern 3 (soft): Soft container wash (bg-*-container) + dark neutral charcoal text (on-*-container).
  * - Full WCAG 2.2 SC 2.5.8 touch target compliance (expands to 44px when interactive or removable).
+ *   For wrapped multi-row interactive chip groups, use `gap-y-3` (12px) or `gap-y-4` (16px) so expanded vertical hit areas do not overlap.
  * - Floating 2px focus ring (outline-offset: 2px) on keyboard focus.
  */
 import * as React from 'react';
@@ -178,6 +179,10 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
         }
       : style;
 
+    const isPrimitiveChildren = React.Children.toArray(children).every(
+      (child) => typeof child === 'string' || typeof child === 'number'
+    );
+
     const leadingMedia = (
       <>
         {avatar && <span className="shrink-0 -ms-1 me-1">{avatar}</span>}
@@ -195,7 +200,11 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
             <span className="inline-flex items-center shrink-0 -ms-0.5">{icon}</span>
           )
         )}
-        <span className="truncate">{children}</span>
+        {isPrimitiveChildren ? (
+          <span className="truncate">{children}</span>
+        ) : (
+          <span className="inline-flex items-center gap-1 min-w-0">{children}</span>
+        )}
       </>
     );
 

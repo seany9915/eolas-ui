@@ -374,7 +374,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
           ref={ref}
           data-slot="chat"
           className={cn(
-            '@container relative flex flex-col size-full min-h-120 overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
+            '@container relative flex flex-col size-full min-h-0 overflow-hidden transition-colors duration-quick ease-standard motion-reduce:transition-none',
             variantStyles[variant] ?? variantStyles.card,
             className
           )}

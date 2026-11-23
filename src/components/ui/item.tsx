@@ -31,8 +31,11 @@
 
 import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
+import { Button as BaseButton } from '@base-ui/react/button';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
 import { cn } from '@/lib/utils';
+
+const ItemGroupContext = React.createContext(false);
 
 // ============================================================================
 // Types & Styles
@@ -75,6 +78,8 @@ export function itemVariants({
     variantStyles[variant] ?? variantStyles.default,
     sizeStyles[size] ?? sizeStyles.default,
     'aria-disabled:opacity-50 aria-disabled:pointer-events-none',
+    'has-[[data-item-trigger]]:cursor-pointer has-[[data-item-trigger]]:select-none has-[[data-item-trigger]:focus-visible]:outline has-[[data-item-trigger]:focus-visible]:outline-2 has-[[data-item-trigger]:focus-visible]:outline-offset-2 has-[[data-item-trigger]:focus-visible]:outline-primary',
+    variant !== 'selected' && 'has-[[data-item-trigger]]:hover:bg-state-hover',
     interactive &&
       cn(
         'cursor-pointer select-none active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100 motion-reduce:transition-none',
@@ -113,6 +118,7 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
     },
     ref
   ) => {
+    const inGroup = React.useContext(ItemGroupContext);
     // If onClick or render is provided, automatically treat as interactive unless explicitly set to false
     const isInteractive = interactive ?? Boolean(onClick || render);
 
@@ -132,6 +138,13 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
       className,
     });
 
+    const implicitA11yProps =
+      isInteractive && !render
+        ? { tabIndex: 0, role: 'button' }
+        : inGroup
+          ? { role: 'listitem' }
+          : {};
+
     return useRender({
       render,
       ref,
@@ -144,7 +157,7 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
         children,
         onClick,
         onKeyDown: handleKeyDown,
-        ...(isInteractive && !render ? { tabIndex: 0, role: 'button' } : {}),
+        ...implicitA11yProps,
         ...props,
       },
     });
@@ -166,6 +179,9 @@ export interface ItemGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const ItemGroup = React.forwardRef<HTMLDivElement, ItemGroupProps>(
   ({ className, divided = false, render, children, ...props }, ref) => {
+    const content = (
+      <ItemGroupContext.Provider value={true}>{children}</ItemGroupContext.Provider>
+    );
     return useRender({
       render,
       ref,
@@ -178,7 +194,7 @@ export const ItemGroup = React.forwardRef<HTMLDivElement, ItemGroupProps>(
           divided ? 'divide-y divide-outline-variant/60' : 'gap-1.5',
           className
         ),
-        children,
+        children: content,
         ...props,
       },
     });
@@ -195,20 +211,23 @@ export interface ItemSeparatorProps extends React.ComponentPropsWithoutRef<typeo
 }
 
 export const ItemSeparator = React.forwardRef<HTMLDivElement, ItemSeparatorProps>(
-  ({ className, orientation = 'horizontal', ...props }, ref) => (
-    <BaseSeparator
-      ref={ref}
-      data-slot="item-separator"
-      orientation={orientation}
-      role="separator"
-      className={cn(
-        'bg-outline-variant/60 shrink-0 select-none',
-        orientation === 'horizontal' ? 'h-[1px] w-full my-0' : 'w-[1px] h-full mx-0 self-stretch',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, orientation = 'horizontal', role, ...props }, ref) => {
+    const inGroup = React.useContext(ItemGroupContext);
+    return (
+      <BaseSeparator
+        ref={ref}
+        data-slot="item-separator"
+        orientation={orientation}
+        role={role ?? (inGroup ? 'none' : 'separator')}
+        className={cn(
+          'bg-outline-variant/60 shrink-0 select-none',
+          orientation === 'horizontal' ? 'h-[1px] w-full my-0' : 'w-[1px] h-full mx-0 self-stretch',
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 ItemSeparator.displayName = 'ItemSeparator';
 
@@ -348,7 +367,7 @@ export const ItemActions = React.forwardRef<HTMLDivElement, ItemActionsProps>(
       defaultTagName: 'div',
       props: {
         'data-slot': 'item-actions',
-        className: cn('flex items-center gap-2 shrink-0 ms-auto', className),
+        className: cn('card-interactive-child flex items-center gap-2 shrink-0 ms-auto', className),
         children,
         ...props,
       },
@@ -356,6 +375,59 @@ export const ItemActions = React.forwardRef<HTMLDivElement, ItemActionsProps>(
   }
 );
 ItemActions.displayName = 'ItemActions';
+
+// ============================================================================
+// ItemTrigger & ItemLink (Stretched-overlay row triggers without nested interactive controls)
+// ============================================================================
+
+export interface ItemTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof BaseButton> {
+  children: React.ReactNode;
+}
+
+/**
+ * Stretches a Base UI button hit area across the entire `<Item>` via `card-link` (::after),
+ * allowing sibling buttons in `<Item.Actions>` without nesting interactive controls.
+ */
+export const ItemTrigger = React.forwardRef<HTMLButtonElement, ItemTriggerProps>(
+  ({ className, ...props }, ref) => (
+    <BaseButton
+      ref={ref}
+      data-slot="item-trigger"
+      data-item-trigger=""
+      className={cn(
+        'card-link text-start cursor-pointer transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-primary motion-reduce:transition-none focus:outline-none',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+ItemTrigger.displayName = 'ItemTrigger';
+
+export interface ItemLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  children: React.ReactNode;
+}
+
+/**
+ * Stretches an anchor link hit area across the entire `<Item>` via `card-link` (::after),
+ * allowing sibling buttons in `<Item.Actions>` without nesting interactive controls.
+ */
+export const ItemLink = React.forwardRef<HTMLAnchorElement, ItemLinkProps>(
+  ({ className, ...props }, ref) => (
+    <a
+      ref={ref}
+      data-slot="item-link"
+      data-item-trigger=""
+      className={cn(
+        'card-link transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-primary motion-reduce:transition-none focus:outline-none',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+ItemLink.displayName = 'ItemLink';
 
 // ============================================================================
 // ItemHeader
@@ -425,6 +497,8 @@ export const Item = Object.assign(ItemRoot, {
   Title: ItemTitle,
   Description: ItemDescription,
   Actions: ItemActions,
+  Trigger: ItemTrigger,
+  Link: ItemLink,
   Footer: ItemFooter,
   Separator: ItemSeparator,
 });

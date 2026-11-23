@@ -588,9 +588,9 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                     <Trace.CollapsibleContent>
                       <div className="pt-1 divide-y divide-outline-variant/30">
                         {thoughtSteps!.map((step, idx) => (
-                          <Trace.Line key={idx} status="complete">
-                            <Trace.Icon status="complete" />
-                            <Trace.Title className="font-normal font-sans text-sm text-on-surface-variant">
+                          <Trace.Line key={idx} status="complete" className="items-start py-2">
+                            <Trace.Icon status="complete" className="mt-0.5" />
+                            <Trace.Title wrap className="font-normal font-sans text-sm text-on-surface-variant">
                               {step}
                             </Trace.Title>
                           </Trace.Line>
@@ -619,7 +619,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             {onCopy && (
               <Tooltip content={copied ? 'Copied to clipboard' : 'Copy response'}>
                 <Button
-                  variant="ghost"
+                  variant="text"
                   colorRole="neutral"
                   size="sm"
                   onClick={handleCopy}
@@ -642,7 +642,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                 }
               >
                 <Button
-                  variant={isBookmarked ? 'soft' : 'ghost'}
+                  variant={isBookmarked ? 'soft' : 'text'}
                   colorRole={isBookmarked ? 'primary' : 'neutral'}
                   size="sm"
                   onClick={onBookmark}
@@ -667,7 +667,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             {onRetry && (
               <Tooltip content="Regenerate response">
                 <Button
-                  variant="ghost"
+                  variant="text"
                   colorRole="neutral"
                   size="sm"
                   onClick={onRetry}

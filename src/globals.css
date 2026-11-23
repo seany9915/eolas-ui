@@ -976,248 +976,240 @@ select:autofill {
 }
 
 /* Long-Form Content Rhythm (shadcn Typeset container system) */
-.typeset {
-  --typeset-font-body: var(--font-sans);
-  --typeset-font-heading: var(--font-heading);
-  --typeset-font-mono: var(--font-mono);
-  --typeset-size: 1em;
-  --typeset-leading: 1.5;
-  --typeset-flow: 1.25em;
+@layer components {
+  .typeset {
+    --typeset-font-body: var(--font-sans);
+    --typeset-font-heading: var(--font-heading);
+    --typeset-font-mono: var(--font-mono);
+    --typeset-size: 1em;
+    --typeset-leading: 1.5;
+    --typeset-flow: 1.25em;
 
-  font-family: var(--typeset-font-body);
-  font-size: var(--typeset-size);
-  line-height: var(--typeset-leading);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-}
+    font-family: var(--typeset-font-body);
+    font-size: var(--typeset-size);
+    line-height: var(--typeset-leading);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+  }
 
-/* Prevent top margin leak on first child in articles, dialogs, or chat bubbles */
-.typeset > :first-child {
-  margin-top: 0;
-}
+  /* Prevent top margin leak on first child in articles, dialogs, or chat bubbles */
+  .typeset > :first-child {
+    margin-top: 0;
+  }
 
-/* Headings */
-.typeset h1,
-.typeset h2,
-.typeset h3,
-.typeset h4,
-.typeset h5,
-.typeset h6 {
-  font-family: var(--typeset-font-heading);
-  font-weight: 600;
-  line-height: 1.25;
-  margin-top: calc(var(--typeset-flow) * 1.2);
-  margin-bottom: calc(var(--typeset-flow) * 0.5);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-  text-wrap: balance;
-}
+  /* Headings */
+  .typeset :is(h1, h2, h3, h4, h5, h6):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-family: var(--typeset-font-heading);
+    font-weight: 600;
+    line-height: 1.25;
+    margin-top: calc(var(--typeset-flow) * 1.2);
+    margin-bottom: calc(var(--typeset-flow) * 0.5);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
 
-.typeset h1 {
-  font-size: 1.875em;
-}
+  .typeset h1:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-size: 1.875em;
+  }
 
-.typeset h2 {
-  font-size: 1.5em;
-}
+  .typeset h2:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-size: 1.5em;
+  }
 
-.typeset h3 {
-  font-size: 1.25em;
-}
+  .typeset h3:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-size: 1.25em;
+  }
 
-.typeset h4 {
-  font-size: 1.125em;
-}
+  .typeset h4:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-size: 1.125em;
+  }
 
-.typeset h5 {
-  font-size: 1em;
-}
+  .typeset h5:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-size: 1em;
+  }
 
-.typeset h6 {
-  font-size: 0.875em;
-  color: var(--on-surface-variant);
-}
+  .typeset h6:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-size: 0.875em;
+    color: var(--on-surface-variant);
+  }
 
-/* Paragraphs & Text Flow */
-.typeset p {
-  margin-top: 0;
-  margin-bottom: var(--typeset-flow);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-  text-wrap: pretty;
-}
+  /* Paragraphs & Text Flow */
+  .typeset p:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    margin-top: 0;
+    margin-bottom: var(--typeset-flow);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+  }
 
-/* Lists with restored bullets, numbers, and indentation */
-.typeset ul {
-  list-style-type: disc;
-  padding-inline-start: 1.5em;
-  margin-top: 0;
-  margin-bottom: var(--typeset-flow);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-}
+  /* Lists with restored bullets, numbers, and indentation */
+  .typeset ul:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    list-style-type: disc;
+    padding-inline-start: 1.5em;
+    margin-top: 0;
+    margin-bottom: var(--typeset-flow);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+  }
 
-.typeset ol {
-  list-style-type: decimal;
-  padding-inline-start: 1.5em;
-  margin-top: 0;
-  margin-bottom: var(--typeset-flow);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-}
+  .typeset ol:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    list-style-type: decimal;
+    padding-inline-start: 1.5em;
+    margin-top: 0;
+    margin-bottom: var(--typeset-flow);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+  }
 
-.typeset li {
-  margin-top: calc(var(--typeset-flow) * 0.25);
-  margin-bottom: calc(var(--typeset-flow) * 0.25);
-  text-wrap: pretty;
-}
+  .typeset li:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    margin-top: calc(var(--typeset-flow) * 0.25);
+    margin-bottom: calc(var(--typeset-flow) * 0.25);
+    text-wrap: pretty;
+  }
 
-.typeset li::marker {
-  color: var(--on-surface-variant);
-}
+  .typeset li:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *))::marker {
+    color: var(--on-surface-variant);
+  }
 
-/* Nested lists */
-.typeset ul ul,
-.typeset ol ol,
-.typeset ul ol,
-.typeset ol ul {
-  margin-top: calc(var(--typeset-flow) * 0.25);
-  margin-bottom: 0;
-}
+  /* Nested lists */
+  .typeset :is(ul, ol) :is(ul, ol):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    margin-top: calc(var(--typeset-flow) * 0.25);
+    margin-bottom: 0;
+  }
 
-/* Inline Code & Code Blocks (wired to --typeset-font-mono) */
-.typeset code {
-  font-family: var(--typeset-font-mono);
-  direction: ltr;
-  unicode-bidi: isolate;
-  font-size: 0.875em;
-  background-color: var(--surface-container-high);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-  padding: 0.15em 0.35em;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--outline-variant);
-}
+  /* Inline Code & Code Blocks (wired to --typeset-font-mono) */
+  .typeset code:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-family: var(--typeset-font-mono);
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-size: 0.875em;
+    background-color: var(--surface-container-high);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+    padding: 0.15em 0.35em;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--outline-variant);
+  }
 
-.typeset pre {
-  font-family: var(--typeset-font-mono);
-  direction: ltr;
-  unicode-bidi: isolate;
-  font-size: 0.875em;
-  background-color: var(--surface-container-low);
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-  padding: 1em 1.25em;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--outline-variant);
-  overflow-x: auto;
-  text-align: left;
-  margin-top: 0;
-  margin-bottom: var(--typeset-flow);
-}
+  .typeset pre:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-family: var(--typeset-font-mono);
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-size: 0.875em;
+    background-color: var(--surface-container-low);
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+    padding: 1em 1.25em;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--outline-variant);
+    overflow-x: auto;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: var(--typeset-flow);
+  }
 
-.typeset pre code {
-  background-color: transparent;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  font-size: inherit;
-  color: inherit;
-}
+  .typeset pre code:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
+  }
 
-/* Blockquotes */
-.typeset blockquote {
-  margin-top: 0;
-  margin-bottom: var(--typeset-flow);
-  padding-inline-start: 1em;
-  border-inline-start: 3px solid var(--primary);
-  color: var(--on-surface-variant);
+  /* Blockquotes */
+  .typeset blockquote:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    margin-top: 0;
+    margin-bottom: var(--typeset-flow);
+    padding-inline-start: 1em;
+    border-inline-start: 3px solid var(--primary);
+    color: var(--on-surface-variant);
+  }
 
-}
+  .typeset blockquote > p:last-child:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    margin-bottom: 0;
+  }
 
-.typeset blockquote > p:last-child {
-  margin-bottom: 0;
-}
+  /* Links */
+  .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: from-font;
+    transition: color var(--duration-quick) var(--ease-standard);
+  }
 
-/* Links */
-.typeset a {
-  color: var(--primary);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  text-decoration-thickness: from-font;
-  transition: color var(--duration-quick) var(--ease-standard);
-}
+  .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)):hover {
+    color: color-mix(in srgb, var(--primary) 85%, black);
+  }
 
-.typeset a:hover {
-  color: color-mix(in srgb, var(--primary) 85%, black);
-}
+  /* Tables */
+  .typeset table:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    margin-bottom: var(--typeset-flow);
+    font-size: 0.875em;
+  }
 
-/* Tables */
-.typeset table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 0;
-  margin-bottom: var(--typeset-flow);
-  font-size: 0.875em;
-}
+  .typeset :is(th, td):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    padding: 0.5em 0.75em;
+    border-bottom: 1px solid var(--outline-variant);
+    text-align: start;
+  }
 
-.typeset th,
-.typeset td {
-  padding: 0.5em 0.75em;
-  border-bottom: 1px solid var(--outline-variant);
-  text-align: start;
-}
+  .typeset th:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    font-weight: 600;
+    color: var(--on-surface);
+    overflow-wrap: break-word;
+    background-color: color-mix(in oklch, var(--surface-container-high) 50%, transparent);
+  }
 
-.typeset th {
-  font-weight: 600;
-  color: var(--on-surface);
-  overflow-wrap: break-word;
-  background-color: color-mix(in oklch, var(--surface-container-high) 50%, transparent);
-}
+  /* Horizontal Dividers */
+  .typeset hr:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    border: 0;
+    border-top: 1px solid var(--outline-variant);
+    margin-top: calc(var(--typeset-flow) * 1.5);
+    margin-bottom: calc(var(--typeset-flow) * 1.5);
+  }
 
-/* Horizontal Dividers */
-.typeset hr {
-  border: 0;
-  border-top: 1px solid var(--outline-variant);
-  margin-top: calc(var(--typeset-flow) * 1.5);
-  margin-bottom: calc(var(--typeset-flow) * 1.5);
-}
+  /* Typeset opt-out isolation for embedded cards & interactive primitives */
+  .typeset .not-typeset,
+  .typeset [data-not-typeset] {
+    margin-top: var(--typeset-flow);
+    margin-bottom: var(--typeset-flow);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
 
-/* Typeset opt-out isolation for embedded cards & interactive primitives */
-.typeset .not-typeset,
-.typeset [data-not-typeset] {
-  margin-top: var(--typeset-flow);
-  margin-bottom: var(--typeset-flow);
-  font-size: 1rem;
-  line-height: 1.5;
-}
+  .typeset .not-typeset p:last-child,
+  .typeset [data-not-typeset] p:last-child {
+    margin-bottom: 0;
+  }
 
-.typeset .not-typeset p:last-child,
-.typeset [data-not-typeset] p:last-child {
-  margin-bottom: 0;
-}
+  /* Prevent double-stacking vertical margin with flex/grid gap-* layouts */
+  .typeset:is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]),
+  .typeset :is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]) {
+    margin-block: 0;
+  }
 
-/* Prevent double-stacking vertical margin with flex/grid gap-* layouts */
-.typeset:is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]),
-.typeset :is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]) {
-  margin-block: 0;
-}
+  .typeset-chat {
+    --typeset-flow: 1em;
+    --typeset-leading: 1.5;
+  }
 
-.typeset-chat {
-  --typeset-flow: 1em;
-  --typeset-leading: 1.5;
-}
+  .typeset-guide {
+    --typeset-size: 1.125em;
+    --typeset-leading: 1.55;
+    --typeset-flow: 1.5em;
+  }
 
-.typeset-guide {
-  --typeset-size: 1.125em;
-  --typeset-leading: 1.55;
-  --typeset-flow: 1.5em;
-}
-
-.typeset-large {
-  --typeset-size: 1.25em;
-  --typeset-leading: 1.8;
-  --typeset-flow: 1.75em;
+  .typeset-large {
+    --typeset-size: 1.25em;
+    --typeset-leading: 1.8;
+    --typeset-flow: 1.75em;
+  }
 }
 
 /* Offscreen rendering optimization (MWG: defer-rendering-heavy-content) */
@@ -1321,15 +1313,17 @@ select:autofill {
 }
 
 /* Scrollspy Navigation: active target tracking (MWG: scrollspy) */
-.scrollspy-nav {
-  scroll-target-group: auto;
-}
+@layer components {
+  .scrollspy-nav {
+    scroll-target-group: auto;
+  }
 
-.scrollspy-link:is(:target-current, [aria-current="true"]) {
-  background-color: var(--primary-container);
-  color: var(--on-primary-container);
-  font-weight: 600;
-  border-color: var(--primary);
+  .scrollspy-link[aria-current="true"] {
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+    font-weight: 600;
+    border-color: var(--primary);
+  }
 }
 
 /* Swipe-to-reveal scroll container & initial target (MWG: swipe-to-reveal) */
@@ -1427,6 +1421,7 @@ select:autofill {
   display: grid;
   grid-row: span 3;
   grid-template-rows: subgrid;
+  row-gap: 0.75rem;
 }
 
 @utility card-grid-subgrid {

@@ -251,6 +251,9 @@ const PromptInputTextarea = React.forwardRef<HTMLTextAreaElement, PromptInputTex
 );
 PromptInputTextarea.displayName = 'PromptInput.Textarea';
 
+// Prevents double-wrapping InputGroupAddon when PromptInput.Actions is nested inside PromptInput.Footer.
+const PromptInputFooterContext = React.createContext(false);
+
 export interface PromptInputActionsProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   align?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end';
@@ -259,22 +262,39 @@ export interface PromptInputActionsProps extends React.HTMLAttributes<HTMLDivEle
 
 const PromptInputActions = React.forwardRef<HTMLDivElement, PromptInputActionsProps>(
   ({ children, align = 'block-end', className, ...props }, ref) => {
+    const inFooter = React.useContext(PromptInputFooterContext);
+
+    if (inFooter) {
+      return (
+        <div
+          ref={ref}
+          data-slot="prompt-input-actions"
+          className={cn('flex flex-wrap items-center gap-1.5 min-w-0', className)}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+
     return (
-      <InputGroupAddon
-        ref={ref}
-        align={align}
-        data-slot="prompt-input-actions"
-        className={cn(
-          align === 'block-end' && 'px-0.5 pb-0 pt-1.5',
-          align === 'block-start' && 'px-0.5 pt-0 pb-1.5 mb-auto',
-          align === 'inline-start' && 'px-0.5',
-          align === 'inline-end' && 'px-0.5',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </InputGroupAddon>
+      <PromptInputFooterContext.Provider value={true}>
+        <InputGroupAddon
+          ref={ref}
+          align={align}
+          data-slot="prompt-input-actions"
+          className={cn(
+            align === 'block-end' && 'px-0.5 pb-0 pt-1.5',
+            align === 'block-start' && 'px-0.5 pt-0 pb-1.5 mb-auto',
+            align === 'inline-start' && 'px-0.5',
+            align === 'inline-end' && 'px-0.5',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </InputGroupAddon>
+      </PromptInputFooterContext.Provider>
     );
   }
 );
@@ -361,7 +381,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
   if (models.length === 0) {
     return (
       <Button
-        variant="ghost"
+        variant="text"
         colorRole="neutral"
         size="sm"
         disabled={disabled}
@@ -382,7 +402,7 @@ export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
     <Menu
       trigger={
         <Button
-          variant="ghost"
+          variant="text"
           colorRole="neutral"
           size="sm"
           disabled={disabled}
@@ -466,7 +486,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
   if (options.length === 0) {
     return (
       <Button
-        variant={isThinkingActive ? 'soft' : 'ghost'}
+        variant={isThinkingActive ? 'soft' : 'text'}
         colorRole={isThinkingActive ? 'secondary' : 'neutral'}
         size="sm"
         disabled={disabled}
@@ -506,7 +526,7 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
     <Menu
       trigger={
         <Button
-          variant={isThinkingActive ? 'soft' : 'ghost'}
+          variant={isThinkingActive ? 'soft' : 'text'}
           colorRole={isThinkingActive ? 'secondary' : 'neutral'}
           size="sm"
           disabled={disabled}
@@ -614,7 +634,7 @@ export const PromptInputAttachButton: React.FC<PromptInputAttachButtonProps> = (
       />
       <Tooltip content={label}>
         <Button
-          variant="ghost"
+          variant="text"
           colorRole="neutral"
           size="sm"
           disabled={disabled}
@@ -640,6 +660,7 @@ export interface PromptInputToolToggleProps {
   icon?: string;
   label: string;
   activeLabel?: string;
+  alwaysShowLabel?: boolean;
   disabled?: boolean;
   className?: string;
 }
@@ -650,13 +671,14 @@ export const PromptInputToolToggle: React.FC<PromptInputToolToggleProps> = ({
   icon = 'language',
   label,
   activeLabel,
+  alwaysShowLabel = false,
   disabled = false,
   className,
 }) => {
   return (
     <Tooltip content={active ? activeLabel || `${label} (Active)` : `Enable ${label}`}>
       <Button
-        variant={active ? 'soft' : 'ghost'}
+        variant={active ? 'soft' : 'text'}
         colorRole={active ? 'primary' : 'neutral'}
         size="sm"
         disabled={disabled}
@@ -673,7 +695,7 @@ export const PromptInputToolToggle: React.FC<PromptInputToolToggleProps> = ({
         )}
       >
         <Icon name={icon} size="xs" aria-hidden="true" />
-        <span className="hidden @sm:inline">{label}</span>
+        <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{label}</span>
       </Button>
     </Tooltip>
   );
@@ -686,6 +708,7 @@ PromptInputToolToggle.displayName = 'PromptInput.ToolToggle';
 export interface PromptInputVoiceToggleProps {
   isRecording?: boolean;
   onToggle?: () => void;
+  alwaysShowLabel?: boolean;
   disabled?: boolean;
   label?: string;
   className?: string;
@@ -694,6 +717,7 @@ export interface PromptInputVoiceToggleProps {
 export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
   isRecording = false,
   onToggle,
+  alwaysShowLabel = false,
   disabled = false,
   label = 'Voice input',
   className,
@@ -701,7 +725,7 @@ export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
   return (
     <Tooltip content={isRecording ? 'Stop recording' : label}>
       <Button
-        variant={isRecording ? 'soft' : 'ghost'}
+        variant={isRecording ? 'soft' : 'text'}
         colorRole={isRecording ? 'error' : 'neutral'}
         size="sm"
         disabled={disabled}
@@ -723,7 +747,7 @@ export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
           className={cn(isRecording && 'text-error animate-pulse motion-reduce:animate-none')}
           aria-hidden="true"
         />
-        <span className="hidden @sm:inline">{isRecording ? 'Listening...' : 'Voice'}</span>
+        <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{isRecording ? 'Listening...' : 'Voice'}</span>
       </Button>
     </Tooltip>
   );

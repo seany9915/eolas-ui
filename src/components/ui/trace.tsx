@@ -318,10 +318,11 @@ export interface TraceTitleProps extends React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode;
   className?: string;
   shimmer?: boolean;
+  wrap?: boolean;
 }
 
 export const TraceTitle = React.forwardRef<HTMLSpanElement, TraceTitleProps>(
-  ({ children, className, shimmer, ...props }, ref) => {
+  ({ children, className, shimmer, wrap = false, ...props }, ref) => {
     const lineCtx = useTraceLineContext();
     const shouldShimmer = shimmer ?? (lineCtx.status === 'running');
     const isError = lineCtx.status === 'error';
@@ -342,7 +343,8 @@ export const TraceTitle = React.forwardRef<HTMLSpanElement, TraceTitleProps>(
         ref={ref}
         data-slot="trace-title"
         className={cn(
-          'flex-1 min-w-0 font-sans text-xs font-semibold text-on-surface truncate leading-normal',
+          'flex-1 min-w-0 font-sans text-xs font-semibold text-on-surface leading-normal',
+          wrap ? 'whitespace-normal break-words' : 'truncate',
           isError && 'text-error',
           isPending && 'text-on-surface-variant font-normal',
           className
@@ -542,7 +544,7 @@ export const TraceAction = React.forwardRef<HTMLButtonElement, TraceActionProps>
         ref={ref}
         type="button"
         data-slot="trace-action"
-        variant="ghost"
+        variant="text"
         colorRole="neutral"
         size="sm"
         disabled={disabled}

@@ -327,6 +327,103 @@
         }
       ],
       "docs": "Run \"npx oxlint .\" to enforce Eolas UI and @shadcn/lint contracts. Ensure your `components.json` `tailwind.css` file imports `./eolas-theme.css` (or points directly to `src/eolas-theme.css`) so `shadcn/no-unknown-classes` recognizes Eolas tokens. If your UI primitives live outside src/components/ui or components/ui, add your custom directory glob to overrides[0].files in .oxlintrc.json."
+    },
+    {
+      "name": "logos",
+      "type": "registry:item",
+      "title": "Eolas Brand Logos",
+      "description": "Official Eolas SVG brand marks (stacked primary mark, horizontal lockups, pictorial marks, and wordmarks) aligned with DESIGN.md color tokens.",
+      "categories": [
+        "system"
+      ],
+      "files": [
+        {
+          "path": "public/logos/horizontal-lockup-amber.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/horizontal-lockup-amber.svg"
+        },
+        {
+          "path": "public/logos/horizontal-lockup-black.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/horizontal-lockup-black.svg"
+        },
+        {
+          "path": "public/logos/horizontal-lockup-white.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/horizontal-lockup-white.svg"
+        },
+        {
+          "path": "public/logos/horizontal-lockup.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/horizontal-lockup.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark-amber-white-bitone.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark-amber-white-bitone.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark-amber-white.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark-amber-white.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark-amber.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark-amber.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark-pure-white.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark-pure-white.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark-sunny-amber.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark-sunny-amber.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark-white.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark-white.svg"
+        },
+        {
+          "path": "public/logos/pictorial-mark.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/pictorial-mark.svg"
+        },
+        {
+          "path": "public/logos/primary-mark.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/primary-mark.svg"
+        },
+        {
+          "path": "public/logos/wordmark-amber.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/wordmark-amber.svg"
+        },
+        {
+          "path": "public/logos/wordmark-black.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/wordmark-black.svg"
+        },
+        {
+          "path": "public/logos/wordmark-primary.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/wordmark-primary.svg"
+        },
+        {
+          "path": "public/logos/wordmark-white.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/wordmark-white.svg"
+        },
+        {
+          "path": "public/logos/wordmark.svg",
+          "type": "registry:file",
+          "target": "~/public/logos/wordmark.svg"
+        }
+      ],
+      "docs": "Installs all Eolas SVG brand marks into `public/logos/`. Reference them via `/logos/horizontal-lockup.svg` (or `assetUrl('/logos/horizontal-lockup.svg')` for subpath deployments)."
     }
   ]
 }

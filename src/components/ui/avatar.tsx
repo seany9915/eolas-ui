@@ -229,9 +229,11 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
     );
   }
 
+  const hasSrc = Boolean(src?.trim());
+
   return (
     <AvatarRoot ref={ref} size={size} customColor={customColor} className={className} {...props}>
-      {src && (
+      {hasSrc && (
         <AvatarImage
           src={src}
           alt={alt}
@@ -241,7 +243,7 @@ const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
           onLoadingStatusChange={onLoadingStatusChange}
         />
       )}
-      <AvatarFallback delay={delay}>
+      <AvatarFallback delay={hasSrc ? delay : 0}>
         {fallback}
       </AvatarFallback>
     </AvatarRoot>

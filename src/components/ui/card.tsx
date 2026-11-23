@@ -345,15 +345,20 @@ export interface CardTriggerProps
  */
 export const CardTrigger = React.forwardRef<HTMLButtonElement, CardTriggerProps>(
   ({ className, ...props }, ref) => {
-    const { isSelectable, selected } = React.useContext(CardContext);
+    const { prominence, isSelectable, selected } = React.useContext(CardContext);
     const isRadio = props.role === 'radio';
+    const isLightSurface = prominence === 'default' || prominence === 'accent';
 
     return (
       <BaseButton
         ref={ref}
         data-slot="card-trigger"
         data-card-trigger=""
-        className={cn('card-link text-start cursor-pointer', className)}
+        className={cn(
+          'card-link text-start cursor-pointer transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+          isLightSurface ? 'hover:text-primary' : 'hover:underline underline-offset-4',
+          className
+        )}
         {...props}
         aria-pressed={isSelectable && !isRadio ? (props['aria-pressed'] ?? selected) : props['aria-pressed']}
         aria-checked={isRadio ? (props['aria-checked'] ?? selected) : props['aria-checked']}

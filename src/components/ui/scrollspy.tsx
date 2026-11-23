@@ -109,8 +109,10 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
       }
     }, []);
 
+    const isExternallyManaged = controlledActiveId !== undefined && !onActiveChange;
+
     React.useEffect(() => {
-      if (typeof window === 'undefined' || items.length === 0) return;
+      if (typeof window === 'undefined' || items.length === 0 || isExternallyManaged) return;
 
       const sectionElements = items
         .map((item) => document.getElementById(item.id))
@@ -171,7 +173,7 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
       return () => {
         observer.disconnect();
       };
-    }, [items, rootMargin, handleActiveChange]);
+    }, [items, rootMargin, handleActiveChange, isExternallyManaged]);
 
     const isHorizontal = orientation === 'horizontal';
 
@@ -203,7 +205,7 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
                 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isHorizontal
                   ? cn(
-                      'min-h-[44px] px-3.5 py-2 -mb-px rounded-t border-b-2 font-medium text-xs',
+                      'shrink-0 whitespace-nowrap min-h-[44px] px-3.5 py-2 -mb-px rounded-t border-b-2 font-medium text-xs',
                       isActive
                         ? 'border-primary bg-primary-container text-on-primary-container font-semibold'
                         : 'border-transparent text-on-surface-variant hover:text-on-surface hover:bg-state-hover hover:border-outline-variant'

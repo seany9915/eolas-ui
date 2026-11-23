@@ -208,7 +208,7 @@ export const CodeBlockCopyButton: React.FC<CodeBlockCopyButtonProps> = ({
     <Tooltip content={copied ? copiedLabel : label}>
       <Button
         type="button"
-        variant="ghost"
+        variant="text"
         colorRole="neutral"
         size="sm"
         data-slot="code-block-copy-button"

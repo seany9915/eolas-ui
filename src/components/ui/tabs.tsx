@@ -189,9 +189,9 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
               effectiveVariant === 'unstyled'
                 ? ''
                 : isContained
-                  ? 'p-1 rounded bg-surface-container-high border border-outline-variant gap-1 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                  ? 'p-1 rounded bg-surface-container-high border border-outline-variant gap-1 w-max max-w-full overflow-x-auto scrollbar-none select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                   : isPills
-                    ? 'gap-1.5 max-w-full select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                    ? 'gap-1.5 w-max max-w-full overflow-x-auto scrollbar-none select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                     : cn(
                         'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
                         enableScrollFade && 'scroll-fade-x',
@@ -535,12 +535,6 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
         ? (tabList[0]?.value ?? tabList[0]?.id)
         : undefined);
     const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
-    const isPillOrContained =
-      variant === 'contained' ||
-      variant === 'segmented' ||
-      variant === 'segment' ||
-      variant === 'pills' ||
-      variant === 'pill';
 
     return (
       <TabsRoot
@@ -554,7 +548,7 @@ const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
         size={size}
         showIndicator={showIndicator}
         className={cn(
-          inline || isPillOrContained ? 'w-max max-w-full items-start' : 'w-full',
+          inline ? 'w-max max-w-full items-start' : 'w-full',
           className
         )}
         {...props}

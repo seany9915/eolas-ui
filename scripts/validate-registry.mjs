@@ -61,6 +61,9 @@ function mapRegistryFilePathToRepoSource(regFilePath) {
   if (regFilePath.startsWith('lint/')) {
     return `packages/eolas-ui/${regFilePath}`;
   }
+  if (regFilePath.startsWith('logos/')) {
+    return `public/${regFilePath}`;
+  }
   return regFilePath;
 }
 

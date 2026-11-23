@@ -221,16 +221,18 @@ const SourcesList = React.forwardRef<HTMLDivElement, SourcesListProps>(
     }
 
     return (
-      <TraceCollapsibleContent ref={ref} variant="flush">
-        <Trace
-          variant="ghost"
-          data-slot="sources-content"
-          className={className}
-          {...props}
-        >
-          {children}
-        </Trace>
-      </TraceCollapsibleContent>
+      <SourcesPanelContext.Provider value={false}>
+        <TraceCollapsibleContent ref={ref} variant="flush">
+          <Trace
+            variant="ghost"
+            data-slot="sources-content"
+            className={className}
+            {...props}
+          >
+            {children}
+          </Trace>
+        </TraceCollapsibleContent>
+      </SourcesPanelContext.Provider>
     );
   }
 );

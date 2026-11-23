@@ -31,15 +31,21 @@ export interface SuggestionItem {
 export interface SuggestionChipsRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   label?: string;
+  align?: 'start' | 'center' | 'end';
   className?: string;
 }
 
 const SuggestionChipsRoot = React.forwardRef<HTMLDivElement, SuggestionChipsRootProps>(
-  ({ children, label, className, ...props }, ref) => {
+  ({ children, label, align = 'start', className, ...props }, ref) => {
     return (
       <div
         ref={ref}
-        className={cn('@container flex flex-col gap-2 w-full', className)}
+        className={cn(
+          '@container flex flex-col gap-2 w-full',
+          align === 'center' && 'items-center',
+          align === 'end' && 'items-end',
+          className
+        )}
         {...props}
       >
         {label && (
@@ -57,11 +63,12 @@ SuggestionChipsRoot.displayName = 'SuggestionChips.Root';
 export interface SuggestionChipsListProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   layout?: 'wrap' | 'scroll' | 'stack';
+  align?: 'start' | 'center' | 'end';
   className?: string;
 }
 
 const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsListProps>(
-  ({ children, layout = 'wrap', className, onKeyDown, ...props }, ref) => {
+  ({ children, layout = 'wrap', align = 'start', className, onKeyDown, ...props }, ref) => {
     const listRef = React.useRef<HTMLDivElement | null>(null);
 
     const setCombinedRef = React.useCallback(
@@ -139,6 +146,10 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
           layout === 'wrap' && 'flex flex-wrap gap-2',
           layout === 'scroll' && 'flex overflow-x-auto gap-2 pb-1 scrollbar-none',
           layout === 'stack' && 'flex flex-col gap-2',
+          layout !== 'stack' && align === 'center' && 'justify-center',
+          layout !== 'stack' && align === 'end' && 'justify-end',
+          layout === 'stack' && align === 'center' && 'items-center',
+          layout === 'stack' && align === 'end' && 'items-end',
           className
         )}
         {...props}
@@ -310,6 +321,7 @@ export interface SuggestionChipsProps {
   onSelect?: (prompt: string) => void;
   label?: string;
   layout?: 'wrap' | 'scroll' | 'stack';
+  align?: 'start' | 'center' | 'end';
   variant?: 'compact' | 'card' | 'ghost';
   className?: string;
   children?: React.ReactNode;
@@ -320,6 +332,7 @@ const SuggestionChipsComponent: React.FC<SuggestionChipsProps> = ({
   onSelect = () => {},
   label = 'Suggested prompts',
   layout = 'wrap',
+  align = 'start',
   variant = 'compact',
   className,
   children,
@@ -327,8 +340,8 @@ const SuggestionChipsComponent: React.FC<SuggestionChipsProps> = ({
   if (!children && (!suggestions || suggestions.length === 0)) return null;
 
   return (
-    <SuggestionChipsRoot label={label} className={className}>
-      <SuggestionChipsList layout={layout}>
+    <SuggestionChipsRoot label={label} align={align} className={className}>
+      <SuggestionChipsList layout={layout} align={align}>
         {children ||
           suggestions?.map((item, idx) => (
             <SuggestionChip

@@ -28,25 +28,36 @@ import { cn } from '@/lib/utils';
 
 export type { PanelImperativeHandle, GroupImperativeHandle };
 
+export type ResizablePanelGroupVariant = 'default' | 'canvas' | 'ghost';
+
+const resizableGroupVariantStyles: Record<ResizablePanelGroupVariant, string> = {
+  default: 'rounded-lg border border-outline-variant bg-surface',
+  canvas: 'bg-background',
+  ghost: 'bg-transparent',
+};
+
 export interface ResizablePanelGroupProps
   extends Omit<GroupProps, 'orientation'> {
   direction?: 'horizontal' | 'vertical';
   orientation?: 'horizontal' | 'vertical';
+  variant?: ResizablePanelGroupVariant;
 }
 
 export const ResizablePanelGroup = React.forwardRef<
   HTMLDivElement,
   ResizablePanelGroupProps
->(({ className, direction = 'horizontal', orientation, ...props }, ref) => {
+>(({ className, direction = 'horizontal', orientation, variant = 'default', ...props }, ref) => {
   const resolvedOrientation = orientation ?? direction;
 
   return (
     <Group
       elementRef={ref}
       data-slot="resizable-panel-group"
+      data-variant={variant}
       orientation={resolvedOrientation}
       className={cn(
-        '@container flex size-full overflow-hidden rounded-lg border border-outline-variant bg-surface',
+        '@container flex size-full overflow-hidden',
+        resizableGroupVariantStyles[variant],
         resolvedOrientation === 'horizontal' ? 'flex-row' : 'flex-col',
         className
       )}

@@ -214,6 +214,10 @@ function DialogComponent<Payload = unknown>({
   );
 }
 
+const DialogContentContext = React.createContext<{ hasCloseButton: boolean }>({
+  hasCloseButton: false,
+});
+
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseDialog.Popup> {
   size?: DialogSize;
@@ -262,7 +266,9 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
             )}
             {...props}
           >
-            {children}
+            <DialogContentContext.Provider value={{ hasCloseButton: showCloseButton }}>
+              {children}
+            </DialogContentContext.Provider>
             {showCloseButton && (
               <DialogClose
                 className="absolute top-3 end-3"
@@ -294,9 +300,17 @@ export const DialogTrigger = React.forwardRef<
 DialogTrigger.displayName = 'DialogTrigger';
 
 export const DialogHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="dialog-header" className={cn('flex flex-col gap-1.5 text-start mb-4', className)} {...props} />
-  )
+  ({ className, ...props }, ref) => {
+    const { hasCloseButton } = React.useContext(DialogContentContext);
+    return (
+      <div
+        ref={ref}
+        data-slot="dialog-header"
+        className={cn('flex flex-col gap-1.5 text-start mb-4', hasCloseButton && 'pe-12', className)}
+        {...props}
+      />
+    );
+  }
 );
 DialogHeader.displayName = 'DialogHeader';
 
