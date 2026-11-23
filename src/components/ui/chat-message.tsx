@@ -210,14 +210,14 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
             return 'bg-primary-container text-on-primary-container';
           }
           if (resolvedRole === 'system') {
-            return 'bg-surface-container text-on-surface-variant text-sm font-medium';
+            return 'bg-surface-container-low text-on-surface-variant text-sm font-medium';
           }
           return 'bg-surface text-on-surface border border-outline-variant shadow-ambient';
         case 'default':
         default:
           return resolvedAlign === 'end'
             ? 'bg-primary text-on-primary'
-            : 'bg-surface-container text-on-surface';
+            : 'bg-surface text-on-surface border border-outline-variant/60';
       }
     })();
 
@@ -381,7 +381,7 @@ const ChatMessageAvatar: React.FC<ChatMessageAvatarProps> = ({
         'size-7 text-xs shrink-0 select-none border',
         resolvedRole === 'user'
           ? 'bg-primary text-on-primary border-primary'
-          : 'bg-surface-container text-on-surface border-outline-variant',
+          : 'bg-surface-container-high text-on-surface border-outline-variant',
         className
       )}
       {...props}

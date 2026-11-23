@@ -112,7 +112,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           'inline-flex w-max items-center rounded border bg-surface overflow-hidden',
           'transition-[border-color,box-shadow]',
           'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
-          'data-[disabled]:opacity-50 data-[disabled]:bg-surface-container/30 data-[disabled]:pointer-events-none',
+          'data-[disabled]:opacity-50 data-[disabled]:bg-surface-container-low data-[disabled]:pointer-events-none',
           error ? 'border-error focus-within:border-error has-[:focus-visible]:outline-error' : 'border-outline hover:border-on-surface-variant/80'
         )}
       >
@@ -120,7 +120,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           aria-label="Decrease value"
           className={cn(
             numberFieldSizeStyles[size].button,
-            'flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-e border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none'
+            'flex items-center justify-center text-on-surface-variant hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-e border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container-low focus-visible:text-primary cursor-pointer select-none'
           )}
         >
           <Icon name="remove" size="sm" />
@@ -138,7 +138,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           aria-label="Increase value"
           className={cn(
             numberFieldSizeStyles[size].button,
-            'flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:bg-surface-container/80 active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-s border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container focus-visible:text-primary cursor-pointer select-none'
+            'flex items-center justify-center text-on-surface-variant hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:scale-[0.96] transition-colors disabled:opacity-40 data-[disabled]:opacity-40 border-s border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container-low focus-visible:text-primary cursor-pointer select-none'
           )}
         >
           <Icon name="add" size="sm" />

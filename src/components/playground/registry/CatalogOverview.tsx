@@ -217,7 +217,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
 
         {filteredEntries.length === 0 ? (
           <div className="py-16 px-4 text-center space-y-3 bg-surface rounded-xl shadow-ambient">
-            <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mx-auto text-on-surface-variant">
+            <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mx-auto text-on-surface-variant">
               <Icon name="search_off" size="md" />
             </div>
             <h3 className="font-heading text-base font-bold text-on-surface">No components found</h3>

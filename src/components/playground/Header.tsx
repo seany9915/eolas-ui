@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
                             'flex flex-col gap-0.5 px-3 py-2.5 rounded-lg transition-colors cursor-pointer outline-none select-none text-left',
                             isActive
                               ? 'bg-primary-container text-on-primary-container font-semibold'
-                              : 'text-on-surface hover:bg-surface-container focus:bg-surface-container'
+                              : 'text-on-surface hover:bg-state-hover focus:bg-state-hover'
                           )}
                         >
                           <div className="flex items-center gap-2 font-sans text-sm font-semibold">

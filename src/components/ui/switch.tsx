@@ -138,7 +138,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
     return (
       <div
         className={cn(
-          'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors hover:bg-surface-container/30',
+          'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors hover:bg-state-hover',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
           !isClassNameFn ? className : undefined
         )}

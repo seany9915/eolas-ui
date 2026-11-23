@@ -18,10 +18,10 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLElement> {
 /**
  * Skeleton
  *
- * Accessible loading placeholder styled with the design system's surface-container token.
+ * Accessible loading placeholder styled with the design system's surface-container-high token.
  * Uses a calm, subtle opacity pulse to communicate asynchronous state without jarring flicker.
  *
- * Complies with DESIGN.md line 566 (surface-container toned pulse, never generic gray).
+ * Complies with DESIGN.md line 566 (surface-container-high toned pulse, never generic gray).
  * Supports Base UI polymorphic composition via the `render` prop.
  */
 const SkeletonRoot = React.forwardRef<HTMLElement, SkeletonProps>(

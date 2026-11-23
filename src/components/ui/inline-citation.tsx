@@ -356,7 +356,7 @@ const InlineCitationQuote = React.forwardRef<HTMLQuoteElement, InlineCitationQuo
       <blockquote
         ref={ref}
         className={cn(
-          'border-s-2 border-secondary ps-2.5 py-1 text-xs font-normal text-on-surface-variant bg-surface-container/40 rounded-none leading-relaxed',
+          'border-s-2 border-secondary ps-2.5 py-1 text-xs font-normal text-on-surface-variant bg-surface-container-low rounded-none leading-relaxed',
           className
         )}
         {...props}

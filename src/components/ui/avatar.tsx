@@ -182,7 +182,7 @@ export const AvatarGroupCount = React.forwardRef<HTMLDivElement, AvatarGroupCoun
     ref={ref}
     data-slot="avatar-group-count"
     className={cn(
-      'relative flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-container text-xs font-label font-semibold text-on-surface-variant ring-2 ring-surface border border-outline-variant select-none',
+      'relative flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-xs font-label font-semibold text-on-surface-variant ring-2 ring-surface border border-outline-variant select-none',
       className
     )}
     {...props}

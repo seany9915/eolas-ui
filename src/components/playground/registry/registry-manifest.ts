@@ -297,7 +297,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Use Calendar for date, multiple date, and date range selections.",
       "Integrates with React DayPicker v9/v10 while maintaining complete shadcn/ui API compatibility.",
       "Commonly paired with Popover and Button to form a DatePicker.",
-      "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast."
+      "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container-high range fills, and WCAG 2.2 AA contrast."
     ],
     "dependencies": [
       "react-day-picker@^10.0.0"
@@ -594,7 +594,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Use Command for fast, accessible command palettes, spotlight search, and quick action menus.",
       "Powered by cmdk for fuzzy searching, keyboard scoring, and grouped item filtering.",
       "CommandDialog integrates Base UI Dialog (with screen-reader accessible DialogTitle and DialogDescription) while retaining complete shadcn Command API compatibility.",
-      "Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings, surface-container wash for item selection, and strict semantic tokens."
+      "Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings, surface-container-low wash for item selection, and strict semantic tokens."
     ],
     "dependencies": [
       "cmdk"
@@ -993,7 +993,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Use Kbd to visually represent keyboard keys, hotkeys, and shortcut combinations (e.g. ⌘K, Ctrl+B).",
       "Use KbdGroup to compose multiple keycaps together without line breaks.",
       "Ideal for embedding in buttons, command palettes, menus, and tooltips.",
-      "Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container wash, subtle outline-variant border, and strict semantic tokens."
+      "Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container-high wash, subtle outline-variant border, and strict semantic tokens."
     ],
     "dependencies": [
       "@base-ui/react"

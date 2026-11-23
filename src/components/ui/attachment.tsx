@@ -227,8 +227,8 @@ export const AttachmentMedia = React.forwardRef<HTMLDivElement, AttachmentMediaP
           'flex shrink-0 items-center justify-center select-none overflow-hidden',
           sizeClasses,
           isImage
-            ? 'bg-surface-container object-cover [&>img]:size-full [&>img]:object-cover [&>img]:rounded-[inherit]'
-            : 'bg-surface-container text-on-surface-variant',
+            ? 'bg-surface-container-high object-cover [&>img]:size-full [&>img]:object-cover [&>img]:rounded-[inherit]'
+            : 'bg-surface-container-high text-on-surface-variant',
           className
         ),
         children,
@@ -409,7 +409,7 @@ export const AttachmentAction = React.forwardRef<HTMLButtonElement, AttachmentAc
           onClick?.(e);
         }}
         className={cn(
-          'p-0 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container/70 shrink-0 inline-flex items-center justify-center',
+          'p-0 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-state-hover shrink-0 inline-flex items-center justify-center',
           isMicro ? 'size-5 min-h-[20px] min-w-[20px]' : 'size-7 min-h-[28px] min-w-[28px]',
           className
         )}

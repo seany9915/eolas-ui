@@ -122,7 +122,7 @@ export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerClose
         render
           ? className
           : composeClassName(
-              'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
+              'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
               className
             )
       }
@@ -498,7 +498,7 @@ function DrawerComponentInner<Payload = unknown>(
                       <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant mt-6 shrink-0">{footer}</div>
                     ) : (
                       <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6 shrink-0">
-                        <BaseDrawer.Close data-slot="drawer-close" className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
+                        <BaseDrawer.Close data-slot="drawer-close" className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
                           Close panel
                         </BaseDrawer.Close>
                       </div>

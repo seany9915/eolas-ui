@@ -264,7 +264,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                           Ready for clinical workflows. Defined at <code className="font-mono text-primary">{entry.sourcePath}</code>.
                         </p>
                       </div>
-                      <div className="bg-surface-container rounded-lg p-3 max-w-md mx-auto font-mono text-xs text-left border border-outline-variant">
+                      <div className="bg-surface-container-low rounded-lg p-3 max-w-md mx-auto font-mono text-xs text-left border border-outline-variant">
                         {importStatement}
                       </div>
                     </div>
@@ -303,7 +303,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 <p className="font-sans text-xs text-on-surface-variant">
                   Or install directly via the bundled Eolas UI CLI:
                 </p>
-                <div className="bg-surface-container text-on-surface p-3.5 rounded-lg font-mono text-xs border border-outline-variant flex items-center justify-between gap-2">
+                <div className="bg-surface-container-low text-on-surface p-3.5 rounded-lg font-mono text-xs border border-outline-variant flex items-center justify-between gap-2">
                   <span className="truncate">{eolasCliCommand}</span>
                   <Button
                     size="sm"
@@ -323,12 +323,12 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 <Icon name="code" size="sm" className="text-primary" />
                 Import & Usage
               </h3>
-              <div className="bg-surface-container p-3.5 rounded-lg font-mono text-xs border border-outline-variant">
+              <div className="bg-surface-container-low p-3.5 rounded-lg font-mono text-xs border border-outline-variant">
                 {importStatement}
               </div>
               <div className="font-sans text-xs text-on-surface-variant space-y-2">
                 <p>Source file location:</p>
-                <code className="block bg-surface-container px-2.5 py-1.5 rounded text-primary font-mono text-xs border border-outline-variant">
+                <code className="block bg-surface-container-low px-2.5 py-1.5 rounded text-primary font-mono text-xs border border-outline-variant">
                   {entry.sourcePath}
                 </code>
               </div>
@@ -344,7 +344,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                   {entry.dependencies.map((dep) => (
                     <span
                       key={dep}
-                      className="font-mono text-xs px-2.5 py-1 rounded-md bg-surface-container text-on-surface border border-outline-variant"
+                      className="font-mono text-xs px-2.5 py-1 rounded-md bg-surface-container-low text-on-surface border border-outline-variant"
                     >
                       {dep}
                     </span>
@@ -383,13 +383,13 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                 Accessibility & Design Law
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
-                <div className="p-4 rounded-lg bg-surface-container border border-outline-variant">
+                <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
                   <span className="font-bold text-on-surface block mb-1">WCAG 2.2 AA Contrast:</span>
                   <span className="text-on-surface-variant">
                     All text and interactive borders meet 4.5:1 / 3:1 contrast ratios across clinical lighting conditions.
                   </span>
                 </div>
-                <div className="p-4 rounded-lg bg-surface-container border border-outline-variant">
+                <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant">
                   <span className="font-bold text-on-surface block mb-1">Touch Target Compliance:</span>
                   <span className="text-on-surface-variant">
                     Complies with WCAG 2.2 SC 2.5.8 Target Size with minimum 44x44px touch envelopes for clinical tablets and mobile devices.

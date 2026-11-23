@@ -25,7 +25,7 @@ export const DirectionProviderDemo: React.FC<ComponentDemoProps> = () => {
         </Button>
       </div>
       <DirectionProvider direction={dir}>
-        <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-sans">
+        <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-sans">
           <p className="font-bold text-on-surface">مستشفى رويال فيكتوريا للأطفال (Royal Victoria Paediatric Hospital)</p>
           <p className="text-on-surface-variant">DirectionProvider sets the CSS `dir` context for bidirectional Base UI primitives.</p>
         </div>
@@ -56,7 +56,7 @@ export const UtilsDemo: React.FC<ComponentDemoProps> = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-4">
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <span className="font-heading text-sm font-bold text-on-surface">Class & URL Utilities</span>
           <Badge variant="soft" colorRole={safeUrl ? 'success' : 'error'} size="sm">
@@ -96,7 +96,7 @@ export const SanitizeDemo: React.FC<ComponentDemoProps> = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-4">
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <span className="font-heading text-sm font-bold text-on-surface">Untrusted HTML Sanitizer</span>
           <Button
@@ -148,7 +148,7 @@ export const SchedulerDemo: React.FC<ComponentDemoProps> = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-4">
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <span className="font-heading text-sm font-bold text-on-surface">Cooperative Filter Scheduler</span>
           <Badge variant="soft" colorRole={isFiltering ? 'warning' : 'primary'} size="sm">
@@ -195,7 +195,7 @@ export const BuiltInAiDemo: React.FC<ComponentDemoProps> = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-3">
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Icon name="psychology" size="sm" className="text-primary" />
           <span className="font-heading text-sm font-bold text-on-surface">On-Device Browser AI Status</span>
@@ -240,7 +240,7 @@ export const ScrollCompletionDemo: React.FC<ComponentDemoProps> = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-3">
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <span className="font-heading text-sm font-bold text-on-surface">Scroll Completion Promise</span>
           <Badge variant="soft" colorRole={status === 'Arrived' ? 'success' : 'primary'} size="sm">
@@ -267,9 +267,9 @@ export const ScrollCompletionDemo: React.FC<ComponentDemoProps> = () => {
           ref={scrollerRef}
           className="h-40 overflow-y-auto rounded-lg bg-surface border border-outline-variant p-3 flex flex-col gap-3"
         >
-          <div className="p-3 rounded bg-surface-container text-xs font-sans text-on-surface-variant">Section 1: Overview</div>
-          <div className="p-3 rounded bg-surface-container text-xs font-sans text-on-surface-variant">Section 2: Assessment</div>
-          <div className="p-3 rounded bg-surface-container text-xs font-sans text-on-surface-variant">Section 3: Dosing</div>
+          <div className="p-3 rounded bg-surface-container-low text-xs font-sans text-on-surface-variant">Section 1: Overview</div>
+          <div className="p-3 rounded bg-surface-container-low text-xs font-sans text-on-surface-variant">Section 2: Assessment</div>
+          <div className="p-3 rounded bg-surface-container-low text-xs font-sans text-on-surface-variant">Section 3: Dosing</div>
           <div
             ref={targetRef}
             className="p-3 rounded bg-primary-container text-on-primary-container text-xs font-sans font-semibold"
@@ -288,7 +288,7 @@ export const FormatDurationDemo: React.FC<ComponentDemoProps> = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto py-6 flex flex-col gap-4">
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <span className="font-heading text-sm font-bold text-on-surface">Duration Formatting</span>
           <Badge variant="soft" colorRole="primary" size="sm">

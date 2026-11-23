@@ -310,7 +310,7 @@ export const CarouselPrevious = React.forwardRef<
       className={composeClassName(
         [
           'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
-          'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+          'hover:bg-state-hover hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
           'disabled:opacity-30 disabled:pointer-events-none',
           'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
@@ -363,7 +363,7 @@ export const CarouselNext = React.forwardRef<
       className={composeClassName(
         [
           'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
-          'hover:bg-surface-container hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+          'hover:bg-state-hover hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
           'disabled:opacity-30 disabled:pointer-events-none',
           'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',

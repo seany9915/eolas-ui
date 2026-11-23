@@ -80,8 +80,8 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
               : cn(
                   'rounded-lg border p-4',
                   !isApproved && !isDenied && 'bg-surface border-outline-variant/80',
-                  isApproved && 'bg-surface-container/30 border-outline-variant/80',
-                  isDenied && 'bg-surface-container/40 border-outline-variant/60 opacity-80'
+                  isApproved && 'bg-surface-container-low border-outline-variant/80',
+                  isDenied && 'bg-surface-container-low border-outline-variant/60 opacity-80'
                 ),
             className
           )}
@@ -123,7 +123,7 @@ const ConfirmationMedia: React.FC<ConfirmationMediaProps> = ({
           ? cn(
               'size-7 rounded-md text-xs',
               isApproved && 'bg-success text-on-success font-bold',
-              isDenied && 'bg-surface-container text-on-surface-variant',
+              isDenied && 'bg-surface-container-high text-on-surface-variant',
               !isApproved && !isDenied && 'bg-warning-container text-on-warning-container'
             )
           : cn(
@@ -230,7 +230,7 @@ const ConfirmationDetails: React.FC<ConfirmationDetailsProps> = ({
   return (
     <div
       className={cn(
-        'mt-2.5 p-2.5 rounded-sm bg-surface-container font-mono text-xs text-on-surface-variant overflow-x-auto',
+        'mt-2.5 p-2.5 rounded-sm bg-surface-container-low font-mono text-xs text-on-surface-variant overflow-x-auto',
         className
       )}
       {...props}
@@ -262,7 +262,7 @@ const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, chil
     : Object.entries(changes).map(([key, val]) => ({ label: key, from: val.from, to: val.to }));
 
   return (
-    <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container/60 font-mono text-xs flex flex-col gap-1.5', className)} {...props}>
+    <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container-low font-mono text-xs flex flex-col gap-1.5', className)} {...props}>
       {items.map((item, idx) => (
         <div key={idx} className="flex items-center justify-between gap-2 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
           <span className="text-on-surface-variant font-semibold">{item.label}:</span>

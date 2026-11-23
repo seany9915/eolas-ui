@@ -176,7 +176,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
               dataKey="value"
               angleAxisId={0}
               fill={arcColor}
-              background={{ fill: 'var(--color-surface-container)' }}
+              background={{ fill: 'var(--color-surface-container-high)' }}
               cornerRadius={6}
             />
           </RadialBarChart>

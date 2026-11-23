@@ -96,7 +96,7 @@ const ToastComponent: React.FC<ToastProps> = ({
             <BaseToast.Close
               data-slot="toast-close"
               onClick={onClose}
-              className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+              className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
               aria-label="Dismiss toast"
             >
               <Icon name="close" size="sm" aria-hidden="true" />
@@ -427,7 +427,7 @@ const ActiveToastItem: React.FC<{
           data-slot="toast-action"
           {...restFallbackAction}
           className={composeClassName(
-            'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0 touch-target-expanded',
+            'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0 touch-target-expanded',
             fallbackActionClassName
           )}
         />
@@ -435,7 +435,7 @@ const ActiveToastItem: React.FC<{
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close
           data-slot="toast-close"
-          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container/80 active:bg-surface-container transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
           aria-label="Dismiss toast"
         >
           <Icon name="close" size="sm" aria-hidden="true" />

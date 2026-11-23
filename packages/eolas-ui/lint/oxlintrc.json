@@ -53,7 +53,8 @@
     "shadcn/no-arbitrary-values": [
       "error",
       {
-        "scanAllStrings": true
+        "scanAllStrings": true,
+        "allow": ["transition-*"]
       }
     ],
     "shadcn/no-inline-styles": [

@@ -107,7 +107,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
           onClear?.();
         }}
         className={cn(
-          'rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none',
+          'rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer touch-manipulation flex items-center justify-center select-none',
           size === 'sm'
             ? 'relative size-7 min-w-[28px] min-h-[28px] after:absolute after:-inset-2 after:content-[\'\']'
             : 'relative size-8 min-w-[32px] min-h-[32px] after:absolute after:-inset-1.5 after:content-[\'\']'
@@ -156,8 +156,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
         'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:appearance-none',
         'placeholder:text-on-surface-variant/80',
-        'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        'disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+        'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
         'aria-invalid:border-error aria-invalid:focus-visible:border-error aria-invalid:focus-visible:outline-error',
         'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error',
         'user-invalid:border-error user-invalid:focus-visible:border-error user-invalid:focus-visible:outline-error',

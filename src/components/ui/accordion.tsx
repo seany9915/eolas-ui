@@ -222,7 +222,7 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
       className={composeClassName(
         cn(
           'w-full',
-          level === 2 && 'p-4 rounded-lg bg-surface-container border-none shadow-card'
+          level === 2 && 'p-4 rounded-lg bg-surface border-none shadow-card'
         ),
         className
       )}

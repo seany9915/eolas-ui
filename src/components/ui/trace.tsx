@@ -67,7 +67,7 @@ export interface TraceRootProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Visual presentation variant of the trace container.
    * - `default`: Standard contained surface with 1px outline-variant border.
-   * - `embedded`: Subtle surface-container wash for grouped field contexts.
+   * - `embedded`: Subtle surface-container-low wash for grouped field contexts.
    * - `timeline`: Vertical connected-rail timeline layout.
    * - `ghost`: Transparent unboxed container for chat message turns and nested traces.
    * @deprecated Use `variant="ghost"` instead of `unboxed`.
@@ -113,7 +113,7 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
             (resolvedVariant === 'default' || resolvedVariant === 'card') &&
               'rounded-lg border border-outline-variant bg-surface overflow-hidden divide-y divide-outline-variant/40',
             resolvedVariant === 'embedded' &&
-              'rounded-lg border border-outline-variant/60 bg-surface-container/30 overflow-hidden divide-y divide-outline-variant/30',
+              'rounded-lg border border-outline-variant/60 bg-surface-container-low overflow-hidden divide-y divide-outline-variant/30',
             (resolvedVariant === 'ghost' || resolvedVariant === 'unboxed') &&
               'rounded-none border-none bg-transparent divide-y divide-outline-variant/30',
             resolvedVariant === 'timeline' &&
@@ -214,14 +214,14 @@ export const TraceIcon = React.forwardRef<HTMLSpanElement, TraceIconProps>(
             ? cn(
                 'size-6 rounded-full text-xs font-medium',
                 stepNumber !== undefined &&
-                  'border border-outline-variant/60 bg-surface-container text-on-surface font-mono text-xs font-semibold leading-none',
+                  'border border-outline-variant/60 bg-surface-container-high text-on-surface font-mono text-xs font-semibold leading-none',
                 stepNumber === undefined && isComplete && 'bg-success-container text-on-success-container font-bold',
-                stepNumber === undefined && resolvedStatus === 'running' && 'bg-surface-container text-on-surface-variant',
+                stepNumber === undefined && resolvedStatus === 'running' && 'bg-surface-container-high text-on-surface-variant',
                 stepNumber === undefined && resolvedStatus === 'warning' && 'bg-warning-container text-on-warning-container font-bold',
                 stepNumber === undefined && resolvedStatus === 'error' && 'bg-error-container text-on-error-container font-bold',
-                stepNumber === undefined && resolvedStatus === 'pending' && 'bg-surface-container text-on-surface-variant/90 border border-outline/40',
-                stepNumber === undefined && resolvedStatus === 'cancelled' && 'bg-surface-container text-on-surface-variant/70 border border-outline-variant',
-                stepNumber === undefined && resolvedStatus === 'default' && 'bg-surface-container text-on-surface-variant'
+                stepNumber === undefined && resolvedStatus === 'pending' && 'bg-surface-container-high text-on-surface-variant/90 border border-outline/40',
+                stepNumber === undefined && resolvedStatus === 'cancelled' && 'bg-surface-container-high text-on-surface-variant/70 border border-outline-variant',
+                stepNumber === undefined && resolvedStatus === 'default' && 'bg-surface-container-high text-on-surface-variant'
               )
             : cn(
                 'size-5 text-xs',
@@ -297,9 +297,9 @@ export const TraceBadge = React.forwardRef<HTMLSpanElement, TraceBadgeProps>(
           resolvedStatus === 'running' && 'bg-secondary-container text-on-secondary-container',
           resolvedStatus === 'warning' && 'bg-warning-container text-on-warning-container',
           resolvedStatus === 'error' && 'bg-error-container text-on-error-container',
-          resolvedStatus === 'pending' && 'bg-surface-container text-on-surface-variant/90 border border-outline/40',
-          resolvedStatus === 'cancelled' && 'bg-surface-container text-on-surface-variant line-through',
-          resolvedStatus === 'default' && 'bg-surface-container text-on-surface-variant',
+          resolvedStatus === 'pending' && 'bg-surface-container-high text-on-surface-variant/90 border border-outline/40',
+          resolvedStatus === 'cancelled' && 'bg-surface-container-high text-on-surface-variant line-through',
+          resolvedStatus === 'default' && 'bg-surface-container-high text-on-surface-variant',
           className
         )}
         {...props}
@@ -436,7 +436,7 @@ export const TraceCollapsibleTrigger = React.forwardRef<
       className={composeClassName(
         cn(
           'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start',
-          'hover:bg-surface-container/40 transition-colors',
+          'hover:bg-state-hover transition-colors',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'disabled:cursor-not-allowed disabled:opacity-60'
         ),

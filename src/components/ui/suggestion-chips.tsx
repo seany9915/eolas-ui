@@ -194,7 +194,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         onClick={handleClick}
         className={cn(
           'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
-          'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-start',
+          'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           className
@@ -234,7 +234,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         expandedTouchTarget
         className={cn(
           'group inline-flex items-center gap-2 px-3 py-1 h-8 rounded-full',
-          'bg-transparent border-0 hover:bg-surface-container/60 text-start',
+          'bg-transparent border-0 hover:bg-state-hover text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           className
@@ -273,7 +273,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
       expandedTouchTarget
       className={cn(
         'group inline-flex items-center gap-2 px-3.5 py-1 h-8 rounded-full',
-        'bg-surface border border-outline-variant hover:border-primary hover:bg-surface-container/60 text-start',
+        'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
         className

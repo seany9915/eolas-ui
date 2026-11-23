@@ -144,6 +144,12 @@ export function findNormalizedMatchRanges(
   return ranges;
 }
 
+function resolveContainerElement(
+  containerTarget: HTMLElement | null | React.RefObject<HTMLElement | null>
+): HTMLElement | null {
+  return containerTarget instanceof HTMLElement ? containerTarget : containerTarget?.current ?? null;
+}
+
 export function useTextHighlight(
   containerTarget: HTMLElement | null | React.RefObject<HTMLElement | null>,
   query: string,
@@ -156,14 +162,12 @@ export function useTextHighlight(
   const ownerRef = React.useRef<symbol>(Symbol('highlight-owner'));
   const cachedTextNodesRef = React.useRef<Text[]>([]);
 
-  const containerElement =
-    containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
+  const containerElement = resolveContainerElement(containerTarget);
 
   // Observe container content mutations (ignoring the sr-only live status region) so the cached
   // text-node list refreshes only when container content changes rather than on every keystroke.
   React.useEffect(() => {
-    const container =
-      containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
+    const container = resolveContainerElement(containerTarget);
     if (!container || typeof MutationObserver === 'undefined') return;
     let frame = 0;
     const observer = new MutationObserver((mutations) => {
@@ -187,8 +191,7 @@ export function useTextHighlight(
 
   // Cache TreeWalker text nodes per container and content version to avoid full DOM walks on every keystroke
   React.useEffect(() => {
-    const container =
-      containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
+    const container = resolveContainerElement(containerTarget);
     if (!container || typeof document === 'undefined') {
       cachedTextNodesRef.current = [];
       return;
@@ -225,8 +228,7 @@ export function useTextHighlight(
     }
 
     setIsSupported(true);
-    const container =
-      containerTarget && 'current' in containerTarget ? containerTarget.current : containerTarget;
+    const container = resolveContainerElement(containerTarget);
     const owner = ownerRef.current;
 
     // Clear this instance's highlight if query is empty or container is unmounted

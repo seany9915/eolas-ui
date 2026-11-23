@@ -1247,7 +1247,7 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
             // Constant 2px border eliminates 1px layout shift when toggling selection
             isSelected
               ? 'border-2 border-primary bg-primary-container text-on-surface'
-              : 'border-2 border-outline-variant bg-surface hover:border-outline hover:bg-surface-container text-on-surface',
+              : 'border-2 border-outline-variant bg-surface hover:border-outline hover:bg-state-hover text-on-surface',
             disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
             className
           )}

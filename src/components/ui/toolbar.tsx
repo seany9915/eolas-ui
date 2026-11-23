@@ -221,7 +221,7 @@ export const ToolbarLink = React.forwardRef<HTMLAnchorElement, ToolbarLinkProps>
         ref={ref}
         className={composeClassName(
           cn(
-            'inline-flex items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container select-none',
+            'inline-flex items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-state-hover select-none',
             'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)]',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
             sizeClasses

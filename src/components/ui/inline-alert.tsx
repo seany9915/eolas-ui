@@ -140,7 +140,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   };
 
   const surfaceWashBg: Record<InlineAlertRole, string> = {
-    neutral: 'bg-surface-container',
+    neutral: 'bg-surface-container-low',
     warning: 'bg-warning-container/60',
     error: 'bg-error-container/60',
     success: 'bg-success-container/60',

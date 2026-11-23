@@ -187,7 +187,7 @@ export const PlanContent = React.forwardRef<HTMLDivElement, PlanContentProps>(
       <TraceCollapsibleContent ref={ref} variant="flush" className={className} {...props}>
         <div>
           {/* Progress Track */}
-          <div className="px-3.5 py-2.5 bg-surface-container/20 border-b border-outline-variant/30 flex flex-col gap-1.5">
+          <div className="px-3.5 py-2.5 bg-surface-container-low border-b border-outline-variant/30 flex flex-col gap-1.5">
             <div className="flex items-center justify-between text-xs font-sans text-on-surface-variant">
               <span className="font-medium">Plan Progress</span>
               <span className="font-mono tabular-nums font-semibold">{progressPercent}%</span>

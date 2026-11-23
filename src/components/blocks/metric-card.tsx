@@ -71,7 +71,7 @@ export const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
           </Card.Title>
           {icon && (
             <Card.Action className="self-center">
-              <div className="flex items-center justify-center size-8 rounded-md bg-surface-container text-on-surface-variant shrink-0">
+              <div className="flex items-center justify-center size-8 rounded-md bg-surface-container-high text-on-surface-variant shrink-0">
                 <Icon name={icon} size="md" aria-hidden="true" />
               </div>
             </Card.Action>

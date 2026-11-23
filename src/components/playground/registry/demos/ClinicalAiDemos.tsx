@@ -150,7 +150,7 @@ export const TraceDemo: React.FC<ComponentDemoProps> = () => {
         {/* Outbound reference link with trailing arrow icon */}
         <a
           href="#reference-materials"
-          className="block hover:bg-surface-container/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-none"
+          className="block hover:bg-state-hover transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-none"
         >
           <Trace.Line>
             <Trace.Icon name="menu_book" />
@@ -415,7 +415,7 @@ export const ToolDemo: React.FC<ComponentDemoProps> = () => {
       <Tool.Root status="complete">
         <Tool.Header name="Speech exercise library" iconName="menu_book" status="complete" duration="1.2s" />
         <Tool.Content>
-          <div className="p-3 text-xs font-mono bg-surface-container rounded-b-lg border-t border-outline-variant/60">
+          <div className="p-3 text-xs font-mono bg-surface-container-low rounded-b-lg border-t border-outline-variant/60">
             Speech cards loaded: 24 sound pairs | Level: Grade 2 | Status: Ready
           </div>
         </Tool.Content>

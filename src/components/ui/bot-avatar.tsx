@@ -150,7 +150,7 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
         </div>
 
         {showDisclaimerBadge && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-label font-semibold bg-surface-container text-on-surface-variant border border-outline-variant">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-label font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant">
             {disclaimerText}
           </span>
         )}

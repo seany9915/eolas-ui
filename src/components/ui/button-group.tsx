@@ -120,7 +120,7 @@ export const ButtonGroupText = React.forwardRef<HTMLDivElement, ButtonGroupTextP
       props: {
         'data-slot': 'button-group-text',
         className: cn(
-          'flex items-center justify-center px-3 text-xs font-label font-medium text-on-surface-variant bg-surface-container/60 border border-outline-variant select-none min-h-11',
+          'flex items-center justify-center px-3 text-xs font-label font-medium text-on-surface-variant bg-surface-container-low border border-outline-variant select-none min-h-11',
           className
         ),
         children,

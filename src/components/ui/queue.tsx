@@ -123,7 +123,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
         ref={ref}
         status={status}
         className={cn(
-          'bg-surface hover:bg-surface-container/20 transition-colors',
+          'bg-surface hover:bg-state-hover transition-colors',
           description ? 'items-start py-2.5' : 'items-center py-2.5',
           className
         )}
@@ -222,7 +222,7 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
           open={open}
           onOpenChange={onOpenChange}
         >
-          <TraceCollapsibleTrigger className="bg-surface-container/30 hover:bg-surface-container/50 py-2 min-h-[44px]">
+          <TraceCollapsibleTrigger className="bg-surface-container-low hover:bg-state-hover py-2 min-h-[44px]">
             <div className="flex items-center gap-2.5 w-full">
               <span
                 className={cn(

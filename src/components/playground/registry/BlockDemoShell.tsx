@@ -41,7 +41,7 @@ export const BlockDemoShell: React.FC<BlockDemoShellProps> = ({
         <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
           {description}
         </p>
-        <div className="mt-1 flex items-start gap-2 p-3 rounded-lg bg-surface-container/60 border border-outline-variant/40 text-xs font-sans text-on-surface">
+        <div className="mt-1 flex items-start gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40 text-xs font-sans text-on-surface">
           <Icon name="info" size="xs" className="text-primary mt-0.5 shrink-0" />
           <span>
             <strong className="font-bold">When to use:</strong> {whenToUse}

@@ -12,7 +12,7 @@
  * - CommandDialog integrates Base UI Dialog (with screen-reader accessible DialogTitle and
  *   DialogDescription) while retaining complete shadcn Command API compatibility.
  * - Follows DESIGN.md tokens: Lexend body font (font-sans), Atkinson Hyperlegible Next headings,
- *   surface-container wash for item selection, and strict semantic tokens.
+ *   surface-container-low wash for item selection, and strict semantic tokens.
  */
 import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';

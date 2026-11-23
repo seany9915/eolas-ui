@@ -753,7 +753,7 @@ export const PromptInputStop: React.FC<PromptInputStopProps> = ({
       expandedTouchTarget
       aria-label={label}
       className={cn(
-        'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 bg-surface-container text-on-surface hover:bg-error-container hover:text-on-error-container',
+        'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 bg-surface-container-high text-on-surface hover:bg-error-container hover:text-on-error-container',
         className
       )}
     >

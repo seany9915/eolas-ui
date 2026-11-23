@@ -218,7 +218,7 @@ function PreviewCardComponentInner<Payload = unknown>(
                           {title && <h4 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h4>}
                         </div>
                         {badgeText && (
-                          <span className="px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label text-xs font-semibold shrink-0">
+                          <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label text-xs font-semibold shrink-0">
                             {badgeText}
                           </span>
                         )}

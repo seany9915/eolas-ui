@@ -104,8 +104,8 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
               ? 'shadow-ambient bg-surface/95 backdrop-blur-xs [&:not(:focus-within)]:hover:border-outline'
               : '[&:not(:focus-within)]:hover:border-outline/80'
           ),
-      disabled && 'opacity-60 bg-surface-container/30 border-outline-variant cursor-not-allowed',
-      'has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:opacity-60 has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:bg-surface-container/30 has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:border-outline-variant has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:cursor-not-allowed',
+      disabled && 'opacity-60 bg-surface-container-low border-outline-variant cursor-not-allowed',
+      'has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:opacity-60 has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:bg-surface-container-low has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:border-outline-variant has-[[data-slot-control]:disabled,input:not([type=file]):disabled,textarea:disabled]:cursor-not-allowed',
       className
     );
 

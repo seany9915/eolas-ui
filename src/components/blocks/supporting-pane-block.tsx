@@ -140,7 +140,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         aria-labelledby={supportingTitle ? supportingHeadingId : undefined}
         aria-label={!supportingTitle ? 'Supporting details' : undefined}
         className={cn(
-          'flex flex-col bg-surface-container shrink-0 min-w-0 overflow-hidden transition-opacity duration-quick ease-standard motion-reduce:transition-none',
+          'flex flex-col bg-surface-container-low shrink-0 min-w-0 overflow-hidden transition-opacity duration-quick ease-standard motion-reduce:transition-none',
           isOpen
             ? cn(
                 paneWidthClassName,
@@ -157,7 +157,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       >
         <div className={cn(paneWidthClassName, 'w-full flex flex-col flex-1 min-h-0 shrink-0 min-w-0')}>
           {/* Supporting Pane Header */}
-          <div className="px-4 pt-4 pb-3 border-b border-outline-variant/60 flex items-center justify-between gap-2 bg-surface-container shrink-0">
+          <div className="px-4 pt-4 pb-3 border-b border-outline-variant/60 flex items-center justify-between gap-2 bg-surface-container-low shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               {supportingTitle && (
                 <SupportingHeadingTag

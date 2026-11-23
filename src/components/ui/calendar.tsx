@@ -11,7 +11,7 @@
  * - Integrates with React DayPicker v9/v10 while maintaining complete shadcn/ui API compatibility.
  * - Commonly paired with Popover and Button to form a DatePicker.
  * - Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings,
- *   primary brand selection, surface-container range fills, and WCAG 2.2 AA contrast.
+ *   primary brand selection, surface-container-high range fills, and WCAG 2.2 AA contrast.
  */
 import * as React from 'react';
 import { DayPicker, type DateRange, type DayButtonProps } from 'react-day-picker';
@@ -132,7 +132,7 @@ export function Calendar({
         range_end:
           'rounded-e bg-primary text-on-primary [&>button]:bg-primary [&>button]:text-on-primary [&>button]:font-semibold [&>button]:hover:bg-primary/90 [&>button]:hover:text-on-primary [&>button]:border-transparent [&>button]:after:hidden',
         range_middle:
-          'bg-surface-container text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-state-hover',
+          'bg-surface-container-high text-on-surface rounded-none [&>button]:bg-transparent [&>button]:text-on-surface [&>button]:hover:bg-state-hover',
         today:
           '[&>button]:font-bold [&>button]:relative [&>button]:after:content-[""] [&>button]:after:absolute [&>button]:after:bottom-1 [&>button]:after:left-1/2 [&>button]:after:-translate-x-1/2 [&>button]:after:size-1 [&>button]:after:rounded-full [&>button]:after:bg-primary',
         outside:
@@ -144,7 +144,7 @@ export function Calendar({
         dropdown:
           'absolute inset-0 size-full opacity-0 cursor-pointer appearance-none z-[5] focus-visible:outline-none',
         dropdown_root:
-          'relative inline-flex items-center rounded border border-outline bg-surface px-1.5 h-8 hover:bg-surface-container transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
+          'relative inline-flex items-center rounded border border-outline bg-surface px-1.5 h-8 hover:bg-state-hover transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
         months_dropdown: '',
         years_dropdown: '',
         ...classNames,

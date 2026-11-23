@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+﻿import { Button } from '@/components/ui/button';
 import * as React from 'react';
 import { Tabs } from '@/components/ui/tabs';
 import { Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionPanel } from '@/components/ui/accordion';
@@ -330,7 +330,7 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
           Collapsible Navigation Sidebar
         </h3>
         <p className="font-sans text-xs text-on-surface-variant">
-          Application shell navigation with collapsible icon mode, keyboard shortcuts (<kbd className="font-mono bg-surface-container px-1 py-0.5 rounded border border-outline-variant">Ctrl+B</kbd>), edge resizing rail, and Base UI drawer fallback on mobile.
+          Application shell navigation with collapsible icon mode, keyboard shortcuts (<kbd className="font-mono bg-surface-container-high px-1 py-0.5 rounded border border-outline-variant">Ctrl+B</kbd>), edge resizing rail, and Base UI drawer fallback on mobile.
         </p>
       </div>
 
@@ -459,7 +459,7 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-surface-container/60 border border-outline-variant flex flex-col gap-2">
+            <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2">
               <p className="font-heading text-xs font-bold text-on-surface">
                 Interactive Sidebar Controls
               </p>
@@ -485,7 +485,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       description: 'Record baseline articulation accuracy and target sounds',
       content: (
         <div className="flex flex-col gap-4 font-sans text-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-surface-container-low border border-outline-variant/60">
             <div>
               <span className="font-mono text-xs text-on-surface-variant block">Sound Accuracy</span>
               <span className="text-base font-bold text-on-surface font-mono tabular-nums">84% Baseline</span>
@@ -515,7 +515,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       description: 'Review sound clarity scores and practice recommendations',
       content: (
         <div className="flex flex-col gap-4 font-sans text-sm">
-          <div className="p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60 flex flex-col gap-2">
+          <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="font-label font-semibold text-on-surface">Articulation Score</span>
               <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-primary-container text-on-primary-container">
@@ -526,7 +526,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
               Pronunciation of vowel sounds is clear and consistent. Maximum sustained sound duration was 18 seconds.
             </p>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-container/30 border border-outline-variant/40">
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40">
             <Icon name="verified_user" size="sm" className="text-secondary shrink-0" />
             <span className="text-body-md text-on-surface">Reviewed by C. Doherty, Speech-Language Pathologist</span>
           </div>
@@ -539,7 +539,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       description: 'Confirm practice exercises and session schedule',
       content: (
         <div className="flex flex-col gap-4 font-sans text-sm">
-          <div className="p-4 rounded-lg bg-surface-container/40 border border-outline-variant/60 flex flex-col gap-2">
+          <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 flex flex-col gap-2">
             <span className="font-label font-semibold text-on-surface block">Practice Plan Details</span>
             <ul className="flex flex-col gap-1.5 text-body-md text-on-surface-variant list-disc pl-5">
               <li>Two review sessions each week (Clinic Room 2B)</li>
@@ -589,7 +589,7 @@ export const SteppersLegacyDemo: React.FC<ComponentDemoProps> = () => {
       >
         steppers.tsx is an alias for number-field.tsx. New code should import NumberField directly from @/components/ui/number-field.
       </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-mono">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-mono">
         <p className="text-on-surface">Modern replacement import:</p>
         <p className="text-primary font-bold">import &#123; NumberField &#125; from '@/components/ui/number-field';</p>
       </div>
@@ -604,7 +604,7 @@ export const ScrollAreaDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex flex-col gap-2 text-xs font-sans text-on-surface-variant">
           <h4 className="font-heading text-xs font-bold text-on-surface mb-2">Recent Practice Sessions</h4>
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="p-2 rounded bg-surface-container border border-outline-variant/50 font-mono text-[11px]">
+            <div key={i} className="p-2 rounded bg-surface-container-low border border-outline-variant/50 font-mono text-[11px]">
               Session {i + 1} - Accuracy: {85 + (i % 10)}% | Practice words: {15 + i}
             </div>
           ))}
@@ -630,7 +630,7 @@ export const ScrollspyDemo: React.FC<ComponentDemoProps> = () => {
         <span className="font-mono text-[11px]">Active: {active}</span>
       </div>
 
-      <div className="p-2 rounded-xl bg-surface-container/20 border border-outline-variant/60">
+      <div className="p-2 rounded-xl bg-surface-container-low border border-outline-variant/60">
         <Scrollspy
           items={items.map((item) => ({
             ...item,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { NumberRoll } from '@/components/ui/number-roll';
 import { SpinningCounter } from '@/components/ui/spinning-counter';
 import { NumberPopIn } from '@/components/ui/number-pop-in';
@@ -96,7 +96,7 @@ export const TextsRevealDemo: React.FC<ComponentDemoProps> = () => {
         </Button>
       </div>
 
-      <div className="p-4 rounded-xl bg-surface-container/30 border border-outline-variant/60 min-h-[140px] flex items-center">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/60 min-h-[140px] flex items-center">
         <TextsReveal show={show} className="flex flex-col gap-2 font-heading text-sm font-semibold text-on-surface">
           <TextsRevealLine index={0}>1. Breath Support & Warm-up</TextsRevealLine>
           <TextsRevealLine index={1}>2. Vowel Sound Prolongation</TextsRevealLine>
@@ -249,7 +249,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
           name="care-card-morph"
           className="w-full block"
         >
-          <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-3">
+          <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="size-9 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
@@ -310,7 +310,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
               'text-xs h-8 px-3 rounded-md font-label font-semibold border transition-colors',
               activeCategory === 'drills'
                 ? 'bg-primary text-on-primary border-transparent'
-                : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
+                : 'bg-surface text-on-surface border-outline-variant hover:bg-state-hover'
             )}
           >
             Practice Drills
@@ -322,7 +322,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
               'text-xs h-8 px-3 rounded-md font-label font-semibold border transition-colors',
               activeCategory === 'notes'
                 ? 'bg-primary text-on-primary border-transparent'
-                : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-container'
+                : 'bg-surface text-on-surface border-outline-variant hover:bg-state-hover'
             )}
           >
             Clinical Notes
@@ -330,7 +330,7 @@ export const ViewTransitionDemo: React.FC<ComponentDemoProps> = () => {
         </div>
 
         <ViewTransition name="category-content-morph" className="w-full block">
-          <div className="p-3.5 rounded-lg bg-surface-container border border-outline-variant text-xs font-sans text-on-surface">
+          <div className="p-3.5 rounded-lg bg-surface-container-low border border-outline-variant text-xs font-sans text-on-surface">
             {activeCategory === 'drills' ? (
               <p>Active drills: 3 vowel repetition exercises and 2 multisyllabic reading passages queued.</p>
             ) : (

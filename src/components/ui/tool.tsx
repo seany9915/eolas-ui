@@ -262,7 +262,7 @@ const ToolInput: React.FC<ToolInputProps> = ({
         children
       ) : codeString ? (
         <CodeBlock language="json" size="sm" variant="flush">
-          <CodeBlock.Header className="px-3 py-1 bg-surface-container/60">
+          <CodeBlock.Header className="px-3 py-1 bg-surface-container-high/60">
             <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">arguments.json</CodeBlock.Title>
             <CodeBlock.CopyButton value={codeString} />
           </CodeBlock.Header>
@@ -301,7 +301,7 @@ const ToolOutput: React.FC<ToolOutputProps> = ({
         children
       ) : codeString ? (
         <CodeBlock language="json" size="sm" variant="flush">
-          <CodeBlock.Header className="px-3 py-1 bg-surface-container/60">
+          <CodeBlock.Header className="px-3 py-1 bg-surface-container-high/60">
             <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">result.json</CodeBlock.Title>
             <CodeBlock.CopyButton value={codeString} />
           </CodeBlock.Header>

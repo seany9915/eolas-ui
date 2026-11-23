@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { InputGroup, InputGroupInput, InputGroupTextarea, InputGroupAddon, InputGroupButton, InputGroupText } from '@/components/ui/input-group';
@@ -40,7 +40,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
       name="Button"
       badge="Base UI Atom"
       description="Interactive trigger for actions, submissions, modal reveals, and workflow progression. Standardized with 48px touch floors, Atkinson Hyperlegible Next typography, and floating 2px focus rings."
-      whenToUse="Executing actions within the current screen (saving records, opening modals, initiating drills). Never use for page-level navigation — use NavigationMenu or semantic links."
+      whenToUse="Executing actions within the current screen (saving records, opening modals, initiating drills). Never use for page-level navigation â€” use NavigationMenu or semantic links."
       typicalExample={
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="filled" colorRole="primary">
@@ -465,7 +465,7 @@ export const SwitchDemo: React.FC<ComponentDemoProps> = () => {
   const [enabled, setEnabled] = React.useState(true);
   return (
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
-      <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-outline-variant">
+      <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low border border-outline-variant">
         <div className="flex flex-col gap-0.5">
           <span className="font-label text-sm font-bold text-on-surface block">Audio Feedback</span>
           <span className="font-sans text-xs text-on-surface-variant">Play audio cues during pronunciation drills</span>
@@ -585,7 +585,7 @@ export const NumberFieldDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-col gap-6 w-full max-w-sm mx-auto">
       <NumberField
         label="Session Duration (minutes)"
-        description="Recommended practice session: 10ΓÇô30 minutes"
+        description="Recommended practice session: 10Î“Ã‡Ã´30 minutes"
         value={sessionMinutes}
         onValueChange={setSessionMinutes}
         min={5}
@@ -641,7 +641,7 @@ export const SelectionControlsLegacyDemo: React.FC<ComponentDemoProps> = () => {
       >
         selection-controls.tsx re-exports Checkbox, Radio, and Switch. New code should import directly from @/components/ui/checkbox, @/components/ui/radio, or @/components/ui/switch.
       </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-mono">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-mono">
         <p className="text-on-surface">Modern replacement imports:</p>
         <p className="text-primary font-bold">import &#123; Checkbox &#125; from '@/components/ui/checkbox';</p>
         <p className="text-primary font-bold">import &#123; Radio, RadioGroup &#125; from '@/components/ui/radio';</p>
@@ -660,7 +660,7 @@ export const TogglesLegacyDemo: React.FC<ComponentDemoProps> = () => {
       >
         toggles.tsx re-exports Toggle and ToggleGroup. New code should import directly from @/components/ui/toggle or @/components/ui/toggle-group.
       </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container border border-outline-variant flex flex-col gap-2 text-xs font-mono">
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-mono">
         <p className="text-on-surface">Modern replacement imports:</p>
         <p className="text-primary font-bold">import &#123; Toggle &#125; from '@/components/ui/toggle';</p>
         <p className="text-primary font-bold">import &#123; ToggleGroup &#125; from '@/components/ui/toggle-group';</p>
@@ -822,7 +822,7 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
       }
       pinnedStatesSection={
         <div className="flex flex-col gap-3 w-full max-w-md">
-          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container/40 text-xs">
+          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container-low text-xs">
             <div className="flex items-center gap-3">
               <span className="size-8 rounded-md bg-surface text-on-surface font-bold relative inline-flex items-center justify-center font-sans border border-outline-variant/60 after:absolute after:bottom-1 after:size-1 after:rounded-full after:bg-primary">
                 3
@@ -835,7 +835,7 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
             <span className="font-mono text-[11px] text-outline">today</span>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container/40 text-xs">
+          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container-low text-xs">
             <div className="flex items-center gap-3">
               <span className="size-8 rounded-md bg-primary text-on-primary font-semibold inline-flex items-center justify-center font-sans">
                 10
@@ -848,7 +848,7 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
             <span className="font-mono text-[11px] text-outline">selected</span>
           </div>
 
-          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container/40 text-xs">
+          <div className="flex items-center justify-between p-3 rounded-lg border border-outline-variant bg-surface-container-low text-xs">
             <div className="flex items-center gap-3">
               <span className="size-8 rounded-md text-on-surface-variant/30 font-normal inline-flex items-center justify-center font-sans">
                 28

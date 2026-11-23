@@ -51,8 +51,8 @@ export interface ItemVariantsProps {
 const variantStyles: Record<ItemVariant, string> = {
   default: 'bg-transparent text-on-surface border-2 border-transparent',
   outline: 'bg-surface text-on-surface border-2 border-outline-variant',
-  muted: 'bg-surface-container text-on-surface border-2 border-transparent',
-  ghost: 'bg-transparent text-on-surface border-2 border-transparent hover:bg-surface-container/60',
+  muted: 'bg-surface-container-low text-on-surface border-2 border-transparent',
+  ghost: 'bg-transparent text-on-surface border-2 border-transparent hover:bg-state-hover',
   selected: 'bg-primary-container text-on-primary-container border-2 border-primary hover:bg-primary-container/90',
 };
 
@@ -78,7 +78,7 @@ export function itemVariants({
     interactive &&
       cn(
         'cursor-pointer select-none active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100 motion-reduce:transition-none',
-        variant !== 'selected' && 'hover:bg-surface-container/70'
+        variant !== 'selected' && 'hover:bg-state-hover'
       ),
     className
   );
@@ -225,7 +225,7 @@ export interface ItemMediaProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const mediaVariantStyles: Record<ItemMediaVariant, string> = {
   default: 'bg-transparent flex items-center justify-center shrink-0 [&_svg]:size-4 [&_.material-symbols-outlined]:text-base',
-  icon: 'size-9 rounded-md bg-surface-container text-on-surface-variant group-data-[variant=selected]/item:bg-surface group-data-[variant=selected]/item:text-primary flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
+  icon: 'size-9 rounded-md bg-surface-container-high text-on-surface-variant group-data-[variant=selected]/item:bg-surface group-data-[variant=selected]/item:text-primary flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
   avatar: 'size-10 rounded-full overflow-hidden flex items-center justify-center shrink-0',
   image: 'size-12 rounded-md overflow-hidden object-cover flex items-center justify-center shrink-0',
 };

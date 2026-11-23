@@ -115,7 +115,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
           render={
             <a
               href={safeHref}
-              className="group/task-link block w-full hover:bg-surface-container/30 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+              className="group/task-link block w-full hover:bg-state-hover transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
             />
           }
         >

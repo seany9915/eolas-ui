@@ -364,7 +364,7 @@ function ComboboxComponentInner<
             className={composeClassName(
               [
                 error && 'border-error focus-within:outline-error',
-                disabled && 'bg-surface-container/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
+                disabled && 'bg-surface-container-low border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
               ],
               inputGroupClassName
             )}
@@ -493,7 +493,7 @@ export const ComboboxInput = React.forwardRef<
         'hover:border-on-surface-variant/80',
         'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         '[[data-slot=combobox-input-group]_&]:border-0 [[data-slot=combobox-input-group]_&]:bg-transparent [[data-slot=combobox-input-group]_&]:rounded-none [[data-slot=combobox-input-group]_&]:focus-visible:outline-none [[data-slot=combobox-input-group]_&]:hover:border-0 [[data-slot=combobox-input-group]_&]:flex-1 [[data-slot=combobox-input-group]_&]:min-w-0',
-        'disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+        'disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
         error && 'border-error focus-visible:outline-error',
       ],
       className
@@ -523,8 +523,8 @@ export const ComboboxTrigger = React.forwardRef<
       aria-label={hasChildren ? undefined : 'Toggle options'}
       className={composeClassName(
         hasChildren
-          ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-surface-container focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-container/30 disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
-          : 'relative size-7 min-w-[28px] min-h-[28px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
+          ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
+          : 'relative size-7 min-w-[28px] min-h-[28px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
         className
       )}
       {...props}
@@ -566,7 +566,7 @@ export const ComboboxItem = React.forwardRef<
         [
           'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
           'hover:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
-          'data-[selected]:bg-surface-container data-[selected]:text-primary data-[selected]:font-semibold',
+          'data-[selected]:bg-surface-container-low data-[selected]:text-primary data-[selected]:font-semibold',
           'data-[selected]:hover:bg-primary-container data-[selected]:hover:text-on-primary-container data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
           'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
           indicatorPosition === 'start' && 'flex-row-reverse justify-end gap-2.5',
@@ -679,7 +679,7 @@ export const ComboboxClear = React.forwardRef<
     ref={ref}
     data-slot="combobox-clear"
     className={composeClassName(
-      'relative size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
+      'relative size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
       className
     )}
     aria-label="Clear selection"
@@ -767,7 +767,7 @@ export const ComboboxInputGroup = React.forwardRef<
         'relative flex items-center w-full rounded border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,outline-color]',
         'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
         'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
-        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
         'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
       ],
       className
@@ -848,7 +848,7 @@ export const ComboboxChip = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip"
     className={composeClassName(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-surface-container text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-surface-container-high text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
       className
     )}
     {...props}
@@ -864,7 +864,7 @@ export const ComboboxChipRemove = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip-remove"
     className={composeClassName(
-      'size-4 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container cursor-pointer transition-colors',
+      'size-4 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-state-hover cursor-pointer transition-colors',
       className
     )}
     aria-label="Remove"

@@ -588,7 +588,7 @@ export const MenuClear = React.forwardRef<HTMLButtonElement, MenuClearProps>(
       data-slot="menu-clear"
       aria-label={ariaLabel ?? (children ? undefined : 'Clear filter')}
       className={composeClassName(
-        "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
+        "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
         className
       )}
       {...props}

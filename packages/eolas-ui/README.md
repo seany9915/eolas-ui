@@ -108,8 +108,8 @@ Then extend the preset in `.oxlintrc.json`:
 This preset enforces:
 - **13 `eolas/*` AST guardrails**: `no-raw-html-controls`, `no-radix-imports`, `no-positive-tabindex`, `require-iscomposing-on-enter`, `no-static-clickable-elements`, `no-nested-card`, `no-sparkle-icons`, `no-triple-tint`, `no-light-surface-tertiary`, `no-transition-all`, `no-spring-easing`, `no-uppercase`, `no-unsafe-type-cast`, plus **`typescript/ban-ts-comment`**
 - **6 `shadcn/*` rules**:
-  - `shadcn/no-raw-colors` — enforces Eolas semantic tokens (`bg-primary`, `bg-surface-container`, `text-on-surface`, etc.)
-  - `shadcn/no-arbitrary-values` — bans arbitrary bracket classes (`p-[13px]`)
+  - `shadcn/no-raw-colors` — enforces Eolas semantic tokens (`bg-primary`, `bg-surface-container-low`, `bg-surface-container-high`, `text-on-surface`, etc.)
+  - `shadcn/no-arbitrary-values` — bans arbitrary bracket classes (`p-[13px]`), while allowing explicit `transition-[...]` motion properties
   - `shadcn/no-inline-styles` — bans ad-hoc `style={{ ... }}` overrides
   - `shadcn/no-unknown-classes` — flags unrecognized utility classes
   - `shadcn/require-static-classes` — enforces statically analyzable Tailwind classes

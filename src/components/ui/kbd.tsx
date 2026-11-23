@@ -10,7 +10,7 @@
  * - Use Kbd to visually represent keyboard keys, hotkeys, and shortcut combinations (e.g. ⌘K, Ctrl+B).
  * - Use KbdGroup to compose multiple keycaps together without line breaks.
  * - Ideal for embedding in buttons, command palettes, menus, and tooltips.
- * - Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container wash,
+ * - Follows DESIGN.md tokens: Roboto Mono font (font-mono), surface-container-high wash,
  *   subtle outline-variant border, and strict semantic tokens.
  */
 import * as React from 'react';

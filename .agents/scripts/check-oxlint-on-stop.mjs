@@ -37,6 +37,12 @@ process.stdin.on('end', () => {
 });
 
 function main(input) {
+  if (
+    process.env.EOLAS_SKIP_STOP_OXLINT === '1' ||
+    process.env.EOLAS_SKIP_STOP_OXLINT === 'true'
+  ) {
+    return respond({});
+  }
   if (input.continuationActive === true) {
     return respond({});
   }
@@ -85,63 +91,93 @@ function main(input) {
     // Fall back to default IGNORED_PREFIXES if .oxlintrc.json cannot be parsed
   }
 
-  const topRes = spawnSync('git', ['rev-parse', '--show-toplevel'], {
-    cwd: workspaceRoot,
-    encoding: 'utf8',
-    timeout: 5000,
-  });
-
-  if (topRes.error || topRes.status !== 0 || !topRes.stdout) {
-    return respond({});
-  }
-
-  const gitTopLevel = safeRealpath(topRes.stdout.trim());
-  const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
-
-  const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z'], {
-    cwd: workspaceRoot,
-    encoding: 'utf8',
-    timeout: 5000,
-  });
-
-  if (gitRes.error || gitRes.status !== 0 || !gitRes.stdout) {
-    return respond({});
-  }
-
-  const tokens = gitRes.stdout.split('\0');
+  const scopedEnv = process.env.EOLAS_OXLINT_STOP_FILES;
   const filesToLint = [];
   const seen = new Set();
 
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
-    if (!token || token.length < 4) continue;
-    const statusCode = token.slice(0, 2);
-    const relRaw = token.slice(3);
-    if (statusCode[0] === 'R' || statusCode[0] === 'C' || statusCode[1] === 'R' || statusCode[1] === 'C') {
-      i += 1;
+  if (scopedEnv && scopedEnv.trim()) {
+    const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
+    for (const entry of scopedEnv.split(/[,\r\n]+/)) {
+      const rawFile = entry.trim();
+      if (!rawFile) continue;
+      const absPath = path.isAbsolute(rawFile)
+        ? rawFile
+        : path.resolve(resolvedWorkspaceRoot, rawFile);
+      const relToWorkspace = path.relative(resolvedWorkspaceRoot, absPath);
+      if (!relToWorkspace || relToWorkspace.startsWith('..') || path.isAbsolute(relToWorkspace)) {
+        continue;
+      }
+      const norm = relToWorkspace.replace(/\\/g, '/').replace(/^\.\//, '');
+      if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/i.test(norm)) continue;
+      if (ignoredPrefixes.some((prefix) => norm.startsWith(prefix))) continue;
+      if (!fs.existsSync(absPath)) continue;
+      try {
+        if (!fs.statSync(absPath).isFile()) continue;
+      } catch {
+        continue;
+      }
+      if (!seen.has(norm)) {
+        seen.add(norm);
+        filesToLint.push(norm);
+      }
     }
-    if (!relRaw) continue;
+  } else {
+    const topRes = spawnSync('git', ['rev-parse', '--show-toplevel'], {
+      cwd: workspaceRoot,
+      encoding: 'utf8',
+      timeout: 5000,
+    });
 
-    const absPath = path.resolve(gitTopLevel, relRaw);
-    const relToWorkspace = path.relative(resolvedWorkspaceRoot, absPath);
-    if (!relToWorkspace || relToWorkspace.startsWith('..') || path.isAbsolute(relToWorkspace)) {
-      continue;
+    if (topRes.error || topRes.status !== 0 || !topRes.stdout) {
+      return respond({});
     }
 
-    const norm = relToWorkspace.replace(/\\/g, '/').replace(/^\.\//, '');
-    if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/i.test(norm)) continue;
-    if (ignoredPrefixes.some((prefix) => norm.startsWith(prefix))) continue;
+    const gitTopLevel = safeRealpath(topRes.stdout.trim());
+    const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
 
-    if (!fs.existsSync(absPath)) continue;
-    try {
-      if (!fs.statSync(absPath).isFile()) continue;
-    } catch {
-      continue;
+    const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z'], {
+      cwd: workspaceRoot,
+      encoding: 'utf8',
+      timeout: 5000,
+    });
+
+    if (gitRes.error || gitRes.status !== 0 || !gitRes.stdout) {
+      return respond({});
     }
 
-    if (!seen.has(norm)) {
-      seen.add(norm);
-      filesToLint.push(norm);
+    const tokens = gitRes.stdout.split('\0');
+
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      if (!token || token.length < 4) continue;
+      const statusCode = token.slice(0, 2);
+      const relRaw = token.slice(3);
+      if (statusCode[0] === 'R' || statusCode[0] === 'C' || statusCode[1] === 'R' || statusCode[1] === 'C') {
+        i += 1;
+      }
+      if (!relRaw) continue;
+
+      const absPath = path.resolve(gitTopLevel, relRaw);
+      const relToWorkspace = path.relative(resolvedWorkspaceRoot, absPath);
+      if (!relToWorkspace || relToWorkspace.startsWith('..') || path.isAbsolute(relToWorkspace)) {
+        continue;
+      }
+
+      const norm = relToWorkspace.replace(/\\/g, '/').replace(/^\.\//, '');
+      if (!/\.(?:ts|tsx|js|jsx|mjs|cjs)$/i.test(norm)) continue;
+      if (ignoredPrefixes.some((prefix) => norm.startsWith(prefix))) continue;
+
+      if (!fs.existsSync(absPath)) continue;
+      try {
+        if (!fs.statSync(absPath).isFile()) continue;
+      } catch {
+        continue;
+      }
+
+      if (!seen.has(norm)) {
+        seen.add(norm);
+        filesToLint.push(norm);
+      }
     }
   }
 

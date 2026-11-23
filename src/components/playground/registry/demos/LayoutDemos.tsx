@@ -33,7 +33,7 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
           <Card.Title>Sound Practice Plan</Card.Title>
           <Card.Description>Daily articulation exercises</Card.Description>
           <Card.Action>
-            <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium">
+            <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">
               Active
             </span>
           </Card.Action>
@@ -210,7 +210,7 @@ export const ChartDemo: React.FC<ComponentDemoProps> = () => {
               className="font-mono text-xs text-on-surface-variant"
             />
             <ChartTooltip
-              cursor={{ fill: 'var(--color-surface-container)' }}
+              cursor={{ fill: 'var(--color-surface-container-low)' }}
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Bar dataKey="minutes" fill="var(--color-minutes)" radius={[6, 6, 0, 0]} />
@@ -242,7 +242,7 @@ export const ResizableDemo: React.FC<ComponentDemoProps> = () => {
       </div>
       <div className="h-48 rounded-xl border border-outline-variant overflow-hidden bg-surface">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={40} minSize={25} className="p-4 bg-surface-container/30 text-xs font-sans">
+          <ResizablePanel defaultSize={40} minSize={25} className="p-4 bg-surface-container-low text-xs font-sans">
             <span className="font-bold text-on-surface block mb-1">Left Pane: Practice History</span>
             <span className="text-on-surface-variant">Learner ID: P-2024-819</span>
           </ResizablePanel>
@@ -404,7 +404,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
 
           {/* Processing state */}
           <Attachment state="processing">
-            <Attachment.Media className="bg-surface-container text-on-surface-variant">
+            <Attachment.Media className="bg-surface-container-high text-on-surface-variant">
               <Icon name="hourglass_empty" size="md" aria-hidden="true" />
             </Attachment.Media>
             <Attachment.Content>
@@ -483,7 +483,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
           <div className="flex flex-col gap-1.5">
             <span className="font-heading text-xs font-bold text-on-surface">Micro Tier (28px Inline Citation)</span>
             <Attachment size="xs" state="done">
-              <Attachment.Media className="bg-surface-container text-on-surface">
+              <Attachment.Media className="bg-surface-container-high text-on-surface">
                 <Icon name="attach_file" size="xs" className="text-[12px]" aria-hidden="true" />
               </Attachment.Media>
               <Attachment.Content>
@@ -530,7 +530,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex flex-col gap-3 w-full max-w-md">
           {/* Normal State */}
           <Attachment state="done">
-            <Attachment.Media className="bg-surface-container text-on-surface">
+            <Attachment.Media className="bg-surface-container-high text-on-surface">
               <Icon name="description" size="md" aria-hidden="true" />
             </Attachment.Media>
             <Attachment.Content>
@@ -668,7 +668,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
               </Attachment>
 
               <Attachment state="done" className="w-64">
-                <Attachment.Media className="bg-surface-container text-on-surface">
+                <Attachment.Media className="bg-surface-container-high text-on-surface">
                   <Icon name="analytics" size="md" aria-hidden="true" />
                 </Attachment.Media>
                 <Attachment.Content>
@@ -692,7 +692,7 @@ export const AttachmentDemo: React.FC<ComponentDemoProps> = () => {
 export const StickyContainerDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4">
-      <StickyContainer className="p-3 rounded-lg bg-surface-container border border-outline-variant text-xs font-mono text-center">
+      <StickyContainer className="p-3 rounded-lg bg-surface-container-low border border-outline-variant text-xs font-mono text-center">
         Banner: Daily practice reminder scheduled for 10:00 AM
       </StickyContainer>
     </div>
@@ -765,7 +765,7 @@ export const SwipeRevealDemo: React.FC<ComponentDemoProps> = () => {
               Morning Drills · Initial /r/ sounds need review
             </p>
           </div>
-          <span className="font-label text-[11px] text-on-surface-variant shrink-0 flex items-center gap-1 bg-surface-container/40 px-2 py-1 rounded">
+          <span className="font-label text-[11px] text-on-surface-variant shrink-0 flex items-center gap-1 bg-surface-container-high/60 px-2 py-1 rounded">
             <Icon name="swipe" size="xs" /> Swipe
           </span>
         </div>
@@ -940,7 +940,7 @@ export const KbdDemo: React.FC<ComponentDemoProps> = () => {
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Size comparison
         </span>
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-surface-container">
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-surface-container-low">
           <div className="flex items-center gap-2">
             <span className="font-sans text-xs text-on-surface-variant">Default (md):</span>
             <Kbd>Shift</Kbd>

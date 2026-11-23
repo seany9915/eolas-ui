@@ -150,7 +150,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
               </>
             )}
             <ChartTooltip
-              cursor={{ fill: 'var(--color-surface-container)' }}
+              cursor={{ fill: 'var(--color-surface-container-low)' }}
               content={<ChartTooltipContent indicator="dot" />}
             />
             {(showLegend ?? series.length > 1) && (

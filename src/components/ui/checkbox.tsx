@@ -88,7 +88,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
             'data-[checked]:bg-primary data-[checked]:border-primary text-on-primary',
             'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary text-on-primary',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-            'data-[disabled]:bg-surface-container/40 data-[disabled]:border-outline-variant data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
+            'data-[disabled]:bg-surface-container-high/50 data-[disabled]:border-outline-variant data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
             error ? 'border-error focus-visible:outline-error' : 'border-outline hover:border-on-surface'
           ),
           !hasOuterWrapper || isClassNameFn ? className : undefined
@@ -144,7 +144,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           'flex items-start gap-3 group rounded transition-colors',
           compact
             ? 'p-1'
-            : 'w-full min-h-[44px] py-2 px-3 hover:bg-surface-container/30',
+            : 'w-full min-h-[44px] py-2 px-3 hover:bg-state-hover',
           'has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-60 has-[[data-disabled]]:hover:bg-transparent',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
           !isClassNameFn ? className : undefined

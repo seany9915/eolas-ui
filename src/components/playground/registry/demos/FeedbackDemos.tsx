@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { InlineAlert } from '@/components/ui/inline-alert';
 import { toast, Toaster } from '@/components/ui/toast';
 import { Badge } from '@/components/ui/badge';
@@ -108,7 +108,7 @@ export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
               This alert includes an accessible dismiss button. Click the close button on the right to dismiss.
             </InlineAlert>
           ) : (
-            <div className="p-4 rounded-lg bg-surface-container/60 border border-outline-variant/60 flex items-center justify-between">
+            <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 flex items-center justify-between">
               <span className="font-sans text-xs text-on-surface-variant">Alert was dismissed.</span>
               <Button size="sm" variant="outline" colorRole="neutral" onClick={() => setDismissed(false)}>
                 Restore Alert
@@ -358,7 +358,7 @@ export const ChipDemo: React.FC<ComponentDemoProps> = () => {
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Approved patterns & sizes
         </span>
-        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface-container">
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface-container-low">
           <Chip size="sm" variant="filled" colorRole="primary" icon="flag">
             Small Filled
           </Chip>
@@ -728,7 +728,7 @@ export const BadgeDemo: React.FC<ComponentDemoProps> = () => {
         <span className="font-label text-xs font-semibold text-on-surface-variant">
           Shapes & calibrated size scale
         </span>
-        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface-container">
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-surface-container-low">
           <Badge size="sm" shape="pill" colorRole="primary" icon="check">Small (20px)</Badge>
           <Badge size="md" shape="pill" colorRole="secondary" icon="check">Medium (24px)</Badge>
           <Badge size="lg" shape="pill" colorRole="success" icon="check">Large (28px)</Badge>

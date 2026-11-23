@@ -213,7 +213,7 @@ export const ContextMenuSubmenuTrigger = React.forwardRef<HTMLDivElement, Contex
       ref={ref}
       data-slot="context-menu-sub-trigger"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container-low data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}

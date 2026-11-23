@@ -506,7 +506,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
         className={composeClassName(
           [
             error && 'border-error focus-within:border-error focus-within:outline-error',
-            disabled && 'bg-surface-container/30 border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
+            disabled && 'bg-surface-container-low border-outline-variant text-on-surface-variant/60 cursor-not-allowed',
           ],
           inputGroupClassName
         )}
@@ -751,7 +751,7 @@ export const AutocompleteInputGroup = React.forwardRef<
         'relative flex items-center w-full rounded border border-outline bg-surface transition-[border-color,outline-color]',
         'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
         'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
-        'data-[disabled]:bg-surface-container/30 data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
+        'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
         'data-[invalid]:border-error data-[invalid]:focus-within:border-error data-[invalid]:focus-within:outline-error',
       ],
       className
@@ -798,7 +798,7 @@ export const AutocompleteTrigger = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'relative size-7 min-w-[28px] min-h-[28px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
+        'relative size-7 min-w-[28px] min-h-[28px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
         'data-[popup-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
       ],
@@ -842,7 +842,7 @@ export const AutocompleteClear = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'relative size-7 min-w-[28px] min-h-[28px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
+        'relative size-7 min-w-[28px] min-h-[28px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
         'transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
         'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',

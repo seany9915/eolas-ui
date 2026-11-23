@@ -151,7 +151,7 @@ function DialogComponent<Payload = unknown>({
                   </BaseDialog.Title>
                   <BaseDialog.Close
                     data-slot="dialog-close"
-                    className="size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Close dialog"
                   >
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
@@ -353,7 +353,7 @@ export const DialogClose = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }

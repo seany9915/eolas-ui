@@ -78,7 +78,7 @@ export const TableHeader = React.forwardRef<
   <thead
     ref={ref}
     data-slot="table-header"
-    className={cn('[&_tr]:border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm', className)}
+    className={cn('[&_tr]:border-b border-outline-variant bg-surface-container-high/50 text-on-surface font-label font-bold text-sm', className)}
     {...props}
   />
 ));
@@ -105,7 +105,7 @@ export const TableFooter = React.forwardRef<
     ref={ref}
     data-slot="table-footer"
     className={cn(
-      'border-t border-outline-variant bg-surface-container/50 font-medium font-sans text-on-surface [&>tr]:last:border-b-0',
+      'border-t border-outline-variant bg-surface-container-high/50 font-medium font-sans text-on-surface [&>tr]:last:border-b-0',
       className
     )}
     {...props}
@@ -121,7 +121,7 @@ export const TableRow = React.forwardRef<
     ref={ref}
     data-slot="table-row"
     className={cn(
-      'border-b border-outline-variant transition-colors hover:bg-state-hover data-[state=selected]:bg-surface-container data-[state=selected]:hover:bg-surface-container-high min-h-[var(--density-table-row-min-h,3.5rem)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+      'border-b border-outline-variant transition-colors hover:bg-state-hover data-[state=selected]:bg-surface-container-low data-[state=selected]:hover:bg-surface-container-high min-h-[var(--density-table-row-min-h,3.5rem)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
       className
     )}
     {...props}
@@ -237,7 +237,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
               <TableCaption id={captionId}>{caption}</TableCaption>
             )}
             <thead className={cn(isStack && '@max-sm:hidden')}>
-              <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container/50 text-on-surface font-label font-bold text-sm">
+              <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container-high/50 text-on-surface font-label font-bold text-sm">
                 {columns.map((col, idx) => {
                   const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
                   const alignClass =
@@ -272,7 +272,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                   key={keyExtractor(row)}
                   data-slot="table-row"
                   className={cn(
-                    'min-h-14 hover:bg-surface-container/30 transition-colors',
+                    'min-h-14 hover:bg-state-hover transition-colors',
                     isStack &&
                       '@max-sm:block @max-sm:p-4 @max-sm:rounded-lg @max-sm:border @max-sm:border-outline-variant @max-sm:bg-surface'
                   )}

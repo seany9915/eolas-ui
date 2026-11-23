@@ -30,7 +30,6 @@
   --color-surface: var(--surface);
   --color-on-surface: var(--on-surface);
   --color-on-surface-variant: var(--on-surface-variant);
-  --color-surface-container: var(--surface-container);
   --color-surface-container-low: var(--surface-container-low);
   --color-surface-container-high: var(--surface-container-high);
   --color-outline: var(--outline);
@@ -160,7 +159,6 @@
   --on-surface-variant: oklch(0.41 0.006 80);
   --surface-container-low: oklch(0.96 0.004 82);
   --surface-container-high: oklch(0.92 0.005 82);
-  --surface-container: var(--surface-container-low);
   --outline: oklch(0.54 0.006 80);
   --outline-variant: oklch(0.83 0.006 82);
   --state-hover: color-mix(in oklch, var(--on-surface) 8%, transparent);
@@ -291,9 +289,21 @@ html {
   border-width: 4px;
 }
 
-/* Opt-in stable scrollbar gutter for document-scrolling layouts */
+/* Opt-in stable scrollbar gutter and scrollbar styling utilities */
 @utility scrollbar-stable {
   scrollbar-gutter: stable;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline-variant) transparent;
 }
 
 @layer base {
@@ -1081,7 +1091,7 @@ select:autofill {
   direction: ltr;
   unicode-bidi: isolate;
   font-size: 0.875em;
-  background-color: var(--surface-container);
+  background-color: var(--surface-container-high);
   color: var(--on-surface);
   overflow-wrap: break-word;
   padding: 0.15em 0.35em;
@@ -1094,7 +1104,7 @@ select:autofill {
   direction: ltr;
   unicode-bidi: isolate;
   font-size: 0.875em;
-  background-color: var(--surface-container);
+  background-color: var(--surface-container-low);
   color: var(--on-surface);
   overflow-wrap: break-word;
   padding: 1em 1.25em;
@@ -1162,7 +1172,7 @@ select:autofill {
   font-weight: 600;
   color: var(--on-surface);
   overflow-wrap: break-word;
-  background-color: color-mix(in srgb, var(--surface-container) 50%, transparent);
+  background-color: color-mix(in oklch, var(--surface-container-high) 50%, transparent);
 }
 
 /* Horizontal Dividers */

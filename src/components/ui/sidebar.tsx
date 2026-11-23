@@ -660,7 +660,7 @@ export interface SidebarGroupActionProps extends React.ButtonHTMLAttributes<HTML
 export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGroupActionProps>(
   ({ className, render, ...props }, ref) => {
     const classes = cn(
-      'absolute end-3 top-3 flex size-6 items-center justify-center rounded p-0 text-on-surface-variant outline-none transition-transform hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2 after:content-[\'\']',
+      'absolute end-3 top-3 flex size-6 items-center justify-center rounded p-0 text-on-surface-variant outline-none transition-transform hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2 after:content-[\'\']',
       'group-data-[collapsible=icon]:hidden',
       className
     );
@@ -1014,7 +1014,7 @@ export const SidebarMenuSubButton = React.forwardRef<
       '[&>span:last-child]:truncate',
       isActive
         ? 'bg-primary-container text-on-primary-container font-semibold'
-        : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium',
+        : 'text-on-surface-variant hover:bg-state-hover hover:text-on-surface font-medium',
       sizeClasses
     );
 

@@ -74,7 +74,7 @@ export const ChartContainer = React.forwardRef<
         ref={ref}
         role={resolvedRole}
         className={cn(
-          "@container flex w-full min-w-0 aspect-video justify-center text-xs font-sans [&_.recharts-cartesian-axis-tick_text]:fill-on-surface-variant [&_.recharts-cartesian-grid_line]:stroke-outline-variant/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-outline-variant [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_line]:stroke-outline-variant/40 [&_.recharts-radial-bar-background-sector]:fill-surface-container [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-surface-container/40 [&_.recharts-reference-line_line]:stroke-outline-variant [&_.recharts-sector:not([stroke])]:stroke-transparent [&_.recharts-surface]:outline-none",
+          "@container flex w-full min-w-0 aspect-video justify-center text-xs font-sans [&_.recharts-cartesian-axis-tick_text]:fill-on-surface-variant [&_.recharts-cartesian-grid_line]:stroke-outline-variant/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-outline-variant [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_line]:stroke-outline-variant/40 [&_.recharts-radial-bar-background-sector]:fill-surface-container-high [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-surface-container-high/40 [&_.recharts-reference-line_line]:stroke-outline-variant [&_.recharts-sector:not([stroke])]:stroke-transparent [&_.recharts-surface]:outline-none",
           className
         )}
         {...props}

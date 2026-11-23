@@ -383,7 +383,7 @@ const MessageScrollerContainer = React.forwardRef<HTMLDivElement, MessageScrolle
         data-slot="message-scroller"
         className={cn(
           'relative flex flex-col size-full overflow-hidden',
-          variant === 'container' && 'bg-surface-container/20',
+          variant === 'container' && 'bg-surface-container-low',
           variant === 'canvas' && 'bg-background',
           className
         )}

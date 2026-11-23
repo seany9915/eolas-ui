@@ -186,7 +186,7 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
               Your responses have been recorded successfully.
             </p>
           </div>
-          <div className="bg-surface-container rounded-md p-4 text-left font-mono text-xs text-on-surface-variant border border-outline-variant overflow-x-auto">
+          <div className="bg-surface-container-low rounded-md p-4 text-left font-mono text-xs text-on-surface-variant border border-outline-variant overflow-x-auto">
             {JSON.stringify(completedData, null, 2)}
           </div>
           <Button
@@ -1013,7 +1013,7 @@ export const ListDetailBlockDemo: React.FC<ComponentDemoProps> = () => {
                 {/* Plan Panel */}
                 <Tabs.Panel value="plan" className="flex flex-col gap-4">
                   {/* Practice Target Summary */}
-                  <div className="p-4 rounded-md bg-surface-container flex flex-col gap-2">
+                  <div className="p-4 rounded-md bg-surface-container-low flex flex-col gap-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <h4 className="font-heading text-sm font-semibold text-on-surface">
                         Practice target
@@ -1300,7 +1300,7 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
           {/* Main Primary Task Canvas */}
           <div className="flex flex-col gap-6 items-center justify-center p-4 @md:p-8 text-center my-auto min-h-80">
             {/* Target Phrase Callout */}
-            <div className="w-full max-w-lg p-6 rounded-lg bg-surface-container flex flex-col gap-2">
+            <div className="w-full max-w-lg p-6 rounded-lg bg-surface-container-low flex flex-col gap-2">
               <span className="text-sm font-sans font-semibold text-primary">
                 Practice sentence
               </span>
@@ -1315,7 +1315,7 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
             {/* Simulated Live Audio Waveform */}
             <div
               aria-hidden="true"
-              className="flex items-center justify-center gap-1.5 h-12 px-5 rounded-lg bg-surface-container w-full max-w-xs"
+              className="flex items-center justify-center gap-1.5 h-12 px-5 rounded-lg bg-surface-container-low w-full max-w-xs"
             >
               {[12, 22, 34, 18, 28, 36, 24, 30, 16, 26].map((barHeight, idx) => (
                 <div

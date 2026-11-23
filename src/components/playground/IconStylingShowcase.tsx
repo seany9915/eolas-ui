@@ -26,7 +26,7 @@ export const IconStylingShowcase: React.FC = () => {
           <div>
             <h2 className="font-heading text-2xl font-bold text-on-surface">Design System Icon Styling Showcase</h2>
             <p className="font-sans text-sm text-on-surface-variant">
-              Comprehensive reference of every icon styling rule explicitly defined in <code className="bg-surface-container px-1.5 py-0.5 rounded text-primary font-mono font-bold text-xs">DESIGN.md</code>, including contrast verifications, optical size matrix, state transitions, and accessible <code className="bg-surface-container px-1.5 py-0.5 rounded text-primary font-mono font-bold text-xs">&lt;Icon /&gt;</code> primitive usage.
+              Comprehensive reference of every icon styling rule explicitly defined in <code className="bg-surface-container-high px-1.5 py-0.5 rounded text-primary font-mono font-bold text-xs">DESIGN.md</code>, including contrast verifications, optical size matrix, state transitions, and accessible <code className="bg-surface-container-high px-1.5 py-0.5 rounded text-primary font-mono font-bold text-xs">&lt;Icon /&gt;</code> primitive usage.
             </p>
           </div>
         </div>
@@ -102,7 +102,7 @@ export const IconStylingShowcase: React.FC = () => {
                   aria-hidden="true"
                 </Badge>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-surface-container rounded">
+              <div className="flex items-center gap-3 p-3 bg-surface-container-low rounded">
                 <span className="text-primary">
                   <Icon name="medical_services" size="lg" />
                 </span>
@@ -122,7 +122,7 @@ export const IconStylingShowcase: React.FC = () => {
                   aria-label / sr-only
                 </Badge>
               </div>
-              <div className="flex items-center gap-4 p-3 bg-surface-container rounded">
+              <div className="flex items-center gap-4 p-3 bg-surface-container-low rounded">
                 <Tooltip content="Print therapy summary">
                   <Button
                     variant="outlined"
@@ -149,7 +149,7 @@ export const IconStylingShowcase: React.FC = () => {
           <div>
             <h3 className="font-heading text-xl font-bold text-on-surface">2. Soft Tonal Icon Containers (Tonal Icon Tiles)</h3>
             <p className="font-sans text-xs text-on-surface-variant">
-              Icon glyphs inside soft role-container washes (<code className="font-mono text-primary">primary-container</code>, <code className="font-mono text-primary">surface-container</code>) with charcoal (<code className="font-mono">#1C1A18</code>) or brand blue glyphs. Delivers visual weight, clear structural framing, and 8.0:1+ contrast.
+              Icon glyphs inside soft role-container washes (<code className="font-mono text-primary">primary-container</code>, <code className="font-mono text-primary">surface-container-high</code>) with charcoal (<code className="font-mono">#1C1A18</code>) or brand blue glyphs. Delivers visual weight, clear structural framing, and 8.0:1+ contrast.
             </p>
           </div>
           <Badge variant="soft" colorRole="primary" size="sm">
@@ -174,12 +174,12 @@ export const IconStylingShowcase: React.FC = () => {
           {/* Surface-Variant Soft Tile */}
           <Card>
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-md bg-surface-container text-on-surface-variant flex items-center justify-center shrink-0">
+              <div className="h-12 w-12 rounded-md bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
                 <Icon name="record_voice_over" size="lg" />
               </div>
               <div>
                 <p className="font-sans text-sm font-bold text-on-surface">Phoneme Speech Drill</p>
-                <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">surface-container</code> wash</p>
+                <p className="font-sans text-xs text-on-surface-variant"><code className="font-mono text-xs">surface-container-high</code> wash</p>
               </div>
             </div>
           </Card>
@@ -223,7 +223,7 @@ export const IconStylingShowcase: React.FC = () => {
               </span>
               <span className="font-mono text-xs font-bold text-success">8.66:1 Contrast</span>
             </div>
-            <div className="p-4 bg-surface-container rounded flex items-center gap-4">
+            <div className="p-4 bg-surface-container-low rounded flex items-center gap-4">
               {/* Solid Amber Badge */}
               <div className="h-10 w-10 rounded bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-xs font-bold">
                 <Icon name="emoji_events" size="md" />
@@ -244,7 +244,7 @@ export const IconStylingShowcase: React.FC = () => {
               </span>
               <span className="font-mono text-xs font-bold text-error">1.99:1 FAIL</span>
             </div>
-            <div className="p-4 bg-surface-container rounded flex items-center gap-4">
+            <div className="p-4 bg-surface-container-low rounded flex items-center gap-4">
               {/* Bare Amber Icon (FAILS CONTRAST) */}
               <div className="h-10 w-10 rounded bg-surface border border-outline-variant flex items-center justify-center shrink-0 text-secondary">
                 <Icon name="emoji_events" size="md" />
@@ -532,7 +532,7 @@ export const IconStylingShowcase: React.FC = () => {
       </section>
 
       {/* 9. Comprehensive Design System Icon Audit & Gaps Analysis */}
-      <section className="rounded-lg bg-surface-container border border-outline-variant p-6 space-y-4">
+      <section className="rounded-lg bg-surface-container-low border border-outline-variant p-6 space-y-4">
         <div className="flex items-center gap-2">
           <span className="text-primary">
             <Icon name="verified" size="md" />

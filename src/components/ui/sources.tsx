@@ -139,7 +139,7 @@ export const SourcesCount = React.forwardRef<HTMLSpanElement, SourcesCountProps>
       <span
         ref={ref}
         data-slot="sources-count"
-        className={cn('font-mono text-xs tabular-nums px-1.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-medium', className)}
+        className={cn('font-mono text-xs tabular-nums px-1.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium', className)}
         {...props}
       >
         {children ?? count}
@@ -374,7 +374,7 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
         rel={itemUrl ? 'noopener noreferrer' : undefined}
         className={cn(
           'group block w-full text-start transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
-          'hover:bg-surface-container/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           className
         )}
         {...props}

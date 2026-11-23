@@ -146,7 +146,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                         'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                         isSelected
                           ? 'border-primary bg-primary-container text-on-surface'
-                          : 'border-transparent bg-surface hover:border-outline-variant/50 hover:bg-surface-container text-on-surface'
+                          : 'border-transparent bg-surface hover:border-outline-variant/50 hover:bg-state-hover text-on-surface'
                       )}
                     >
                       <Radio value={opt.id} className="mt-0.5" />
@@ -172,7 +172,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                         'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:outline-offset-2',
                         selectedId === APPROVAL_CARD_CUSTOM_OPTION_ID
                           ? 'border-primary bg-primary-container text-on-surface'
-                          : 'border-transparent bg-surface hover:border-outline-variant/50 hover:bg-surface-container text-on-surface'
+                          : 'border-transparent bg-surface hover:border-outline-variant/50 hover:bg-state-hover text-on-surface'
                       )}
                     >
                       <Radio value={APPROVAL_CARD_CUSTOM_OPTION_ID} className="shrink-0" />

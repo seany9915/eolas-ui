@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Dialog } from '@/components/ui/dialog';
 import { AlertDialog } from '@/components/ui/alert-dialog';
 import { Drawer } from '@/components/ui/drawer';
@@ -44,7 +44,7 @@ export const DialogDemo: React.FC<ComponentDemoProps> = () => {
           <p>
             Learner P-2024-819 has been scheduled for sound practice evaluation under Sarah Jenkins, Speech-Language Pathologist.
           </p>
-          <div className="p-3 rounded-lg bg-surface-container border border-outline-variant font-mono text-xs">
+          <div className="p-3 rounded-lg bg-surface-container-low border border-outline-variant font-mono text-xs">
             Room: Studio B | Focus: /r/ Blends | Format: Individual
           </div>
         </div>
@@ -128,11 +128,11 @@ export const DrawerDemo: React.FC<ComponentDemoProps> = () => {
         }
       >
         <div className="flex flex-col gap-4 py-4 text-xs font-sans text-on-surface-variant">
-          <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
+          <div className="p-3 rounded-lg bg-surface-container-low border border-outline-variant">
             <span className="font-bold text-on-surface block mb-1">Practice Status: Active</span>
             <span>Accuracy: 92% | Streak: 5 days | Weekly Goal: Met</span>
           </div>
-          <div className="p-3 rounded-lg bg-surface-container border border-outline-variant">
+          <div className="p-3 rounded-lg bg-surface-container-low border border-outline-variant">
             <span className="font-bold text-on-surface block mb-1">Recent Practice Sessions:</span>
             <span>Session 12: 95% | Session 11: 88% | Session 10: 91%</span>
           </div>
@@ -173,10 +173,10 @@ export const MenuDemo: React.FC<ComponentDemoProps> = () => {
           <Menu.Positioner sideOffset={4}>
             <Menu.Popup className="p-1 min-w-48 rounded-xl bg-surface border border-outline-variant shadow-ambient">
               <Menu.Group>
-                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
+                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-state-hover rounded-lg cursor-pointer">
                   Export Progress Report
                 </Menu.Item>
-                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-surface-container rounded-lg cursor-pointer">
+                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-state-hover rounded-lg cursor-pointer">
                   Assign Practice Group
                 </Menu.Item>
               </Menu.Group>
@@ -202,14 +202,14 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-2xl mx-auto rounded-xl border border-outline-variant bg-surface overflow-hidden">
       {/* Top Application Menubar Chrome */}
-      <Menubar variant="flush" className="bg-surface-container/30 px-2 py-1">
+      <Menubar variant="flush" className="bg-surface-container-low px-2 py-1">
         <Menubar.Menu>
           <Menubar.Trigger>File</Menubar.Trigger>
           <Menubar.Content>
-            <Menubar.Item icon="person_add" shortcut="⌘N">
+            <Menubar.Item icon="person_add" shortcut="âŒ˜N">
               New Learner Profile
             </Menubar.Item>
-            <Menubar.Item icon="file_download" shortcut="⌘E">
+            <Menubar.Item icon="file_download" shortcut="âŒ˜E">
               Export Practice Summary
             </Menubar.Item>
             <Menubar.Separator />
@@ -222,10 +222,10 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
         <Menubar.Menu>
           <Menubar.Trigger>Edit</Menubar.Trigger>
           <Menubar.Content>
-            <Menubar.Item icon="undo" shortcut="⌘Z">
+            <Menubar.Item icon="undo" shortcut="âŒ˜Z">
               Undo Session Note
             </Menubar.Item>
-            <Menubar.Item icon="redo" shortcut="⇧⌘Z">
+            <Menubar.Item icon="redo" shortcut="â‡§âŒ˜Z">
               Redo Entry
             </Menubar.Item>
             <Menubar.Separator />
@@ -295,7 +295,7 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
           <div>
             <h5 className="font-heading text-sm font-semibold text-on-surface">Practice Session: Learner #4892</h5>
-            <p className="font-sans text-xs text-on-surface-variant">Speech Therapy — Morning Studio Group</p>
+            <p className="font-sans text-xs text-on-surface-variant">Speech Therapy â€” Morning Studio Group</p>
           </div>
           <div className="flex items-center gap-2">
             {showVitals && (
@@ -324,7 +324,7 @@ export const ContextMenuDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-8">
       <ContextMenu.Root>
-        <ContextMenu.Trigger className="w-full h-32 rounded-xl border-2 border-dashed border-outline-variant bg-surface-container/40 flex flex-col items-center justify-center text-center p-4 cursor-context-menu select-none">
+        <ContextMenu.Trigger className="w-full h-32 rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center text-center p-4 cursor-context-menu select-none">
           <Icon name="touch_app" size="md" className="text-primary mb-2" />
           <span className="font-heading text-xs font-bold text-on-surface">Right Click or Long Press Here</span>
           <span className="font-sans text-[11px] text-on-surface-variant">Triggers Base UI ContextMenu popup</span>
@@ -333,10 +333,10 @@ export const ContextMenuDemo: React.FC<ComponentDemoProps> = () => {
           <ContextMenu.Positioner>
             <ContextMenu.Popup className="p-1 min-w-40 rounded-xl bg-surface border border-outline-variant shadow-ambient text-xs">
               <ContextMenu.Group>
-                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
+                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-state-hover cursor-pointer">
                   View Session History
                 </ContextMenu.Item>
-                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-surface-container cursor-pointer">
+                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-state-hover cursor-pointer">
                   Assign Therapist
                 </ContextMenu.Item>
               </ContextMenu.Group>
@@ -484,12 +484,12 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
         >
           <Icon name="search" size="xs" aria-hidden="true" />
           <span>Open Menu</span>
-          <Kbd size="sm" className="ml-1.5">⌘K</Kbd>
+          <Kbd size="sm" className="ml-1.5">âŒ˜K</Kbd>
         </Button>
       </div>
 
       {lastAction && (
-        <div className="p-3 rounded-lg bg-surface-container text-xs font-sans text-on-surface flex items-center justify-between">
+        <div className="p-3 rounded-lg bg-surface-container-low text-xs font-sans text-on-surface flex items-center justify-between">
           <span>Selected action: <strong>{lastAction}</strong></span>
           <Button variant="unstyled" onClick={() => setLastAction(null)} className="text-on-surface-variant hover:text-on-surface text-xs underline">
             Clear
@@ -528,21 +528,21 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
                 <Icon name="add" size="sm" aria-hidden="true" />
                 <span>New Consultation</span>
                 <CommandShortcut>
-                  <Kbd size="sm">⌘N</Kbd>
+                  <Kbd size="sm">âŒ˜N</Kbd>
                 </CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => setLastAction('Record Audio Drill')}>
                 <Icon name="mic" size="sm" aria-hidden="true" />
                 <span>Record Audio Drill</span>
                 <CommandShortcut>
-                  <Kbd size="sm">⌘R</Kbd>
+                  <Kbd size="sm">âŒ˜R</Kbd>
                 </CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => setLastAction('Download Care Plan')}>
                 <Icon name="download" size="sm" aria-hidden="true" />
                 <span>Download Care Plan</span>
                 <CommandShortcut>
-                  <Kbd size="sm">⌘D</Kbd>
+                  <Kbd size="sm">âŒ˜D</Kbd>
                 </CommandShortcut>
               </CommandItem>
             </CommandGroup>
@@ -572,12 +572,12 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
             <CommandItem onSelect={() => handleSelect('New Consultation')}>
               <Icon name="add" size="sm" aria-hidden="true" />
               <span>New Consultation</span>
-              <CommandShortcut><Kbd size="sm">⌘N</Kbd></CommandShortcut>
+              <CommandShortcut><Kbd size="sm">âŒ˜N</Kbd></CommandShortcut>
             </CommandItem>
             <CommandItem onSelect={() => handleSelect('Record Audio Drill')}>
               <Icon name="mic" size="sm" aria-hidden="true" />
               <span>Record Audio Drill</span>
-              <CommandShortcut><Kbd size="sm">⌘R</Kbd></CommandShortcut>
+              <CommandShortcut><Kbd size="sm">âŒ˜R</Kbd></CommandShortcut>
             </CommandItem>
           </CommandGroup>
         </CommandList>

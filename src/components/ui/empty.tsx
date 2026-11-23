@@ -138,7 +138,7 @@ export const EmptyMedia = React.forwardRef<HTMLDivElement, EmptyMediaProps>(
         data-variant={variant}
         className={cn(
           'flex shrink-0 items-center justify-center mb-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
-          variant === 'icon' && 'size-14 rounded-full bg-surface-container text-on-surface-variant',
+          variant === 'icon' && 'size-14 rounded-full bg-surface-container-high text-on-surface-variant',
           className
         )}
         {...props}

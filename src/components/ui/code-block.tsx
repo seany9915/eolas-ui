@@ -69,9 +69,9 @@ const CodeBlockRoot = React.forwardRef<HTMLDivElement, CodeBlockProps>(
           className={cn(
             '@container group/code-block relative w-full font-mono text-xs overflow-hidden',
             'transition-[border-color,background-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-            variant === 'default' && 'rounded-lg border border-outline-variant bg-surface-container/60',
+            variant === 'default' && 'rounded-lg border border-outline-variant bg-surface-container-low',
             variant === 'destructive' && 'rounded-lg border border-error/40 bg-error-container/30 text-on-surface',
-            variant === 'flush' && 'rounded-sm border-none bg-surface-container/60',
+            variant === 'flush' && 'rounded-sm border-none bg-surface-container-low',
             variant === 'ghost' && 'rounded-sm border-none bg-transparent',
             className
           )}
@@ -106,7 +106,7 @@ export const CodeBlockHeader = React.forwardRef<HTMLDivElement, CodeBlockHeaderP
           size === 'sm' ? 'px-3 py-1.5 min-h-8' : 'px-3.5 py-2 min-h-10',
           variant === 'destructive'
             ? 'border-error/30 bg-error-container/40'
-            : 'border-outline-variant/40 bg-surface-container',
+            : 'border-outline-variant/40 bg-surface-container-high/60',
           className
         )}
         {...props}
@@ -310,7 +310,7 @@ export const CodeBlockLine = React.forwardRef<HTMLDivElement, CodeBlockLineProps
           variant === 'added' && 'bg-success-container/40 text-on-surface',
           variant === 'removed' && 'bg-error-container/40 text-on-surface',
           variant === 'highlighted' && 'bg-primary-container/50 text-on-surface',
-          !variant && 'hover:bg-surface-container/30',
+          !variant && 'hover:bg-state-hover',
           className
         )}
         {...props}
@@ -351,7 +351,7 @@ export const CodeBlockFooter = React.forwardRef<HTMLDivElement, CodeBlockFooterP
           size === 'sm' ? 'px-3 py-1' : 'px-3.5 py-1.5',
           variant === 'destructive'
             ? 'border-error/30 bg-error-container/40'
-            : 'border-outline-variant/40 bg-surface-container/60',
+            : 'border-outline-variant/40 bg-surface-container-low',
           className
         )}
         {...props}

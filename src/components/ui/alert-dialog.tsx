@@ -269,7 +269,7 @@ export const AlertDialogMedia = React.forwardRef<HTMLDivElement, React.HTMLAttri
       ref={ref}
       data-slot="alert-dialog-media"
       className={cn(
-        'inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-container text-on-surface [&_svg:not([class*="size-"])]:size-6',
+        'inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-on-surface [&_svg:not([class*="size-"])]:size-6',
         className
       )}
       {...props}
@@ -353,7 +353,7 @@ export const AlertDialogCancel = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'inline-flex items-center justify-center font-label text-sm font-semibold rounded h-12 px-5 min-h-[48px] bg-surface text-on-surface border-2 border-outline hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'inline-flex items-center justify-center font-label text-sm font-semibold rounded h-12 px-5 min-h-[48px] bg-surface text-on-surface border-2 border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }
@@ -375,7 +375,7 @@ export const AlertDialogClose = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }
