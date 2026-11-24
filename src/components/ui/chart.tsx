@@ -151,7 +151,7 @@ export const ChartTooltip = ({
   animationDuration = 150,
   animationEasing = 'ease-out',
   isAnimationActive = true,
-  allowEscapeViewBox = { x: true, y: true },
+  allowEscapeViewBox = { x: false, y: true },
   offset = 12,
   wrapperStyle,
   cursor = {
@@ -297,7 +297,7 @@ export const ChartTooltipContent = React.forwardRef<
         ref={ref}
         data-slot="chart-tooltip"
         className={cn(
-          'pointer-events-none select-none grid min-w-[8rem] items-start gap-1.5 rounded-[0.75rem] border border-outline-variant/60 bg-surface/95 backdrop-blur-sm px-3 py-2 text-xs shadow-ambient text-on-surface',
+          'pointer-events-none select-none grid min-w-[8rem] max-w-[calc(100vw-2rem)] items-start gap-1.5 rounded-[0.75rem] border border-outline-variant/60 bg-surface/95 backdrop-blur-sm px-3 py-2 text-xs shadow-ambient text-on-surface',
           className
         )}
       >

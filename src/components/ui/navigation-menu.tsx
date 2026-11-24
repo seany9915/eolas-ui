@@ -35,7 +35,7 @@ export const NavigationMenuList = React.forwardRef<
   <BaseNavigationMenu.List
     ref={ref}
     data-slot="navigation-menu-list"
-    className={composeClassName('flex flex-1 h-full list-none items-stretch gap-2 px-1 bg-transparent w-full', className)}
+    className={composeClassName('flex flex-1 h-full list-none items-stretch gap-2 px-1 bg-transparent w-full min-w-0 overflow-x-auto scrollbar-none', className)}
     {...props}
   />
 ));
@@ -46,8 +46,13 @@ export const NavigationMenuItemPrimitive = BaseNavigationMenu.Item;
 export const NavigationMenuItemComponent = React.forwardRef<
   HTMLLIElement,
   React.ComponentPropsWithoutRef<typeof BaseNavigationMenu.Item>
->((props, ref) => (
-  <BaseNavigationMenu.Item ref={ref} data-slot="navigation-menu-item" {...props} />
+>(({ className, ...props }, ref) => (
+  <BaseNavigationMenu.Item
+    ref={ref}
+    data-slot="navigation-menu-item"
+    className={composeClassName('shrink-0', className)}
+    {...props}
+  />
 ));
 NavigationMenuItemComponent.displayName = 'NavigationMenuItem';
 
@@ -66,7 +71,7 @@ export const NavigationMenuTrigger = React.forwardRef<
     aria-current={active ? 'page' : undefined}
     className={composeClassName(
       cn(
-        'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
+        'group relative inline-flex shrink-0 whitespace-nowrap min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
         'hover:text-on-surface hover:bg-state-hover',
         'data-[popup-open]:text-primary data-[popup-open]:bg-state-hover',
         'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
@@ -92,7 +97,7 @@ export const NavigationMenuContent = React.forwardRef<
     data-slot="navigation-menu-content"
     className={composeClassName(
       cn(
-        'h-full w-[calc(100vw-40px)] p-2 min-[500px]:w-max min-[500px]:min-w-[260px] min-[500px]:max-w-[420px]',
+        'h-full max-h-[var(--available-height)] overflow-y-auto overscroll-contain w-[min(calc(100vw-2rem),var(--available-width))] p-2 min-[500px]:w-max min-[500px]:min-w-[260px] min-[500px]:max-w-[min(420px,var(--available-width))]',
         'transition-[opacity,transform,translate] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
         'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
         'data-[starting-style]:data-[activation-direction=left]:translate-x-[-20%]',
@@ -130,7 +135,7 @@ export const NavigationMenuLink = React.forwardRef<
       className={composeClassName(
         isBar
           ? cn(
-              'group relative inline-flex min-h-[44px] h-full w-max items-center justify-center gap-2 px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
+              'group relative inline-flex shrink-0 whitespace-nowrap min-h-[44px] h-full w-max items-center justify-center gap-2 px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
               active
                 ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none after:z-10'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
@@ -160,7 +165,7 @@ export const NavigationMenuPositioner = React.forwardRef<
     data-slot="navigation-menu-positioner"
     sideOffset={8}
     className={composeClassName(
-      'h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none z-50',
+      'h-[var(--positioner-height)] w-[var(--positioner-width)] max-w-[var(--available-width)] max-h-[var(--available-height)] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none z-50',
       className
     )}
     {...props}
@@ -177,7 +182,7 @@ export const NavigationMenuPopup = React.forwardRef<
     data-slot="navigation-menu-popup"
     className={composeClassName(
       cn(
-        'relative h-[var(--popup-height)] w-[var(--popup-width)] origin-[var(--transform-origin)]',
+        'relative h-[var(--popup-height)] w-[var(--popup-width)] max-w-[var(--available-width)] max-h-[var(--available-height)] origin-[var(--transform-origin)]',
         'rounded bg-surface border border-outline-variant shadow-ambient outline-none',
         'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
         'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
@@ -316,7 +321,7 @@ function NavigationMenuComponentInner<Value = string>(
 
               if (hasChildren) {
                 return (
-                  <BaseNavigationMenu.Item key={item.id} data-slot="navigation-menu-item" value={item.id as Value} className="relative h-full">
+                  <BaseNavigationMenu.Item key={item.id} data-slot="navigation-menu-item" value={item.id as Value} className="relative h-full shrink-0">
                     <NavigationMenuTrigger active={isActive}>
                       {item.icon && (
                         <Icon name={item.icon} size="sm" className="leading-none" />
@@ -389,7 +394,7 @@ function NavigationMenuComponentInner<Value = string>(
               }
 
               return (
-                <BaseNavigationMenu.Item key={item.id} data-slot="navigation-menu-item" value={item.id as Value} className="h-full">
+                <BaseNavigationMenu.Item key={item.id} data-slot="navigation-menu-item" value={item.id as Value} className="h-full shrink-0">
                   <NavigationMenuLink
                     href={item.href || `#${item.id}`}
                     variant="bar"

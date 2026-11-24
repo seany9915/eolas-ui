@@ -201,7 +201,7 @@ export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
       ref={ref}
       data-slot="card-header"
       className={cn(
-        '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 has-[[data-slot=card-action]]:grid-cols-[1fr_auto]',
+        '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 has-[[data-slot=card-action]]:grid-cols-[minmax(0,1fr)_auto]',
         className
       )}
       {...props}
@@ -231,7 +231,7 @@ export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
         ref={ref}
         data-slot="card-title"
         className={cn(
-          'font-heading text-lg font-semibold leading-snug tracking-tight text-balance',
+          'min-w-0 font-heading text-lg font-semibold leading-snug tracking-tight text-balance',
           textTone,
           className
         )}
@@ -259,7 +259,7 @@ export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescri
         ref={ref}
         data-slot="card-description"
         className={cn(
-          'font-sans text-sm leading-relaxed text-pretty',
+          'min-w-0 font-sans text-sm leading-relaxed text-pretty',
           textTone,
           className
         )}
@@ -305,7 +305,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
     <div
       ref={ref}
       data-slot="card-footer"
-      className={cn('flex items-center pt-4 mt-auto gap-3', className)}
+      className={cn('flex flex-wrap items-center pt-4 mt-auto gap-3', className)}
       {...props}
     />
   )

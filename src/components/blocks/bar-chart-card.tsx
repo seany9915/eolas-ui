@@ -38,7 +38,7 @@ export interface BarChartCardProps
   series: BarChartSeries[];
   config: ChartConfig;
   layout?: 'horizontal' | 'vertical';
-  yAxisWidth?: number;
+  yAxisWidth?: number | 'auto';
   showLegend?: boolean;
   /** Whether to render the numeric Y-axis scale in horizontal layout. Defaults to `true`. */
   showYAxis?: boolean;
@@ -57,7 +57,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       series,
       config,
       layout = 'horizontal',
-      yAxisWidth = 80,
+      yAxisWidth = 'auto',
       showLegend,
       showYAxis = true,
       trend,
@@ -68,13 +68,16 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
       emptyTitle,
       emptyDescription,
       chartLabel,
-      contentClassName = 'h-64 w-full',
+      contentClassName,
       className,
       ...props
     },
     ref
   ) => {
     const isVerticalLayout = layout === 'vertical';
+    const shouldShowLegend = showLegend ?? series.length > 1;
+    const resolvedContentClassName =
+      contentClassName ?? (shouldShowLegend ? 'h-72 w-full' : 'h-64 w-full');
     const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
     const lastIndexByStack = React.useMemo(() => {
       const map = new Map<string, number>();
@@ -95,7 +98,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName={contentClassName}
+        contentClassName={resolvedContentClassName}
         className={className}
         {...props}
       >
@@ -141,7 +144,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
                 />
                 <YAxis
                   hide={!showYAxis}
-                  width={showYAxis ? 36 : 0}
+                  width={showYAxis ? 'auto' : 0}
                   tickLine={false}
                   axisLine={false}
                   tickMargin={4}

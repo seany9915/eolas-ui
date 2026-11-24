@@ -81,12 +81,14 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
       emptyTitle,
       emptyDescription,
       chartLabel,
-      contentClassName = 'h-56 @xs:h-64 w-full',
+      contentClassName,
       className,
       ...props
     },
     ref
   ) => {
+    const resolvedContentClassName =
+      contentClassName ?? (showLegend ? 'h-72 @xs:h-80 w-full' : 'h-56 @xs:h-64 w-full');
     const [internalActiveIndex, setInternalActiveIndex] = React.useState<number | undefined>(undefined);
     const isControlled = activeIndex !== undefined;
     const currentActiveIndex = isControlled ? (activeIndex ?? undefined) : internalActiveIndex;
@@ -199,7 +201,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName={contentClassName}
+        contentClassName={resolvedContentClassName}
         skeletonShape="circle"
         className={className}
         {...props}
@@ -269,7 +271,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-on-surface text-2xl font-bold font-mono tracking-tight"
+                          className="fill-on-surface text-xl @xs:text-2xl font-bold font-mono tracking-tight"
                         >
                           {displayValue}
                         </tspan>
@@ -294,7 +296,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                 content={
                   <ChartLegendContent
                     nameKey={nameKey}
-                    className="-translate-y-2 flex-wrap"
+                    className="flex-wrap"
                   />
                 }
               />

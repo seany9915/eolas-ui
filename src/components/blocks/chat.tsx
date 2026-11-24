@@ -73,7 +73,7 @@ export const ChatHeader = React.forwardRef<HTMLDivElement, ChatHeaderProps>(
         ref={ref}
         data-slot="chat-header"
         className={cn(
-          'flex items-center justify-between px-4 py-3 border-b border-outline-variant bg-surface min-h-14 shrink-0',
+          'flex items-center justify-between gap-3 px-4 py-3 border-b border-outline-variant bg-surface min-h-14 shrink-0',
           className
         )}
         {...props}
@@ -388,11 +388,11 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
               {header}
 
               {/* Viewport Engine */}
-              <MessageScroller variant="default" className="flex-1 min-h-0">
+              <MessageScroller variant="default" className="isolate flex-1 min-h-0">
                 <MessageScrollerViewport>
                   <MessageScrollerContent>
                     {messages.length === 0 ? (
-                      <div className="flex-1 flex items-center justify-center p-8 min-h-75">
+                      <div className="flex-1 flex items-center justify-center p-6 @sm:p-8 min-h-48 short:min-h-0">
                         {emptyState ?? (
                           <Empty
                             variant="unboxed"
@@ -424,43 +424,36 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                         )}
                       </>
                     )}
-                    {isFloating && (
-                      <div
-                        className={cn(
-                          'shrink-0 select-none pointer-events-none',
-                          normalizedSuggestions.length > 0 ? 'h-48' : 'h-32'
-                        )}
-                        aria-hidden="true"
-                      />
-                    )}
                   </MessageScrollerContent>
                 </MessageScrollerViewport>
 
                 {/* Jump to bottom edge control */}
-                <MessageScrollerButton
-                  className={cn(
-                    isFloating
-                      ? normalizedSuggestions.length > 0
-                        ? 'bottom-36 end-4'
-                        : 'bottom-24 end-4'
-                      : 'bottom-4 end-4'
-                  )}
-                />
+                <MessageScrollerButton className="bottom-4 end-4" />
               </MessageScroller>
 
               {/* Floating Island vs Docked Layout */}
               {isFloating ? (
-                <div className="absolute inset-x-0 bottom-4 px-4 z-10 pointer-events-none flex flex-col items-center gap-2">
+                <div
+                  data-slot="chat-floating-dock"
+                  className={cn(
+                    'relative shrink-0 px-4 pt-2 pb-4 flex flex-col items-center gap-2',
+                    variant === 'card' &&
+                      'before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-surface before:to-transparent',
+                    variant === 'canvas' &&
+                      'before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-background before:to-transparent'
+                  )}
+                >
                   {normalizedSuggestions.length > 0 && (
-                    <div className="pointer-events-auto w-full max-w-3xl">
+                    <div className="w-full max-w-3xl">
                       <SuggestionChips
                         label={suggestionsLabel}
+                        layout="responsive"
                         suggestions={normalizedSuggestions}
                         onSelect={handleSuggestionClick}
                       />
                     </div>
                   )}
-                  <div className="pointer-events-auto w-full max-w-3xl">
+                  <div className="w-full max-w-3xl">
                     {promptInputNode}
                   </div>
                 </div>
@@ -479,6 +472,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                     >
                       <SuggestionChips
                         label={suggestionsLabel}
+                        layout="responsive"
                         suggestions={normalizedSuggestions}
                         onSelect={handleSuggestionClick}
                       />

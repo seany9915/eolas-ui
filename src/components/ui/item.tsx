@@ -83,6 +83,7 @@ export function itemVariants({
     interactive &&
       cn(
         'cursor-pointer select-none active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100 motion-reduce:transition-none',
+        (size === 'xs' || size === 'sm') && 'min-h-11',
         variant !== 'selected' && 'hover:bg-state-hover'
       ),
     className

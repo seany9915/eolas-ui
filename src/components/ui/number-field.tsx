@@ -54,7 +54,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
   const descriptionId = description ? `${inputId}-description` : undefined;
   const errorId = error ? `${inputId}-error` : undefined;
   const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
-  const rootClassName = composeClassName('flex flex-col gap-1.5 w-max', className);
+  const rootClassName = composeClassName('flex flex-col items-start gap-1.5 w-fit max-w-full', className);
 
   // Composable compound usage
   if (children) {
@@ -92,7 +92,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       {...props}
     >
       {label && (
-        <label htmlFor={inputId} className="font-label text-sm font-semibold text-on-surface cursor-pointer flex items-center justify-between">
+        <label htmlFor={inputId} className="font-label text-sm font-semibold text-on-surface cursor-pointer flex items-center justify-between gap-2 w-full max-w-full">
           <span>{label}</span>
           {required && (
             <span className="text-sm text-on-surface-variant font-normal">(required)</span>
@@ -101,7 +101,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       )}
 
       {description && (
-        <span id={descriptionId} className="font-sans text-sm text-on-surface-variant">
+        <span id={descriptionId} className="font-sans text-sm text-on-surface-variant max-w-full break-words">
           {description}
         </span>
       )}
@@ -109,7 +109,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       <BaseNumberField.Group
         data-slot="number-field-group"
         className={cn(
-          'inline-flex w-max items-center rounded border bg-surface overflow-hidden',
+          'inline-flex w-fit max-w-full items-center rounded border bg-surface overflow-hidden',
           'transition-[border-color,box-shadow]',
           'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
           'data-[disabled]:opacity-50 data-[disabled]:bg-surface-container-low data-[disabled]:pointer-events-none',
@@ -131,7 +131,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
           aria-describedby={describedBy}
           className={cn(
             numberFieldSizeStyles[size].input,
-            'min-w-[4rem] w-20 [field-sizing:content] px-2 text-center font-mono font-bold text-on-surface tabular-nums bg-transparent outline-none focus:outline-none focus-visible:outline-none focus:ring-0'
+            'min-w-[4rem] w-20 max-w-full [field-sizing:content] px-2 text-center font-mono font-bold text-on-surface tabular-nums bg-transparent outline-none focus:outline-none focus-visible:outline-none focus:ring-0'
           )}
         />
         <BaseNumberField.Increment
@@ -146,7 +146,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       </BaseNumberField.Group>
 
       {error && (
-        <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none">
+        <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none max-w-full break-words">
           <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </span>

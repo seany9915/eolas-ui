@@ -228,7 +228,7 @@ export const NavigationBarLabel = React.forwardRef<HTMLSpanElement, NavigationBa
         'data-slot': 'navigation-bar-label',
         'data-selected': isActive ? 'true' : undefined,
         className: cn(
-          'font-sans text-xs font-semibold leading-tight mt-1 tracking-tight truncate max-w-22',
+          'font-sans text-xs font-semibold leading-tight mt-1 tracking-tight truncate max-w-[min(100%,5.5rem)] text-center',
           isActive ? 'text-on-surface' : 'text-on-surface-variant',
           className
         ),

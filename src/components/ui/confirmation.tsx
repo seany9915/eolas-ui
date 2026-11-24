@@ -264,9 +264,9 @@ const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, chil
   return (
     <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container-low font-mono text-xs flex flex-col gap-1.5', className)} {...props}>
       {items.map((item, idx) => (
-        <div key={idx} className="flex items-center justify-between gap-2 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
+        <div key={idx} className="flex flex-wrap items-center justify-between gap-2 min-w-0 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
           <span className="text-on-surface-variant font-semibold">{item.label}:</span>
-          <div className="flex items-center gap-1.5 truncate">
+          <div className="flex items-center gap-1.5 min-w-0 max-w-full truncate">
             {item.from !== undefined && (
               <span className="text-error/80 line-through truncate max-w-[120px]">{String(item.from)}</span>
             )}
@@ -296,7 +296,7 @@ const ConfirmationActions: React.FC<ConfirmationActionsProps> = ({
 }) => {
   return (
     <div
-      className={cn('flex items-center justify-end gap-2.5 mt-3 pt-2.5 border-t border-outline-variant/40', className)}
+      className={cn('flex flex-wrap items-center justify-end gap-2.5 mt-3 pt-2.5 border-t border-outline-variant/40', className)}
       {...props}
     >
       {children}

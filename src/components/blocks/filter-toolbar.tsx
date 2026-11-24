@@ -65,9 +65,9 @@ export function FilterToolbar({
 
   return (
     <div className={cn('@container flex w-full flex-col gap-3', className)}>
-      <div className="flex flex-col @md:flex-row items-stretch @md:items-center justify-between gap-3">
+      <div className="flex flex-col @2xl:flex-row items-stretch @2xl:items-center justify-between gap-3">
         {/* Search input with accessible Field label and native-safe clear trigger */}
-        <Field.Root className="w-full min-w-0 @md:flex-1 @md:min-w-48">
+        <Field.Root className="w-full min-w-0 @2xl:flex-1 @2xl:min-w-48">
           <Field.Label className="sr-only">{searchLabel}</Field.Label>
           <Input
             type="search"
@@ -82,9 +82,9 @@ export function FilterToolbar({
         </Field.Root>
 
         {/* Filter dropdowns and actions */}
-        <div className="flex flex-wrap items-center gap-2 w-full @md:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full @2xl:w-auto min-w-0 max-w-full">
           {filterGroups.map((group) => (
-            <Field.Root key={group.id} className="w-full @xs:w-auto @xs:min-w-36">
+            <Field.Root key={group.id} className="w-full min-w-0 max-w-full @xs:w-auto @xs:min-w-36">
               <Field.Label className="sr-only">{group.label}</Field.Label>
               <Select
                 value={group.value}

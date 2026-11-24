@@ -59,12 +59,15 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
       emptyTitle,
       emptyDescription,
       chartLabel,
-      contentClassName = 'h-56 @xs:h-64 w-full',
+      contentClassName,
       className,
       ...props
     },
     ref
   ) => {
+    const shouldShowLegend = showLegend ?? series.length > 1;
+    const resolvedContentClassName =
+      contentClassName ?? (shouldShowLegend ? 'h-72 @xs:h-80 w-full' : 'h-56 @xs:h-64 w-full');
     const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
     const resolvedEmpty = isEmpty ?? (!data || data.length === 0 || series.length === 0);
 
@@ -79,7 +82,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName={contentClassName}
+        contentClassName={resolvedContentClassName}
         className={className}
         {...props}
       >
@@ -92,8 +95,8 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
           <RadarChart
             aria-label={chartLabel ?? title}
             data={data}
-            outerRadius="70%"
-            margin={{ top: 16, right: 24, bottom: 16, left: 24 }}
+            outerRadius="65%"
+            margin={{ top: 16, right: 32, bottom: 16, left: 32 }}
           >
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarAngleAxis

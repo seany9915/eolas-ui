@@ -57,8 +57,8 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
           disabled={disabled}
           className={composeClassName(
             cn(
-              'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant w-max select-none',
-              orientation === 'vertical' && 'flex-col items-stretch'
+              'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant w-max max-w-full overflow-x-auto scrollbar-none select-none',
+              orientation === 'vertical' && 'flex-col items-stretch overflow-x-visible'
             ),
             className
           )}
@@ -111,7 +111,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
         aria-pressed={active !== undefined ? active : undefined}
         className={composeClassName(
           cn(
-            'rounded-sm flex items-center justify-center font-label font-semibold cursor-pointer select-none',
+            'rounded-sm flex shrink-0 whitespace-nowrap items-center justify-center font-label font-semibold cursor-pointer select-none',
             'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
             'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
@@ -211,9 +211,9 @@ export interface ToolbarLinkProps
 export const ToolbarLink = React.forwardRef<HTMLAnchorElement, ToolbarLinkProps>(
   ({ size = 'md', className, children, ...props }, ref) => {
     const sizeClasses = {
-      sm: 'h-9 px-2.5 min-w-[36px] text-xs',
-      md: 'h-11 px-3 min-w-[44px] min-h-[44px] text-sm',
-      lg: 'h-12 px-4 min-w-[48px] min-h-[48px] text-base',
+      sm: 'h-11 px-3 min-w-11 min-h-11 text-xs',
+      md: 'h-11 px-3 min-w-11 min-h-11 text-sm',
+      lg: 'h-12 px-4 min-w-12 min-h-12 text-base',
     }[size];
 
     return (
@@ -221,7 +221,7 @@ export const ToolbarLink = React.forwardRef<HTMLAnchorElement, ToolbarLinkProps>
         ref={ref}
         className={composeClassName(
           cn(
-            'inline-flex items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-state-hover select-none',
+            'inline-flex shrink-0 whitespace-nowrap items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-state-hover select-none',
             'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)]',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
             sizeClasses
@@ -249,7 +249,7 @@ export const ToolbarInput = React.forwardRef<HTMLInputElement, ToolbarInputProps
         focusableWhenDisabled={focusableWhenDisabled}
         className={composeClassName(
           cn(
-            'h-9 px-3 rounded bg-surface border border-outline text-sm font-sans text-on-surface placeholder:text-on-surface-variant/80',
+            'h-11 min-h-11 min-w-0 max-w-full px-3 rounded bg-surface border border-outline text-sm font-sans text-on-surface placeholder:text-on-surface-variant/80',
             'focus-visible:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed'
           ),

@@ -74,17 +74,17 @@ function mergeDrawerRefs<T>(
 }
 
 export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
-  right: 'fixed inset-y-0 right-0 z-50 flex max-w-full justify-end',
-  left: 'fixed inset-y-0 left-0 z-50 flex max-w-full justify-start',
+  right: 'fixed inset-0 z-50 flex max-w-full justify-end',
+  left: 'fixed inset-0 z-50 flex max-w-full justify-start',
   down: 'fixed inset-x-0 bottom-0 z-50 flex max-h-full items-end justify-center',
   up: 'fixed inset-x-0 top-0 z-50 flex max-h-full items-start justify-center',
 };
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   left:
-    'w-screen max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    'w-full max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   down:
     'w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   up:
@@ -174,7 +174,7 @@ export const DrawerHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribute
       ref={ref}
       data-slot="drawer-header"
       className={cn(
-        'grid auto-rows-min items-start gap-1.5 text-start mb-4 has-[>[data-slot=drawer-close]]:grid-cols-[1fr_auto] [&>[data-slot=drawer-close]]:col-start-2 [&>[data-slot=drawer-close]]:row-start-1 [&>[data-slot=drawer-close]]:self-start [&>[data-slot=drawer-close]]:justify-self-end has-[>[data-slot=drawer-description]]:[&>[data-slot=drawer-close]]:row-span-2',
+        'grid auto-rows-min items-start gap-1.5 text-start mb-4 has-[>[data-slot=drawer-close]]:grid-cols-[minmax(0,1fr)_auto] [&>[data-slot=drawer-close]]:col-start-2 [&>[data-slot=drawer-close]]:row-start-1 [&>[data-slot=drawer-close]]:self-start [&>[data-slot=drawer-close]]:justify-self-end has-[>[data-slot=drawer-description]]:[&>[data-slot=drawer-close]]:row-span-2',
         className
       )}
       {...props}
@@ -192,7 +192,7 @@ DrawerBody.displayName = 'DrawerBody';
 
 export const DrawerFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="drawer-footer" className={cn('pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6', className)} {...props} />
+    <div ref={ref} data-slot="drawer-footer" className={cn('pt-6 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-6', className)} {...props} />
   )
 );
 DrawerFooter.displayName = 'DrawerFooter';
@@ -505,7 +505,7 @@ function DrawerComponentInner<Payload = unknown>(
                     {footer ? (
                       <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant mt-6 shrink-0">{footer}</div>
                     ) : (
-                      <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant flex items-center justify-end gap-3 mt-6 shrink-0">
+                      <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-6 shrink-0">
                         <BaseDrawer.Close data-slot="drawer-close" className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
                           Close panel
                         </BaseDrawer.Close>

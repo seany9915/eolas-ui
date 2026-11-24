@@ -104,7 +104,8 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         aria-labelledby={ariaLabelBy}
         className={composeClassName(
           cn(
-            'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:-top-2.5 after:-bottom-2.5 after:-left-0.5 after:-right-0.5 after:content-[\'\']',
+            'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:content-[\'\']',
+            size === 'sm' ? 'after:-inset-y-3 after:-inset-x-1' : 'after:-inset-y-2.5 after:-inset-x-0.5',
             'bg-surface-container-high',
             error ? 'border-error focus-visible:outline-error' : 'border-outline',
             'data-[checked]:bg-primary data-[checked]:border-primary',
@@ -143,7 +144,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
           !isClassNameFn ? className : undefined
         )}
       >
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-w-0 break-words">
           <label
             htmlFor={switchId}
             className="font-sans text-sm font-medium text-on-surface cursor-pointer select-none"

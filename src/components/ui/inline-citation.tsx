@@ -146,7 +146,7 @@ const InlineCitationCardTrigger = React.forwardRef<
   );
 
   const baseTriggerClassName = cn(
-    'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer',
+    'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer touch-target-expanded',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   );
 
@@ -159,7 +159,7 @@ const InlineCitationCardTrigger = React.forwardRef<
       {...(safeHref
         ? { href: safeHref, target: '_blank', rel: 'noopener noreferrer' }
         : {})}
-      render={render ?? (safeHref ? undefined : <UnstyledButton expandedTouchTarget />)}
+      render={render ?? (safeHref ? undefined : <UnstyledButton />)}
       className={composeClassName(baseTriggerClassName, className)}
       {...props}
     >
@@ -192,12 +192,16 @@ const InlineCitationCard = React.forwardRef<HTMLDivElement, InlineCitationCardPr
   ({ children, className, sideOffset = 8, ...props }, ref) => {
     return (
       <BasePreviewCard.Portal>
-        <BasePreviewCard.Positioner sideOffset={sideOffset} className="z-50 outline-none">
+        <BasePreviewCard.Positioner
+          sideOffset={sideOffset}
+          collisionPadding={8}
+          className="z-50 outline-none max-w-[min(var(--available-width),calc(100vw-1rem))]"
+        >
           <BasePreviewCard.Popup
             ref={ref}
             className={composeClassName(
               cn(
-                'w-80 max-w-[calc(100vw-2rem)] p-3.5 rounded bg-surface border border-outline-variant shadow-ambient text-on-surface',
+                'w-80 max-w-full max-h-[var(--available-height)] overflow-y-auto overscroll-contain p-3.5 rounded bg-surface border border-outline-variant shadow-ambient text-on-surface',
                 'transition-[opacity,transform] duration-quick ease-standard origin-[var(--transform-origin)]',
                 'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98]',
                 'data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
@@ -330,11 +334,11 @@ const InlineCitationSource: React.FC<InlineCitationSourceProps> = ({
         </span>
       )}
       {(displayDomain || authorOrDate || icon || safeFavicon) && (
-        <div className="flex items-center gap-1.5 font-mono text-xs text-on-surface-variant">
+        <div className="flex flex-wrap items-center gap-1.5 min-w-0 font-mono text-xs text-on-surface-variant">
           {(safeFavicon || icon) && <InlineCitationIcon src={safeFavicon} name={icon} />}
-          {displayDomain && <span>{displayDomain}</span>}
+          {displayDomain && <span className="truncate max-w-full">{displayDomain}</span>}
           {displayDomain && authorOrDate && <span>•</span>}
-          {authorOrDate && <span>{authorOrDate}</span>}
+          {authorOrDate && <span className="truncate max-w-full">{authorOrDate}</span>}
         </div>
       )}
     </div>

@@ -93,7 +93,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       emptyListDescription,
       density,
       className,
-      listWidthClassName = '@2xl:w-80 @3xl:w-96',
+      listWidthClassName = '@2xl:w-72 @4xl:w-80',
       children,
       ...props
     },
@@ -266,7 +266,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
         data-slot="list-detail-block"
         data-density={density}
         className={cn(
-          '@container size-full min-h-120 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col',
+          '@container size-full min-h-120 short:min-h-0 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col',
           className
         )}
         {...props}
@@ -287,7 +287,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
         >
           {/* List Header */}
           <div className="flex flex-col shrink-0 bg-surface">
-            <div className="min-h-16 h-16 short:min-h-14 short:h-14 px-4 border-b border-outline-variant flex items-center justify-between gap-2">
+            <div className="min-h-16 short:min-h-14 py-2 px-4 border-b border-outline-variant flex items-center justify-between gap-2">
               <h2 className="font-heading text-base font-semibold text-on-surface truncate">
                 {title}
               </h2>
@@ -451,7 +451,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               {/* Unified Detail Header */}
               <div
                 data-slot="detail-header"
-                className="min-h-16 h-16 short:min-h-14 short:h-14 px-3 @2xl:px-4 @md:px-6 border-b border-outline-variant flex items-center justify-between gap-2 @2xl:gap-3 bg-surface shrink-0"
+                className="min-h-16 short:min-h-14 py-2 px-3 @md:px-4 @2xl:px-6 border-b border-outline-variant flex flex-wrap items-center justify-between gap-2 @2xl:gap-3 bg-surface shrink-0"
               >
                 <div className="flex items-center gap-1.5 @2xl:gap-2.5 min-w-0 flex-1">
                   <Button
@@ -481,7 +481,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                   )}
                 </div>
                 {detailActions && (
-                  <div className="flex items-center gap-1.5 shrink-0">{detailActions}</div>
+                  <div className="flex flex-wrap items-center gap-1.5 shrink-0 max-w-full">{detailActions}</div>
                 )}
               </div>
 

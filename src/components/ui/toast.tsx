@@ -380,7 +380,7 @@ const ActiveToastItem: React.FC<{
       className={
         isAnchored
           ? cn(
-              'pointer-events-auto relative flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-sm w-full select-none',
+              'pointer-events-auto relative flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-[min(24rem,var(--available-width))] w-full select-none',
               'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               accentBorder[toastType] || accentBorder.info
             )
@@ -446,12 +446,20 @@ const ActiveToastItem: React.FC<{
 
   // If anchored toast, wrap in BaseToast.Positioner and add BaseToast.Arrow
   if (t.positionerProps?.anchor) {
-    const { className: positionerClassName, ...restPositionerProps } = t.positionerProps;
+    const {
+      className: positionerClassName,
+      collisionPadding = 8,
+      ...restPositionerProps
+    } = t.positionerProps;
     return (
       <BaseToast.Positioner
         toast={t}
+        collisionPadding={collisionPadding}
         {...restPositionerProps}
-        className={composeClassName('z-[60] pointer-events-auto', positionerClassName)}
+        className={composeClassName(
+          'z-[60] pointer-events-auto max-w-[var(--available-width)]',
+          positionerClassName
+        )}
       >
         {toastCardContent}
         <BaseToast.Arrow className="data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90">

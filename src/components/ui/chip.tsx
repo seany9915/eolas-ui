@@ -211,7 +211,7 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
     const { 'aria-label': ariaLabel, ...containerProps } = props;
 
     const sharedBaseClasses = cn(
-      'inline-flex items-center rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
+      'inline-flex items-center max-w-full rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
       'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
       '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
       sizeStyles[size],
@@ -266,7 +266,7 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
                 if (!disabled) onRemove();
               }}
               disabled={disabled}
-              className="relative ms-0.5 -me-1.5 size-6 min-w-[24px] min-h-[24px] hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center rounded-full text-current shrink-0 after:absolute after:-inset-y-2 after:inset-x-0 after:content-['']"
+              className="relative ms-0.5 -me-1.5 size-6 min-w-[24px] min-h-[24px] hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center rounded-full text-current shrink-0 after:absolute after:-inset-y-2.5 after:inset-x-0 after:content-['']"
               aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
             >
               <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">
@@ -334,7 +334,7 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
               if (!disabled) onRemove();
             }}
             disabled={disabled}
-            className="relative ms-0.5 -me-1.5 size-6 min-w-[24px] min-h-[24px] hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center rounded-full text-current shrink-0 after:absolute after:-inset-y-2 after:inset-x-0 after:content-['']"
+            className="relative ms-0.5 -me-1.5 size-6 min-w-[24px] min-h-[24px] hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer touch-manipulation inline-flex items-center justify-center rounded-full text-current shrink-0 after:absolute after:-inset-y-2.5 after:inset-x-0 after:content-['']"
             aria-label={removeLabel ?? (labelText ? `Remove ${labelText}` : 'Remove')}
           >
             <span className="material-symbols-outlined text-[14px] leading-none font-bold" aria-hidden="true">

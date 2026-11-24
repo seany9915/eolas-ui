@@ -345,14 +345,15 @@ const SourcesItem: React.FC<SourcesItemProps> = ({
           target={itemUrl ? '_blank' : undefined}
           rel={itemUrl ? 'noopener noreferrer' : undefined}
           className={cn(
-            'group inline-flex items-center gap-1.5 text-sm font-sans font-medium text-on-surface underline underline-offset-2 hover:text-secondary',
+            'group relative inline-flex max-w-full items-center gap-1.5 text-sm font-sans font-medium text-on-surface underline underline-offset-2 hover:text-secondary',
+            'after:absolute after:inset-x-0 after:-inset-y-3 after:content-[\'\']',
             'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
             className
           )}
           {...props}
         >
           <SourceIcon src={itemFavicon} name={itemIcon || 'menu_book'} />
-          <span className="truncate">
+          <span className="min-w-0 truncate">
             {itemTitle}
             {itemUrl && <span className="sr-only"> (opens in a new tab)</span>}
           </span>

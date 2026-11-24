@@ -166,7 +166,7 @@ function DialogComponent<Payload = unknown>({
                 {footer ? (
                   <div data-slot="dialog-footer" className="mt-6">{footer}</div>
                 ) : (
-                  <div data-slot="dialog-footer" className="flex items-center justify-end gap-3 mt-6">
+                  <div data-slot="dialog-footer" className="flex flex-wrap items-center justify-end gap-3 mt-6">
                     <BaseDialog.Close
                       data-slot="dialog-close"
                       render={
@@ -323,7 +323,7 @@ DialogBody.displayName = 'DialogBody';
 
 export const DialogFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="dialog-footer" className={cn('flex items-center justify-end gap-3 mt-6', className)} {...props} />
+    <div ref={ref} data-slot="dialog-footer" className={cn('flex flex-wrap items-center justify-end gap-3 mt-6', className)} {...props} />
   )
 );
 DialogFooter.displayName = 'DialogFooter';

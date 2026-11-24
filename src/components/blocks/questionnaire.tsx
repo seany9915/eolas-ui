@@ -640,7 +640,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           ))}
           <QuestionnaireActions>
             <QuestionnairePrevious />
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ms-auto">
               <QuestionnaireSkip />
               <QuestionnaireNext />
               <QuestionnaireSubmit />
@@ -665,7 +665,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           )}
           {...props}
         >
-          <div className={cn('w-full flex flex-col', variant === 'card' && 'p-6 @md:p-8')}>
+          <div className={cn('w-full flex flex-col', variant === 'card' && 'p-4 @sm:p-6 @md:p-8')}>
             {renderedChildren}
           </div>
         </form>
@@ -1082,8 +1082,8 @@ export const QuestionnaireChoices = React.forwardRef<HTMLDivElement, Questionnai
         className={cn(
           'w-full',
           columns === 1 && 'flex flex-col gap-2.5',
-          columns === 2 && 'grid grid-cols-1 @md:grid-cols-2 gap-2.5',
-          columns === 3 && 'grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-2.5',
+          columns === 2 && 'grid grid-cols-1 @xl:grid-cols-2 gap-2.5',
+          columns === 3 && 'grid grid-cols-1 @lg:grid-cols-2 @2xl:grid-cols-3 gap-2.5',
           className
         )}
         {...props}
@@ -1489,7 +1489,7 @@ export const QuestionnaireActions = React.forwardRef<HTMLDivElement, Questionnai
       <div
         ref={ref}
         className={cn(
-          'flex items-center justify-between gap-3 pt-6 mt-6 border-t border-outline-variant w-full',
+          'flex flex-wrap items-center justify-between gap-3 pt-6 mt-6 border-t border-outline-variant w-full',
           className
         )}
         {...props}

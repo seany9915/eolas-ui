@@ -65,12 +65,15 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
       emptyTitle,
       emptyDescription,
       chartLabel,
-      contentClassName = 'h-64 w-full',
+      contentClassName,
       className,
       ...props
     },
     ref
   ) => {
+    const shouldShowLegend = showLegend ?? series.length > 1;
+    const resolvedContentClassName =
+      contentClassName ?? (shouldShowLegend ? 'h-72 w-full' : 'h-64 w-full');
     const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
     const resolvedEmpty = isEmpty ?? (!data || data.length === 0 || series.length === 0);
 
@@ -86,7 +89,7 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName={contentClassName}
+        contentClassName={resolvedContentClassName}
         className={className}
         {...props}
       >
@@ -113,7 +116,7 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
             />
             <YAxis
               hide={!showYAxis}
-              width={showYAxis ? 36 : 0}
+              width={showYAxis ? 'auto' : 0}
               tickLine={false}
               axisLine={false}
               tickMargin={4}

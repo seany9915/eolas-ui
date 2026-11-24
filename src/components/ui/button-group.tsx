@@ -42,7 +42,7 @@ export const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupProps
             'inline-flex isolate',
             isHorizontal
               ? [
-                  'flex-row [&>*:not(:first-child)]:-ms-px',
+                  'flex-row max-w-full overflow-x-auto scrollbar-none p-1 -m-1 [&>*:not(:first-child)]:-ms-px',
                   // Horizontal fused edges: collapse inner corners while preserving outer radius
                   '[&>*:not(:first-child)]:rounded-s-none',
                   '[&>*:not(:last-child)]:rounded-e-none',

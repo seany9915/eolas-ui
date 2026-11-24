@@ -622,74 +622,73 @@ export function DataTableToolbar<TData extends RowData>({
   };
 
   return (
-    <div
-      data-slot="data-table-toolbar"
-      className="flex flex-col @sm:flex-row items-stretch @sm:items-center justify-between gap-3 w-full"
-    >
-      <div className="flex flex-1 flex-wrap items-center gap-2">
-        {showSearch ? (
-          <Field.Root className="w-full @sm:max-w-xs">
-            <Field.Label htmlFor={searchInputId} className="sr-only">
-              {searchPlaceholder}
-            </Field.Label>
-            <InputGroup size="sm">
-              <InputGroupAddon align="inline-start">
-                <Icon name="search" size="xs" aria-hidden="true" />
-              </InputGroupAddon>
-              <InputGroupInput
-                ref={searchInputRef}
-                id={searchInputId}
-                enterKeyHint="search"
-                placeholder={searchPlaceholder}
-                value={activeSearchValue}
-                onChange={(event) => handleSearchChange(event.target.value)}
-              />
-              {activeSearchValue && (
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    size="icon-xs"
-                    colorRole="neutral"
-                    aria-label="Clear search"
-                    onClick={handleClearSearch}
-                  >
-                    <Icon name="close" size="xs" aria-hidden="true" />
-                  </InputGroupButton>
+    <div data-slot="data-table-toolbar" className="@container w-full">
+      <div className="flex flex-col @xl:flex-row items-stretch @xl:items-center justify-between gap-3 w-full">
+        <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
+          {showSearch ? (
+            <Field.Root className="w-full min-w-0 @xl:max-w-xs">
+              <Field.Label htmlFor={searchInputId} className="sr-only">
+                {searchPlaceholder}
+              </Field.Label>
+              <InputGroup size="sm">
+                <InputGroupAddon align="inline-start">
+                  <Icon name="search" size="xs" aria-hidden="true" />
                 </InputGroupAddon>
-              )}
-            </InputGroup>
-          </Field.Root>
-        ) : null}
-        {facetedFilters?.map((filter) => {
-          const col = table.getColumn(filter.columnId);
-          if (!col) return null;
-          return (
-            <DataTableFacetedFilter
-              key={filter.columnId}
-              column={col}
-              title={filter.title}
-              options={filter.options}
-            />
-          );
-        })}
-        {isFiltered && (
-          <Button
-            variant="text"
-            colorRole="neutral"
-            size="sm"
-            className="shrink-0"
-            onClick={() => {
-              table.resetColumnFilters();
-              table.resetGlobalFilter();
-            }}
-          >
-            <span>Reset</span>
-            <Icon name="close" size="xs" aria-hidden="true" />
-          </Button>
-        )}
-      </div>
-      <div className="flex items-center gap-2 self-end @sm:self-auto">
-        {children}
-        {showColumnVisibility && <DataTableViewOptions table={table} />}
+                <InputGroupInput
+                  ref={searchInputRef}
+                  id={searchInputId}
+                  enterKeyHint="search"
+                  placeholder={searchPlaceholder}
+                  value={activeSearchValue}
+                  onChange={(event) => handleSearchChange(event.target.value)}
+                />
+                {activeSearchValue && (
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      size="icon-xs"
+                      colorRole="neutral"
+                      aria-label="Clear search"
+                      onClick={handleClearSearch}
+                    >
+                      <Icon name="close" size="xs" aria-hidden="true" />
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                )}
+              </InputGroup>
+            </Field.Root>
+          ) : null}
+          {facetedFilters?.map((filter) => {
+            const col = table.getColumn(filter.columnId);
+            if (!col) return null;
+            return (
+              <DataTableFacetedFilter
+                key={filter.columnId}
+                column={col}
+                title={filter.title}
+                options={filter.options}
+              />
+            );
+          })}
+          {isFiltered && (
+            <Button
+              variant="text"
+              colorRole="neutral"
+              size="sm"
+              className="shrink-0"
+              onClick={() => {
+                table.resetColumnFilters();
+                table.resetGlobalFilter();
+              }}
+            >
+              <span>Reset</span>
+              <Icon name="close" size="xs" aria-hidden="true" />
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 self-end @xl:self-auto shrink-0">
+          {children}
+          {showColumnVisibility && <DataTableViewOptions table={table} />}
+        </div>
       </div>
     </div>
   );
@@ -721,83 +720,82 @@ export function DataTablePagination<TData extends RowData>({
   return (
     <div
       data-slot="data-table-pagination"
-      className={cn(
-        'flex flex-col @sm:flex-row items-center justify-between gap-4 py-2 px-1 w-full',
-        className
-      )}
+      className={cn('@container w-full', className)}
       {...props}
     >
-      {showSelectedCount && (
-        <div className="font-sans text-xs text-on-surface-variant flex-1 select-none">
-          {selectedCount} of {totalCount} {totalCount === 1 ? 'row' : 'rows'} selected.
-        </div>
-      )}
-      <div className="flex flex-wrap items-center gap-4 @lg:gap-8 ms-auto">
-        <Field.Root orientation="horizontal" className="w-auto gap-2">
-          <Field.Label
-            htmlFor={pageSizeId}
-            className="whitespace-nowrap"
-          >
-            Rows per page
-          </Field.Label>
-          <Select
-            id={pageSizeId}
-            options={pageSizeOptions.map((size) => ({
-              label: String(size),
-              value: String(size),
-            }))}
-            value={String(table.state.pagination.pageSize)}
-            onValueChange={(val) => {
-              if (val) table.setPageSize(Number(val));
-            }}
-            size="sm"
-          />
-        </Field.Root>
-        <div className="flex items-center justify-center font-sans text-xs text-on-surface font-medium min-w-24 select-none">
-          Page {table.state.pagination.pageIndex + 1}
-          {hasKnownPageCount ? ` of ${Math.max(1, rawPageCount)}` : ''}
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="outline"
-            colorRole="neutral"
-            size="icon"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <Icon name="first_page" size="xs" directional aria-hidden="true" />
-            <span className="sr-only">Go to first page</span>
-          </Button>
-          <Button
-            variant="outline"
-            colorRole="neutral"
-            size="icon"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <Icon name="chevron_left" size="xs" directional aria-hidden="true" />
-            <span className="sr-only">Go to previous page</span>
-          </Button>
-          <Button
-            variant="outline"
-            colorRole="neutral"
-            size="icon"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <Icon name="chevron_right" size="xs" directional aria-hidden="true" />
-            <span className="sr-only">Go to next page</span>
-          </Button>
-          <Button
-            variant="outline"
-            colorRole="neutral"
-            size="icon"
-            onClick={() => hasKnownPageCount && table.setPageIndex(Math.max(0, rawPageCount - 1))}
-            disabled={!hasKnownPageCount || !table.getCanNextPage()}
-          >
-            <Icon name="last_page" size="xs" directional aria-hidden="true" />
-            <span className="sr-only">Go to last page</span>
-          </Button>
+      <div className="flex flex-col @2xl:flex-row items-center justify-between gap-4 py-2 px-1 w-full">
+        {showSelectedCount && (
+          <div className="font-sans text-xs text-on-surface-variant flex-1 select-none">
+            {selectedCount} of {totalCount} {totalCount === 1 ? 'row' : 'rows'} selected.
+          </div>
+        )}
+        <div className="flex flex-wrap items-center justify-center @2xl:justify-end gap-4 @3xl:gap-8 @2xl:ms-auto">
+          <Field.Root orientation="horizontal" className="w-auto gap-2">
+            <Field.Label
+              htmlFor={pageSizeId}
+              className="whitespace-nowrap"
+            >
+              Rows per page
+            </Field.Label>
+            <Select
+              id={pageSizeId}
+              options={pageSizeOptions.map((size) => ({
+                label: String(size),
+                value: String(size),
+              }))}
+              value={String(table.state.pagination.pageSize)}
+              onValueChange={(val) => {
+                if (val) table.setPageSize(Number(val));
+              }}
+              size="sm"
+            />
+          </Field.Root>
+          <div className="flex items-center justify-center font-sans text-xs text-on-surface font-medium min-w-24 select-none">
+            Page {table.state.pagination.pageIndex + 1}
+            {hasKnownPageCount ? ` of ${Math.max(1, rawPageCount)}` : ''}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              colorRole="neutral"
+              size="icon"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <Icon name="first_page" size="xs" directional aria-hidden="true" />
+              <span className="sr-only">Go to first page</span>
+            </Button>
+            <Button
+              variant="outline"
+              colorRole="neutral"
+              size="icon"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <Icon name="chevron_left" size="xs" directional aria-hidden="true" />
+              <span className="sr-only">Go to previous page</span>
+            </Button>
+            <Button
+              variant="outline"
+              colorRole="neutral"
+              size="icon"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <Icon name="chevron_right" size="xs" directional aria-hidden="true" />
+              <span className="sr-only">Go to next page</span>
+            </Button>
+            <Button
+              variant="outline"
+              colorRole="neutral"
+              size="icon"
+              onClick={() => hasKnownPageCount && table.setPageIndex(Math.max(0, rawPageCount - 1))}
+              disabled={!hasKnownPageCount || !table.getCanNextPage()}
+            >
+              <Icon name="last_page" size="xs" directional aria-hidden="true" />
+              <span className="sr-only">Go to last page</span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -123,11 +123,8 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
     (node: HTMLDivElement | null) => {
       rootRef.current = node;
       assignRef(ref, node);
-      if (!hasFieldWrapper) {
-        assignRef(containerRef, node);
-      }
     },
-    [ref, containerRef, hasFieldWrapper]
+    [ref]
   );
 
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? '');
@@ -213,8 +210,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       aria-label={!label && hasFieldWrapper ? 'One-time passcode' : undefined}
       className={composeClassName(
         cn(
-          !hasFieldWrapper && '@container',
-          'flex gap-1.5 @sm:gap-2 items-center',
+          'flex flex-wrap max-w-full gap-1 @xs:gap-1.5 @sm:gap-2 items-center',
           center ? 'justify-center' : 'justify-start'
         ),
         !hasFieldWrapper || isClassNameFn ? className : undefined
@@ -228,7 +224,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
           <React.Fragment key={idx}>
             {showSeparator && idx === sepIndex && (
               <BaseOTPField.Separator
-                className="text-on-surface-variant/60 flex items-center justify-center font-bold px-1 select-none"
+                className="text-on-surface-variant/60 flex items-center justify-center font-bold px-0.5 select-none"
                 aria-hidden="true"
               >
                 –
@@ -238,7 +234,8 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
               pattern={pattern}
               aria-label={idx === 0 ? undefined : `Character ${idx + 1} of ${length}`}
               className={cn(
-                'w-10 min-w-10 @sm:w-12 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded',
+                'w-10 min-w-10 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded',
+                length > 6 ? '@md:w-12' : '@sm:w-12',
                 'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
                 'border-outline hover:border-on-surface-variant/80',
                 'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
@@ -254,7 +251,11 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   );
 
   if (!hasFieldWrapper) {
-    return otpRoot;
+    return (
+      <div ref={containerRef} data-slot="otp-field-container" className="@container w-full max-w-full">
+        {otpRoot}
+      </div>
+    );
   }
 
   return (

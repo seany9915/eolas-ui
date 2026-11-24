@@ -105,18 +105,18 @@ export function Calendar({
     <DayPicker
       data-slot="calendar"
       showOutsideDays={showOutsideDays}
-      className={cn('w-fit p-3 bg-surface text-on-surface rounded-lg border border-outline-variant', className)}
+      className={cn('w-fit max-w-full overflow-x-auto p-3 bg-surface text-on-surface rounded-lg border border-outline-variant', className)}
       classNames={{
         root: 'p-1',
-        months: 'relative flex flex-col sm:flex-row gap-4',
+        months: 'relative flex flex-col sm:flex-row sm:flex-wrap gap-4',
         month: 'flex flex-col gap-4',
         month_caption: 'flex justify-center items-center h-9 px-9 relative',
         caption_label: 'inline-flex items-center gap-0.5 text-sm font-semibold font-label text-on-surface whitespace-nowrap select-none pointer-events-none',
         nav: 'absolute inset-x-0 top-0 flex items-center justify-between h-9 px-1 pointer-events-none z-10',
         button_previous:
-          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-1.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         button_next:
-          'pointer-events-auto relative after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
+          'pointer-events-auto relative after:absolute after:-inset-1.5 after:content-[\'\'] size-8 min-h-0 min-w-0 p-0 rounded inline-flex items-center justify-center bg-surface text-on-surface-variant border border-outline-variant hover:bg-state-hover hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-30 disabled:pointer-events-none',
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
         weekday: 'text-on-surface-variant rounded w-9 font-normal text-xs text-center font-sans select-none',
@@ -144,7 +144,7 @@ export function Calendar({
         dropdown:
           'absolute inset-0 size-full opacity-0 cursor-pointer appearance-none z-[5] focus-visible:outline-none',
         dropdown_root:
-          'relative inline-flex items-center rounded border border-outline bg-surface px-1.5 h-8 hover:bg-state-hover transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
+          'relative inline-flex items-center rounded border border-outline bg-surface px-1.5 h-9 hover:bg-state-hover transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary has-[:focus-visible]:border-primary',
         months_dropdown: '',
         years_dropdown: '',
         ...classNames,

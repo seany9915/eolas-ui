@@ -72,7 +72,7 @@ const AppShellDestinationMenu: React.FC<AppShellDestinationMenuProps> = ({
   activeId,
   onSelect,
 }) => {
-  const { isMobile, isEmbedded, setOpenMobile } = useSidebar();
+  const { isMobile, mobileBehavior, setOpenMobile } = useSidebar();
 
   return (
     <Sidebar.Group>
@@ -86,7 +86,7 @@ const AppShellDestinationMenu: React.FC<AppShellDestinationMenuProps> = ({
                   isActive={isActive}
                   onClick={() => {
                     onSelect(dest.id);
-                    if (isMobile && !isEmbedded) {
+                    if (isMobile && mobileBehavior === 'drawer') {
                       setOpenMobile(false);
                     }
                   }}
@@ -200,6 +200,9 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       if (activeDestinationId === undefined) {
         setInternalActiveId(id);
       }
+      if (embedded && sizeClass === 'mobile') {
+        setSidebarOpen(false);
+      }
       onDestinationChange?.(id);
     };
 
@@ -210,9 +213,11 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       collapsible === 'none' && sizeClass === 'mobile' && destinations.length > 0
         ? false
         : !embedded || sizeClass !== 'mobile' || hasCustomSidebarDrawer;
+    const isEmbeddedMobileOverlay = embedded && sizeClass === 'mobile' && showSidebar;
     const effectiveCollapsible =
       embedded && sizeClass === 'mobile' && collapsible === 'icon' ? 'offcanvas' : collapsible;
     const showMobileBar = destinations.length > 0 && (!embedded || sizeClass === 'mobile');
+    const canOpenSidebarOnShortMobile = showSidebar && collapsible !== 'none';
     const shouldShowMobileTrigger =
       showSidebarTriggerOnMobile ??
       Boolean(sidebarContent || sidebarFooter || destinations.length === 0);
@@ -223,9 +228,10 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         open={sidebarOpen}
         onOpenChange={setSidebarOpen}
         mobileBreakpoint={640}
+        mobileBehavior={embedded ? 'inline' : 'drawer'}
         embedded={embedded}
         className={cn(
-          embedded ? 'relative overflow-hidden h-full min-h-0' : 'w-full min-h-screen',
+          embedded ? 'relative overflow-hidden h-full min-h-0' : 'w-full min-h-svh',
           className
         )}
         {...props}
@@ -241,9 +247,13 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
 
         {/* Desktop & Tablet Collapsible Navigation Sidebar */}
         {showSidebar && (
-          <Sidebar collapsible={effectiveCollapsible} embedded={embedded}>
+          <Sidebar
+            collapsible={effectiveCollapsible}
+            embedded={embedded}
+            overlay={isEmbeddedMobileOverlay}
+          >
             {sidebarHeader && (
-              <Sidebar.Header className="min-h-16 h-16 short:min-h-14 short:h-14 justify-center">
+              <Sidebar.Header className="min-h-16 short:min-h-14 justify-center">
                 {sidebarHeader}
               </Sidebar.Header>
             )}
@@ -268,12 +278,12 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           {/* Top App Bar */}
           <header
             data-slot="app-shell-header"
-            className="sticky top-0 z-20 flex items-center justify-between gap-3 px-4 min-h-16 h-16 short:min-h-14 short:h-14 bg-surface border-b border-outline-variant transition-colors duration-quick ease-standard motion-reduce:transition-none shrink-0"
+            className="sticky top-0 z-20 flex items-center justify-between gap-3 px-4 py-2 min-h-16 short:min-h-14 bg-surface border-b border-outline-variant transition-colors duration-quick ease-standard motion-reduce:transition-none shrink-0"
           >
             <div
               className={cn(
                 'flex items-center gap-2 min-w-0',
-                topBarNav && 'shrink-0 max-w-44 sm:max-w-72'
+                topBarNav && 'shrink max-w-36 sm:max-w-72'
               )}
             >
               {showSidebar && collapsible !== 'none' && (
@@ -299,7 +309,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
               <div
                 data-slot="app-shell-top-nav"
                 className={cn(
-                  'items-stretch h-full min-w-0 flex-1',
+                  'items-stretch self-stretch min-w-0 flex-1',
                   embedded
                     ? destinations.length > 0 && sizeClass === 'mobile'
                       ? 'hidden'
@@ -316,7 +326,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             {topBarActions && (
               <div
                 data-slot="app-shell-top-actions"
-                className="flex items-center gap-2 shrink-0 h-full"
+                className="flex items-center gap-2 shrink-0"
               >
                 {topBarActions}
               </div>
@@ -348,7 +358,8 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 className={cn(
                   'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
                   // Safe bottom padding on mobile over the fixed navigation bar
-                  destinations.length > 0 && 'pb-28 sm:pb-6 short:pb-6'
+                  destinations.length > 0 &&
+                    (canOpenSidebarOnShortMobile ? 'pb-28 sm:pb-6 short:pb-6' : 'pb-28 sm:pb-6')
                 )}
               >
                 {children}
@@ -356,9 +367,9 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             </main>
           )}
 
-          {/* Mobile Bottom Navigation Bar (Hidden on >=640px and on compact height) */}
+          {/* Mobile Bottom Navigation Bar (Hidden on >=640px; hidden on compact height only when sidebar trigger can take over) */}
           {showMobileBar && (
-            <div className={cn('short:hidden', !embedded && 'block sm:hidden')}>
+            <div className={cn(canOpenSidebarOnShortMobile && 'short:hidden', !embedded && 'block sm:hidden')}>
               <NavigationBar
                 value={activeId}
                 onValueChange={handleSelectDestination}

@@ -186,7 +186,7 @@ function RadioComponentInner<Value = string>(
       <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">
         {radioNode}
       </div>
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 min-w-0 break-words">
         <span className="font-sans text-sm font-medium text-on-surface select-none group-has-[[data-disabled]]:text-on-surface-variant">
           {label}
         </span>

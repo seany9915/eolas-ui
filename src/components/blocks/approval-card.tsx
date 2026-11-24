@@ -189,7 +189,7 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
         )}
 
         {/* Card Footer with Multi-step Pagination & Action Triggers */}
-        <Card.Footer className="justify-between gap-3">
+        <Card.Footer className="flex-wrap justify-between gap-3">
           {stepCurrent && stepTotal ? (
             <div className="flex items-center gap-1.5 text-on-surface-variant font-mono text-xs tabular-nums select-none">
               {onPreviousStep && (
@@ -220,11 +220,9 @@ export const ApprovalCard = React.forwardRef<HTMLDivElement, ApprovalCardProps>(
                 </Button>
               )}
             </div>
-          ) : (
-            <div />
-          )}
+          ) : null}
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2 ms-auto">
             {onSkip && (
               <Button type="button" variant="outline" colorRole="neutral" size="sm" onClick={onSkip}>
                 {skipLabel}

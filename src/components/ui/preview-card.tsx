@@ -44,11 +44,15 @@ export interface PreviewCardPositionerProps
   extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Positioner> {}
 
 export const PreviewCardPositioner = React.forwardRef<HTMLDivElement, PreviewCardPositionerProps>(
-  ({ className, sideOffset = 8, ...props }, ref) => (
+  ({ className, sideOffset = 8, collisionPadding = 8, ...props }, ref) => (
     <BasePreviewCard.Positioner
       ref={ref}
       sideOffset={sideOffset}
-      className={composeClassName('z-50 outline-none', className)}
+      collisionPadding={collisionPadding}
+      className={composeClassName(
+        'z-50 outline-none max-w-[min(var(--available-width),calc(100vw-1rem))]',
+        className
+      )}
       {...props}
     />
   )
@@ -92,17 +96,42 @@ export interface PreviewCardPopupProps
   extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Popup> {}
 
 export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopupProps>(
-  ({ className, ...props }, ref) => (
-    <BasePreviewCard.Popup
-      ref={ref}
-      data-slot="preview-card-content"
-      className={composeClassName(
-        'w-72 p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2 transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98] motion-reduce:transition-none motion-reduce:transform-none',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, children, ...props }, ref) => {
+    const childArray = React.Children.toArray(children);
+    const arrowChildren: React.ReactNode[] = [];
+    const bodyChildren: React.ReactNode[] = [];
+
+    for (const child of childArray) {
+      if (
+        React.isValidElement(child) &&
+        (child.type === PreviewCardArrow || child.type === BasePreviewCard.Arrow)
+      ) {
+        arrowChildren.push(child);
+      } else {
+        bodyChildren.push(child);
+      }
+    }
+
+    return (
+      <BasePreviewCard.Popup
+        ref={ref}
+        data-slot="preview-card-content"
+        className={composeClassName(
+          'relative w-72 max-w-full max-h-[var(--available-height)] p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98] motion-reduce:transition-none motion-reduce:transform-none',
+          className
+        )}
+        {...props}
+      >
+        {arrowChildren}
+        <div
+          data-slot="preview-card-body"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain flex flex-col gap-2"
+        >
+          {bodyChildren}
+        </div>
+      </BasePreviewCard.Popup>
+    );
+  }
 );
 PreviewCardPopup.displayName = 'PreviewCardPopup';
 

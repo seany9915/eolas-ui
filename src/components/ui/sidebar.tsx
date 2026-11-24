@@ -37,6 +37,8 @@ export const SIDEBAR_WIDTH_MOBILE = '18rem';
 export const SIDEBAR_WIDTH_ICON = '3.5rem';
 export const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
+export type SidebarMobileBehavior = 'drawer' | 'hidden' | 'inline';
+
 export interface SidebarContext {
   state: 'expanded' | 'collapsed';
   open: boolean;
@@ -45,6 +47,7 @@ export interface SidebarContext {
   setOpenMobile: (open: boolean | ((value: boolean) => boolean)) => void;
   isMobile: boolean;
   mobileBreakpoint: number;
+  mobileBehavior: SidebarMobileBehavior;
   isEmbedded: boolean;
   toggleSidebar: () => void;
 }
@@ -75,6 +78,19 @@ function useIsMobile(breakpoint = 768) {
   return isMobile;
 }
 
+function getDesktopBreakpointClasses(mobileBreakpoint: number) {
+  if (mobileBreakpoint <= 640) {
+    return { block: 'hidden sm:block', flex: 'hidden sm:flex', railFlex: 'sm:flex' };
+  }
+  if (mobileBreakpoint >= 1280) {
+    return { block: 'hidden xl:block', flex: 'hidden xl:flex', railFlex: 'xl:flex' };
+  }
+  if (mobileBreakpoint >= 1024) {
+    return { block: 'hidden lg:block', flex: 'hidden lg:flex', railFlex: 'lg:flex' };
+  }
+  return { block: 'hidden md:block', flex: 'hidden md:flex', railFlex: 'md:flex' };
+}
+
 /* -------------------------------------------------------------------------------------------------
  * SidebarProvider
  * -----------------------------------------------------------------------------------------------*/
@@ -82,8 +98,20 @@ export interface SidebarProviderProps extends React.HTMLAttributes<HTMLDivElemen
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Viewport pixel breakpoint below which non-embedded sidebars render as a mobile Drawer. Defaults to 768. */
+  /** Viewport pixel breakpoint below which sidebars switch to mobileBehavior. Defaults to 768. */
   mobileBreakpoint?: number;
+  /**
+   * Controls how the sidebar behaves below `mobileBreakpoint` (works independently of `embedded`):
+   * - `'drawer'` (default): collapses into a Base UI slide-over Drawer on mobile and hides inline chrome.
+   * - `'hidden'`: hides the sidebar below `mobileBreakpoint` without rendering a mobile Drawer.
+   * - `'inline'`: keeps the sidebar rendered inline inside its container at all viewport widths (for contained previews).
+   */
+  mobileBehavior?: SidebarMobileBehavior;
+  /**
+   * Confines desktop sidebar height and positioning (`h-full` / `absolute`) to its parent container
+   * instead of full-viewport `h-svh` / `fixed` (for example, below a top `<Header>`).
+   * Mobile responsiveness is governed separately by `mobileBehavior`.
+   */
   embedded?: boolean;
 }
 
@@ -94,6 +122,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
       open: openProp,
       onOpenChange: setOpenProp,
       mobileBreakpoint = 768,
+      mobileBehavior = 'drawer',
       embedded = false,
       className,
       style,
@@ -142,10 +171,10 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     );
 
     const toggleSidebar = React.useCallback(() => {
-      return isMobile && !isEmbedded
+      return isMobile && mobileBehavior === 'drawer'
         ? setOpenMobile((prev) => !prev)
         : setOpen((prev) => !prev);
-    }, [isMobile, isEmbedded, setOpen, setOpenMobile]);
+    }, [isMobile, mobileBehavior, setOpen, setOpenMobile]);
 
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -171,12 +200,24 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
         setOpen,
         isMobile,
         mobileBreakpoint,
+        mobileBehavior,
         isEmbedded,
         openMobile,
         setOpenMobile,
         toggleSidebar,
       }),
-      [state, open, setOpen, isMobile, mobileBreakpoint, isEmbedded, openMobile, setOpenMobile, toggleSidebar]
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        mobileBreakpoint,
+        mobileBehavior,
+        isEmbedded,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+      ]
     );
 
     return (
@@ -217,6 +258,10 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'sidebar' | 'floating' | 'inset';
   collapsible?: 'offcanvas' | 'icon' | 'none';
   embedded?: boolean;
+  /** When true on an embedded sidebar, overlays workspace content without reserving `sidebar-gap` width. */
+  overlay?: boolean;
+  /** Overrides `SidebarProvider`'s `mobileBehavior` for this sidebar (`'drawer' | 'hidden' | 'inline'`). */
+  mobileBehavior?: SidebarMobileBehavior;
 }
 
 export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
@@ -226,13 +271,23 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
       variant = 'sidebar',
       collapsible = 'offcanvas',
       embedded,
+      overlay = false,
+      mobileBehavior,
       className,
       children,
       ...props
     },
     ref
   ) => {
-    const { isMobile, mobileBreakpoint, state, openMobile, setOpenMobile, isEmbedded: contextEmbedded } = useSidebar();
+    const {
+      isMobile,
+      mobileBreakpoint,
+      mobileBehavior: contextMobileBehavior,
+      state,
+      openMobile,
+      setOpenMobile,
+      isEmbedded: contextEmbedded,
+    } = useSidebar();
     const isEmbedded =
       embedded ??
       contextEmbedded ??
@@ -240,8 +295,9 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
         className?.includes('relative') ||
         className?.includes('absolute') ||
         false);
-    const desktopVisibleClass = mobileBreakpoint <= 640 ? 'hidden sm:block' : 'hidden md:block';
-    const desktopFlexClass = mobileBreakpoint <= 640 ? 'hidden sm:flex' : 'hidden md:flex';
+    const effectiveMobileBehavior = mobileBehavior ?? contextMobileBehavior;
+    const { block: desktopVisibleClass, flex: desktopFlexClass } =
+      getDesktopBreakpointClasses(mobileBreakpoint);
 
     if (collapsible === 'none') {
       return (
@@ -262,7 +318,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
       );
     }
 
-    if (isMobile && !isEmbedded) {
+    if (isMobile && effectiveMobileBehavior === 'drawer') {
       return (
         <BaseDrawer.Root
           open={openMobile}
@@ -314,13 +370,19 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
       );
     }
 
+    const containerVisibilityClass =
+      effectiveMobileBehavior === 'inline' ? 'block' : desktopVisibleClass;
+    const asideVisibilityClass =
+      effectiveMobileBehavior === 'inline' ? 'flex' : desktopFlexClass;
+
     return (
       <div
         ref={ref}
         data-slot="sidebar-container"
         className={cn(
           'group peer text-on-surface select-none',
-          isEmbedded ? 'relative h-full shrink-0 block' : desktopVisibleClass
+          isEmbedded && 'relative h-full shrink-0',
+          containerVisibilityClass
         )}
         data-state={state}
         data-collapsible={state === 'collapsed' ? collapsible : ''}
@@ -333,6 +395,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           className={cn(
             'duration-[var(--duration-slow)] relative w-[var(--sidebar-width)] bg-transparent transition-[width] ease-[var(--ease-standard)] motion-reduce:transition-none',
             isEmbedded ? 'h-full' : 'h-svh',
+            overlay && 'w-0',
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
@@ -357,8 +420,12 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
             className,
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
             isEmbedded
-              ? 'absolute inset-y-0 z-20 h-full w-[var(--sidebar-width)] flex flex-col'
-              : cn('fixed inset-y-0 z-20 flex-col h-svh w-[var(--sidebar-width)]', desktopFlexClass)
+              ? cn(
+                  'absolute inset-y-0 h-full w-[var(--sidebar-width)] max-w-full flex-col',
+                  overlay ? 'z-30 shadow-modal' : 'z-20',
+                  asideVisibilityClass
+                )
+              : cn('fixed inset-y-0 z-20 flex-col h-svh w-[var(--sidebar-width)]', asideVisibilityClass)
           )}
           {...props}
         >
@@ -389,8 +456,8 @@ export interface SidebarTriggerProps extends React.ComponentPropsWithoutRef<type
 
 export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
   ({ className, onClick, icon, children, ...props }, ref) => {
-    const { toggleSidebar, state, isMobile, isEmbedded, openMobile } = useSidebar();
-    const isOpen = isMobile && !isEmbedded ? openMobile : state === 'expanded';
+    const { toggleSidebar, state, isMobile, mobileBehavior, openMobile } = useSidebar();
+    const isOpen = isMobile && mobileBehavior === 'drawer' ? openMobile : state === 'expanded';
     const shortcutLabel =
       typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent)
         ? '⌘B'
@@ -433,7 +500,7 @@ export const SidebarRail = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseButton>
 >(({ className, render, nativeButton, ...props }, ref) => {
   const { toggleSidebar, mobileBreakpoint } = useSidebar();
-  const desktopFlexClass = mobileBreakpoint <= 640 ? 'sm:flex' : 'md:flex';
+  const { railFlex: desktopFlexClass } = getDesktopBreakpointClasses(mobileBreakpoint);
 
   return (
     <Tooltip content="Toggle Sidebar">
@@ -488,7 +555,8 @@ export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
         className: cn(
           'relative flex flex-1 flex-col bg-surface',
           isEmbedded ? 'min-h-0 h-full' : 'min-h-svh',
-          'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
+          !isEmbedded && 'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)]',
+          'md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
           className
         ),
         ...props,

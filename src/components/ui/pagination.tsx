@@ -102,7 +102,7 @@ export const PaginationPrevious = React.forwardRef<
     {...props}
   >
     <Icon name="chevron_left" size="sm" directional className="text-base" />
-    <span className="hidden @sm:inline">{children}</span>
+    <span className="hidden @md:inline">{children}</span>
   </PaginationLink>
 ));
 PaginationPrevious.displayName = 'PaginationPrevious';
@@ -122,7 +122,7 @@ export const PaginationNext = React.forwardRef<
     className={cn('gap-1 ps-3.5 pe-2.5', className)}
     {...props}
   >
-    <span className="hidden @sm:inline">{children}</span>
+    <span className="hidden @md:inline">{children}</span>
     <Icon name="chevron_right" size="sm" directional className="text-base" />
   </PaginationLink>
 ));

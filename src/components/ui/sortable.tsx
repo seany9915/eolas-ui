@@ -144,10 +144,10 @@ export const SortableList = React.forwardRef<HTMLDivElement, SortableListProps>(
       orientation === 'horizontal'
         ? 'flex flex-row flex-wrap gap-2'
         : orientation === 'grid'
-          ? 'grid grid-cols-1 sm:grid-cols-2 gap-3'
+          ? 'grid grid-cols-1 @lg:grid-cols-2 gap-3'
           : 'flex flex-col gap-2';
 
-    return useRender({
+    const listElement = useRender({
       defaultTagName: 'div',
       render,
       ref,
@@ -159,6 +159,16 @@ export const SortableList = React.forwardRef<HTMLDivElement, SortableListProps>(
         ...props,
       },
     });
+
+    if (orientation === 'grid') {
+      return (
+        <div data-slot="sortable-list-container" className="@container w-full">
+          {listElement}
+        </div>
+      );
+    }
+
+    return listElement;
   }
 );
 SortableList.displayName = 'Sortable.List';
@@ -236,7 +246,7 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
         'data-disabled': disabled ? '' : undefined,
         role,
         className: cn(
-          'relative flex items-center gap-3 rounded-md border border-outline-variant bg-surface p-3 text-on-surface',
+          'relative flex min-w-0 items-center gap-3 rounded-md border border-outline-variant bg-surface p-3 text-on-surface',
           'transition-[border-color,background-color,box-shadow,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           isDragging && hasOverlay && 'transition-none border-dashed border-outline-variant bg-surface-container-low [&>*]:opacity-0',

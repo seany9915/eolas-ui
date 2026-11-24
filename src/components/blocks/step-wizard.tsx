@@ -279,25 +279,25 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
         {showNavigationButtons && (
           <>
             <Separator className="mt-4 mb-0" />
-            <Card.Footer className="justify-between">
-              <div className={cn('flex items-center', isFirstStep && 'invisible')}>
+            <Card.Footer className="flex-wrap justify-between gap-3">
+              {!isFirstStep && (
                 <Button
                   type="button"
                   variant="outline"
                   colorRole="neutral"
                   size="md"
                   onClick={handlePrevious}
-                  disabled={isFirstStep}
                 >
                   <Icon name="chevron_left" size="sm" directional aria-hidden="true" />
                   <span>{previousLabel}</span>
                 </Button>
-              </div>
+              )}
               <Button
                 type="button"
                 variant="filled"
                 size="md"
                 onClick={handleNext}
+                className="ms-auto"
               >
                 <span>{isLastStep ? completeLabel : nextLabel}</span>
                 {!isLastStep && <Icon name="chevron_right" size="sm" directional aria-hidden="true" />}

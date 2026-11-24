@@ -64,7 +64,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
       emptyTitle,
       emptyDescription,
       chartLabel,
-      contentClassName = 'h-64 w-full',
+      contentClassName,
       className,
       ...props
     },
@@ -72,6 +72,8 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
   ) => {
     const gradientIdPrefix = React.useId().replace(/:/g, '');
     const shouldShowLegend = showLegend ?? (series.length > 1);
+    const resolvedContentClassName =
+      contentClassName ?? (shouldShowLegend ? 'h-72 w-full' : 'h-64 w-full');
     const resolvedConfig = React.useMemo(() => applySeriesOverrides(config, series), [config, series]);
     const resolvedEmpty = isEmpty ?? (!data || data.length === 0 || series.length === 0);
 
@@ -87,7 +89,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
         isEmpty={resolvedEmpty}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
-        contentClassName={contentClassName}
+        contentClassName={resolvedContentClassName}
         className={className}
         {...props}
       >
@@ -136,7 +138,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
             />
             {showYAxis && (
               <YAxis
-                width={36}
+                width="auto"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={4}

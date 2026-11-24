@@ -60,9 +60,13 @@ const SuggestionChipsRoot = React.forwardRef<HTMLDivElement, SuggestionChipsRoot
 );
 SuggestionChipsRoot.displayName = 'SuggestionChips.Root';
 
+export type SuggestionChipsLayout = 'wrap' | 'scroll' | 'stack' | 'responsive';
+
+const SuggestionChipsListContext = React.createContext<SuggestionChipsLayout>('wrap');
+
 export interface SuggestionChipsListProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
-  layout?: 'wrap' | 'scroll' | 'stack';
+  layout?: SuggestionChipsLayout;
   align?: 'start' | 'center' | 'end';
   className?: string;
 }
@@ -138,24 +142,29 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
     };
 
     return (
-      <div
-        ref={setCombinedRef}
-        data-slot="suggestion-chips-list"
-        onKeyDown={handleKeyDown}
-        className={cn(
-          layout === 'wrap' && 'flex flex-wrap gap-2',
-          layout === 'scroll' && 'flex overflow-x-auto gap-2 pb-1 scrollbar-none',
-          layout === 'stack' && 'flex flex-col gap-2',
-          layout !== 'stack' && align === 'center' && 'justify-center',
-          layout !== 'stack' && align === 'end' && 'justify-end',
-          layout === 'stack' && align === 'center' && 'items-center',
-          layout === 'stack' && align === 'end' && 'items-end',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <SuggestionChipsListContext.Provider value={layout}>
+        <div
+          ref={setCombinedRef}
+          data-slot="suggestion-chips-list"
+          data-layout={layout}
+          onKeyDown={handleKeyDown}
+          className={cn(
+            layout === 'wrap' && 'flex flex-wrap gap-2',
+            layout === 'scroll' && 'flex overflow-x-auto gap-2 py-1 -my-1 px-1 -mx-1 scrollbar-none max-w-full',
+            layout === 'responsive' &&
+              'flex overflow-x-auto gap-2 py-1 -my-1 px-1 -mx-1 scrollbar-none max-w-full @sm:flex-wrap @sm:overflow-visible @sm:py-0 @sm:my-0 @sm:px-0 @sm:mx-0',
+            layout === 'stack' && 'flex flex-col gap-2',
+            layout !== 'stack' && align === 'center' && 'justify-center',
+            layout !== 'stack' && align === 'end' && 'justify-end',
+            layout === 'stack' && align === 'center' && 'items-center',
+            layout === 'stack' && align === 'end' && 'items-end',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </SuggestionChipsListContext.Provider>
     );
   }
 );
@@ -192,6 +201,10 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
     itemLabel ||
     (typeof children === 'string' ? children : 'Suggested question');
 
+  const listLayout = React.useContext(SuggestionChipsListContext);
+  const isScrollLayout = listLayout === 'scroll';
+  const isResponsiveLayout = listLayout === 'responsive';
+
   const handleClick = () => {
     onSelect?.(itemPrompt);
     onClick?.(itemPrompt);
@@ -205,6 +218,8 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         onClick={handleClick}
         className={cn(
           'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
+          isScrollLayout && 'shrink-0 w-max max-w-full',
+          isResponsiveLayout && '@max-sm:shrink-0 @max-sm:w-max max-w-full',
           'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
@@ -244,7 +259,12 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
         onClick={handleClick}
         expandedTouchTarget
         className={cn(
-          'group inline-flex items-center gap-2 px-3 py-1 h-8 rounded-full',
+          'group inline-flex items-center gap-2 px-3 py-1.5 min-h-8 h-auto rounded-full',
+          isScrollLayout
+            ? 'shrink-0 whitespace-nowrap'
+            : isResponsiveLayout
+              ? '@max-sm:shrink-0 @max-sm:whitespace-nowrap @sm:max-w-full'
+              : 'max-w-full',
           'bg-transparent border-0 hover:bg-state-hover text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
@@ -260,7 +280,12 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
             aria-hidden="true"
           />
         )}
-        <span className="text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
+        <span
+          className={cn(
+            'text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors',
+            !isScrollLayout && (isResponsiveLayout ? '@sm:min-w-0 @sm:break-words' : 'min-w-0 break-words')
+          )}
+        >
           {children || itemLabel}
         </span>
         {showArrow && (
@@ -283,7 +308,12 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
       onClick={handleClick}
       expandedTouchTarget
       className={cn(
-        'group inline-flex items-center gap-2 px-3.5 py-1 h-8 rounded-full',
+        'group inline-flex items-center gap-2 px-3.5 py-1.5 min-h-8 h-auto rounded-full',
+        isScrollLayout
+          ? 'shrink-0 whitespace-nowrap'
+          : isResponsiveLayout
+            ? '@max-sm:shrink-0 @max-sm:whitespace-nowrap @sm:max-w-full'
+            : 'max-w-full',
         'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
@@ -299,7 +329,12 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
           aria-hidden="true"
         />
       )}
-      <span className="text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors">
+      <span
+        className={cn(
+          'text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors',
+          !isScrollLayout && (isResponsiveLayout ? '@sm:min-w-0 @sm:break-words' : 'min-w-0 break-words')
+        )}
+      >
         {children || itemLabel}
       </span>
       {showArrow && (
@@ -320,7 +355,7 @@ export interface SuggestionChipsProps {
   suggestions?: (SuggestionItem | string)[];
   onSelect?: (prompt: string) => void;
   label?: string;
-  layout?: 'wrap' | 'scroll' | 'stack';
+  layout?: SuggestionChipsLayout;
   align?: 'start' | 'center' | 'end';
   variant?: 'compact' | 'card' | 'ghost';
   className?: string;

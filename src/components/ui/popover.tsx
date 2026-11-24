@@ -134,7 +134,7 @@ function PopoverComponentInner<Payload = unknown>(
       sideOffset={sideOffset}
       alignOffset={alignOffset}
       collisionPadding={collisionPadding}
-      className="z-50 outline-none"
+      className="z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none"
     >
       <BasePopover.Popup
         ref={ref}
@@ -142,31 +142,33 @@ function PopoverComponentInner<Payload = unknown>(
         initialFocus={initialFocus}
         finalFocus={finalFocus}
         className={composeClassName(
-          'w-80 p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+          'relative flex flex-col w-80 max-w-full max-h-[var(--available-height)] rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
           className
         )}
       >
         {showArrow && <PopoverArrow />}
-        {title && (
-          <BasePopover.Title data-slot="popover-title" className="font-heading text-base font-bold text-on-surface mb-1.5">
-            {title}
-          </BasePopover.Title>
-        )}
-        {description && (
-          <BasePopover.Description data-slot="popover-description" className="font-sans text-sm text-on-surface-variant mb-3 leading-relaxed">
-            {description}
-          </BasePopover.Description>
-        )}
-        <div className="font-sans text-sm text-on-surface-variant leading-relaxed">
-          {typeof children === 'function' ? children(renderProps) : children}
-        </div>
-        {showCloseButton && (
-          <div className="mt-4 pt-3 border-t border-outline-variant flex justify-end">
-            <BasePopover.Close data-slot="popover-close" className="inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              {closeLabel}
-            </BasePopover.Close>
+        <div data-slot="popover-body" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5">
+          {title && (
+            <BasePopover.Title data-slot="popover-title" className="font-heading text-base font-bold text-on-surface mb-1.5">
+              {title}
+            </BasePopover.Title>
+          )}
+          {description && (
+            <BasePopover.Description data-slot="popover-description" className="font-sans text-sm text-on-surface-variant mb-3 leading-relaxed">
+              {description}
+            </BasePopover.Description>
+          )}
+          <div className="font-sans text-sm text-on-surface-variant leading-relaxed">
+            {typeof children === 'function' ? children(renderProps) : children}
           </div>
-        )}
+          {showCloseButton && (
+            <div className="mt-4 pt-3 border-t border-outline-variant flex justify-end">
+              <BasePopover.Close data-slot="popover-close" className="inline-flex items-center justify-center h-11 min-h-[44px] px-4 rounded bg-surface text-on-surface border border-outline font-label text-sm font-semibold cursor-pointer hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {closeLabel}
+              </BasePopover.Close>
+            </div>
+          )}
+        </div>
       </BasePopover.Popup>
     </BasePopover.Positioner>
   );
@@ -305,19 +307,21 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
         sideOffset={sideOffset}
         alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={composeClassName('z-50 outline-none', containerClassName)}
+        className={composeClassName('z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none', containerClassName)}
       >
         <BasePopover.Popup
           ref={ref}
           data-slot="popover-content"
           className={composeClassName(
-            'w-80 p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+            'relative flex flex-col w-80 max-w-full max-h-[var(--available-height)] p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
         >
           {showArrow && <PopoverArrow />}
-          {children}
+          <div data-slot="popover-body" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            {children}
+          </div>
         </BasePopover.Popup>
       </BasePopover.Positioner>
     );

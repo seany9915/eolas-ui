@@ -116,7 +116,7 @@ function AlertDialogComponent<Payload = unknown>({
                 className={composeClassName(
                   cn(
                     '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-                    isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
+                    isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
                     dialogSizeClasses[size] || dialogSizeClasses.md
                   ),
                   className
@@ -126,7 +126,7 @@ function AlertDialogComponent<Payload = unknown>({
                   <span className="material-symbols-outlined text-error text-2xl mt-0.5 shrink-0" aria-hidden="true">
                     warning
                   </span>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <BaseAlertDialog.Title data-slot="alert-dialog-title" className={cn('font-heading text-lg font-bold text-on-surface', !title && 'sr-only')}>
                       {title || 'Alert'}
                     </BaseAlertDialog.Title>
@@ -138,7 +138,7 @@ function AlertDialogComponent<Payload = unknown>({
                   </div>
                 </div>
                 {typeof children === 'function' ? children(renderProps) : children}
-                <div data-slot="alert-dialog-footer" className="flex items-center justify-end gap-3 pt-3 border-t border-outline-variant">
+                <div data-slot="alert-dialog-footer" className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-outline-variant">
                   <BaseAlertDialog.Close
                     data-slot="alert-dialog-cancel"
                     render={
@@ -226,7 +226,7 @@ export const AlertDialogContent = React.forwardRef<HTMLDivElement, AlertDialogCo
             className={composeClassName(
               cn(
                 '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-                isOutsideScroll ? 'my-auto' : 'max-h-[calc(100vh-2rem)] overflow-y-auto',
+                isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
                 dialogSizeClasses[size] || dialogSizeClasses.md
               ),
               className
@@ -287,7 +287,7 @@ AlertDialogBody.displayName = 'AlertDialogBody';
 
 export const AlertDialogFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="alert-dialog-footer" className={cn('flex items-center justify-end gap-3 pt-3 border-t border-outline-variant', className)} {...props} />
+    <div ref={ref} data-slot="alert-dialog-footer" className={cn('flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-outline-variant', className)} {...props} />
   )
 );
 AlertDialogFooter.displayName = 'AlertDialogFooter';

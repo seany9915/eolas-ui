@@ -70,7 +70,7 @@ export const DeleteConfirmationDialog = React.forwardRef<
           <div className="flex items-center justify-center size-11 rounded-full bg-error-container text-on-error-container shrink-0">
             <Icon name="delete" size="lg" aria-hidden="true" />
           </div>
-          <AlertDialog.Header className="mt-1">
+          <AlertDialog.Header className="mt-1 min-w-0 flex-1 break-words">
             <AlertDialog.Title>{title}</AlertDialog.Title>
             <AlertDialog.Description>{description ?? defaultDescription}</AlertDialog.Description>
             {failed && (
@@ -81,7 +81,7 @@ export const DeleteConfirmationDialog = React.forwardRef<
           </AlertDialog.Header>
         </div>
 
-        <AlertDialog.Footer className="mt-6">
+        <AlertDialog.Footer className="mt-6 flex-wrap">
           <Button
             variant="outline"
             colorRole="neutral"

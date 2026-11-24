@@ -53,50 +53,42 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
     const isDashed = variant === 'dashed';
     const isDefault = variant === 'default';
 
+    const rootClasses = cn(
+      '@container flex w-full min-w-0 flex-1 flex-col my-4',
+      isDefault && 'rounded-lg bg-surface border border-outline-variant',
+      isDashed && 'rounded-lg bg-surface border border-dashed border-outline-variant',
+      isFlush && 'border-none bg-transparent shadow-none',
+      className
+    );
+    const innerClasses =
+      'flex w-full min-w-0 flex-1 flex-col items-center justify-center p-6 @sm:p-12 text-center text-balance';
+
     // If compound children are provided, render children inside the styled container
     if (children) {
       return (
-        <div
-          ref={ref}
-          data-slot="empty"
-          className={cn(
-            '@container flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
-            isDefault && 'rounded-lg bg-surface border border-outline-variant',
-            isDashed && 'rounded-lg bg-surface border border-dashed border-outline-variant',
-            isFlush && 'border-none bg-transparent shadow-none',
-            className
-          )}
-          {...props}
-        >
-          {children}
+        <div ref={ref} data-slot="empty" className={rootClasses} {...props}>
+          <div data-slot="empty-inner" className={innerClasses}>
+            {children}
+          </div>
         </div>
       );
     }
 
     // Convenience shorthand rendering when children are omitted
     return (
-      <div
-        ref={ref}
-        data-slot="empty"
-        className={cn(
-          '@container flex w-full min-w-0 flex-1 flex-col items-center justify-center p-8 @sm:p-12 text-center text-balance my-4',
-          isDefault && 'rounded-lg bg-surface border border-outline-variant',
-          isDashed && 'rounded-lg bg-surface border border-dashed border-outline-variant',
-          isFlush && 'border-none bg-transparent shadow-none',
-          className
-        )}
-        {...props}
-      >
-        <EmptyHeader>
-          {icon && (
-            <EmptyMedia variant="icon">
-              <Icon name={icon} size="xl" {...iconProps} />
-            </EmptyMedia>
-          )}
-          {title && <EmptyTitle>{title}</EmptyTitle>}
-          {description && <EmptyDescription>{description}</EmptyDescription>}
-        </EmptyHeader>
-        {action && <EmptyContent>{action}</EmptyContent>}
+      <div ref={ref} data-slot="empty" className={rootClasses} {...props}>
+        <div data-slot="empty-inner" className={innerClasses}>
+          <EmptyHeader>
+            {icon && (
+              <EmptyMedia variant="icon">
+                <Icon name={icon} size="xl" {...iconProps} />
+              </EmptyMedia>
+            )}
+            {title && <EmptyTitle>{title}</EmptyTitle>}
+            {description && <EmptyDescription>{description}</EmptyDescription>}
+          </EmptyHeader>
+          {action && <EmptyContent>{action}</EmptyContent>}
+        </div>
       </div>
     );
   }

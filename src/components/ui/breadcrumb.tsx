@@ -30,7 +30,7 @@ export const BreadcrumbList = React.forwardRef<
     ref={ref}
     data-slot="breadcrumb-list"
     className={cn(
-      'flex flex-wrap items-center gap-1.5 font-sans text-sm text-on-surface-variant break-words',
+      'flex flex-wrap items-center gap-x-1.5 gap-y-2 font-sans text-sm text-on-surface-variant break-words',
       className
     )}
     {...props}
@@ -56,20 +56,28 @@ export interface BreadcrumbLinkProps extends React.ComponentPropsWithoutRef<'a'>
 }
 
 export const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
-  ({ className, render, ...props }, ref) =>
-    useRender({
+  ({ className, render, children, ...props }, ref) => {
+    const wrappedChildren =
+      children !== undefined ? (
+        <span className="truncate max-w-[200px] @sm:max-w-none">{children}</span>
+      ) : undefined;
+
+    return useRender({
       render,
       ref,
       defaultTagName: 'a',
       props: {
         'data-slot': 'breadcrumb-link',
         className: cn(
-          'transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm truncate max-w-[200px] @sm:max-w-none',
+          'relative inline-flex items-center max-w-full transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm after:absolute after:inset-x-0 after:-inset-y-3 after:content-[\'\']',
+          children === undefined && 'truncate max-w-[200px] @sm:max-w-none',
           className
         ),
         ...props,
+        ...(wrappedChildren !== undefined ? { children: wrappedChildren } : {}),
       },
-    })
+    });
+  }
 );
 BreadcrumbLink.displayName = 'BreadcrumbLink';
 

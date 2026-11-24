@@ -119,7 +119,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         className="flex-1 flex flex-col min-w-0 min-h-0 bg-surface"
       >
         {canvasToolbar && (
-          <div className="px-4 @md:px-6 py-2.5 border-b border-outline-variant/60 flex items-center justify-between gap-3 bg-surface shrink-0 min-w-0">
+          <div className="px-4 @md:px-6 py-2.5 border-b border-outline-variant/60 flex flex-wrap items-center justify-between gap-3 bg-surface shrink-0 min-w-0">
             {canvasToolbar}
           </div>
         )}
@@ -144,8 +144,8 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
           isOpen
             ? cn(
                 paneWidthClassName,
-                // Compact (<768px) stacked panel caps height so primary canvas remains usable
-                'w-full h-auto max-h-96 short:max-h-48 @3xl:max-h-none opacity-100',
+                // Compact (<768px) stacked panel caps height so primary canvas keeps majority height
+                'w-full h-auto max-h-64 @sm:max-h-72 short:max-h-40 @3xl:max-h-none opacity-100',
                 // Wide (@3xl+) full-height side panel
                 '@3xl:h-full',
                 side === 'left'
@@ -204,7 +204,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         {...props}
       >
         {/* Top Application Header Bar */}
-        <div className="min-h-14 h-14 short:min-h-13 short:h-13 px-4 @md:px-6 border-b border-outline-variant flex items-center justify-between gap-3 bg-surface shrink-0">
+        <div className="min-h-14 short:min-h-13 py-2 px-4 @md:px-6 border-b border-outline-variant flex flex-wrap items-center justify-between gap-3 bg-surface shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             {title && (
               <h2 className="font-heading text-base @md:text-headline-sm font-semibold text-on-surface truncate">

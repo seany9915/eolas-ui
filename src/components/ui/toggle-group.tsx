@@ -76,20 +76,30 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
     const groupContext = React.useContext(ToggleGroupContext);
     const effectiveSize = size ?? groupContext.size;
     const isSpaced = groupContext.spacing > 0;
+    const isVertical = groupContext.orientation === 'vertical';
     const label = ariaLabel ?? ariaLabelProp;
 
-    // Synchronize outer tray height (p-1 + 1px border = +10px) with 44px/48px/56px sibling controls
+    // Synchronize horizontal outer tray height (p-1 + 1px border = +10px) with 44px/48px/56px sibling controls.
+    // Enforce >= 44px horizontal floor (`min-w-11`) and vertical-only `::after` hit-target expansion on compact
+    // horizontal items so single-character options (1, 2, 4, A4) hit 44x44px without horizontal overlap.
+    // Vertical trays have no sibling height-synchrony constraint and use real 44px+ height to avoid stacked overlap.
     const sizeClasses = isSpaced
       ? {
-          sm: 'h-11 px-3.5 min-w-[44px] min-h-[44px] text-xs gap-1.5',
-          md: 'h-12 px-4.5 min-w-[48px] min-h-[48px] text-sm gap-2',
-          lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5',
+          sm: 'h-11 px-3.5 min-w-11 min-h-11 text-xs gap-1.5',
+          md: 'h-12 px-4.5 min-w-12 min-h-12 text-sm gap-2',
+          lg: 'h-14 px-6 min-w-14 min-h-14 text-base gap-2.5',
         }[effectiveSize]
-      : {
-          sm: 'h-[34px] px-3 min-w-[36px] text-xs gap-1.5',
-          md: 'h-[38px] px-4 min-w-[40px] text-sm gap-2',
-          lg: 'h-[46px] px-5 min-w-[48px] text-base gap-2.5',
-        }[effectiveSize];
+      : isVertical
+        ? {
+            sm: 'min-h-11 h-11 px-3 min-w-11 text-xs gap-1.5',
+            md: 'min-h-11 h-11 px-4 min-w-11 text-sm gap-2',
+            lg: 'min-h-12 h-12 px-5 min-w-12 text-base gap-2.5',
+          }[effectiveSize]
+        : {
+            sm: "relative h-[34px] px-3 min-w-11 text-xs gap-1.5 after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
+            md: "relative h-[38px] px-4 min-w-11 text-sm gap-2 after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
+            lg: 'h-[46px] px-5 min-w-12 text-base gap-2.5',
+          }[effectiveSize];
 
     const baseItemClasses = cn(
       'inline-flex items-center justify-center font-label font-semibold cursor-pointer select-none',
@@ -272,7 +282,10 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
             cn(
               spacing > 0
                 ? 'inline-flex w-fit max-w-full flex-wrap gap-[calc(var(--spacing)*var(--toggle-spacing))] select-none'
-                : 'inline-flex w-fit max-w-full flex-wrap p-1 rounded gap-1 select-none bg-surface-container-high border border-outline-variant',
+                : cn(
+                    'inline-flex w-fit max-w-full flex-wrap p-1 rounded select-none bg-surface-container-high border border-outline-variant',
+                    orientation === 'vertical' ? 'gap-1' : 'gap-x-1 gap-y-2'
+                  ),
               orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
               typeof className === 'function' ? className(state) : className
             )

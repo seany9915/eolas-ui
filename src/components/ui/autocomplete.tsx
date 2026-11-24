@@ -798,7 +798,7 @@ export const AutocompleteTrigger = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'relative size-7 min-w-[28px] min-h-[28px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
+        'relative size-8 min-w-[32px] min-h-[32px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\']',
         'data-[popup-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
       ],
@@ -842,7 +842,7 @@ export const AutocompleteClear = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'relative size-7 min-w-[28px] min-h-[28px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\']',
+        'relative size-8 min-w-[32px] min-h-[32px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\']',
         'transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
         'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',

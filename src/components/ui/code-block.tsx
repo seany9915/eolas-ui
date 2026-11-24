@@ -161,7 +161,7 @@ export const CodeBlockActions = React.forwardRef<HTMLDivElement, CodeBlockAction
         className={cn(
           'flex items-center gap-1.5 shrink-0',
           floating
-            ? 'absolute top-2 end-2 opacity-0 group-hover/code-block:opacity-100 focus-within:opacity-100 transition-opacity duration-quick motion-reduce:transition-none'
+            ? 'absolute top-2 end-2 opacity-100 [@media(hover:hover)_and_(pointer:fine)]:opacity-0 [@media(hover:hover)_and_(pointer:fine)]:group-hover/code-block:opacity-100 focus-within:opacity-100 transition-opacity duration-quick motion-reduce:transition-none'
             : 'ms-auto',
           className
         )}

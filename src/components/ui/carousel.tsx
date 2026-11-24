@@ -317,7 +317,7 @@ export const CarouselPrevious = React.forwardRef<
           !isInline && [
             'absolute z-10',
             orientation === 'horizontal'
-              ? '-start-12 top-1/2 -translate-y-1/2'
+              ? 'start-2 @2xl:-start-12 top-1/2 -translate-y-1/2'
               : '-top-12 left-1/2 -translate-x-1/2',
           ],
         ],
@@ -370,7 +370,7 @@ export const CarouselNext = React.forwardRef<
           !isInline && [
             'absolute z-10',
             orientation === 'horizontal'
-              ? '-end-12 top-1/2 -translate-y-1/2'
+              ? 'end-2 @2xl:-end-12 top-1/2 -translate-y-1/2'
               : '-bottom-12 left-1/2 -translate-x-1/2',
           ],
         ],

@@ -132,8 +132,8 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
             startAngle={180}
             endAngle={0}
             cy="70%"
-            innerRadius={70}
-            outerRadius={105}
+            innerRadius="62%"
+            outerRadius="90%"
           >
             <ChartTooltip
               cursor={false}
@@ -154,7 +154,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) - 16}
-                          className="fill-on-surface text-3xl font-bold font-mono tracking-tight"
+                          className="fill-on-surface text-2xl @xs:text-3xl font-bold font-mono tracking-tight"
                         >
                           {displayValue}
                         </tspan>

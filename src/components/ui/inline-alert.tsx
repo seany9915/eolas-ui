@@ -84,7 +84,7 @@ export const InlineAlertAction = React.forwardRef<HTMLDivElement, InlineAlertAct
     <div
       ref={ref}
       data-slot="inline-alert-action"
-      className={cn('mt-3 flex items-center gap-3', className)}
+      className={cn('mt-3 flex flex-wrap items-center gap-3', className)}
       {...props}
     />
   )

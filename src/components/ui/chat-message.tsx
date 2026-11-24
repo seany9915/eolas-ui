@@ -69,7 +69,7 @@ const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
           {hasAvatarChild ? (
             <div
               className={cn(
-                'flex items-start gap-3',
+                'flex items-start gap-3 min-w-0',
                 resolvedAlign === 'end'
                   ? 'flex-row-reverse max-w-[90%] @md:max-w-[80%]'
                   : 'flex-row max-w-[95%] @md:max-w-[85%]'
@@ -80,7 +80,7 @@ const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
           ) : (
             <div
               className={cn(
-                'flex flex-col gap-1.5',
+                'flex flex-col gap-1.5 min-w-0',
                 resolvedAlign === 'end'
                   ? 'items-end max-w-[90%] @md:max-w-[80%]'
                   : 'items-start max-w-[95%] @md:max-w-[85%]'
@@ -229,7 +229,7 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
         data-align={resolvedAlign}
         data-variant={resolvedVariant}
         className={cn(
-          'relative flex flex-col p-4 text-base font-sans leading-relaxed transition-colors',
+          'relative flex flex-col min-w-0 p-4 text-base font-sans leading-relaxed transition-colors',
           cornerClass,
           variantClass,
           className
@@ -443,7 +443,7 @@ const ChatMessageActions: React.FC<ChatMessageActionsProps> = ({ children, class
     <div
       {...props}
       className={cn(
-        'flex items-center gap-1 mt-1 px-1 text-on-surface-variant',
+        'flex flex-wrap items-center gap-1 mt-1 px-1 text-on-surface-variant',
         className
       )}
     >
@@ -603,7 +603,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             </div>
           )}
 
-          <div className="typeset typeset-chat">{content}</div>
+          <div className="typeset typeset-chat min-w-0 max-w-full break-words">{content}</div>
 
           {citations && (
             <div className="mt-3 pt-2.5 border-t border-outline-variant/50">

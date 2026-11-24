@@ -275,18 +275,27 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
       effectiveVariant === 'segmented' ||
       effectiveVariant === 'segment';
     const hasSlidingIndicator = context.showIndicator;
+    const isVertical = context.orientation === 'vertical';
 
-    // Size height tokens: contained items subtract tray padding+border (+10px) to align outer height with 44/48/56px controls
+    // Size height tokens: horizontal contained items subtract tray padding+border (+10px) to align outer height
+    // with 44/48/56px sibling controls while expanding vertically via ::after (kept within tray padding to avoid
+    // vertical scrollbars) and enforcing min-w-11 horizontally. Vertical contained items use full 44px+ height.
     const sizeClasses = isContained
-      ? {
-          sm: 'py-1.5 px-3 min-h-[34px] h-[34px] text-xs',
-          md: 'py-1.5 px-4 min-h-[38px] h-[38px] text-sm',
-          lg: 'py-2.5 px-5 min-h-[46px] h-[46px] text-base',
-        }[effectiveSize]
+      ? isVertical
+        ? {
+            sm: 'py-2 px-3 min-h-11 min-w-11 text-xs',
+            md: 'py-2 px-4 min-h-11 min-w-11 text-sm',
+            lg: 'py-2.5 px-5 min-h-12 min-w-12 text-base',
+          }[effectiveSize]
+        : {
+            sm: "py-1.5 px-3 min-h-[34px] min-w-11 text-xs after:absolute after:inset-x-0 after:-inset-y-1 after:content-['']",
+            md: "py-1.5 px-4 min-h-[38px] min-w-11 text-sm after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
+            lg: 'py-2.5 px-5 min-h-[46px] min-w-12 text-base',
+          }[effectiveSize]
       : {
-          sm: 'py-2 px-3.5 min-h-[44px] text-xs',
-          md: 'py-2.5 px-4 min-h-[48px] text-sm',
-          lg: 'py-3.5 px-5 min-h-[56px] text-base',
+          sm: 'py-2 px-3.5 min-h-11 text-xs',
+          md: 'py-2.5 px-4 min-h-12 text-sm',
+          lg: 'py-3.5 px-5 min-h-14 text-base',
         }[effectiveSize];
 
     return (
@@ -298,7 +307,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         className={(state) =>
           cn(
             // Retain font-semibold across both active and inactive to prevent layout shift
-            'inline-flex items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
+            'inline-flex shrink-0 whitespace-nowrap items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
             sizeClasses,
             effectiveVariant === 'unstyled'
               ? ''
@@ -463,7 +472,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
         keepMounted={resolvedKeepMounted}
         className={(state) =>
           cn(
-            'py-4 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+            'min-w-0 data-[orientation=vertical]:flex-1 py-4 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
             '[&[hidden]:not([hidden="until-found"])]:hidden',
             typeof className === 'function' ? className(state) : className
           )

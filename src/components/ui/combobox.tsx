@@ -524,7 +524,7 @@ export const ComboboxTrigger = React.forwardRef<
       className={composeClassName(
         hasChildren
           ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
-          : 'relative size-7 min-w-[28px] min-h-[28px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
+          : 'relative size-8 min-w-[32px] min-h-[32px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
         className
       )}
       {...props}
@@ -679,7 +679,7 @@ export const ComboboxClear = React.forwardRef<
     ref={ref}
     data-slot="combobox-clear"
     className={composeClassName(
-      'relative size-7 min-w-[28px] min-h-[28px] rounded-full flex items-center justify-center after:absolute after:-inset-y-2 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
+      'relative size-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
       className
     )}
     aria-label="Clear selection"
@@ -834,7 +834,7 @@ export const ComboboxChips = React.forwardRef<
   <BaseCombobox.Chips
     ref={ref}
     data-slot="combobox-chips"
-    className={composeClassName('flex flex-wrap items-center gap-1.5 p-1', className)}
+    className={composeClassName('flex flex-wrap items-center gap-2 p-1', className)}
     {...props}
   />
 ));
@@ -848,7 +848,7 @@ export const ComboboxChip = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip"
     className={composeClassName(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-surface-container-high text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
+      'inline-flex items-center gap-1 ps-2.5 pe-1 py-0.5 min-h-7 max-w-full rounded-sm text-xs font-medium bg-surface-container-high text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
       className
     )}
     {...props}
@@ -864,7 +864,7 @@ export const ComboboxChipRemove = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip-remove"
     className={composeClassName(
-      'size-4 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-state-hover cursor-pointer transition-colors',
+      'size-6 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer transition-colors',
       className
     )}
     aria-label="Remove"

@@ -153,7 +153,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
         <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">
           {checkboxNode}
         </div>
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-w-0 break-words">
           <label
             htmlFor={checkboxId}
             className="font-sans text-sm font-medium text-on-surface cursor-pointer select-none group-has-[[data-disabled]]:cursor-not-allowed group-has-[[data-disabled]]:text-on-surface-variant"

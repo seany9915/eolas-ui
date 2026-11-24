@@ -236,7 +236,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
             {caption && (
               <TableCaption id={captionId}>{caption}</TableCaption>
             )}
-            <thead className={cn(isStack && '@max-sm:hidden')}>
+            <thead className={cn(isStack && '@max-lg:hidden')}>
               <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container-high/50 text-on-surface font-label font-bold text-sm">
                 {columns.map((col, idx) => {
                   const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
@@ -264,7 +264,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
             <tbody
               className={cn(
                 'divide-y divide-outline-variant',
-                isStack && '@max-sm:divide-y-0 @max-sm:flex @max-sm:flex-col @max-sm:gap-3 @max-sm:p-3'
+                isStack && '@max-lg:divide-y-0 @max-lg:flex @max-lg:flex-col @max-lg:gap-3 @max-lg:p-3'
               )}
             >
               {data.map((row) => (
@@ -274,7 +274,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                   className={cn(
                     'min-h-14 hover:bg-state-hover transition-colors',
                     isStack &&
-                      '@max-sm:block @max-sm:p-4 @max-sm:rounded-lg @max-sm:border @max-sm:border-outline-variant @max-sm:bg-surface'
+                      '@max-lg:block @max-lg:p-4 @max-lg:rounded-lg @max-lg:border @max-lg:border-outline-variant @max-lg:bg-surface'
                   )}
                 >
                   {columns.map((col, cIdx) => {
@@ -297,15 +297,15 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                           numericClass,
                           col.className,
                           isStack &&
-                            '@max-sm:flex @max-sm:items-center @max-sm:justify-between @max-sm:px-0 @max-sm:py-2 @max-sm:border-b @max-sm:border-outline-variant/40 @max-sm:last:border-b-0'
+                            '@max-lg:flex @max-lg:items-center @max-lg:justify-between @max-lg:px-0 @max-lg:py-2 @max-lg:border-b @max-lg:border-outline-variant/40 @max-lg:last:border-b-0'
                         )}
                       >
                         {isStack && (
-                          <span className="hidden @max-sm:inline-block font-label text-xs font-semibold text-on-surface-variant me-3 select-none">
+                          <span className="hidden @max-lg:inline-block font-label text-xs font-semibold text-on-surface-variant me-3 select-none">
                             {col.header}
                           </span>
                         )}
-                        <span className={cn(effectiveAlign === 'right' && isStack && '@max-sm:text-end')}>
+                        <span className={cn(effectiveAlign === 'right' && isStack && '@max-lg:text-end')}>
                           {typeof col.accessor === 'function'
                             ? col.accessor(row)
                             : (row[col.accessor] as React.ReactNode)}

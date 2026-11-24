@@ -89,7 +89,11 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
         className={cn('@container w-full', className)}
         {...props}
       >
-        <Card.Header>
+        <Card.Header
+          className={cn(
+            action && 'flex flex-col gap-3 @sm:grid @sm:items-start'
+          )}
+        >
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 min-w-0">
               <Card.Title className="min-w-0">{title}</Card.Title>
@@ -97,7 +101,11 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
             </div>
             {description && <Card.Description>{description}</Card.Description>}
           </div>
-          {action && <Card.Action>{action}</Card.Action>}
+          {action && (
+            <Card.Action className="flex flex-wrap items-center gap-2 max-w-full @sm:justify-self-end">
+              {action}
+            </Card.Action>
+          )}
         </Card.Header>
 
         <Card.Content className="pt-2">

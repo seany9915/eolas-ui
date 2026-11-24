@@ -61,7 +61,7 @@ function ModelSelectorRootInner<
     <Combobox<Value, Multiple, Item>
       ref={ref}
       data-slot="model-selector-root"
-      className={cn('inline-flex items-center gap-2', className)}
+      className={cn('@container flex flex-wrap items-center gap-2 w-full min-w-0 max-w-full', className)}
       {...props}
     >
       {children}
@@ -121,7 +121,7 @@ const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
   );
 
   return (
-    <div className={cn('min-w-36 @sm:min-w-44', className)}>
+    <div className={cn('min-w-0 max-w-full flex-1 @xs:flex-none @xs:min-w-36 @sm:min-w-44', className)}>
       <Combobox
         items={modelItems}
         value={valueProp}
@@ -202,7 +202,7 @@ const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('min-w-[110px] @sm:min-w-[130px]', className)}>
+    <div className={cn('min-w-0 max-w-full flex-1 @xs:flex-none @xs:min-w-[110px] @sm:min-w-[130px]', className)}>
       <Tooltip content="Adjust depth of model reasoning steps">
         {/* Wrapper keeps TooltipTrigger's data-popup-open and id off SelectTrigger */}
         <div className="w-full">
@@ -266,7 +266,7 @@ const ModelSelectorComponent = React.forwardRef<HTMLDivElement, ModelSelectorPro
       <div
         ref={ref}
         data-slot="model-selector-root"
-        className={cn('inline-flex items-center gap-2', className)}
+        className={cn('@container flex flex-wrap items-center gap-2 w-full min-w-0 max-w-full', className)}
         {...props}
       >
         <ModelSelectorModel

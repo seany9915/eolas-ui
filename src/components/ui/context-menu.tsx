@@ -94,13 +94,13 @@ export const ContextMenuContent = React.forwardRef<HTMLDivElement, ContextMenuCo
         sideOffset={sideOffset}
         alignOffset={alignOffset}
         collisionPadding={collisionPadding}
-        className={composeClassName('z-50 outline-none', containerClassName)}
+        className={composeClassName('z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none', containerClassName)}
       >
         <BaseContextMenu.Popup
           ref={ref}
           data-slot="context-menu-content"
           className={composeClassName(
-            'min-w-[200px] p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+            'min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] overflow-x-hidden overflow-y-auto overscroll-contain p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
@@ -335,8 +335,15 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
           {children}
         </BaseContextMenu.Trigger>
         <BaseContextMenu.Portal>
-          <BaseContextMenu.Positioner sideOffset={4} collisionPadding={8} className="z-50 outline-none">
-            <BaseContextMenu.Popup data-slot="context-menu-content" className="min-w-[200px] p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none">
+          <BaseContextMenu.Positioner
+            sideOffset={4}
+            collisionPadding={8}
+            className="z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none"
+          >
+            <BaseContextMenu.Popup
+              data-slot="context-menu-content"
+              className="min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] overflow-x-hidden overflow-y-auto overscroll-contain p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none"
+            >
               {items.map((item) => (
                 <ContextMenuItem
                   key={item.id}

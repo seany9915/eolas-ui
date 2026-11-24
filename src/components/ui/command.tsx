@@ -157,7 +157,7 @@ export const CommandList = React.forwardRef<
     ref={ref}
     data-slot="command-list"
     className={cn(
-      'max-h-[min(300px,60vh)] overflow-y-auto overflow-x-hidden p-1 overscroll-contain scroll-py-1',
+      'max-h-[min(300px,60dvh)] overflow-y-auto overflow-x-hidden p-1 overscroll-contain scroll-py-1',
       className
     )}
     {...props}
