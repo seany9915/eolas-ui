@@ -35,7 +35,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Viewport breakpoints (`sm:`, `md:`, `lg:`) inside reusable components** → **Use:** `@container` on a defined-width wrapper `<div>` (`w-full` or grid cell, never `<table>`/`<tr>`/auto-sized flex) + `@sm:`/`@md:`/`@lg:`. Reserve viewport queries for page shells.
 - **Banned: Start-aligned numeric table columns** → **Use:** `text-end` + `tabular-nums` / `font-mono` on numeric `<th>` and `<td>` (or `numeric: true` on `<Table />`).
 - **Banned: Arbitrary or `0px` clamped nested radii in padded cards** → **Use:** $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ for nested media/panels (clamping to `rounded` / `8px`; tight `p-1` segmented shells still use `rounded-sm` / `4px`).
-- **Banned: Mismatched input + button heights or asymmetric icon insets** → **Use:** Identical height tiers (`sm`: 44px, `md`: 48px, `lg`: 56px), `shrink-0 whitespace-nowrap` on buttons, and symmetric icon padding.
+- **Banned: Mismatched sibling control heights, +2px inner-border height drift, wrapping `ToggleGroup` labels in narrow columns, or asymmetric icon insets** → **Use:** The outer-box height tiers (`sm`: 44px, `md`: 48px, `lg`: 56px) and 3-family matrix in `DESIGN.md`, `Select`/`Radio` for multi-word options in narrow columns, `shrink-0 whitespace-nowrap` on row buttons, and symmetric icon padding.
 
 ## Iconography & Copy
 - **Banned: `mr-*` / `ml-*` on `<Icon>` inside flex containers** → **Use:** Parent `gap-*` (e.g. `<Button>`'s `gap-2`).

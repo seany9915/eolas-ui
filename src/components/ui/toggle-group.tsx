@@ -96,9 +96,9 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
             lg: 'min-h-12 h-12 px-5 min-w-12 text-base gap-2.5',
           }[effectiveSize]
         : {
-            sm: "relative h-[34px] px-3 min-w-11 text-xs gap-1.5 after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
-            md: "relative h-[38px] px-4 min-w-11 text-sm gap-2 after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
-            lg: 'h-[46px] px-5 min-w-12 text-base gap-2.5',
+            sm: "relative self-stretch min-h-[34px] py-1.5 px-3 min-w-11 text-xs gap-1.5 after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
+            md: "relative self-stretch min-h-[38px] py-1.5 px-4 min-w-11 text-sm gap-2 after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
+            lg: 'self-stretch min-h-[46px] py-2 px-5 min-w-12 text-base gap-2.5',
           }[effectiveSize];
 
     const baseItemClasses = cn(
@@ -284,9 +284,16 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
                 ? 'inline-flex w-fit max-w-full flex-wrap gap-[calc(var(--spacing)*var(--toggle-spacing))] select-none'
                 : cn(
                     'inline-flex w-fit max-w-full flex-wrap p-1 rounded select-none bg-surface-container-high border border-outline-variant',
-                    orientation === 'vertical' ? 'gap-1' : 'gap-x-1 gap-y-2'
+                    orientation === 'vertical'
+                      ? 'gap-1'
+                      : cn(
+                          'gap-x-1 gap-y-2',
+                          size === 'sm' && 'min-h-11',
+                          size === 'md' && 'min-h-12',
+                          size === 'lg' && 'min-h-14'
+                        )
                   ),
-              orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-center',
+              orientation === 'vertical' ? 'flex-col items-stretch w-max' : 'flex-row items-stretch',
               typeof className === 'function' ? className(state) : className
             )
           }

@@ -349,7 +349,7 @@ function ComboboxComponentInner<
             <label
               htmlFor={comboboxId}
               id={`${comboboxId}-label`}
-              className="block font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none"
+              className="block font-label text-sm font-semibold text-on-surface cursor-pointer select-none"
             >
               {label}
             </label>
@@ -361,6 +361,7 @@ function ComboboxComponentInner<
           )}
 
           <ComboboxInputGroup
+            size={size}
             className={composeClassName(
               [
                 error && 'border-error focus-within:outline-error',
@@ -380,10 +381,10 @@ function ComboboxComponentInner<
               aria-labelledby={label ? `${comboboxId}-label` : undefined}
               className={composeClassName(
                 [
-                  'flex-1 min-w-0 bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none',
-                  size === 'sm' && 'h-11 ps-3 pe-1 min-h-[44px] text-xs',
-                  size === 'md' && 'h-12 ps-3.5 pe-1 min-h-[48px] text-sm',
-                  size === 'lg' && 'h-14 ps-5 pe-1 min-h-[56px] text-base',
+                  'flex-1 min-w-0 self-stretch h-auto bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none',
+                  size === 'sm' && 'py-1.5 ps-3 pe-1 text-xs',
+                  size === 'md' && 'py-2 ps-3.5 pe-1 text-sm',
+                  size === 'lg' && 'py-2.5 ps-5 pe-1 text-base',
                   'disabled:cursor-not-allowed',
                 ],
                 inputClassName
@@ -492,7 +493,7 @@ export const ComboboxInput = React.forwardRef<
         size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
         'hover:border-on-surface-variant/80',
         'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-        '[[data-slot=combobox-input-group]_&]:border-0 [[data-slot=combobox-input-group]_&]:bg-transparent [[data-slot=combobox-input-group]_&]:rounded-none [[data-slot=combobox-input-group]_&]:focus-visible:outline-none [[data-slot=combobox-input-group]_&]:hover:border-0 [[data-slot=combobox-input-group]_&]:flex-1 [[data-slot=combobox-input-group]_&]:min-w-0',
+        '[[data-slot=combobox-input-group]_&]:border-0 [[data-slot=combobox-input-group]_&]:bg-transparent [[data-slot=combobox-input-group]_&]:rounded-none [[data-slot=combobox-input-group]_&]:focus-visible:outline-none [[data-slot=combobox-input-group]_&]:hover:border-0 [[data-slot=combobox-input-group]_&]:flex-1 [[data-slot=combobox-input-group]_&]:min-w-0 [[data-slot=combobox-input-group]_&]:h-auto [[data-slot=combobox-input-group]_&]:min-h-0 [[data-slot=combobox-input-group]_&]:self-stretch',
         'disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
         error && 'border-error focus-visible:outline-error',
       ],
@@ -755,16 +756,24 @@ export const ComboboxPositioner = React.forwardRef<
 ));
 ComboboxPositioner.displayName = 'ComboboxPositioner';
 
+export interface ComboboxInputGroupProps
+  extends React.ComponentPropsWithoutRef<typeof BaseCombobox.InputGroup> {
+  size?: 'sm' | 'md' | 'lg';
+}
+
 export const ComboboxInputGroup = React.forwardRef<
   React.ComponentRef<typeof BaseCombobox.InputGroup>,
-  React.ComponentPropsWithoutRef<typeof BaseCombobox.InputGroup>
->(({ className, ...props }, ref) => (
+  ComboboxInputGroupProps
+>(({ className, size = 'md', ...props }, ref) => (
   <BaseCombobox.InputGroup
     data-slot="combobox-input-group"
     ref={ref}
     className={composeClassName(
       [
-        'relative flex items-center w-full rounded border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,outline-color]',
+        'relative flex items-stretch w-full rounded border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,outline-color]',
+        size === 'sm' && 'min-h-11',
+        size === 'md' && 'min-h-12',
+        size === 'lg' && 'min-h-14',
         'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
         'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
         'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
@@ -784,7 +793,7 @@ export const ComboboxLabel = React.forwardRef<
   <BaseCombobox.Label
     ref={ref}
     data-slot="combobox-label"
-    className={composeClassName('block font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none', className)}
+    className={composeClassName('block font-label text-sm font-semibold text-on-surface cursor-pointer select-none', className)}
     {...props}
   />
 ));

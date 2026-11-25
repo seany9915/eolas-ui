@@ -255,7 +255,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
     >
       <div className={cn('flex flex-col gap-1.5 w-full', className)}>
         {label && (
-          <BaseSelect.Label data-slot="select-label" className="font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none">
+          <BaseSelect.Label data-slot="select-label" className="font-label text-sm font-semibold text-on-surface cursor-pointer select-none">
             {label}
           </BaseSelect.Label>
         )}
@@ -703,7 +703,7 @@ export const SelectLabel = React.forwardRef<
   <BaseSelect.Label
     ref={ref}
     data-slot="select-label"
-    className={composeClassName('font-label text-xs font-semibold text-on-surface-variant cursor-pointer select-none', className)}
+    className={composeClassName('font-label text-sm font-semibold text-on-surface cursor-pointer select-none', className)}
     {...props}
   />
 ));

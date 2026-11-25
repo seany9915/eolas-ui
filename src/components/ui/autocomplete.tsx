@@ -503,6 +503,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
 
     const inputGroupElement = (
       <AutocompleteInputGroup
+        size={size}
         className={composeClassName(
           [
             error && 'border-error focus-within:border-error focus-within:outline-error',
@@ -536,10 +537,10 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
             [
               'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none transition-[border-color,box-shadow]',
               'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-              '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0',
-              size === 'sm' && 'h-11 min-h-[44px] text-xs',
-              size === 'md' && 'h-12 min-h-[48px] text-sm',
-              size === 'lg' && 'h-14 min-h-[56px] text-base',
+              '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0 [[data-slot=autocomplete-input-group]_&]:h-auto [[data-slot=autocomplete-input-group]_&]:min-h-0 [[data-slot=autocomplete-input-group]_&]:self-stretch',
+              size === 'sm' && 'py-1.5 text-xs',
+              size === 'md' && 'py-2 text-sm',
+              size === 'lg' && 'py-2.5 text-base',
               hasLeading ? 'ps-1' : 'ps-3.5',
               clearable || showTrigger || hasTrailing ? 'pe-2' : 'pe-3.5',
               'disabled:cursor-not-allowed',
@@ -739,16 +740,24 @@ export const AutocompleteLabel = React.forwardRef<HTMLLabelElement, Autocomplete
 );
 AutocompleteLabel.displayName = 'AutocompleteLabel';
 
+export interface AutocompleteInputGroupProps
+  extends React.ComponentPropsWithoutRef<typeof BaseAutocomplete.InputGroup> {
+  size?: 'sm' | 'md' | 'lg';
+}
+
 export const AutocompleteInputGroup = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.InputGroup>,
-  React.ComponentPropsWithoutRef<typeof BaseAutocomplete.InputGroup>
->(({ className, ...props }, ref) => (
+  AutocompleteInputGroupProps
+>(({ className, size = 'md', ...props }, ref) => (
   <BaseAutocomplete.InputGroup
     data-slot="autocomplete-input-group"
     ref={ref}
     className={composeClassName(
       [
-        'relative flex items-center w-full rounded border border-outline bg-surface transition-[border-color,outline-color]',
+        'relative flex items-stretch w-full rounded border border-outline bg-surface transition-[border-color,outline-color]',
+        size === 'sm' && 'min-h-11',
+        size === 'md' && 'min-h-12',
+        size === 'lg' && 'min-h-14',
         'hover:border-on-surface-variant/80 data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
         'focus-within:border-primary focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-primary',
         'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
@@ -777,7 +786,7 @@ export const AutocompleteInput = React.forwardRef<
       [
         'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 transition-[border-color,box-shadow]',
         'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-        '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0',
+        '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0 [[data-slot=autocomplete-input-group]_&]:h-auto [[data-slot=autocomplete-input-group]_&]:min-h-0 [[data-slot=autocomplete-input-group]_&]:self-stretch',
         size === 'sm' && 'h-11 min-h-[44px] text-xs',
         size === 'md' && 'h-12 min-h-[48px] text-sm',
         size === 'lg' && 'h-14 min-h-[56px] text-base',

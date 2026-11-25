@@ -26,10 +26,10 @@ export interface NumberFieldProps extends BaseNumberField.Root.Props {
   size?: NumberFieldSize;
 }
 
-const numberFieldSizeStyles: Record<NumberFieldSize, { button: string; input: string }> = {
-  sm: { button: 'size-11 min-h-[44px] min-w-[44px]', input: 'h-11 text-sm' },
-  md: { button: 'size-12 min-h-[48px] min-w-[48px]', input: 'h-12 text-base' },
-  lg: { button: 'size-14 min-h-[56px] min-w-[56px]', input: 'h-14 text-lg' },
+const numberFieldSizeStyles: Record<NumberFieldSize, { group: string; button: string; input: string }> = {
+  sm: { group: 'h-11 min-h-11', button: 'h-full w-11 min-w-11 shrink-0', input: 'h-full text-sm' },
+  md: { group: 'h-12 min-h-12', button: 'h-full w-12 min-w-12 shrink-0', input: 'h-full text-base' },
+  lg: { group: 'h-14 min-h-14', button: 'h-full w-14 min-w-14 shrink-0', input: 'h-full text-lg' },
 };
 
 const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(({
@@ -109,7 +109,8 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
       <BaseNumberField.Group
         data-slot="number-field-group"
         className={cn(
-          'inline-flex w-fit max-w-full items-center rounded border bg-surface overflow-hidden',
+          'inline-flex w-fit max-w-full items-stretch rounded border bg-surface overflow-hidden',
+          numberFieldSizeStyles[size].group,
           'transition-[border-color,box-shadow]',
           'has-[:focus-visible]:border-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-1 has-[:focus-visible]:outline-primary',
           'data-[disabled]:opacity-50 data-[disabled]:bg-surface-container-low data-[disabled]:pointer-events-none',
