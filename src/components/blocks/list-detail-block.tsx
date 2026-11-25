@@ -614,7 +614,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                 data-flush={detailBodyFlush ? 'true' : undefined}
                 className={cn(
                   detailBodyFlush
-                    ? 'flex-1 flex flex-col min-h-0 overflow-hidden'
+                    ? 'flex-1 flex flex-col min-h-0 overflow-hidden p-0'
                     : 'flex-1 overflow-y-auto'
                 )}
               >

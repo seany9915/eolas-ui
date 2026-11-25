@@ -515,6 +515,7 @@ export const SidebarRail = React.forwardRef<
         data-slot="sidebar-rail"
         data-sidebar="rail"
         aria-label="Toggle Sidebar"
+        aria-hidden="true"
         tabIndex={-1}
         onClick={toggleSidebar}
         render={render}

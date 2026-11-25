@@ -234,7 +234,11 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         mobileBehavior={embedded ? 'inline' : 'drawer'}
         embedded={embedded}
         className={cn(
-          embedded ? 'relative overflow-hidden h-full min-h-0' : 'w-full min-h-svh',
+          embedded
+            ? 'relative overflow-hidden h-full min-h-0'
+            : flush
+              ? 'w-full h-dvh min-h-0 overflow-hidden'
+              : 'w-full min-h-svh',
           className
         )}
         {...props}
@@ -277,11 +281,18 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         )}
 
         {/* Main Content Area Inset */}
-        <Sidebar.Inset render={<div />} embedded={embedded} className="flex flex-col flex-1 min-w-0">
+        <Sidebar.Inset
+          render={<div />}
+          embedded={embedded}
+          className={cn(
+            'flex flex-col flex-1 min-w-0',
+            flush && !embedded && 'h-full min-h-0'
+          )}
+        >
           {/* Top App Bar */}
           <header
             data-slot="app-shell-header"
-            className="sticky top-0 z-20 flex items-center justify-between gap-3 px-4 py-2 min-h-16 short:min-h-14 bg-surface border-b border-outline-variant transition-colors duration-quick ease-standard motion-reduce:transition-none shrink-0"
+            className="sticky top-0 z-20 flex items-center justify-between gap-3 px-4 py-0 min-h-16 short:min-h-14 bg-surface border-b border-outline-variant transition-colors duration-quick ease-standard motion-reduce:transition-none shrink-0"
           >
             <div
               className={cn(
@@ -317,7 +328,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
               <div
                 data-slot="app-shell-top-nav"
                 className={cn(
-                  'items-stretch self-stretch min-w-0 flex-1',
+                  'items-stretch self-stretch -mb-px min-w-0 flex-1',
                   embedded
                     ? destinations.length > 0 && sizeClass === 'mobile'
                       ? 'hidden'
