@@ -16,6 +16,7 @@ import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
 import { Button } from './button';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface DrawerProps<Payload = unknown>
@@ -186,8 +187,17 @@ export const DrawerHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribute
 DrawerHeader.displayName = 'DrawerHeader';
 
 export const DrawerBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="drawer-body" className={cn('flex-1 overflow-y-auto min-h-0', className)} {...props} />
+  ({ className, children, ...props }, ref) => (
+    <ScrollArea
+      ref={ref}
+      data-slot="drawer-body"
+      className="flex-1 min-h-0"
+      viewportClassName="overscroll-contain"
+      contentClassName={className}
+      {...props}
+    >
+      {children}
+    </ScrollArea>
   )
 );
 DrawerBody.displayName = 'DrawerBody';
@@ -504,9 +514,9 @@ function DrawerComponentInner<Payload = unknown>(
                       </div>
                       {description && <DrawerDescription>{description}</DrawerDescription>}
                     </div>
-                    <div data-slot="drawer-body" className="flex-1 overflow-y-auto min-h-0">
+                    <DrawerBody>
                       {typeof children === 'function' ? children(renderProps) : children}
-                    </div>
+                    </DrawerBody>
                     {footer ? (
                       <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant mt-4 shrink-0">{footer}</div>
                     ) : (

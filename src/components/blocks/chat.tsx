@@ -110,7 +110,7 @@ export const ChatMessages = React.forwardRef<HTMLDivElement, ChatMessagesProps>(
       <MessageScroller variant="default" className="flex-1 min-h-0">
         <MessageScrollerViewport
           ref={ref}
-          className={cn('flex-1 min-h-0 w-full overflow-y-auto overscroll-contain relative motion-safe:scroll-smooth', className)}
+          className={cn('motion-safe:scroll-smooth', className)}
           {...props}
         >
           <MessageScrollerContent>

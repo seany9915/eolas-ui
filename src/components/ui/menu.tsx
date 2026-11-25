@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
+import { ScrollArea } from './scroll-area';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface MenuItemData {
@@ -120,12 +121,22 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
           ref={ref}
           data-slot="menu-content"
           className={composeClassName(
-            'min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] overflow-x-hidden overflow-y-auto overscroll-contain p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+            'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
         >
-          {children}
+          <ScrollArea
+            className="min-h-0 flex-[0_1_auto]"
+            viewportClassName="overscroll-contain scroll-py-1"
+            viewportProps={{
+              tabIndex: -1,
+              onMouseDown: (e) => e.preventDefault(),
+            }}
+            contentClassName="p-1"
+          >
+            {children}
+          </ScrollArea>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
     </BaseMenu.Portal>
@@ -508,34 +519,44 @@ function MenuComponent<Payload = unknown>({
                   typeof className === 'function' || typeof popupClassName === 'function'
                     ? (state) =>
                         cn(
-                          'min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] overflow-x-hidden overflow-y-auto overscroll-contain p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+                          'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
                           typeof className === 'function' ? className(state) : className,
                           typeof popupClassName === 'function' ? popupClassName(state) : popupClassName
                         )
                     : cn(
-                        'min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] overflow-x-hidden overflow-y-auto overscroll-contain p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+                        'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
                         className,
                         popupClassName
                       )
                 }
               >
-                {children ? (
-                  renderChildren(renderProps)
-                ) : items ? (
-                  <MenuGroup>
-                    {items.map((item) => (
-                      <MenuItem
-                        key={item.id}
-                        onClick={item.onClick}
-                        disabled={item.disabled}
-                        destructive={item.destructive}
-                        icon={item.icon}
-                      >
-                        {item.label}
-                      </MenuItem>
-                    ))}
-                  </MenuGroup>
-                ) : null}
+                <ScrollArea
+                  className="min-h-0 flex-[0_1_auto]"
+                  viewportClassName="overscroll-contain scroll-py-1"
+                  viewportProps={{
+                    tabIndex: -1,
+                    onMouseDown: (e) => e.preventDefault(),
+                  }}
+                  contentClassName="p-1"
+                >
+                  {children ? (
+                    renderChildren(renderProps)
+                  ) : items ? (
+                    <MenuGroup>
+                      {items.map((item) => (
+                        <MenuItem
+                          key={item.id}
+                          onClick={item.onClick}
+                          disabled={item.disabled}
+                          destructive={item.destructive}
+                          icon={item.icon}
+                        >
+                          {item.label}
+                        </MenuItem>
+                      ))}
+                    </MenuGroup>
+                  ) : null}
+                </ScrollArea>
               </BaseMenu.Popup>
             </BaseMenu.Positioner>
           </BaseMenu.Portal>
@@ -593,12 +614,21 @@ export interface MenuListProps extends React.ComponentPropsWithoutRef<typeof Bas
 
 export const MenuList = React.forwardRef<HTMLDivElement, MenuListProps>(
   ({ className, ...props }, ref) => (
-    <BaseMenu.List
-      ref={ref}
-      data-slot="menu-list"
-      className={composeClassName('overflow-y-auto max-h-[min(300px,var(--available-height))] outline-none', className)}
-      {...props}
-    />
+    <ScrollArea
+      className="min-h-0 flex-[0_1_auto] max-h-[min(300px,var(--available-height))]"
+      viewportClassName="overscroll-contain scroll-py-1"
+      viewportProps={{
+        tabIndex: -1,
+        onMouseDown: (e) => e.preventDefault(),
+      }}
+    >
+      <BaseMenu.List
+        ref={ref}
+        data-slot="menu-list"
+        className={composeClassName('outline-none', className)}
+        {...props}
+      />
+    </ScrollArea>
   )
 );
 MenuList.displayName = 'MenuList';

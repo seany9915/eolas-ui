@@ -23,6 +23,7 @@ import * as React from 'react';
 import { PreviewCard as BasePreviewCard } from '@base-ui/react/preview-card';
 import { UnstyledButton, Button } from './button';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 import { Skeleton } from './skeleton';
 import {
   Carousel,
@@ -206,7 +207,7 @@ const InlineCitationCard = React.forwardRef<HTMLDivElement, InlineCitationCardPr
             ref={ref}
             className={composeClassName(
               cn(
-                'w-80 max-w-full max-h-[var(--available-height)] overflow-y-auto overscroll-contain p-3.5 rounded bg-surface border border-outline-variant shadow-ambient text-on-surface',
+                'flex flex-col w-80 max-w-full max-h-[var(--available-height)] rounded bg-surface border border-outline-variant shadow-ambient text-on-surface',
                 'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-standard origin-[var(--transform-origin)]',
                 'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98]',
                 'data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
@@ -216,7 +217,13 @@ const InlineCitationCard = React.forwardRef<HTMLDivElement, InlineCitationCardPr
             )}
             {...props}
           >
-            {children}
+            <ScrollArea
+              className="min-h-0 flex-[0_1_auto]"
+              viewportClassName="overscroll-contain"
+              contentClassName="p-3.5"
+            >
+              {children}
+            </ScrollArea>
           </BasePreviewCard.Popup>
         </BasePreviewCard.Positioner>
       </BasePreviewCard.Portal>

@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from './dialog';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 
 export interface CommandProps
   extends React.ComponentPropsWithoutRef<typeof CommandPrimitive> {}
@@ -195,15 +196,21 @@ export const CommandList = React.forwardRef<
   React.ComponentRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.List
-    ref={ref}
-    data-slot="command-list"
-    className={cn(
-      'max-h-[min(300px,60dvh)] overflow-y-auto overflow-x-hidden p-1 overscroll-contain scroll-py-1',
-      className
-    )}
-    {...props}
-  />
+  <ScrollArea
+    className="min-h-0 flex-[0_1_auto] max-h-[min(300px,60dvh)]"
+    viewportClassName="overscroll-contain scroll-py-1"
+    viewportProps={{
+      tabIndex: -1,
+      onMouseDown: (e) => e.preventDefault(),
+    }}
+  >
+    <CommandPrimitive.List
+      ref={ref}
+      data-slot="command-list"
+      className={cn('p-1 pe-1.5', className)}
+      {...props}
+    />
+  </ScrollArea>
 ));
 CommandList.displayName = CommandPrimitive.List.displayName;
 

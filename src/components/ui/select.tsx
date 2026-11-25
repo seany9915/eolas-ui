@@ -3,7 +3,10 @@
 import * as React from 'react';
 import { Select as BaseSelect } from '@base-ui/react/select';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 import { cn, composeClassName } from '@/lib/utils';
+
+const SelectPositionerModeContext = React.createContext<boolean>(false);
 
 export interface SelectOption {
   value: string;
@@ -321,13 +324,10 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
               )}
             >
               {showScrollArrows && <SelectScrollUpArrow />}
-              <BaseSelect.List
-                data-slot="select-list"
+              <SelectList
+                scrollable={!isItemAligned && !showScrollArrows}
                 className={composeClassName(
-                  [
-                    'relative flex flex-col gap-1 min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
-                    showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
-                  ],
+                  showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                   listClassName
                 )}
               >
@@ -379,7 +379,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
                     ))}
                   </BaseSelect.Group>
                 ) : null}
-              </BaseSelect.List>
+              </SelectList>
               {showScrollArrows && <SelectScrollDownArrow />}
             </BaseSelect.Popup>
           </BaseSelect.Positioner>
@@ -516,16 +516,18 @@ export const SelectPositioner = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Positioner>,
   SelectPositionerProps
 >(({ className, side = 'bottom', align = 'start', sideOffset = 4, collisionPadding = 8, alignItemWithTrigger = false, ...props }, ref) => (
-  <BaseSelect.Positioner
-    ref={ref}
-    side={side}
-    align={align}
-    sideOffset={sideOffset}
-    collisionPadding={collisionPadding}
-    alignItemWithTrigger={alignItemWithTrigger}
-    className={composeClassName('z-50 outline-none', className)}
-    {...props}
-  />
+  <SelectPositionerModeContext.Provider value={alignItemWithTrigger}>
+    <BaseSelect.Positioner
+      ref={ref}
+      side={side}
+      align={align}
+      sideOffset={sideOffset}
+      collisionPadding={collisionPadding}
+      alignItemWithTrigger={alignItemWithTrigger}
+      className={composeClassName('z-50 outline-none', className)}
+      {...props}
+    />
+  </SelectPositionerModeContext.Provider>
 ));
 SelectPositioner.displayName = 'SelectPositioner';
 
@@ -549,22 +551,61 @@ export const SelectPopup = React.forwardRef<
 SelectPopup.displayName = 'SelectPopup';
 
 export interface SelectListProps
-  extends React.ComponentPropsWithoutRef<typeof BaseSelect.List> {}
+  extends React.ComponentPropsWithoutRef<typeof BaseSelect.List> {
+  /**
+   * Wraps the list in `ScrollArea` when `alignItemWithTrigger` is `false` and scroll arrows are off.
+   * Set to `false` if composing `Select.ScrollUpArrow` / `Select.ScrollDownArrow` manually.
+   */
+  scrollable?: boolean;
+  /** Optional class overrides for the outer `ScrollArea` root (e.g. custom `max-h-*`). */
+  scrollAreaClassName?: string;
+}
 
 export const SelectList = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.List>,
   SelectListProps
->(({ className, ...props }, ref) => (
-  <BaseSelect.List
-    ref={ref}
-    data-slot="select-list"
-    className={composeClassName(
-      'relative flex flex-col gap-1 min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, scrollable, scrollAreaClassName, ...props }, ref) => {
+  const isItemAligned = React.useContext(SelectPositionerModeContext);
+  const useScrollArea = scrollable ?? !isItemAligned;
+
+  if (!useScrollArea) {
+    return (
+      <BaseSelect.List
+        ref={ref}
+        data-slot="select-list"
+        className={composeClassName(
+          'relative flex flex-col gap-1 min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-1 outline-none [scrollbar-width:thin]',
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <ScrollArea
+      className={cn(
+        'min-h-0 flex-[0_1_auto] max-h-[min(20rem,calc(var(--available-height)-0.75rem))]',
+        scrollAreaClassName
+      )}
+      viewportClassName="overscroll-contain scroll-py-1"
+      viewportProps={{
+        tabIndex: -1,
+        onMouseDown: (e) => e.preventDefault(),
+      }}
+    >
+      <BaseSelect.List
+        ref={ref}
+        data-slot="select-list"
+        className={composeClassName(
+          'relative flex flex-col gap-1 p-1 pe-1.5 outline-none',
+          className
+        )}
+        {...props}
+      />
+    </ScrollArea>
+  );
+});
 SelectList.displayName = 'SelectList';
 
 export const SelectContent = React.forwardRef<
@@ -626,6 +667,7 @@ export const SelectContent = React.forwardRef<
           >
             {showScrollArrows && <SelectScrollUpArrow />}
             <SelectList
+              scrollable={!isItemAligned && !showScrollArrows}
               className={composeClassName(
                 showScrollArrows ? 'scroll-py-6' : 'scroll-py-1',
                 listClassName

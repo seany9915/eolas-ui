@@ -15,6 +15,7 @@
  */
 import * as React from 'react';
 import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
+import { ScrollArea } from './scroll-area';
 import { cn, composeClassName } from '@/lib/utils';
 
 export interface AutocompleteOption {
@@ -975,19 +976,51 @@ export const AutocompleteEmpty = React.forwardRef<
 ));
 AutocompleteEmpty.displayName = 'AutocompleteEmpty';
 
+export interface AutocompleteListProps
+  extends React.ComponentPropsWithoutRef<typeof BaseAutocomplete.List> {
+  /** Wraps the list in `ScrollArea` for custom scrollbars. Set to `false` when using an external virtualizer. Defaults to `true`. */
+  scrollable?: boolean;
+}
+
 export const AutocompleteList = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.List>,
-  React.ComponentPropsWithoutRef<typeof BaseAutocomplete.List>
->(({ className, ...props }, ref) => (
-  <BaseAutocomplete.List
-    ref={ref}
-    className={composeClassName(
-      'min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-0.5 scroll-py-1 flex flex-col gap-1 outline-none [scrollbar-width:thin] data-[empty]:p-0',
-      className
-    )}
-    {...props}
-  />
-));
+  AutocompleteListProps
+>(({ className, scrollable = true, ...props }, ref) => {
+  if (!scrollable) {
+    return (
+      <BaseAutocomplete.List
+        ref={ref}
+        data-slot="autocomplete-list"
+        className={composeClassName(
+          'min-h-0 flex-1 max-h-[min(20rem,calc(var(--available-height)-0.75rem))] overflow-y-auto overscroll-contain p-0.5 scroll-py-1 flex flex-col gap-1 outline-none [scrollbar-width:thin] data-[empty]:p-0',
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <ScrollArea
+      className="min-h-0 flex-[0_1_auto] max-h-[min(20rem,calc(var(--available-height)-0.75rem))]"
+      viewportClassName="overscroll-contain scroll-py-1"
+      viewportProps={{
+        tabIndex: -1,
+        onMouseDown: (e) => e.preventDefault(),
+      }}
+    >
+      <BaseAutocomplete.List
+        ref={ref}
+        data-slot="autocomplete-list"
+        className={composeClassName(
+          'p-0.5 pe-1.5 flex flex-col gap-1 outline-none data-[empty]:p-0',
+          className
+        )}
+        {...props}
+      />
+    </ScrollArea>
+  );
+});
 AutocompleteList.displayName = 'AutocompleteList';
 
 export const AutocompleteItem = React.forwardRef<

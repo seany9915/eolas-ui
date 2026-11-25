@@ -19,6 +19,7 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 import { Tooltip } from './tooltip';
 import { announce } from '@/lib/announce';
 import { cn } from '@/lib/utils';
@@ -277,24 +278,29 @@ export const CodeBlockContent = React.forwardRef<HTMLPreElement, CodeBlockConten
     }, [children, lineNumbers, startLine]);
 
     return (
-      <pre
-        ref={ref}
-        dir="ltr"
-        data-slot="code-block-content"
-        data-wrap={wrap ? '' : undefined}
-        data-line-numbers={lineNumbers ? '' : undefined}
-        className={cn(
-          'overflow-x-auto font-mono leading-relaxed text-left [unicode-bidi:isolate] selection:bg-primary-container selection:text-on-primary-container',
-          size === 'sm' ? 'p-2.5 text-xs' : 'p-3.5 text-sm',
-          variant === 'destructive' ? 'text-on-error-container' : 'text-on-surface',
-          wrap && 'whitespace-pre-wrap break-words [&_[data-slot=code-block-line]]:min-w-0',
-          '[scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--outline-variant)_60%,transparent)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant/60 [&::-webkit-scrollbar-track]:bg-transparent',
-          className
-        )}
-        {...props}
+      <ScrollArea
+        orientation={wrap ? 'vertical' : 'horizontal'}
+        className="w-full"
+        contentClassName={wrap ? 'w-full min-w-0' : 'min-w-full'}
       >
-        {renderedChildren}
-      </pre>
+        <pre
+          ref={ref}
+          dir="ltr"
+          data-slot="code-block-content"
+          data-wrap={wrap ? '' : undefined}
+          data-line-numbers={lineNumbers ? '' : undefined}
+          className={cn(
+            'font-mono leading-relaxed text-left [unicode-bidi:isolate] selection:bg-primary-container selection:text-on-primary-container',
+            size === 'sm' ? 'p-2.5 text-xs' : 'p-3.5 text-sm',
+            variant === 'destructive' ? 'text-on-error-container' : 'text-on-surface',
+            wrap && 'whitespace-pre-wrap break-words [&_[data-slot=code-block-line]]:min-w-0',
+            className
+          )}
+          {...props}
+        >
+          {renderedChildren}
+        </pre>
+      </ScrollArea>
     );
   }
 );

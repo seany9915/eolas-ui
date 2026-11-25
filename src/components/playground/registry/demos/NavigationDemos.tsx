@@ -587,15 +587,21 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
 export const ScrollAreaDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-md mx-auto py-4">
-      <ScrollArea className="h-44 rounded-xl border border-outline-variant bg-surface p-4">
-        <div className="flex flex-col gap-2 text-xs font-sans text-on-surface-variant">
-          <h4 className="font-heading text-xs font-bold text-on-surface mb-2">Recent Practice Sessions</h4>
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="p-2 rounded bg-surface-container-low border border-outline-variant/50 font-mono text-[11px]">
-              Session {i + 1} - Accuracy: {85 + (i % 10)}% | Practice words: {15 + i}
-            </div>
-          ))}
-        </div>
+      <ScrollArea
+        variant="framed"
+        fade
+        className="h-44"
+        contentClassName="p-4 flex flex-col gap-2 font-sans text-sm text-on-surface-variant"
+      >
+        <h4 className="font-heading text-sm font-bold text-on-surface mb-1">Recent Practice Sessions</h4>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="px-3 py-2 rounded bg-surface-container-low border border-outline font-mono text-xs text-on-surface"
+          >
+            Session {i + 1} · Accuracy: {85 + (i % 10)}% · Practice words: {15 + i}
+          </div>
+        ))}
       </ScrollArea>
     </div>
   );

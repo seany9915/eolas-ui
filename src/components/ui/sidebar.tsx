@@ -23,6 +23,7 @@ import { Tooltip, TooltipProvider, type TooltipProps } from '@/components/ui/too
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icon } from '@/components/ui/icon';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
@@ -684,19 +685,23 @@ SidebarSeparator.displayName = 'SidebarSeparator';
 export const SidebarContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
   return (
-    <div
+    <ScrollArea
       ref={ref}
       data-slot="sidebar-content"
       data-sidebar="content"
-      className={cn(
-        'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden scrollbar-thin',
-        'group-data-[collapsible=icon]:overflow-y-auto group-data-[collapsible=icon]:items-center',
+      className="min-h-0 flex-1"
+      viewportClassName="overscroll-contain"
+      contentClassName={cn(
+        'flex flex-col gap-2',
+        'group-data-[collapsible=icon]:items-center',
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </ScrollArea>
   );
 });
 SidebarContent.displayName = 'SidebarContent';

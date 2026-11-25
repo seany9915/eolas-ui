@@ -22,6 +22,7 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 import { Tooltip } from './tooltip';
 import { cn } from '@/lib/utils';
 
@@ -508,28 +509,27 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
     );
 
     return (
-      <div
-        ref={mergedRef}
-        role="region"
+      <ScrollArea
+        fade
         data-slot="message-scroller-viewport"
-        data-pending-scroll={pendingScroll ? '' : undefined}
-        data-scrollable-start={scrollable.start ? '' : undefined}
-        data-scrollable-end={scrollable.end ? '' : undefined}
-        aria-label={ariaLabel}
-        className={cn(
-          'relative flex-1 w-full overflow-y-auto overscroll-contain data-[pending-scroll]:invisible focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
-          '[scrollbar-width:thin] [scrollbar-color:var(--outline-variant)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant [&::-webkit-scrollbar-track]:bg-transparent',
-          (scrollable.start || scrollable.end) &&
-            '[mask-image:linear-gradient(to_bottom,transparent_0,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent_100%)]',
-          scrollable.start ? '[--fade-top:24px]' : '[--fade-top:0px]',
-          scrollable.end ? '[--fade-bottom:24px]' : '[--fade-bottom:0px]',
+        className="flex-1 min-h-0 w-full"
+        viewportRef={mergedRef}
+        viewportClassName={cn(
+          'relative overscroll-contain data-[pending-scroll]:invisible',
           className
         )}
-        tabIndex={0}
-        {...props}
+        contentClassName="min-h-full flex flex-col"
+        viewportProps={{
+          role: 'region',
+          'aria-label': ariaLabel,
+          'data-pending-scroll': pendingScroll ? '' : undefined,
+          'data-scrollable-start': scrollable.start ? '' : undefined,
+          'data-scrollable-end': scrollable.end ? '' : undefined,
+          ...props,
+        }}
       >
         {children}
-      </div>
+      </ScrollArea>
     );
   }
 );
@@ -562,7 +562,7 @@ export const MessageScrollerContent = React.forwardRef<HTMLDivElement, MessageSc
         role="log"
         aria-relevant="additions"
         data-slot="message-scroller-content"
-        className={cn('flex flex-col gap-4 p-4 min-h-full justify-start', className)}
+        className={cn('flex flex-1 flex-col gap-4 p-4 min-h-full justify-start', className)}
         {...props}
       >
         {children}

@@ -248,6 +248,7 @@
         "seany9915/eolas-ui/badge",
         "seany9915/eolas-ui/icon",
         "seany9915/eolas-ui/empty",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/skeleton",
         "seany9915/eolas-ui/utils"
       ],
@@ -422,6 +423,7 @@
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/icon",
         "seany9915/eolas-ui/badge",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [

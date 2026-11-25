@@ -15,6 +15,7 @@
 import * as React from 'react';
 import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface ComboboxOption {
@@ -454,7 +455,7 @@ function ComboboxComponentInner<
                 <ComboboxPopup className={popupClassName}>
                   <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
 
-                  <ComboboxList className={listClassName}>
+                  <ComboboxList className={listClassName} scrollable={!virtualized}>
                     {normalizedGroups ? (
                       (group: { label: string; items: ComboboxOption[] }) => (
                         <ComboboxGroup key={group.label} items={group.items}>
@@ -774,20 +775,51 @@ export const ComboboxEmpty = React.forwardRef<
 ));
 ComboboxEmpty.displayName = 'ComboboxEmpty';
 
+export interface ComboboxListProps
+  extends React.ComponentPropsWithoutRef<typeof BaseCombobox.List> {
+  /** Wraps the list in `ScrollArea` for custom scrollbars. Set to `false` when using an external virtualizer. Defaults to `true`. */
+  scrollable?: boolean;
+}
+
 export const ComboboxList = React.forwardRef<
   React.ComponentRef<typeof BaseCombobox.List>,
-  React.ComponentPropsWithoutRef<typeof BaseCombobox.List>
->(({ className, ...props }, ref) => (
-  <BaseCombobox.List
-    ref={ref}
-    data-slot="combobox-list"
-    className={composeClassName(
-      'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 flex flex-col gap-0.5 outline-none data-[empty]:p-0',
-      className
-    )}
-    {...props}
-  />
-));
+  ComboboxListProps
+>(({ className, scrollable = true, ...props }, ref) => {
+  if (!scrollable) {
+    return (
+      <BaseCombobox.List
+        ref={ref}
+        data-slot="combobox-list"
+        className={composeClassName(
+          'max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain py-1 scroll-py-1 flex flex-col gap-0.5 outline-none data-[empty]:p-0',
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <ScrollArea
+      className="min-h-0 flex-[0_1_auto] max-h-[min(20rem,var(--available-height))]"
+      viewportClassName="overscroll-contain scroll-py-1"
+      viewportProps={{
+        tabIndex: -1,
+        onMouseDown: (e) => e.preventDefault(),
+      }}
+    >
+      <BaseCombobox.List
+        ref={ref}
+        data-slot="combobox-list"
+        className={composeClassName(
+          'py-1 pe-1.5 flex flex-col gap-0.5 outline-none data-[empty]:p-0',
+          className
+        )}
+        {...props}
+      />
+    </ScrollArea>
+  );
+});
 ComboboxList.displayName = 'ComboboxList';
 
 export const ComboboxPopup = React.forwardRef<

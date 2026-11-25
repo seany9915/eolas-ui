@@ -24,6 +24,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Badge, type BadgeColorRole } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 export interface SupportingPaneBlockProps
@@ -139,9 +140,12 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
             {canvasToolbar}
           </div>
         )}
-        <div className="flex-1 p-4 @md:p-6 overflow-y-auto min-h-0">
-          {children}
-        </div>
+        <ScrollArea
+          className="flex-1 min-h-0"
+          viewportClassName="overscroll-contain"
+        >
+          <div className="p-4 @md:p-6">{children}</div>
+        </ScrollArea>
       </section>
     );
 
@@ -203,9 +207,12 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
           </div>
 
           {/* Supporting Pane Body */}
-          <div className="flex-1 p-4 overflow-y-auto min-w-0 min-h-0">
-            {supportingContent}
-          </div>
+          <ScrollArea
+            className="flex-1 min-w-0 min-h-0"
+            viewportClassName="overscroll-contain"
+          >
+            <div className="p-4">{supportingContent}</div>
+          </ScrollArea>
         </div>
       </aside>
     );

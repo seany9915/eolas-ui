@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Popover as BasePopover } from '@base-ui/react/popover';
+import { ScrollArea } from './scroll-area';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 
@@ -172,7 +173,12 @@ function PopoverComponentInner<Payload = unknown>(
         )}
       >
         {showArrow && <PopoverArrow />}
-        <div data-slot="popover-body" className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5">
+        <ScrollArea
+          data-slot="popover-body"
+          className="min-h-0 flex-[0_1_auto]"
+          viewportClassName="overscroll-contain"
+          contentClassName="p-5"
+        >
           {title && (
             <BasePopover.Title data-slot="popover-title" className="font-heading text-base font-bold text-on-surface mb-1.5">
               {title}
@@ -193,7 +199,7 @@ function PopoverComponentInner<Payload = unknown>(
               </BasePopover.Close>
             </div>
           )}
-        </div>
+        </ScrollArea>
       </BasePopover.Popup>
     </BasePopover.Positioner>
   );
@@ -345,9 +351,13 @@ export const PopoverContent = Object.assign(
             {...props}
           >
             {showArrow && <PopoverArrow />}
-            <div data-slot="popover-body" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            <ScrollArea
+              data-slot="popover-body"
+              className="min-h-0 flex-[0_1_auto]"
+              viewportClassName="overscroll-contain"
+            >
               {children}
-            </div>
+            </ScrollArea>
           </BasePopover.Popup>
         </BasePopover.Positioner>
       );

@@ -204,7 +204,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
       </SidebarHeader>
 
       {/* Category List & Items */}
-      <SidebarContent className="flex-1 overflow-y-auto px-2 py-3 flex flex-col gap-1">
+      <SidebarContent className="px-2 py-3 flex flex-col gap-1">
         {REGISTRY_CATEGORIES.map((category) => {
           const categoryEntries = entriesByCategory[category.id] || [];
           if (categoryEntries.length === 0 && searchQuery) {

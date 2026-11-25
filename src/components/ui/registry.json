@@ -91,6 +91,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -637,6 +638,7 @@
       "registryDependencies": [
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/tooltip",
         "seany9915/eolas-ui/announce",
         "seany9915/eolas-ui/utils"
@@ -698,6 +700,7 @@
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -730,7 +733,8 @@
       "registryDependencies": [
         "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/dialog",
-        "seany9915/eolas-ui/icon"
+        "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area"
       ],
       "files": [
         {
@@ -794,6 +798,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -906,6 +911,7 @@
       "registryDependencies": [
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -1131,6 +1137,7 @@
       "registryDependencies": [
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/skeleton",
         "seany9915/eolas-ui/carousel",
         "seany9915/eolas-ui/utils"
@@ -1295,6 +1302,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -1318,7 +1326,8 @@
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils",
-        "seany9915/eolas-ui/icon"
+        "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area"
       ],
       "files": [
         {
@@ -1339,6 +1348,7 @@
       "registryDependencies": [
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/tooltip",
         "seany9915/eolas-ui/utils"
       ],
@@ -1642,6 +1652,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -1665,7 +1676,8 @@
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/utils",
-        "seany9915/eolas-ui/icon"
+        "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area"
       ],
       "files": [
         {
@@ -1946,8 +1958,10 @@
       "meta": {
         "taxonomy": [
           "Augments native browser scrolling with custom-styled, accessible scrollbars.",
-          "Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
+          "Supports vertical, horizontal, or dual-axis scrolling with optional overflow fade masks.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring (scoped to direct-child viewport so nested ScrollAreas never double-highlight), slim 6px passive overlay thumb that expands to 8px with >=3:1 contrast on track hover/active drag, high-contrast / forced-colors overrides, inverted surface support, and calibrated motion restraint.",
+          "Place internal padding on `contentClassName` (or `viewportClassName`), not on `Root`, so scrolling content reaches the container edges cleanly without detaching the scrollbar.",
+          "When using `scrollbarVisibility=\"always\"`, add matching end-padding (e.g. `pe-3`) on `contentClassName` because overlay scrollbars do not reserve layout gutter space."
         ]
       }
     },
@@ -1993,6 +2007,7 @@
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -2067,6 +2082,7 @@
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/input",
         "seany9915/eolas-ui/separator",
+        "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/skeleton",
         "seany9915/eolas-ui/icon",
         "seany9915/eolas-ui/utils"

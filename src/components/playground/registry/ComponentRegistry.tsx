@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Drawer } from '@/components/ui/drawer';
 import { Icon } from '@/components/ui/icon';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { RegistrySidebar } from './RegistrySidebar';
 import { RegistryCanvas } from './RegistryCanvas';
@@ -166,8 +167,11 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
       />
 
       {/* Main Sandbox Canvas or Catalog Overview (div avoids nested <main> inside App's <main>) */}
-      <SidebarInset render={<div />} className="flex-1 min-w-0 bg-background flex flex-col overflow-y-auto">
-        <div className="flex-1 p-4 sm:p-8 lg:p-10 xl:p-12 w-full max-w-[1600px] mx-auto">
+      <SidebarInset render={<div />} className="flex-1 min-w-0 min-h-0 bg-background flex flex-col overflow-hidden">
+        <ScrollArea
+          className="flex-1 min-h-0"
+          contentClassName="p-4 sm:p-8 lg:p-10 xl:p-12 w-full max-w-[1600px] mx-auto"
+        >
           {selectedEntry ? (
             <RegistryCanvas
               entry={selectedEntry}
@@ -187,7 +191,7 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
               onTierFilterChange={setTierFilter}
             />
           )}
-        </div>
+        </ScrollArea>
       </SidebarInset>
     </SidebarProvider>
   );

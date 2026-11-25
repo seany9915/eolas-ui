@@ -31,6 +31,7 @@ import { Item } from '@/components/ui/item';
 import { Badge, type BadgeColorRole } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { Empty } from '@/components/ui/empty';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -414,7 +415,8 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           </div>
 
           {/* List Items Container with Roving Arrow-Key Focus */}
-          <div data-slot="list-items" className="flex-1 overflow-y-auto flex flex-col">
+          <ScrollArea className="flex-1 min-h-0" viewportClassName="overscroll-contain">
+            <div data-slot="list-items" className="flex flex-col">
             {searchable && hasSearchQuery && (
               <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {filteredItems.length === 0
@@ -539,7 +541,8 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                 })}
               </Item.Group>
             )}
-          </div>
+            </div>
+          </ScrollArea>
         </div>
 
         {/* Detail Pane */}
@@ -635,16 +638,12 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               )}
 
               {/* Detail Body */}
-              <div
-                data-slot="detail-body"
-                data-flush={detailBodyFlush ? 'true' : undefined}
-                className={cn(
-                  detailBodyFlush
-                    ? 'flex-1 flex flex-col min-h-0 overflow-hidden p-0'
-                    : cn('flex-1 overflow-y-auto', !density && '@max-md:p-4')
-                )}
-              >
-                {detailBodyFlush ? (
+              {detailBodyFlush ? (
+                <div
+                  data-slot="detail-body"
+                  data-flush="true"
+                  className="flex-1 flex flex-col min-h-0 overflow-hidden p-0"
+                >
                   <div className="@container flex-1 flex flex-col min-h-0 w-full">
                     {renderDetail ? (
                       renderDetail(selectedItem)
@@ -656,8 +655,13 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                       </p>
                     )}
                   </div>
-                ) : (
-                  <div className="@container w-full">
+                </div>
+              ) : (
+                <ScrollArea className="flex-1 min-h-0" viewportClassName="overscroll-contain">
+                  <div
+                    data-slot="detail-body"
+                    className={cn('@container w-full', !density && '@max-md:p-4')}
+                  >
                     {renderDetail ? (
                       renderDetail(selectedItem)
                     ) : children ? (
@@ -668,8 +672,8 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                       </p>
                     )}
                   </div>
-                )}
-              </div>
+                </ScrollArea>
+              )}
             </div>
           ) : (
             <div className="flex-1 flex flex-col h-full min-h-0">
@@ -678,7 +682,11 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                   Details
                 </span>
               </div>
-              <div className="flex-1 overflow-y-auto flex flex-col">
+              <ScrollArea
+                className="flex-1 min-h-0"
+                viewportClassName="overscroll-contain"
+                contentClassName="flex flex-col"
+              >
                 <Empty
                   variant="unboxed"
                   icon="touch_app"
@@ -687,7 +695,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                   action={emptyDetailAction}
                   className="my-0"
                 />
-              </div>
+              </ScrollArea>
             </div>
           )}
         </div>

@@ -1435,8 +1435,10 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "sourcePath": "src/components/ui/scroll-area.tsx",
     "taxonomy": [
       "Augments native browser scrolling with custom-styled, accessible scrollbars.",
-      "Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.",
-      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
+      "Supports vertical, horizontal, or dual-axis scrolling with optional overflow fade masks.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring (scoped to direct-child viewport so nested ScrollAreas never double-highlight), slim 6px passive overlay thumb that expands to 8px with >=3:1 contrast on track hover/active drag, high-contrast / forced-colors overrides, inverted surface support, and calibrated motion restraint.",
+      "Place internal padding on `contentClassName` (or `viewportClassName`), not on `Root`, so scrolling content reaches the container edges cleanly without detaching the scrollbar.",
+      "When using `scrollbarVisibility=\"always\"`, add matching end-padding (e.g. `pe-3`) on `contentClassName` because overlay scrollbars do not reserve layout gutter space."
     ],
     "dependencies": [
       "@base-ui/react"

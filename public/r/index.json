@@ -507,6 +507,7 @@
       "@base-ui/react"
     ],
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -1053,6 +1054,7 @@
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json",
       "https://seany9915.github.io/eolas-ui/r/announce.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
@@ -1114,6 +1116,7 @@
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -1146,7 +1149,8 @@
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
       "https://seany9915.github.io/eolas-ui/r/dialog.json",
-      "https://seany9915.github.io/eolas-ui/r/icon.json"
+      "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json"
     ],
     "files": [
       {
@@ -1210,6 +1214,7 @@
       "@base-ui/react"
     ],
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -1322,6 +1327,7 @@
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -1547,6 +1553,7 @@
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/skeleton.json",
       "https://seany9915.github.io/eolas-ui/r/carousel.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
@@ -1711,6 +1718,7 @@
       "@base-ui/react"
     ],
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -1734,7 +1742,8 @@
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
-      "https://seany9915.github.io/eolas-ui/r/icon.json"
+      "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json"
     ],
     "files": [
       {
@@ -1755,6 +1764,7 @@
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/tooltip.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
@@ -2058,6 +2068,7 @@
       "@base-ui/react"
     ],
     "registryDependencies": [
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -2081,7 +2092,8 @@
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/utils.json",
-      "https://seany9915.github.io/eolas-ui/r/icon.json"
+      "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json"
     ],
     "files": [
       {
@@ -2362,8 +2374,10 @@
     "meta": {
       "taxonomy": [
         "Augments native browser scrolling with custom-styled, accessible scrollbars.",
-        "Supports vertical, horizontal, or dual-axis scrolling with overflow fade masks.",
-        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, and motion restraint."
+        "Supports vertical, horizontal, or dual-axis scrolling with optional overflow fade masks.",
+        "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring (scoped to direct-child viewport so nested ScrollAreas never double-highlight), slim 6px passive overlay thumb that expands to 8px with >=3:1 contrast on track hover/active drag, high-contrast / forced-colors overrides, inverted surface support, and calibrated motion restraint.",
+        "Place internal padding on `contentClassName` (or `viewportClassName`), not on `Root`, so scrolling content reaches the container edges cleanly without detaching the scrollbar.",
+        "When using `scrollbarVisibility=\"always\"`, add matching end-padding (e.g. `pe-3`) on `contentClassName` because overlay scrollbars do not reserve layout gutter space."
       ]
     }
   },
@@ -2409,6 +2423,7 @@
     ],
     "registryDependencies": [
       "https://seany9915.github.io/eolas-ui/r/icon.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [
@@ -2483,6 +2498,7 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/input.json",
       "https://seany9915.github.io/eolas-ui/r/separator.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/skeleton.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
@@ -3503,6 +3519,7 @@
       "https://seany9915.github.io/eolas-ui/r/badge.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/empty.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/skeleton.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
@@ -3677,6 +3694,7 @@
       "https://seany9915.github.io/eolas-ui/r/button.json",
       "https://seany9915.github.io/eolas-ui/r/icon.json",
       "https://seany9915.github.io/eolas-ui/r/badge.json",
+      "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
       "https://seany9915.github.io/eolas-ui/r/utils.json"
     ],
     "files": [

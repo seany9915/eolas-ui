@@ -5,6 +5,7 @@ import { Menubar as BaseMenubar } from '@base-ui/react/menubar';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 
 export interface MenubarMenuItem {
   id: string;
@@ -93,12 +94,22 @@ export const MenubarContent = React.forwardRef<HTMLDivElement, MenubarContentPro
           ref={ref}
           data-slot="menubar-content"
           className={composeClassName(
-            'min-w-[220px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] overflow-x-hidden overflow-y-auto overscroll-contain p-1 rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+            'flex flex-col min-w-[220px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
             className
           )}
           {...props}
         >
-          {children}
+          <ScrollArea
+            className="min-h-0 flex-[0_1_auto]"
+            viewportClassName="overscroll-contain scroll-py-1"
+            viewportProps={{
+              tabIndex: -1,
+              onMouseDown: (e) => e.preventDefault(),
+            }}
+            contentClassName="p-1"
+          >
+            {children}
+          </ScrollArea>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
     </BaseMenu.Portal>

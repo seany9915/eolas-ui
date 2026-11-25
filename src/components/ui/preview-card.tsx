@@ -4,6 +4,7 @@ import * as React from 'react';
 import { PreviewCard as BasePreviewCard } from '@base-ui/react/preview-card';
 import { cn, composeClassName } from '@/lib/utils';
 import { Icon } from './icon';
+import { ScrollArea } from './scroll-area';
 
 interface PreviewCardContextValue {
   delay?: number;
@@ -131,12 +132,14 @@ export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopu
         {...props}
       >
         {arrowChildren}
-        <div
+        <ScrollArea
           data-slot="preview-card-body"
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain flex flex-col gap-2"
+          className="min-h-0 flex-[0_1_auto]"
+          viewportClassName="overscroll-contain"
+          contentClassName="flex flex-col gap-2"
         >
           {bodyChildren}
-        </div>
+        </ScrollArea>
       </BasePreviewCard.Popup>
     );
   }
