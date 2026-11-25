@@ -192,11 +192,11 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
 
     return (
       <>
-        {/* Out-of-flow 1px sentinel so it never participates in parent flex/grid gap calculations */}
+        {/* Zero-offset 1px sentinel positioned immediately above stickyElement */}
         <div
           ref={sentinelRef}
           aria-hidden="true"
-          className="absolute top-0 inset-x-0 h-px p-0 opacity-0 pointer-events-none"
+          className="h-px w-full -mb-px p-0 opacity-0 pointer-events-none"
         />
         {stickyElement}
       </>

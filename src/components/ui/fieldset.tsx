@@ -36,8 +36,10 @@ export const FieldsetRoot = React.forwardRef<
     className={composeClassName(
       cn(
         'w-full group/fieldset flex flex-col gap-3',
-        variant === 'card' && 'p-5 rounded-lg bg-surface border border-outline-variant shadow-card gap-4',
-        variant === 'flat' && 'p-5 rounded-lg bg-surface-container-low border-none gap-4',
+        variant === 'card' &&
+          'p-5 rounded-lg bg-surface border border-transparent shadow-card forced-colors:border-[CanvasText] gap-4',
+        variant === 'flat' &&
+          'p-5 rounded-lg bg-surface-container-low border border-transparent forced-colors:border-[CanvasText] gap-4',
         disabled && 'opacity-60 cursor-not-allowed'
       ),
       className
@@ -84,10 +86,22 @@ FieldsetDescription.displayName = 'FieldsetDescription';
 
 const FieldsetComponent = React.forwardRef<HTMLFieldSetElement, FieldsetProps>(
   ({ legend, description, children, variant = 'default', className, disabled, ...props }, ref) => {
+    const generatedId = React.useId();
+    const descId = description ? `${generatedId}-desc` : undefined;
+    const describedBy =
+      [props['aria-describedby'], descId].filter(Boolean).join(' ') || undefined;
+
     return (
-      <FieldsetRoot ref={ref} variant={variant} disabled={disabled} className={className} {...props}>
+      <FieldsetRoot
+        ref={ref}
+        variant={variant}
+        disabled={disabled}
+        className={className}
+        {...props}
+        aria-describedby={describedBy}
+      >
         {legend && <FieldsetLegend>{legend}</FieldsetLegend>}
-        {description && <FieldsetDescription>{description}</FieldsetDescription>}
+        {description && <FieldsetDescription id={descId}>{description}</FieldsetDescription>}
         {children}
       </FieldsetRoot>
     );

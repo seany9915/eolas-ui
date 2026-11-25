@@ -21,6 +21,7 @@
 import * as React from 'react';
 import { Toolbar as BaseToolbar } from '@base-ui/react/toolbar';
 import { Tooltip } from './tooltip';
+import { Icon } from './icon';
 import { cn, composeClassName } from '@/lib/utils';
 
 interface ToolbarContextValue {
@@ -57,6 +58,7 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
       <ToolbarContext.Provider value={{ orientation }}>
         <BaseToolbar.Root
           ref={ref}
+          data-slot="toolbar"
           data-variant={variant}
           orientation={orientation}
           loopFocus={loopFocus}
@@ -65,7 +67,7 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
             cn(
               'flex items-center gap-1.5 w-max max-w-full overflow-x-auto scrollbar-none select-none',
               variant === 'ghost'
-                ? 'p-0 rounded-none bg-transparent border-0'
+                ? 'p-1 -m-1 rounded-none bg-transparent border-0'
                 : 'p-1.5 rounded-lg bg-surface border border-outline-variant',
               orientation === 'vertical' && 'flex-col items-stretch overflow-x-visible'
             ),
@@ -86,7 +88,7 @@ export interface ToolbarButtonProps
   active?: boolean;
   tooltip?: React.ReactNode;
   icon?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
 }
 
 export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
@@ -106,15 +108,17 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
   ) => {
     const context = React.useContext(ToolbarContext);
 
-    const sizeClasses = {
-      sm: 'size-11 min-w-[44px] min-h-[44px] text-xs',
-      md: 'size-11 min-w-[44px] min-h-[44px] text-sm',
-      lg: 'size-12 min-w-[48px] min-h-[48px] text-base',
-    }[size];
+    const sizeClasses: Record<'sm' | 'md' | 'lg' | 'icon', string> = {
+      sm: 'h-11 min-w-11 px-2.5 gap-1.5 text-xs',
+      md: 'h-11 min-w-11 px-2.5 gap-1.5 text-sm',
+      lg: 'h-12 min-w-12 px-3 gap-2 text-base',
+      icon: 'size-11 min-w-[44px] min-h-[44px] p-0',
+    };
 
     const button = (
       <BaseToolbar.Button
         ref={ref}
+        data-slot="toolbar-button"
         disabled={disabled}
         focusableWhenDisabled={focusableWhenDisabled}
         aria-pressed={active !== undefined ? active : undefined}
@@ -124,7 +128,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
             'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
             'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
-            sizeClasses,
+            sizeClasses[size],
             active
               ? 'bg-primary text-on-primary'
               : 'text-on-surface-variant hover:bg-state-hover hover:text-on-surface',
@@ -134,11 +138,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
         )}
         {...props}
       >
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="sm" className="shrink-0" aria-hidden="true" />}
         {children}
       </BaseToolbar.Button>
     );
@@ -148,7 +148,7 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
         <Tooltip
           content={tooltip}
           disabled={disabled}
-          side={context.orientation === 'vertical' ? 'right' : 'top'}
+          side={context.orientation === 'vertical' ? 'inline-end' : 'top'}
         >
           {button}
         </Tooltip>
@@ -169,6 +169,7 @@ export const ToolbarGroup = React.forwardRef<HTMLDivElement, ToolbarGroupProps>(
     return (
       <BaseToolbar.Group
         ref={ref}
+        data-slot="toolbar-group"
         disabled={disabled}
         className={composeClassName(
           cn(
@@ -198,6 +199,7 @@ export const ToolbarSeparator = React.forwardRef<HTMLDivElement, ToolbarSeparato
     return (
       <BaseToolbar.Separator
         ref={ref}
+        data-slot="toolbar-separator"
         orientation={effectiveOrientation}
         className={composeClassName(
           effectiveOrientation === 'vertical'
@@ -228,10 +230,11 @@ export const ToolbarLink = React.forwardRef<HTMLAnchorElement, ToolbarLinkProps>
     return (
       <BaseToolbar.Link
         ref={ref}
+        data-slot="toolbar-link"
         className={composeClassName(
           cn(
             'inline-flex shrink-0 whitespace-nowrap items-center justify-center rounded-sm font-label font-semibold text-on-surface-variant hover:text-on-surface hover:bg-state-hover select-none',
-            'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)]',
+            'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-quick)] motion-reduce:transition-none',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
             sizeClasses
           ),
@@ -254,11 +257,12 @@ export const ToolbarInput = React.forwardRef<HTMLInputElement, ToolbarInputProps
     return (
       <BaseToolbar.Input
         ref={ref}
+        data-slot="toolbar-input"
         disabled={disabled}
         focusableWhenDisabled={focusableWhenDisabled}
         className={composeClassName(
           cn(
-            'h-11 min-h-11 min-w-0 max-w-full px-3 rounded bg-surface border border-outline text-sm font-sans text-on-surface placeholder:text-on-surface-variant/80',
+            'h-11 min-h-11 min-w-0 max-w-full px-3 rounded bg-surface border border-outline text-sm font-sans text-on-surface placeholder:text-on-surface-variant/80 transition-[border-color,outline-color] duration-[var(--duration-quick)] motion-reduce:transition-none',
             'focus-visible:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary focus-visible:z-10',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed'
           ),
@@ -317,6 +321,7 @@ const ToolbarComponent = React.forwardRef<HTMLDivElement, ToolbarProps>(
           : actions?.map((act) => (
               <ToolbarButton
                 key={act.id}
+                size="icon"
                 onClick={act.action}
                 disabled={act.disabled}
                 aria-label={act.label}

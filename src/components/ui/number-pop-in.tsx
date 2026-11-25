@@ -22,10 +22,31 @@ export interface NumberPopInProps extends React.HTMLAttributes<HTMLSpanElement> 
   prefix?: string;
   suffix?: string;
   decimals?: number;
+  locale?: Intl.LocalesArgument;
   format?: (value: number) => string;
   /** Whether to announce value updates via a polite live region. Defaults to false. */
   announce?: boolean;
   className?: string;
+}
+
+const popInFormatterCache = new Map<string, Intl.NumberFormat>();
+
+function getCachedPopInFormatter(
+  locale: Intl.LocalesArgument | undefined,
+  decimals: number
+): Intl.NumberFormat {
+  const localeKey = Array.isArray(locale) ? locale.join(',') : (locale ?? 'default');
+  const cacheKey = `${localeKey}|${decimals}`;
+  let formatter = popInFormatterCache.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, {
+      numberingSystem: 'latn',
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+    popInFormatterCache.set(cacheKey, formatter);
+  }
+  return formatter;
 }
 
 export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
@@ -35,6 +56,7 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
       prefix = '',
       suffix = '',
       decimals = 0,
+      locale,
       format,
       announce = false,
       role,
@@ -44,51 +66,99 @@ export const NumberPopIn = React.forwardRef<HTMLSpanElement, NumberPopInProps>(
     },
     ref
   ) => {
-    const formattedText = React.useMemo(() => {
-      if (format) return format(value);
-      if (decimals > 0) return value.toFixed(decimals);
-      return Math.round(value).toLocaleString();
-    }, [value, format, decimals]);
+    const safeValue = Number.isFinite(value) ? value : 0;
 
-    // Decompose into characters and anchor stagger cleanly to numeric digits (never the '.' separator).
-    const charItems = React.useMemo(() => {
-      const chars = formattedText.split('');
-      const decimalIdx = formattedText.lastIndexOf('.');
-
-      if (decimalIdx !== -1) {
-        let fractionalDigitCount = 0;
-        return chars.map((char, idx) => {
-          let staggerIndex = 0;
-          if (idx > decimalIdx && /[0-9]/.test(char)) {
-            fractionalDigitCount += 1;
-            staggerIndex = Math.min(fractionalDigitCount, 2);
+    const { formattedText, charItems } = React.useMemo(() => {
+      if (format) {
+        const text = format(safeValue);
+        const chars = text.split('');
+        const decimalIdx = text.lastIndexOf('.');
+        if (decimalIdx !== -1) {
+          let fracCount = 0;
+          return {
+            formattedText: text,
+            charItems: chars.map((char, idx) => {
+              let staggerIndex = 0;
+              if (idx > decimalIdx && /^[0-9]$/.test(char)) {
+                fracCount += 1;
+                staggerIndex = Math.min(fracCount, 2);
+              }
+              return { char, idx, staggerIndex };
+            }),
+          };
+        }
+        const digitIndices: number[] = [];
+        for (let i = 0; i < chars.length; i += 1) {
+          if (/^[0-9]$/.test(chars[i])) digitIndices.push(i);
+        }
+        const staggerByIdx = new Map<number, number>();
+        if (digitIndices.length > 1) {
+          const trailingCount = Math.min(2, digitIndices.length - 1);
+          const startPos = digitIndices.length - trailingCount;
+          for (let i = 0; i < trailingCount; i += 1) {
+            staggerByIdx.set(digitIndices[startPos + i], i + 1);
           }
-          return { char, idx, staggerIndex };
-        });
+        }
+        return {
+          formattedText: text,
+          charItems: chars.map((char, idx) => ({
+            char,
+            idx,
+            staggerIndex: staggerByIdx.get(idx) ?? 0,
+          })),
+        };
       }
 
-      const digitIndices: number[] = [];
-      for (let i = 0; i < chars.length; i += 1) {
-        if (/[0-9]/.test(chars[i])) {
-          digitIndices.push(i);
+      const normalizedDecimals = Math.max(0, Math.floor(decimals));
+      const formatter = getCachedPopInFormatter(locale, normalizedDecimals);
+      const parts = formatter.formatToParts(safeValue);
+      const hasDecimal = parts.some((p) => p.type === 'decimal');
+      const items: Array<{ char: string; idx: number; staggerIndex: number; isDigit: boolean }> = [];
+      let fracCount = 0;
+      let idx = 0;
+
+      for (const part of parts) {
+        if (part.type === 'integer') {
+          for (const char of part.value) {
+            items.push({ char, idx, staggerIndex: 0, isDigit: /^[0-9]$/.test(char) });
+            idx += 1;
+          }
+        } else if (part.type === 'fraction') {
+          for (const char of part.value) {
+            const isDigit = /^[0-9]$/.test(char);
+            if (isDigit) fracCount += 1;
+            items.push({
+              char,
+              idx,
+              staggerIndex: isDigit ? Math.min(fracCount, 2) : 0,
+              isDigit,
+            });
+            idx += 1;
+          }
+        } else {
+          for (const char of part.value) {
+            items.push({ char, idx, staggerIndex: 0, isDigit: false });
+            idx += 1;
+          }
         }
       }
 
-      const staggerByIndex = new Map<number, number>();
-      if (digitIndices.length > 1) {
-        const trailingCount = Math.min(2, digitIndices.length - 1);
-        const startPos = digitIndices.length - trailingCount;
-        for (let i = 0; i < trailingCount; i += 1) {
-          staggerByIndex.set(digitIndices[startPos + i], i + 1);
+      if (!hasDecimal) {
+        const digitPositions = items.filter((item) => item.isDigit);
+        if (digitPositions.length > 1) {
+          const trailingCount = Math.min(2, digitPositions.length - 1);
+          const startPos = digitPositions.length - trailingCount;
+          for (let i = 0; i < trailingCount; i += 1) {
+            digitPositions[startPos + i].staggerIndex = i + 1;
+          }
         }
       }
 
-      return chars.map((char, idx) => ({
-        char,
-        idx,
-        staggerIndex: staggerByIndex.get(idx) ?? 0,
-      }));
-    }, [formattedText]);
+      return {
+        formattedText: items.map((i) => i.char).join(''),
+        charItems: items,
+      };
+    }, [safeValue, format, decimals, locale]);
 
     const fullText = `${prefix}${formattedText}${suffix}`;
 

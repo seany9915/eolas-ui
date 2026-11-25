@@ -60,6 +60,8 @@ export interface ChatMessageData extends ChatMessageProps {
  * -----------------------------------------------------------------------------------------------*/
 export interface ChatHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
+  /** Heading tag used for the chat header title. Defaults to `'h3'`. */
+  titleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   subtitle?: string;
   actions?: React.ReactNode;
   children?: React.ReactNode;
@@ -67,7 +69,8 @@ export interface ChatHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const ChatHeader = React.forwardRef<HTMLDivElement, ChatHeaderProps>(
-  ({ title, subtitle, actions, children, className, ...props }, ref) => {
+  ({ title, titleAs = 'h3', subtitle, actions, children, className, ...props }, ref) => {
+    const TitleTag = titleAs;
     return (
       <div
         ref={ref}
@@ -81,7 +84,7 @@ export const ChatHeader = React.forwardRef<HTMLDivElement, ChatHeaderProps>(
         {children ?? (
           <>
             <div className="flex flex-col min-w-0">
-              {title && <h3 className="font-heading text-base font-bold text-on-surface truncate">{title}</h3>}
+              {title && <TitleTag className="font-heading text-base font-bold text-on-surface truncate">{title}</TitleTag>}
               {subtitle && <p className="font-sans text-sm text-on-surface-variant truncate">{subtitle}</p>}
             </div>
             {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
@@ -107,7 +110,7 @@ export const ChatMessages = React.forwardRef<HTMLDivElement, ChatMessagesProps>(
       <MessageScroller variant="default" className="flex-1 min-h-0">
         <MessageScrollerViewport
           ref={ref}
-          className={cn('flex-1 min-h-0 w-full overflow-y-auto overscroll-contain relative scroll-smooth', className)}
+          className={cn('flex-1 min-h-0 w-full overflow-y-auto overscroll-contain relative motion-safe:scroll-smooth', className)}
           {...props}
         >
           <MessageScrollerContent>
@@ -134,10 +137,13 @@ export const ChatFooter = React.forwardRef<HTMLDivElement, ChatFooterProps>(
       <div
         ref={ref}
         data-slot="chat-footer"
-        className={cn('p-3.5 border-t border-outline-variant bg-surface shrink-0', className)}
+        className={cn(
+          'p-3.5 border-t border-outline-variant bg-surface shrink-0',
+          className
+        )}
         {...props}
       >
-        {children}
+        <div className="pb-safe">{children}</div>
       </div>
     );
   }
@@ -150,20 +156,35 @@ ChatFooter.displayName = 'ChatFooter';
 export interface ChatStatusProps extends React.HTMLAttributes<HTMLDivElement> {
   status?: React.ReactNode;
   isStreaming?: boolean;
+  /** Screen-reader text announced while `isStreaming` is true and no status/children exist. */
+  streamingLabel?: string;
+  /** Emits `role="status"` and `aria-live="polite"`. Set to `false` when nested inside a `role="log"` container. */
+  live?: boolean;
   children?: React.ReactNode;
 }
 
 export const ChatStatus = React.forwardRef<HTMLDivElement, ChatStatusProps>(
-  ({ status, isStreaming = false, children, className, ...props }, ref) => {
+  (
+    {
+      status,
+      isStreaming = false,
+      streamingLabel = 'Generating response...',
+      live = true,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
     if (!status && !children && !isStreaming) return null;
     return (
       <div
         ref={ref}
-        role="status"
-        aria-live="polite"
+        role={live ? 'status' : undefined}
+        aria-live={live ? 'polite' : undefined}
         data-slot="chat-status"
         className={cn(
-          'flex items-center gap-2 px-4 py-1.5 text-xs font-sans text-on-surface-variant select-none',
+          'flex items-center gap-2 px-4 py-1.5 text-sm font-sans text-on-surface-variant select-none',
           className
         )}
         {...props}
@@ -176,7 +197,7 @@ export const ChatStatus = React.forwardRef<HTMLDivElement, ChatStatusProps>(
         )}
         {children || (typeof status === 'string' ? <span>{status}</span> : status)}
         {isStreaming && !status && !children && (
-          <span className="sr-only">Generating response...</span>
+          <span className="sr-only">{streamingLabel}</span>
         )}
       </div>
     );
@@ -223,6 +244,8 @@ export interface ChatProps extends React.HTMLAttributes<HTMLDivElement> {
   footerHint?: React.ReactNode;
   status?: React.ReactNode;
   isStreaming?: boolean;
+  /** Accessible status fallback while `isStreaming` or `isLoading` is active. */
+  streamingLabel?: string;
   position?: 'docked' | 'floating';
   model?: string;
   onModelChange?: (model: string) => void;
@@ -245,7 +268,7 @@ export interface ChatProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<NonNullable<ChatProps['variant']>, string> = {
-  card: 'rounded-lg border border-transparent shadow-card bg-surface',
+  card: 'rounded-lg border border-transparent shadow-card bg-surface forced-colors:border-on-surface',
   canvas: 'rounded-none border-0 bg-background',
   ghost: 'rounded-none border-0 bg-transparent',
   unboxed: 'rounded-none border-0 bg-transparent',
@@ -276,6 +299,7 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
       footerHint,
       status,
       isStreaming = false,
+      streamingLabel = 'Generating response...',
       position = 'docked',
       model,
       onModelChange,
@@ -330,10 +354,21 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
       }
     };
 
-    const normalizedSuggestions: SuggestionItem[] = suggestions.map((s, idx) =>
-      typeof s === 'string' ? { id: `sugg-${idx}`, label: s, prompt: s } : s
-    );
+    const normalizedSuggestions: SuggestionItem[] = React.useMemo(() => {
+      const seen = new Map<string, number>();
+      return suggestions.map((s) => {
+        if (typeof s !== 'string') return s;
+        const count = seen.get(s) ?? 0;
+        seen.set(s, count + 1);
+        return {
+          id: count === 0 ? `sugg-${s}` : `sugg-${s}-${count}`,
+          label: s,
+          prompt: s,
+        };
+      });
+    }, [suggestions]);
 
+    const suggestionsDisabled = disabled || isLoading;
     const isFloating = position === 'floating';
 
     const promptInputNode = (
@@ -417,8 +452,10 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                         {(status || isStreaming || isLoading) && (
                           <MessageScrollerItem messageId="chat-live-status">
                             <ChatStatus
+                              live={false}
                               status={status}
                               isStreaming={isStreaming || isLoading}
+                              streamingLabel={streamingLabel}
                             />
                           </MessageScrollerItem>
                         )}
@@ -438,22 +475,26 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                   className={cn(
                     'relative shrink-0 px-4 pt-2 pb-4 flex flex-col items-center gap-2',
                     variant === 'card' &&
-                      'before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-surface before:to-transparent',
+                      'before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-linear-to-t before:from-surface before:to-transparent',
                     variant === 'canvas' &&
-                      'before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-background before:to-transparent'
+                      'before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-linear-to-t before:from-background before:to-transparent'
                   )}
                 >
                   {normalizedSuggestions.length > 0 && (
                     <div className="w-full max-w-3xl">
-                      <SuggestionChips
-                        label={suggestionsLabel}
-                        layout="responsive"
-                        suggestions={normalizedSuggestions}
-                        onSelect={handleSuggestionClick}
-                      />
+                      <SuggestionChips label={suggestionsLabel} layout="responsive">
+                        {normalizedSuggestions.map((item) => (
+                          <SuggestionChip
+                            key={item.id ?? item.label}
+                            suggestion={item}
+                            disabled={suggestionsDisabled}
+                            onSelect={handleSuggestionClick}
+                          />
+                        ))}
+                      </SuggestionChips>
                     </div>
                   )}
-                  <div className="w-full max-w-3xl">
+                  <div className="pb-safe w-full max-w-3xl">
                     {promptInputNode}
                   </div>
                 </div>
@@ -470,12 +511,16 @@ const ChatRoot = React.forwardRef<HTMLDivElement, ChatProps>(
                             : 'bg-transparent'
                       )}
                     >
-                      <SuggestionChips
-                        label={suggestionsLabel}
-                        layout="responsive"
-                        suggestions={normalizedSuggestions}
-                        onSelect={handleSuggestionClick}
-                      />
+                      <SuggestionChips label={suggestionsLabel} layout="responsive">
+                        {normalizedSuggestions.map((item) => (
+                          <SuggestionChip
+                            key={item.id ?? item.label}
+                            suggestion={item}
+                            disabled={suggestionsDisabled}
+                            onSelect={handleSuggestionClick}
+                          />
+                        ))}
+                      </SuggestionChips>
                     </div>
                   )}
                   <ChatFooter

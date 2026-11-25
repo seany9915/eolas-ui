@@ -85,11 +85,55 @@ function routeTransitionFocus(
   const resolved = 'current' in focusTarget ? focusTarget.current : focusTarget;
   if (resolved) {
     // Only make natively non-focusable targets programmatically focusable, and undo it on blur
-    if (resolved.tabIndex < 0 && !resolved.hasAttribute('tabindex')) {
+    const addedTempTabIndex = resolved.tabIndex < 0 && !resolved.hasAttribute('tabindex');
+    if (addedTempTabIndex) {
       resolved.setAttribute('tabindex', '-1');
-      resolved.addEventListener('blur', () => resolved.removeAttribute('tabindex'), { once: true });
     }
     resolved.focus({ preventScroll: true });
+    if (addedTempTabIndex) {
+      if (document.activeElement === resolved) {
+        resolved.addEventListener('blur', () => resolved.removeAttribute('tabindex'), { once: true });
+      } else {
+        resolved.removeAttribute('tabindex');
+      }
+    }
+  }
+}
+
+const emptySubscribe = () => () => {};
+
+function getViewTransitionSupport(): boolean {
+  return typeof document !== 'undefined' && typeof document.startViewTransition === 'function';
+}
+
+const activeTransitionOwners = new WeakMap<HTMLElement, { baseline: string; ownerId: number }>();
+let nextTransitionOwnerId = 0;
+
+function claimTargetTransitionName(
+  targetElement: HTMLElement | null | undefined,
+  transitionName: string | undefined,
+  ownerId: number
+): void {
+  if (!transitionName || !targetElement) return;
+  const existing = activeTransitionOwners.get(targetElement);
+  const baseline = existing ? existing.baseline : targetElement.style.getPropertyValue('view-transition-name');
+  activeTransitionOwners.set(targetElement, { baseline, ownerId });
+  targetElement.style.setProperty('view-transition-name', transitionName);
+}
+
+function releaseTargetTransitionName(
+  targetElement: HTMLElement | null | undefined,
+  transitionName: string | undefined,
+  ownerId: number
+): void {
+  if (!transitionName || !targetElement) return;
+  const entry = activeTransitionOwners.get(targetElement);
+  if (!entry || entry.ownerId !== ownerId) return;
+  activeTransitionOwners.delete(targetElement);
+  if (entry.baseline) {
+    targetElement.style.setProperty('view-transition-name', entry.baseline);
+  } else {
+    targetElement.style.removeProperty('view-transition-name');
   }
 }
 
@@ -111,23 +155,11 @@ export async function startScopedViewTransition(
   options?: TransitionOptions
 ): Promise<void> {
   const { focusTarget, transitionName, targetElement, types } = options || {};
-  const baselineName =
-    transitionName && targetElement
-      ? targetElement.style.getPropertyValue('view-transition-name')
-      : null;
-
-  if (transitionName && targetElement) {
-    targetElement.style.setProperty('view-transition-name', transitionName);
-  }
+  const ownerId = ++nextTransitionOwnerId;
+  claimTargetTransitionName(targetElement, transitionName, ownerId);
 
   const cleanupName = () => {
-    if (transitionName && targetElement) {
-      if (baselineName) {
-        targetElement.style.setProperty('view-transition-name', baselineName);
-      } else {
-        targetElement.style.removeProperty('view-transition-name');
-      }
-    }
+    releaseTargetTransitionName(targetElement, transitionName, ownerId);
   };
 
   const runUpdate = async () => {
@@ -191,7 +223,6 @@ export function useViewTransition(): UseViewTransitionReturn {
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const activeIdRef = React.useRef(0);
   const isMountedRef = React.useRef(true);
-  const originalNamesRef = React.useRef(new WeakMap<HTMLElement, string>());
 
   React.useEffect(() => {
     isMountedRef.current = true;
@@ -200,12 +231,11 @@ export function useViewTransition(): UseViewTransitionReturn {
     };
   }, []);
 
-  const isSupported = React.useMemo(() => {
-    return (
-      typeof document !== 'undefined' &&
-      typeof document.startViewTransition === 'function'
-    );
-  }, []);
+  const isSupported = React.useSyncExternalStore(
+    emptySubscribe,
+    getViewTransitionSupport,
+    () => false
+  );
 
   const startTransition = React.useCallback(
     async (
@@ -214,32 +244,15 @@ export function useViewTransition(): UseViewTransitionReturn {
     ): Promise<void> => {
       const { focusTarget, transitionName, targetElement, types } = options || {};
       const myId = ++activeIdRef.current;
-
-      // Capture baseline view-transition-name once per element so overlapping transitions cannot lose it.
-      if (transitionName && targetElement && !originalNamesRef.current.has(targetElement)) {
-        originalNamesRef.current.set(
-          targetElement,
-          targetElement.style.getPropertyValue('view-transition-name')
-        );
-      }
-      if (transitionName && targetElement) {
-        targetElement.style.setProperty('view-transition-name', transitionName);
-      }
+      const ownerId = ++nextTransitionOwnerId;
+      claimTargetTransitionName(targetElement, transitionName, ownerId);
 
       const routeFocus = () => {
         routeTransitionFocus(focusTarget);
       };
 
       const cleanupName = () => {
-        if (transitionName && targetElement) {
-          const baseline = originalNamesRef.current.get(targetElement) ?? '';
-          originalNamesRef.current.delete(targetElement);
-          if (baseline) {
-            targetElement.style.setProperty('view-transition-name', baseline);
-          } else {
-            targetElement.style.removeProperty('view-transition-name');
-          }
-        }
+        releaseTargetTransitionName(targetElement, transitionName, ownerId);
       };
 
       // Commit synchronous and post-await React state updates before snapshots finish.
@@ -269,9 +282,7 @@ export function useViewTransition(): UseViewTransitionReturn {
             routeFocus();
           }
         } finally {
-          if (activeIdRef.current === myId) {
-            cleanupName();
-          }
+          cleanupName();
         }
         return;
       }
@@ -293,11 +304,9 @@ export function useViewTransition(): UseViewTransitionReturn {
           throw err;
         }
       } finally {
-        if (activeIdRef.current === myId) {
-          cleanupName();
-          if (isMountedRef.current) {
-            setIsTransitioning(false);
-          }
+        cleanupName();
+        if (activeIdRef.current === myId && isMountedRef.current) {
+          setIsTransitioning(false);
         }
       }
     },

@@ -69,15 +69,10 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
     const formattedDuration =
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
-    const stepLine = (
-      <TraceLine
-        ref={ref}
-        status={status}
-        className={cn(description || wrap ? 'items-start py-2' : 'items-center', className)}
-        {...props}
-      >
+    const renderStepContent = () => (
+      <>
         <TraceIcon name={icon} status={status} className={description || wrap ? 'mt-0.5' : undefined} />
-        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
+        <span className="flex flex-col min-w-0 flex-1 leading-tight text-start">
           <TraceTitle wrap={wrap}>{title}</TraceTitle>
           {description && (
             <span
@@ -89,7 +84,7 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
               {description}
             </span>
           )}
-        </div>
+        </span>
         {formattedDuration && (
           <TraceDescription className="ms-auto shrink-0 ps-2">
             <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
@@ -97,14 +92,22 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
             </span>
           </TraceDescription>
         )}
-      </TraceLine>
+      </>
     );
 
     if (children) {
       return (
         <TraceCollapsible defaultOpen={false}>
           <TraceCollapsibleTrigger>
-            {stepLine}
+            <TraceLine
+              ref={ref}
+              render={<span />}
+              status={status}
+              className={cn(description || wrap ? 'items-start py-2' : 'items-center', className)}
+              {...props}
+            >
+              {renderStepContent()}
+            </TraceLine>
           </TraceCollapsibleTrigger>
           <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
             {typeof children === 'string' ? (
@@ -117,7 +120,16 @@ export const ChainOfThoughtStep = React.forwardRef<HTMLDivElement, ChainOfThough
       );
     }
 
-    return stepLine;
+    return (
+      <TraceLine
+        ref={ref}
+        status={status}
+        className={cn(description || wrap ? 'items-start py-2' : 'items-center', className)}
+        {...props}
+      >
+        {renderStepContent()}
+      </TraceLine>
+    );
   }
 );
 ChainOfThoughtStep.displayName = 'ChainOfThoughtStep';
@@ -138,7 +150,7 @@ export interface ChainOfThoughtHeaderProps
 export const ChainOfThoughtHeader = React.forwardRef<HTMLButtonElement, ChainOfThoughtHeaderProps>(
   (
     {
-      title = 'Chain of thought',
+      title = 'Reasoning steps',
       stepCount,
       status: propStatus,
       badgeLabel,
@@ -154,13 +166,13 @@ export const ChainOfThoughtHeader = React.forwardRef<HTMLButtonElement, ChainOfT
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
-          <TraceLine status={status}>
+          <TraceLine render={<span />} status={status}>
             <TraceIcon name={isStreaming && !propStatus ? 'progress_activity' : 'hub'} status={status} />
             <TraceTitle>{title}</TraceTitle>
             <TraceDescription>
               <span className="flex items-center gap-2">
                 {stepCount !== undefined && (
-                  <Badge variant="outline" colorRole="neutral" size="sm" className="font-mono text-xs py-0 px-1.5 h-5">
+                  <Badge variant="outline" colorRole="neutral" size="sm">
                     {stepCount} {stepCount === 1 ? 'step' : 'steps'}
                   </Badge>
                 )}
@@ -203,7 +215,7 @@ ChainOfThoughtContent.displayName = 'ChainOfThoughtContent';
 /* -------------------------------------------------------------------------------------------------
  * ChainOfThought (Root)
  * -----------------------------------------------------------------------------------------------*/
-export interface ChainOfThoughtProps {
+export interface ChainOfThoughtProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -223,6 +235,7 @@ export const ChainOfThoughtRoot = React.forwardRef<HTMLDivElement, ChainOfThough
       variant,
       children,
       className,
+      ...props
     },
     ref
   ) => {
@@ -232,7 +245,7 @@ export const ChainOfThoughtRoot = React.forwardRef<HTMLDivElement, ChainOfThough
 
     return (
       <ChainOfThoughtContext.Provider value={{ isStreaming }}>
-        <div ref={ref} data-slot="chain-of-thought" className={cn('w-full', className)}>
+        <div ref={ref} data-slot="chain-of-thought" className={cn('w-full', className)} {...props}>
           <Trace variant={resolvedVariant}>
             <TraceCollapsible
               defaultOpen={resolvedDefaultOpen}

@@ -139,7 +139,7 @@ function scan(content, targetFile) {
       violations.push('Found banned AI cliché vocabulary ("delve", "tapestry", "unleash", "elevate", "seamless", "enclave", "apparatus", etc.) in UI copy. Write in plain everyday English.');
     }
     if (PROP_JARGON_RE.test(stripped) || JSX_TEXT_JARGON_RE.test(stripped)) {
-      violations.push('Found dev/database/CSS jargon in UI copy ("committed to", "unconstrained", "synchronized", "telemetry", "affordance", "matrix", "repository"). Describe user outcomes in plain English.');
+      violations.push('Found dev/database/CSS jargon in UI copy ("committed to", "unconstrained", "hydrated", "synchronized", "telemetry", "matrix", "repository"). Describe user outcomes in plain English.');
     }
   }
 

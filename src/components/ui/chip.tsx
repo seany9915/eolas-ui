@@ -212,10 +212,9 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
 
     const sharedBaseClasses = cn(
       'inline-flex items-center max-w-full rounded-full font-label font-semibold select-none shrink-0 whitespace-nowrap',
-      'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+      'transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
       '[&_.material-symbols-outlined]:leading-none [&_.material-symbols-outlined]:shrink-0',
       sizeStyles[size],
-      touchTargetClass,
       patternClass,
       customColor && 'contrast-auto'
     );
@@ -254,7 +253,10 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
                 onSelect(!selected);
               }
             }}
-            className="inline-flex items-center gap-[inherit] min-w-0 bg-transparent border-0 p-0 text-current cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className={cn(
+              'inline-flex items-center gap-[inherit] min-w-0 bg-transparent border-0 p-0 text-current cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+              touchTargetClass
+            )}
           >
             {leadingMedia}
           </BaseButton>
@@ -295,8 +297,9 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
           className={composeClassName(
             cn(
               sharedBaseClasses,
+              touchTargetClass,
               !disabled &&
-                'cursor-pointer hover:brightness-95 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                'cursor-pointer hover:brightness-95 active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
               disabled && 'opacity-50 pointer-events-none cursor-not-allowed'
             ),
             className

@@ -334,7 +334,7 @@ Pairings:
 - **Emphasis-only (`500ms` / `--duration-emphasis`):** Reserved for milestones (`SuccessCheck`); high-frequency controls (Checkbox/Switch) use crisp `150ms` micro-transitions.
 
 ### Essential Motion Primitives (`@/components/ui/`)
-`Skeleton` & `Skeleton.Reveal` (`skeleton.tsx`, `bg-surface-container-high`), `TextSwap` (`text-swap.tsx`), `NotificationBadge` (`notification-badge.tsx`), `TextsReveal` (`texts-reveal.tsx`, ≤5 lines), `NumberRoll` (`number-roll.tsx`, `tabular-nums`), `NumberPopIn` (`number-pop-in.tsx`), `SpinningCounter` (`spinning-counter.tsx`), `ShimmerText` (`shimmer-text.tsx`), `ErrorShake` (`error-shake.tsx`), `SuccessCheck` (`success-check.tsx`).
+`Skeleton` & `Skeleton.Reveal` (`skeleton.tsx`, `bg-surface-container-high`), `TextSwap` (`text-swap.tsx`), `NotificationBadge` (`notification-badge.tsx`), `TextsReveal` (`texts-reveal.tsx`, ≤5 lines), `NumberPopIn` (`number-pop-in.tsx`), `SpinningCounter` (`spinning-counter.tsx`), `ShimmerText` (`shimmer-text.tsx`), `ErrorShake` (`error-shake.tsx`), `SuccessCheck` (`success-check.tsx`).
 
 ### Mandatory Accessibility Fallback
 Every transition must include `@media (prefers-reduced-motion: reduce)` / `motion-reduce:transition-none`, stripping translation, scale, and blur while keeping opacity/state changes. Base UI components use `[data-starting-style]` and `[data-ending-style]` CSS transitions.

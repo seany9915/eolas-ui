@@ -83,8 +83,8 @@ export const NavigationBarRoot = React.forwardRef<HTMLElement, NavigationBarProp
         'aria-label': ariaLabel,
         'data-slot': 'navigation-bar',
         className: cn(
-          'w-full bg-surface border-t border-outline-variant flex items-center justify-evenly gap-1 px-2 py-1.5 select-none z-30',
-          fixed ? 'fixed bottom-0 inset-x-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]' : 'relative',
+          'w-full bg-surface border-t border-outline-variant flex items-center justify-evenly gap-1 px-2 py-1.5 select-none',
+          fixed ? 'fixed bottom-0 inset-x-0 z-30 pb-[max(0.5rem,env(safe-area-inset-bottom))]' : 'relative',
           className
         ),
         children,
@@ -174,28 +174,30 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
           {...props}
         >
           {/* Active Pill Indicator for Icon */}
-          <div
-            data-slot="navigation-bar-indicator"
-            className={cn(
-              'relative inline-flex items-center justify-center h-8 px-3.5 rounded-full transition-[background-color,color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-              isSelected
-                ? 'bg-primary-container text-on-primary-container'
-                : 'bg-transparent text-on-surface-variant group-hover:bg-state-hover'
-            )}
-          >
-            {icon}
-            {badge !== undefined && badge !== null && (
-              <div className="absolute -top-0.5 -end-2.5 pointer-events-none">
-                {typeof badge === 'number' || typeof badge === 'string' ? (
-                  <Badge variant="filled" colorRole="primary" size="sm" className="px-1.5 min-w-5 leading-none">
-                    {badge}
-                  </Badge>
-                ) : (
-                  badge
-                )}
-              </div>
-            )}
-          </div>
+          {(icon !== undefined && icon !== null) || (badge !== undefined && badge !== null) ? (
+            <span
+              data-slot="navigation-bar-indicator"
+              className={cn(
+                'relative inline-flex items-center justify-center h-8 px-3.5 rounded-full transition-[background-color,color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                isSelected
+                  ? 'bg-primary-container text-on-primary-container forced-colors:outline forced-colors:outline-2 forced-colors:outline-[Highlight]'
+                  : 'bg-transparent text-on-surface-variant group-hover:bg-state-hover'
+              )}
+            >
+              {icon}
+              {badge !== undefined && badge !== null && (
+                <span className="absolute -top-0.5 -end-2.5 pointer-events-none">
+                  {typeof badge === 'number' || typeof badge === 'string' ? (
+                    <Badge variant="filled" colorRole="primary" size="sm" className="px-1.5 min-w-5 leading-none">
+                      {badge}
+                    </Badge>
+                  ) : (
+                    badge
+                  )}
+                </span>
+              )}
+            </span>
+          ) : null}
 
           {/* Destination Label */}
           {label !== undefined && label !== null && (

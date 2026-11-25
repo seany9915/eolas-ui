@@ -191,7 +191,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                 : isContained
                   ? 'p-1 rounded bg-surface-container-high border border-outline-variant gap-1 w-max max-w-full overflow-x-auto scrollbar-none select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                   : isPills
-                    ? 'gap-1.5 w-max max-w-full overflow-x-auto scrollbar-none select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                    ? 'p-1 -m-1 gap-1.5 w-max max-w-full overflow-x-auto scrollbar-none select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                     : cn(
                         'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
                         enableScrollFade && 'scroll-fade-x',
@@ -288,7 +288,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
             lg: 'py-2.5 px-5 min-h-12 min-w-12 text-base',
           }[effectiveSize]
         : {
-            sm: "py-1.5 px-3 min-h-[34px] min-w-11 text-xs after:absolute after:inset-x-0 after:-inset-y-1 after:content-['']",
+            sm: "py-1.5 px-3 min-h-[34px] min-w-11 text-xs after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
             md: "py-1.5 px-4 min-h-[38px] min-w-11 text-sm after:absolute after:inset-x-0 after:inset-y-[min(0px,calc((100%-44px)/2))] after:content-['']",
             lg: 'py-2.5 px-5 min-h-[46px] min-w-12 text-base',
           }[effectiveSize]
@@ -307,13 +307,13 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         className={(state) =>
           cn(
             // Retain font-semibold across both active and inactive to prevent layout shift
-            'inline-flex shrink-0 whitespace-nowrap items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] relative cursor-pointer select-none',
+            'inline-flex shrink-0 whitespace-nowrap items-center justify-center gap-2 font-label font-semibold transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none relative cursor-pointer select-none',
             sizeClasses,
             effectiveVariant === 'unstyled'
               ? ''
               : isContained
                 ? cn(
-                    'rounded-sm text-on-surface-variant hover:text-on-surface z-10 border border-transparent',
+                    'rounded-sm text-on-surface hover:bg-state-hover z-10 border border-transparent',
                     hasSlidingIndicator
                       ? cn(
                           'bg-transparent hover:bg-state-hover',
@@ -372,16 +372,14 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                 : cn(
                     'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-state-hover border-b-2 border-transparent',
                     hasSlidingIndicator
-                      ? cn(
-                          'data-[active]:text-primary',
-                          'aria-selected:text-primary'
-                        )
-                      : cn(
-                          'data-[active]:text-primary data-[active]:border-primary -mb-px',
-                          'aria-selected:text-primary aria-selected:border-primary'
-                        )
+                      ? effectiveColorRole === 'secondary'
+                        ? cn('data-[active]:text-secondary', 'aria-selected:text-secondary')
+                        : cn('data-[active]:text-primary', 'aria-selected:text-primary')
+                      : effectiveColorRole === 'secondary'
+                        ? cn('data-[active]:text-secondary data-[active]:border-secondary -mb-px', 'aria-selected:text-secondary aria-selected:border-secondary')
+                        : cn('data-[active]:text-primary data-[active]:border-primary -mb-px', 'aria-selected:text-primary aria-selected:border-primary')
                   ),
-            isContained || isPills
+            isPills
               ? 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-20'
               : 'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary focus-visible:z-20',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
@@ -418,6 +416,18 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
   ({ value, keepMounted = false, hiddenUntilFound = false, flush = false, children, className, ...props }, forwardedRef) => {
     const internalRef = React.useRef<HTMLDivElement>(null);
     const resolvedKeepMounted = hiddenUntilFound || keepMounted;
+
+    const mergedPanelRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        internalRef.current = node;
+        if (typeof forwardedRef === 'function') {
+          forwardedRef(node);
+        } else if (forwardedRef) {
+          forwardedRef.current = node;
+        }
+      },
+      [forwardedRef]
+    );
 
     React.useEffect(() => {
       const panel = internalRef.current;
@@ -461,14 +471,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
 
     return (
       <BaseTabs.Panel
-        ref={(node) => {
-          internalRef.current = node;
-          if (typeof forwardedRef === 'function') {
-            forwardedRef(node);
-          } else if (forwardedRef) {
-            forwardedRef.current = node;
-          }
-        }}
+        ref={mergedPanelRef}
         data-slot="tabs-content"
         value={value}
         keepMounted={resolvedKeepMounted}
@@ -514,107 +517,115 @@ export interface TabsProps<Value extends TabValue = string> {
   panelClassName?: string;
 }
 
-const TabsComponent = React.forwardRef<HTMLDivElement, TabsProps<TabValue>>(
-  (
-    {
-      items,
-      tabs,
-      value,
-      defaultValue,
-      onValueChange,
-      orientation = 'horizontal',
-      activateOnFocus = false,
-      loopFocus = true,
-      variant = 'line',
-      colorRole = 'primary',
-      size = 'md',
-      showIndicator = true,
-      indicatorClassName,
-      inline = false,
-      hiddenUntilFound = false,
-      children,
-      className,
-      listClassName,
-      panelClassName,
-      ...props
-    },
-    ref
-  ) => {
-    const tabList = items || tabs;
-    const initialValue =
-      defaultValue ??
-      (value === undefined && tabList && tabList.length > 0
-        ? (tabList[0]?.value ?? tabList[0]?.id)
-        : undefined);
-    const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
+function TabsComponentInner<Value extends TabValue = string>(
+  {
+    items,
+    tabs,
+    value,
+    defaultValue,
+    onValueChange,
+    orientation = 'horizontal',
+    activateOnFocus = false,
+    loopFocus = true,
+    variant = 'line',
+    colorRole = 'primary',
+    size = 'md',
+    showIndicator = true,
+    indicatorClassName,
+    inline = false,
+    hiddenUntilFound = false,
+    children,
+    className,
+    listClassName,
+    panelClassName,
+    ...props
+  }: TabsProps<Value>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
+  const tabList = items || tabs;
+  const initialValue =
+    defaultValue ??
+    (value === undefined && tabList && tabList.length > 0
+      ? (tabList[0]?.value ?? tabList[0]?.id)
+      : undefined);
+  const hasContent = Boolean(tabList?.some((t) => t.content !== undefined));
 
-    return (
-      <TabsRoot
-        ref={ref}
-        value={value}
-        defaultValue={initialValue}
-        onValueChange={onValueChange}
-        orientation={orientation}
-        variant={variant}
-        colorRole={colorRole}
-        size={size}
-        showIndicator={showIndicator}
-        className={cn(
-          inline ? 'w-max max-w-full items-start' : 'w-full',
-          className
-        )}
-        {...props}
-      >
-        {children ? (
-          children
-        ) : (
-          <>
-            <TabsList
-              activateOnFocus={activateOnFocus}
-              loopFocus={loopFocus}
-              variant={variant}
-              size={size}
-              showIndicator={showIndicator}
-              indicatorClassName={indicatorClassName}
-              className={listClassName}
-            >
-              {tabList?.map((tab) => {
-                const tabKey = (tab.value ?? tab.id) as string;
-                return (
-                  <Tab
-                    key={tabKey}
-                    value={tabKey}
-                    icon={tab.icon}
-                    disabled={tab.disabled}
-                    variant={variant}
-                    size={size}
-                  >
-                    {tab.label}
-                  </Tab>
-                );
-              })}
-            </TabsList>
-            {hasContent &&
-              tabList?.map((tab) => {
-                const tabKey = (tab.value ?? tab.id) as string;
-                if (tab.content === undefined || tab.content === null || tab.content === false) return null;
-                return (
-                  <TabsPanel
-                    key={tabKey}
-                    value={tabKey}
-                    hiddenUntilFound={hiddenUntilFound}
-                    className={panelClassName}
-                  >
-                    {tab.content}
-                  </TabsPanel>
-                );
-              })}
-          </>
-        )}
-      </TabsRoot>
-    );
-  }
-);
+  return (
+    <TabsRoot
+      ref={ref}
+      value={value}
+      defaultValue={initialValue}
+      onValueChange={
+        onValueChange as
+          | ((val: TabValue, eventDetails: BaseTabs.Root.ChangeEventDetails) => void)
+          | undefined
+      }
+      orientation={orientation}
+      variant={variant}
+      colorRole={colorRole}
+      size={size}
+      showIndicator={showIndicator}
+      className={cn(
+        inline ? 'w-max max-w-full items-start' : 'w-full',
+        className
+      )}
+      {...props}
+    >
+      {children ? (
+        children
+      ) : (
+        <>
+          <TabsList
+            activateOnFocus={activateOnFocus}
+            loopFocus={loopFocus}
+            variant={variant}
+            colorRole={colorRole}
+            size={size}
+            showIndicator={showIndicator}
+            indicatorClassName={indicatorClassName}
+            className={listClassName}
+          >
+            {tabList?.map((tab) => {
+              const tabKey = (tab.value ?? tab.id) as string;
+              return (
+                <Tab
+                  key={tabKey}
+                  value={tabKey}
+                  icon={tab.icon}
+                  disabled={tab.disabled}
+                  variant={variant}
+                  colorRole={colorRole}
+                  size={size}
+                >
+                  {tab.label}
+                </Tab>
+              );
+            })}
+          </TabsList>
+          {hasContent &&
+            tabList?.map((tab) => {
+              const tabKey = (tab.value ?? tab.id) as string;
+              if (tab.content === undefined || tab.content === null || tab.content === false) return null;
+              return (
+                <TabsPanel
+                  key={tabKey}
+                  value={tabKey}
+                  hiddenUntilFound={hiddenUntilFound}
+                  className={panelClassName}
+                >
+                  {tab.content}
+                </TabsPanel>
+              );
+            })}
+        </>
+      )}
+    </TabsRoot>
+  );
+}
+
+const TabsComponent = React.forwardRef(TabsComponentInner) as (<Value extends TabValue = string>(
+  props: TabsProps<Value> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
 TabsComponent.displayName = 'Tabs';
 
 export const TabsIndicator = React.forwardRef<

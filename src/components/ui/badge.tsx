@@ -29,9 +29,12 @@ export type BadgeVariant =
   | 'tonal'
   /** @deprecated Use `'outline'` instead. Kept for backwards compatibility. */
   | 'outlined'
-  | 'default' // shadcn alias for filled
-  | 'secondary' // shadcn alias for neutral soft
-  | 'destructive'; // shadcn alias for error
+  /** @deprecated Use `'filled'` instead. Kept for shadcn compatibility. */
+  | 'default'
+  /** @deprecated Use `variant="soft" colorRole="neutral"` instead. Kept for shadcn compatibility. */
+  | 'secondary'
+  /** @deprecated Use `variant="filled" colorRole="error"` instead. Kept for shadcn compatibility. */
+  | 'destructive';
 
 export type BadgeColorRole =
   | 'primary'
@@ -167,6 +170,12 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     },
     ref
   ) => {
+    const isFilledDot =
+      variant === 'filled' ||
+      variant === 'default' ||
+      variant === 'destructive' ||
+      (colorRole === 'tertiary' && (variant === 'outline' || variant === 'outlined'));
+
     const computedClass = badgeVariants({
       variant,
       colorRole,
@@ -182,7 +191,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
             data-icon="dot"
             className={cn(
               'size-1.5 rounded-full shrink-0',
-              variant === 'filled' ? 'bg-current opacity-80' : 'bg-current'
+              isFilledDot ? 'bg-current opacity-80' : 'bg-current'
             )}
             aria-hidden="true"
           />

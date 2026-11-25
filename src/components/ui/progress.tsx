@@ -50,26 +50,33 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
       locale,
       'aria-valuetext': ariaValueText,
       getAriaValueText,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
       children,
       className,
       ...props
     },
     ref
   ) => {
+    const isIndeterminate =
+      value === null || value === undefined || !Number.isFinite(value);
+    const resolvedValue = isIndeterminate ? null : value;
+
     // Composable compound usage
     if (children) {
       return (
         <BaseProgress.Root
           ref={ref}
           data-slot="progress"
-          value={value ?? null}
+          value={resolvedValue}
           max={max}
           min={min}
           format={format}
           locale={locale}
           {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
           getAriaValueText={getAriaValueText}
-          aria-label={props['aria-label'] || label || (children ? undefined : 'Progress')}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           className={composeClassName('flex flex-col gap-1.5 w-full', className)}
           {...props}
         >
@@ -78,8 +85,6 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
       );
     }
 
-    const isIndeterminate =
-      value === null || value === undefined || !Number.isFinite(value);
     const range = max - min;
     const percentage =
       isIndeterminate || range <= 0
@@ -87,19 +92,21 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
         : Math.min(100, Math.max(0, ((value - min) / range) * 100));
     const shouldShowValue = showValue !== undefined ? showValue : label !== undefined;
     const hasHeader = Boolean(label || (shouldShowValue && !isIndeterminate));
+    const resolvedAriaLabel = ariaLabel ?? (!label && !ariaLabelledBy ? 'Progress' : undefined);
 
     return (
       <BaseProgress.Root
         ref={ref}
         data-slot="progress"
-        value={value ?? null}
+        value={resolvedValue}
         max={max}
         min={min}
         format={format}
         locale={locale}
         {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
         getAriaValueText={getAriaValueText}
-        aria-label={props['aria-label'] || label || 'Progress'}
+        aria-label={resolvedAriaLabel}
+        aria-labelledby={ariaLabelledBy}
         className={composeClassName('flex flex-col gap-1.5 w-full', className)}
         {...props}
       >
@@ -108,7 +115,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
             {label && <BaseProgress.Label data-slot="progress-label">{label}</BaseProgress.Label>}
             {shouldShowValue && !isIndeterminate && (
               <BaseProgress.Value data-slot="progress-value" className="font-mono text-sm font-bold text-on-surface tabular-nums">
-                {(formattedValue, val) => formattedValue || `${val ?? Math.round(percentage)}%`}
+                {(formattedValue) => formattedValue || `${Math.round(percentage)}%`}
               </BaseProgress.Value>
             )}
           </div>
@@ -116,7 +123,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
         <BaseProgress.Track
           data-slot="progress-track"
           className={cn(
-            'relative w-full rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/30',
+            'relative w-full rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/30 forced-colors:border-[CanvasText]',
             sizeClasses[size],
             trackClassName
           )}
@@ -124,7 +131,7 @@ const ProgressComponent = React.forwardRef<HTMLDivElement, ProgressProps>(
           <BaseProgress.Indicator
             data-slot="progress-indicator"
             className={cn(
-              'h-full bg-primary transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+              'h-full bg-primary forced-colors:bg-[Highlight] transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none',
               'data-[indeterminate]:w-full motion-safe:data-[indeterminate]:animate-pulse'
             )}
           />
@@ -138,31 +145,75 @@ ProgressComponent.displayName = 'Progress';
 export const ProgressRoot = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseProgress.Root>
->((props, ref) => <BaseProgress.Root ref={ref} data-slot="progress" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseProgress.Root
+    ref={ref}
+    data-slot="progress"
+    className={composeClassName('flex flex-col gap-1.5 w-full', className)}
+    {...props}
+  />
+));
 ProgressRoot.displayName = 'ProgressRoot';
 
 export const ProgressLabel = React.forwardRef<
   HTMLSpanElement,
   React.ComponentPropsWithoutRef<typeof BaseProgress.Label>
->((props, ref) => <BaseProgress.Label ref={ref} data-slot="progress-label" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseProgress.Label
+    ref={ref}
+    data-slot="progress-label"
+    className={composeClassName('font-label text-sm font-semibold text-on-surface', className)}
+    {...props}
+  />
+));
 ProgressLabel.displayName = 'ProgressLabel';
 
 export const ProgressValue = React.forwardRef<
   HTMLSpanElement,
   React.ComponentPropsWithoutRef<typeof BaseProgress.Value>
->((props, ref) => <BaseProgress.Value ref={ref} data-slot="progress-value" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseProgress.Value
+    ref={ref}
+    data-slot="progress-value"
+    className={composeClassName('font-mono text-sm font-bold text-on-surface tabular-nums', className)}
+    {...props}
+  />
+));
 ProgressValue.displayName = 'ProgressValue';
 
 export const ProgressTrack = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof BaseProgress.Track>
->((props, ref) => <BaseProgress.Track ref={ref} data-slot="progress-track" {...props} />);
+  React.ComponentPropsWithoutRef<typeof BaseProgress.Track> & { size?: 'sm' | 'md' | 'lg' }
+>(({ className, size = 'md', ...props }, ref) => (
+  <BaseProgress.Track
+    ref={ref}
+    data-slot="progress-track"
+    className={composeClassName(
+      cn(
+        'relative w-full rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/30 forced-colors:border-[CanvasText]',
+        sizeClasses[size]
+      ),
+      className
+    )}
+    {...props}
+  />
+));
 ProgressTrack.displayName = 'ProgressTrack';
 
 export const ProgressIndicator = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseProgress.Indicator>
->((props, ref) => <BaseProgress.Indicator ref={ref} data-slot="progress-indicator" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseProgress.Indicator
+    ref={ref}
+    data-slot="progress-indicator"
+    className={composeClassName(
+      'h-full bg-primary forced-colors:bg-[Highlight] transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[indeterminate]:w-full motion-safe:data-[indeterminate]:animate-pulse',
+      className
+    )}
+    {...props}
+  />
+));
 ProgressIndicator.displayName = 'ProgressIndicator';
 
 // Compound export mapping Base UI primitives
@@ -176,8 +227,5 @@ export const Progress = Object.assign(ProgressComponent, {
 
 // Re-export Base UI primitives for compound composition
 export { BaseProgress };
-
-// Cross-export Skeleton for backward compatibility with existing imports
-export { Skeleton } from './skeleton';
 
 export default Progress;

@@ -44,6 +44,14 @@
     "eolas/no-spring-easing": "error",
     "eolas/no-uppercase": "error",
     "eolas/no-unsafe-type-cast": "error",
+    "eolas/one-way-imports": "error",
+    "eolas/wrapped-libraries": "error",
+    "eolas/no-reach-in-selectors": "error",
+    "eolas/icon-button-label": "error",
+    "eolas/prefer-shorthand": "error",
+    "eolas/no-dark-variant": "error",
+    "eolas/no-important": "error",
+    "eolas/no-rebuilt-overlay": "error",
     "typescript/ban-ts-comment": "error",
     "shadcn/no-raw-colors": [
       "error",
@@ -223,7 +231,7 @@
             "message": "Toast must maintain standard asymmetric shape (rounded-s-none rounded-e) with 4px start accent bar and 44x44px dismiss button. Do not apply rounded-*."
           },
           {
-            "pattern": "^(Tabs|Tab|TabsList|TabsTab|TabsTrigger|Tabs\\.List|Tabs\\.Tab|Tabs\\.Trigger)$",
+            "pattern": "^(Tabs|Tab|TabsList|TabsTrigger|Tabs\\.List|Tabs\\.Tab|Tabs\\.Trigger)$",
             "allow": [
               "layout",
               "w-*"
@@ -235,7 +243,7 @@
             "message": "Tabs manage their own selection wash and active borders. Do not override backgrounds or apply uppercase styling."
           },
           {
-            "pattern": "^(Input|Textarea|Select|SelectTrigger|Select\\.Trigger|Combobox|ComboboxInput|ComboboxTrigger|Combobox\\.Input|Combobox\\.Trigger|Autocomplete|AutocompleteInput|AutocompleteTrigger|Autocomplete\\.Input|Autocomplete\\.Trigger|NumberField|NumberFieldGroup|NumberFieldInput|NumberField\\.Group|NumberField\\.Input|OTPField|OTPFieldInput|OTPField\\.Input|PromptInput|PromptInputTextarea|PromptInput\\.Textarea|InputGroup|InputGroupInput|InputGroupTextarea|InputGroup\\.Input|InputGroup\\.Textarea)$",
+            "pattern": "^(Input|Textarea|Select|SelectTrigger|Select\\.Trigger|Combobox|ComboboxInput|ComboboxInputGroup|ComboboxTrigger|Combobox\\.Input|Combobox\\.InputGroup|Combobox\\.Trigger|Autocomplete|AutocompleteInput|AutocompleteInputGroup|AutocompleteTrigger|Autocomplete\\.Input|Autocomplete\\.InputGroup|Autocomplete\\.Trigger|NumberField|NumberFieldGroup|NumberFieldInput|NumberField\\.Group|NumberField\\.Input|OTPField|OTPFieldInput|OTPField\\.Input|PromptInput|PromptInputTextarea|PromptInput\\.Textarea|InputGroup|InputGroupInput|InputGroupTextarea|InputGroup\\.Input|InputGroup\\.Textarea)$",
             "allow": [
               "layout",
               "w-*"
@@ -259,7 +267,7 @@
             "message": "Field, FieldGroup, FieldRoot, and FieldContent permit layout sizing and gap spacing between fields or horizontal controls."
           },
           {
-            "pattern": "^(FieldLabel|Field\\.Label)$",
+            "pattern": "^(FieldLabel|FieldTitle|FieldLegend|FieldsetLegend|Field\\.Label|Field\\.Title|Field\\.Legend|Fieldset\\.Legend)$",
             "allow": [
               "layout",
               "sr-only",
@@ -268,7 +276,7 @@
             "deny": [
               "uppercase"
             ],
-            "message": "FieldLabel owns its typography and contrast. Only layout, whitespace-nowrap, or sr-only visibility helpers are permitted."
+            "message": "FieldLabel / FieldTitle / FieldLegend / FieldsetLegend own their typography and contrast. Only layout, whitespace-nowrap, or sr-only visibility helpers are permitted."
           },
           {
             "pattern": "^(Dialog|AlertDialog|Drawer|DialogContent|DialogPopup|AlertDialogContent|AlertDialogPopup|DrawerPanel|DrawerPopup|DrawerContent|Dialog\\.Content|Dialog\\.Popup|AlertDialog\\.Content|AlertDialog\\.Popup|Drawer\\.Panel|Drawer\\.Popup|Drawer\\.Content)$",
@@ -282,7 +290,7 @@
             "message": "Modal overlays must maintain standard surface styling, focus traps, and backdrop filters defined by Eolas UI."
           },
           {
-            "pattern": "^(Popover|PopoverPopup|PopoverContent|Popover\\.Popup|Popover\\.Content|Menu|MenuPopup|MenuContent|Menu\\.Popup|Menu\\.Content|Tooltip|TooltipPopup|TooltipContent|Tooltip\\.Popup|Tooltip\\.Content|SelectPopup|SelectContent|Select\\.Popup|Select\\.Content|ComboboxPopup|ComboboxContent|Combobox\\.Popup|Combobox\\.Content|AutocompletePopup|AutocompleteContent|Autocomplete\\.Popup|Autocomplete\\.Content|ContextMenu|ContextMenuPopup|ContextMenuContent|ContextMenu\\.Popup|ContextMenu\\.Content|PreviewCard|PreviewCardPopup|PreviewCardContent|PreviewCard\\.Popup|PreviewCard\\.Content|Menubar|MenubarPopup|MenubarContent|Menubar\\.Popup|Menubar\\.Content|NavigationMenu|NavigationMenuPopup|NavigationMenuContent|NavigationMenu\\.Popup|NavigationMenu\\.Content)$",
+            "pattern": "^(Popover|PopoverPopup|PopoverContent|Popover\\.Popup|Popover\\.Content|Menu|MenuPopup|MenuContent|Menu\\.Popup|Menu\\.Content|Tooltip|TooltipPopup|TooltipContent|Tooltip\\.Popup|Tooltip\\.Content|SelectPopup|SelectContent|Select\\.Popup|Select\\.Content|ComboboxPopup|ComboboxContent|Combobox\\.Popup|Combobox\\.Content|AutocompletePopup|AutocompleteContent|Autocomplete\\.Popup|Autocomplete\\.Content|ContextMenu|ContextMenuPopup|ContextMenuContent|ContextMenu\\.Popup|ContextMenu\\.Content|PreviewCard|PreviewCardPopup|PreviewCard\\.Popup|Menubar|MenubarContent|Menubar\\.Content|NavigationMenu|NavigationMenuPopup|NavigationMenuContent|NavigationMenu\\.Popup|NavigationMenu\\.Content)$",
             "allow": [
               "layout",
               "w-*",
@@ -305,7 +313,7 @@
             "message": "Skeleton loaders support layout dimensions (w-*, h-*) and shapes (rounded, rounded-full) to mirror target components."
           },
           {
-            "pattern": "^(TextSwap|NotificationBadge|TextsReveal|NumberRoll|NumberPopIn|SpinningCounter|ShimmerText|ErrorShake|SuccessCheck)$",
+            "pattern": "^(TextSwap|NotificationBadge|TextsReveal|NumberPopIn|SpinningCounter|ShimmerText|ErrorShake|SuccessCheck)$",
             "allow": [
               "layout"
             ],
@@ -354,6 +362,13 @@
         ],
         "eolas/no-raw-html-controls": "off",
         "eolas/no-static-clickable-elements": "off",
+        "eolas/wrapped-libraries": "off",
+        "eolas/no-reach-in-selectors": "off",
+        "eolas/icon-button-label": "off",
+        "eolas/prefer-shorthand": "off",
+        "eolas/no-dark-variant": "off",
+        "eolas/no-important": "off",
+        "eolas/no-rebuilt-overlay": "off",
         "jsx-a11y/anchor-has-content": "off",
         "jsx-a11y/control-has-associated-label": "off",
         "jsx-a11y/label-has-associated-control": "off",

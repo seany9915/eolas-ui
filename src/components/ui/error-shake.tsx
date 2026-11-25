@@ -14,6 +14,7 @@
  * Complies with WCAG 2.2 and motion-reduce:animate-none.
  */
 import * as React from 'react';
+import { Icon } from './icon';
 import { cn } from '@/lib/utils';
 
 export interface ErrorShakeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -115,16 +116,16 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
         <p
           role="alert"
           className={cn(
-            'font-sans text-xs font-semibold text-error flex items-center gap-1',
-            'transition-[opacity,visibility] duration-300 ease-out motion-reduce:transition-none',
-            showError ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+            'font-sans text-sm font-semibold text-error flex items-center gap-1',
+            'transition-[opacity,visibility] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            showError
+              ? 'opacity-100 visible'
+              : 'opacity-0 invisible h-0 overflow-hidden m-0 pointer-events-none'
           )}
         >
           {showError ? (
             <>
-              <span className="material-symbols-outlined text-sm shrink-0" aria-hidden="true">
-                error
-              </span>
+              <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
               <span>{errorMessage}</span>
             </>
           ) : null}

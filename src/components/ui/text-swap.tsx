@@ -141,24 +141,25 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
     return (
       <span
         ref={setRefs}
+        data-slot="text-swap"
         className={cn(
-          'inline-block select-none',
+          'inline-block select-none translate-y-[var(--swap-y,0px)]',
           isEnterStart
             ? 'transition-none'
             : 'transition-[transform,filter,opacity] ease-in-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:filter-none',
-          isExit && 'opacity-0 blur-[2px]',
-          isEnterStart && 'opacity-0 blur-[2px]',
-          (phase === 'enter' || phase === 'idle') && 'opacity-100 blur-none translate-y-0',
+          isExit && 'opacity-0 blur-[var(--blur-small)]',
+          isEnterStart && 'opacity-0 blur-[var(--blur-small)]',
+          (phase === 'enter' || phase === 'idle') && 'opacity-100 blur-none',
           className
         )}
         style={{
           ...style,
           transitionDuration: isEnterStart ? '0ms' : `${duration}ms`,
-          transform: isExit
-            ? `translateY(-${translateY}px)`
+          ['--swap-y' as string]: isExit
+            ? `-${translateY}px`
             : isEnterStart
-            ? `translateY(${translateY}px)`
-            : 'translateY(0)',
+            ? `${translateY}px`
+            : '0px',
         }}
         {...props}
       >

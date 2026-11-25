@@ -20,8 +20,6 @@ import {
   SliderDemo,
   NumberFieldDemo,
   OTPFieldDemo,
-  SelectionControlsLegacyDemo,
-  TogglesLegacyDemo,
   CalendarDemo,
   ButtonGroupDemo,
 } from './InputsDemos';
@@ -49,7 +47,6 @@ import {
   ProgressDemo,
   ProgressRingDemo,
   EmptyDemo,
-  EmptyStateDemo,
   SpinnerDemo,
   SkeletonDemo,
   ReadingProgressDemo,
@@ -64,7 +61,6 @@ import {
   NavigationMenuDemo,
   SidebarDemo,
   StepWizardDemo,
-  SteppersLegacyDemo,
   ScrollAreaDemo,
   ScrollspyDemo,
   NavigationBarDemo,
@@ -115,16 +111,13 @@ import {
 } from './ClinicalAiDemos';
 
 import {
-  ApprovalCardDemo,
   AreaChartCardDemo,
   BarChartCardDemo,
   ChartCardDemo,
   ChatBlockDemo,
   DataTableDemo,
-  DeleteConfirmationDialogDemo,
   FilterToolbarDemo,
   LineChartCardDemo,
-  MetricCardDemo,
   PieChartCardDemo,
   QuestionnaireDemo,
   RadarChartCardDemo,
@@ -135,7 +128,6 @@ import {
 } from './BlocksDemos';
 
 import {
-  NumberRollDemo,
   SpinningCounterDemo,
   NumberPopInDemo,
   TextSwapDemo,
@@ -180,8 +172,6 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'number-field': NumberFieldDemo,
   'otp-field': OTPFieldDemo,
   'calendar': CalendarDemo,
-  'selection-controls': SelectionControlsLegacyDemo,
-  'toggles': TogglesLegacyDemo,
 
   // Overlays
   'dialog': DialogDemo,
@@ -206,7 +196,6 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'progress': ProgressDemo,
   'progress-ring': ProgressRingDemo,
   'empty': EmptyDemo,
-  'empty-state': EmptyStateDemo,
   'spinner': SpinnerDemo,
   'skeleton': SkeletonDemo,
   'reading-progress': ReadingProgressDemo,
@@ -219,7 +208,6 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'navigation-menu': NavigationMenuDemo,
   'sidebar': SidebarDemo,
   'step-wizard': StepWizardDemo,
-  'steppers': SteppersLegacyDemo,
   'scroll-area': ScrollAreaDemo,
   'scrollspy': ScrollspyDemo,
   'navigation-bar': NavigationBarDemo,
@@ -267,16 +255,13 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'checkpoint': CheckpointDemo,
 
   // Blocks
-  'approval-card': ApprovalCardDemo,
   'area-chart-card': AreaChartCardDemo,
   'bar-chart-card': BarChartCardDemo,
   'chart-card': ChartCardDemo,
   'chat': ChatBlockDemo,
   'data-table': DataTableDemo,
-  'delete-confirmation-dialog': DeleteConfirmationDialogDemo,
   'filter-toolbar': FilterToolbarDemo,
   'line-chart-card': LineChartCardDemo,
-  'metric-card': MetricCardDemo,
   'pie-chart-card': PieChartCardDemo,
   'questionnaire': QuestionnaireDemo,
   'radar-chart-card': RadarChartCardDemo,
@@ -286,7 +271,6 @@ export const REGISTRY_DEMOS: ComponentDemoMap = {
   'supporting-pane-block': SupportingPaneBlockDemo,
 
   // Motion
-  'number-roll': NumberRollDemo,
   'spinning-counter': SpinningCounterDemo,
   'number-pop-in': NumberPopInDemo,
   'text-swap': TextSwapDemo,

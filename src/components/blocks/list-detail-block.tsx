@@ -104,6 +104,14 @@ export interface ListDetailBlockProps extends React.HTMLAttributes<HTMLDivElemen
   children?: React.ReactNode;
 }
 
+function isElementVisible(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  if (typeof el.checkVisibility === 'function') {
+    return el.checkVisibility();
+  }
+  return el.getClientRects().length > 0;
+}
+
 export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockProps>(
   (
     {
@@ -152,6 +160,15 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     const detailPaneRef = React.useRef<HTMLDivElement | null>(null);
     const backButtonRef = React.useRef<HTMLButtonElement | null>(null);
     const searchInputRef = React.useRef<HTMLInputElement | null>(null);
+    const focusRafRef = React.useRef<number | null>(null);
+
+    React.useEffect(() => {
+      return () => {
+        if (focusRafRef.current !== null) {
+          cancelAnimationFrame(focusRafRef.current);
+        }
+      };
+    }, []);
 
     const isControlledSelect = selectedId !== undefined;
     const currentSelectedId = isControlledSelect ? selectedId : internalSelectedId;
@@ -179,13 +196,17 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
 
     const handleActivateItem = (id: string) => {
       // On compact single-pane widths, detail-pane is hidden before selection; move focus into it on open.
-      const isCompactView = detailPaneRef.current?.offsetParent === null;
+      const isCompactView = !isElementVisible(detailPaneRef.current);
       setFocusedItemId(id);
       handleSelect(id);
       if (isCompactView) {
-        window.requestAnimationFrame(() => {
-          if (backButtonRef.current && backButtonRef.current.offsetParent !== null) {
-            backButtonRef.current.focus();
+        if (focusRafRef.current !== null) {
+          cancelAnimationFrame(focusRafRef.current);
+        }
+        focusRafRef.current = window.requestAnimationFrame(() => {
+          focusRafRef.current = null;
+          if (isElementVisible(backButtonRef.current)) {
+            backButtonRef.current?.focus();
           }
         });
       }
@@ -228,12 +249,16 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           ? restoreFocusId
           : rovingTargetId;
       handleSelect(null);
-      window.requestAnimationFrame(() => {
+      if (focusRafRef.current !== null) {
+        cancelAnimationFrame(focusRafRef.current);
+      }
+      focusRafRef.current = window.requestAnimationFrame(() => {
+        focusRafRef.current = null;
         const targetNode = targetId ? findItemNode(targetId) : null;
-        if (targetNode && targetNode.offsetParent !== null) {
-          targetNode.focus();
-        } else if (searchInputRef.current && searchInputRef.current.offsetParent !== null) {
-          searchInputRef.current.focus();
+        if (isElementVisible(targetNode)) {
+          targetNode?.focus();
+        } else if (isElementVisible(searchInputRef.current)) {
+          searchInputRef.current?.focus();
         }
       });
     };
@@ -287,7 +312,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
     const handleDetailKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key !== 'Escape' || e.defaultPrevented || !selectedItem) return;
       // Only navigate back on Escape in compact view where the list pane is hidden.
-      const isCompactView = listPaneRef.current?.offsetParent === null;
+      const isCompactView = !isElementVisible(listPaneRef.current);
       if (isCompactView) {
         e.preventDefault();
         handleBackToList(selectedItem.id);
@@ -364,6 +389,8 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                     <InputGroup.Input
                       ref={searchInputRef}
                       id={searchInputId}
+                      type="search"
+                      enterKeyHint="search"
                       value={currentSearch}
                       onChange={handleSearchChange}
                       placeholder={searchPlaceholder}
@@ -399,7 +426,6 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               <div
                 role="status"
                 aria-live="polite"
-                aria-label={loadingLabel}
                 className="flex flex-col gap-1.5"
               >
                 <span className="sr-only">{loadingLabel}</span>
@@ -533,7 +559,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                 data-slot="detail-header"
                 className="min-h-16 short:min-h-14 py-2 px-3 @md:px-4 @2xl:px-6 border-b border-outline-variant flex flex-wrap items-center justify-between gap-2 @2xl:gap-3 bg-surface shrink-0"
               >
-                <div className="flex items-center gap-1.5 @2xl:gap-2.5 min-w-0 flex-1">
+                <div className={cn('flex items-center gap-1.5 @2xl:gap-2.5 min-w-0 flex-1', detailActions && 'min-w-44')}>
                   <Button
                     ref={backButtonRef}
                     variant="text"
@@ -615,7 +641,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                 className={cn(
                   detailBodyFlush
                     ? 'flex-1 flex flex-col min-h-0 overflow-hidden p-0'
-                    : 'flex-1 overflow-y-auto'
+                    : cn('flex-1 overflow-y-auto', !density && '@max-md:p-4')
                 )}
               >
                 {detailBodyFlush ? (
@@ -647,7 +673,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
             </div>
           ) : (
             <div className="flex-1 flex flex-col h-full min-h-0">
-              <div className="min-h-16 h-16 short:min-h-14 short:h-14 px-4 @md:px-6 border-b border-outline-variant hidden @2xl:flex items-center bg-surface shrink-0">
+              <div className="min-h-16 short:min-h-14 px-4 @md:px-6 border-b border-outline-variant hidden @2xl:flex items-center bg-surface shrink-0">
                 <span className="font-heading text-base font-semibold text-on-surface-variant">
                   Details
                 </span>

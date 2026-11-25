@@ -41,7 +41,7 @@ export const MenubarTrigger = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'relative inline-flex shrink-0 whitespace-nowrap items-center justify-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded font-label text-sm font-semibold transition-colors cursor-pointer select-none outline-none after:absolute after:-inset-1 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover data-[popup-open]:bg-state-hover data-[popup-open]:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
+            'relative inline-flex shrink-0 whitespace-nowrap items-center justify-center gap-1.5 px-3 py-1.5 min-h-[36px] min-w-[44px] rounded font-label text-sm font-semibold transition-colors motion-reduce:transition-none cursor-pointer select-none outline-none after:absolute after:-inset-y-1 after:inset-x-0 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover data-[popup-open]:bg-state-hover data-[popup-open]:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }
@@ -59,6 +59,7 @@ export interface MenubarContentProps extends React.ComponentPropsWithoutRef<type
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   containerClassName?: BaseMenu.Positioner.Props['className'];
+  container?: BaseMenu.Portal.Props['container'];
   keepMounted?: boolean;
 }
 
@@ -67,18 +68,19 @@ export const MenubarContent = React.forwardRef<HTMLDivElement, MenubarContentPro
     {
       className,
       children,
-      side,
+      side = 'bottom',
       sideOffset = 4,
       align = 'start',
       alignOffset,
       collisionPadding = 8,
       containerClassName,
+      container,
       keepMounted,
       ...props
     },
     ref
   ) => (
-    <BaseMenu.Portal keepMounted={keepMounted}>
+    <BaseMenu.Portal container={container} keepMounted={keepMounted}>
       <BaseMenu.Positioner
         side={side}
         sideOffset={sideOffset}
@@ -117,7 +119,7 @@ export const MenubarItem = React.forwardRef<HTMLDivElement, MenubarItemProps>(
       data-slot="menubar-item"
       className={composeClassName(
         cn(
-          'flex items-center justify-between gap-3 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+          'flex items-center justify-between gap-3 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none',
           'data-[disabled]:opacity-40 data-[disabled]:pointer-events-none',
           destructive
             ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
@@ -127,7 +129,7 @@ export const MenubarItem = React.forwardRef<HTMLDivElement, MenubarItemProps>(
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <Icon name={icon} size="sm" className="shrink-0" />
         )}
@@ -154,12 +156,12 @@ export const MenubarCheckboxItem = React.forwardRef<HTMLDivElement, MenubarCheck
       ref={ref}
       data-slot="menubar-checkbox-item"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <Icon name={icon} size="sm" className="shrink-0" />
         )}
@@ -184,12 +186,12 @@ export const MenubarRadioItem = React.forwardRef<HTMLDivElement, MenubarRadioIte
       ref={ref}
       data-slot="menubar-radio-item"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <Icon name={icon} size="sm" className="shrink-0" />
         )}
@@ -214,12 +216,12 @@ export const MenubarSubmenuTrigger = React.forwardRef<HTMLDivElement, MenubarSub
       ref={ref}
       data-slot="menubar-sub-trigger"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container-low data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container-low data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <Icon name={icon} size="sm" className="shrink-0" />
         )}
@@ -252,7 +254,7 @@ export const MenubarLinkItem = React.forwardRef<
     ref={ref}
     data-slot="menubar-link-item"
     className={composeClassName(
-      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
+      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       className
     )}
     {...props}
@@ -306,7 +308,7 @@ export const MenubarGroupLabel = React.forwardRef<
   <BaseMenu.GroupLabel
     ref={ref}
     data-slot="menubar-label"
-    className={composeClassName('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
+    className={composeClassName('px-3 py-1.5 font-label text-xs font-semibold text-on-surface-variant select-none', className)}
     {...props}
   />
 ));
@@ -335,9 +337,11 @@ export const MenubarMenu = React.forwardRef<HTMLButtonElement, MenubarMenuProps>
             <span>{triggerLabel}</span>
           </MenubarTrigger>
           <MenubarContent>
-            {children
-              ? children
-              : items?.map((item) => (
+            {children ? (
+              children
+            ) : items ? (
+              <MenubarGroup>
+                {items.map((item) => (
                   <MenubarItem
                     key={item.id}
                     disabled={item.disabled}
@@ -349,6 +353,8 @@ export const MenubarMenu = React.forwardRef<HTMLButtonElement, MenubarMenuProps>
                     {item.label}
                   </MenubarItem>
                 ))}
+              </MenubarGroup>
+            ) : null}
           </MenubarContent>
         </BaseMenu.Root>
       );
@@ -410,7 +416,7 @@ const MenubarComponent = React.forwardRef<HTMLDivElement, MenubarProps>(
         {children
           ? children
           : menus?.map((menu, i) => (
-              <MenubarMenu key={i} triggerLabel={menu.triggerLabel} items={menu.items} />
+              <MenubarMenu key={`${menu.triggerLabel}-${i}`} triggerLabel={menu.triggerLabel} items={menu.items} />
             ))}
       </BaseMenubar>
     );

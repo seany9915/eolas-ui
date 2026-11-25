@@ -14,7 +14,8 @@
  */
 import * as React from 'react';
 import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
-import { cn, composeClassName } from '@/lib/utils';
+import { Icon } from './icon';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface ComboboxOption {
   value: string;
@@ -249,9 +250,13 @@ function ComboboxComponentInner<
 
     // If children are provided, this is a compositional/compound Combobox
     if (children) {
+      const resolvedCompoundItems =
+        options || groups
+          ? (itemCollection as BaseCombobox.Root.Props<Value, Multiple, Item>['items'])
+          : items;
       const rootNode = (
         <BaseCombobox.Root<Value, Multiple, Item>
-          items={items}
+          items={resolvedCompoundItems}
           value={value}
           defaultValue={defaultValue}
           onValueChange={handleValueChange}
@@ -355,7 +360,7 @@ function ComboboxComponentInner<
             </label>
           )}
           {description && (
-            <p id={descriptionId} className="text-xs text-on-surface-variant font-sans">
+            <p id={descriptionId} className="text-sm text-on-surface-variant font-sans">
               {description}
             </p>
           )}
@@ -370,26 +375,63 @@ function ComboboxComponentInner<
               inputGroupClassName
             )}
           >
-            <BaseCombobox.Input
-              data-slot="combobox-input"
-              id={comboboxId}
-              placeholder={placeholder}
-              disabled={disabled}
-              readOnly={readOnly}
-              aria-invalid={!!error}
-              aria-describedby={describedBy}
-              aria-labelledby={label ? `${comboboxId}-label` : undefined}
-              className={composeClassName(
-                [
-                  'flex-1 min-w-0 self-stretch h-auto bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none',
-                  size === 'sm' && 'py-1.5 ps-3 pe-1 text-xs',
-                  size === 'md' && 'py-2 ps-3.5 pe-1 text-sm',
-                  size === 'lg' && 'py-2.5 ps-5 pe-1 text-base',
-                  'disabled:cursor-not-allowed',
-                ],
-                inputClassName
-              )}
-            />
+            {(() => {
+              const inputControl = (
+                <BaseCombobox.Input
+                  data-slot="combobox-input"
+                  id={comboboxId}
+                  placeholder={placeholder}
+                  disabled={disabled}
+                  readOnly={readOnly}
+                  aria-invalid={!!error}
+                  aria-describedby={describedBy}
+                  aria-labelledby={label ? `${comboboxId}-label` : undefined}
+                  className={composeClassName(
+                    [
+                      'flex-1 min-w-0 self-stretch h-auto bg-transparent border-0 text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none',
+                      multiple && 'min-w-24',
+                      size === 'sm' && 'py-1.5 ps-3 pe-1 text-base sm:text-sm',
+                      size === 'md' && 'py-2 ps-3.5 pe-1 text-sm',
+                      size === 'lg' && 'py-2.5 ps-5 pe-1 text-base',
+                      'disabled:cursor-not-allowed',
+                    ],
+                    inputClassName
+                  )}
+                />
+              );
+
+              if (!multiple) return inputControl;
+
+              return (
+                <ComboboxChips className="flex-1 min-w-0">
+                  <BaseCombobox.Value>
+                    {(selected: unknown) =>
+                      Array.isArray(selected)
+                        ? selected.map((val, idx) => {
+                            const strVal =
+                              typeof val === 'object' && val !== null && 'value' in val
+                                ? String((val as { value: unknown }).value)
+                                : String(val);
+                            const chipLabel =
+                              typeof val === 'object' && val !== null && 'label' in val
+                                ? String((val as { label: unknown }).label)
+                                : normalizedOptions.find((o) => o.value === strVal)?.label ??
+                                  normalizedGroups?.flatMap((g) => g.items).find((o) => o.value === strVal)?.label ??
+                                  strVal;
+                            return (
+                              <ComboboxChip key={`${strVal}-${idx}`}>
+                                <span className="truncate">{chipLabel}</span>
+                                <ComboboxChipRemove />
+                              </ComboboxChip>
+                            );
+                          })
+                        : null
+                    }
+                  </BaseCombobox.Value>
+                  {inputControl}
+                </ComboboxChips>
+              );
+            })()}
             <div className="flex items-center gap-1.5 pe-2 shrink-0">
               {clearable && (
                 <ComboboxClear disabled={disabled || readOnly} />
@@ -487,8 +529,8 @@ export const ComboboxInput = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 transition-colors',
-        size === 'sm' && 'h-11 px-3 min-h-[44px] text-xs',
+        'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 transition-colors motion-reduce:transition-none',
+        size === 'sm' && 'h-11 px-3 min-h-[44px] text-base sm:text-sm',
         size === 'md' && 'h-12 px-3.5 min-h-[48px] text-sm',
         size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
         'hover:border-on-surface-variant/80',
@@ -508,26 +550,42 @@ export interface ComboboxTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BaseCombobox.Trigger> {
   showIcon?: boolean;
   icon?: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
 }
+
+const triggerSizeClasses: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'h-11 px-3.5 min-h-[44px] text-sm',
+  md: 'h-12 px-4 min-h-[48px] text-sm',
+  lg: 'h-14 px-5 min-h-[56px] text-base',
+};
 
 export const ComboboxTrigger = React.forwardRef<
   React.ComponentRef<typeof BaseCombobox.Trigger>,
   ComboboxTriggerProps
->(({ className, children, showIcon = true, icon, ...props }, ref) => {
+>(({ className, children, showIcon = true, icon, size = 'md', render, nativeButton, ...props }, ref) => {
   const hasChildren = Boolean(children);
 
   return (
     <BaseCombobox.Trigger
       ref={ref}
       data-slot="combobox-trigger"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
       tabIndex={hasChildren ? props.tabIndex : (props.tabIndex ?? -1)}
       aria-label={hasChildren ? undefined : 'Toggle options'}
-      className={composeClassName(
-        hasChildren
-          ? 'inline-flex items-center justify-between gap-2 h-12 px-4 min-h-[48px] rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors cursor-pointer disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed'
-          : 'relative size-8 min-w-[32px] min-h-[32px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
-        className
-      )}
+      className={
+        render
+          ? className
+          : composeClassName(
+              hasChildren
+                ? cn(
+                    'inline-flex items-center justify-between gap-2 rounded border border-outline bg-surface text-on-surface font-sans hover:border-on-surface-variant/80 hover:bg-state-hover focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary transition-colors motion-reduce:transition-none cursor-pointer disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+                    triggerSizeClasses[size]
+                  )
+                : 'relative self-center shrink-0 size-8 min-w-[32px] min-h-[32px] rounded-sm flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors motion-reduce:transition-none cursor-pointer border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-40',
+              className
+            )
+      }
       {...props}
     >
       {children}
@@ -565,7 +623,7 @@ export const ComboboxItem = React.forwardRef<
       data-slot="combobox-item"
       className={composeClassName(
         [
-          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors motion-reduce:transition-none',
           'hover:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
           'data-[selected]:bg-surface-container-low data-[selected]:text-primary data-[selected]:font-semibold',
           'data-[selected]:hover:bg-primary-container data-[selected]:hover:text-on-primary-container data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
@@ -680,7 +738,7 @@ export const ComboboxClear = React.forwardRef<
     ref={ref}
     data-slot="combobox-clear"
     className={composeClassName(
-      'relative size-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
+      'relative self-center shrink-0 size-8 min-w-[32px] min-h-[32px] rounded-full flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\'] text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors motion-reduce:transition-none cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40',
       className
     )}
     aria-label="Clear selection"
@@ -704,7 +762,7 @@ export const ComboboxEmpty = React.forwardRef<
     data-slot="combobox-empty"
     className={composeClassName(
       [
-        'px-3 py-2.5 text-xs font-sans text-on-surface-variant text-center select-none',
+        'px-3 py-2.5 text-sm font-sans text-on-surface-variant text-center select-none',
         'empty:p-0 empty:m-0 empty:h-0 empty:min-h-0 empty:border-0 overflow-hidden',
       ],
       className
@@ -770,7 +828,7 @@ export const ComboboxInputGroup = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'relative flex items-stretch w-full rounded border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,outline-color]',
+        'relative flex items-stretch w-full rounded border border-outline bg-surface text-on-surface hover:border-on-surface-variant/80 transition-[border-color,outline-color] motion-reduce:transition-none [&:has(>[data-slot=combobox-trigger],>[data-slot=combobox-clear])]:gap-1.5 [&:has(>[data-slot=combobox-trigger],>[data-slot=combobox-clear])]:pe-1.5',
         size === 'sm' && 'min-h-11',
         size === 'md' && 'min-h-12',
         size === 'lg' && 'min-h-14',
@@ -815,7 +873,7 @@ export const ComboboxGroupLabel = React.forwardRef<
     ref={ref}
     data-slot="combobox-group-label"
     className={composeClassName(
-      'sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none',
+      'sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-semibold text-on-surface-variant border-b border-outline-variant/40 select-none',
       className
     )}
     {...props}
@@ -857,7 +915,7 @@ export const ComboboxChip = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip"
     className={composeClassName(
-      'inline-flex items-center gap-1 ps-2.5 pe-1 py-0.5 min-h-7 max-w-full rounded-sm text-xs font-medium bg-surface-container-high text-on-surface border border-outline-variant select-none data-[disabled]:opacity-40',
+      'inline-flex items-center gap-1 ps-2.5 pe-1 py-0.5 min-h-7 max-w-full rounded-sm text-xs font-medium bg-surface text-on-surface border border-outline select-none data-[disabled]:opacity-40',
       className
     )}
     {...props}
@@ -873,17 +931,13 @@ export const ComboboxChipRemove = React.forwardRef<
     ref={ref}
     data-slot="combobox-chip-remove"
     className={composeClassName(
-      'size-6 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer transition-colors',
+      'size-6 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer transition-colors motion-reduce:transition-none',
       className
     )}
     aria-label="Remove"
     {...props}
   >
-    {children ?? (
-      <span className="material-symbols-outlined text-xs" aria-hidden="true">
-        close
-      </span>
-    )}
+    {children ?? <Icon name="close" size="xs" aria-hidden="true" />}
   </BaseCombobox.ChipRemove>
 ));
 ComboboxChipRemove.displayName = 'ComboboxChipRemove';
@@ -907,7 +961,7 @@ ComboboxBackdrop.displayName = 'ComboboxBackdrop';
 export const ComboboxArrow = React.forwardRef<
   React.ComponentRef<typeof BaseCombobox.Arrow>,
   React.ComponentPropsWithoutRef<typeof BaseCombobox.Arrow>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <BaseCombobox.Arrow
     ref={ref}
     data-slot="combobox-arrow"
@@ -922,7 +976,19 @@ export const ComboboxArrow = React.forwardRef<
       className
     )}
     {...props}
-  />
+  >
+    {children ?? (
+      <svg
+        width="10"
+        height="5"
+        viewBox="0 0 10 5"
+        className="block fill-surface stroke-outline-variant"
+        aria-hidden="true"
+      >
+        <path d="M0 5 L5 0 L10 5" />
+      </svg>
+    )}
+  </BaseCombobox.Arrow>
 ));
 ComboboxArrow.displayName = 'ComboboxArrow';
 

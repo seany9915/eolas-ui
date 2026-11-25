@@ -21,6 +21,7 @@ export interface SpinningCounterProps extends React.HTMLAttributes<HTMLSpanEleme
   prefix?: string;
   suffix?: string;
   decimals?: number;
+  locale?: Intl.LocalesArgument;
   format?: (value: number) => string;
   /** Cell height as a CSS length (e.g. '1.4em') or pixel number. Defaults to '1.4em' for zoom safety. */
   cellHeight?: number | string;
@@ -32,6 +33,25 @@ export interface SpinningCounterProps extends React.HTMLAttributes<HTMLSpanEleme
 }
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const counterFormatterCache = new Map<string, Intl.NumberFormat>();
+
+function getCachedCounterFormatter(
+  locale: Intl.LocalesArgument | undefined,
+  decimals: number
+): Intl.NumberFormat {
+  const localeKey = Array.isArray(locale) ? locale.join(',') : (locale ?? 'default');
+  const cacheKey = `${localeKey}|${decimals}`;
+  let formatter = counterFormatterCache.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, {
+      numberingSystem: 'latn',
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+    counterFormatterCache.set(cacheKey, formatter);
+  }
+  return formatter;
+}
 
 interface ReelColumnProps {
   char: string;
@@ -55,7 +75,7 @@ const ReelColumn: React.FC<ReelColumnProps> = ({ char, columnIndex, cellHeight, 
   }
 
   const targetDigit = parseInt(char, 10);
-  const staggerDelay = columnIndex * 90; // 90ms per column (--reel-stagger)
+  const staggerDelay = Math.min(columnIndex, 4) * 40; // capped at 5 items / 200ms per DESIGN.md Motion Rule 5
 
   return (
     <span
@@ -69,7 +89,7 @@ const ReelColumn: React.FC<ReelColumnProps> = ({ char, columnIndex, cellHeight, 
       <span
         style={{
           transform: `translateY(calc(-${targetDigit} * ${cellHeight}))`,
-          transition: `transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${staggerDelay}ms`,
+          transition: `transform ${duration}ms var(--ease-standard) ${staggerDelay}ms`,
         }}
         className="flex flex-col motion-reduce:transition-none!"
       >
@@ -133,6 +153,50 @@ function buildAnchoredColumns(formattedText: string): KeyedColumn[] {
   return columns;
 }
 
+function buildColumnsFromParts(parts: Intl.NumberFormatPart[]): KeyedColumn[] {
+  const decimalIdx = parts.findIndex((p) => p.type === 'decimal');
+  const intParts = decimalIdx === -1 ? parts : parts.slice(0, decimalIdx);
+  const fracParts = decimalIdx === -1 ? [] : parts.slice(decimalIdx + 1);
+
+  const intColumns: KeyedColumn[] = [];
+  let intDigitPos = 0;
+  let intSepPos = 0;
+  for (let p = intParts.length - 1; p >= 0; p -= 1) {
+    const part = intParts[p];
+    const chars = Array.from(part.value);
+    for (let c = chars.length - 1; c >= 0; c -= 1) {
+      const char = chars[c];
+      if (part.type === 'integer' && /^[0-9]$/.test(char)) {
+        intColumns.unshift({ key: `int-${intDigitPos}`, char });
+        intDigitPos += 1;
+      } else {
+        intColumns.unshift({ key: `sep-int-${intSepPos}`, char });
+        intSepPos += 1;
+      }
+    }
+  }
+
+  const fracColumns: KeyedColumn[] = [];
+  if (decimalIdx !== -1) {
+    fracColumns.push({ key: 'sep-decimal', char: parts[decimalIdx].value });
+    let decDigitPos = 0;
+    let decSepPos = 0;
+    for (const part of fracParts) {
+      for (const char of part.value) {
+        if (part.type === 'fraction' && /^[0-9]$/.test(char)) {
+          fracColumns.push({ key: `dec-${decDigitPos}`, char });
+          decDigitPos += 1;
+        } else {
+          fracColumns.push({ key: `sep-dec-${decSepPos}`, char });
+          decSepPos += 1;
+        }
+      }
+    }
+  }
+
+  return [...intColumns, ...fracColumns];
+}
+
 export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounterProps>(
   (
     {
@@ -140,6 +204,7 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
       prefix = '',
       suffix = '',
       decimals = 0,
+      locale,
       format,
       cellHeight = '1.4em',
       duration = 1200,
@@ -152,14 +217,20 @@ export const SpinningCounter = React.forwardRef<HTMLSpanElement, SpinningCounter
     },
     ref
   ) => {
-    const formattedText = React.useMemo(() => {
-      if (format) return format(value);
-      if (decimals > 0) return value.toFixed(decimals);
-      return Math.round(value).toLocaleString();
-    }, [value, format, decimals]);
+    const safeValue = Number.isFinite(value) ? value : 0;
+
+    const { formattedText, columns } = React.useMemo(() => {
+      if (format) {
+        const text = format(safeValue);
+        return { formattedText: text, columns: buildAnchoredColumns(text) };
+      }
+      const normalizedDecimals = Math.max(0, Math.floor(decimals));
+      const parts = getCachedCounterFormatter(locale, normalizedDecimals).formatToParts(safeValue);
+      const cols = buildColumnsFromParts(parts);
+      return { formattedText: cols.map((c) => c.char).join(''), columns: cols };
+    }, [safeValue, format, decimals, locale]);
 
     const resolvedCellHeight = typeof cellHeight === 'number' ? `${cellHeight}px` : cellHeight;
-    const columns = React.useMemo(() => buildAnchoredColumns(formattedText), [formattedText]);
 
     return (
       <span

@@ -26,23 +26,28 @@ const DEFAULT_STATE_LABELS: Record<OrbState, string> = {
   shaping: 'Formatting output...',
 };
 
+function subscribeReducedMotion(callback: () => void): () => void {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return () => {};
+  }
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
+}
+
+function getReducedMotionSnapshot(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const listener = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', listener);
-    return () => mediaQuery.removeEventListener('change', listener);
-  }, []);
-
-  return prefersReducedMotion;
+  return React.useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    () => false
+  );
 }
 
 export interface ThinkingOrbProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -129,7 +134,10 @@ export const ThinkingOrb = React.forwardRef<HTMLDivElement, ThinkingOrbProps>(
 
         {label ? (
           <>
-            <span className="text-base font-sans text-on-surface leading-snug">
+            <span
+              className="text-base font-sans text-on-surface leading-snug"
+              aria-hidden={Boolean(statusText) || undefined}
+            >
               {label}
             </span>
             {statusText && <span className="sr-only">{statusText}</span>}

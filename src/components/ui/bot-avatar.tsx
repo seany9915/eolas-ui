@@ -8,6 +8,7 @@ import {
   type BotAvatarState,
   type BotAvatarFace,
 } from 'bot-avatars';
+import { Badge } from './badge';
 import { cn } from '@/lib/utils';
 
 export { botAvatarTypes };
@@ -99,8 +100,10 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
       paused: explicitPaused,
       respectReducedMotion: _respectReducedMotion,
       showDisclaimerBadge = false,
-      disclaimerText = 'Digital Assistant',
+      disclaimerText = 'Digital Helper',
       className,
+      'aria-label': ariaLabelProp,
+      role: roleProp,
       ...props
     },
     ref
@@ -119,18 +122,18 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
     const effectiveJumpEvery = isCalm ? 0 : 8; // 0 disables spontaneous flips
     const effectiveInteractive = isCalm ? false : interactive;
 
-    const accessibleLabel =
-      label || `Digital Assistant (${type} character, ${state} state)`;
+    const accessibleLabel = ariaLabelProp || label || 'Digital Helper';
 
     return (
       <div
         ref={ref}
-        role="img"
-        aria-label={accessibleLabel}
+        role={roleProp}
         className={cn('inline-flex flex-col items-center gap-1.5 select-none', className)}
         {...props}
       >
         <div
+          role="img"
+          aria-label={accessibleLabel}
           className="relative flex items-center justify-center shrink-0"
           style={{ width: pixelSize, height: pixelSize }}
         >
@@ -150,9 +153,9 @@ export const BotAvatar = React.forwardRef<HTMLDivElement, BotAvatarProps>(
         </div>
 
         {showDisclaimerBadge && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-label font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant">
+          <Badge variant="soft" colorRole="neutral" size="sm">
             {disclaimerText}
-          </span>
+          </Badge>
         )}
       </div>
     );

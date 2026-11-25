@@ -15,7 +15,7 @@
 import * as React from 'react';
 import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 import { getContrastInk } from '@/lib/contrast';
 
 export type AvatarSize = 'sm' | 'md' | 'lg';
@@ -32,6 +32,21 @@ const sizeClasses: Record<AvatarSize, string> = {
   md: 'size-10 text-sm',
   lg: 'size-14 text-base',
 };
+
+function takeTwoGraphemes(text: string): string {
+  if (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    let out = '';
+    let count = 0;
+    for (const part of segmenter.segment(text)) {
+      if (count >= 2) break;
+      out += part.segment;
+      count += 1;
+    }
+    return out;
+  }
+  return Array.from(text).slice(0, 2).join('');
+}
 
 export interface AvatarRootProps extends React.ComponentPropsWithoutRef<typeof BaseAvatar.Root> {
   size?: AvatarSize;
@@ -50,11 +65,11 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
 }, ref) => {
   const dynamicStyle: AvatarRootProps['style'] = customColor
     ? (() => {
-        const baseDynamic: React.CSSProperties & { '--dynamic-bg'?: string } = {
+        const baseDynamic: React.CSSProperties & { '--dynamic-bg'?: string; '--chip-ink'?: string } = {
           '--dynamic-bg': customColor,
+          '--chip-ink': getContrastInk(customColor),
           backgroundColor: customColor,
           borderColor: 'transparent',
-          color: getContrastInk(customColor),
         };
         return typeof style === 'function'
           ? (state) => ({ ...baseDynamic, ...style(state) })
@@ -72,7 +87,7 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
         className={composeClassName(
           cn(
             'group/avatar relative inline-flex items-center justify-center rounded-full select-none shrink-0',
-            'bg-surface-container-high text-on-surface-variant font-label font-bold border border-outline-variant',
+            'bg-surface-container-high text-on-surface font-label font-semibold border border-outline-variant',
             customColor && 'contrast-auto',
             sizeClasses[size]
           ),
@@ -128,7 +143,7 @@ export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackPr
       )}
       {...props}
     >
-      {typeof children === 'string' ? children.slice(0, 2) : children}
+      {typeof children === 'string' ? takeTwoGraphemes(children) : children}
     </BaseAvatar.Fallback>
   );
 });
@@ -144,8 +159,8 @@ export const AvatarBadge = React.forwardRef<HTMLSpanElement, AvatarBadgeProps>((
     ref={ref}
     data-slot="avatar-badge"
     className={cn(
-      'absolute bottom-0 end-0 z-10 inline-flex items-center justify-center rounded-full bg-primary text-on-primary ring-2 ring-surface select-none',
-      'size-2.5 group-data-[size=sm]/avatar:size-2 group-data-[size=md]/avatar:size-2.5 group-data-[size=lg]/avatar:size-3.5',
+      'absolute bottom-0 end-0 z-10 inline-flex items-center justify-center rounded-full bg-primary text-on-primary border-2 border-surface select-none',
+      'size-3 group-data-[size=sm]/avatar:size-2.5 group-data-[size=md]/avatar:size-3 group-data-[size=lg]/avatar:size-4',
       '[&>svg]:size-2 group-data-[size=lg]/avatar:[&>svg]:size-2.5',
       className
     )}
@@ -164,7 +179,7 @@ export const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(({
     ref={ref}
     data-slot="avatar-group"
     className={cn(
-      'group/avatar-group flex items-center [&>*:not(:first-child)]:-ms-2 [&>[data-slot=avatar]]:ring-2 [&>[data-slot=avatar]]:ring-surface',
+      'group/avatar-group flex items-center [&>*:not(:first-child)]:-ms-2 [&>[data-slot=avatar]]:border-2 [&>[data-slot=avatar]]:border-surface',
       className
     )}
     {...props}
@@ -172,17 +187,22 @@ export const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(({
 ));
 AvatarGroup.displayName = 'AvatarGroup';
 
-export interface AvatarGroupCountProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface AvatarGroupCountProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: AvatarSize;
+}
 
 export const AvatarGroupCount = React.forwardRef<HTMLDivElement, AvatarGroupCountProps>(({
+  size = 'md',
   className,
   ...props
 }, ref) => (
   <div
     ref={ref}
     data-slot="avatar-group-count"
+    data-size={size}
     className={cn(
-      'relative flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-xs font-label font-semibold text-on-surface-variant ring-2 ring-surface border border-outline-variant select-none',
+      'relative flex shrink-0 items-center justify-center rounded-full bg-surface-container-high font-label font-semibold text-on-surface border-2 border-surface select-none',
+      sizeClasses[size],
       className
     )}
     {...props}
@@ -208,7 +228,7 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<typeof BaseA
 
 const AvatarComponent = React.forwardRef<HTMLSpanElement, AvatarProps>(({
   src,
-  alt = 'User Avatar',
+  alt = '',
   fallback,
   delay = 300,
   size = 'md',
@@ -259,13 +279,21 @@ export interface AvatarButtonProps extends React.ComponentPropsWithoutRef<typeof
 export const AvatarButton = React.forwardRef<HTMLButtonElement, AvatarButtonProps>(({
   avatar,
   label = 'User profile',
+  render,
+  nativeButton,
+  type,
   className,
   ...props
 }, ref) => {
+  const resolvedNativeButton = resolveNativeButton(render, nativeButton);
+  const resolvedType = type ?? (resolvedNativeButton === false ? undefined : 'button');
+
   return (
     <BaseButton
       ref={ref}
-      type="button"
+      {...(resolvedType !== undefined ? { type: resolvedType } : {})}
+      render={render}
+      nativeButton={resolvedNativeButton}
       aria-label={label}
       className={composeClassName(
         cn(

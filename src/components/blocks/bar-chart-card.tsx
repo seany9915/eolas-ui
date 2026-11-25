@@ -17,6 +17,8 @@ import {
   ChartLegend,
   ChartLegendContent,
   applySeriesOverrides,
+  resolveChartSeriesColor,
+  usePrefersReducedMotion,
   type ChartConfig,
 } from '@/components/ui/chart';
 
@@ -74,6 +76,7 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
     },
     ref
   ) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
     const isVerticalLayout = layout === 'vertical';
     const shouldShowLegend = showLegend ?? series.length > 1;
     const resolvedContentClassName =
@@ -109,7 +112,6 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
           className="aspect-auto size-full"
         >
           <BarChart
-            aria-label={chartLabel ?? title}
             data={data}
             layout={isVerticalLayout ? 'vertical' : 'horizontal'}
             margin={
@@ -128,9 +130,19 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
                   axisLine={false}
                   tickMargin={8}
                   width={yAxisWidth}
+                  tickFormatter={(value) => {
+                    const str = String(value ?? '');
+                    return str.length > 14 ? `${str.slice(0, 13).trimEnd()}…` : str;
+                  }}
                   className="text-xs text-on-surface-variant"
                 />
-                <XAxis type="number" hide />
+                <XAxis
+                  type="number"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={4}
+                  className="text-xs text-on-surface-variant"
+                />
               </>
             ) : (
               <>
@@ -167,14 +179,18 @@ export const BarChartCard = React.forwardRef<HTMLDivElement, BarChartCardProps>(
                 : isVerticalLayout
                 ? [0, 4, 4, 0]
                 : [4, 4, 0, 0];
+              const { fill, isTertiary } = resolveChartSeriesColor(resolvedConfig, item.dataKey, index);
 
               return (
                 <Bar
                   key={item.dataKey}
                   dataKey={item.dataKey}
-                  fill={`var(--color-${item.dataKey})`}
+                  fill={fill}
+                  stroke={isTertiary ? 'var(--color-outline)' : undefined}
+                  strokeWidth={isTertiary ? 1 : undefined}
                   stackId={item.stackId}
                   radius={radius}
+                  isAnimationActive={!prefersReducedMotion}
                 />
               );
             })}

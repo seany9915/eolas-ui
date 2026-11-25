@@ -232,30 +232,38 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
     ...style,
   } as React.CSSProperties;
 
-  return (
-    <>
-      <span
-        ref={ref}
-        className={cn(
-          'material-symbols-outlined select-none leading-none',
-          size === 'inline'
-            ? 'inline-block align-baseline'
-            : 'inline-flex size-[1em] shrink-0 items-center justify-center',
-          sizeClasses[size],
-          directional && 'icon-directional',
-          className
-        )}
-        style={iconStyle}
-        role={role ?? (hasAriaLabel && !srLabel ? 'img' : undefined)}
-        aria-hidden={isDecorative || srLabel ? 'true' : undefined}
-        aria-label={props['aria-label']}
-        {...props}
-      >
-        {name}
-      </span>
-      {srLabel && <span className="sr-only">{srLabel}</span>}
-    </>
+  const iconElement = (
+    <span
+      ref={ref}
+      className={cn(
+        'material-symbols-outlined select-none leading-none',
+        size === 'inline'
+          ? 'inline-block align-baseline'
+          : 'inline-flex size-[1em] shrink-0 items-center justify-center',
+        sizeClasses[size],
+        directional && 'icon-directional',
+        className
+      )}
+      style={iconStyle}
+      role={role ?? (hasAriaLabel && !srLabel ? 'img' : undefined)}
+      aria-hidden={isDecorative || srLabel ? 'true' : undefined}
+      aria-label={props['aria-label']}
+      {...props}
+    >
+      {name}
+    </span>
   );
+
+  if (srLabel) {
+    return (
+      <span className="inline-flex items-center">
+        {iconElement}
+        <span className="sr-only">{srLabel}</span>
+      </span>
+    );
+  }
+
+  return iconElement;
 });
 
 BaseIcon.displayName = 'Icon';
@@ -265,6 +273,7 @@ export interface ToggleIconProps extends Omit<React.HTMLAttributes<HTMLSpanEleme
   onName: AppIconName;
   offName: AppIconName;
   size?: IconSize;
+  filled?: boolean;
   srLabel?: string;
   onLabel?: string;
   offLabel?: string;
@@ -282,6 +291,7 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
   onName,
   offName,
   size = 'lg',
+  filled = false,
   srLabel,
   onLabel,
   offLabel,
@@ -310,8 +320,9 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
       <BaseIcon
         name={offName}
         size={size}
+        filled={filled}
         className={cn(
-          'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+          'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           active
             ? 'opacity-0 scale-[0.25] blur-[var(--blur-small)] pointer-events-none'
             : 'opacity-100 scale-100 blur-none'
@@ -320,8 +331,9 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
       <BaseIcon
         name={onName}
         size={size}
+        filled={filled}
         className={cn(
-          'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+          'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           active
             ? 'opacity-100 scale-100 blur-none'
             : 'opacity-0 scale-[0.25] blur-[var(--blur-small)] pointer-events-none'
@@ -334,9 +346,28 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
 
 ToggleIcon.displayName = 'ToggleIcon';
 
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+function subscribeIconReducedMotion(callback: () => void): () => void {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return () => {};
+  }
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
+  mq.addEventListener('change', callback);
+  return () => mq.removeEventListener('change', callback);
+}
+
+function getIconReducedMotionSnapshot(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+}
+
 export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   name: string;
   size?: IconSize;
+  filled?: boolean;
   directional?: boolean;
   srLabel?: string;
   className?: string;
@@ -349,23 +380,24 @@ export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanEl
 export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProps>(({
   name,
   size = 'lg',
+  filled = false,
   directional = false,
   srLabel,
   className,
   role,
   ...props
 }, ref) => {
+  const prefersReducedMotion = React.useSyncExternalStore(
+    subscribeIconReducedMotion,
+    getIconReducedMotionSnapshot,
+    () => false
+  );
   const [currentName, setCurrentName] = React.useState(name);
   const [prevName, setPrevName] = React.useState<string | null>(null);
   const [entered, setEntered] = React.useState(true);
 
   // Stage the swap during render so the timer effect below is not torn down by its own state updates.
   if (name !== currentName) {
-    const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     setCurrentName(name);
     if (prefersReducedMotion) {
       setPrevName(null);
@@ -391,7 +423,7 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
 
   React.useEffect(() => {
     if (!prevName) return;
-    const timer = window.setTimeout(() => setPrevName(null), 250); // Matches --duration-fast (250ms)
+    const timer = window.setTimeout(() => setPrevName(null), 150); // Matches --duration-quick (150ms)
     return () => window.clearTimeout(timer);
   }, [prevName]);
   const hasAriaLabel = Boolean(props['aria-label']);
@@ -414,8 +446,9 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
         <BaseIcon
           name={prevName}
           size={size}
+          filled={filled}
           className={cn(
-            'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] pointer-events-none motion-reduce:transition-none',
+            'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-standard)] pointer-events-none motion-reduce:transition-none',
             entered ? 'opacity-0 scale-[0.25] blur-[var(--blur-small)]' : 'opacity-100 scale-100 blur-none'
           )}
         />
@@ -423,8 +456,9 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
       <BaseIcon
         name={currentName}
         size={size}
+        filled={filled}
         className={cn(
-          'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+          'col-start-1 row-start-1 transition-[opacity,transform,filter] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           entered ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[var(--blur-small)]'
         )}
       />

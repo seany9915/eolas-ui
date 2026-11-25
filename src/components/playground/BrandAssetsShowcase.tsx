@@ -26,9 +26,9 @@ export const BrandAssetsShowcase: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="flex flex-col gap-10">
       {/* Guidance Callout */}
-      <InlineAlert title="Eolas Brand Assets & Tonal Guidelines" titleAs="h2" role="neutral" icon="branding_watermark">
+      <InlineAlert title="Eolas Brand Assets & Tonal Guidelines" titleAs="h2" role="neutral" ariaRole="note" icon="branding_watermark">
         Mark type (Stacked, Horizontal, Pictorial, Wordmark) and tonal variant (Primary, White, Black, Amber) are independent choices. Pick a mark type based on layout, then pick a tonal variant based on the background luminance.
       </InlineAlert>
 
@@ -83,8 +83,8 @@ export const BrandAssetsShowcase: React.FC = () => {
 
           {/* Dark Charcoal Footer Lockup via Inverted Card Primitive */}
           <Card variant="inverted" className="h-full">
-            <div className="flex flex-col justify-between space-y-6">
-              <div className="flex items-center justify-between border-b border-surface/20 pb-4">
+            <div className="flex flex-col justify-between gap-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-surface/20 pb-4">
                 <img src={assetUrl('/logos/horizontal-lockup-white.svg')} alt="White Lockup" className="h-8 w-auto object-contain" />
                 <img src={assetUrl('/logos/wordmark-amber.svg')} alt="Amber Wordmark" className="h-5 w-auto object-contain" />
               </div>

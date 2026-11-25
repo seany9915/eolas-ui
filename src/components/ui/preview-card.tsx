@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { PreviewCard as BasePreviewCard } from '@base-ui/react/preview-card';
 import { cn, composeClassName } from '@/lib/utils';
+import { Icon } from './icon';
 
 interface PreviewCardContextValue {
   delay?: number;
@@ -16,19 +17,26 @@ export interface PreviewCardTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Trigger> {}
 
 export const PreviewCardTrigger = React.forwardRef<HTMLAnchorElement, PreviewCardTriggerProps>(
-  ({ className, children, delay, closeDelay, ...props }, ref) => {
+  ({ className, children, delay, closeDelay, render, href, ...props }, ref) => {
     const context = React.useContext(PreviewCardContext);
     const resolvedDelay = delay ?? context.delay;
     const resolvedCloseDelay = closeDelay ?? context.closeDelay;
+    const isFallbackButton = href === undefined && render === undefined;
+    const resolvedRender = isFallbackButton ? <button type="button" /> : render;
 
     return (
       <BasePreviewCard.Trigger
         ref={ref}
         data-slot="preview-card-trigger"
-        delay={resolvedDelay}
-        closeDelay={resolvedCloseDelay}
+        render={resolvedRender}
+        {...(!isFallbackButton && href !== undefined ? { href } : {})}
+        {...(resolvedDelay !== undefined ? { delay: resolvedDelay } : {})}
+        {...(resolvedCloseDelay !== undefined ? { closeDelay: resolvedCloseDelay } : {})}
         className={composeClassName(
-          'inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded',
+          cn(
+            'inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded transition-colors motion-reduce:transition-none',
+            isFallbackButton && 'bg-transparent border-0 p-0'
+          ),
           className
         )}
         {...props}
@@ -148,6 +156,7 @@ export interface PreviewCardProps<Payload = unknown>
   alignOffset?: BasePreviewCard.Positioner.Props['alignOffset'];
   showArrow?: boolean;
   keepMounted?: boolean;
+  container?: BasePreviewCard.Portal.Props['container'];
   delay?: number;
   closeDelay?: number;
   children?: BasePreviewCard.Root.Props<Payload>['children'];
@@ -167,6 +176,7 @@ function PreviewCardComponentInner<Payload = unknown>(
     alignOffset,
     showArrow = false,
     keepMounted,
+    container,
     open,
     defaultOpen,
     onOpenChange,
@@ -224,7 +234,7 @@ function PreviewCardComponentInner<Payload = unknown>(
             >
               {React.isValidElement(trigger) ? undefined : trigger}
             </PreviewCardTrigger>
-            <BasePreviewCard.Portal keepMounted={keepMounted}>
+            <BasePreviewCard.Portal container={container} keepMounted={keepMounted}>
               <PreviewCardPositioner
                 side={side}
                 align={align}
@@ -240,9 +250,7 @@ function PreviewCardComponentInner<Payload = unknown>(
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           {icon && (
-                            <span className="material-symbols-outlined text-primary text-xl shrink-0" aria-hidden="true">
-                              {icon}
-                            </span>
+                            <Icon name={icon} size="md" className="text-primary shrink-0" aria-hidden="true" />
                           )}
                           {title && <h4 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h4>}
                         </div>

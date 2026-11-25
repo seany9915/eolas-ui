@@ -75,7 +75,7 @@ function installOxlintShim(targetDir) {
   fs.mkdirSync(binDir, { recursive: true });
   fs.writeFileSync(
     path.join(targetDir, 'node_modules', 'oxlint', 'package.json'),
-    JSON.stringify({ name: 'oxlint', type: 'commonjs' })
+    JSON.stringify({ name: 'oxlint', type: 'commonjs', bin: { oxlint: 'bin/oxlint' } })
   );
   const shimPath = path.join(binDir, 'oxlint');
   fs.writeFileSync(
@@ -368,6 +368,190 @@ try {
         return <span className={cls}>Title</span>;
       }
     `,
+    'src/transition-all-bracket-bad.tsx': `
+      export function BadBracketTransition() {
+        return (
+          <div>
+            <div className="transition-[all]" />
+            <div className="transition-[all_200ms_ease]" />
+            <div className="hover:transition-[opacity,all_150ms]" />
+          </div>
+        );
+      }
+    `,
+    'src/transition-all-bracket-ok.tsx': `
+      export function GoodBracketTransition() {
+        return (
+          <div>
+            <div className="transition-[opacity,transform]" />
+            <div className="transition-[--all-props]" />
+          </div>
+        );
+      }
+    `,
+    'src/tertiary-extended-bad.tsx': `
+      export function BadExtendedTertiary() {
+        return (
+          <div>
+            <span className="decoration-tertiary">Deco</span>
+            <svg className="stroke-tertiary/80 fill-tertiary" />
+          </div>
+        );
+      }
+    `,
+    'src/raw-html-block-ok.tsx': `
+      const Trigger = (_p: { render?: unknown }) => null;
+      export function GoodBlockRender({ active }: { active: boolean }) {
+        return (
+          <Trigger
+            render={(props: Record<string, unknown>) => {
+              const cls = active ? 'opacity-100' : 'opacity-50';
+              return <button {...props} type="button" className={cls}>Open</button>;
+            }}
+          />
+        );
+      }
+    `,
+    'src/raw-html-block-var-bad.tsx': `
+      const Trigger = (_p: { render?: unknown }) => null;
+      export function BadBlockVarRender() {
+        return (
+          <Trigger
+            render={(props: Record<string, unknown>) => {
+              const rogue = <button type="button">Rogue</button>;
+              return <span {...props}>{rogue}</span>;
+            }}
+          />
+        );
+      }
+    `,
+    'src/raw-html-lowercase-render-bad.tsx': `
+      export function BadLowercaseRender() {
+        return <div data-x="1" {...({ render: <button type="button">A</button> } as Record<string, unknown>)} />;
+      }
+    `,
+    'src/raw-html-lowercase-attr-bad.tsx': `
+      export function BadLowercaseAttrRender() {
+        return <div render={<button type="button">A</button>} />;
+      }
+    `,
+    'src/components/ui/bad-ui-layer.tsx': `
+      import { ChartCard } from '@/components/blocks/chart-card';
+      export function BadUiLayer() {
+        return <ChartCard />;
+      }
+    `,
+    'src/components/blocks/bad-block-layer.tsx': `
+      import { SecretForm } from '@/features/secret-form';
+      export function BadBlockLayer() {
+        return <SecretForm />;
+      }
+    `,
+    'src/components/blocks/ok-block-layer.tsx': `
+      import { ChartCard } from '@/components/blocks/chart-card';
+      import { ContextMenuContent } from '@/components/ui/context-menu';
+      export function OkBlockLayer() {
+        return <ContextMenuContent />;
+      }
+    `,
+    'src/wrapped-bad.tsx': `
+      import { Dialog } from '@base-ui/react/dialog';
+      export function BadWrapped() {
+        return <Dialog.Root />;
+      }
+    `,
+    'src/wrapped-type-ok.tsx': `
+      import type { DialogRootProps } from '@base-ui/react/dialog';
+      export type LocalDialogProps = DialogRootProps;
+    `,
+    'src/lib/utils.ts': `
+      export { mergeProps } from '@base-ui/react/merge-props';
+      export { useRender } from '@base-ui/react/use-render';
+    `,
+    'src/reach-in-bad.tsx': `
+      const Button = (_p: { className?: string }) => null;
+      export function BadReachIn() {
+        return <Button className="[&_svg]:text-error [&>span]:font-medium" />;
+      }
+    `,
+    'src/reach-in-self-ok.tsx': `
+      export function GoodSelfSelector() {
+        return <div className='[&[hidden]:not([hidden="until-found"])]:hidden' />;
+      }
+    `,
+    'src/icon-button-bad.tsx': `
+      const Button = (_p: { size?: string; children?: unknown }) => null;
+      const Icon = (_p: { name: string }) => null;
+      export function BadIconBtn() {
+        return (
+          <Button size="icon">
+            <Icon name="close" />
+          </Button>
+        );
+      }
+    `,
+    'src/icon-button-ok.tsx': `
+      const Button = (_p: { size?: string; 'aria-label'?: string; children?: unknown }) => null;
+      const Icon = (_p: { name: string }) => null;
+      export function GoodIconBtns() {
+        return (
+          <div>
+            <Button size="icon" aria-label="Close">
+              <Icon name="close" />
+            </Button>
+            <Button size="icon">
+              <Icon name="close" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
+        );
+      }
+    `,
+    'src/prefer-shorthand-bad.tsx': `
+      export function BadShorthand() {
+        return (
+          <div className="space-y-4">
+            <div className="w-4 h-4" />
+            <div className="h-screen" />
+          </div>
+        );
+      }
+    `,
+    'src/prefer-shorthand-ok.tsx': `
+      export function GoodShorthand({ wide }: { wide: boolean }) {
+        return (
+          <div className="flex flex-col gap-4">
+            <div className="size-4 w-4 h-6 w-auto h-auto h-dvh" />
+            <div className={wide ? 'w-4' : 'h-4'} />
+          </div>
+        );
+      }
+    `,
+    'src/dark-variant-bad.tsx': `
+      export function BadDarkVariant() {
+        return <div className="dark:bg-surface md:dark:text-on-surface" />;
+      }
+    `,
+    'src/dark-variant-ok.tsx': `
+      export function GoodInvertedSurface() {
+        return <div className="inverted:text-on-surface" />;
+      }
+    `,
+    'src/important-mod-bad.tsx': `
+      export function BadImportantMod() {
+        return <div className="!p-0 h-8!" />;
+      }
+    `,
+    'src/rebuilt-overlay-bad.tsx': `
+      export function BadRebuiltOverlay() {
+        return <div className="fixed inset-0 bg-on-surface/50" />;
+      }
+    `,
+    'src/rebuilt-overlay-ok.tsx': `
+      export function GoodBackdrop() {
+        return <div className="absolute inset-0 bg-on-surface/40" />;
+      }
+    `,
   };
 
   for (const [relPath, content] of Object.entries(fixtures)) {
@@ -503,6 +687,125 @@ try {
       'expected const cls = "uppercase" used in JSX className to be flagged'
     );
   });
+
+  test('no-transition-all catches transition-[all] and underscore/comma arbitrary forms without false-positives', () => {
+    const badCodes = rulesForFile(diagnostics, 'src/transition-all-bracket-bad.tsx').filter(
+      (c) => c === 'eolas(no-transition-all)'
+    );
+    assert.equal(badCodes.length, 3, `expected 3 no-transition-all errors for bracket variants, got ${badCodes.length}`);
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/transition-all-bracket-ok.tsx').includes('eolas(no-transition-all)'),
+      'expected transition-[opacity,transform] and transition-[--all-props] to pass'
+    );
+  });
+
+  test('no-light-surface-tertiary catches decoration, fill, and stroke-tertiary with opacity', () => {
+    const codes = rulesForFile(diagnostics, 'src/tertiary-extended-bad.tsx').filter(
+      (c) => c === 'eolas(no-light-surface-tertiary)'
+    );
+    assert.equal(codes.length, 2, `expected 2 no-light-surface-tertiary errors, got ${codes.length}`);
+  });
+
+  test('no-raw-html-controls allows block-body render return, blocks rogue block vars and lowercase HTML render props', () => {
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/raw-html-block-ok.tsx').includes('eolas(no-raw-html-controls)'),
+      'expected returned <button> in block-body render callback to be allowed'
+    );
+    assert.ok(
+      rulesForFile(diagnostics, 'src/raw-html-block-var-bad.tsx').includes('eolas(no-raw-html-controls)'),
+      'expected non-returned const rogue = <button /> inside block-body render to be blocked'
+    );
+    assert.ok(
+      rulesForFile(diagnostics, 'src/raw-html-lowercase-attr-bad.tsx').includes('eolas(no-raw-html-controls)'),
+      'expected <div render={<button />} /> lowercase HTML render prop to be blocked'
+    );
+  });
+
+  test('one-way-imports enforces ui -> blocks -> features/views boundary', () => {
+    assert.ok(
+      rulesForFile(diagnostics, 'src/components/ui/bad-ui-layer.tsx').includes('eolas(one-way-imports)'),
+      'expected ui primitive importing blocks/ to be blocked'
+    );
+    assert.ok(
+      rulesForFile(diagnostics, 'src/components/blocks/bad-block-layer.tsx').includes('eolas(one-way-imports)'),
+      'expected block importing features/ to be blocked'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/components/blocks/ok-block-layer.tsx').includes('eolas(one-way-imports)'),
+      'expected block importing blocks/ and ui/ to pass'
+    );
+  });
+
+  test('wrapped-libraries blocks direct headless UI imports outside ui/ while allowing type-only imports', () => {
+    assert.ok(
+      rulesForFile(diagnostics, 'src/wrapped-bad.tsx').includes('eolas(wrapped-libraries)'),
+      'expected runtime @base-ui/react import outside ui/ to be blocked'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/wrapped-type-ok.tsx').includes('eolas(wrapped-libraries)'),
+      'expected import type from @base-ui/react to pass'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/lib/utils.ts').includes('eolas(wrapped-libraries)'),
+      'expected src/lib/utils.ts re-exporting @base-ui/react/merge-props and use-render to pass'
+    );
+  });
+
+  test('no-reach-in-selectors blocks [&_...] on components without flagging self-selectors on elements', () => {
+    assert.ok(
+      rulesForFile(diagnostics, 'src/reach-in-bad.tsx').includes('eolas(no-reach-in-selectors)'),
+      'expected [&_svg] on <Button> to be blocked'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/reach-in-self-ok.tsx').includes('eolas(no-reach-in-selectors)'),
+      'expected self-selector [&[hidden]:not([hidden="until-found"])]:hidden to pass'
+    );
+  });
+
+  test('icon-button-label catches unlabeled icon-only buttons and allows aria-label or sr-only text', () => {
+    assert.ok(
+      rulesForFile(diagnostics, 'src/icon-button-bad.tsx').includes('eolas(icon-button-label)'),
+      'expected <Button size="icon"><Icon name="close" /></Button> to be blocked'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/icon-button-ok.tsx').includes('eolas(icon-button-label)'),
+      'expected aria-label and sr-only labeled icon buttons to pass'
+    );
+  });
+
+  test('prefer-shorthand catches w-X h-X, space-y-*, and h-screen while allowing ternary splits and shorthands', () => {
+    const badCodes = rulesForFile(diagnostics, 'src/prefer-shorthand-bad.tsx').filter(
+      (c) => c === 'eolas(prefer-shorthand)'
+    );
+    assert.equal(badCodes.length, 3, `expected 3 prefer-shorthand diagnostics, got ${badCodes.length}`);
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/prefer-shorthand-ok.tsx').includes('eolas(prefer-shorthand)'),
+      'expected size-4, w-4 h-6, w-auto h-auto, h-dvh, and ternary splits to pass'
+    );
+  });
+
+  test('no-dark-variant, no-important, and no-rebuilt-overlay enforce Eolas surface, override, and overlay rules', () => {
+    assert.ok(
+      rulesForFile(diagnostics, 'src/dark-variant-bad.tsx').includes('eolas(no-dark-variant)'),
+      'expected dark: variant to be blocked'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/dark-variant-ok.tsx').includes('eolas(no-dark-variant)'),
+      'expected inverted: variant to pass'
+    );
+    assert.ok(
+      rulesForFile(diagnostics, 'src/important-mod-bad.tsx').includes('eolas(no-important)'),
+      'expected ! modifier to be blocked'
+    );
+    assert.ok(
+      rulesForFile(diagnostics, 'src/rebuilt-overlay-bad.tsx').includes('eolas(no-rebuilt-overlay)'),
+      'expected fixed inset-0 overlay div to be blocked'
+    );
+    assert.ok(
+      !rulesForFile(diagnostics, 'src/rebuilt-overlay-ok.tsx').includes('eolas(no-rebuilt-overlay)'),
+      'expected absolute inset-0 backdrop to pass'
+    );
+  });
 } finally {
   cleanupTempDir(lintTmp);
 }
@@ -619,6 +922,31 @@ try {
     assert.equal(insideBad.decision, 'continue', `expected continue for subdir workspace, got ${JSON.stringify(insideBad)}`);
     assert.match(insideBad.reason, /no-uppercase/);
   });
+
+  test('hoisted monorepo node_modules/oxlint & JSONC .oxlintrc.json with https:// $schema works cleanly', () => {
+    const hoistedApp = path.join(gitTmp, 'packages', 'hoisted-app');
+    fs.mkdirSync(path.join(hoistedApp, 'src'), { recursive: true });
+    fs.mkdirSync(path.join(hoistedApp, 'ignored-dir'), { recursive: true });
+    // Note: NO node_modules/oxlint inside hoistedApp — must resolve upward to gitTmp/node_modules/oxlint
+    fs.writeFileSync(
+      path.join(hoistedApp, '.oxlintrc.json'),
+      `{\n  // JSONC line comment before schema URL\n  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",\n  "extends": [${JSON.stringify(EOLAS_OXLINT_RC.replace(/\\/g, '/'))}],\n  /* block comment */ "ignorePatterns": ["ignored-dir/**"],\n}\n`
+    );
+    fs.writeFileSync(
+      path.join(hoistedApp, 'ignored-dir', 'SkipMe.tsx'),
+      'export function SkipMe() { return <div className="uppercase">Ignored</div>; }\n'
+    );
+    const cleanOut = runHook('check-oxlint-on-stop.mjs', { workspacePaths: [hoistedApp] }, hoistedApp);
+    assert.deepEqual(cleanOut, {}, 'JSONC ignorePatterns should preserve https:// and skip ignored-dir');
+
+    fs.writeFileSync(
+      path.join(hoistedApp, 'src', 'HoistedBad.tsx'),
+      'export function HoistedBad() { return <div className="uppercase">Bad</div>; }\n'
+    );
+    const badOut = runHook('check-oxlint-on-stop.mjs', { workspacePaths: [hoistedApp] }, hoistedApp);
+    assert.equal(badOut.decision, 'continue', `expected hoisted oxlint resolution to catch error, got ${JSON.stringify(badOut)}`);
+    assert.match(badOut.reason, /no-uppercase/);
+  });
 } finally {
   cleanupTempDir(gitTmp);
 }
@@ -645,6 +973,21 @@ test('allows TypeScript comparisons and generics mentioning telemetry or everyda
     },
   });
   assert.equal(out.decision, 'allow', `expected allow, got ${JSON.stringify(out)}`);
+});
+
+test('denies banned PROP_JARGON ("hydrated") without mismatching error message', () => {
+  const out = runHook('check-anti-patterns.mjs', {
+    toolCall: {
+      name: 'write_file',
+      args: {
+        Path: 'src/features/SyncBanner.tsx',
+        Content: 'export function SyncBanner() { return <div title="Data hydrated from cache" />; }\n',
+      },
+    },
+  });
+  assert.equal(out.decision, 'deny', `expected deny for hydrated UI prop, got ${JSON.stringify(out)}`);
+  assert.match(out.reason, /"hydrated"/);
+  assert.doesNotMatch(out.reason, /affordance/i);
 });
 
 test('catches transition-property: all; and transition: all in CSS', () => {

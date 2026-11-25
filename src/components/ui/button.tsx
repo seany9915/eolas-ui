@@ -68,7 +68,7 @@ const baseStyles = cn(
   '[&_svg:not([class*="size-"])]:size-4 [&_[data-icon=inline-start]]:-ms-0.5 [&_[data-icon=inline-end]]:-me-0.5',
   'transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
   'motion-reduce:active:scale-100 motion-reduce:transition-none',
-  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary inverted:focus-visible:outline-on-neutral',
   'disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100',
   'data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:active:scale-100'
 );
@@ -101,23 +101,23 @@ const softStyles: Record<ButtonColorRole, string> = {
 };
 
 const outlinedStyles: Record<ButtonColorRole, string> = {
-  primary: 'bg-surface text-primary border-2 border-primary hover:bg-state-hover',
-  secondary: 'bg-surface text-secondary border-2 border-secondary hover:bg-secondary-container/30',
-  tertiary: 'bg-tertiary text-on-tertiary border-2 border-tertiary', // forced fallback to filled for contrast
-  error: 'bg-surface text-error border-2 border-error hover:bg-error-container/20',
-  warning: 'bg-surface text-warning border-2 border-warning hover:bg-warning-container/20',
-  success: 'bg-surface text-success border-2 border-success hover:bg-success-container/20',
-  neutral: 'bg-surface text-on-surface border-2 border-outline hover:bg-state-hover',
+  primary: 'bg-surface text-primary border-2 border-primary hover:bg-state-hover inverted:bg-transparent inverted:text-primary-container inverted:border-primary-container inverted:hover:bg-primary-container/15',
+  secondary: 'bg-surface text-secondary border-2 border-secondary hover:bg-secondary-container/30 inverted:bg-transparent inverted:text-secondary-container inverted:border-secondary-container inverted:hover:bg-secondary-container/15',
+  tertiary: 'bg-tertiary text-on-tertiary border-2 border-tertiary inverted:bg-transparent inverted:text-tertiary inverted:border-tertiary inverted:hover:bg-tertiary/15', // solid amber fallback on light surfaces; true outline on dark inverted surfaces
+  error: 'bg-surface text-error border-2 border-error hover:bg-error-container/20 inverted:bg-transparent inverted:text-error-container inverted:border-error-container inverted:hover:bg-error-container/15',
+  warning: 'bg-surface text-warning border-2 border-warning hover:bg-warning-container/20 inverted:bg-transparent inverted:text-warning-container inverted:border-warning-container inverted:hover:bg-warning-container/15',
+  success: 'bg-surface text-success border-2 border-success hover:bg-success-container/20 inverted:bg-transparent inverted:text-success-container inverted:border-success-container inverted:hover:bg-success-container/15',
+  neutral: 'bg-surface text-on-surface border-2 border-outline hover:bg-state-hover inverted:bg-transparent inverted:text-on-neutral inverted:border-outline-variant inverted:hover:bg-surface/10',
 };
 
 const textStyles: Record<ButtonColorRole, string> = {
-  primary: 'bg-transparent text-primary hover:bg-primary-container/30',
-  secondary: 'bg-transparent text-secondary hover:bg-secondary-container/30',
-  tertiary: 'bg-tertiary-container text-on-tertiary-container hover:brightness-95 active:brightness-90', // forced fallback to filled for contrast
-  error: 'bg-transparent text-error hover:bg-error-container/30',
-  warning: 'bg-transparent text-warning hover:bg-warning-container/30',
-  success: 'bg-transparent text-success hover:bg-success-container/30',
-  neutral: 'bg-transparent text-on-surface hover:bg-state-hover',
+  primary: 'bg-transparent text-primary hover:bg-primary-container/30 inverted:text-primary-container inverted:hover:bg-primary-container/15',
+  secondary: 'bg-transparent text-secondary hover:bg-secondary-container/30 inverted:text-secondary-container inverted:hover:bg-secondary-container/15',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container hover:brightness-95 active:brightness-90 inverted:bg-transparent inverted:text-tertiary inverted:hover:bg-tertiary/15', // container pill fallback on light surfaces; amber text on dark inverted surfaces
+  error: 'bg-transparent text-error hover:bg-error-container/30 inverted:text-error-container inverted:hover:bg-error-container/15',
+  warning: 'bg-transparent text-warning hover:bg-warning-container/30 inverted:text-warning-container inverted:hover:bg-warning-container/15',
+  success: 'bg-transparent text-success hover:bg-success-container/30 inverted:text-success-container inverted:hover:bg-success-container/15',
+  neutral: 'bg-transparent text-on-surface hover:bg-state-hover inverted:text-on-neutral inverted:hover:bg-surface/10',
 };
 
 export interface ButtonVariantsProps {
@@ -154,25 +154,19 @@ export function buttonVariants({
     );
   }
 
-  // Ensure Sunny Amber (tertiary) uses high-contrast filled or soft container (never outline/text on light backgrounds)
-  const safeVariant =
-    colorRole === 'tertiary' && normalizedVariant !== 'filled' && normalizedVariant !== 'soft'
-      ? 'filled'
-      : normalizedVariant;
-
   const variantClass =
-    safeVariant === 'filled'
+    normalizedVariant === 'filled'
       ? filledStyles[colorRole]
-      : safeVariant === 'soft'
+      : normalizedVariant === 'soft'
         ? softStyles[colorRole]
-        : safeVariant === 'outline'
+        : normalizedVariant === 'outline'
           ? outlinedStyles[colorRole]
           : textStyles[colorRole];
 
   return cn(
     baseStyles,
     sizeStyles[size] || sizeStyles.md,
-    safeVariant !== 'text' && (size === 'icon' ? 'active:scale-[var(--scale-large)]' : 'active:scale-[var(--scale-small)]'),
+    normalizedVariant !== 'text' && (size === 'icon' ? 'active:scale-[var(--scale-large)]' : 'active:scale-[var(--scale-small)]'),
     variantClass,
     expandedTouchTarget && 'touch-target-expanded',
     className
@@ -220,20 +214,34 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
             colorRole,
             size,
             expandedTouchTarget,
+            className: loading && size === 'icon' ? 'relative' : undefined,
           }),
           className
         )}
         {...props}
       >
-        {loading && (
-          <span
-            className="material-symbols-outlined animate-spin text-base shrink-0"
-            aria-hidden="true"
-          >
-            progress_activity
-          </span>
+        {loading && size === 'icon' ? (
+          <>
+            <span className="opacity-0 inline-flex items-center justify-center">{children}</span>
+            <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+              <span className="material-symbols-outlined motion-safe:animate-spin motion-reduce:animate-pulse text-base shrink-0">
+                progress_activity
+              </span>
+            </span>
+          </>
+        ) : (
+          <>
+            {loading && (
+              <span
+                className="material-symbols-outlined motion-safe:animate-spin motion-reduce:animate-pulse text-base shrink-0"
+                aria-hidden="true"
+              >
+                progress_activity
+              </span>
+            )}
+            {children}
+          </>
         )}
-        {size === 'icon' && loading ? null : children}
       </BaseButton>
     );
   }

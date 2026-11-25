@@ -200,20 +200,20 @@ export const Scrollspy = React.forwardRef<HTMLElement, ScrollspyProps>(
               href={href}
               aria-current={isActive ? 'true' : undefined}
               className={cn(
-                // Base layout with mandatory 44px touch target floor
-                'scrollspy-link inline-flex items-center transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] select-none cursor-pointer',
+                // Base layout with mandatory 44px touch target floor and constant font-semibold to avoid active width shift
+                'scrollspy-link inline-flex items-center transition-[color,background-color,border-color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none cursor-pointer font-semibold text-sm',
                 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isHorizontal
                   ? cn(
-                      'shrink-0 whitespace-nowrap min-h-[44px] px-3.5 py-2 -mb-px rounded-t border-b-2 font-medium text-xs',
+                      'shrink-0 whitespace-nowrap min-h-[44px] px-3.5 py-2 -mb-px rounded-t border-b-2',
                       isActive
-                        ? 'border-primary bg-primary-container text-on-primary-container font-semibold'
+                        ? 'border-primary bg-primary-container text-on-primary-container'
                         : 'border-transparent text-on-surface-variant hover:text-on-surface hover:bg-state-hover hover:border-outline-variant'
                     )
                   : cn(
-                      'min-h-[44px] px-3.5 py-2 rounded font-medium text-xs transition-colors',
+                      'min-h-[44px] px-3.5 py-2 rounded transition-colors motion-reduce:transition-none',
                       isActive
-                        ? 'bg-primary-container text-on-primary-container font-semibold'
+                        ? 'bg-primary-container text-on-primary-container'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover'
                     ),
                 isActive && activeItemClassName,

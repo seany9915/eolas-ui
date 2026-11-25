@@ -46,6 +46,18 @@ export interface UseWebOtpReturn {
   error: Error | null;
 }
 
+const emptySubscribe = () => () => {};
+
+function getWebOtpSupport(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof navigator !== 'undefined' &&
+    'OTPCredential' in window &&
+    'credentials' in navigator &&
+    typeof navigator.credentials?.get === 'function'
+  );
+}
+
 export function useWebOtp({
   enabled = true,
   onCodeReceived,
@@ -58,14 +70,11 @@ export function useWebOtp({
     onCodeReceivedRef.current = onCodeReceived;
   }, [onCodeReceived]);
 
-  const isSupported = React.useMemo(() => {
-    return (
-      typeof window !== 'undefined' &&
-      typeof navigator !== 'undefined' &&
-      'OTPCredential' in window &&
-      'credentials' in navigator
-    );
-  }, []);
+  const isSupported = React.useSyncExternalStore(
+    emptySubscribe,
+    getWebOtpSupport,
+    () => false
+  );
 
   const cancel = React.useCallback(() => {
     if (abortControllerRef.current) {
@@ -96,11 +105,16 @@ export function useWebOtp({
 
         const credential = await navigator.credentials.get(options);
 
+        if (ac.signal.aborted || abortControllerRef.current !== ac) return;
         if (isOTPCredential(credential)) {
           onCodeReceivedRef.current?.(credential.code);
         }
       } catch (err: unknown) {
-        if (err instanceof DOMException && err.name === 'AbortError') {
+        if (
+          ac.signal.aborted ||
+          abortControllerRef.current !== ac ||
+          (err instanceof DOMException && err.name === 'AbortError')
+        ) {
           return;
         }
         setError(err instanceof Error ? err : new Error(String(err)));

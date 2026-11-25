@@ -81,7 +81,9 @@ function stripControlsAndWhitespace(rawValue: string): string {
 function isDangerousUrl(rawValue: string): boolean {
   const normalized = stripControlsAndWhitespace(rawValue);
   if (!normalized) return false;
-  if (normalized.startsWith('//')) return true;
+  if (normalized.startsWith('//') || normalized.startsWith('/\\') || normalized.startsWith('\\')) {
+    return true;
+  }
 
   if (
     normalized.startsWith('/') ||
@@ -230,7 +232,11 @@ export function safeSetHtml(
     ? rawElements.filter((t) => !replaceSet.has(t.toLowerCase()))
     : rawElements;
 
-  if ('setHTML' in Element.prototype && typeof element.setHTML === 'function') {
+  if (
+    typeof Element !== 'undefined' &&
+    'setHTML' in Element.prototype &&
+    typeof element.setHTML === 'function'
+  ) {
     try {
       element.setHTML(untrustedHtml, {
         sanitizer: {
@@ -251,12 +257,24 @@ export function safeSetHtml(
   element.replaceChildren(fragment);
 }
 
+function escapeHtmlEntities(raw: string): string {
+  return raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /**
  * Sanitizes an untrusted HTML string into clean, safe HTML markup.
+ * Rich HTML sanitization requires a browser DOM; in non-DOM SSR environments this
+ * safely HTML-escapes the raw input string rather than attempting regex tag stripping.
+ * Prefer `<SanitizedHtml />` for SSR-safe rich HTML rendering.
  */
 export function sanitizeHtml(untrustedHtml: string, config: SanitizeConfig = {}): string {
   if (typeof document === 'undefined') {
-    return untrustedHtml.replace(/<[^>]*>?/gm, ''); // Server-side plain-text strip fallback
+    return escapeHtmlEntities(untrustedHtml);
   }
   const container = document.createElement('div');
   safeSetHtml(container, untrustedHtml, config);

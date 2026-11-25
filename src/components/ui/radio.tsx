@@ -14,6 +14,7 @@
 import * as React from 'react';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
+import { Icon } from './icon';
 import { cn, composeClassName } from '@/lib/utils';
 
 export type RadioValue = string | number;
@@ -81,9 +82,7 @@ function RadioGroupComponentInner<Value = string>(
       {children}
       {error && (
         <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none mt-1.5">
-          <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-            error
-          </span>
+          <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </span>
       )}
@@ -144,11 +143,13 @@ function RadioComponentInner<Value = string>(
       inputRef={inputRef}
       className={composeClassName(
         cn(
-          'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
-          'data-[checked]:border-2 data-[checked]:border-primary',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-primary',
-          'data-[disabled]:border-outline-variant data-[disabled]:bg-surface-container-high/50 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60',
-          error ? 'border-error focus-visible:outline-error' : 'border-outline'
+          'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] motion-reduce:transition-none flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
+          error
+            ? 'border-error data-[checked]:border-2 data-[checked]:border-error focus-visible:outline-error'
+            : 'border-outline data-[checked]:border-2 data-[checked]:border-primary focus-visible:outline-primary',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px]',
+          'forced-colors:data-[checked]:border-[Highlight]',
+          'data-[disabled]:border-outline-variant data-[disabled]:bg-surface-container-high/50 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60'
         ),
         !label || isClassNameFn ? className : undefined
       )}
@@ -160,7 +161,7 @@ function RadioComponentInner<Value = string>(
         <BaseRadio.Indicator
           data-slot="radio-group-indicator"
           keepMounted
-          className="size-2.5 rounded-full bg-primary transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] scale-0 data-[checked]:scale-100"
+          className="size-2.5 rounded-full bg-primary forced-colors:bg-[Highlight] transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none scale-0 data-[checked]:scale-100"
         />
       )}
     </BaseRadio.Root>
@@ -174,7 +175,7 @@ function RadioComponentInner<Value = string>(
     <label
       htmlFor={radioId}
       className={cn(
-        'flex items-start gap-3 cursor-pointer group rounded transition-colors',
+        'flex items-start gap-3 cursor-pointer group rounded transition-colors motion-reduce:transition-none',
         compact
           ? 'p-1'
           : 'w-full min-h-[44px] py-2 px-3 hover:bg-state-hover',
@@ -183,10 +184,10 @@ function RadioComponentInner<Value = string>(
         !isClassNameFn ? className : undefined
       )}
     >
-      <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">
+      <span className="relative flex items-center justify-center size-6 mt-0.5 shrink-0">
         {radioNode}
-      </div>
-      <div className="flex flex-col flex-1 min-w-0 break-words">
+      </span>
+      <span className="flex flex-col flex-1 min-w-0 break-words">
         <span className="font-sans text-sm font-medium text-on-surface select-none group-has-[[data-disabled]]:text-on-surface-variant">
           {label}
         </span>
@@ -197,13 +198,11 @@ function RadioComponentInner<Value = string>(
         )}
         {hasErrorText && (
           <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
-            <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-              error
-            </span>
+            <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
             <span>{error}</span>
           </span>
         )}
-      </div>
+      </span>
     </label>
   );
 }
@@ -213,21 +212,72 @@ const RadioComponent = React.forwardRef(RadioComponentInner) as (<Value = string
 ) => React.JSX.Element) & { displayName?: string };
 RadioComponent.displayName = 'Radio';
 
+export const RadioGroupRoot = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseRadioGroup>
+>(({ className, ...props }, ref) => (
+  <BaseRadioGroup
+    ref={ref}
+    data-slot="radio-group"
+    className={composeClassName('flex w-full flex-col gap-1', className)}
+    {...props}
+  />
+));
+RadioGroupRoot.displayName = 'RadioGroupRoot';
+
+export const RadioRoot = React.forwardRef<
+  HTMLElement,
+  React.ComponentPropsWithoutRef<typeof BaseRadio.Root> & { error?: boolean }
+>(({ className, error, ...props }, ref) => (
+  <BaseRadio.Root
+    ref={ref}
+    data-slot="radio-group-item"
+    className={composeClassName(
+      cn(
+        'relative size-5 rounded-full border bg-surface transition-[background-color,border-color,box-shadow] motion-reduce:transition-none flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
+        error
+          ? 'border-error data-[checked]:border-2 data-[checked]:border-error focus-visible:outline-error'
+          : 'border-outline data-[checked]:border-2 data-[checked]:border-primary focus-visible:outline-primary',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px]',
+        'forced-colors:data-[checked]:border-[Highlight]',
+        'data-[disabled]:border-outline-variant data-[disabled]:bg-surface-container-high/50 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60'
+      ),
+      className
+    )}
+    {...props}
+  />
+));
+RadioRoot.displayName = 'RadioRoot';
+
+export const RadioIndicator = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseRadio.Indicator>
+>(({ className, ...props }, ref) => (
+  <BaseRadio.Indicator
+    ref={ref}
+    data-slot="radio-group-indicator"
+    keepMounted
+    className={composeClassName(
+      'size-2.5 rounded-full bg-primary forced-colors:bg-[Highlight] transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none scale-0 data-[checked]:scale-100',
+      className
+    )}
+    {...props}
+  />
+));
+RadioIndicator.displayName = 'RadioIndicator';
+
 // Compound export mapping Base UI primitives
 export const RadioGroup = Object.assign(RadioGroupComponent, {
-  Root: BaseRadioGroup,
+  Root: RadioGroupRoot,
   Item: RadioComponent,
 });
 
 export const Radio = Object.assign(RadioComponent, {
-  Root: BaseRadio.Root,
-  Indicator: BaseRadio.Indicator,
+  Root: RadioRoot,
+  Indicator: RadioIndicator,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseRadio, BaseRadioGroup };
-export const RadioRoot = BaseRadio.Root;
-export const RadioIndicator = BaseRadio.Indicator;
-export const RadioGroupRoot = BaseRadioGroup;
 
 export default Radio;

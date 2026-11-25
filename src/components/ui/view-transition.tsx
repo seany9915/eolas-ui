@@ -19,7 +19,7 @@ import {
   startScopedViewTransition,
   type TransitionOptions,
 } from '@/lib/view-transitions';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 type NativeViewTransitionProps = React.ViewTransitionProps;
 
@@ -73,17 +73,21 @@ export const ViewTransition = React.forwardRef<HTMLDivElement, ViewTransitionPro
     },
     ref
   ) => {
+    // Only apply CSS viewTransitionName directly when React 19 <ViewTransition> is unavailable;
+    // otherwise React 19 manages view-transition-name on the child DOM node automatically.
+    const shouldApplyManualName = Boolean(name && !NativeViewTransition);
     const dynamicStyle: React.CSSProperties | undefined =
-      style || name
+      style || shouldApplyManualName
         ? {
             ...style,
-            ...(name ? { viewTransitionName: name } : {}),
+            ...(shouldApplyManualName ? { viewTransitionName: name } : {}),
           }
         : undefined;
 
     const wrapped = (
       <div
         ref={ref}
+        data-slot="view-transition"
         style={dynamicStyle}
         className={cn(className)}
         {...props}
@@ -136,6 +140,9 @@ export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTra
       transitionOptions,
       onClick,
       disabled,
+      focusableWhenDisabled,
+      render,
+      nativeButton,
       className,
       children,
       ...props
@@ -143,6 +150,7 @@ export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTra
     ref
   ) => {
     const { startTransition, isTransitioning } = useViewTransition();
+    const resolvedNativeButton = resolveNativeButton(render, nativeButton);
 
     const handleClick: React.ComponentPropsWithoutRef<typeof BaseButton>['onClick'] = (e) => {
       onClick?.(e);
@@ -156,14 +164,16 @@ export const ViewTransitionTrigger = React.forwardRef<HTMLButtonElement, ViewTra
     return (
       <BaseButton
         ref={ref}
+        data-slot="view-transition-trigger"
+        render={render}
+        nativeButton={resolvedNativeButton}
         {...props}
         onClick={handleClick}
         disabled={disabled || isTransitioning}
-        focusableWhenDisabled
+        focusableWhenDisabled={focusableWhenDisabled ?? (isTransitioning ? true : undefined)}
         aria-busy={isTransitioning || undefined}
-        className={cn(
-          'inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded font-label text-sm font-semibold transition-colors cursor-pointer select-none',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        className={composeClassName(
+          'inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded font-label text-sm font-semibold transition-colors motion-reduce:transition-none cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed',
           className
         )}
       >

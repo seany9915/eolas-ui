@@ -14,6 +14,7 @@
  */
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
+import { Icon } from './icon';
 import { cn } from '@/lib/utils';
 
 export interface SwipeRevealProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,9 +26,9 @@ export interface SwipeRevealProps extends React.HTMLAttributes<HTMLDivElement> {
   leadingActions?: React.ReactNode;
   /** When true, disables swipe-to-reveal track interaction */
   disabled?: boolean;
-  /** Renders an accessible visible toggle button for non-swipe / keyboard access (WCAG 2.5.1) */
+  /** Renders an accessible visible toggle button for non-swipe / keyboard access (WCAG 2.5.1). When false, keeps a focusable sr-only toggle for keyboard users. */
   showToggle?: boolean;
-  /** Accessible label for the optional toggle button. Defaults to 'Row actions' */
+  /** Accessible label for the toggle button. Defaults to 'Row actions' */
   toggleLabel?: string;
   /** Optional callback fired when the revealed panel opens or closes */
   onOpenChange?: (open: boolean) => void;
@@ -133,7 +134,7 @@ export const SwipeRevealAction = React.forwardRef<HTMLButtonElement, SwipeReveal
         aria-hidden={ariaHiddenProp ?? (!isRevealed ? true : undefined)}
         className={cn(
           'min-w-[48px] min-h-[44px] px-4 flex items-center justify-center font-label text-sm font-semibold cursor-pointer select-none',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors duration-[var(--duration-quick)]',
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary transition-colors duration-[var(--duration-quick)] motion-reduce:transition-none',
           'disabled:opacity-40 disabled:cursor-not-allowed',
           variantStyles[variant],
           className
@@ -155,7 +156,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
       actions,
       leadingActions,
       disabled = false,
-      showToggle = false,
+      showToggle = true,
       toggleLabel = 'Row actions',
       onOpenChange,
       ...props
@@ -328,26 +329,45 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
 
           <SwipeRevealContent
             ref={contentRef}
-            className={cn(showToggle && (hasTrailing || hasLeading) && 'flex items-center justify-between gap-2')}
+            className={cn(
+              (hasTrailing || hasLeading) &&
+                (showToggle ? 'flex items-center justify-between gap-2' : 'relative')
+            )}
           >
-            {showToggle && (hasTrailing || hasLeading) ? (
-              <>
-                <div className="min-w-0 flex-1">{children}</div>
-                <BaseButton
-                  type="button"
-                  data-swipe-toggle=""
-                  disabled={disabled}
-                  aria-expanded={isOpen}
-                  aria-controls={toggleControlsId}
-                  aria-label={toggleLabel}
-                  onClick={handleToggleActions}
-                  className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded text-on-surface-variant hover:text-on-surface hover:bg-state-hover cursor-pointer transition-colors duration-[var(--duration-quick)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
-                    {isOpen ? 'close' : 'more_vert'}
-                  </span>
-                </BaseButton>
-              </>
+            {hasTrailing || hasLeading ? (
+              showToggle ? (
+                <>
+                  <div className="min-w-0 flex-1">{children}</div>
+                  <BaseButton
+                    type="button"
+                    data-swipe-toggle=""
+                    disabled={disabled}
+                    aria-expanded={isOpen}
+                    aria-controls={toggleControlsId}
+                    aria-label={toggleLabel}
+                    onClick={handleToggleActions}
+                    className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded text-on-surface-variant hover:text-on-surface hover:bg-state-hover cursor-pointer transition-colors duration-[var(--duration-quick)] motion-reduce:transition-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Icon name={isOpen ? 'close' : 'more_vert'} size="sm" aria-hidden="true" />
+                  </BaseButton>
+                </>
+              ) : (
+                <>
+                  {children}
+                  <BaseButton
+                    type="button"
+                    data-swipe-toggle=""
+                    disabled={disabled}
+                    aria-expanded={isOpen}
+                    aria-controls={toggleControlsId}
+                    aria-label={toggleLabel}
+                    onClick={handleToggleActions}
+                    className="sr-only focus:not-sr-only focus:absolute focus:end-2 focus:top-1/2 focus:-translate-y-1/2 focus:z-20 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded bg-surface text-on-surface shadow-ambient cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Icon name={isOpen ? 'close' : 'more_vert'} size="sm" aria-hidden="true" />
+                  </BaseButton>
+                </>
+              )
             ) : (
               children
             )}

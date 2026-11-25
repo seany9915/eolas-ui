@@ -124,9 +124,18 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
       if (currentIndex === -1) return;
 
       let nextIndex = -1;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      const isRtl = getComputedStyle(root).direction === 'rtl';
+      if (e.key === 'ArrowRight') {
+        nextIndex = isRtl
+          ? (currentIndex - 1 + items.length) % items.length
+          : (currentIndex + 1) % items.length;
+      } else if (e.key === 'ArrowLeft') {
+        nextIndex = isRtl
+          ? (currentIndex + 1) % items.length
+          : (currentIndex - 1 + items.length) % items.length;
+      } else if (e.key === 'ArrowDown') {
         nextIndex = (currentIndex + 1) % items.length;
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      } else if (e.key === 'ArrowUp') {
         nextIndex = (currentIndex - 1 + items.length) % items.length;
       } else if (e.key === 'Home') {
         nextIndex = 0;
@@ -149,10 +158,10 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
           data-layout={layout}
           onKeyDown={handleKeyDown}
           className={cn(
-            layout === 'wrap' && 'flex flex-wrap gap-2',
-            layout === 'scroll' && 'flex overflow-x-auto gap-2 py-1 -my-1 px-1 -mx-1 scrollbar-none max-w-full',
+            layout === 'wrap' && 'flex flex-wrap gap-x-2 gap-y-3',
+            layout === 'scroll' && 'flex overflow-x-auto gap-2 py-1.5 -my-1.5 px-1 -mx-1 scrollbar-none max-w-full',
             layout === 'responsive' &&
-              'flex overflow-x-auto gap-2 py-1 -my-1 px-1 -mx-1 scrollbar-none max-w-full @sm:flex-wrap @sm:overflow-visible @sm:py-0 @sm:my-0 @sm:px-0 @sm:mx-0',
+              'flex overflow-x-auto gap-x-2 gap-y-3 py-1.5 -my-1.5 px-1 -mx-1 scrollbar-none max-w-full @sm:flex-wrap @sm:overflow-visible @sm:py-0 @sm:my-0 @sm:px-0 @sm:mx-0',
             layout === 'stack' && 'flex flex-col gap-2',
             layout !== 'stack' && align === 'center' && 'justify-center',
             layout !== 'stack' && align === 'end' && 'justify-end',
@@ -170,7 +179,8 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
 );
 SuggestionChipsList.displayName = 'SuggestionChips.List';
 
-export interface SuggestionChipProps {
+export interface SuggestionChipProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof Button>, 'onSelect' | 'onClick' | 'variant' | 'children'> {
   suggestion?: SuggestionItem | string;
   onSelect?: (prompt: string) => void;
   onClick?: (prompt: string) => void;
@@ -180,109 +190,176 @@ export interface SuggestionChipProps {
   children?: React.ReactNode;
 }
 
-const SuggestionChip: React.FC<SuggestionChipProps> = ({
-  suggestion = '',
-  onSelect,
-  onClick,
-  variant = 'compact',
-  showArrow = false,
-  className,
-  children,
-}) => {
-  const item: SuggestionItem =
-    typeof suggestion === 'string'
-      ? { label: suggestion, prompt: suggestion }
-      : suggestion;
+const SuggestionChip = React.forwardRef<HTMLButtonElement, SuggestionChipProps>(
+  (
+    {
+      suggestion = '',
+      onSelect,
+      onClick,
+      variant = 'compact',
+      showArrow = false,
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const item: SuggestionItem =
+      typeof suggestion === 'string'
+        ? { label: suggestion, prompt: suggestion }
+        : suggestion;
 
-  const itemLabel = item.label || (typeof children === 'string' ? children : '');
-  const itemPrompt = item.prompt || itemLabel;
-  const itemIcon = item.icon;
-  const accessibleLabel =
-    itemLabel ||
-    (typeof children === 'string' ? children : 'Suggested question');
+    const itemLabel = item.label || (typeof children === 'string' ? children : '');
+    const itemPrompt = item.prompt || itemLabel;
+    const itemIcon = item.icon;
+    const accessibleLabel =
+      itemLabel ||
+      (typeof children === 'string' ? children : 'Suggested question');
 
-  const listLayout = React.useContext(SuggestionChipsListContext);
-  const isScrollLayout = listLayout === 'scroll';
-  const isResponsiveLayout = listLayout === 'responsive';
+    const listLayout = React.useContext(SuggestionChipsListContext);
+    const isScrollLayout = listLayout === 'scroll';
+    const isResponsiveLayout = listLayout === 'responsive';
 
-  const handleClick = () => {
-    onSelect?.(itemPrompt);
-    onClick?.(itemPrompt);
-  };
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      const listContainer = e.currentTarget.closest('[data-slot="suggestion-chips-list"]');
+      if (listContainer) {
+        const items = listContainer.querySelectorAll<HTMLButtonElement>(
+          '[data-slot="suggestion-chip"]:not(:disabled)'
+        );
+        items.forEach((el) => el.setAttribute('tabindex', el === e.currentTarget ? '0' : '-1'));
+      }
+      onSelect?.(itemPrompt);
+      onClick?.(itemPrompt);
+    };
 
-  if (variant === 'card') {
-    return (
-      <Button
-        variant="unstyled"
-        data-slot="suggestion-chip"
-        onClick={handleClick}
-        className={cn(
-          'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
-          isScrollLayout && 'shrink-0 w-max max-w-full',
-          isResponsiveLayout && '@max-sm:shrink-0 @max-sm:w-max max-w-full',
-          'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-          'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
-          className
-        )}
-        aria-label={`Ask: ${accessibleLabel}`}
-      >
-        <div className="flex items-center gap-2.5 min-w-0">
+    if (variant === 'card') {
+      return (
+        <Button
+          ref={ref}
+          variant="unstyled"
+          data-slot="suggestion-chip"
+          onClick={handleClick}
+          className={cn(
+            'group flex items-center justify-between gap-3 w-full p-3 min-h-[44px] rounded-lg',
+            isScrollLayout && 'shrink-0 w-max max-w-full',
+            isResponsiveLayout && '@max-sm:shrink-0 @max-sm:w-max max-w-full',
+            'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+            'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
+            className
+          )}
+          aria-label={accessibleLabel}
+          {...props}
+        >
+          <span className="flex items-center gap-2.5 min-w-0">
+            {itemIcon && (
+              <Icon
+                name={itemIcon}
+                size="sm"
+                className="text-secondary group-hover:scale-105 transition-transform motion-reduce:transform-none motion-reduce:transition-none shrink-0"
+                aria-hidden="true"
+              />
+            )}
+            <span className="text-sm font-sans font-medium text-on-surface truncate leading-snug">
+              {children || itemLabel}
+            </span>
+          </span>
+          <Icon
+            name="arrow_forward"
+            size="xs"
+            directional
+            className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
+            aria-hidden="true"
+          />
+        </Button>
+      );
+    }
+
+    if (variant === 'ghost') {
+      return (
+        <Button
+          ref={ref}
+          variant="unstyled"
+          data-slot="suggestion-chip"
+          onClick={handleClick}
+          expandedTouchTarget
+          className={cn(
+            'group inline-flex items-center gap-2 px-3 py-1.5 min-h-8 h-auto rounded-full',
+            isScrollLayout
+              ? 'shrink-0 whitespace-nowrap'
+              : isResponsiveLayout
+                ? '@max-sm:shrink-0 @max-sm:whitespace-nowrap @sm:max-w-full'
+                : 'max-w-full',
+            'bg-transparent border-0 hover:bg-state-hover text-start',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+            'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
+            className
+          )}
+          aria-label={accessibleLabel}
+          {...props}
+        >
           {itemIcon && (
             <Icon
               name={itemIcon}
-              size="sm"
-              className="text-secondary group-hover:scale-105 transition-transform shrink-0"
+              size="xs"
+              className="text-primary group-hover:scale-105 transition-transform motion-reduce:transform-none motion-reduce:transition-none shrink-0"
               aria-hidden="true"
             />
           )}
-          <span className="text-sm font-sans font-medium text-on-surface truncate leading-snug">
+          <span
+            className={cn(
+              'text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors motion-reduce:transition-none',
+              !isScrollLayout && (isResponsiveLayout ? '@sm:min-w-0 @sm:break-words' : 'min-w-0 break-words')
+            )}
+          >
             {children || itemLabel}
           </span>
-        </div>
-        <Icon
-          name="arrow_forward"
-          size="xs"
-          directional
-          className="text-on-surface-variant/60 group-hover:text-secondary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
-          aria-hidden="true"
-        />
-      </Button>
-    );
-  }
+          {showArrow && (
+            <Icon
+              name="arrow_forward"
+              size="xs"
+              directional
+              className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
+              aria-hidden="true"
+            />
+          )}
+        </Button>
+      );
+    }
 
-  if (variant === 'ghost') {
     return (
       <Button
+        ref={ref}
         variant="unstyled"
         data-slot="suggestion-chip"
         onClick={handleClick}
         expandedTouchTarget
         className={cn(
-          'group inline-flex items-center gap-2 px-3 py-1.5 min-h-8 h-auto rounded-full',
+          'group inline-flex items-center gap-2 px-3.5 py-1.5 min-h-8 h-auto rounded-full',
           isScrollLayout
             ? 'shrink-0 whitespace-nowrap'
             : isResponsiveLayout
               ? '@max-sm:shrink-0 @max-sm:whitespace-nowrap @sm:max-w-full'
               : 'max-w-full',
-          'bg-transparent border-0 hover:bg-state-hover text-start',
+          'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-          'transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
+          'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
           className
         )}
-        aria-label={`Ask: ${accessibleLabel}`}
+        aria-label={accessibleLabel}
+        {...props}
       >
         {itemIcon && (
           <Icon
             name={itemIcon}
             size="xs"
-            className="text-primary group-hover:scale-105 transition-transform shrink-0"
+            className="text-primary group-hover:scale-105 transition-transform motion-reduce:transform-none motion-reduce:transition-none shrink-0"
             aria-hidden="true"
           />
         )}
         <span
           className={cn(
-            'text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors',
+            'text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors motion-reduce:transition-none',
             !isScrollLayout && (isResponsiveLayout ? '@sm:min-w-0 @sm:break-words' : 'min-w-0 break-words')
           )}
         >
@@ -300,58 +377,10 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({
       </Button>
     );
   }
-
-  return (
-    <Button
-      variant="unstyled"
-      data-slot="suggestion-chip"
-      onClick={handleClick}
-      expandedTouchTarget
-      className={cn(
-        'group inline-flex items-center gap-2 px-3.5 py-1.5 min-h-8 h-auto rounded-full',
-        isScrollLayout
-          ? 'shrink-0 whitespace-nowrap'
-          : isResponsiveLayout
-            ? '@max-sm:shrink-0 @max-sm:whitespace-nowrap @sm:max-w-full'
-            : 'max-w-full',
-        'bg-surface border border-outline-variant hover:border-primary hover:bg-state-hover text-start',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-        'transition-[border-color,background-color] duration-quick ease-standard motion-reduce:transition-none cursor-pointer',
-        className
-      )}
-      aria-label={`Ask: ${accessibleLabel}`}
-    >
-      {itemIcon && (
-        <Icon
-          name={itemIcon}
-          size="xs"
-          className="text-primary group-hover:scale-105 transition-transform motion-reduce:transform-none shrink-0"
-          aria-hidden="true"
-        />
-      )}
-      <span
-        className={cn(
-          'text-xs font-sans font-medium text-on-surface group-hover:text-primary transition-colors',
-          !isScrollLayout && (isResponsiveLayout ? '@sm:min-w-0 @sm:break-words' : 'min-w-0 break-words')
-        )}
-      >
-        {children || itemLabel}
-      </span>
-      {showArrow && (
-        <Icon
-          name="arrow_forward"
-          size="xs"
-          directional
-          className="text-on-surface-variant/50 group-hover:text-primary group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-[color,transform] motion-reduce:transform-none motion-reduce:transition-none shrink-0"
-          aria-hidden="true"
-        />
-      )}
-    </Button>
-  );
-};
+);
 SuggestionChip.displayName = 'SuggestionChip';
 
-export interface SuggestionChipsProps {
+export interface SuggestionChipsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   suggestions?: (SuggestionItem | string)[];
   onSelect?: (prompt: string) => void;
   label?: string;
@@ -362,34 +391,40 @@ export interface SuggestionChipsProps {
   children?: React.ReactNode;
 }
 
-const SuggestionChipsComponent: React.FC<SuggestionChipsProps> = ({
-  suggestions,
-  onSelect = () => {},
-  label = 'Suggested prompts',
-  layout = 'wrap',
-  align = 'start',
-  variant = 'compact',
-  className,
-  children,
-}) => {
-  if (!children && (!suggestions || suggestions.length === 0)) return null;
+const SuggestionChipsComponent = React.forwardRef<HTMLDivElement, SuggestionChipsProps>(
+  (
+    {
+      suggestions,
+      onSelect = () => {},
+      label = 'Suggested prompts',
+      layout = 'wrap',
+      align = 'start',
+      variant = 'compact',
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    if (!children && (!suggestions || suggestions.length === 0)) return null;
 
-  return (
-    <SuggestionChipsRoot label={label} align={align} className={className}>
-      <SuggestionChipsList layout={layout} align={align}>
-        {children ||
-          suggestions?.map((item, idx) => (
-            <SuggestionChip
-              key={typeof item === 'string' ? item : item.id || idx}
-              suggestion={item}
-              onSelect={onSelect}
-              variant={variant}
-            />
-          ))}
-      </SuggestionChipsList>
-    </SuggestionChipsRoot>
-  );
-};
+    return (
+      <SuggestionChipsRoot ref={ref} label={label} align={align} className={className} {...props}>
+        <SuggestionChipsList layout={layout} align={align}>
+          {children ||
+            suggestions?.map((item, idx) => (
+              <SuggestionChip
+                key={typeof item === 'string' ? item : item.id || idx}
+                suggestion={item}
+                onSelect={onSelect}
+                variant={variant}
+              />
+            ))}
+        </SuggestionChipsList>
+      </SuggestionChipsRoot>
+    );
+  }
+);
 SuggestionChipsComponent.displayName = 'SuggestionChips';
 
 export interface SuggestionChipsGroupProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -397,20 +432,17 @@ export interface SuggestionChipsGroupProps extends React.HTMLAttributes<HTMLDivE
   children: React.ReactNode;
 }
 
-const SuggestionChipsGroup: React.FC<SuggestionChipsGroupProps> = ({
-  label,
-  children,
-  className,
-  ...props
-}) => (
-  <div className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
-    {label && (
-      <span className="font-heading text-xs font-semibold text-on-surface-variant select-none px-0.5">
-        {label}
-      </span>
-    )}
-    <div className="flex flex-wrap gap-2">{children}</div>
-  </div>
+const SuggestionChipsGroup = React.forwardRef<HTMLDivElement, SuggestionChipsGroupProps>(
+  ({ label, children, className, ...props }, ref) => (
+    <div ref={ref} data-slot="suggestion-chips-group" className={cn('flex flex-col gap-1.5 w-full', className)} {...props}>
+      {label && (
+        <span className="font-heading text-xs font-semibold text-on-surface-variant select-none px-0.5">
+          {label}
+        </span>
+      )}
+      <div className="flex flex-wrap gap-x-2 gap-y-3">{children}</div>
+    </div>
+  )
 );
 SuggestionChipsGroup.displayName = 'SuggestionChips.Group';
 

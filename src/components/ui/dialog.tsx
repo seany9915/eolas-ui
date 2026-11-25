@@ -5,7 +5,17 @@ import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { Button } from './button';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
-export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'fullscreen' | string;
+export type DialogSize =
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | '2xl'
+  | '3xl'
+  | '4xl'
+  | '5xl'
+  | 'fullscreen'
+  | (string & {});
 
 export interface DialogProps<Payload = unknown> {
   open?: boolean;
@@ -32,6 +42,7 @@ export interface DialogProps<Payload = unknown> {
   initialFocus?: BaseDialog.Popup.Props['initialFocus'];
   finalFocus?: BaseDialog.Popup.Props['finalFocus'];
   keepMounted?: boolean;
+  container?: BaseDialog.Portal.Props['container'];
   className?: BaseDialog.Popup.Props['className'];
 }
 
@@ -72,6 +83,7 @@ function DialogComponent<Payload = unknown>({
   initialFocus,
   finalFocus,
   keepMounted,
+  container,
   className,
 }: DialogProps<Payload>): React.JSX.Element {
   // If used as composable compound root (<Dialog open={...}><DialogContent>...</DialogContent></Dialog>)
@@ -121,7 +133,7 @@ function DialogComponent<Payload = unknown>({
               {!React.isValidElement(trigger) ? trigger : undefined}
             </BaseDialog.Trigger>
           )}
-          <BaseDialog.Portal keepMounted={keepMounted}>
+          <BaseDialog.Portal container={container} keepMounted={keepMounted}>
             <BaseDialog.Backdrop data-slot="dialog-overlay" className="fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
             <BaseDialog.Viewport
               data-slot="dialog-viewport"
@@ -138,7 +150,7 @@ function DialogComponent<Payload = unknown>({
                 finalFocus={finalFocus}
                 className={composeClassName(
                   cn(
-                    'w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+                    '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
                     isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
                     dialogSizeClasses[size] || dialogSizeClasses.md
                   ),
@@ -151,7 +163,7 @@ function DialogComponent<Payload = unknown>({
                   </BaseDialog.Title>
                   <BaseDialog.Close
                     data-slot="dialog-close"
-                    className="size-11 min-w-[44px] min-h-[44px] -me-3 -mt-3 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="size-11 min-w-[44px] min-h-[44px] -me-3 -mt-3 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Close dialog"
                   >
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
@@ -175,34 +187,35 @@ function DialogComponent<Payload = unknown>({
                         </Button>
                       }
                     />
-                    {closeOnConfirm ? (
-                      <BaseDialog.Close
-                        data-slot="dialog-close"
-                        render={
-                          <Button
-                            variant="filled"
-                            colorRole="primary"
-                            size="md"
-                            onClick={() => {
-                              onConfirm?.();
-                            }}
-                          >
-                            {confirmLabel}
-                          </Button>
-                        }
-                      />
-                    ) : (
-                      <Button
-                        variant="filled"
-                        colorRole="primary"
-                        size="md"
-                        onClick={() => {
-                          onConfirm?.();
-                        }}
-                      >
-                        {confirmLabel}
-                      </Button>
-                    )}
+                    {onConfirm &&
+                      (closeOnConfirm ? (
+                        <BaseDialog.Close
+                          data-slot="dialog-close"
+                          render={
+                            <Button
+                              variant="filled"
+                              colorRole="primary"
+                              size="md"
+                              onClick={() => {
+                                onConfirm();
+                              }}
+                            >
+                              {confirmLabel}
+                            </Button>
+                          }
+                        />
+                      ) : (
+                        <Button
+                          variant="filled"
+                          colorRole="primary"
+                          size="md"
+                          onClick={() => {
+                            onConfirm();
+                          }}
+                        >
+                          {confirmLabel}
+                        </Button>
+                      ))}
                   </div>
                 )}
               </BaseDialog.Popup>
@@ -224,16 +237,17 @@ export interface DialogContentProps
   scroll?: 'inside' | 'outside';
   showCloseButton?: boolean;
   keepMounted?: boolean;
+  container?: BaseDialog.Portal.Props['container'];
   containerClassName?: BaseDialog.Viewport.Props['className'];
   backdropClassName?: BaseDialog.Backdrop.Props['className'];
 }
 
 // Standard composable compound slots
 export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
-  ({ className, children, size = 'md', scroll = 'inside', showCloseButton = true, keepMounted, containerClassName, backdropClassName, ...props }, ref) => {
+  ({ className, children, size = 'md', scroll = 'inside', showCloseButton = true, keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => {
     const isOutsideScroll = scroll === 'outside';
     return (
-      <BaseDialog.Portal keepMounted={keepMounted}>
+      <BaseDialog.Portal container={container} keepMounted={keepMounted}>
         <BaseDialog.Backdrop
           data-slot="dialog-overlay"
           className={composeClassName(
@@ -258,7 +272,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
             data-slot="dialog-content"
             className={composeClassName(
               cn(
-                'relative w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+                '@container relative w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
                 isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
                 dialogSizeClasses[size] || dialogSizeClasses.md
               ),
@@ -367,7 +381,7 @@ export const DialogClose = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }

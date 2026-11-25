@@ -43,11 +43,11 @@ const variantStyles: Record<ToggleVariant, string> = {
     'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:hover:bg-primary-container data-[pressed]:hover:brightness-95'
   ),
   ghost: cn(
-    'bg-transparent border-2 border-transparent text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+    'bg-transparent border-2 border-transparent text-on-surface hover:bg-state-hover',
     'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary data-[pressed]:hover:bg-primary-container data-[pressed]:hover:brightness-95'
   ),
   subtle: cn(
-    'bg-surface border-2 border-outline-variant text-on-surface-variant hover:bg-state-hover hover:text-on-surface hover:border-outline',
+    'bg-surface border-2 border-outline-variant text-on-surface hover:bg-state-hover hover:border-outline',
     'data-[pressed]:bg-surface-container-high data-[pressed]:text-on-surface data-[pressed]:border-outline data-[pressed]:hover:bg-surface-container-high'
   ),
 };
@@ -94,6 +94,7 @@ const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<string>>
             'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
             'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
+            'forced-colors:data-[pressed]:border-[Highlight] forced-colors:data-[pressed]:bg-[Highlight] forced-colors:data-[pressed]:text-[HighlightText]',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
             variantStyles[variant],
             sizeStyles[size],

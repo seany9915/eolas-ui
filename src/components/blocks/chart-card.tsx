@@ -42,6 +42,8 @@ export interface ChartCardProps
   trend?: ChartCardTrend;
   footer?: React.ReactNode;
   loading?: boolean;
+  /** Screen-reader announcement while `loading` is true. Defaults to 'Loading chart data'. */
+  loadingLabel?: string;
   isEmpty?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -63,6 +65,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
       trend,
       footer,
       loading = false,
+      loadingLabel = 'Loading chart data',
       isEmpty = false,
       emptyTitle = 'No chart data',
       emptyDescription = 'Data will appear here once recorded.',
@@ -126,13 +129,13 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                 aria-live="polite"
                 className="flex size-full items-center justify-center"
               >
-                <span className="sr-only">Loading chart data</span>
+                <span className="sr-only">{loadingLabel}</span>
                 {skeletonShape === 'circle' ? (
                   <Skeleton className="size-48 @xs:size-56 rounded-full" />
                 ) : skeletonShape === 'gauge' ? (
                   <Skeleton className="size-40 @xs:size-48 rounded-full" />
                 ) : (
-                  <Skeleton className="size-full rounded-none" />
+                  <Skeleton className="size-full" />
                 )}
               </div>
             ) : isEmpty ? (
@@ -151,7 +154,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
 
         {hasFooter ? (
           <Card.Footer>
-            <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-outline-variant/30 pt-3 text-xs text-on-surface-variant">
+            <div className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-outline-variant/30 pt-3 text-sm text-on-surface-variant">
               {trend && (
                 <div className="flex flex-wrap items-center gap-2 min-w-0">
                   <Badge

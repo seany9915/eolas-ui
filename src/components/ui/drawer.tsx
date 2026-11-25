@@ -14,6 +14,8 @@
  */
 import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
+import { Button } from './button';
+import { Icon } from './icon';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface DrawerProps<Payload = unknown>
@@ -27,6 +29,7 @@ export interface DrawerProps<Payload = unknown>
   description?: React.ReactNode;
   children?: BaseDrawer.Root.Props<Payload>['children'];
   footer?: React.ReactNode;
+  /** Physical screen edge & swipe dismissal direction matching `@base-ui/react/drawer`. */
   swipeDirection?: 'right' | 'left' | 'down' | 'up';
   snapPoints?: BaseDrawer.Root.SnapPoint[];
   snapToSequentialPoints?: boolean;
@@ -42,6 +45,7 @@ export interface DrawerProps<Payload = unknown>
   showCloseButton?: boolean;
   showHandle?: boolean;
   keepMounted?: boolean;
+  container?: BaseDrawer.Portal.Props['container'];
   className?: BaseDrawer.Popup.Props['className'];
   popupClassName?: BaseDrawer.Popup.Props['className'];
 }
@@ -74,21 +78,21 @@ function mergeDrawerRefs<T>(
 }
 
 export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
-  right: 'fixed inset-0 z-50 flex max-w-full justify-end',
-  left: 'fixed inset-0 z-50 flex max-w-full justify-start',
+  right: 'fixed inset-0 z-50 flex max-w-full ltr:justify-end rtl:justify-start',
+  left: 'fixed inset-0 z-50 flex max-w-full ltr:justify-start rtl:justify-end',
   down: 'fixed inset-x-0 bottom-0 z-50 flex max-h-full items-end justify-center',
   up: 'fixed inset-x-0 top-0 z-50 flex max-h-full items-start justify-center',
 };
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    'w-full max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    '@container w-full max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   left:
-    'w-full max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    '@container w-full max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   down:
-    'w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   up:
-    'w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
 };
 
 // Visual grab handle pill
@@ -130,9 +134,7 @@ export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerClose
       {...props}
     >
       {children || (
-        <span className="material-symbols-outlined text-2xl select-none" aria-hidden="true">
-          close
-        </span>
+        <Icon name="close" size="lg" aria-hidden="true" />
       )}
     </BaseDrawer.Close>
   )
@@ -231,7 +233,7 @@ export const DrawerBackdrop = React.forwardRef<
     ref={ref}
     data-slot="drawer-overlay"
     className={composeClassName(
-      'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)]',
+      'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
       className
     )}
     {...props}
@@ -325,6 +327,7 @@ export interface DrawerPanelProps
   showHandle?: boolean;
   backdropClassName?: BaseDrawer.Backdrop.Props['className'];
   keepMounted?: boolean;
+  container?: BaseDrawer.Portal.Props['container'];
 }
 
 export const DrawerPanel = React.forwardRef<HTMLDivElement, DrawerPanelProps>(
@@ -336,6 +339,7 @@ export const DrawerPanel = React.forwardRef<HTMLDivElement, DrawerPanelProps>(
       className,
       backdropClassName,
       keepMounted,
+      container,
       ...props
     },
     ref
@@ -343,7 +347,7 @@ export const DrawerPanel = React.forwardRef<HTMLDivElement, DrawerPanelProps>(
     const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
     const swipeDirection = swipeDirectionProp ?? contextDirection;
     return (
-      <BaseDrawer.Portal keepMounted={keepMounted}>
+      <BaseDrawer.Portal container={container} keepMounted={keepMounted}>
         <DrawerBackdrop className={backdropClassName} />
         <DrawerViewport swipeDirection={swipeDirection}>
           <DrawerPopup ref={ref} swipeDirection={swipeDirection} className={className} {...props}>
@@ -396,6 +400,7 @@ function DrawerComponentInner<Payload = unknown>(
     showCloseButton = true,
     showHandle = true,
     keepMounted,
+    container,
     className,
     popupClassName,
     ...props
@@ -479,7 +484,7 @@ function DrawerComponentInner<Payload = unknown>(
                 {!React.isValidElement(trigger) ? trigger : undefined}
               </BaseDrawer.Trigger>
             )}
-            <BaseDrawer.Portal keepMounted={keepMounted}>
+            <BaseDrawer.Portal container={container} keepMounted={keepMounted}>
               <DrawerBackdrop />
               <DrawerViewport swipeDirection={swipeDirection}>
                 <DrawerPopup
@@ -494,7 +499,7 @@ function DrawerComponentInner<Payload = unknown>(
                       <div className="flex items-start justify-between gap-2">
                         <DrawerTitle className={cn(!title && 'sr-only')}>{title || 'Panel'}</DrawerTitle>
                         {showCloseButton && (
-                          <DrawerCloseButton className="-me-3 -mt-3 shrink-0" aria-label="Close drawer panel" />
+                          <DrawerCloseButton className="-me-3 -mt-3 shrink-0" aria-label="Close drawer" />
                         )}
                       </div>
                       {description && <DrawerDescription>{description}</DrawerDescription>}
@@ -506,9 +511,14 @@ function DrawerComponentInner<Payload = unknown>(
                       <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant mt-4 shrink-0">{footer}</div>
                     ) : (
                       <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4 shrink-0">
-                        <BaseDrawer.Close data-slot="drawer-close" className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
-                          Close panel
-                        </BaseDrawer.Close>
+                        <BaseDrawer.Close
+                          data-slot="drawer-close"
+                          render={
+                            <Button variant="outline" colorRole="neutral" size="sm">
+                              Close
+                            </Button>
+                          }
+                        />
                       </div>
                     )}
                   </DrawerContent>
@@ -522,9 +532,10 @@ function DrawerComponentInner<Payload = unknown>(
   );
 }
 
-const DrawerComponent = React.forwardRef(DrawerComponentInner) as <Payload = unknown>(
+const DrawerComponent = React.forwardRef(DrawerComponentInner) as (<Payload = unknown>(
   props: DrawerProps<Payload> & React.RefAttributes<HTMLDivElement>
-) => React.JSX.Element;
+) => React.JSX.Element) & { displayName?: string };
+DrawerComponent.displayName = 'Drawer';
 
 // Compound export mapping Base UI primitives
 export const Drawer = Object.assign(DrawerComponent, {

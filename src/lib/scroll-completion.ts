@@ -167,6 +167,71 @@ function getScrollParent(node: Element | null): HTMLElement | null {
   return null;
 }
 
+function getScrollOffsets(scroller: HTMLElement | Window): { x: number; y: number } {
+  if (scroller === window) {
+    return { x: window.scrollX, y: window.scrollY };
+  }
+  const el = scroller as HTMLElement;
+  return { x: el.scrollLeft, y: el.scrollTop };
+}
+
+function isInstantBehavior(behavior?: ScrollBehavior): boolean {
+  if (behavior === 'instant') return true;
+  if (behavior === 'smooth') return false;
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function awaitScrollSettlement(
+  scroller: HTMLElement | Window,
+  invokeScroll: () => unknown,
+  behavior?: ScrollBehavior,
+  idleTimeoutMs = 100,
+  signal?: AbortSignal,
+  abortOnUserInterrupt = false
+): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (signal?.aborted) {
+    return Promise.reject(createAbortError(signal));
+  }
+
+  let sawScroll = false;
+  const before = getScrollOffsets(scroller);
+  const trackPreScroll = () => {
+    sawScroll = true;
+  };
+  scroller.addEventListener('scroll', trackPreScroll, { passive: true });
+
+  let result: unknown;
+  try {
+    result = invokeScroll();
+  } catch (err) {
+    scroller.removeEventListener('scroll', trackPreScroll);
+    return Promise.reject(err);
+  }
+
+  if (result instanceof Promise) {
+    scroller.removeEventListener('scroll', trackPreScroll);
+    return raceWithSignalAndInterrupt(result as Promise<void>, scroller, signal, abortOnUserInterrupt);
+  }
+
+  scroller.removeEventListener('scroll', trackPreScroll);
+  const after = getScrollOffsets(scroller);
+  const movedSynchronously = after.x !== before.x || after.y !== before.y;
+
+  if (isInstantBehavior(behavior) || (movedSynchronously && !sawScroll)) {
+    return Promise.resolve();
+  }
+
+  return waitForScrollEnd(scroller, idleTimeoutMs, signal, abortOnUserInterrupt);
+}
+
 /**
  * Scrolls `element` into view and resolves once the scroll animation settles.
  */
@@ -177,16 +242,15 @@ export function scrollIntoViewAsync(
 ): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
   const { signal, abortOnUserInterrupt = false, idleTimeoutMs } = completionOptions ?? {};
-  if (signal?.aborted) {
-    return Promise.reject(createAbortError(signal));
-  }
-
   const scroller = completionOptions?.scroller ?? getScrollParent(element) ?? window;
-  const result = element.scrollIntoView(options) as unknown;
-  if (result instanceof Promise) {
-    return raceWithSignalAndInterrupt(result as Promise<void>, scroller, signal, abortOnUserInterrupt);
-  }
-  return waitForScrollEnd(scroller, idleTimeoutMs, signal, abortOnUserInterrupt);
+  return awaitScrollSettlement(
+    scroller,
+    () => element.scrollIntoView(options),
+    options?.behavior,
+    idleTimeoutMs,
+    signal,
+    abortOnUserInterrupt
+  );
 }
 
 /**
@@ -205,13 +269,12 @@ export function scrollToAsync(
       : idleTimeoutMsOrOptions;
   const { idleTimeoutMs = 100, signal, abortOnUserInterrupt = false } = resolvedOptions;
 
-  if (signal?.aborted) {
-    return Promise.reject(createAbortError(signal));
-  }
-
-  const result = scroller.scrollTo(options) as unknown;
-  if (result instanceof Promise) {
-    return raceWithSignalAndInterrupt(result as Promise<void>, scroller, signal, abortOnUserInterrupt);
-  }
-  return waitForScrollEnd(scroller, idleTimeoutMs, signal, abortOnUserInterrupt);
+  return awaitScrollSettlement(
+    scroller,
+    () => scroller.scrollTo(options),
+    options?.behavior,
+    idleTimeoutMs,
+    signal,
+    abortOnUserInterrupt
+  );
 }

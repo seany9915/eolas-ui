@@ -5,32 +5,23 @@ description: Core workspace contract — Base UI architecture, 3-layer separatio
 
 # Core Contract — Read This First, Every Turn
 
-## 1. Component Library: Base UI (`@base-ui/react`)
-- Default headless foundation is **Base UI** (`@base-ui/react`), not Radix. Never import `@radix-ui/*` in new code; migrate legacy Radix/custom primitives when touched.
-- Full conventions: [component-library.md](./component-library.md).
+## 1. Foundation
+Client-side **Vite + React 19** SPA with Tailwind CSS v4 and **Base UI** (`@base-ui/react`, never `@radix-ui/*` or `next/*`). Full guide: [component-library.md](./component-library.md).
 
-## 2. The 3 Architectural Layers & Direct Tag Ban
-1. **Primitives (`src/components/ui/`):** Pure Base UI wrappers, design tokens, and controlled AI primitives (`PromptInput`, `ChatMessage`, `MessageScroller`, `ModelSelector`, `Trace`, `Tool`). Zero network/DB/auth logic; never import from `blocks` or `features`.
-2. **Composite Blocks (`src/components/blocks/`):** Pure controlled UI assemblies built from `ui/` and tokens (props in, callbacks out; zero network/auth coupling). Never import from `features/` or `views/`.
-3. **Feature Views (`src/features/` or `src/views/`):** Owns state, queries, auth, and routing; composes `blocks/` and `ui/`.
-- **Direct Tag Ban:** Raw `<button>`, `<input>`, `<select>`, `<textarea>`, and `<dialog>` outside `src/components/ui/` are banned (Oxlint `eolas/no-raw-html-controls`). Always use `<Button>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, or `<UnstyledButton>` (for custom-styled bare buttons) from `@/components/ui/`.
-- **Pre-Creation Workflow:** Inventory `src/components/ui/` and `src/components/blocks/` first → reuse or extend with props → only build new in `ui/` or `blocks/` if nothing fits.
+## 2. The 3 Architectural Layers & Pre-Creation Workflow
+1. **Primitives (`src/components/ui/`):** Pure Base UI wrappers, tokens, and controlled AI primitives; never import `blocks/` or `features/`.
+2. **Composite Blocks (`src/components/blocks/`):** Controlled UI compositions (props/callbacks only; zero network/DB/auth coupling); never import `features/` or `views/`.
+3. **Feature Views (`src/features/` or `src/views/`):** Owns state, queries, auth, and routing.
+- **Pre-Creation Workflow:** Inventory `ui/` and `blocks/` first → reuse or extend with props → only build new if nothing fits.
 
 ## 3. API Preservation
-Never erode component APIs, strip `ref` / Base UI `render` props, drop compound subcomponents, or downgrade primitives to `<div>`/`<button>` during styling or bug fixes. Make surgical diffs only.
+Never erode component APIs, strip `ref` / `render` props, drop compound subcomponents, or downgrade primitives (`render={<span />}`). Make surgical diffs only.
 
-## 4. Always-On Guardrails (Full List: [anti-patterns.md](./anti-patterns.md))
-- **No triple-tint chips/badges:** Use Filled, Colored Outline + neutral `surface`, or Soft Wash (`*-container` + ultra-dark `on-*-container` on pills; `#1C1A18` on callouts/cards).
-- **Focus vs. selection:** Floating `outline-offset: 2px` for focus; flush `2px` border + surface wash for selection.
-- **No child-margin hacks:** Never use `space-y-*` / `space-x-*`; use `flex gap-*` or `grid gap-*`.
-- **No manual `<Icon>` margins:** Never add `mr-*`/`ml-*` inside buttons/menus/badges (`gap-2` handles spacing).
-- **Shorthands:** Enforce `size-*` over `w-* h-*` and `truncate` over multi-class ellipsis.
-- **Forms:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>`; use `<InputGroup>` + `<InputGroupAddon>` instead of absolute-positioned buttons.
-- **Overlays:** Always render an accessible title (`<DialogTitle>`, `<DrawerTitle>`, or `sr-only`); never add manual `z-index` in consumer/block/feature code (`ui/` portal primitives manage stacking).
-- **Triggers:** Never downgrade triggers with `render={<span />}` ("Behavior Wraps the Line").
-- **Motion:** Never use `transition-all` or ad-hoc `@keyframes` sweeps (use `<ShimmerText>` / `<Skeleton>`).
-- **Copy:** Plain everyday English, 1–2 nouns max per label; never expose dev/DB/CSS jargon (`committed`, `synchronized`, `affordance`, `telemetry`, `workflow`, `protocol`).
-- **No registry bloat:** Never place domain-specific views or auth/SSE flows in `src/components/blocks/`.
+## 4. Quick Steer (Enforced by Oxlint + Hooks; Full List: [anti-patterns.md](./anti-patterns.md))
+- **Controls, Overlays & Imports:** Use Eolas primitives (`<Button>`, `<UnstyledButton>`, `<Input>`, `<Select>`, `<Textarea>`, `<Dialog>`, `<Icon>`) instead of raw HTML controls, unlabelled icon buttons, `fixed inset-0` overlays, or direct `@base-ui/react*`/`@radix-ui/*` imports outside `ui/`.
+- **Layout & Shorthands:** `className` is layout-only — no restyling, `[&_...]` reach-in selectors, `!` overrides, `size-*` over `w-X h-X`, `flex/grid gap-*` over `space-x/y-*`, `h-dvh` over `h-screen`, `truncate`, and no `<Icon>` `mr-*`/`ml-*`.
+- **Surfaces, Contrast & Motion:** Use Filled / Outline / Soft Wash (no triple-tint), `inverted:*` instead of `dark:*`, `#1C1A18` on callouts/cards, light-surface-safe colors (no `*-tertiary` accents), `outline-offset: 2px` focus vs flush `2px` selection, explicit `transition-[...]` (no `transition-all`, no spring outside `SuccessCheck`), `<ShimmerText>`/`<Skeleton>`, and never nest `<Card>`.
+- **Forms, Titles & Copy:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>` (`<InputGroup>` for addons), render `<DialogTitle>`/`<DrawerTitle>` without manual `z-index`, guard `Enter` with `isComposing`, use plain everyday English (1–2 nouns; no dev/DB/CSS jargon), and keep domain views out of `blocks/`.
 
 ## 5. Routing Index
 

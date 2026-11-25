@@ -23,6 +23,7 @@
 import * as React from 'react';
 import { Input as BaseInput } from '@base-ui/react/input';
 import { Button as BaseButton } from '@base-ui/react/button';
+import { Icon } from './icon';
 import { cn, composeClassName } from '@/lib/utils';
 
 export type InputSize = 'sm' | 'md' | 'lg';
@@ -33,6 +34,8 @@ export interface InputProps extends Omit<React.ComponentPropsWithoutRef<typeof B
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   trailingAction?: React.ReactNode;
+  /** Optional class name applied to the outer wrapper (`[data-slot="input-wrapper"]`). */
+  wrapperClassName?: string;
   clearable?: boolean;
   onClear?: () => void;
   /**
@@ -61,6 +64,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
       className,
+      wrapperClassName,
       size = 'md',
       leadingIcon,
       trailingIcon,
@@ -71,6 +75,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
       value,
       disabled,
       onChange,
+      'aria-invalid': ariaInvalidProp,
       ...props
     },
     ref
@@ -113,9 +118,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
             : 'relative size-8 min-w-[32px] min-h-[32px] after:absolute after:-inset-1.5 after:content-[\'\']'
         )}
       >
-        <span className="material-symbols-outlined text-base leading-none select-none" aria-hidden="true">
-          close
-        </span>
+        <Icon name="close" size="sm" aria-hidden="true" />
       </BaseButton>
     ) : null;
 
@@ -123,7 +126,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     const hasTrailing = Boolean(effectiveTrailing);
 
     const sizeClasses = {
-      sm: 'h-11 min-h-[44px] text-sm',
+      sm: 'h-11 min-h-[44px] text-base sm:text-sm',
       md: 'h-12 min-h-[48px] text-base',
       lg: 'h-14 min-h-[56px] text-base',
     }[size];
@@ -171,7 +174,6 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
         ref={mergedRef}
         value={value}
         disabled={disabled}
-        aria-invalid={error ? true : undefined}
         data-slot="input"
         className={inputClasses}
         onChange={(e) => {
@@ -179,15 +181,16 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
           onChange?.(e);
         }}
         {...props}
+        aria-invalid={error ? true : ariaInvalidProp}
       />
     );
 
-    if (!hasLeading && !hasTrailing) {
-      return inputElement;
-    }
-
     return (
-      <div className="relative flex items-center w-full" data-slot="input-wrapper" role="presentation">
+      <div
+        className={cn('relative flex items-center w-full', wrapperClassName)}
+        data-slot="input-wrapper"
+        role="presentation"
+      >
         {leadingIcon && (
           <span
             className={cn(

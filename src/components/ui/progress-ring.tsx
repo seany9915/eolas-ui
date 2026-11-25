@@ -14,7 +14,7 @@
  */
 import * as React from 'react';
 import { Progress as BaseProgress } from '@base-ui/react/progress';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type ProgressRingSize = 'sm' | 'md' | 'lg' | 'xl';
 export type ProgressRingColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error';
@@ -94,18 +94,20 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
 
     const colors = colorStyles[color] || colorStyles.primary;
     const resolvedAriaLabel = ariaLabel ?? (!label && !ariaLabelledBy ? 'Progress' : undefined);
+    const resolvedValue = isIndeterminate ? null : clampedValue;
 
     return (
       <BaseProgress.Root
         ref={ref}
+        data-slot="progress-ring"
         aria-label={resolvedAriaLabel}
         aria-labelledby={ariaLabelledBy}
-        value={value ?? null}
+        value={resolvedValue}
         max={max}
         min={min}
         format={format}
         locale={locale}
-        className={cn('relative inline-flex flex-col items-center justify-center select-none', className)}
+        className={composeClassName('relative inline-flex flex-col items-center justify-center select-none', className)}
         {...props}
       >
         {label && (
@@ -118,7 +120,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
           <svg
             className={cn(
               'size-full -rotate-90 origin-center',
-              isIndeterminate && 'animate-spin motion-reduce:animate-none'
+              isIndeterminate && 'motion-safe:animate-spin motion-reduce:animate-pulse'
             )}
             viewBox={`0 0 ${dimension} ${dimension}`}
             aria-hidden="true"
@@ -155,7 +157,7 @@ const ProgressRingComponent = React.forwardRef<HTMLDivElement, ProgressRingProps
           </svg>
 
           {/* Center Content Slot */}
-          <div className={cn('absolute inset-0 flex items-center justify-center font-mono font-bold tabular-nums text-on-surface', config.textSize)}>
+          <div className={cn('absolute inset-0 flex items-center justify-center font-mono font-semibold tabular-nums text-on-surface', config.textSize)}>
             {children !== undefined ? (
               children
             ) : showValue && !isIndeterminate ? (

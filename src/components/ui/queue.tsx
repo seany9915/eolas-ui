@@ -123,7 +123,7 @@ export const QueueItemComponent = React.forwardRef<HTMLDivElement, QueueItemComp
         ref={ref}
         status={status}
         className={cn(
-          'bg-surface hover:bg-state-hover transition-colors',
+          'bg-surface hover:bg-state-hover transition-colors motion-reduce:transition-none',
           description ? 'items-start py-2.5' : 'items-center py-2.5',
           className
         )}
@@ -216,14 +216,14 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
     const defaultIcon = isCompleted ? 'task_alt' : 'pending_actions';
 
     return (
-      <div ref={ref} className={className} {...props}>
+      <div ref={ref} data-slot="queue-section" className={className} {...props}>
         <TraceCollapsible
           defaultOpen={defaultOpen}
           open={open}
           onOpenChange={onOpenChange}
         >
           <TraceCollapsibleTrigger className="bg-surface-container-low hover:bg-state-hover py-2 min-h-[44px]">
-            <div className="flex items-center gap-2.5 w-full">
+            <span className="flex items-center gap-2.5 w-full">
               <span
                 className={cn(
                   'flex size-5 shrink-0 items-center justify-center text-xs select-none',
@@ -243,7 +243,7 @@ export const QueueSection = React.forwardRef<HTMLDivElement, QueueSectionProps>(
                   </span>
                 </TraceDescription>
               )}
-            </div>
+            </span>
           </TraceCollapsibleTrigger>
 
           <TraceCollapsibleContent variant="flush">
@@ -259,7 +259,7 @@ QueueSection.displayName = 'QueueSection';
 /* -------------------------------------------------------------------------------------------------
  * Queue (Root Container)
  * -----------------------------------------------------------------------------------------------*/
-export interface QueueProps {
+export interface QueueProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   items?: QueueItem[];
   title?: string;
   description?: string;
@@ -272,119 +272,127 @@ export interface QueueProps {
   className?: string;
 }
 
-export const QueueRoot: React.FC<QueueProps> = ({
-  items = [],
-  title,
-  description,
-  todoTitle,
-  completedTitle,
-  defaultTodoOpen = true,
-  defaultCompletedOpen = false,
-  variant,
-  children,
-  className,
-}) => {
-  const chatContext = useChatMessageContext();
-  const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
-  const isItemCompleted = (i: QueueItem) => i.isCompleted === true || i.status === 'complete';
-  const pendingItems = items.filter((i) => !isItemCompleted(i));
-  const completedItems = items.filter((i) => isItemCompleted(i));
+export const QueueRoot = React.forwardRef<HTMLDivElement, QueueProps>(
+  (
+    {
+      items = [],
+      title,
+      description,
+      todoTitle,
+      completedTitle,
+      defaultTodoOpen = true,
+      defaultCompletedOpen = false,
+      variant,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
+    const isItemCompleted = (i: QueueItem) => i.isCompleted === true || i.status === 'complete';
+    const pendingItems = items.filter((i) => !isItemCompleted(i));
+    const completedItems = items.filter((i) => isItemCompleted(i));
 
-  const resolvedTodoTitle = todoTitle ?? `${pendingItems.length} to do`;
-  const resolvedCompletedTitle = completedTitle ?? `${completedItems.length} completed`;
+    const resolvedTodoTitle = todoTitle ?? `${pendingItems.length} to do`;
+    const resolvedCompletedTitle = completedTitle ?? `${completedItems.length} completed`;
 
-  const isCompound = React.Children.toArray(children).some((child) => {
-    if (!React.isValidElement(child)) return false;
-    const type = child.type;
-    const displayName = (type as { displayName?: string })?.displayName;
+    const isCompound = React.Children.toArray(children).some((child) => {
+      if (!React.isValidElement(child)) return false;
+      const type = child.type;
+      const displayName = (type as { displayName?: string })?.displayName;
+      return (
+        type === QueueSection ||
+        type === QueueHeader ||
+        type === QueueTitle ||
+        type === QueueList ||
+        type === QueueItemComponent ||
+        type === QueueEmpty ||
+        displayName === 'QueueSection' ||
+        displayName === 'QueueHeader' ||
+        displayName === 'QueueTitle' ||
+        displayName === 'QueueList' ||
+        displayName === 'QueueItem' ||
+        displayName === 'QueueEmpty'
+      );
+    });
+
     return (
-      type === QueueSection ||
-      type === QueueHeader ||
-      type === QueueTitle ||
-      type === QueueList ||
-      type === QueueItemComponent ||
-      type === QueueEmpty ||
-      displayName === 'QueueSection' ||
-      displayName === 'QueueHeader' ||
-      displayName === 'QueueTitle' ||
-      displayName === 'QueueList' ||
-      displayName === 'QueueItem' ||
-      displayName === 'QueueEmpty'
-    );
-  });
+      <div ref={ref} data-slot="queue" className={cn('w-full', className)} {...props}>
+        <Trace variant={resolvedVariant}>
+          {(title || description) && (
+            <div className="px-3.5 pt-3 pb-2 border-b border-outline-variant/40">
+              {title && <h5 className="font-heading text-sm font-bold text-on-surface">{title}</h5>}
+              {description && <p className="font-sans text-xs text-on-surface-variant mt-0.5">{description}</p>}
+            </div>
+          )}
 
-  return (
-    <div data-slot="queue" className={cn('w-full', className)}>
-      <Trace variant={resolvedVariant}>
-        {(title || description) && (
-          <div className="px-3.5 pt-3 pb-2 border-b border-outline-variant/40">
-            {title && <h5 className="font-heading text-sm font-bold text-on-surface">{title}</h5>}
-            {description && <p className="font-sans text-xs text-on-surface-variant mt-0.5">{description}</p>}
-          </div>
-        )}
+          {isCompound ? (
+            children
+          ) : (
+            <>
+              {/* Section 1: Pending To-Do Items */}
+              {pendingItems.length > 0 && (
+                <QueueSection
+                  title={resolvedTodoTitle}
+                  countLabel={`${pendingItems.length} remaining`}
+                  status="pending"
+                  defaultOpen={defaultTodoOpen}
+                >
+                  {pendingItems.map((item) => {
+                    const status = item.status ?? 'pending';
+                    return (
+                      <QueueItemComponent
+                        key={item.id}
+                        title={item.title}
+                        description={item.description}
+                        status={status}
+                        duration={item.duration}
+                        content={item.content}
+                      />
+                    );
+                  })}
+                </QueueSection>
+              )}
 
-        {isCompound ? (
-          children
-        ) : (
-          <>
-            {/* Section 1: Pending To-Do Items */}
-            {pendingItems.length > 0 && (
-              <QueueSection
-                title={resolvedTodoTitle}
-                countLabel={`${pendingItems.length} remaining`}
-                status="pending"
-                defaultOpen={defaultTodoOpen}
-              >
-                {pendingItems.map((item) => {
-                  const status = item.status ?? 'pending';
-                  return (
+              {/* Section 2: Completed Items */}
+              {completedItems.length > 0 && (
+                <QueueSection
+                  title={resolvedCompletedTitle}
+                  countLabel={`${completedItems.length} finished`}
+                  status="complete"
+                  defaultOpen={defaultCompletedOpen}
+                >
+                  {completedItems.map((item) => (
                     <QueueItemComponent
                       key={item.id}
                       title={item.title}
                       description={item.description}
-                      status={status}
+                      status="complete"
                       duration={item.duration}
                       content={item.content}
                     />
-                  );
-                })}
-              </QueueSection>
-            )}
+                  ))}
+                </QueueSection>
+              )}
 
-            {/* Section 2: Completed Items */}
-            {completedItems.length > 0 && (
-              <QueueSection
-                title={resolvedCompletedTitle}
-                countLabel={`${completedItems.length} finished`}
-                status="complete"
-                defaultOpen={defaultCompletedOpen}
-              >
-                {completedItems.map((item) => (
-                  <QueueItemComponent
-                    key={item.id}
-                    title={item.title}
-                    description={item.description}
-                    status="complete"
-                    duration={item.duration}
-                    content={item.content}
-                  />
-                ))}
-              </QueueSection>
-            )}
+              {items.length === 0 && (
+                <TraceLine status="default">
+                  <TraceIcon name="inbox" status="default" />
+                  <TraceTitle>Queue is empty</TraceTitle>
+                  <TraceDescription>No active agent tasks</TraceDescription>
+                </TraceLine>
+              )}
+            </>
+          )}
+        </Trace>
+      </div>
+    );
+  }
+);
+QueueRoot.displayName = 'QueueRoot';
 
-            {items.length === 0 && (
-              <TraceLine status="default">
-                <TraceIcon name="inbox" status="default" />
-                <TraceTitle>Queue is empty</TraceTitle>
-                <TraceDescription>No active agent tasks</TraceDescription>
-              </TraceLine>
-            )}
-          </>
-        )}
-      </Trace>
-    </div>
-  );
-};
 export interface QueueEmptyProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
@@ -392,22 +400,27 @@ export interface QueueEmptyProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
 }
 
-export const QueueEmpty: React.FC<QueueEmptyProps> = ({
-  title = 'Queue is empty',
-  description = 'No active agent tasks',
-  icon = 'inbox',
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <TraceLine status="default" className={className} {...props}>
-      <TraceIcon name={icon} status="default" />
-      <TraceTitle>{children || title}</TraceTitle>
-      {description && <TraceDescription>{description}</TraceDescription>}
-    </TraceLine>
-  );
-};
+export const QueueEmpty = React.forwardRef<HTMLDivElement, QueueEmptyProps>(
+  (
+    {
+      title = 'Queue is empty',
+      description = 'No active agent tasks',
+      icon = 'inbox',
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <TraceLine ref={ref} data-slot="queue-empty" status="default" className={className} {...props}>
+        <TraceIcon name={icon} status="default" />
+        <TraceTitle>{children || title}</TraceTitle>
+        {description && <TraceDescription>{description}</TraceDescription>}
+      </TraceLine>
+    );
+  }
+);
 QueueEmpty.displayName = 'QueueEmpty';
 
 export const QueueAction = TraceAction;

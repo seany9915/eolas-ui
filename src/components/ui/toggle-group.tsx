@@ -107,8 +107,8 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
       'active:scale-[var(--scale-tiny)] motion-reduce:transform-none motion-reduce:transition-none',
       sizeClasses,
       isSpaced
-        ? 'rounded border border-outline-variant bg-surface text-on-surface-variant hover:text-on-surface hover:bg-state-hover'
-        : 'rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover border border-transparent',
+        ? 'rounded border border-outline-variant bg-surface text-on-surface hover:bg-state-hover'
+        : 'rounded-sm text-on-surface hover:bg-state-hover border border-transparent',
       groupContext.multiple
         ? 'data-[pressed]:bg-primary-container data-[pressed]:text-on-primary-container data-[pressed]:border-primary forced-colors:data-[pressed]:border-[Highlight]'
         : isSpaced

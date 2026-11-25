@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Drawer } from '@/components/ui/drawer';
 import { Icon } from '@/components/ui/icon';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { RegistrySidebar } from './RegistrySidebar';
@@ -41,9 +42,10 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
   const [tierFilter, setTierFilter] = React.useState<ComponentTier | 'all'>('all');
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  // Sync hash changes from browser back/forward
+  // Sync hash changes from browser back/forward (ignore #main-content skip link)
   React.useEffect(() => {
     const handleHashChange = () => {
+      if (window.location.hash === '#main-content') return;
       const hashId = getHashComponentId();
       if (hashId !== selectedId) {
         setSelectedId(hashId);
@@ -54,6 +56,15 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [selectedId]);
 
+  const selectedEntry = selectedId ? REGISTRY_MAP[selectedId] : null;
+  const DemoComponent = selectedId ? REGISTRY_DEMOS[selectedId] : undefined;
+
+  React.useEffect(() => {
+    document.title = selectedEntry
+      ? `${selectedEntry.title} — Eolas Components`
+      : 'Components — Eolas Design System';
+  }, [selectedEntry]);
+
   // Handle selection and update URL hash
   const handleSelect = (id: string | null) => {
     setSelectedId(id);
@@ -62,9 +73,11 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
     } else {
       window.location.hash = 'components';
     }
-    // On mobile screens, close sidebar when a component is picked
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setIsSidebarOpen(false);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0 });
+      if (window.innerWidth < 1024) {
+        setIsSidebarOpen(false);
+      }
     }
   };
 
@@ -72,21 +85,19 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
     setDirection((prev) => (prev === 'ltr' ? 'rtl' : 'ltr'));
   };
 
-  const selectedEntry = selectedId ? REGISTRY_MAP[selectedId] : null;
-  const DemoComponent = selectedId ? REGISTRY_DEMOS[selectedId] : undefined;
-
   return (
     <SidebarProvider
       embedded
-      className={cn('w-full flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-4.5rem)] relative', className)}
+      className={cn('w-full flex-1 flex flex-col lg:flex-row min-h-[calc(100dvh-4.5rem)] relative', className)}
       style={{ '--sidebar-width': '18.5rem', '--sidebar-width-mobile': '20rem' } as React.CSSProperties}
     >
       {/* Mobile Topbar for Sidebar Toggle (< lg screens) */}
-      <div className="lg:hidden w-full flex items-center justify-between p-3.5 border-b border-outline-variant bg-surface sticky top-18 z-30">
+      <div className="lg:hidden w-full flex items-center justify-between gap-2 px-4 py-2.5 border-b border-outline-variant bg-surface sticky top-18 z-30">
         <Button
           size="sm"
           variant="outline"
           colorRole="neutral"
+          aria-expanded={isSidebarOpen}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="text-xs font-medium"
         >
@@ -104,7 +115,44 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
         )}
       </div>
 
-      {/* Canonical Sidebar Component - Docked to left edge */}
+      {/* Mobile Drawer Sidebar (< lg) */}
+      <Drawer open={isSidebarOpen} onOpenChange={setIsSidebarOpen} swipeDirection="left">
+        <Drawer.Panel className="p-0 w-80 max-w-full lg:hidden" showHandle={false}>
+          <div className="flex items-center justify-between px-3 py-2 border-b border-outline-variant bg-surface shrink-0">
+            <Drawer.Title className="font-heading text-base font-bold text-on-surface">
+              Browse Components
+            </Drawer.Title>
+            <Drawer.Close
+              render={
+                <Button
+                  size="icon"
+                  variant="text"
+                  colorRole="neutral"
+                  aria-label="Close component menu"
+                />
+              }
+            >
+              <Icon name="close" size="sm" />
+            </Drawer.Close>
+          </div>
+          <Drawer.Description className="sr-only">
+            Filter and select a component from the Eolas UI registry.
+          </Drawer.Description>
+          <RegistrySidebar
+            selectedId={selectedId}
+            onSelect={handleSelect}
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+            tierFilter={tierFilter}
+            onTierFilterChange={setTierFilter}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            className="flex flex-1 min-h-0"
+          />
+        </Drawer.Panel>
+      </Drawer>
+
+      {/* Desktop Sticky Sidebar (lg+) */}
       <RegistrySidebar
         selectedId={selectedId}
         onSelect={handleSelect}
@@ -114,12 +162,12 @@ export const ComponentRegistry: React.FC<ComponentRegistryProps> = ({
         onTierFilterChange={setTierFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        className={cn(!isSidebarOpen && 'hidden lg:flex')}
+        className="hidden lg:flex"
       />
 
-      {/* Main Sandbox Canvas or Catalog Overview in SidebarInset */}
-      <SidebarInset className="flex-1 min-w-0 bg-background flex flex-col overflow-y-auto">
-        <div className="flex-1 p-6 sm:p-8 lg:p-10 xl:p-12 w-full max-w-[1600px] mx-auto">
+      {/* Main Sandbox Canvas or Catalog Overview (div avoids nested <main> inside App's <main>) */}
+      <SidebarInset render={<div />} className="flex-1 min-w-0 bg-background flex flex-col overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-8 lg:p-10 xl:p-12 w-full max-w-[1600px] mx-auto">
           {selectedEntry ? (
             <RegistryCanvas
               entry={selectedEntry}

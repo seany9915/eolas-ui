@@ -25,7 +25,7 @@ export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
       data-slot="menu-item"
       className={composeClassName(
         cn(
-          'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none',
+          'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none',
           destructive
             ? 'text-error hover:bg-error/10 focus:bg-error/10 data-[highlighted]:bg-error/10 data-[highlighted]:text-error'
             : 'text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
@@ -85,6 +85,7 @@ export interface MenuContentProps extends React.ComponentPropsWithoutRef<typeof 
   sideOffset?: number;
   alignOffset?: number;
   collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  container?: BaseMenu.Portal.Props['container'];
   containerClassName?: BaseMenu.Positioner.Props['className'];
   keepMounted?: boolean;
 }
@@ -99,13 +100,14 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
       sideOffset = 4,
       alignOffset,
       collisionPadding = 8,
+      container,
       containerClassName,
       keepMounted,
       ...props
     },
     ref
   ) => (
-    <BaseMenu.Portal keepMounted={keepMounted}>
+    <BaseMenu.Portal container={container} keepMounted={keepMounted}>
       <BaseMenu.Positioner
         side={side}
         align={align}
@@ -158,10 +160,18 @@ export const MenuShortcut = React.forwardRef<
 MenuShortcut.displayName = 'MenuShortcut';
 
 export interface MenuTriggerProps
-  extends React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger> {}
+  extends React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger> {
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const menuTriggerSizeClasses: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'h-11 px-4 min-h-[44px] text-sm',
+  md: 'h-12 px-4 min-h-[48px] text-sm',
+  lg: 'h-14 px-5 min-h-[56px] text-base',
+};
 
 export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
-  ({ className, children, render, nativeButton, ...props }, ref) => (
+  ({ className, children, size = 'sm', render, nativeButton, ...props }, ref) => (
     <BaseMenu.Trigger
       ref={ref}
       data-slot="menu-trigger"
@@ -171,7 +181,10 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
         render
           ? className
           : composeClassName(
-              'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+              cn(
+                'inline-flex items-center justify-between gap-2 rounded border border-outline bg-surface text-on-surface font-label font-semibold hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors motion-reduce:transition-none cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+                menuTriggerSizeClasses[size]
+              ),
               className
             )
       }
@@ -194,18 +207,18 @@ export const MenuCheckboxItem = React.forwardRef<HTMLDivElement, MenuCheckboxIte
       ref={ref}
       data-slot="menu-checkbox-item"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
             {icon}
           </span>
         )}
-        <span className="truncate">{children}</span>
+        <span className="truncate flex-1">{children}</span>
       </div>
       <BaseMenu.CheckboxItemIndicator className="shrink-0 text-primary flex items-center justify-center">
         <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
@@ -228,18 +241,18 @@ export const MenuRadioItem = React.forwardRef<HTMLDivElement, MenuRadioItemProps
       ref={ref}
       data-slot="menu-radio-item"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[checked]:font-semibold data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
             {icon}
           </span>
         )}
-        <span className="truncate">{children}</span>
+        <span className="truncate flex-1">{children}</span>
       </div>
       <BaseMenu.RadioItemIndicator className="shrink-0 text-primary flex items-center justify-center">
         <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
@@ -262,18 +275,18 @@ export const MenuSubmenuTrigger = React.forwardRef<HTMLDivElement, MenuSubmenuTr
       ref={ref}
       data-slot="menu-sub-trigger"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-state-hover data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-state-hover data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 truncate">
+      <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
         {icon && (
           <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
             {icon}
           </span>
         )}
-        <span className="truncate">{children}</span>
+        <span className="truncate flex-1">{children}</span>
       </div>
       <span
         className="material-symbols-outlined icon-directional text-base text-on-surface-variant shrink-0"
@@ -293,7 +306,7 @@ export const MenuGroupLabel = React.forwardRef<
   <BaseMenu.GroupLabel
     ref={ref}
     data-slot="menu-label"
-    className={composeClassName('px-3 py-1.5 font-label text-xs font-bold text-on-surface-variant select-none', className)}
+    className={composeClassName('px-3 py-1.5 font-label text-xs font-semibold text-on-surface-variant select-none', className)}
     {...props}
   />
 ));
@@ -323,7 +336,7 @@ export const MenuLinkItem = React.forwardRef<
     ref={ref}
     data-slot="menu-link-item"
     className={composeClassName(
-      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
+      'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       className
     )}
     {...props}
@@ -341,6 +354,7 @@ export interface MenuProps<Payload = unknown> {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean, eventDetails: BaseMenu.Root.ChangeEventDetails) => void;
   onOpenChangeComplete?: (open: boolean) => void;
+  onItemHighlighted?: BaseMenu.Root.Props<Payload>['onItemHighlighted'];
   modal?: boolean;
   loopFocus?: boolean;
   highlightItemOnHover?: boolean;
@@ -351,6 +365,7 @@ export interface MenuProps<Payload = unknown> {
   handle?: BaseMenu.Handle<Payload>;
   triggerId?: string | null;
   defaultTriggerId?: string | null;
+  container?: BaseMenu.Portal.Props['container'];
   side?: BaseMenu.Positioner.Props['side'];
   align?: 'start' | 'center' | 'end';
   sideOffset?: number;
@@ -373,6 +388,7 @@ function MenuComponent<Payload = unknown>({
   defaultOpen,
   onOpenChange,
   onOpenChangeComplete,
+  onItemHighlighted,
   modal = true,
   loopFocus = true,
   highlightItemOnHover = true,
@@ -383,6 +399,7 @@ function MenuComponent<Payload = unknown>({
   handle,
   triggerId,
   defaultTriggerId,
+  container,
   side,
   align,
   sideOffset = 4,
@@ -405,6 +422,7 @@ function MenuComponent<Payload = unknown>({
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
         onOpenChangeComplete={onOpenChangeComplete}
+        onItemHighlighted={onItemHighlighted}
         modal={modal}
         loopFocus={loopFocus}
         highlightItemOnHover={highlightItemOnHover}
@@ -434,6 +452,7 @@ function MenuComponent<Payload = unknown>({
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
       onOpenChangeComplete={onOpenChangeComplete}
+      onItemHighlighted={onItemHighlighted}
       modal={modal}
       loopFocus={loopFocus}
       highlightItemOnHover={highlightItemOnHover}
@@ -462,7 +481,7 @@ function MenuComponent<Payload = unknown>({
               data-slot="menu-trigger"
               className={composeClassName(
                 cn(
-                  'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
+                  'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors motion-reduce:transition-none cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
                   fullWidth ? 'w-full' : 'w-max'
                 ),
                 triggerClassName
@@ -474,7 +493,7 @@ function MenuComponent<Payload = unknown>({
               </span>
             </BaseMenu.Trigger>
           )}
-          <BaseMenu.Portal>
+          <BaseMenu.Portal container={container}>
             <BaseMenu.Positioner
               side={side}
               align={align}
@@ -500,9 +519,11 @@ function MenuComponent<Payload = unknown>({
                       )
                 }
               >
-                {children
-                  ? renderChildren(renderProps)
-                  : items?.map((item) => (
+                {children ? (
+                  renderChildren(renderProps)
+                ) : items ? (
+                  <MenuGroup>
+                    {items.map((item) => (
                       <MenuItem
                         key={item.id}
                         onClick={item.onClick}
@@ -513,6 +534,8 @@ function MenuComponent<Payload = unknown>({
                         {item.label}
                       </MenuItem>
                     ))}
+                  </MenuGroup>
+                ) : null}
               </BaseMenu.Popup>
             </BaseMenu.Positioner>
           </BaseMenu.Portal>
@@ -546,7 +569,7 @@ function MenuComponent<Payload = unknown>({
 export interface MenuInputProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Input> {}
 
 export const MenuInput = React.forwardRef<HTMLInputElement, MenuInputProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, enterKeyHint = 'search', ...props }, ref) => (
     <div className="flex items-center gap-2 px-3 py-2 border-b border-outline-variant">
       <span className="material-symbols-outlined text-lg text-on-surface-variant select-none" aria-hidden="true">
         search
@@ -554,8 +577,9 @@ export const MenuInput = React.forwardRef<HTMLInputElement, MenuInputProps>(
       <BaseMenu.Input
         ref={ref}
         data-slot="menu-input"
+        enterKeyHint={enterKeyHint}
         className={composeClassName(
-          'w-full bg-transparent font-sans text-sm text-on-surface placeholder:text-on-surface-variant/80 outline-none disabled:cursor-not-allowed disabled:opacity-50',
+          'w-full bg-transparent font-sans text-base sm:text-sm text-on-surface placeholder:text-on-surface-variant/80 outline-none disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
         {...props}
@@ -588,7 +612,7 @@ export const MenuClear = React.forwardRef<HTMLButtonElement, MenuClearProps>(
       data-slot="menu-clear"
       aria-label={ariaLabel ?? (children ? undefined : 'Clear filter')}
       className={composeClassName(
-        "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
+        "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors motion-reduce:transition-none cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
         className
       )}
       {...props}

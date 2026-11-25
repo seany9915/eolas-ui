@@ -1,5 +1,4 @@
 ﻿import * as React from 'react';
-import { NumberRoll } from '@/components/ui/number-roll';
 import { SpinningCounter } from '@/components/ui/spinning-counter';
 import { NumberPopIn } from '@/components/ui/number-pop-in';
 import { TextSwap } from '@/components/ui/text-swap';
@@ -14,25 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 import { ComponentDemoProps } from '../types';
-
-export const NumberRollDemo: React.FC<ComponentDemoProps> = () => {
-  const [val, setVal] = React.useState(128);
-  return (
-    <div className="flex flex-col items-center justify-center gap-6 py-8">
-      <div className="font-mono text-3xl font-bold text-primary">
-        <NumberRoll value={val} suffix=" words" />
-      </div>
-      <div className="flex items-center gap-2">
-        <Button size="sm" variant="outline" onClick={() => setVal((v) => v - 10)}>
-          -10 words
-        </Button>
-        <Button size="sm" variant="filled" onClick={() => setVal((v) => v + 10)}>
-          +10 words
-        </Button>
-      </div>
-    </div>
-  );
-};
 
 export const SpinningCounterDemo: React.FC<ComponentDemoProps> = () => {
   const [count, setCount] = React.useState(42);

@@ -85,7 +85,8 @@ export const EFFORT_OPTIONS: SelectOption[] = [
   { value: 'high', label: 'Thinking: High' },
 ];
 
-export interface ModelSelectorModelProps {
+export interface ModelSelectorModelProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue'> {
   value?: string;
   defaultValue?: string;
   onValueChange?: (model: string) => void;
@@ -96,91 +97,100 @@ export interface ModelSelectorModelProps {
   className?: string;
 }
 
-const ModelSelectorModel: React.FC<ModelSelectorModelProps> = ({
-  value: valueProp,
-  defaultValue,
-  onValueChange,
-  models = [],
-  disabled = false,
-  size = 'sm',
-  placeholder = 'Select model',
-  className,
-}) => {
-  const hasModels = models.length > 0;
-  const modelItems = React.useMemo(
-    () =>
-      createComboboxItems(models, {
-        getValue: (item: ModelItem) => item.value,
-        getLabel: (item: ModelItem) => item.label,
-      }),
-    [models]
-  );
-  const selectedModel = React.useMemo(
-    () => models.find((m) => m.value === valueProp),
-    [models, valueProp]
-  );
+const ModelSelectorModel = React.forwardRef<HTMLDivElement, ModelSelectorModelProps>(
+  (
+    {
+      value: valueProp,
+      defaultValue,
+      onValueChange,
+      models = [],
+      disabled = false,
+      size = 'sm',
+      placeholder = 'Select model',
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const hasModels = models.length > 0;
+    const modelItems = React.useMemo(
+      () =>
+        createComboboxItems(models, {
+          getValue: (item: ModelItem) => item.value,
+          getLabel: (item: ModelItem) => item.label,
+        }),
+      [models]
+    );
+    const selectedModel = React.useMemo(
+      () => models.find((m) => m.value === valueProp),
+      [models, valueProp]
+    );
 
-  return (
-    <div className={cn('min-w-0 max-w-full flex-1 @xs:flex-none @xs:min-w-36 @sm:min-w-44', className)}>
-      <Combobox
-        items={modelItems}
-        value={valueProp}
-        defaultValue={defaultValue ?? null}
-        onValueChange={(val) => {
-          if (val && typeof val === 'string') {
-            onValueChange?.(val);
-          }
-        }}
-        disabled={disabled || !hasModels}
+    return (
+      <div
+        ref={ref}
+        className={cn('min-w-0 max-w-full flex-1 @xs:flex-none @xs:min-w-36 @sm:min-w-44', className)}
+        {...props}
       >
-        <ComboboxTrigger
-          aria-label="Select model"
-          className={cn(
-            'w-full',
-            size === 'sm' ? 'h-11 min-h-[44px] px-3.5 text-xs' : 'h-12 min-h-[48px] px-4 text-sm'
-          )}
+        <Combobox
+          items={modelItems}
+          value={valueProp}
+          defaultValue={defaultValue ?? null}
+          onValueChange={(val) => {
+            if (val && typeof val === 'string') {
+              onValueChange?.(val);
+            }
+          }}
+          disabled={disabled || !hasModels}
         >
-          <ComboboxValue placeholder={hasModels ? placeholder : 'No models available'}>
-            {(val) => {
-              const match = models.find((m) => m.value === val) ?? selectedModel;
-              return match ? match.label : hasModels ? placeholder : 'No models available';
-            }}
-          </ComboboxValue>
-        </ComboboxTrigger>
-        <ComboboxContent className="w-72 max-w-[calc(100vw-2rem)]">
-          <div className="p-1.5 border-b border-outline-variant/60">
-            <ComboboxInput placeholder="Search models..." size="sm" />
-          </div>
-          <ComboboxEmpty>No models found.</ComboboxEmpty>
-          <ComboboxList>
-            {(item: ModelItem) => (
-              <ComboboxItem key={item.value} value={item.value} disabled={item.disabled}>
-                <div className="flex flex-col min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="truncate font-medium text-on-surface">{item.label}</span>
-                    {item.badge && (
-                      <Badge size="sm" variant="soft" colorRole="secondary">
-                        {item.badge}
-                      </Badge>
+          <ComboboxTrigger
+            aria-label="Select model"
+            size={size}
+            className="w-full"
+          >
+            <ComboboxValue placeholder={hasModels ? placeholder : 'No models available'}>
+              {(val) => {
+                const match = models.find((m) => m.value === val) ?? selectedModel;
+                return match ? match.label : hasModels ? placeholder : 'No models available';
+              }}
+            </ComboboxValue>
+          </ComboboxTrigger>
+          <ComboboxContent className="w-72 max-w-[var(--available-width)]">
+            <div className="p-1.5 border-b border-outline-variant/60">
+              <ComboboxInput placeholder="Search models..." size="sm" enterKeyHint="search" />
+            </div>
+            <ComboboxEmpty>No models found.</ComboboxEmpty>
+            <ComboboxList>
+              {(item: ModelItem) => (
+                <ComboboxItem key={item.value} value={item.value} disabled={item.disabled}>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate font-medium text-on-surface">{item.label}</span>
+                      {item.badge && (
+                        <Badge size="sm" variant="soft" colorRole="secondary">
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    {item.description && (
+                      <span className="text-sm text-on-surface-variant truncate">
+                        {item.description}
+                      </span>
                     )}
                   </div>
-                  {item.description && (
-                    <span className="text-xs text-on-surface-variant truncate">
-                      {item.description}
-                    </span>
-                  )}
-                </div>
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-    </div>
-  );
-};
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>
+    );
+  }
+);
 ModelSelectorModel.displayName = 'ModelSelector.Model';
 
-export interface ModelSelectorEffortProps {
+export interface ModelSelectorEffortProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue'> {
   value?: ThinkingEffort;
   defaultValue?: ThinkingEffort;
   onValueChange?: (effort: ThinkingEffort) => void;
@@ -191,40 +201,50 @@ export interface ModelSelectorEffortProps {
   className?: string;
 }
 
-const ModelSelectorEffort: React.FC<ModelSelectorEffortProps> = ({
-  value: valueProp,
-  defaultValue = 'medium',
-  onValueChange,
-  options = EFFORT_OPTIONS,
-  disabled = false,
-  size = 'sm',
-  placeholder = 'Thinking',
-  className,
-}) => {
-  return (
-    <div className={cn('min-w-0 max-w-full flex-1 @xs:flex-none @xs:min-w-[110px] @sm:min-w-[130px]', className)}>
-      <Tooltip content="Adjust depth of model reasoning steps">
-        {/* Wrapper keeps TooltipTrigger's data-popup-open and id off SelectTrigger */}
-        <div className="w-full">
-          <Select
-            options={options}
-            value={valueProp}
-            defaultValue={defaultValue}
-            onValueChange={(val) => {
-              if (val && typeof val === 'string') {
-                onValueChange?.(val as ThinkingEffort);
-              }
-            }}
-            disabled={disabled}
-            size={size}
-            aria-label="Adjust reasoning effort"
-            placeholder={placeholder}
-          />
-        </div>
-      </Tooltip>
-    </div>
-  );
-};
+const ModelSelectorEffort = React.forwardRef<HTMLDivElement, ModelSelectorEffortProps>(
+  (
+    {
+      value: valueProp,
+      defaultValue = 'medium',
+      onValueChange,
+      options = EFFORT_OPTIONS,
+      disabled = false,
+      size = 'sm',
+      placeholder = 'Thinking',
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <div
+        ref={ref}
+        className={cn('min-w-0 max-w-full flex-1 @xs:flex-none @xs:min-w-[110px] @sm:min-w-[130px]', className)}
+        {...props}
+      >
+        <Tooltip content="Adjust depth of model reasoning steps">
+          {/* Wrapper keeps TooltipTrigger's data-popup-open and id off SelectTrigger */}
+          <div className="w-full">
+            <Select
+              options={options}
+              value={valueProp}
+              defaultValue={defaultValue}
+              onValueChange={(val) => {
+                if (val && typeof val === 'string') {
+                  onValueChange?.(val as ThinkingEffort);
+                }
+              }}
+              disabled={disabled}
+              size={size}
+              aria-label="Adjust reasoning effort"
+              placeholder={placeholder}
+            />
+          </div>
+        </Tooltip>
+      </div>
+    );
+  }
+);
 ModelSelectorEffort.displayName = 'ModelSelector.Effort';
 
 /* -------------------------------------------------------------------------------------------------

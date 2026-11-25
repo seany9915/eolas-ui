@@ -32,6 +32,94 @@ const colorRoleClasses: Record<'primary' | 'secondary' | 'tertiary' | 'warning' 
   success: 'bg-success',
 };
 
+const MeterContext = React.createContext<{ colorRole: NonNullable<MeterProps['colorRole']> }>({
+  colorRole: 'primary',
+});
+
+export const MeterRoot = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMeter.Root> & {
+    colorRole?: MeterProps['colorRole'];
+  }
+>(({ className, colorRole = 'primary', ...props }, ref) => (
+  <MeterContext.Provider value={{ colorRole }}>
+    <BaseMeter.Root
+      ref={ref}
+      data-slot="meter"
+      className={composeClassName('flex flex-col gap-1.5 w-full', className)}
+      {...props}
+    />
+  </MeterContext.Provider>
+));
+MeterRoot.displayName = 'MeterRoot';
+
+export const MeterLabel = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseMeter.Label>
+>(({ className, ...props }, ref) => (
+  <BaseMeter.Label
+    ref={ref}
+    data-slot="meter-label"
+    className={composeClassName('font-label text-sm font-semibold text-on-surface', className)}
+    {...props}
+  />
+));
+MeterLabel.displayName = 'MeterLabel';
+
+export const MeterValue = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseMeter.Value>
+>(({ className, ...props }, ref) => (
+  <BaseMeter.Value
+    ref={ref}
+    data-slot="meter-value"
+    className={composeClassName('font-mono text-sm font-bold text-on-surface tabular-nums', className)}
+    {...props}
+  />
+));
+MeterValue.displayName = 'MeterValue';
+
+export const MeterTrack = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMeter.Track>
+>(({ className, ...props }, ref) => (
+  <BaseMeter.Track
+    ref={ref}
+    data-slot="meter-track"
+    className={composeClassName(
+      'w-full h-3 rounded-full bg-surface-container-high overflow-hidden relative border border-outline-variant',
+      className
+    )}
+    {...props}
+  />
+));
+MeterTrack.displayName = 'MeterTrack';
+
+export const MeterIndicator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMeter.Indicator> & {
+    colorRole?: MeterProps['colorRole'];
+  }
+>(({ className, colorRole: colorRoleProp, ...props }, ref) => {
+  const { colorRole: contextColorRole } = React.useContext(MeterContext);
+  const resolvedRole = colorRoleProp ?? contextColorRole;
+  return (
+    <BaseMeter.Indicator
+      ref={ref}
+      data-slot="meter-indicator"
+      className={composeClassName(
+        cn(
+          'h-full transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none forced-colors:bg-[Highlight]',
+          colorRoleClasses[resolvedRole]
+        ),
+        className
+      )}
+      {...props}
+    />
+  );
+});
+MeterIndicator.displayName = 'MeterIndicator';
+
 const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
   value,
   min = 0,
@@ -50,42 +138,48 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
   // Composable compound usage
   if (children) {
     return (
-      <BaseMeter.Root
+      <MeterRoot
         ref={ref}
         value={value}
         min={min}
         max={max}
         format={format}
         locale={locale}
+        colorRole={colorRole}
         {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
         getAriaValueText={getAriaValueText}
-        className={composeClassName('flex flex-col gap-1.5 w-full', className)}
+        className={className}
         {...props}
       >
         {children}
-      </BaseMeter.Root>
+      </MeterRoot>
     );
   }
 
   return (
-    <BaseMeter.Root
+    <MeterRoot
       ref={ref}
       value={value}
       min={min}
       max={max}
       format={format}
       locale={locale}
+      colorRole={colorRole}
       {...(ariaValueText !== undefined ? { 'aria-valuetext': ariaValueText } : {})}
       getAriaValueText={getAriaValueText}
-      className={composeClassName('flex flex-col gap-1.5 w-full', className)}
+      className={className}
       {...props}
     >
       {(label || value !== undefined) && (
         <div className="flex items-center justify-between font-label text-sm font-semibold text-on-surface">
-          {label && <BaseMeter.Label>{label}</BaseMeter.Label>}
-          <BaseMeter.Value className="font-mono text-sm font-bold text-on-surface tabular-nums">
-            {(formattedValue, val) => formattedValue || `${val}%`}
-          </BaseMeter.Value>
+          {label && <MeterLabel>{label}</MeterLabel>}
+          <MeterValue>
+            {(formattedValue, val) => {
+              if (formattedValue) return formattedValue;
+              const pct = max === min ? 0 : Math.round(((val - min) / (max - min)) * 100);
+              return `${pct}%`;
+            }}
+          </MeterValue>
         </div>
       )}
       {description && (
@@ -93,15 +187,10 @@ const MeterComponent = React.forwardRef<HTMLDivElement, MeterProps>(({
           {description}
         </span>
       )}
-      <BaseMeter.Track className="w-full h-3 rounded-full bg-surface-container-high overflow-hidden relative border border-outline-variant">
-        <BaseMeter.Indicator
-          className={cn(
-            'h-full transition-[width] duration-[var(--duration-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-            colorRoleClasses[colorRole]
-          )}
-        />
-      </BaseMeter.Track>
-    </BaseMeter.Root>
+      <MeterTrack>
+        <MeterIndicator colorRole={colorRole} />
+      </MeterTrack>
+    </MeterRoot>
   );
 });
 
@@ -109,19 +198,14 @@ MeterComponent.displayName = 'Meter';
 
 // Compound export mapping Base UI primitives
 export const Meter = Object.assign(MeterComponent, {
-  Root: BaseMeter.Root,
-  Track: BaseMeter.Track,
-  Indicator: BaseMeter.Indicator,
-  Value: BaseMeter.Value,
-  Label: BaseMeter.Label,
+  Root: MeterRoot,
+  Track: MeterTrack,
+  Indicator: MeterIndicator,
+  Value: MeterValue,
+  Label: MeterLabel,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseMeter };
-export const MeterRoot = BaseMeter.Root;
-export const MeterLabel = BaseMeter.Label;
-export const MeterValue = BaseMeter.Value;
-export const MeterTrack = BaseMeter.Track;
-export const MeterIndicator = BaseMeter.Indicator;
 
 export default Meter;

@@ -135,6 +135,7 @@
   --spacing-margin-tablet: var(--margin-tablet);
   --spacing-margin-desktop: var(--margin-desktop);
   --container-measure: var(--measure);
+  --container-page: var(--container-max);
   --spacing-container-max: var(--container-max);
 }
 
@@ -201,7 +202,7 @@
   --margin-desktop: 4rem;
   --container-max: 80rem;
   --measure: 40rem;
-  --header-height: 4rem;
+  --header-height: 4.5rem;
 }
 
 /* Document-level overscroll containment, sticky anchor clearance & motion rules (Good CSS #45, #46) */
@@ -223,13 +224,33 @@ html {
   }
 }
 
-/* Global reduced-motion transition guard: collapses CSS transition durations without stripping functional transforms or loading spinners */
+/* Global reduced-motion guard: collapses CSS transition durations & one-shot keyframes (preserving end-states/animationend) and disables infinite decorative sweeps */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
     transition-delay: 0ms !important;
+  }
+
+  .animate-badge-pop,
+  .animate-error-shake,
+  .animate-text-reveal,
+  .animate-step-forward,
+  .animate-step-backward,
+  .animate-roll-up,
+  .animate-roll-down,
+  .animate-check-pop,
+  .animate-success-check,
+  .animate-check-draw,
+  .animate-digit-pop {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .animate-shimmer-sweep {
+    animation: none !important;
   }
 }
 
@@ -390,7 +411,7 @@ html {
   [data-slot="prompt-input"] :where(input, textarea),
   [data-slot="combobox-input-group"] :where(input),
   [data-slot="autocomplete-input-group"] :where(input),
-  [data-slot="number-field-group"] :where(input, button) {
+  [data-slot="number-field-group"] :where(input) {
     outline: none;
     box-shadow: none;
   }
@@ -402,9 +423,14 @@ html {
   [data-slot="combobox-input-group"] :where(input):focus-visible,
   [data-slot="autocomplete-input-group"] :where(input):focus,
   [data-slot="autocomplete-input-group"] :where(input):focus-visible,
-  [data-slot="number-field-group"] :where(input, button):focus,
-  [data-slot="number-field-group"] :where(input, button):focus-visible {
+  [data-slot="number-field-group"] :where(input):focus,
+  [data-slot="number-field-group"] :where(input):focus-visible {
     outline: none;
+    box-shadow: none;
+  }
+  [data-slot="number-field-group"] button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
     box-shadow: none;
   }
 
@@ -1136,7 +1162,13 @@ select:autofill {
   }
 
   .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)):hover {
-    color: color-mix(in srgb, var(--primary) 85%, black);
+    color: color-mix(in oklch, var(--primary) 85%, black);
+  }
+
+  /* Responsive horizontal scroll wrapper for markdown/HTML tables (keeps semantic <table> display intact) */
+  .typeset-table-wrap {
+    overflow-x: auto;
+    max-width: 100%;
   }
 
   /* Tables */
@@ -1179,6 +1211,40 @@ select:autofill {
 
   .typeset :where(.not-typeset, [data-not-typeset]) p:last-child {
     margin-bottom: 0;
+  }
+
+  /* Inverted surface overrides so .typeset prose inside <Card prominence="inverted"> stays high-contrast */
+  [data-surface="inverted"] .typeset,
+  [data-prominence="inverted"] .typeset {
+    color: var(--on-neutral);
+  }
+  [data-surface="inverted"] .typeset :is(h1, h2, h3, h4, h5, p, ul, ol, th):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)),
+  [data-prominence="inverted"] .typeset :is(h1, h2, h3, h4, h5, p, ul, ol, th):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    color: var(--on-neutral);
+  }
+  [data-surface="inverted"] .typeset :is(h6, blockquote):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)),
+  [data-surface="inverted"] .typeset li:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *))::marker,
+  [data-prominence="inverted"] .typeset :is(h6, blockquote):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)),
+  [data-prominence="inverted"] .typeset li:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *))::marker {
+    color: color-mix(in oklch, var(--on-neutral) 82%, transparent);
+  }
+  [data-surface="inverted"] .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)),
+  [data-prominence="inverted"] .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    color: var(--tertiary);
+  }
+  [data-surface="inverted"] .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)):hover,
+  [data-prominence="inverted"] .typeset a:not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)):hover {
+    color: color-mix(in oklch, var(--tertiary) 85%, white);
+  }
+  [data-surface="inverted"] .typeset :is(code, pre):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)),
+  [data-prominence="inverted"] .typeset :is(code, pre):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    background-color: color-mix(in oklch, var(--on-neutral) 12%, transparent);
+    color: var(--on-neutral);
+    border-color: color-mix(in oklch, var(--on-neutral) 25%, transparent);
+  }
+  [data-surface="inverted"] .typeset :is(th, td, hr):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)),
+  [data-prominence="inverted"] .typeset :is(th, td, hr):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
+    border-color: color-mix(in oklch, var(--on-neutral) 25%, transparent);
   }
 
   /* Prevent double-stacking vertical margin with flex/grid gap-* layouts */
@@ -1293,6 +1359,13 @@ select:autofill {
   text-underline-offset: 2px;
 }
 
+@media (forced-colors: active) {
+  ::highlight(search-results) {
+    background-color: Mark;
+    color: MarkText;
+  }
+}
+
 /* State-Aware Sticky Header: compositor-driven stuck elevation (MWG: state-aware-sticky-headers) */
 .sticky-scroll-container {
   position: sticky;
@@ -1325,6 +1398,13 @@ select:autofill {
     color: var(--on-primary-container);
     font-weight: 600;
     border-color: var(--primary);
+  }
+
+  @media (forced-colors: active) {
+    .scrollspy-link[aria-current="true"] {
+      border-inline-start: 3px solid Highlight;
+      outline: 1px solid Highlight;
+    }
   }
 }
 
@@ -1515,10 +1595,6 @@ select:autofill {
   interpolate-size: allow-keywords;
 }
 
-
-
-
-
 /* ============================================================================
  * Modern Web Guidance 1.0 Enhancements
  * ============================================================================ */
@@ -1552,6 +1628,7 @@ select:autofill {
 
 /* Normalize fallback x-height strictly on typography classes (never *, body, or icon fonts) */
 .font-sans,
+.font-label,
 .font-heading,
 .font-mono,
 .typeset {
@@ -1632,6 +1709,13 @@ select:autofill {
 [dir="rtl"] .scroll-shadow-x,
 :dir(rtl) .scroll-shadow-x {
   background-size: var(--fade-end, 0px) 100%, var(--fade-start, 0px) 100%;
+}
+
+@media (forced-colors: active) {
+  .scroll-shadow-x {
+    background-image: none;
+    border: 1px solid CanvasText;
+  }
 }
 
 /* 4. Higher-Order Density Token Reactivity (MWG: design-token-reactivity)

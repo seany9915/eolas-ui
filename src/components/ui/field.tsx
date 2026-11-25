@@ -243,7 +243,7 @@ export const FieldError = React.forwardRef<HTMLDivElement, FieldErrorProps>(
         match={resolvedMatch}
         className={composeClassName(
           cn(
-            'flex gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-quick',
+            'flex gap-1.5 text-sm font-semibold text-error font-sans data-[starting-style]:opacity-0 transition-opacity duration-quick motion-reduce:transition-none',
             isMultipleErrors ? 'items-start' : 'items-center'
           ),
           className
@@ -253,7 +253,7 @@ export const FieldError = React.forwardRef<HTMLDivElement, FieldErrorProps>(
           ((elementProps) => (
             <div {...elementProps}>
               <Icon name="error" size="sm" className={cn('shrink-0 text-error', isMultipleErrors && 'mt-0.5')} />
-              <span>{elementProps.children}</span>
+              <div className="min-w-0 flex-1">{elementProps.children}</div>
             </div>
           ))
         }
@@ -292,8 +292,45 @@ export interface FieldProps extends React.ComponentPropsWithoutRef<typeof BaseFi
   hint?: React.ReactNode;
   error?: React.ReactNode;
   required?: boolean;
+  requiredLabel?: React.ReactNode;
   orientation?: FieldOrientation;
   children: React.ReactNode;
+}
+
+function hasFieldCompoundChildren(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false;
+    const t = child.type;
+    if (
+      t === FieldLabel ||
+      t === FieldTitle ||
+      t === FieldControl ||
+      t === FieldDescription ||
+      t === FieldContent ||
+      t === FieldError ||
+      t === FieldItem ||
+      t === BaseField.Label ||
+      t === BaseField.Control ||
+      t === BaseField.Description ||
+      t === BaseField.Error ||
+      t === BaseField.Item
+    ) {
+      return true;
+    }
+    const name = typeof t === 'function' || typeof t === 'object' ? (t as { displayName?: string }).displayName : undefined;
+    return Boolean(name && /^Field(Label|Title|Control|Description|Content|Error|Item)/.test(name));
+  });
+}
+
+function canAcceptNativeRequired(child: React.ReactNode): child is React.ReactElement<{ required?: boolean }> {
+  if (!React.isValidElement<{ required?: boolean }>(child)) return false;
+  if (child.props.required !== undefined) return false;
+  if (typeof child.type === 'string') {
+    return child.type === 'input' || child.type === 'select' || child.type === 'textarea';
+  }
+  const displayName = (child.type as { displayName?: string }).displayName;
+  if (displayName === 'InputGroup' || displayName === 'InputGroupRoot') return false;
+  return true;
 }
 
 const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
@@ -304,6 +341,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
       hint,
       error,
       required,
+      requiredLabel = '(required)',
       orientation = 'vertical',
       children,
       className,
@@ -318,10 +356,16 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
     ref
   ) => {
     const helperText = description ?? hint;
+    const isCompoundUsage =
+      label === undefined &&
+      helperText === undefined &&
+      error === undefined &&
+      hasFieldCompoundChildren(children);
 
-    // Forward `required` to a single direct control child so native validation matches the label.
+    // Forward `required` to a single direct control child so native validation matches the label,
+    // skipping layout wrappers like InputGroup or raw HTML containers.
     const control =
-      required && React.isValidElement<{ required?: boolean }>(children) && children.props.required === undefined
+      required && canAcceptNativeRequired(children)
         ? React.cloneElement(children, { required: true })
         : children;
 
@@ -338,15 +382,17 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
         className={className}
         {...props}
       >
-        {orientation === 'horizontal' || orientation === 'responsive' ? (
+        {isCompoundUsage ? (
+          children
+        ) : orientation === 'horizontal' || orientation === 'responsive' ? (
           <>
             {(label || helperText) && (
               <FieldContent>
                 {label && (
                   <FieldLabel>
                     <span>{label}</span>
-                    {required && (
-                      <span className="text-sm text-on-surface-variant font-normal">(required)</span>
+                    {required && requiredLabel !== null && (
+                      <span className="text-sm text-on-surface-variant font-normal">{requiredLabel}</span>
                     )}
                   </FieldLabel>
                 )}
@@ -360,8 +406,8 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
             {label && (
               <FieldLabel>
                 <span>{label}</span>
-                {required && (
-                  <span className="text-sm text-on-surface-variant font-normal">(required)</span>
+                {required && requiredLabel !== null && (
+                  <span className="text-sm text-on-surface-variant font-normal">{requiredLabel}</span>
                 )}
               </FieldLabel>
             )}
@@ -370,11 +416,7 @@ const FieldComponent = React.forwardRef<HTMLDivElement, FieldProps>(
           </>
         )}
 
-        {error ? (
-          <FieldError match={true}>{error}</FieldError>
-        ) : (
-          <FieldError />
-        )}
+        {!isCompoundUsage && (error ? <FieldError match={true}>{error}</FieldError> : <FieldError />)}
       </FieldRoot>
     );
   }

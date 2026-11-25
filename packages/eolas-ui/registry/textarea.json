@@ -3,7 +3,7 @@
   "name": "textarea",
   "type": "registry:ui",
   "title": "Textarea",
-  "description": "Textarea primitive.",
+  "description": "Multi-line text input with clean focus rings, error states, and consistent clinical typography tokens.",
   "categories": [
     "inputs"
   ],

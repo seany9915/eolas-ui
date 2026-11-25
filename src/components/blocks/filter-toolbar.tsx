@@ -31,7 +31,7 @@ export interface ActiveFilterTag {
   valueLabel: string;
 }
 
-export interface FilterToolbarProps {
+export interface FilterToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   searchLabel?: string;
@@ -41,102 +41,178 @@ export interface FilterToolbarProps {
   activeFilters?: ActiveFilterTag[];
   onRemoveFilter?: (filterId: string) => void;
   onReset?: () => void;
+  resetLabel?: string;
+  activeFiltersLabel?: string;
+  removeFilterLabel?: (filter: ActiveFilterTag) => string;
   actions?: React.ReactNode;
   className?: string;
 }
 
-export function FilterToolbar({
-  searchQuery,
-  onSearchChange,
-  searchLabel = 'Search',
-  searchPlaceholder = 'Search...',
-  filterGroups = [],
-  onFilterChange,
-  activeFilters = [],
-  onRemoveFilter,
-  onReset,
-  actions,
-  className,
-}: FilterToolbarProps) {
-  const hasActiveFilters =
-    searchQuery.trim().length > 0 ||
-    activeFilters.length > 0 ||
-    filterGroups.some((group) => group.value !== (group.defaultValue ?? ''));
+export const FilterToolbar = React.forwardRef<HTMLDivElement, FilterToolbarProps>(
+  (
+    {
+      searchQuery,
+      onSearchChange,
+      searchLabel = 'Search',
+      searchPlaceholder = 'Search...',
+      filterGroups = [],
+      onFilterChange,
+      activeFilters = [],
+      onRemoveFilter,
+      onReset,
+      resetLabel = 'Reset',
+      activeFiltersLabel = 'Active filters:',
+      removeFilterLabel,
+      actions,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const baseId = React.useId();
+    const searchInputId = `${baseId}-search`;
+    const searchInputRef = React.useRef<HTMLInputElement | null>(null);
+    const resetButtonRef = React.useRef<HTMLButtonElement | null>(null);
+    const chipNodeRefs = React.useRef<Map<string, HTMLElement | null>>(new Map());
+    const focusRafRef = React.useRef<number | null>(null);
 
-  return (
-    <div className={cn('@container flex w-full flex-col gap-3', className)}>
-      <div className="flex flex-col @2xl:flex-row items-stretch @2xl:items-center justify-between gap-3">
-        {/* Search input with accessible Field label and native-safe clear trigger */}
-        <Field.Root className="w-full min-w-0 @2xl:flex-1 @2xl:min-w-48">
-          <Field.Label className="sr-only">{searchLabel}</Field.Label>
-          <Input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            leadingIcon={<Icon name="search" size="md" aria-hidden="true" />}
-            clearable
-            onClear={() => onSearchChange('')}
-            className="w-full"
-          />
-        </Field.Root>
+    React.useEffect(() => {
+      return () => {
+        if (focusRafRef.current !== null) {
+          cancelAnimationFrame(focusRafRef.current);
+        }
+      };
+    }, []);
 
-        {/* Filter dropdowns and actions */}
-        <div className="flex flex-wrap items-center gap-2 w-full @2xl:w-auto min-w-0 max-w-full">
-          {filterGroups.map((group) => (
-            <Field.Root key={group.id} className="w-full min-w-0 max-w-full @xs:w-auto @xs:min-w-36">
-              <Field.Label className="sr-only">{group.label}</Field.Label>
-              <Select
-                value={group.value}
-                onValueChange={(val) => {
-                  if (val != null && onFilterChange) {
-                    onFilterChange(group.id, val);
+    const hasActiveFilters =
+      searchQuery.trim().length > 0 ||
+      activeFilters.length > 0 ||
+      filterGroups.some((group) => group.value !== (group.defaultValue ?? ''));
+
+    const handleRemoveChip = (filterId: string, index: number) => {
+      const nextFilterId = activeFilters[index + 1]?.id ?? activeFilters[index - 1]?.id ?? null;
+      onRemoveFilter?.(filterId);
+
+      if (focusRafRef.current !== null) {
+        cancelAnimationFrame(focusRafRef.current);
+      }
+      focusRafRef.current = window.requestAnimationFrame(() => {
+        focusRafRef.current = null;
+        if (nextFilterId) {
+          const nextNode = chipNodeRefs.current.get(nextFilterId);
+          const focusTarget = nextNode?.querySelector<HTMLElement>('button') ?? nextNode;
+          if (focusTarget) {
+            focusTarget.focus();
+            return;
+          }
+        }
+        if (resetButtonRef.current) {
+          resetButtonRef.current.focus();
+          return;
+        }
+        searchInputRef.current?.focus();
+      });
+    };
+
+    return (
+      <div ref={ref} data-slot="filter-toolbar" className={cn('@container flex w-full flex-col gap-3', className)} {...props}>
+        <div className="flex flex-col @2xl:flex-row items-stretch @2xl:items-center justify-between gap-3">
+          {/* Search input with accessible Field label and native-safe clear trigger */}
+          <Field.Root className="w-full min-w-0 @2xl:flex-1 @2xl:min-w-48">
+            <Field.Label htmlFor={searchInputId} className="sr-only">
+              {searchLabel}
+            </Field.Label>
+            <Input
+              ref={searchInputRef}
+              id={searchInputId}
+              type="search"
+              enterKeyHint="search"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={searchPlaceholder}
+              leadingIcon={<Icon name="search" size="md" aria-hidden="true" />}
+              clearable
+              onClear={() => onSearchChange('')}
+              className="w-full"
+            />
+          </Field.Root>
+
+          {/* Filter dropdowns and actions */}
+          <div className="flex flex-wrap items-center gap-2 w-full @2xl:w-auto min-w-0 max-w-full">
+            {filterGroups.map((group, idx) => {
+              const selectId = `${baseId}-filter-${idx}`;
+              return (
+                <Field.Root key={group.id} className="w-full min-w-0 max-w-full @xs:w-auto @xs:min-w-36">
+                  <Field.Label htmlFor={selectId} className="sr-only">
+                    {group.label}
+                  </Field.Label>
+                  <Select
+                    id={selectId}
+                    value={group.value}
+                    onValueChange={(val) => {
+                      if (val != null && onFilterChange) {
+                        onFilterChange(group.id, val);
+                      }
+                    }}
+                    options={group.options}
+                    placeholder={group.label}
+                    aria-label={group.label}
+                  />
+                </Field.Root>
+              );
+            })}
+
+            {hasActiveFilters && onReset && (
+              <Button
+                ref={resetButtonRef}
+                variant="outline"
+                colorRole="neutral"
+                onClick={onReset}
+              >
+                <Icon name="restart_alt" size="sm" aria-hidden="true" />
+                {resetLabel}
+              </Button>
+            )}
+
+            {actions}
+          </div>
+        </div>
+
+        {/* Active Filter Chips */}
+        {activeFilters.length > 0 && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-3 pt-1">
+            <span className="font-sans text-label-sm text-on-surface-variant">
+              {activeFiltersLabel}
+            </span>
+            {activeFilters.map((filter, idx) => (
+              <Chip
+                key={filter.id}
+                ref={(node) => {
+                  if (node) {
+                    chipNodeRefs.current.set(filter.id, node);
+                  } else {
+                    chipNodeRefs.current.delete(filter.id);
                   }
                 }}
-                options={group.options}
-                placeholder={group.label}
-                aria-label={group.label}
-              />
-            </Field.Root>
-          ))}
-
-          {hasActiveFilters && onReset && (
-            <Button
-              variant="outline"
-              colorRole="neutral"
-              onClick={onReset}
-            >
-              <Icon name="restart_alt" size="sm" aria-hidden="true" />
-              Reset
-            </Button>
-          )}
-
-          {actions}
-        </div>
+                variant="outline"
+                colorRole="primary"
+                onRemove={onRemoveFilter ? () => handleRemoveChip(filter.id, idx) : undefined}
+                removeLabel={
+                  removeFilterLabel
+                    ? removeFilterLabel(filter)
+                    : `Remove ${filter.label} filter: ${filter.valueLabel}`
+                }
+              >
+                <span className="font-normal">{filter.label}:</span>{' '}
+                <span className="font-semibold">{filter.valueLabel}</span>
+              </Chip>
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* Active Filter Chips */}
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="font-sans text-label-sm text-on-surface-variant">
-            Active filters:
-          </span>
-          {activeFilters.map((filter) => (
-            <Chip
-              key={filter.id}
-              variant="outline"
-              colorRole="primary"
-              onRemove={onRemoveFilter ? () => onRemoveFilter(filter.id) : undefined}
-              removeLabel={`Remove ${filter.label} filter: ${filter.valueLabel}`}
-            >
-              <span className="font-medium opacity-80">{filter.label}:</span>{' '}
-              <span className="font-semibold">{filter.valueLabel}</span>
-            </Chip>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+    );
+  }
+);
+FilterToolbar.displayName = 'FilterToolbar';
 
 export default FilterToolbar;

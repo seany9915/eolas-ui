@@ -19,6 +19,7 @@
  */
 import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
+import { useRender } from '@base-ui/react/use-render';
 import { Icon } from './icon';
 import { Button } from './button';
 import { ShimmerText } from './shimmer-text';
@@ -133,33 +134,36 @@ TraceRoot.displayName = 'Trace.Root';
 /* -------------------------------------------------------------------------------------------------
  * TraceLine (Single execution line)
  * -----------------------------------------------------------------------------------------------*/
-export interface TraceLineProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TraceLineProps extends React.HTMLAttributes<HTMLElement> {
   status?: TraceStatus;
+  render?: useRender.RenderProp;
   children?: React.ReactNode;
   className?: string;
 }
 
 export const TraceLine = React.forwardRef<HTMLDivElement, TraceLineProps>(
-  ({ status = 'default', children, className, ...props }, ref) => {
-    return (
-      <TraceLineContext.Provider value={{ status }}>
-        <div
-          ref={ref}
-          data-slot="trace-line"
-          data-status={status}
-          className={cn(
-            'flex items-center gap-2.5 px-3.5 py-2.5 min-h-[44px] text-xs font-sans text-on-surface transition-colors w-full',
-            '[[data-slot=trace-collapsible-trigger]_&]:px-0 [[data-slot=trace-collapsible-trigger]_&]:py-0 [[data-slot=trace-collapsible-trigger]_&]:min-h-0',
-            status === 'pending' && 'text-on-surface-variant',
-            status === 'error' && 'text-error',
-            className
-          )}
-          {...props}
-        >
-          {children}
-        </div>
-      </TraceLineContext.Provider>
+  ({ status = 'default', render, children, className, ...props }, ref) => {
+    const content = (
+      <TraceLineContext.Provider value={{ status }}>{children}</TraceLineContext.Provider>
     );
+    return useRender({
+      render,
+      ref,
+      defaultTagName: 'div',
+      props: {
+        'data-slot': 'trace-line',
+        'data-status': status,
+        className: cn(
+          'flex items-center gap-2.5 px-3.5 py-2.5 min-h-[44px] text-xs font-sans text-on-surface transition-colors motion-reduce:transition-none w-full',
+          '[[data-slot=trace-collapsible-trigger]_&]:px-0 [[data-slot=trace-collapsible-trigger]_&]:py-0 [[data-slot=trace-collapsible-trigger]_&]:min-h-0',
+          status === 'pending' && 'text-on-surface-variant',
+          status === 'error' && 'text-error',
+          className
+        ),
+        children: content,
+        ...props,
+      },
+    });
   }
 );
 TraceLine.displayName = 'Trace.Line';
@@ -215,10 +219,10 @@ export const TraceIcon = React.forwardRef<HTMLSpanElement, TraceIconProps>(
                 'size-6 rounded-full text-xs font-medium',
                 stepNumber !== undefined &&
                   'border border-outline-variant/60 bg-surface-container-high text-on-surface font-mono text-xs font-semibold leading-none',
-                stepNumber === undefined && isComplete && 'bg-success-container text-on-success-container font-bold',
+                stepNumber === undefined && isComplete && 'bg-success-container text-on-success-container font-semibold',
                 stepNumber === undefined && resolvedStatus === 'running' && 'bg-surface-container-high text-on-surface-variant',
-                stepNumber === undefined && resolvedStatus === 'warning' && 'bg-warning-container text-on-warning-container font-bold',
-                stepNumber === undefined && resolvedStatus === 'error' && 'bg-error-container text-on-error-container font-bold',
+                stepNumber === undefined && resolvedStatus === 'warning' && 'bg-warning-container text-on-warning-container font-semibold',
+                stepNumber === undefined && resolvedStatus === 'error' && 'bg-error-container text-on-error-container font-semibold',
                 stepNumber === undefined && resolvedStatus === 'pending' && 'bg-surface-container-high text-on-surface-variant/90 border border-outline/40',
                 stepNumber === undefined && resolvedStatus === 'cancelled' && 'bg-surface-container-high text-on-surface-variant/70 border border-outline-variant',
                 stepNumber === undefined && resolvedStatus === 'default' && 'bg-surface-container-high text-on-surface-variant'
@@ -438,15 +442,15 @@ export const TraceCollapsibleTrigger = React.forwardRef<
       className={composeClassName(
         cn(
           'group flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 cursor-pointer text-start',
-          'hover:bg-state-hover transition-colors',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'hover:bg-state-hover transition-colors motion-reduce:transition-none',
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
           'disabled:cursor-not-allowed disabled:opacity-60'
         ),
         className
       )}
       {...props}
     >
-      <div className="flex-1 min-w-0 flex items-center gap-2.5">{children}</div>
+      <span className="flex-1 min-w-0 flex items-center gap-2.5">{children}</span>
       {!hideChevron && (
         <span
           className="flex items-center justify-center size-5 ms-2 text-on-surface-variant/80 shrink-0 group-hover:text-on-surface group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none"

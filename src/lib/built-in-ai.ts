@@ -186,6 +186,40 @@ function isTranslatorOptions(value: unknown): value is TranslatorOptions {
   );
 }
 
+const emptySubscribe = () => () => {};
+
+function getLanguageModelFactory(): LanguageModelFactory | undefined {
+  return typeof window !== 'undefined' ? window.LanguageModel : undefined;
+}
+
+function getLanguageDetectorFactory(): LanguageDetectorFactory | undefined {
+  return typeof window !== 'undefined' ? window.LanguageDetector : undefined;
+}
+
+function getSummarizerFactory(): SummarizerFactory | undefined {
+  return typeof window !== 'undefined' ? window.Summarizer : undefined;
+}
+
+function getTranslatorFactory(): TranslatorFactory | undefined {
+  return typeof window !== 'undefined' ? window.Translator : undefined;
+}
+
+function resolveDownloadPercent(event: DownloadProgressEvent): number | null {
+  if (typeof event.total === 'number' && event.total > 0 && Number.isFinite(event.loaded)) {
+    return Math.min(100, Math.max(0, Math.round((event.loaded / event.total) * 100)));
+  }
+  if (
+    event.total === 0 &&
+    typeof event.loaded === 'number' &&
+    Number.isFinite(event.loaded) &&
+    event.loaded >= 0 &&
+    event.loaded <= 1
+  ) {
+    return Math.round(event.loaded * 100);
+  }
+  return null;
+}
+
 interface DestroyableInstance {
   destroy?(): void;
 }
@@ -283,63 +317,75 @@ function useBuiltInAiSession<TInstance extends DestroyableInstance, TOptions ext
         return pendingRef.current.promise;
       }
 
-      // Gate user activation strictly when model download is required ('downloadable').
-      // Never block already-'available' on-device models.
-      const status = await factory.availability(mergedOptions);
-      if (mountedRef.current) {
-        setAvailability(status);
-      }
-      if (status === 'unavailable') {
-        throw new Error(unsupportedMessage);
-      }
-      if (
-        status === 'downloadable' &&
-        typeof navigator !== 'undefined' &&
-        navigator.userActivation &&
-        !navigator.userActivation.isActive
-      ) {
-        throw new DOMException(
-          'Downloading this on-device AI model requires an active user gesture.',
-          'NotAllowedError'
-        );
-      }
-
-      if (instanceRef.current) {
-        instanceRef.current.destroy?.();
-        instanceRef.current = null;
-        activeOptionsKeyRef.current = '';
-      }
-
       const expectedGen = ++generationRef.current;
-      const createPromise = factory
-        .create({
+
+      const createPromise = (async (): Promise<TInstance> => {
+        // Gate user activation strictly when model download is required ('downloadable').
+        // Never block already-'available' on-device models.
+        const status = await factory.availability(mergedOptions);
+        if (mountedRef.current) {
+          setAvailability(status);
+        }
+        if (status === 'unavailable') {
+          throw new Error(unsupportedMessage);
+        }
+        if (
+          status === 'downloadable' &&
+          typeof navigator !== 'undefined' &&
+          navigator.userActivation &&
+          !navigator.userActivation.isActive
+        ) {
+          throw new DOMException(
+            'Downloading this on-device AI model requires an active user gesture.',
+            'NotAllowedError'
+          );
+        }
+
+        if (!mountedRef.current || generationRef.current !== expectedGen) {
+          throw new DOMException('AI session creation superseded or unmounted', 'AbortError');
+        }
+
+        if (instanceRef.current) {
+          instanceRef.current.destroy?.();
+          instanceRef.current = null;
+          activeOptionsKeyRef.current = '';
+        }
+
+        const instance = await factory.create({
           ...(mergedOptions as TOptions),
           monitor(m: ModelMonitor) {
             m.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
-              if (e.total > 0 && mountedRef.current && generationRef.current === expectedGen) {
-                setDownloadProgress(Math.round((e.loaded / e.total) * 100));
+              if (!mountedRef.current || generationRef.current !== expectedGen) return;
+              const percent = resolveDownloadPercent(e);
+              if (percent !== null) {
+                setDownloadProgress(percent);
               }
             });
           },
-        })
-        .then((instance) => {
-          if (!mountedRef.current || generationRef.current !== expectedGen) {
-            instance.destroy?.();
-            throw new DOMException('AI session creation superseded or unmounted', 'AbortError');
-          }
-          instanceRef.current = instance;
-          activeOptionsKeyRef.current = targetKey;
-          if (pendingRef.current?.promise === createPromise) {
-            pendingRef.current = null;
-          }
+        });
+
+        if (!mountedRef.current || generationRef.current !== expectedGen) {
+          instance.destroy?.();
+          throw new DOMException('AI session creation superseded or unmounted', 'AbortError');
+        }
+
+        instanceRef.current = instance;
+        activeOptionsKeyRef.current = targetKey;
+        if (mountedRef.current) {
           setDownloadProgress(null);
-          return instance;
-        })
+        }
+        return instance;
+      })()
         .catch((err) => {
-          if (pendingRef.current?.promise === createPromise) {
-            pendingRef.current = null;
+          if (mountedRef.current && generationRef.current === expectedGen) {
+            setDownloadProgress(null);
           }
           throw err;
+        })
+        .finally(() => {
+          if (pendingRef.current?.promise === createPromise) {
+            pendingRef.current = null;
+          }
         });
 
       pendingRef.current = { key: targetKey, promise: createPromise };
@@ -354,6 +400,7 @@ function useBuiltInAiSession<TInstance extends DestroyableInstance, TOptions ext
     downloadProgress,
     error,
     setError,
+    mountedRef,
     getOrCreateInstance,
   };
 }
@@ -366,10 +413,11 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
   const [inputUsage, setInputUsage] = React.useState<number | null>(null);
   const [inputQuota, setInputQuota] = React.useState<number | null>(null);
 
-  const factory = React.useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
-    return window.LanguageModel;
-  }, []);
+  const factory = React.useSyncExternalStore(
+    emptySubscribe,
+    getLanguageModelFactory,
+    () => undefined
+  );
 
   const normalizedDefaultOptions = React.useMemo(
     () => normalizeLanguageModelOptions(defaultOptions),
@@ -382,6 +430,7 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
     downloadProgress,
     error,
     setError,
+    mountedRef,
     getOrCreateInstance,
   } = useBuiltInAiSession<LanguageModelInstance, ChromeLanguageModelCreateOptions>(
     factory,
@@ -389,10 +438,14 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
     normalizedDefaultOptions
   );
 
-  const syncUsageMetrics = React.useCallback((model: LanguageModelInstance) => {
-    if (typeof model.inputUsage === 'number') setInputUsage(model.inputUsage);
-    if (typeof model.inputQuota === 'number') setInputQuota(model.inputQuota);
-  }, []);
+  const syncUsageMetrics = React.useCallback(
+    (model: LanguageModelInstance) => {
+      if (!mountedRef.current) return;
+      if (typeof model.inputUsage === 'number') setInputUsage(model.inputUsage);
+      if (typeof model.inputQuota === 'number') setInputQuota(model.inputQuota);
+    },
+    [mountedRef]
+  );
 
   const prompt = React.useCallback(
     async (
@@ -400,8 +453,10 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
       promptOpts?: LanguageModelPromptOptions,
       overrideOptions?: LanguageModelOptions
     ): Promise<string> => {
-      setIsPrompting(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsPrompting(true);
+        setError(null);
+      }
       try {
         const model = await getOrCreateInstance(normalizeLanguageModelOptions(overrideOptions));
         syncUsageMetrics(model);
@@ -410,13 +465,13 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
         return result;
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsPrompting(false);
+        if (mountedRef.current) setIsPrompting(false);
       }
     },
-    [getOrCreateInstance, setError, syncUsageMetrics]
+    [getOrCreateInstance, mountedRef, setError, syncUsageMetrics]
   );
 
   const promptStreaming = React.useCallback(
@@ -426,8 +481,10 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
       promptOpts?: LanguageModelPromptOptions,
       overrideOptions?: LanguageModelOptions
     ): Promise<string> => {
-      setIsPrompting(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsPrompting(true);
+        setError(null);
+      }
       let accumulated = '';
       try {
         const model = await getOrCreateInstance(normalizeLanguageModelOptions(overrideOptions));
@@ -441,13 +498,13 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
         return accumulated;
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsPrompting(false);
+        if (mountedRef.current) setIsPrompting(false);
       }
     },
-    [getOrCreateInstance, setError, syncUsageMetrics]
+    [getOrCreateInstance, mountedRef, setError, syncUsageMetrics]
   );
 
   const measureInputUsage = React.useCallback(
@@ -482,10 +539,11 @@ export function useLanguageModel(defaultOptions?: LanguageModelOptions) {
 export function useLanguageDetector() {
   const [isDetecting, setIsDetecting] = React.useState(false);
 
-  const factory = React.useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
-    return window.LanguageDetector;
-  }, []);
+  const factory = React.useSyncExternalStore(
+    emptySubscribe,
+    getLanguageDetectorFactory,
+    () => undefined
+  );
 
   const {
     isSupported,
@@ -493,6 +551,7 @@ export function useLanguageDetector() {
     downloadProgress,
     error,
     setError,
+    mountedRef,
     getOrCreateInstance,
   } = useBuiltInAiSession<LanguageDetectorInstance, {}>(
     factory,
@@ -501,20 +560,22 @@ export function useLanguageDetector() {
 
   const detect = React.useCallback(
     async (text: string, options?: DetectCallOptions): Promise<DetectedLanguageResult[]> => {
-      setIsDetecting(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsDetecting(true);
+        setError(null);
+      }
       try {
         const detector = await getOrCreateInstance();
         return await detector.detect(text, options);
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsDetecting(false);
+        if (mountedRef.current) setIsDetecting(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, mountedRef, setError]
   );
 
   return {
@@ -533,10 +594,11 @@ export function useLanguageDetector() {
 export function useSummarizer(defaultOptions?: SummarizerOptions) {
   const [isSummarizing, setIsSummarizing] = React.useState(false);
 
-  const factory = React.useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
-    return window.Summarizer;
-  }, []);
+  const factory = React.useSyncExternalStore(
+    emptySubscribe,
+    getSummarizerFactory,
+    () => undefined
+  );
 
   const {
     isSupported,
@@ -544,6 +606,7 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
     downloadProgress,
     error,
     setError,
+    mountedRef,
     getOrCreateInstance,
   } = useBuiltInAiSession<SummarizerInstance, SummarizerOptions>(
     factory,
@@ -557,20 +620,22 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
       contextOptions?: SummarizeContextOptions,
       overrideOptions?: SummarizerOptions
     ): Promise<string> => {
-      setIsSummarizing(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsSummarizing(true);
+        setError(null);
+      }
       try {
         const summarizer = await getOrCreateInstance(overrideOptions);
         return await summarizer.summarize(text, contextOptions);
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsSummarizing(false);
+        if (mountedRef.current) setIsSummarizing(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, mountedRef, setError]
   );
 
   const summarizeStreaming = React.useCallback(
@@ -580,8 +645,10 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
       contextOptions?: SummarizeContextOptions,
       overrideOptions?: SummarizerOptions
     ): Promise<string> => {
-      setIsSummarizing(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsSummarizing(true);
+        setError(null);
+      }
       let accumulated = '';
       try {
         const summarizer = await getOrCreateInstance(overrideOptions);
@@ -593,13 +660,13 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
         return accumulated;
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsSummarizing(false);
+        if (mountedRef.current) setIsSummarizing(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, mountedRef, setError]
   );
 
   return {
@@ -619,10 +686,11 @@ export function useSummarizer(defaultOptions?: SummarizerOptions) {
 export function useTranslator(defaultOptions?: TranslatorOptions) {
   const [isTranslating, setIsTranslating] = React.useState(false);
 
-  const factory = React.useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
-    return window.Translator;
-  }, []);
+  const factory = React.useSyncExternalStore(
+    emptySubscribe,
+    getTranslatorFactory,
+    () => undefined
+  );
 
   const {
     isSupported,
@@ -630,6 +698,7 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
     downloadProgress,
     error,
     setError,
+    mountedRef,
     getOrCreateInstance,
   } = useBuiltInAiSession<TranslatorInstance, TranslatorOptions>(
     factory,
@@ -645,8 +714,10 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
       optionsOrOverride?: TranslateCallOptions | TranslatorOptions,
       overrideOptions?: TranslatorOptions
     ): Promise<string> => {
-      setIsTranslating(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsTranslating(true);
+        setError(null);
+      }
       try {
         const resolvedOverride = isTranslatorOptions(optionsOrOverride)
           ? optionsOrOverride
@@ -660,13 +731,13 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
         return await translator.translate(text, callOptions);
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsTranslating(false);
+        if (mountedRef.current) setIsTranslating(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, mountedRef, setError]
   );
 
   const translateStreaming = React.useCallback(
@@ -676,8 +747,10 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
       optionsOrOverride?: TranslateCallOptions | TranslatorOptions,
       overrideOptions?: TranslatorOptions
     ): Promise<string> => {
-      setIsTranslating(true);
-      setError(null);
+      if (mountedRef.current) {
+        setIsTranslating(true);
+        setError(null);
+      }
       let accumulated = '';
       try {
         const resolvedOverride = isTranslatorOptions(optionsOrOverride)
@@ -697,13 +770,13 @@ export function useTranslator(defaultOptions?: TranslatorOptions) {
         return accumulated;
       } catch (err: unknown) {
         const parsed = err instanceof Error ? err : new Error(String(err));
-        setError(parsed);
+        if (mountedRef.current) setError(parsed);
         throw parsed;
       } finally {
-        setIsTranslating(false);
+        if (mountedRef.current) setIsTranslating(false);
       }
     },
-    [getOrCreateInstance, setError]
+    [getOrCreateInstance, mountedRef, setError]
   );
 
   return {

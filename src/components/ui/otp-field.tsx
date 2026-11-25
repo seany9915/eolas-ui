@@ -12,16 +12,20 @@
  *   WCAG 2.2 SC 2.5.8 compliant 44x44px/48x48px touch targets, and motion restraint.
  */
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 import { OTPField as BaseOTPField } from '@base-ui/react/otp-field';
 import { Field as BaseField } from '@base-ui/react/field';
 import { cn, composeClassName } from '@/lib/utils';
 import { useWebOtp } from '@/lib/use-web-otp';
 import { Icon } from './icon';
 
+export type OTPFieldSize = 'sm' | 'md' | 'lg';
+
 export interface OTPFieldProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseOTPField.Root>, 'onChange' | 'length'> {
   id?: string;
   center?: boolean;
+  size?: OTPFieldSize;
   label?: React.ReactNode;
   description?: React.ReactNode;
   error?: string;
@@ -80,9 +84,16 @@ function assignRef<T>(target: React.Ref<T> | undefined, value: T | null) {
   }
 }
 
+const otpSizeClasses: Record<OTPFieldSize, { single: string; wide: string }> = {
+  sm: { single: 'w-10 min-w-10 h-11 min-h-[44px] text-lg', wide: '@md:w-11 @sm:w-11' },
+  md: { single: 'w-10 min-w-10 h-12 min-h-[48px] text-xl', wide: '' },
+  lg: { single: 'w-12 min-w-12 h-14 min-h-[56px] text-2xl', wide: '@md:w-14 @sm:w-14' },
+};
+
 const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   id,
   center = false,
+  size = 'md',
   label,
   description,
   error,
@@ -162,28 +173,35 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
 
       // Deliver received SMS OTP through the first slot input so Base UI runs its native
       // uncontrolled/controlled pipeline (onValueChange, onValueComplete) without
-      // forcing controlled mode.
+      // forcing controlled mode, flushing synchronously before requestSubmit().
       const firstInput = rootRef.current?.querySelector<HTMLInputElement>('input');
       const nativeValueSetter = Object.getOwnPropertyDescriptor(
         HTMLInputElement.prototype,
         'value'
       )?.set;
       if (firstInput && nativeValueSetter) {
-        nativeValueSetter.call(firstInput, normalized);
-        firstInput.dispatchEvent(new Event('input', { bubbles: true }));
+        flushSync(() => {
+          nativeValueSetter.call(firstInput, normalized);
+          firstInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
         if (autoSubmit) {
           firstInput.form?.requestSubmit();
         }
         return;
       }
 
-      handleValueChange(normalized);
-      handleValueComplete(normalized);
+      flushSync(() => {
+        handleValueChange(normalized);
+        handleValueComplete(normalized);
+      });
       if (autoSubmit) {
         firstInput?.form?.requestSubmit();
       }
     },
   });
+
+  const sizeConfig = otpSizeClasses[size] || otpSizeClasses.md;
+  const responsiveWidthClass = size === 'md' ? (length > 6 ? '@md:w-12' : '@sm:w-12') : sizeConfig.wide;
 
   const otpRoot = (
     <BaseOTPField.Root
@@ -234,14 +252,15 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
               pattern={pattern}
               aria-label={idx === 0 ? undefined : `Character ${idx + 1} of ${length}`}
               className={cn(
-                'w-10 min-w-10 h-12 min-h-[48px] text-center font-mono text-xl font-bold tabular-nums rounded',
-                length > 6 ? '@md:w-12' : '@sm:w-12',
-                'border bg-surface text-on-surface transition-[border-color,box-shadow] shrink-0',
-                'border-outline hover:border-on-surface-variant/80',
-                'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+                'text-center font-mono font-bold tabular-nums rounded shrink-0',
+                sizeConfig.single,
+                responsiveWidthClass,
+                'border bg-surface text-on-surface transition-[border-color,box-shadow] motion-reduce:transition-none',
+                error
+                  ? 'border-error focus-visible:border-error focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-error'
+                  : 'border-outline hover:border-on-surface-variant/80 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
                 'disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
-                'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error',
-                error && 'border-error focus-visible:border-error focus-visible:outline-error'
+                'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error'
               )}
             />
           </React.Fragment>
@@ -282,8 +301,8 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       {otpRoot}
 
       {error ? (
-        <BaseField.Error match={true} className="text-xs text-error font-sans flex items-center gap-1 mt-1">
-          <Icon name="error" size="xs" className="leading-none text-error" />
+        <BaseField.Error match={true} className="text-sm text-error font-sans font-medium flex items-center gap-1.5 mt-1">
+          <Icon name="error" size="xs" className="leading-none text-error shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </BaseField.Error>
       ) : null}
@@ -293,17 +312,68 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
 
 OTPFieldComponent.displayName = 'OTPField';
 
+export const OTPFieldRoot = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseOTPField.Root>
+>(({ className, ...props }, ref) => (
+  <BaseOTPField.Root
+    ref={ref}
+    data-slot="otp-field"
+    className={composeClassName('flex flex-wrap max-w-full gap-1 @xs:gap-1.5 @sm:gap-2 items-center', className)}
+    {...props}
+  />
+));
+OTPFieldRoot.displayName = 'OTPFieldRoot';
+
+export const OTPFieldInput = React.forwardRef<
+  HTMLInputElement,
+  Omit<React.ComponentPropsWithoutRef<typeof BaseOTPField.Input>, 'size'> & { size?: OTPFieldSize; error?: boolean }
+>(({ className, size = 'md', error, ...props }, ref) => (
+  <BaseOTPField.Input
+    ref={ref}
+    data-slot="otp-field-input"
+    className={composeClassName(
+      cn(
+        'text-center font-mono font-bold tabular-nums rounded shrink-0',
+        otpSizeClasses[size].single,
+        'border bg-surface text-on-surface transition-[border-color,box-shadow] motion-reduce:transition-none',
+        error
+          ? 'border-error focus-visible:border-error focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-error'
+          : 'border-outline hover:border-on-surface-variant/80 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+        'disabled:bg-surface-container-low disabled:border-outline-variant disabled:text-on-surface-variant/60 disabled:cursor-not-allowed',
+        'data-[invalid]:border-error data-[invalid]:focus-visible:border-error data-[invalid]:focus-visible:outline-error'
+      ),
+      className
+    )}
+    {...props}
+  />
+));
+OTPFieldInput.displayName = 'OTPFieldInput';
+
+export const OTPFieldSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseOTPField.Separator>
+>(({ className, children, ...props }, ref) => (
+  <BaseOTPField.Separator
+    ref={ref}
+    data-slot="otp-field-separator"
+    className={composeClassName('text-on-surface-variant/60 flex items-center justify-center font-bold px-0.5 select-none', className)}
+    aria-hidden="true"
+    {...props}
+  >
+    {children ?? '–'}
+  </BaseOTPField.Separator>
+));
+OTPFieldSeparator.displayName = 'OTPFieldSeparator';
+
 // Compound export mapping Base UI primitives
 export const OTPField = Object.assign(OTPFieldComponent, {
-  Root: BaseOTPField.Root,
-  Input: BaseOTPField.Input,
-  Separator: BaseOTPField.Separator,
+  Root: OTPFieldRoot,
+  Input: OTPFieldInput,
+  Separator: OTPFieldSeparator,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseOTPField };
-export const OTPFieldRoot = BaseOTPField.Root;
-export const OTPFieldInput = BaseOTPField.Input;
-export const OTPFieldSeparator = BaseOTPField.Separator;
 
 export default OTPField;

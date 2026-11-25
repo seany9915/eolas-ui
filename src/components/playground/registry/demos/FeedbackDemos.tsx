@@ -9,7 +9,6 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { Empty } from '@/components/ui/empty';
-import { EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { ReadingProgress } from '@/components/ui/reading-progress';
 import { Button } from '@/components/ui/button';
@@ -462,24 +461,6 @@ export const EmptyDemo: React.FC<ComponentDemoProps> = () => {
           </Button>
         </Empty.Content>
       </Empty>
-    </div>
-  );
-};
-
-export const EmptyStateDemo: React.FC<ComponentDemoProps> = () => {
-  return (
-    <div className="w-full max-w-lg mx-auto py-6">
-      <EmptyState
-        icon="assignment"
-        title="No Practice Sessions Scheduled"
-        description="There are no upcoming practice sessions scheduled for today."
-        action={
-          <Button colorRole="primary" size="sm">
-            <Icon name="add" size="xs" />
-            <span>Schedule Session</span>
-          </Button>
-        }
-      />
     </div>
   );
 };

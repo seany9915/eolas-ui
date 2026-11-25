@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 
 export type InlineAlertRole = 'neutral' | 'warning' | 'error' | 'success';
@@ -94,21 +94,27 @@ InlineAlertAction.displayName = 'InlineAlertAction';
 export interface InlineAlertCloseProps extends React.ComponentPropsWithoutRef<typeof BaseButton> {}
 
 export const InlineAlertClose = React.forwardRef<HTMLButtonElement, InlineAlertCloseProps>(
-  ({ className, children, ...props }, ref) => (
-    <BaseButton
-      ref={ref}
-      type="button"
-      data-slot="inline-alert-close"
-      aria-label="Dismiss alert"
-      className={cn(
-        'shrink-0 min-h-[44px] min-w-[44px] size-11 -me-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none',
-        className
-      )}
-      {...props}
-    >
-      {children ?? <Icon name="close" size="md" aria-hidden="true" />}
-    </BaseButton>
-  )
+  ({ className, children, render, nativeButton, type, ...props }, ref) => {
+    const resolvedNativeButton = resolveNativeButton(render, nativeButton);
+    const resolvedType = type ?? (resolvedNativeButton === false ? undefined : 'button');
+    return (
+      <BaseButton
+        ref={ref}
+        {...(resolvedType !== undefined ? { type: resolvedType } : {})}
+        render={render}
+        nativeButton={resolvedNativeButton}
+        data-slot="inline-alert-close"
+        aria-label="Dismiss alert"
+        className={composeClassName(
+          'shrink-0 min-h-[44px] min-w-[44px] size-11 -me-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none',
+          className
+        )}
+        {...props}
+      >
+        {children ?? <Icon name="close" size="md" aria-hidden="true" />}
+      </BaseButton>
+    );
+  }
 );
 InlineAlertClose.displayName = 'InlineAlertClose';
 
@@ -133,10 +139,10 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   );
 
   const accentBorderClasses: Record<InlineAlertRole, string> = {
-    neutral: 'border-s-on-surface',
-    warning: 'border-s-warning',
-    error: 'border-s-error',
-    success: 'border-s-success',
+    neutral: 'before:border-s-on-surface',
+    warning: 'before:border-s-warning',
+    error: 'before:border-s-error',
+    success: 'before:border-s-success',
   };
 
   const surfaceWashBg: Record<InlineAlertRole, string> = {
@@ -162,7 +168,8 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
 
   const hasIcon = icon !== null && icon !== 'none' && icon !== false && icon !== '';
   const ariaRole = ariaRoleProp ?? (resolvedRole === 'error' ? 'alert' : 'status');
-  const ariaLive = resolvedRole === 'error' ? 'assertive' : 'polite';
+  const ariaLive =
+    ariaRole === 'alert' ? 'assertive' : ariaRole === 'status' ? 'polite' : undefined;
 
   const renderIcon = () => {
     if (!hasIcon) return null;
@@ -189,17 +196,17 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       ref={ref}
       role={ariaRole}
       aria-live={ariaLive}
-      aria-atomic="true"
+      aria-atomic={ariaLive ? 'true' : undefined}
       data-slot="inline-alert"
       data-variant={variant ?? resolvedRole}
       data-role={resolvedRole}
       data-appearance={appearance}
       className={cn(
-        'relative flex items-start gap-4 p-5 rounded-s-none rounded-e border-s-4 text-start',
+        "relative flex items-start gap-4 p-5 ps-6 rounded-s-none rounded-e text-start before:pointer-events-none before:content-[''] before:absolute before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
         accentBorderClasses[resolvedRole],
         appearance === 'surface'
-          ? 'bg-surface border-t border-e border-b border-outline-variant shadow-card'
-          : surfaceWashBg[resolvedRole],
+          ? 'bg-surface border-y border-e border-s-0 border-outline-variant shadow-card before:-inset-y-px'
+          : [surfaceWashBg[resolvedRole], 'before:inset-y-0'],
         className
       )}
       {...props}

@@ -350,7 +350,8 @@ export interface PromptInputModelOption {
   icon?: string;
 }
 
-export interface PromptInputModelSelectProps {
+export interface PromptInputModelSelectProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onChange'> {
   model: string;
   onModelChange: (model: string) => void;
   models?: PromptInputModelOption[];
@@ -358,98 +359,96 @@ export interface PromptInputModelSelectProps {
   className?: string;
 }
 
-export const PromptInputModelSelect: React.FC<PromptInputModelSelectProps> = ({
-  model,
-  onModelChange,
-  models = [],
-  disabled = false,
-  className,
-}) => {
-  const currentModel = models.find((m) => m.id === model);
-  const displayName = currentModel?.name || model;
+export const PromptInputModelSelect = React.forwardRef<HTMLButtonElement, PromptInputModelSelectProps>(
+  ({ model, onModelChange, models = [], disabled = false, className, ...props }, ref) => {
+    const currentModel = models.find((m) => m.id === model);
+    const displayName = currentModel?.name || model;
 
-  const grouped = React.useMemo(() => {
-    const groups: Record<string, PromptInputModelOption[]> = {};
-    for (const m of models) {
-      const p = m.provider || '';
-      if (!groups[p]) groups[p] = [];
-      groups[p].push(m);
-    }
-    return groups;
-  }, [models]);
+    const grouped = React.useMemo(() => {
+      const groups: Record<string, PromptInputModelOption[]> = {};
+      for (const m of models) {
+        const p = m.provider || '';
+        if (!groups[p]) groups[p] = [];
+        groups[p].push(m);
+      }
+      return groups;
+    }, [models]);
 
-  if (models.length === 0) {
-    return (
-      <Button
-        variant="text"
-        colorRole="neutral"
-        size="sm"
-        disabled={disabled}
-        expandedTouchTarget
-        aria-label={`Current model: ${displayName}`}
-        className={cn(
-          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-state-hover transition-colors',
-          className
-        )}
-      >
-        <Icon name={currentModel?.icon || 'smart_toy'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
-        <span className="truncate max-w-[120px]">{displayName}</span>
-      </Button>
-    );
-  }
-
-  return (
-    <Menu
-      trigger={
+    if (models.length === 0) {
+      return (
         <Button
+          ref={ref}
           variant="text"
           colorRole="neutral"
           size="sm"
           disabled={disabled}
-          expandedTouchTarget
           aria-label={`Current model: ${displayName}`}
           className={cn(
-            'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-state-hover transition-colors',
+            'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-state-hover transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
             className
           )}
+          {...props}
         >
           <Icon name={currentModel?.icon || 'smart_toy'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
           <span className="truncate max-w-[120px]">{displayName}</span>
-          <Icon name="expand_more" size="xs" className="text-on-surface-variant/70 shrink-0" aria-hidden="true" />
         </Button>
-      }
-    >
-      <MenuContent side="top" align="start" className="w-68 max-w-[calc(100vw-2rem)] p-1.5">
-        <MenuRadioGroup value={model} onValueChange={(val) => onModelChange(val as string)}>
-          {Object.entries(grouped).map(([provider, items]) => (
-            <MenuGroup key={provider || 'default'}>
-              {provider && <MenuGroupLabel>{provider}</MenuGroupLabel>}
-              {items.map((item) => (
-                <MenuRadioItem key={item.id} value={item.id} className="min-h-11 py-1.5">
-                  <div className="flex flex-col min-w-0 pe-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-heading font-semibold text-xs text-on-surface">{item.name}</span>
-                      {item.badge && (
-                        <Badge size="sm" variant="soft" colorRole="secondary" className="text-xs leading-none h-4.5 py-0 px-1.5">
-                          {item.badge}
-                        </Badge>
+      );
+    }
+
+    return (
+      <Menu
+        trigger={
+          <Button
+            ref={ref}
+            variant="text"
+            colorRole="neutral"
+            size="sm"
+            disabled={disabled}
+            aria-label={`Current model: ${displayName}`}
+            className={cn(
+              'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full text-on-surface hover:bg-state-hover transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
+              className
+            )}
+            {...props}
+          >
+            <Icon name={currentModel?.icon || 'smart_toy'} size="xs" className="text-secondary shrink-0" aria-hidden="true" />
+            <span className="truncate max-w-[120px]">{displayName}</span>
+            <Icon name="expand_more" size="xs" className="text-on-surface-variant/70 shrink-0" aria-hidden="true" />
+          </Button>
+        }
+      >
+        <MenuContent side="top" align="start" className="w-68 max-w-[var(--available-width)] p-1.5">
+          <MenuRadioGroup value={model} onValueChange={(val) => onModelChange(val as string)}>
+            {Object.entries(grouped).map(([provider, items]) => (
+              <MenuGroup key={provider || 'default'}>
+                {provider && <MenuGroupLabel>{provider}</MenuGroupLabel>}
+                {items.map((item) => (
+                  <MenuRadioItem key={item.id} value={item.id} className="min-h-11 py-1.5">
+                    <div className="flex flex-col min-w-0 pe-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-heading font-semibold text-xs text-on-surface">{item.name}</span>
+                        {item.badge && (
+                          <Badge size="sm" variant="soft" colorRole="secondary" className="text-xs leading-none h-4.5 py-0 px-1.5">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      {item.description && (
+                        <span className="text-xs font-sans text-on-surface-variant truncate">
+                          {item.description}
+                        </span>
                       )}
                     </div>
-                    {item.description && (
-                      <span className="text-xs font-sans text-on-surface-variant truncate">
-                        {item.description}
-                      </span>
-                    )}
-                  </div>
-                </MenuRadioItem>
-              ))}
-            </MenuGroup>
-          ))}
-        </MenuRadioGroup>
-      </MenuContent>
-    </Menu>
-  );
-};
+                  </MenuRadioItem>
+                ))}
+              </MenuGroup>
+            ))}
+          </MenuRadioGroup>
+        </MenuContent>
+      </Menu>
+    );
+  }
+);
 PromptInputModelSelect.displayName = 'PromptInput.ModelSelect';
 
 /* -------------------------------------------------------------------------------------------------
@@ -461,7 +460,8 @@ export interface PromptInputEffortOption {
   description?: string;
 }
 
-export interface PromptInputEffortProps {
+export interface PromptInputEffortProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onChange'> {
   effort?: string;
   onEffortChange?: (effort: string) => void;
   options?: PromptInputEffortOption[];
@@ -470,75 +470,35 @@ export interface PromptInputEffortProps {
   className?: string;
 }
 
-export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
-  effort,
-  onEffortChange,
-  options = [],
-  label = 'Thinking',
-  disabled = false,
-  className,
-}) => {
-  const isThinkingActive = Boolean(effort && effort !== 'none' && effort !== 'off');
-  const activeOption = options.find((o) => o.id === effort);
-  const displayValue = activeOption?.label || effort;
-  const buttonLabel = isThinkingActive ? `${label}: ${displayValue}` : label;
+export const PromptInputEffort = React.forwardRef<HTMLButtonElement, PromptInputEffortProps>(
+  ({ effort, onEffortChange, options = [], label = 'Thinking', disabled = false, className, onClick, ...props }, ref) => {
+    const isThinkingActive = Boolean(effort && effort !== 'none' && effort !== 'off');
+    const activeOption = options.find((o) => o.id === effort);
+    const displayValue = activeOption?.label || effort;
+    const buttonLabel = isThinkingActive ? `${label}: ${displayValue}` : label;
 
-  if (options.length === 0) {
-    return (
-      <Button
-        variant={isThinkingActive ? 'soft' : 'text'}
-        colorRole={isThinkingActive ? 'secondary' : 'neutral'}
-        size="sm"
-        disabled={disabled}
-        onClick={() => onEffortChange?.(isThinkingActive ? 'none' : 'active')}
-        expandedTouchTarget
-        aria-label={buttonLabel}
-        aria-pressed={isThinkingActive}
-        className={cn(
-          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
-          isThinkingActive
-            ? 'bg-secondary-container text-on-secondary-container'
-            : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
-          className
-        )}
-      >
-        <Icon
-          name="psychology"
-          size="xs"
-          className={cn('shrink-0', isThinkingActive ? 'text-secondary' : 'text-on-surface-variant/70')}
-          aria-hidden="true"
-        />
-        <span className="truncate">
-          {isThinkingActive ? (
-            <>
-              <span className="hidden @sm:inline">{label}: </span>
-              <span>{displayValue}</span>
-            </>
-          ) : (
-            label
-          )}
-        </span>
-      </Button>
-    );
-  }
-
-  return (
-    <Menu
-      trigger={
+    if (options.length === 0) {
+      return (
         <Button
+          ref={ref}
           variant={isThinkingActive ? 'soft' : 'text'}
           colorRole={isThinkingActive ? 'secondary' : 'neutral'}
           size="sm"
           disabled={disabled}
-          expandedTouchTarget
+          onClick={(e) => {
+            onClick?.(e);
+            onEffortChange?.(isThinkingActive ? 'none' : 'active');
+          }}
           aria-label={buttonLabel}
+          aria-pressed={isThinkingActive}
           className={cn(
-            'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
+            'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
             isThinkingActive
               ? 'bg-secondary-container text-on-secondary-container'
               : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
             className
           )}
+          {...props}
         >
           <Icon
             name="psychology"
@@ -556,38 +516,80 @@ export const PromptInputEffort: React.FC<PromptInputEffortProps> = ({
               label
             )}
           </span>
-          <Icon name="expand_more" size="xs" className="shrink-0 opacity-70" aria-hidden="true" />
         </Button>
-      }
-    >
-      <MenuContent side="top" align="start" className="w-56 p-1.5">
-        <MenuRadioGroup value={effort || ''} onValueChange={(val) => onEffortChange?.(val as string)}>
-          <MenuGroup>
-            <MenuGroupLabel>{label}</MenuGroupLabel>
-            {options.map((opt) => (
-              <MenuRadioItem key={opt.id} value={opt.id} className="min-h-11 py-1 text-xs">
-                <div className="flex flex-col min-w-0 pe-2">
-                  <span className="font-heading font-semibold text-xs text-on-surface">{opt.label}</span>
-                  {opt.description && (
-                    <span className="text-xs font-sans text-on-surface-variant truncate">
-                      {opt.description}
-                    </span>
-                  )}
-                </div>
-              </MenuRadioItem>
-            ))}
-          </MenuGroup>
-        </MenuRadioGroup>
-      </MenuContent>
-    </Menu>
-  );
-};
+      );
+    }
+
+    return (
+      <Menu
+        trigger={
+          <Button
+            ref={ref}
+            variant={isThinkingActive ? 'soft' : 'text'}
+            colorRole={isThinkingActive ? 'secondary' : 'neutral'}
+            size="sm"
+            disabled={disabled}
+            aria-label={buttonLabel}
+            className={cn(
+              'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
+              isThinkingActive
+                ? 'bg-secondary-container text-on-secondary-container'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+              className
+            )}
+            onClick={onClick}
+            {...props}
+          >
+            <Icon
+              name="psychology"
+              size="xs"
+              className={cn('shrink-0', isThinkingActive ? 'text-secondary' : 'text-on-surface-variant/70')}
+              aria-hidden="true"
+            />
+            <span className="truncate">
+              {isThinkingActive ? (
+                <>
+                  <span className="hidden @sm:inline">{label}: </span>
+                  <span>{displayValue}</span>
+                </>
+              ) : (
+                label
+              )}
+            </span>
+            <Icon name="expand_more" size="xs" className="shrink-0 opacity-70" aria-hidden="true" />
+          </Button>
+        }
+      >
+        <MenuContent side="top" align="start" className="w-56 max-w-[var(--available-width)] p-1.5">
+          <MenuRadioGroup value={effort || ''} onValueChange={(val) => onEffortChange?.(val as string)}>
+            <MenuGroup>
+              <MenuGroupLabel>{label}</MenuGroupLabel>
+              {options.map((opt) => (
+                <MenuRadioItem key={opt.id} value={opt.id} className="min-h-11 py-1 text-xs">
+                  <div className="flex flex-col min-w-0 pe-2">
+                    <span className="font-heading font-semibold text-xs text-on-surface">{opt.label}</span>
+                    {opt.description && (
+                      <span className="text-xs font-sans text-on-surface-variant truncate">
+                        {opt.description}
+                      </span>
+                    )}
+                  </div>
+                </MenuRadioItem>
+              ))}
+            </MenuGroup>
+          </MenuRadioGroup>
+        </MenuContent>
+      </Menu>
+    );
+  }
+);
 PromptInputEffort.displayName = 'PromptInput.Effort';
 
 /* -------------------------------------------------------------------------------------------------
  * File Attachment Trigger Button
  * -----------------------------------------------------------------------------------------------*/
-export interface PromptInputAttachButtonProps {
+export interface PromptInputAttachButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
   onFilesSelected?: (files: File[]) => void;
   accept?: string;
   multiple?: boolean;
@@ -596,65 +598,66 @@ export interface PromptInputAttachButtonProps {
   className?: string;
 }
 
-export const PromptInputAttachButton: React.FC<PromptInputAttachButtonProps> = ({
-  onFilesSelected,
-  accept,
-  multiple = true,
-  disabled = false,
-  label = 'Attach files',
-  className,
-}) => {
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
+export const PromptInputAttachButton = React.forwardRef<HTMLButtonElement, PromptInputAttachButtonProps>(
+  ({ onFilesSelected, accept, multiple = true, disabled = false, label = 'Attach files', className, onClick, ...props }, ref) => {
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const handleClick = () => {
-    inputRef.current?.click();
-  };
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(e);
+      inputRef.current?.click();
+    };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    if (files.length > 0) {
-      onFilesSelected?.(files);
-    }
-    // Reset file input so re-selecting same file triggers change
-    e.target.value = '';
-  };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files ? Array.from(e.target.files) : [];
+      if (files.length > 0) {
+        onFilesSelected?.(files);
+      }
+      // Reset file input so re-selecting same file triggers change
+      e.target.value = '';
+    };
 
-  return (
-    <>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        multiple={multiple}
-        className="sr-only"
-        aria-label={label}
-        onChange={handleChange}
-        tabIndex={-1}
-        aria-hidden="true"
-      />
-      <Tooltip content={label}>
-        <Button
-          variant="text"
-          colorRole="neutral"
-          size="sm"
-          disabled={disabled}
-          onClick={handleClick}
-          expandedTouchTarget
+    return (
+      <>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          className="sr-only"
           aria-label={label}
-          className={cn('size-8 min-h-[32px] min-w-[32px] p-0 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover', className)}
-        >
-          <Icon name="attach_file" size="xs" aria-hidden="true" />
-        </Button>
-      </Tooltip>
-    </>
-  );
-};
+          onChange={handleChange}
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+        <Tooltip content={label}>
+          <Button
+            ref={ref}
+            variant="text"
+            colorRole="neutral"
+            size="sm"
+            disabled={disabled}
+            onClick={handleClick}
+            aria-label={label}
+            className={cn(
+              'relative size-8 min-h-[32px] min-w-[32px] p-0 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
+              className
+            )}
+            {...props}
+          >
+            <Icon name="attach_file" size="xs" aria-hidden="true" />
+          </Button>
+        </Tooltip>
+      </>
+    );
+  }
+);
 PromptInputAttachButton.displayName = 'PromptInput.AttachButton';
 
 /* -------------------------------------------------------------------------------------------------
  * Tool Toggles (e.g. Web search)
  * -----------------------------------------------------------------------------------------------*/
-export interface PromptInputToolToggleProps {
+export interface PromptInputToolToggleProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onToggle'> {
   active: boolean;
   onToggle: (active: boolean) => void;
   icon?: string;
@@ -665,47 +668,59 @@ export interface PromptInputToolToggleProps {
   className?: string;
 }
 
-export const PromptInputToolToggle: React.FC<PromptInputToolToggleProps> = ({
-  active,
-  onToggle,
-  icon = 'language',
-  label,
-  activeLabel,
-  alwaysShowLabel = false,
-  disabled = false,
-  className,
-}) => {
-  return (
-    <Tooltip content={active ? activeLabel || `${label} (Active)` : `Enable ${label}`}>
-      <Button
-        variant={active ? 'soft' : 'text'}
-        colorRole={active ? 'primary' : 'neutral'}
-        size="sm"
-        disabled={disabled}
-        onClick={() => onToggle(!active)}
-        expandedTouchTarget
-        aria-pressed={active}
-        aria-label={label}
-        className={cn(
-          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
-          active
-            ? 'bg-primary-container text-on-primary-container'
-            : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
-          className
-        )}
-      >
-        <Icon name={icon} size="xs" aria-hidden="true" />
-        <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{label}</span>
-      </Button>
-    </Tooltip>
-  );
-};
+export const PromptInputToolToggle = React.forwardRef<HTMLButtonElement, PromptInputToolToggleProps>(
+  (
+    {
+      active,
+      onToggle,
+      icon = 'language',
+      label,
+      activeLabel,
+      alwaysShowLabel = false,
+      disabled = false,
+      className,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <Tooltip content={active ? activeLabel || `${label} (Active)` : `Enable ${label}`}>
+        <Button
+          ref={ref}
+          variant={active ? 'soft' : 'text'}
+          colorRole={active ? 'primary' : 'neutral'}
+          size="sm"
+          disabled={disabled}
+          onClick={(e) => {
+            onClick?.(e);
+            onToggle(!active);
+          }}
+          aria-pressed={active}
+          aria-label={label}
+          className={cn(
+            'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
+            active
+              ? 'bg-primary-container text-on-primary-container'
+              : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+            className
+          )}
+          {...props}
+        >
+          <Icon name={icon} size="xs" aria-hidden="true" />
+          <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{label}</span>
+        </Button>
+      </Tooltip>
+    );
+  }
+);
 PromptInputToolToggle.displayName = 'PromptInput.ToolToggle';
 
 /* -------------------------------------------------------------------------------------------------
  * Voice Input Toggle Button
  * -----------------------------------------------------------------------------------------------*/
-export interface PromptInputVoiceToggleProps {
+export interface PromptInputVoiceToggleProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onToggle'> {
   isRecording?: boolean;
   onToggle?: () => void;
   alwaysShowLabel?: boolean;
@@ -714,76 +729,77 @@ export interface PromptInputVoiceToggleProps {
   className?: string;
 }
 
-export const PromptInputVoiceToggle: React.FC<PromptInputVoiceToggleProps> = ({
-  isRecording = false,
-  onToggle,
-  alwaysShowLabel = false,
-  disabled = false,
-  label = 'Voice input',
-  className,
-}) => {
-  return (
-    <Tooltip content={isRecording ? 'Stop recording' : label}>
-      <Button
-        variant={isRecording ? 'soft' : 'text'}
-        colorRole={isRecording ? 'error' : 'neutral'}
-        size="sm"
-        disabled={disabled}
-        onClick={onToggle}
-        expandedTouchTarget
-        aria-pressed={isRecording}
-        aria-label={isRecording ? 'Stop recording' : label}
-        className={cn(
-          'h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors',
-          isRecording
-            ? 'bg-error-container text-on-error-container'
-            : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
-          className
-        )}
-      >
-        <Icon
-          name={isRecording ? 'mic' : 'mic_none'}
-          size="xs"
-          className={cn(isRecording && 'text-error animate-pulse motion-reduce:animate-none')}
-          aria-hidden="true"
-        />
-        <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{isRecording ? 'Listening...' : 'Voice'}</span>
-      </Button>
-    </Tooltip>
-  );
-};
+export const PromptInputVoiceToggle = React.forwardRef<HTMLButtonElement, PromptInputVoiceToggleProps>(
+  ({ isRecording = false, onToggle, alwaysShowLabel = false, disabled = false, label = 'Voice input', className, onClick, ...props }, ref) => {
+    return (
+      <Tooltip content={isRecording ? 'Stop recording' : label}>
+        <Button
+          ref={ref}
+          variant={isRecording ? 'soft' : 'text'}
+          colorRole={isRecording ? 'error' : 'neutral'}
+          size="sm"
+          disabled={disabled}
+          onClick={(e) => {
+            onClick?.(e);
+            onToggle?.();
+          }}
+          aria-pressed={isRecording}
+          aria-label={isRecording ? 'Stop recording' : label}
+          className={cn(
+            'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
+            isRecording
+              ? 'bg-error-container text-on-error-container'
+              : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+            className
+          )}
+          {...props}
+        >
+          <Icon
+            name={isRecording ? 'mic' : 'mic_none'}
+            size="xs"
+            className={cn(isRecording && 'text-error animate-pulse motion-reduce:animate-none')}
+            aria-hidden="true"
+          />
+          <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{isRecording ? 'Listening...' : 'Voice'}</span>
+        </Button>
+      </Tooltip>
+    );
+  }
+);
 PromptInputVoiceToggle.displayName = 'PromptInput.VoiceToggle';
 
 /* -------------------------------------------------------------------------------------------------
  * Submit & Stop Buttons
  * -----------------------------------------------------------------------------------------------*/
-export interface PromptInputStopProps {
+export interface PromptInputStopProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onStop?: () => void;
   label?: string;
   className?: string;
 }
 
-export const PromptInputStop: React.FC<PromptInputStopProps> = ({
-  onStop,
-  label = 'Stop',
-  className,
-}) => (
-  <Tooltip content={label}>
-    <Button
-      variant="soft"
-      colorRole="neutral"
-      size="sm"
-      onClick={onStop}
-      expandedTouchTarget
-      aria-label={label}
-      className={cn(
-        'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 bg-surface-container-high text-on-surface hover:bg-error-container hover:text-on-error-container',
-        className
-      )}
-    >
-      <span className="size-3 rounded-[2px] bg-current shrink-0" aria-hidden="true" />
-    </Button>
-  </Tooltip>
+export const PromptInputStop = React.forwardRef<HTMLButtonElement, PromptInputStopProps>(
+  ({ onStop, label = 'Stop', className, onClick, ...props }, ref) => (
+    <Tooltip content={label}>
+      <Button
+        ref={ref}
+        variant="soft"
+        colorRole="neutral"
+        size="sm"
+        onClick={(e) => {
+          onClick?.(e);
+          onStop?.();
+        }}
+        aria-label={label}
+        className={cn(
+          'relative size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform motion-reduce:transition-none active:scale-95 motion-reduce:active:scale-100 bg-surface-container-high text-on-surface hover:bg-error-container hover:text-on-error-container after:absolute after:inset-x-0 after:-inset-y-1 after:content-[\'\']',
+          className
+        )}
+        {...props}
+      >
+        <span className="size-3 rounded-[2px] bg-current shrink-0" aria-hidden="true" />
+      </Button>
+    </Tooltip>
+  )
 );
 PromptInputStop.displayName = 'PromptInput.Stop';
 
@@ -793,22 +809,46 @@ export interface PromptInputCharacterCountProps extends React.HTMLAttributes<HTM
   className?: string;
 }
 
-export const PromptInputCharacterCount: React.FC<PromptInputCharacterCountProps> = ({
-  current,
-  max,
-  className,
-  ...props
-}) => (
-  <span
-    className={cn('font-mono text-xs tabular-nums text-on-surface-variant/75 select-none', className)}
-    {...props}
-  >
-    {current}{max ? ` / ${max}` : ''}
-  </span>
+export const PromptInputCharacterCount = React.forwardRef<HTMLSpanElement, PromptInputCharacterCountProps>(
+  ({ current, max, className, ...props }, ref) => {
+    const isOverLimit = max !== undefined && current > max;
+    const remaining = max !== undefined ? max - current : undefined;
+    const thresholdAnnouncement = React.useMemo(() => {
+      if (remaining === undefined) return '';
+      if (remaining < 0) return 'Character limit exceeded';
+      if (remaining === 0) return 'Character limit reached';
+      if (remaining <= 5) return '5 or fewer characters remaining';
+      if (remaining <= 10) return '10 or fewer characters remaining';
+      if (remaining <= 20) return '20 or fewer characters remaining';
+      return '';
+    }, [remaining]);
+
+    return (
+      <span
+        ref={ref}
+        data-slot="prompt-input-character-count"
+        className={cn(
+          'font-mono text-xs tabular-nums select-none',
+          isOverLimit ? 'text-error font-semibold' : 'text-on-surface-variant/75',
+          className
+        )}
+        {...props}
+      >
+        <span>
+          {current}{max ? ` / ${max}` : ''}
+        </span>
+        {max !== undefined && (
+          <span className="sr-only" aria-live="polite" aria-atomic="true">
+            {thresholdAnnouncement}
+          </span>
+        )}
+      </span>
+    );
+  }
 );
 PromptInputCharacterCount.displayName = 'PromptInput.CharacterCount';
 
-export interface PromptInputSubmitProps {
+export interface PromptInputSubmitProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   disabled?: boolean;
   onStop?: () => void;
@@ -820,44 +860,55 @@ export interface PromptInputSubmitProps {
   className?: string;
 }
 
-const PromptInputSubmit: React.FC<PromptInputSubmitProps> = ({
-  isLoading = false,
-  disabled = false,
-  onStop,
-  onSubmit,
-  submitLabel = 'Send',
-  stopLabel = 'Stop',
-  showLabel = false,
-  icon = 'arrow_upward',
-  className,
-}) => {
-  if (isLoading) {
-    return <PromptInputStop onStop={onStop} label={stopLabel} className={className} />;
-  }
+const PromptInputSubmit = React.forwardRef<HTMLButtonElement, PromptInputSubmitProps>(
+  (
+    {
+      isLoading = false,
+      disabled = false,
+      onStop,
+      onSubmit,
+      submitLabel = 'Send',
+      stopLabel = 'Stop',
+      showLabel = false,
+      icon = 'arrow_upward',
+      className,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
+    if (isLoading) {
+      return <PromptInputStop ref={ref} onStop={onStop} label={stopLabel} className={className} {...props} />;
+    }
 
-  return (
-    <Tooltip content={submitLabel} disabled={disabled}>
-      <Button
-        variant="filled"
-        colorRole="primary"
-        size={showLabel ? 'md' : 'sm'}
-        onClick={onSubmit}
-        disabled={disabled}
-        expandedTouchTarget
-        aria-label={submitLabel}
-        className={cn(
-          showLabel
-            ? 'h-9 min-h-[36px] px-3.5 rounded-full font-semibold gap-1.5 shrink-0'
-            : 'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 disabled:opacity-40 disabled:scale-100',
-          className
-        )}
-      >
-        {showLabel && <span>{submitLabel}</span>}
-        <Icon name={icon} size="sm" aria-hidden="true" />
-      </Button>
-    </Tooltip>
-  );
-};
+    return (
+      <Tooltip content={submitLabel} disabled={disabled}>
+        <Button
+          ref={ref}
+          variant="filled"
+          colorRole="primary"
+          size={showLabel ? 'md' : 'sm'}
+          onClick={(e) => {
+            onClick?.(e);
+            onSubmit?.();
+          }}
+          disabled={disabled}
+          aria-label={submitLabel}
+          className={cn(
+            showLabel
+              ? 'relative h-9 min-h-[36px] px-3.5 rounded-full font-semibold gap-1.5 shrink-0 after:absolute after:inset-x-0 after:-inset-y-1 after:content-[\'\']'
+              : 'relative size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform motion-reduce:transition-none active:scale-95 motion-reduce:active:scale-100 disabled:opacity-40 disabled:scale-100 after:absolute after:inset-x-0 after:-inset-y-1 after:content-[\'\']',
+            className
+          )}
+          {...props}
+        >
+          {showLabel && <span>{submitLabel}</span>}
+          <Icon name={icon} size="sm" aria-hidden="true" />
+        </Button>
+      </Tooltip>
+    );
+  }
+);
 PromptInputSubmit.displayName = 'PromptInput.Submit';
 
 /* -------------------------------------------------------------------------------------------------

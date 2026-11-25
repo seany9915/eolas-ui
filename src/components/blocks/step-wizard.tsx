@@ -48,8 +48,14 @@ export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   completeDisabled?: boolean;
   /** Shows a loading state on the final step's complete button during async submission. */
   completeLoading?: boolean;
+  /** Disables the next button on intermediate steps (e.g. while current step validation is incomplete). */
+  nextDisabled?: boolean;
+  /** Shows a loading state on the next button during async step validation. */
+  nextLoading?: boolean;
   nextLabel?: string;
   previousLabel?: string;
+  /** Accessible label for the step indicator navigation landmark. Defaults to 'Step progress'. */
+  navLabel?: string;
   /** Heading tag used for the active step title. Defaults to `'h3'`. */
   titleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   showNavigationButtons?: boolean;
@@ -137,8 +143,11 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
       completeLabel = 'Finish',
       completeDisabled = false,
       completeLoading = false,
+      nextDisabled = false,
+      nextLoading = false,
       nextLabel = 'Next step',
       previousLabel = 'Back',
+      navLabel = 'Step progress',
       titleAs = 'h3',
       showNavigationButtons = true,
       variant = 'card',
@@ -201,7 +210,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
               </Card.Title>
             </div>
             {indicator === 'numbered' && (
-              <nav aria-label="Wizard Steps Progress" className="flex flex-wrap items-center gap-1">
+              <nav aria-label={navLabel} className="flex flex-wrap items-center gap-1">
                 {steps.map((s, idx) => {
                   const isSelected = idx === safeIndex;
                   const isCompleted = s.completed !== undefined ? s.completed : idx < safeIndex;
@@ -222,11 +231,13 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                     >
                       <span
                         className={cn(
-                          'size-7 rounded-full flex items-center justify-center font-mono text-xs font-bold tabular-nums transition-colors duration-quick ease-standard motion-reduce:transition-none select-none',
+                          'size-7 rounded-full flex items-center justify-center font-mono text-xs font-semibold tabular-nums transition-colors duration-quick ease-standard motion-reduce:transition-none select-none',
                           isSelected
                             ? 'bg-primary text-on-primary'
                             : isCompleted
                             ? 'bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary'
+                            : canNavigate
+                            ? 'border border-outline text-on-surface-variant bg-surface'
                             : 'border border-outline-variant text-on-surface-variant bg-surface'
                         )}
                       >
@@ -247,7 +258,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
               value={safeIndex + 1}
               max={totalSteps}
               size="sm"
-              aria-label="Wizard progress"
+              aria-label={navLabel}
               aria-valuetext={`Step ${safeIndex + 1} of ${totalSteps}`}
             />
           )}
@@ -310,8 +321,8 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                 type="button"
                 variant="filled"
                 size="md"
-                disabled={isLastStep ? completeDisabled : false}
-                loading={isLastStep ? completeLoading : false}
+                disabled={isLastStep ? completeDisabled : nextDisabled}
+                loading={isLastStep ? completeLoading : nextLoading}
                 onClick={handleNext}
                 className="ms-auto"
               >

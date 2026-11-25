@@ -16,7 +16,7 @@ import {
   type UseSortableInput,
 } from '@dnd-kit/react/sortable';
 import { arrayMove, arraySwap, move } from '@dnd-kit/helpers';
-import { cn, useRender } from '@/lib/utils';
+import { cn, resolveNativeButton, useRender } from '@/lib/utils';
 
 /**
  * Accessible drag-and-drop sortable list, grid, and multi-container primitive built on `@dnd-kit/react` and DESIGN.md tokens.
@@ -198,13 +198,15 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
       plugins,
       className,
       render,
-      role = 'listitem',
+      role: roleProp,
       children,
       ...props
     },
     forwardedRef
   ) => {
     const { hasOverlay, prefersReducedMotion } = React.useContext(SortableContext);
+    const resolvedRole =
+      roleProp ?? (React.isValidElement(render) && render.type === 'li' ? undefined : 'listitem');
     const { ref, handleRef, isDragging, isDragSource, isDropTarget } = useSortable({
       id,
       index,
@@ -244,13 +246,13 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
         'data-drag-source': isDragSource ? '' : undefined,
         'data-drop-target': isDropTarget ? '' : undefined,
         'data-disabled': disabled ? '' : undefined,
-        role,
+        role: resolvedRole,
         className: cn(
           'relative flex min-w-0 items-center gap-3 rounded-md border border-outline-variant bg-surface p-3 text-on-surface',
           'transition-[border-color,background-color,box-shadow,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           isDragging && hasOverlay && 'transition-none border-dashed border-outline-variant bg-surface-container-low [&>*]:opacity-0',
-          isDragging && !hasOverlay && 'z-10 border-2 border-primary bg-surface shadow-modal',
+          isDragging && !hasOverlay && 'z-10 border-primary outline-2 -outline-offset-1 outline-primary bg-surface shadow-modal',
           disabled && 'cursor-not-allowed opacity-50',
           className
         ),
@@ -279,13 +281,14 @@ export const SortableHandle = React.forwardRef<HTMLButtonElement, SortableHandle
     const { handleRef, disabled: itemDisabled } = useSortableItemContext();
     const disabled = Boolean(disabledProp ?? itemDisabled);
     const mergedHandleRef = useMergedRefs(handleRef, forwardedRef);
+    const isNativeButton = resolveNativeButton(render);
 
     return useRender({
       defaultTagName: 'button',
       render,
       ref: mergedHandleRef,
       props: {
-        type: 'button',
+        ...(isNativeButton ? { type: 'button' as const } : {}),
         disabled,
         'aria-label': label,
         'data-slot': 'sortable-handle',

@@ -82,6 +82,7 @@ import {
   TableRow,
   TableHead,
   TableCell,
+  type TableDensity,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
@@ -240,7 +241,7 @@ export function DataTableRowActions<TData extends RowData>({
         align="end"
         trigger={
           <Button
-            variant="ghost"
+            variant="text"
             size="icon"
             colorRole="neutral"
             aria-label="Open menu"
@@ -262,14 +263,8 @@ export function DataTableRowActions<TData extends RowData>({
                   icon={action.icon}
                   onClick={() => action.onClick(row.original)}
                 >
-                  <div className="flex items-center justify-between w-full">
-                    <span>{action.label}</span>
-                    {action.shortcut && (
-                      <span className="font-mono text-xs text-on-surface-variant ms-2">
-                        {action.shortcut}
-                      </span>
-                    )}
-                  </div>
+                  <span>{action.label}</span>
+                  {action.shortcut && <Menu.Shortcut>{action.shortcut}</Menu.Shortcut>}
                 </Menu.Item>
               </React.Fragment>
             ))}
@@ -371,7 +366,7 @@ export function DataTableColumnHeader<TData extends RowData, TValue = unknown>({
       {...props}
     >
       <Button
-        variant="ghost"
+        variant="text"
         size="sm"
         colorRole="neutral"
         onClick={handleSortClick}
@@ -541,19 +536,19 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
                 column?.setFilterValue(filterValues.length ? filterValues : undefined);
               }}
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-2">
+              <span className="flex items-center justify-between gap-3 w-full">
+                <span className="flex items-center gap-2 min-w-0">
                   {option.icon && (
                     <Icon name={option.icon} size="xs" aria-hidden="true" />
                   )}
-                  <span>{option.label}</span>
-                </div>
+                  <span className="truncate">{option.label}</span>
+                </span>
                 {facetCount > 0 && (
-                  <span className="font-mono text-xs text-on-surface-variant tabular-nums">
+                  <span className="font-mono text-xs text-on-surface-variant tabular-nums shrink-0">
                     {facetCount}
                   </span>
                 )}
-              </div>
+              </span>
             </Menu.CheckboxItem>
           );
         })}
@@ -561,7 +556,7 @@ export function DataTableFacetedFilter<TData extends RowData, TValue = unknown>(
           <>
             <Menu.Separator />
             <Menu.Item onClick={() => column?.setFilterValue(undefined)}>
-              <div className="w-full text-center font-medium">Clear filters</div>
+              <span className="w-full text-center font-medium">Clear filters</span>
             </Menu.Item>
           </>
         )}
@@ -725,7 +720,7 @@ export function DataTablePagination<TData extends RowData>({
     >
       <div className="flex flex-col @2xl:flex-row items-center justify-between gap-4 py-2 px-1 w-full">
         {showSelectedCount && (
-          <div className="font-sans text-xs text-on-surface-variant flex-1 select-none">
+          <div className="font-sans text-sm text-on-surface-variant tabular-nums flex-1 select-none">
             {selectedCount} of {totalCount} {totalCount === 1 ? 'row' : 'rows'} selected.
           </div>
         )}
@@ -750,7 +745,7 @@ export function DataTablePagination<TData extends RowData>({
               size="sm"
             />
           </Field.Root>
-          <div className="flex items-center justify-center font-sans text-xs text-on-surface font-medium min-w-24 select-none">
+          <div className="flex items-center justify-center font-sans text-sm text-on-surface font-medium tabular-nums min-w-24 select-none">
             Page {table.state.pagination.pageIndex + 1}
             {hasKnownPageCount ? ` of ${Math.max(1, rawPageCount)}` : ''}
           </div>
@@ -868,8 +863,18 @@ export interface DataTableProps<TData extends RowData> {
   onRowClick?: (row: TData) => void;
   /** Displays a loading state with spinner in the table body */
   loading?: boolean;
+  /** Accessible status text displayed and announced while `loading` is true. Defaults to 'Loading records…'. */
+  loadingLabel?: string;
   /** Custom message rendered when no records match the criteria */
   emptyMessage?: React.ReactNode;
+  /** Accessible table caption forwarded to `<Table>`. */
+  caption?: string;
+  /** Density preset forwarded to `<Table>`. */
+  density?: TableDensity;
+  /** Accessible name for the table region when `caption` / `aria-labelledby` are omitted. */
+  'aria-label'?: string;
+  /** Accessible labelledby ID forwarded to `<Table>`. */
+  'aria-labelledby'?: string;
   className?: string;
   containerClassName?: string;
 }
@@ -931,7 +936,12 @@ export function DataTable<TData extends RowData>({
   getRowId,
   onRowClick,
   loading = false,
+  loadingLabel = 'Loading records…',
   emptyMessage = 'No records found.',
+  caption,
+  density,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   className,
   containerClassName,
 }: DataTableProps<TData>) {
@@ -944,6 +954,13 @@ export function DataTable<TData extends RowData>({
     pageSize,
   });
   const [internalGlobalFilter, setInternalGlobalFilter] = React.useState<string>('');
+
+  React.useEffect(() => {
+    if (paginationProp !== undefined) return;
+    setInternalPagination((prev) =>
+      prev.pageSize === pageSize ? prev : { ...prev, pageIndex: 0, pageSize }
+    );
+  }, [pageSize, paginationProp]);
 
   const sorting = sortingProp ?? internalSorting;
   const columnFilters = columnFiltersProp ?? internalColumnFilters;
@@ -1037,11 +1054,11 @@ export function DataTable<TData extends RowData>({
   const table = propTable ?? internalTable;
   const colSpanCount = table.getVisibleLeafColumns().length || columns.length || 1;
 
-  // Read selection from the table via ref so changing table identities do not loop selection notifications
+  // Deduplicate selection notifications by resolved row objects so filtered inline data does not loop
   const rowSelectionState = table.state.rowSelection;
   const tableData = table.options.data;
   const tableRef = React.useRef(table);
-  const hasMountedSelectionRef = React.useRef(false);
+  const prevSelectedOriginalsRef = React.useRef<TData[] | null>(null);
   const onSelectionChangeRef = React.useRef(onSelectionChange);
   React.useEffect(() => {
     tableRef.current = table;
@@ -1049,15 +1066,22 @@ export function DataTable<TData extends RowData>({
   });
 
   React.useEffect(() => {
-    if (!hasMountedSelectionRef.current) {
-      hasMountedSelectionRef.current = true;
-      if (Object.keys(rowSelectionState).length === 0) {
-        return;
+    const nextSelected = tableRef.current.getSelectedRowModel().rows.map((r) => r.original);
+    const prevSelected = prevSelectedOriginalsRef.current;
+    if (prevSelected === null) {
+      prevSelectedOriginalsRef.current = nextSelected;
+      if (nextSelected.length > 0) {
+        onSelectionChangeRef.current?.(nextSelected);
       }
+      return;
     }
-    onSelectionChangeRef.current?.(
-      tableRef.current.getSelectedRowModel().rows.map((r) => r.original)
-    );
+    const unchanged =
+      prevSelected.length === nextSelected.length &&
+      prevSelected.every((item, idx) => Object.is(item, nextSelected[idx]));
+    if (!unchanged) {
+      prevSelectedOriginalsRef.current = nextSelected;
+      onSelectionChangeRef.current?.(nextSelected);
+    }
   }, [rowSelectionState, tableData]);
 
   return (
@@ -1075,7 +1099,14 @@ export function DataTable<TData extends RowData>({
         </DataTableToolbar>
       )}
 
-      <Table elevated containerClassName={containerClassName}>
+      <Table
+        elevated
+        caption={caption}
+        density={density}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        containerClassName={containerClassName}
+      >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -1118,9 +1149,13 @@ export function DataTable<TData extends RowData>({
                   colSpan={colSpanCount}
                   className="text-center"
                 >
-                  <div className="h-32 flex items-center justify-center gap-2 text-on-surface-variant font-sans text-sm">
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="h-32 flex items-center justify-center gap-2 text-on-surface-variant font-sans text-sm"
+                  >
                     <Spinner size="sm" aria-hidden="true" />
-                    <span>Loading records…</span>
+                    <span>{loadingLabel}</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -1136,10 +1171,18 @@ export function DataTable<TData extends RowData>({
                     onClick={
                       onRowClick
                         ? (event) => {
+                            if (event.defaultPrevented) return;
                             // Ignore clicks from controls inside the row and events bubbling out of portals (menus)
                             const target = event.target as HTMLElement;
                             if (!event.currentTarget.contains(target)) return;
-                            if (target.closest('button, a, input, select, textarea, label, [role="checkbox"], [role="menuitem"]')) return;
+                            if (
+                              target.closest(
+                                'button, a, input, select, textarea, label, [role="checkbox"], [role="menuitem"], [role="switch"], [role="combobox"], [role="radio"], [role="slider"], [role="button"], [role="option"], [contenteditable="true"]'
+                              )
+                            ) {
+                              return;
+                            }
+                            if (window.getSelection()?.toString().trim()) return;
                             onRowClick(row.original);
                           }
                         : undefined

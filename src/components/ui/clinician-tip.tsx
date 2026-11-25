@@ -69,7 +69,7 @@ export const ClinicianTip = React.forwardRef<HTMLDivElement, ClinicianTipProps>(
       <div
         className={cn(
           'text-base text-on-surface-variant leading-relaxed min-w-0',
-          variant === 'unboxed' && 'inverted:text-surface'
+          variant === 'unboxed' && 'inverted:text-on-neutral'
         )}
       >
         {label ? (

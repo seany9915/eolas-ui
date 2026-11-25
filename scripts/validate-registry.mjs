@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   CATEGORY_MAP,
-  DEPRECATED_ITEMS,
   PUBLIC_SYSTEM_LIBS,
   TRANSITIONS_DEV_MAP,
+  extractInternalRegistryImports,
   stripComments,
 } from './registry-meta.mjs';
 
@@ -81,6 +81,16 @@ function normalizeSourceDep(dep) {
   return normalizeBuiltDep(dep);
 }
 
+const ALLOWED_PEER_DEPS = {
+  recharts: new Set(['react-is']),
+};
+
+function stripNpmVersion(spec) {
+  if (typeof spec !== 'string') return spec;
+  const idx = spec.startsWith('@') ? spec.indexOf('@', 1) : spec.indexOf('@');
+  return idx > 0 ? spec.slice(0, idx) : spec;
+}
+
 function extractPackageImports(content) {
   const clean = stripComments(content);
   const pkgs = new Set();
@@ -101,26 +111,7 @@ function extractPackageImports(content) {
 }
 
 function extractInternalImports(content, itemType) {
-  const clean = stripComments(content);
-  const refs = new Set();
-  for (const match of clean.matchAll(/(?:import|export)\s+(?:type\s+)?(?:[^;'"]*?\s+from\s+)?['"]([^'"]+)['"]/g)) {
-    const spec = match[1];
-    if (spec.startsWith('@/components/ui/')) {
-      refs.add(spec.slice('@/components/ui/'.length).replace(/\.(tsx?|jsx?)$/, ''));
-    } else if (spec.startsWith('@/components/blocks/')) {
-      refs.add(spec.slice('@/components/blocks/'.length).replace(/\.(tsx?|jsx?)$/, ''));
-    } else if (spec.startsWith('@/lib/')) {
-      const libName = spec.slice('@/lib/'.length).replace(/\.ts$/, '');
-      if (fs.existsSync(path.join(LIB_DIR, `${libName}.ts`))) {
-        refs.add(libName);
-      }
-    } else if (spec.startsWith('./') && (itemType === 'registry:ui' || itemType === 'registry:block' || itemType === 'registry:lib')) {
-      refs.add(spec.slice(2).split('/')[0].replace(/\.(tsx?|jsx?)$/, ''));
-    } else if (spec.startsWith('../ui/')) {
-      refs.add(spec.slice('../ui/'.length).split('/')[0].replace(/\.(tsx?|jsx?)$/, ''));
-    }
-  }
-  return refs;
+  return extractInternalRegistryImports(content, itemType, { fs, libDir: LIB_DIR });
 }
 
 // 0. Validate components.json
@@ -272,16 +263,6 @@ for (const file of itemFiles) {
   if (!Array.isArray(item.categories) || item.categories.length === 0) {
     errs.push('Missing non-empty "categories" array');
   }
-
-const ALLOWED_PEER_DEPS = {
-  recharts: new Set(['react-is']),
-};
-
-function stripNpmVersion(spec) {
-  if (typeof spec !== 'string') return spec;
-  const idx = spec.startsWith('@') ? spec.indexOf('@', 1) : spec.indexOf('@');
-  return idx > 0 ? spec.slice(0, idx) : spec;
-}
 
   const declaredNpmDeps = new Set(
     (Array.isArray(item.dependencies) ? item.dependencies : []).map(stripNpmVersion)
@@ -722,33 +703,7 @@ if (rootPkg.version !== cliPkg.version) {
   versionParityPassed = true;
 }
 
-// 7. Verify CLI DEPRECATED_ITEMS matches scripts/registry-meta.mjs
-let deprecatedParityPassed = false;
-const CLI_BIN_PATH = path.resolve(ROOT, 'packages/eolas-ui/bin/eolas-ui.js');
-if (!fs.existsSync(CLI_BIN_PATH)) {
-  failed = true;
-  console.error('\npackages/eolas-ui/bin/eolas-ui.js is missing.');
-} else {
-  const cliSrc = fs.readFileSync(CLI_BIN_PATH, 'utf8');
-  const depSetMatch = cliSrc.match(/const DEPRECATED_ITEMS = new Set\(\[([\s\S]*?)\]\);/);
-  if (!depSetMatch) {
-    failed = true;
-    console.error('\nCould not locate DEPRECATED_ITEMS in packages/eolas-ui/bin/eolas-ui.js');
-  } else {
-    const cliDeprecated = [...depSetMatch[1].matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]).sort();
-    const metaDeprecated = Object.keys(DEPRECATED_ITEMS).sort();
-    if (JSON.stringify(cliDeprecated) !== JSON.stringify(metaDeprecated)) {
-      failed = true;
-      console.error(
-        `\nCLI DEPRECATED_ITEMS drift: eolas-ui.js [${cliDeprecated.join(', ')}] != registry-meta.mjs [${metaDeprecated.join(', ')}]`
-      );
-    } else {
-      deprecatedParityPassed = true;
-    }
-  }
-}
-
-// 8. Verify registry-manifest.ts parity (IDs AND title/description/category/dependencies)
+// 7. Verify registry-manifest.ts parity (IDs AND title/description/category/dependencies)
 let manifestParityPassed = false;
 const MANIFEST_PATH = path.resolve(ROOT, 'src/components/playground/registry/registry-manifest.ts');
 if (!fs.existsSync(MANIFEST_PATH)) {
@@ -821,7 +776,6 @@ console.log(`- Source <-> public/r/ content parity: ${srcParityPassed ? 'PASS' :
 console.log(`- Acyclic registryDependencies graph: ${noCyclesPassed ? 'PASS' : 'FAIL'}`);
 console.log(`- Portable placeholder/root targets only: ${hardcodedTargetCount === 0 ? 'PASS' : 'FAIL'}`);
 console.log(`- CLI bundled registry parity (packages/eolas-ui/registry): ${pkgParityPassed ? 'PASS' : 'FAIL'}`);
-console.log(`- CLI DEPRECATED_ITEMS parity: ${deprecatedParityPassed ? 'PASS' : 'FAIL'}`);
 console.log(`- Oxlint consumer config parity: ${lintConfigParityPassed ? 'PASS' : 'FAIL'}`);
 console.log(`- Package version parity (${rootPkg.version}): ${versionParityPassed ? 'PASS' : 'FAIL'}`);
 console.log(`- Playground manifest ID & field parity: ${manifestParityPassed ? 'PASS' : 'FAIL'}`);

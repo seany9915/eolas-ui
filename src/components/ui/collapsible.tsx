@@ -97,8 +97,8 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
             ? className
             : composeClassName(
                 cn(
-                  'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded',
-                  'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+                  'flex items-center justify-between w-full min-h-[44px] font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors motion-reduce:transition-none cursor-pointer text-start group rounded',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                   'disabled:cursor-not-allowed disabled:opacity-50'
                 ),
                 className
@@ -112,7 +112,7 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
             className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none shrink-0"
             aria-hidden="true"
           >
-            keyboard_arrow_down
+            expand_more
           </span>
         )}
       </BaseCollapsible.Trigger>
@@ -148,7 +148,8 @@ const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(
         className={composeClassName(
           cn(
             'w-full',
-            isCard && 'rounded-lg bg-surface border border-outline-variant p-4 shadow-card'
+            isCard &&
+              'rounded-lg bg-surface border border-transparent p-4 shadow-card forced-colors:border-[CanvasText]'
           ),
           className
         )}

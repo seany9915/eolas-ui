@@ -17,27 +17,15 @@ const CLI_VERSION = (() => {
   }
 })();
 
-const DEPRECATED_ITEMS = new Set([
-  'selection-controls',
-  'toggles',
-  'steppers',
-  'empty-state',
-  'number-roll',
-  'approval-card',
-  'metric-card',
-  'delete-confirmation-dialog',
+const PRESET_NAMES = ['theme', 'design-md', 'agent-rules', 'lint', 'logos'];
+const PRESET_SET = new Set(PRESET_NAMES);
+const PRESERVED_USER_CONFIG_TARGETS = new Map([
+  ['~/.oxlintrc.json', 'lint'],
+  ['~/AGENTS.md', 'agent-rules'],
 ]);
 
-const KNOWN_FLAGS = new Set([
-  '--overwrite',
-  '-o',
-  '--dry-run',
-  '--all',
-  '-a',
-  '--include-deprecated',
-  '--version',
-  '-v',
-]);
+const ADD_FLAGS = new Set(['--overwrite', '-o', '--dry-run', '--all', '-a']);
+const SYNC_FLAGS = new Set(['--dry-run', '--all', '-a']);
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -48,21 +36,20 @@ eolas-ui v${CLI_VERSION} - Base UI Component Registry CLI
 
 USAGE:
   npx @seany9915/eolas-ui add <item-name...> [--overwrite] [--dry-run]
-  npx @seany9915/eolas-ui add --all [--overwrite] [--dry-run] [--include-deprecated]
-  npx @seany9915/eolas-ui sync [item-name...] [--all] [--dry-run] [--include-deprecated]
+  npx @seany9915/eolas-ui add --all [--overwrite] [--dry-run]
+  npx @seany9915/eolas-ui sync [item-name...] [--all] [--dry-run]
   npx @seany9915/eolas-ui list
   npx @seany9915/eolas-ui --version
 
 NOTES:
-  --all installs all non-deprecated UI primitives, composite blocks, and utilities
-  (pass --include-deprecated to also include legacy compatibility items).
-  Presets (theme, design-md, agent-rules, lint) can be added explicitly via \`add\`
+  --all installs all UI primitives, composite blocks, and utilities.
+  Presets (${PRESET_NAMES.join(', ')}) can be added explicitly via \`add\`
   and are automatically updated by \`sync\` once installed in your project.
 
 EXAMPLES:
   npx @seany9915/eolas-ui add button dialog select
   npx @seany9915/eolas-ui add @eolas/button
-  npx @seany9915/eolas-ui add theme design-md agent-rules lint
+  npx @seany9915/eolas-ui add ${PRESET_NAMES.join(' ')}
   npx @seany9915/eolas-ui add tabs --overwrite
   npx @seany9915/eolas-ui add data-table --dry-run
   npx @seany9915/eolas-ui sync --dry-run
@@ -151,7 +138,7 @@ function resolveTsconfigFile(fromDir, spec) {
 function loadTsconfigRecursive(configPath, ancestorChain = new Set(), refVisited = new Set()) {
   const absPath = path.resolve(configPath);
   if (ancestorChain.has(absPath)) {
-    return { baseUrlAbs: null, entries: [] };
+    return { baseUrlAbs: null, refBaseUrls: [], entries: [] };
   }
 
   let parsed;
@@ -159,7 +146,7 @@ function loadTsconfigRecursive(configPath, ancestorChain = new Set(), refVisited
     const raw = fs.readFileSync(absPath, 'utf8');
     parsed = JSON.parse(stripJsonCommentsAndTrailingCommas(raw));
   } catch {
-    return { baseUrlAbs: null, entries: [] };
+    return { baseUrlAbs: null, refBaseUrls: [], entries: [] };
   }
 
   const nextAncestors = new Set(ancestorChain);
@@ -205,12 +192,19 @@ function loadTsconfigRecursive(configPath, ancestorChain = new Set(), refVisited
   }
 
   // Follow `references` (e.g., Vite tsconfig.json -> tsconfig.app.json)
+  const refBaseUrls = [];
   if (Array.isArray(parsed?.references)) {
     for (const ref of parsed.references) {
       if (!ref || typeof ref.path !== 'string') continue;
       const refPath = resolveTsconfigFile(configDir, ref.path);
       if (!refPath || refVisited.has(path.resolve(refPath))) continue;
       const refData = loadTsconfigRecursive(refPath, nextAncestors, refVisited);
+      if (refData.baseUrlAbs && !refBaseUrls.includes(refData.baseUrlAbs)) {
+        refBaseUrls.push(refData.baseUrlAbs);
+      }
+      for (const candidate of refData.refBaseUrls) {
+        if (!refBaseUrls.includes(candidate)) refBaseUrls.push(candidate);
+      }
       for (const entry of refData.entries) {
         if (!entryMap.has(entry.pattern)) {
           entryMap.set(entry.pattern, entry);
@@ -221,6 +215,7 @@ function loadTsconfigRecursive(configPath, ancestorChain = new Set(), refVisited
 
   return {
     baseUrlAbs: effectiveBaseUrlAbs,
+    refBaseUrls,
     entries: Array.from(entryMap.values()),
   };
 }
@@ -237,7 +232,7 @@ function loadTsconfigPaths(cwd) {
   if (!rootConfig) return null;
 
   const result = loadTsconfigRecursive(rootConfig);
-  if (result.entries.length === 0 && !result.baseUrlAbs) return null;
+  if (result.entries.length === 0 && !result.baseUrlAbs && result.refBaseUrls.length === 0) return null;
   return result;
 }
 
@@ -325,7 +320,11 @@ function resolveFromTsconfigPaths(rawAlias, tsconfigPaths, cwd) {
     if (pattern.includes('*') && firstTarget.includes('*')) {
       const [patPrefix, patSuffix] = pattern.split('*');
       const [tgtPrefix, tgtSuffix] = firstTarget.split('*');
-      if (rawAlias.startsWith(patPrefix) && rawAlias.endsWith(patSuffix)) {
+      if (
+        rawAlias.length >= patPrefix.length + patSuffix.length &&
+        rawAlias.startsWith(patPrefix) &&
+        rawAlias.endsWith(patSuffix)
+      ) {
         const matched = rawAlias.slice(patPrefix.length, rawAlias.length - patSuffix.length);
         mapped = `${tgtPrefix}${matched}${tgtSuffix}`;
       } else if (patSuffix === '' && patPrefix.endsWith('/') && rawAlias === patPrefix.slice(0, -1)) {
@@ -356,9 +355,17 @@ function resolveAlias(rawAlias, fallback, { cwd, hasSrc, tsconfigPaths }) {
     const stripped = rawAlias.slice(2);
     return hasSrc && !stripped.startsWith('src/') ? path.join('src', stripped) : stripped;
   }
-  if (tsconfigPaths?.baseUrlAbs && !rawAlias.startsWith('.') && !path.isAbsolute(rawAlias)) {
-    const absTarget = path.resolve(tsconfigPaths.baseUrlAbs, rawAlias);
-    return path.relative(cwd, absTarget).replace(/\\/g, '/');
+  if (!rawAlias.startsWith('.') && !path.isAbsolute(rawAlias)) {
+    const baseCandidates = [
+      ...(tsconfigPaths?.baseUrlAbs ? [tsconfigPaths.baseUrlAbs] : []),
+      ...(tsconfigPaths?.refBaseUrls || []),
+    ];
+    if (baseCandidates.length > 0) {
+      const matchedBase =
+        baseCandidates.find((base) => fs.existsSync(path.resolve(base, rawAlias))) || baseCandidates[0];
+      const absTarget = path.resolve(matchedBase, rawAlias);
+      return path.relative(cwd, absTarget).replace(/\\/g, '/');
+    }
   }
   return rawAlias;
 }
@@ -384,7 +391,10 @@ const THEME_TARGET_NAMES = new Set([
 function getThemeCandidatePaths(cwd, componentsConfig) {
   const candidates = [];
   if (componentsConfig?.tailwind?.css) {
-    candidates.push(path.resolve(cwd, componentsConfig.tailwind.css));
+    const configuredAbs = path.resolve(cwd, componentsConfig.tailwind.css);
+    candidates.push(configuredAbs);
+    const besideConfigured = path.join(path.dirname(configuredAbs), 'eolas-theme.css');
+    if (!candidates.includes(besideConfigured)) candidates.push(besideConfigured);
   }
   for (const rel of [
     'src/eolas-theme.css',
@@ -395,6 +405,7 @@ function getThemeCandidatePaths(cwd, componentsConfig) {
     'styles/globals.css',
     'src/index.css',
     'globals.css',
+    'eolas-theme.css',
   ]) {
     const abs = path.resolve(cwd, rel);
     if (!candidates.includes(abs)) candidates.push(abs);
@@ -438,17 +449,24 @@ function resolveDestPath(file, itemType, componentsConfig, ctx) {
       const configuredCss = path.resolve(cwd, componentsConfig.tailwind.css);
       if (!fs.existsSync(configuredCss) || hasEolasThemeSignature(configuredCss)) {
         destPath = configuredCss;
+      } else {
+        destPath = path.join(path.dirname(configuredCss), 'eolas-theme.css');
       }
     } else {
       const candidates = getThemeCandidatePaths(cwd, null);
       const existing = candidates.find((p) => hasEolasThemeSignature(p));
-      if (existing) destPath = existing;
+      destPath = existing || path.resolve(cwd, hasSrc ? 'src/eolas-theme.css' : 'eolas-theme.css');
     }
   }
 
   // Guard against path traversal outside workspace root
   const relToCwd = path.relative(cwd, destPath);
-  if (relToCwd.startsWith('..') || path.isAbsolute(relToCwd)) {
+  if (
+    relToCwd === '..' ||
+    relToCwd.startsWith(`..${path.sep}`) ||
+    relToCwd.startsWith('../') ||
+    path.isAbsolute(relToCwd)
+  ) {
     throw new Error(`Refusing to resolve target outside workspace root: "${destPath}"`);
   }
 
@@ -472,9 +490,9 @@ function isValidItemName(name, catalogMap) {
   return catalogMap.has(name);
 }
 
-function warnUnknownFlags(flags) {
+function warnUnknownFlags(flags, allowedFlags) {
   for (const flag of flags) {
-    if (!KNOWN_FLAGS.has(flag)) {
+    if (!allowedFlags.has(flag)) {
       console.warn(`Warning: Unknown flag "${flag}" ignored.`);
     }
   }
@@ -501,7 +519,7 @@ function listComponents() {
   console.log('');
 }
 
-function addComponents(componentNames, { overwrite = false, dryRun = false } = {}) {
+function addComponents(componentNames, { overwrite = false, dryRun = false, preservedPresets = null } = {}) {
   if (componentNames.length === 0) {
     console.error('Error: Please specify one or more components or items to add.');
     console.log('Run `npx @seany9915/eolas-ui list` to see available items.');
@@ -517,7 +535,7 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
   const tsconfigPaths = loadTsconfigPaths(cwd);
   const ctx = { cwd, hasSrc, tsconfigPaths };
 
-  // Phase 1: Validate and resolve the complete item + dependency graph in memory before touching disk
+  // Phase 1: Validate and resolve the complete item + dependency graph and all destination paths before touching disk
   const queue = componentNames.map(normalizeRegistryDep);
   const processed = new Set();
   const resolvedItems = [];
@@ -572,35 +590,78 @@ function addComponents(componentNames, { overwrite = false, dryRun = false } = {
     process.exit(1);
   }
 
-  // Phase 2: Write (or preview) files after full graph validation succeeds
-  const installedFiles = [];
-  for (const data of resolvedItems) {
-    if (!Array.isArray(data.files)) continue;
+  const plannedWrites = [];
+  try {
+    for (const data of resolvedItems) {
+      if (!Array.isArray(data.files)) continue;
 
-    for (const file of data.files) {
-      const destPath = resolveDestPath(file, data.type, componentsConfig, ctx);
-      const relDest = path.relative(cwd, destPath).replace(/\\/g, '/');
-      const outputContent = rewriteImports(file.content ?? '', relDest, componentsConfig);
-      const exists = fs.existsSync(destPath);
-
-      if (exists && !overwrite) {
-        if (dryRun) {
-          console.log(`  [dry-run] Would skip ${relDest} (already exists)`);
-        } else {
-          console.log(`  - Skipping ${relDest} (already exists, pass --overwrite to replace)`);
-        }
-      } else if (dryRun) {
-        console.log(`  [dry-run] Would write ${relDest}${exists ? ' (overwrite)' : ''}`);
-        installedFiles.push(relDest);
-      } else {
-        const destDir = path.dirname(destPath);
-        if (!fs.existsSync(destDir)) {
-          fs.mkdirSync(destDir, { recursive: true });
-        }
-        fs.writeFileSync(destPath, outputContent, 'utf8');
-        console.log(`  + Installed ${relDest}`);
-        installedFiles.push(relDest);
+      for (const file of data.files) {
+        const target = file.target || getFallbackTarget(file, data.type);
+        const destPath = resolveDestPath(file, data.type, componentsConfig, ctx);
+        const relDest = path.relative(cwd, destPath).replace(/\\/g, '/');
+        const outputContent = rewriteImports(file.content ?? '', relDest, componentsConfig);
+        plannedWrites.push({
+          itemName: data.name,
+          target,
+          destPath,
+          relDest,
+          outputContent,
+        });
       }
+    }
+  } catch (err) {
+    console.error(`Error: ${err.message}\nNo files were written.`);
+    process.exit(1);
+  }
+
+  // Phase 2: Write (or preview) files after full graph & path validation succeeds
+  const installedFiles = [];
+  const normalizeEol = (text) => String(text).replace(/\r\n/g, '\n');
+
+  for (const { target, destPath, relDest, outputContent } of plannedWrites) {
+    const exists = fs.existsSync(destPath);
+    const preservedPreset = PRESERVED_USER_CONFIG_TARGETS.get(target);
+    const shouldPreserve = Boolean(
+      exists && preservedPreset && preservedPresets && preservedPresets.has(preservedPreset)
+    );
+
+    if (shouldPreserve) {
+      let differs = true;
+      try {
+        differs = normalizeEol(fs.readFileSync(destPath, 'utf8')) !== normalizeEol(outputContent);
+      } catch {
+        differs = true;
+      }
+      if (dryRun) {
+        console.log(
+          differs
+            ? `  [dry-run] Would preserve ${relDest} (local customizations; run \`npx @seany9915/eolas-ui sync ${preservedPreset}\` to replace)`
+            : `  [dry-run] Would skip ${relDest} (up to date)`
+        );
+      } else if (differs) {
+        console.log(
+          `  - Preserving ${relDest} (local customizations detected; run \`npx @seany9915/eolas-ui sync ${preservedPreset}\` to replace with updated template)`
+        );
+      } else {
+        console.log(`  - Skipping ${relDest} (up to date)`);
+      }
+    } else if (exists && !overwrite) {
+      if (dryRun) {
+        console.log(`  [dry-run] Would skip ${relDest} (already exists)`);
+      } else {
+        console.log(`  - Skipping ${relDest} (already exists, pass --overwrite to replace)`);
+      }
+    } else if (dryRun) {
+      console.log(`  [dry-run] Would write ${relDest}${exists ? ' (overwrite)' : ''}`);
+      installedFiles.push(relDest);
+    } else {
+      const destDir = path.dirname(destPath);
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+      }
+      fs.writeFileSync(destPath, outputContent, 'utf8');
+      console.log(`  + Installed ${relDest}`);
+      installedFiles.push(relDest);
     }
   }
 
@@ -652,7 +713,13 @@ function detectInstalledItems(items, cwd) {
     const data = JSON.parse(fs.readFileSync(itemFile, 'utf8'));
     const primaryFile = Array.isArray(data.files) ? data.files[0] : null;
     if (!primaryFile) continue;
-    const destPath = resolveDestPath(primaryFile, data.type, componentsConfig, ctx);
+    let destPath;
+    try {
+      destPath = resolveDestPath(primaryFile, data.type, componentsConfig, ctx);
+    } catch (err) {
+      console.error(`Error: ${err.message}`);
+      process.exit(1);
+    }
     if (fs.existsSync(destPath)) {
       if (item.name === 'utils') {
         try {
@@ -668,7 +735,7 @@ function detectInstalledItems(items, cwd) {
     }
   }
 
-  // Detect installed non-component presets (theme, design-md, agent-rules, lint)
+  // Detect installed non-component presets (theme, design-md, agent-rules, lint, logos)
   if (catalogNames.has('theme')) {
     const themeCandidates = getThemeCandidatePaths(cwd, componentsConfig);
     if (themeCandidates.some((candidate) => hasEolasThemeSignature(candidate))) {
@@ -711,6 +778,24 @@ function detectInstalledItems(items, cwd) {
     }
   }
 
+  if (catalogNames.has('logos')) {
+    const logosFile = path.join(REGISTRY_DIR, 'logos.json');
+    if (fs.existsSync(logosFile)) {
+      try {
+        const logosData = JSON.parse(fs.readFileSync(logosFile, 'utf8'));
+        const hasAnyLogo = (logosData.files || []).some((file) => {
+          const destPath = resolveDestPath(file, logosData.type, componentsConfig, ctx);
+          return fs.existsSync(destPath);
+        });
+        if (hasAnyLogo) {
+          installed.push('logos');
+        }
+      } catch {
+        // Ignore unreadable logos.json
+      }
+    }
+  }
+
   return installed;
 }
 
@@ -723,38 +808,36 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
   listComponents();
 } else if (command === 'sync') {
   const flags = args.slice(1).filter((a) => a.startsWith('-'));
-  warnUnknownFlags(flags);
-  const requestedNames = args.slice(1).filter((a) => !a.startsWith('-'));
+  warnUnknownFlags(flags, SYNC_FLAGS);
+  const rawRequested = args.slice(1).filter((a) => !a.startsWith('-'));
   const dryRun = flags.includes('--dry-run');
-  const syncAll = flags.includes('--all') || flags.includes('-a');
-  const includeDeprecated = flags.includes('--include-deprecated');
+  const syncAll = flags.includes('--all') || flags.includes('-a') || rawRequested.includes('all');
+  const requestedNames = rawRequested.filter((n) => n !== 'all');
+  const normalizedRequested = new Set(requestedNames.map(normalizeRegistryDep));
+  const preservedPresets = new Set(
+    ['lint', 'agent-rules'].filter((preset) => !normalizedRequested.has(preset))
+  );
   const items = loadRegistryIndex();
 
-  const nonDeprecatedNames = items
-    .filter(
-      (i) =>
-        (i.type === 'registry:ui' || i.type === 'registry:block' || i.type === 'registry:lib') &&
-        (includeDeprecated || !DEPRECATED_ITEMS.has(i.name))
-    )
+  const allComponentNames = items
+    .filter((i) => i.type === 'registry:ui' || i.type === 'registry:block' || i.type === 'registry:lib')
     .map((i) => i.name);
 
   if (syncAll) {
-    const installedPresets = detectInstalledItems(items, process.cwd()).filter((name) =>
-      ['theme', 'design-md', 'agent-rules', 'lint'].includes(name)
-    );
-    const syncTargets = Array.from(new Set([...nonDeprecatedNames, ...installedPresets, ...requestedNames]));
+    const installedPresets = detectInstalledItems(items, process.cwd()).filter((name) => PRESET_SET.has(name));
+    const syncTargets = Array.from(new Set([...allComponentNames, ...installedPresets, ...requestedNames]));
     console.log(
-      `${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} all ${nonDeprecatedNames.length} Eolas UI components, blocks, and utilities${installedPresets.length > 0 ? ` plus ${installedPresets.length} installed preset(s) (${installedPresets.join(', ')})` : ''}...\n`
+      `${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} all ${allComponentNames.length} Eolas UI components, blocks, and utilities${installedPresets.length > 0 ? ` plus ${installedPresets.length} installed preset(s) (${installedPresets.join(', ')})` : ''}...\n`
     );
-    addComponents(syncTargets, { overwrite: true, dryRun });
+    addComponents(syncTargets, { overwrite: true, dryRun, preservedPresets });
   } else if (requestedNames.length > 0) {
     console.log(`${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} ${requestedNames.length} specified Eolas UI item(s) and their dependencies...\n`);
-    addComponents(requestedNames, { overwrite: true, dryRun });
+    addComponents(requestedNames, { overwrite: true, dryRun, preservedPresets });
   } else {
     const detected = detectInstalledItems(items, process.cwd());
     if (detected.length > 0) {
       console.log(`${dryRun ? '[dry-run] Previewing sync of' : 'Syncing'} ${detected.length} installed Eolas UI item(s) and their dependencies...\n`);
-      addComponents(detected, { overwrite: true, dryRun });
+      addComponents(detected, { overwrite: true, dryRun, preservedPresets });
     } else {
       console.log(
         'No installed Eolas UI items detected in this project. Run `eolas-ui add <item...>` to install specific items, or `eolas-ui sync --all` to install the full catalog.'
@@ -764,20 +847,15 @@ if (!command || command === '--help' || command === '-h' || command === 'help') 
   }
 } else if (command === 'add') {
   const flags = args.slice(1).filter((a) => a.startsWith('-'));
-  warnUnknownFlags(flags);
+  warnUnknownFlags(flags, ADD_FLAGS);
   const names = args.slice(1).filter((a) => !a.startsWith('-'));
   const overwrite = flags.includes('--overwrite') || flags.includes('-o');
   const dryRun = flags.includes('--dry-run');
-  const includeDeprecated = flags.includes('--include-deprecated');
 
   if (flags.includes('--all') || flags.includes('-a') || names.includes('all')) {
     const items = loadRegistryIndex();
     const allComponentNames = items
-      .filter(
-        (i) =>
-          (i.type === 'registry:ui' || i.type === 'registry:block' || i.type === 'registry:lib') &&
-          (includeDeprecated || !DEPRECATED_ITEMS.has(i.name))
-      )
+      .filter((i) => i.type === 'registry:ui' || i.type === 'registry:block' || i.type === 'registry:lib')
       .map((i) => i.name);
     const extraNames = names.filter((n) => n !== 'all');
     const combinedNames = Array.from(new Set([...allComponentNames, ...extraNames]));

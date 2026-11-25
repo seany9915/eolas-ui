@@ -27,8 +27,8 @@ export interface KbdVariantsProps {
 }
 
 const variantStyles: Record<KbdVariant, string> = {
-  default: 'bg-surface-container-high text-on-surface-variant border border-outline-variant shadow-ambient',
-  outline: 'bg-surface text-on-surface border border-outline shadow-ambient',
+  default: 'bg-surface-container-high text-on-surface border border-outline',
+  outline: 'bg-surface text-on-surface border border-outline',
   ghost: 'bg-transparent text-on-surface-variant border-transparent',
 };
 
@@ -53,7 +53,9 @@ export function kbdVariants({
 
 export function detectMacPlatform(): boolean {
   if (typeof navigator === 'undefined') return false;
-  const platform = navigator.platform || navigator.userAgent || '';
+  const navWithUaData = navigator as Navigator & { userAgentData?: { platform?: string } };
+  const platform =
+    navWithUaData.userAgentData?.platform || navigator.platform || navigator.userAgent || '';
   return /mac|iphone|ipad|ipod/i.test(platform);
 }
 

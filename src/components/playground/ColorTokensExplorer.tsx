@@ -61,7 +61,7 @@ export const ColorTokensExplorer: React.FC = () => {
           hex: '#ffffff',
           textHex: '#1C1A18',
           bgClass: 'bg-primary text-on-primary font-semibold',
-          usage: 'High-contrast white text for solid CTA buttons, destructive badges, and dark spotlight cards (17.1:1 AAA on charcoal, 5.75:1 AA on primary).',
+          usage: 'High-contrast white text for solid CTA buttons, destructive badges, and dark spotlight cards (17.1:1 AAA on charcoal, 5.93:1 AA on primary).',
         },
       ],
     },
@@ -88,7 +88,7 @@ export const ColorTokensExplorer: React.FC = () => {
           hex: '#00796B',
           textHex: '#ffffff',
           bgClass: 'bg-secondary text-on-secondary font-semibold',
-          usage: 'Informational support callouts, strategy guides, metadata tags, secondary buttons. Safe for text/border on light backgrounds (WCAG ~4.6:1).',
+          usage: 'Informational support callouts, strategy guides, metadata tags, secondary buttons. Safe for text/border on light backgrounds (WCAG 5.32:1 on white).',
         },
         {
           name: 'secondary-container & on-secondary-container',
@@ -204,6 +204,7 @@ export const ColorTokensExplorer: React.FC = () => {
         title="Color System & Hierarchy"
         titleAs="h2"
         role="neutral"
+        ariaRole="note"
         icon="palette"
       >
         <p>

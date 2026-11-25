@@ -55,22 +55,25 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
     const formattedDuration =
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
+    const isCollapsible = Boolean(children);
+
     const itemLine = (
       <TraceLine
         ref={ref}
+        render={isCollapsible ? <span /> : undefined}
         status={status}
         className={cn(description ? 'items-start py-2' : 'items-center', className)}
         {...props}
       >
         <TraceIcon name={icon} status={status} className={description ? 'mt-0.5' : undefined} />
-        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
+        <span className="flex flex-col min-w-0 flex-1 leading-tight text-start">
           <TraceTitle className="truncate">{title}</TraceTitle>
           {description && (
             <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
               {description}
             </span>
           )}
-        </div>
+        </span>
         {formattedDuration && (
           <TraceDescription className="ms-auto shrink-0 ps-2">
             <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
@@ -81,7 +84,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
       </TraceLine>
     );
 
-    if (children) {
+    if (isCollapsible) {
       return (
         <TraceCollapsible defaultOpen={status === 'running'}>
           <TraceCollapsibleTrigger>
@@ -115,7 +118,7 @@ export const TaskItem = React.forwardRef<HTMLDivElement, TaskItemProps>(
           render={
             <a
               href={safeHref}
-              className="group/task-link block w-full hover:bg-state-hover transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
+              className="group/task-link block w-full hover:bg-state-hover transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
             />
           }
         >
@@ -161,7 +164,7 @@ export const TaskTrigger = React.forwardRef<HTMLButtonElement, TaskTriggerProps>
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
-          <TraceLine status={status}>
+          <TraceLine render={<span />} status={status}>
             <TraceIcon
               name={icon ?? (status === 'running' ? 'progress_activity' : 'checklist')}
               status={status}
@@ -204,7 +207,7 @@ TaskContent.displayName = 'TaskContent';
 /* -------------------------------------------------------------------------------------------------
  * Task (Root Container)
  * -----------------------------------------------------------------------------------------------*/
-export interface TaskProps {
+export interface TaskProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -222,6 +225,7 @@ export const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
       variant,
       children,
       className,
+      ...props
     },
     ref
   ) => {
@@ -229,7 +233,7 @@ export const TaskRoot = React.forwardRef<HTMLDivElement, TaskProps>(
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
 
     return (
-      <div ref={ref} data-slot="task" className={cn('w-full', className)}>
+      <div ref={ref} data-slot="task" className={cn('w-full', className)} {...props}>
         <Trace variant={resolvedVariant}>
           <TraceCollapsible
             defaultOpen={defaultOpen}

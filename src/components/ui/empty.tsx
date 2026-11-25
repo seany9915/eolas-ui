@@ -30,6 +30,7 @@ export interface EmptyProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: string;
   iconProps?: Partial<IconProps>;
   title?: string;
+  titleAs?: 'h2' | 'h3' | 'h4' | 'p';
   description?: string;
   action?: React.ReactNode;
 }
@@ -42,6 +43,7 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
       icon,
       iconProps,
       title,
+      titleAs = 'h3',
       description,
       action,
       children,
@@ -54,7 +56,7 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
     const isDefault = variant === 'default';
 
     const rootClasses = cn(
-      '@container flex w-full min-w-0 flex-1 flex-col my-4',
+      '@container flex w-full min-w-0 flex-1 flex-col',
       isDefault && 'rounded-lg bg-surface border border-outline-variant',
       isDashed && 'rounded-lg bg-surface border border-dashed border-outline-variant',
       isFlush && 'border-none bg-transparent shadow-none',
@@ -84,7 +86,7 @@ export const EmptyComponent = React.forwardRef<HTMLDivElement, EmptyProps>(
                 <Icon name={icon} size="xl" {...iconProps} />
               </EmptyMedia>
             )}
-            {title && <EmptyTitle>{title}</EmptyTitle>}
+            {title && <EmptyTitle as={titleAs}>{title}</EmptyTitle>}
             {description && <EmptyDescription>{description}</EmptyDescription>}
           </EmptyHeader>
           {action && <EmptyContent>{action}</EmptyContent>}
@@ -130,7 +132,7 @@ export const EmptyMedia = React.forwardRef<HTMLDivElement, EmptyMediaProps>(
         data-variant={variant}
         className={cn(
           'flex shrink-0 items-center justify-center mb-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
-          variant === 'icon' && 'size-14 rounded-full bg-surface-container-high text-on-surface-variant',
+          variant === 'icon' && 'size-14 rounded-full bg-surface-container-high text-on-surface',
           className
         )}
         {...props}
@@ -143,12 +145,14 @@ EmptyMedia.displayName = 'EmptyMedia';
 /* -------------------------------------------------------------------------------------------------
  * EmptyTitle
  * -----------------------------------------------------------------------------------------------*/
-export interface EmptyTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface EmptyTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  as?: 'h2' | 'h3' | 'h4' | 'p';
+}
 
 export const EmptyTitle = React.forwardRef<HTMLHeadingElement, EmptyTitleProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, as: Tag = 'h3', children, ...props }, ref) => {
     return (
-      <h3
+      <Tag
         ref={ref}
         data-slot="empty-title"
         className={cn(
@@ -158,7 +162,7 @@ export const EmptyTitle = React.forwardRef<HTMLHeadingElement, EmptyTitleProps>(
         {...props}
       >
         {children}
-      </h3>
+      </Tag>
     );
   }
 );

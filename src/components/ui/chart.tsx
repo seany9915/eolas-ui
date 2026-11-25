@@ -5,7 +5,7 @@ import * as RechartsPrimitive from 'recharts';
 import { cn } from '@/lib/utils';
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: '', dark: '.dark' } as const;
+const THEMES = { light: '', dark: '.dark', inverted: '[data-surface="inverted"]' } as const;
 
 export type ChartConfig = {
   [k in string]: {
@@ -14,9 +14,68 @@ export type ChartConfig = {
     avatar?: string;
   } & (
     | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
+    | { color?: never; theme: Record<'light' | 'dark', string> & Partial<Record<'inverted', string>> }
   );
 };
+
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+function subscribeReducedMotion(callback: () => void): () => void {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return () => {};
+  }
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
+  mq.addEventListener('change', callback);
+  return () => mq.removeEventListener('change', callback);
+}
+
+function getReducedMotionSnapshot(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+}
+
+export function usePrefersReducedMotion(): boolean {
+  return React.useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    () => false
+  );
+}
+
+const FALLBACK_SERIES_COLORS = [
+  'var(--color-primary)',
+  'var(--color-secondary)',
+  'var(--color-tertiary)',
+  'var(--color-outline)',
+] as const;
+
+export function isTertiaryChartColor(color?: string): boolean {
+  return Boolean(color && (/tertiary/i.test(color) || /#f9a825/i.test(color)));
+}
+
+export function resolveChartSeriesColor(
+  config: ChartConfig,
+  key: string,
+  fallbackIndex = 0
+): { fill: string; stroke: string; isTertiary: boolean } {
+  const fallback = FALLBACK_SERIES_COLORS[fallbackIndex % FALLBACK_SERIES_COLORS.length];
+  const entry = config[key];
+  const rawColor =
+    entry && 'color' in entry
+      ? entry.color
+      : entry && 'theme' in entry
+        ? entry.theme?.light
+        : undefined;
+  const hasConfigColor = Boolean(SAFE_CSS_KEY_RE.test(key) && entry && (entry.color || entry.theme));
+  const fill = hasConfigColor ? `var(--color-${key}, ${fallback})` : fallback;
+  const isTertiary = isTertiaryChartColor(rawColor ?? (!hasConfigColor ? fallback : undefined));
+  const stroke = isTertiary
+    ? 'color-mix(in oklch, var(--color-tertiary) 68%, var(--color-on-surface))'
+    : fill;
+  return { fill, stroke, isTertiary };
+}
 
 /** Merges per-series `label` / `strokeColor` overrides into a chart config so block series props are honored. */
 export function applySeriesOverrides(
@@ -161,11 +220,12 @@ export const ChartTooltip = ({
   },
   ...props
 }: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
   return (
     <RechartsPrimitive.Tooltip
       animationDuration={animationDuration}
       animationEasing={animationEasing}
-      isAnimationActive={isAnimationActive}
+      isAnimationActive={prefersReducedMotion ? false : isAnimationActive}
       allowEscapeViewBox={allowEscapeViewBox}
       offset={offset}
       cursor={cursor}
@@ -237,6 +297,7 @@ export const ChartTooltipContent = React.forwardRef<
       labelKey,
       showTotal = false,
       totalLabel = 'Total',
+      ...props
     },
     ref
   ) => {
@@ -300,6 +361,7 @@ export const ChartTooltipContent = React.forwardRef<
           'pointer-events-none select-none grid min-w-[8rem] max-w-[calc(100vw-2rem)] items-start gap-1.5 rounded-[0.75rem] border border-outline-variant/60 bg-surface/95 backdrop-blur-sm px-3 py-2 text-xs shadow-ambient text-on-surface',
           className
         )}
+        {...props}
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
@@ -316,7 +378,7 @@ export const ChartTooltipContent = React.forwardRef<
                   indicator === 'dot' && 'items-center'
                 )}
               >
-                {formatter && item?.value !== undefined && item.name ? (
+                {formatter && item?.value !== undefined && item.name != null && item.name !== '' ? (
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
@@ -334,7 +396,7 @@ export const ChartTooltipContent = React.forwardRef<
                       !hideIndicator && (
                         <div
                           className={cn(
-                            'shrink-0 rounded-[2px] border-[var(--color-border)] bg-[var(--color-bg)] ring-1 ring-outline/25',
+                            'shrink-0 rounded-[2px] border-[var(--color-border)] bg-[var(--color-bg)] ring-1 ring-outline/60',
                             {
                               'size-2.5 rounded-full': indicator === 'dot',
                               'w-1 h-3 rounded-full': indicator === 'line',
@@ -404,6 +466,8 @@ export interface ChartLegendContentProps
   verticalAlign?: 'top' | 'bottom';
   hideIcon?: boolean;
   nameKey?: string;
+  activeIndex?: number;
+  onItemClick?: (index: number) => void;
 }
 
 // Internal props cloned onto custom Legend content by Recharts LegendImpl
@@ -450,6 +514,8 @@ export const ChartLegendContent = React.forwardRef<
       payload,
       verticalAlign = 'bottom',
       nameKey,
+      activeIndex,
+      onItemClick,
       role = 'list',
       'aria-label': ariaLabel = 'Chart legend',
       ...props
@@ -475,41 +541,67 @@ export const ChartLegendContent = React.forwardRef<
         )}
         {...pickLegendDivProps(props as Record<string, unknown>)}
       >
-        {payload.map((item) => {
+        {payload.map((item, index) => {
           const key = `${nameKey || item.dataKey || 'value'}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
+          const iconNode = !hideIcon && (
+            itemConfig?.avatar ? (
+              <img
+                src={itemConfig.avatar}
+                alt=""
+                aria-hidden="true"
+                className="size-3.5 rounded-full object-cover shrink-0 border border-outline-variant/40"
+              />
+            ) : itemConfig?.icon ? (
+              <span
+                aria-hidden="true"
+                className="shrink-0 [&>svg]:size-3.5 [&>svg]:text-on-surface-variant inline-flex items-center justify-center"
+              >
+                <itemConfig.icon />
+              </span>
+            ) : (
+              <span
+                aria-hidden="true"
+                className="inline-block size-2 rounded-full shrink-0 border border-outline/60"
+                style={{
+                  backgroundColor: item.color,
+                }}
+              />
+            )
+          );
+
+          if (onItemClick) {
+            const isSelected = activeIndex === index;
+            return (
+              <div key={item.value ?? index} role="listitem">
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => onItemClick(index)}
+                  className={cn(
+                    'relative inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-sans transition-colors duration-quick ease-standard motion-reduce:transition-none cursor-pointer touch-target-expanded [&>svg]:size-3 [&>svg]:text-on-surface-variant',
+                    'hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                    isSelected
+                      ? 'bg-surface-container-high text-on-surface font-semibold'
+                      : 'text-on-surface-variant font-medium'
+                  )}
+                >
+                  {iconNode}
+                  <span>{itemConfig?.label || item.value}</span>
+                </button>
+              </div>
+            );
+          }
 
           return (
             <div
-              key={item.value}
+              key={item.value ?? index}
               role="listitem"
               className={cn(
                 'flex items-center gap-1.5 [&>svg]:size-3 [&>svg]:text-on-surface-variant'
               )}
             >
-              {itemConfig?.avatar ? (
-                <img
-                  src={itemConfig.avatar}
-                  alt=""
-                  aria-hidden="true"
-                  className="size-3.5 rounded-full object-cover shrink-0 border border-outline-variant/40"
-                />
-              ) : itemConfig?.icon && !hideIcon ? (
-                <div
-                  aria-hidden="true"
-                  className="shrink-0 [&>svg]:size-3.5 [&>svg]:text-on-surface-variant flex items-center justify-center"
-                >
-                  <itemConfig.icon />
-                </div>
-              ) : (
-                <div
-                  aria-hidden="true"
-                  className="size-2 rounded-full shrink-0 border border-outline/30"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
-                />
-              )}
+              {iconNode}
               <span className="font-medium text-on-surface">{itemConfig?.label || item.value}</span>
             </div>
           );

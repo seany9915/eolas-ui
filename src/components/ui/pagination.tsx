@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { cn, sanitizeUrl } from '@/lib/utils';
+import { cn, resolveNativeButton, sanitizeUrl } from '@/lib/utils';
 import { Button, type ButtonProps } from './button';
 import { Icon } from './icon';
 
@@ -56,25 +56,29 @@ export const PaginationLink = React.forwardRef<
   size = 'sm',
   children,
   href,
+  render,
+  nativeButton,
+  'aria-current': ariaCurrent,
   ...props
 }, ref) => {
   const safeHref = sanitizeUrl(href);
-  const isLink = Boolean(safeHref);
+  const resolvedRender = render ?? (safeHref ? <a href={safeHref} /> : undefined);
+  const resolvedNativeButton = resolveNativeButton(resolvedRender, nativeButton);
   return (
     <Button
       ref={ref}
       data-slot="pagination-link"
       data-active={isActive ? 'true' : undefined}
-      nativeButton={isLink ? false : undefined}
-      render={isLink ? <a href={safeHref} aria-current={isActive ? 'page' : undefined} /> : undefined}
-      aria-current={!isLink && isActive ? 'page' : undefined}
+      nativeButton={resolvedNativeButton}
+      render={resolvedRender}
+      aria-current={ariaCurrent ?? (isActive ? 'page' : undefined)}
       variant={isActive ? 'filled' : 'outline'}
       colorRole={isActive ? 'primary' : 'neutral'}
       size={size}
       className={cn(
-        'min-w-[44px] min-h-[44px] h-11 px-3.5 tabular-nums font-sans text-sm rounded transition-colors',
+        'min-w-[44px] min-h-[44px] px-3.5 tabular-nums font-sans text-sm rounded transition-colors motion-reduce:transition-none',
         isActive
-          ? 'pointer-events-none font-semibold shadow-ambient'
+          ? 'pointer-events-none font-semibold'
           : 'text-on-surface hover:bg-state-hover border-outline-variant hover:border-outline',
         className
       )}

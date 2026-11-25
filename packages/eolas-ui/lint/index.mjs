@@ -74,7 +74,229 @@ const LIGHT_SURFACE_TERTIARY_UTILITIES = new Set([
   'border-r-tertiary',
   'ring-tertiary',
   'outline-tertiary',
+  'decoration-tertiary',
+  'divide-tertiary',
+  'fill-tertiary',
+  'stroke-tertiary',
+  'caret-tertiary',
+  'accent-tertiary',
 ]);
+
+const WRAPPED_HEADLESS_LIBS = [
+  '@base-ui/react',
+  '@base-ui-components/react',
+  '@headlessui/react',
+  'react-aria-components',
+  '@ark-ui/react',
+];
+
+const ICON_BUTTON_COMPONENT_NAMES = new Set([
+  'Button',
+  'ButtonRoot',
+  'Button.Root',
+  'UnstyledButton',
+  'Button.Unstyled',
+  'IconButton',
+  'InputGroupButton',
+  'InputGroup.Button',
+  'ToolbarButton',
+  'Toolbar.Button',
+]);
+
+const ICON_ELEMENT_NAMES = new Set([
+  'Icon',
+  'Icon.Toggle',
+  'Icon.CrossFade',
+  'ToggleIcon',
+  'CrossFadeIcon',
+  'svg',
+]);
+
+const SQUARE_SHORTHAND_EXCLUDED_VALUES = new Set([
+  'auto',
+  'min',
+  'max',
+  'fit',
+  'screen',
+  'dvh',
+  'svh',
+  'lvh',
+  'dvw',
+  'svw',
+  'lvw',
+]);
+
+const OVERLAY_HTML_TAGS = new Set(['div', 'section', 'aside']);
+
+function isWrappedHeadlessSpecifier(source) {
+  if (typeof source !== 'string') return false;
+  return WRAPPED_HEADLESS_LIBS.some((pkg) => source === pkg || source.startsWith(`${pkg}/`));
+}
+
+function getFileLayer(filename) {
+  const norm = String(filename || '').replace(/\\/g, '/');
+  if (/(?:^|\/)(?:src\/)?(?:components\/ui|ui)\//i.test(norm)) return 'ui';
+  if (/(?:^|\/)(?:src\/)?components\/blocks\//i.test(norm)) return 'blocks';
+  return null;
+}
+
+function getImportTargetLayer(specifier, filename) {
+  if (typeof specifier !== 'string' || !specifier) return null;
+  const normSpec = specifier.replace(/\\/g, '/');
+  let target = normSpec;
+
+  if (normSpec.startsWith('./') || normSpec.startsWith('../')) {
+    const normFile = String(filename || '').replace(/\\/g, '/');
+    target = path.posix.normalize(path.posix.join(path.posix.dirname(normFile), normSpec));
+  } else if (!normSpec.startsWith('@/') && !normSpec.startsWith('~/')) {
+    return null;
+  }
+
+  if (/(?:^|\/)(?:src\/)?components\/blocks(?:\/|$)/i.test(target)) return 'blocks';
+  if (/(?:^|\/)(?:src\/)?features(?:\/|$)/i.test(target)) return 'features';
+  if (/(?:^|\/)(?:src\/)?views(?:\/|$)/i.test(target)) return 'views';
+  return null;
+}
+
+function splitVariantSegments(variantStr) {
+  if (!variantStr) return [];
+  const segments = [];
+  let bracketDepth = 0;
+  let start = 0;
+  for (let i = 0; i < variantStr.length; i++) {
+    const ch = variantStr[i];
+    if (ch === '[') bracketDepth += 1;
+    else if (ch === ']' && bracketDepth > 0) bracketDepth -= 1;
+    else if (ch === ':' && bracketDepth === 0) {
+      segments.push(variantStr.slice(start, i));
+      start = i + 1;
+    }
+  }
+  segments.push(variantStr.slice(start));
+  return segments;
+}
+
+function hasVariantSegment(variantStr, targetSegment) {
+  return splitVariantSegments(variantStr).includes(targetSegment);
+}
+
+function hasReachInSelector(variantStr) {
+  for (const seg of splitVariantSegments(variantStr)) {
+    if (!seg.startsWith('[') || !seg.endsWith(']')) continue;
+    const inner = seg.slice(1, -1);
+    if (!inner.includes('&')) continue;
+
+    let nestedBrackets = 0;
+    let quote = null;
+    for (let i = 0; i < inner.length; i++) {
+      const ch = inner[i];
+      if (quote) {
+        if (ch === '\\' && i + 1 < inner.length) {
+          i += 1;
+        } else if (ch === quote) {
+          quote = null;
+        }
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        quote = ch;
+        continue;
+      }
+      if (ch === '[') {
+        nestedBrackets += 1;
+        continue;
+      }
+      if (ch === ']' && nestedBrackets > 0) {
+        nestedBrackets -= 1;
+        continue;
+      }
+      if (nestedBrackets === 0 && (ch === '_' || ch === '>' || ch === '+' || ch === '~')) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isTransitionAllToken(base) {
+  if (base === 'transition-all') return true;
+  if (base.startsWith('transition-[') && base.endsWith(']')) {
+    const payload = base.slice('transition-['.length, -1);
+    return /(?:^|[,_\s])all(?:$|[,_\s])/i.test(payload);
+  }
+  return false;
+}
+
+function isComponentJsxName(nameNode) {
+  if (!nameNode) return false;
+  if (nameNode.type === 'JSXMemberExpression') return true;
+  if (nameNode.type === 'JSXIdentifier') {
+    return /^[A-Z]/.test(nameNode.name);
+  }
+  return false;
+}
+
+function collectReturnedRootJsxOpeningElements(exprNode, visitorKeys, outSet) {
+  const expr = unwrapTypeExpr(exprNode);
+  if (!expr) return;
+  if (expr.type === 'JSXElement') {
+    if (expr.openingElement) {
+      outSet.add(expr.openingElement);
+    }
+    return;
+  }
+  if (expr.type === 'JSXFragment') {
+    return;
+  }
+  if (expr.type === 'ConditionalExpression') {
+    collectReturnedRootJsxOpeningElements(expr.consequent, visitorKeys, outSet);
+    collectReturnedRootJsxOpeningElements(expr.alternate, visitorKeys, outSet);
+    return;
+  }
+  if (expr.type === 'LogicalExpression') {
+    collectReturnedRootJsxOpeningElements(expr.left, visitorKeys, outSet);
+    collectReturnedRootJsxOpeningElements(expr.right, visitorKeys, outSet);
+    return;
+  }
+  if (expr.type === 'ArrowFunctionExpression' || expr.type === 'FunctionExpression') {
+    if (!expr.body) return;
+    if (expr.body.type !== 'BlockStatement') {
+      collectReturnedRootJsxOpeningElements(expr.body, visitorKeys, outSet);
+      return;
+    }
+    const visitBlockNode = (curr) => {
+      if (!curr || typeof curr !== 'object') return;
+      if (
+        curr.type === 'FunctionDeclaration' ||
+        curr.type === 'FunctionExpression' ||
+        curr.type === 'ArrowFunctionExpression' ||
+        curr.type === 'ClassDeclaration' ||
+        curr.type === 'ClassExpression'
+      ) {
+        return;
+      }
+      if (curr.type === 'ReturnStatement') {
+        if (curr.argument) {
+          collectReturnedRootJsxOpeningElements(curr.argument, visitorKeys, outSet);
+        }
+        return;
+      }
+      const keys = visitorKeys[curr.type] || Object.keys(curr);
+      for (const key of keys) {
+        if (key === 'parent' || key === 'loc' || key === 'range' || key === 'tokens' || key === 'comments') continue;
+        const child = curr[key];
+        if (Array.isArray(child)) {
+          for (const item of child) {
+            if (item && typeof item.type === 'string') visitBlockNode(item);
+          }
+        } else if (child && typeof child.type === 'string') {
+          visitBlockNode(child);
+        }
+      }
+    };
+    visitBlockNode(expr.body);
+  }
+}
 
 const MAX_CLASS_BRANCHES = 32;
 
@@ -455,7 +677,9 @@ function splitTailwindTokens(str) {
       else if (rawToken[i] === ':' && bracketDepth === 0) lastColon = i;
     }
     const variant = lastColon === -1 ? '' : rawToken.slice(0, lastColon);
-    const afterVariant = (lastColon === -1 ? rawToken : rawToken.slice(lastColon + 1)).replace(/^!|!$/g, '');
+    const rawAfterVariant = lastColon === -1 ? rawToken : rawToken.slice(lastColon + 1);
+    const hasImportant = /^!|!$/.test(rawAfterVariant);
+    const afterVariant = rawAfterVariant.replace(/^!|!$/g, '');
     const slashIdx = findOpacitySlash(afterVariant);
     const base = slashIdx === -1 ? afterVariant : afterVariant.slice(0, slashIdx);
     tokens.push({
@@ -463,6 +687,7 @@ function splitTailwindTokens(str) {
       variant,
       afterVariant,
       base,
+      hasImportant,
       hasOpacity: slashIdx !== -1,
     });
   }
@@ -1480,49 +1705,28 @@ export const plugin = {
         schema: [],
       },
       create(context) {
-        const renderElementDepthStack = [];
-        const rootRenderOpeningNodes = new WeakSet();
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const visitorKeys = sourceCode.visitorKeys || {};
+        const exemptRenderOpeningNodes = new WeakSet();
         return {
-          JSXAttribute(node) {
-            if (node.name?.name === 'render') {
-              renderElementDepthStack.push(0);
-            }
-          },
-          'JSXAttribute:exit'(node) {
-            if (node.name?.name === 'render') {
-              renderElementDepthStack.pop();
-            }
-          },
-          JSXElement(node) {
-            if (renderElementDepthStack.length > 0) {
-              const topIdx = renderElementDepthStack.length - 1;
-              const depthBefore = renderElementDepthStack[topIdx];
-              if (depthBefore === 0 && node.openingElement) {
-                rootRenderOpeningNodes.add(node.openingElement);
-              }
-              renderElementDepthStack[topIdx] = depthBefore + 1;
-            }
-          },
-          'JSXElement:exit'() {
-            if (renderElementDepthStack.length > 0) {
-              const topIdx = renderElementDepthStack.length - 1;
-              renderElementDepthStack[topIdx] = Math.max(0, renderElementDepthStack[topIdx] - 1);
-            }
-          },
-          JSXFragment() {
-            if (renderElementDepthStack.length > 0) {
-              const topIdx = renderElementDepthStack.length - 1;
-              renderElementDepthStack[topIdx] += 1;
-            }
-          },
-          'JSXFragment:exit'() {
-            if (renderElementDepthStack.length > 0) {
-              const topIdx = renderElementDepthStack.length - 1;
-              renderElementDepthStack[topIdx] = Math.max(0, renderElementDepthStack[topIdx] - 1);
-            }
-          },
           JSXOpeningElement(node) {
-            if (rootRenderOpeningNodes.has(node)) return;
+            if (isComponentJsxName(node.name)) {
+              for (const attr of node.attributes || []) {
+                if (
+                  attr?.type === 'JSXAttribute' &&
+                  attr.name?.name === 'render' &&
+                  attr.value?.type === 'JSXExpressionContainer'
+                ) {
+                  collectReturnedRootJsxOpeningElements(
+                    attr.value.expression,
+                    visitorKeys,
+                    exemptRenderOpeningNodes
+                  );
+                }
+              }
+            }
+
+            if (exemptRenderOpeningNodes.has(node)) return;
             if (node.name?.type !== 'JSXIdentifier') return;
             const tag = node.name.name;
             const message = RAW_HTML_CONTROL_MESSAGES[tag];
@@ -1711,7 +1915,7 @@ export const plugin = {
         type: 'problem',
         docs: {
           description:
-            'Disallow Sunny Amber text-tertiary, border-*-tertiary, ring-tertiary, and outline-tertiary on light surfaces (fails WCAG AA 1.97:1 contrast).',
+            'Disallow Sunny Amber text-tertiary, border-*-tertiary, ring-tertiary, outline-tertiary, decoration-tertiary, divide-tertiary, fill-tertiary, stroke-tertiary, caret-tertiary, and accent-tertiary on light surfaces (fails WCAG AA 1.97:1 contrast).',
         },
         schema: [],
       },
@@ -1719,7 +1923,7 @@ export const plugin = {
         let invertedDepth = 0;
         const invertedStack = [];
         const message =
-          'Sunny Amber (`text-tertiary` / `border-*-tertiary` / `ring-tertiary` / `outline-tertiary`) is banned on light surfaces (fails WCAG AA 1.97:1). Use `tertiary` only for solid fills with neutral text, `*-container` washes, or inside inverted dark surfaces (`inverted:text-tertiary`).';
+          'Sunny Amber (`text-tertiary` / `border-*-tertiary` / `ring-tertiary` / `outline-tertiary` / `decoration-tertiary` / `divide-tertiary` / `fill-tertiary` / `stroke-tertiary` / `caret-tertiary` / `accent-tertiary`) is banned on light surfaces (fails WCAG AA 1.97:1). Use `tertiary` only for solid fills with neutral text, `*-container` washes, or inside inverted dark surfaces (`inverted:text-tertiary`).';
 
         return createClassRuleVisitor(context, {
           captureContext: () => ({ inverted: invertedDepth > 0 }),
@@ -1773,7 +1977,7 @@ export const plugin = {
       meta: {
         type: 'problem',
         docs: {
-          description: 'Disallow blanket transition-all utility classes and inline transition: all styles.',
+          description: 'Disallow blanket transition-all / transition-[all] utility classes and inline transition: all styles.',
         },
         schema: [],
       },
@@ -1787,7 +1991,7 @@ export const plugin = {
             const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
             for (const group of groups) {
               const tokens = splitTailwindTokens(group.text);
-              if (tokens.some((t) => t.base === 'transition-all')) {
+              if (tokens.some((t) => isTransitionAllToken(t.base))) {
                 context.report({ node: group.node, message });
               }
             }
@@ -1947,6 +2151,445 @@ export const plugin = {
           TSAsExpression: checkAssertion,
           TSTypeAssertion: checkAssertion,
         };
+      },
+    },
+    'one-way-imports': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Enforce strict architectural layer boundaries: ui primitives cannot import blocks/features/views, and blocks cannot import features/views.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const filename = getFilename(context);
+        const fileLayer = getFileLayer(filename);
+        if (!fileLayer) return {};
+
+        const checkSpecifier = (node, specifier) => {
+          const targetLayer = getImportTargetLayer(specifier, filename);
+          if (!targetLayer) return;
+
+          if (fileLayer === 'ui' && (targetLayer === 'blocks' || targetLayer === 'features' || targetLayer === 'views')) {
+            context.report({
+              node,
+              message: `Layer violation: UI primitives cannot import from ${targetLayer}/. Keep dependencies strictly one-way (ui -> blocks -> features/views).`,
+            });
+          } else if (fileLayer === 'blocks' && (targetLayer === 'features' || targetLayer === 'views')) {
+            context.report({
+              node,
+              message: `Layer violation: composite blocks cannot import from ${targetLayer}/. Keep blocks pure and controlled (props in, callbacks out).`,
+            });
+          }
+        };
+
+        return {
+          ImportDeclaration(node) {
+            checkSpecifier(node, node.source?.value);
+          },
+          ExportNamedDeclaration(node) {
+            if (node.source) checkSpecifier(node, node.source.value);
+          },
+          ExportAllDeclaration(node) {
+            if (node.source) checkSpecifier(node, node.source.value);
+          },
+          ImportExpression(node) {
+            checkSpecifier(node, getStaticStringFromExpr(node.source));
+          },
+          CallExpression(node) {
+            if (
+              node.callee?.type === 'Identifier' &&
+              node.callee.name === 'require' &&
+              node.arguments?.length > 0
+            ) {
+              checkSpecifier(node, getStaticStringFromExpr(node.arguments[0]));
+            }
+          },
+        };
+      },
+    },
+    'wrapped-libraries': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Disallow direct runtime imports of wrapped headless UI libraries outside src/components/ui/; use Eolas UI primitives instead.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const utilsAllowedSpecifiers = new Set(['@base-ui/react/merge-props', '@base-ui/react/use-render']);
+        const isUtilsModule = /(?:^|\/)(?:lib\/)?utils\.[cm]?[jt]sx?$/i.test(
+          String(getFilename(context) || '').replace(/\\/g, '/')
+        );
+        const reportIfWrapped = (node, specifier) => {
+          if (isUtilsModule && utilsAllowedSpecifiers.has(specifier)) return;
+          if (isWrappedHeadlessSpecifier(specifier)) {
+            context.report({
+              node,
+              message: `Do not import wrapped headless library "${specifier}" outside src/components/ui/. Use Eolas UI primitives from @/components/ui/ instead (type-only imports are allowed).`,
+            });
+          }
+        };
+
+        return {
+          ImportDeclaration(node) {
+            if (node.importKind === 'type') return;
+            if (Array.isArray(node.specifiers) && node.specifiers.length > 0 && node.specifiers.every((s) => s.importKind === 'type')) {
+              return;
+            }
+            reportIfWrapped(node, node.source?.value);
+          },
+          ExportNamedDeclaration(node) {
+            if (!node.source || node.exportKind === 'type') return;
+            if (Array.isArray(node.specifiers) && node.specifiers.length > 0 && node.specifiers.every((s) => s.exportKind === 'type')) {
+              return;
+            }
+            reportIfWrapped(node, node.source.value);
+          },
+          ExportAllDeclaration(node) {
+            if (!node.source || node.exportKind === 'type') return;
+            reportIfWrapped(node, node.source.value);
+          },
+          ImportExpression(node) {
+            reportIfWrapped(node, getStaticStringFromExpr(node.source));
+          },
+          CallExpression(node) {
+            if (
+              node.callee?.type === 'Identifier' &&
+              node.callee.name === 'require' &&
+              node.arguments?.length > 0
+            ) {
+              reportIfWrapped(node, getStaticStringFromExpr(node.arguments[0]));
+            }
+          },
+        };
+      },
+    },
+    'no-reach-in-selectors': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Disallow Tailwind arbitrary reach-in selectors ([&_svg], [&>button]) on components outside src/components/ui/.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const openingIsComponentStack = [];
+
+        return createClassRuleVisitor(context, {
+          captureContext: () => ({
+            onComponent: openingIsComponentStack[openingIsComponentStack.length - 1] === true,
+          }),
+          onCheckExpr({ expr, visitedCalls, resolveVar, snapshot }) {
+            if (!snapshot?.onComponent) return;
+            const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
+            for (const group of groups) {
+              const tokens = splitTailwindTokens(group.text);
+              const badToken = tokens.find((t) => hasReachInSelector(t.variant));
+              if (badToken) {
+                context.report({
+                  node: group.node,
+                  message: `Avoid reach-in selector "${badToken.raw}" on components. Use documented component props/variants or extend the primitive in src/components/ui/.`,
+                });
+              }
+            }
+          },
+          createExtra: () => ({
+            JSXOpeningElement(node) {
+              openingIsComponentStack.push(isComponentJsxName(node.name));
+            },
+            'JSXOpeningElement:exit'() {
+              openingIsComponentStack.pop();
+            },
+          }),
+        });
+      },
+    },
+    'icon-button-label': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Require an accessible name (aria-label, aria-labelledby, title, or screen-reader text) on icon-only Button controls.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const hasLabelAttr = (attrs) => {
+          for (const attr of attrs) {
+            if (attr.type === 'JSXSpreadAttribute') return true;
+            if (attr.type !== 'JSXAttribute') continue;
+            const name = attr.name?.name;
+            if (name !== 'aria-label' && name !== 'aria-labelledby' && name !== 'title') continue;
+            if (!attr.value) continue;
+            if (attr.value.type === 'Literal') {
+              if (typeof attr.value.value === 'string' && attr.value.value.trim().length > 0) return true;
+              continue;
+            }
+            if (attr.value.type === 'JSXExpressionContainer') {
+              const staticVal = getStaticStringFromExpr(attr.value.expression);
+              if (staticVal === null || staticVal.trim().length > 0) return true;
+            }
+          }
+          return false;
+        };
+
+        return {
+          JSXElement(node) {
+            const tagFull = getJsxTagParts(node.openingElement?.name).full;
+            if (!ICON_BUTTON_COMPONENT_NAMES.has(tagFull)) return;
+            const attrs = node.openingElement?.attributes || [];
+            if (hasLabelAttr(attrs)) return;
+
+            let hasIconChild = false;
+            let hasAccessibleContent = false;
+
+            for (const child of node.children || []) {
+              if (child.type === 'JSXText') {
+                if (child.value.trim().length > 0) {
+                  hasAccessibleContent = true;
+                  break;
+                }
+              } else if (child.type === 'JSXExpressionContainer') {
+                if (child.expression?.type !== 'JSXEmptyExpression') {
+                  hasAccessibleContent = true;
+                  break;
+                }
+              } else if (child.type === 'JSXFragment') {
+                hasAccessibleContent = true;
+                break;
+              } else if (child.type === 'JSXElement') {
+                const childTag = getJsxTagParts(child.openingElement?.name).full;
+                if (ICON_ELEMENT_NAMES.has(childTag)) {
+                  hasIconChild = true;
+                } else {
+                  hasAccessibleContent = true;
+                  break;
+                }
+              }
+            }
+
+            if (hasIconChild && !hasAccessibleContent) {
+              context.report({
+                node: node.openingElement,
+                message: `Icon-only <${tagFull}> requires an accessible label. Add aria-label="..." or a <span className="sr-only">...</span> child.`,
+              });
+            }
+          },
+        };
+      },
+    },
+    'prefer-shorthand': {
+      meta: {
+        type: 'suggestion',
+        docs: {
+          description:
+            'Enforce DESIGN.md Tailwind shorthands: size-* over w-X h-X, flex/grid gap-* over space-x/space-y-*, and h-dvh over h-screen.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const reportedKindsByNode = new WeakMap();
+        const reportOnce = (node, kind, message) => {
+          let kinds = reportedKindsByNode.get(node);
+          if (!kinds) {
+            kinds = new Set();
+            reportedKindsByNode.set(node, kinds);
+          }
+          if (kinds.has(kind)) return;
+          kinds.add(kind);
+          context.report({ node, message });
+        };
+
+        return createClassRuleVisitor(context, {
+          onCheckExpr({ expr, rootNode, visitedCalls, resolveVar }) {
+            const branches = extractClassBranchesFromExpr(expr, { visitedCalls, resolveVar, rootNode });
+            for (const branch of branches) {
+              if (!branch.text) continue;
+              const tokens = splitTailwindTokens(branch.text);
+              const widthsByVariant = new Map();
+              const heightsByVariant = new Map();
+
+              for (const token of tokens) {
+                if (/^-?space-[xy]-/.test(token.base)) {
+                  reportOnce(
+                    branch.node,
+                    `space:${token.raw}`,
+                    `Avoid child-margin utility "${token.raw}". Use flex/grid with gap-* instead per DESIGN.md.`
+                  );
+                }
+
+                if (token.base === 'h-screen' || token.base === 'min-h-screen') {
+                  const replacement = token.base.replace('screen', 'dvh');
+                  reportOnce(
+                    branch.node,
+                    `screen:${token.base}`,
+                    `Use "${replacement}" instead of "${token.base}" for mobile viewport/keyboard safety.`
+                  );
+                }
+
+                const wMatch = token.base.match(/^w-([^\s/]+)$/);
+                if (wMatch) {
+                  const val = wMatch[1];
+                  if (!SQUARE_SHORTHAND_EXCLUDED_VALUES.has(val) && !val.startsWith('[')) {
+                    let map = widthsByVariant.get(token.variant);
+                    if (!map) {
+                      map = new Map();
+                      widthsByVariant.set(token.variant, map);
+                    }
+                    map.set(val, token.raw);
+                  }
+                }
+
+                const hMatch = token.base.match(/^h-([^\s/]+)$/);
+                if (hMatch) {
+                  const val = hMatch[1];
+                  if (!SQUARE_SHORTHAND_EXCLUDED_VALUES.has(val) && !val.startsWith('[')) {
+                    let map = heightsByVariant.get(token.variant);
+                    if (!map) {
+                      map = new Map();
+                      heightsByVariant.set(token.variant, map);
+                    }
+                    map.set(val, token.raw);
+                  }
+                }
+              }
+
+              for (const [variant, widthMap] of widthsByVariant.entries()) {
+                const heightMap = heightsByVariant.get(variant);
+                if (!heightMap) continue;
+                for (const [val, wRaw] of widthMap.entries()) {
+                  const hRaw = heightMap.get(val);
+                  if (!hRaw) continue;
+                  const prefix = variant ? `${variant}:` : '';
+                  reportOnce(
+                    branch.node,
+                    `square:${prefix}${val}`,
+                    `Use "${prefix}size-${val}" instead of "${wRaw} ${hRaw}".`
+                  );
+                }
+              }
+            }
+          },
+        });
+      },
+    },
+    'no-dark-variant': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Disallow Tailwind dark:* variants; Eolas UI scopes dark surfaces with [data-surface="inverted"] (inverted:*).',
+        },
+        schema: [],
+      },
+      create(context) {
+        return createClassRuleVisitor(context, {
+          onCheckExpr({ expr, visitedCalls, resolveVar }) {
+            const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
+            for (const group of groups) {
+              const tokens = splitTailwindTokens(group.text);
+              const badToken = tokens.find((t) => hasVariantSegment(t.variant, 'dark'));
+              if (badToken) {
+                context.report({
+                  node: group.node,
+                  message: `Avoid "${badToken.raw}". Eolas UI scopes dark surfaces via [data-surface="inverted"] (inverted:*) rather than Tailwind dark: variants.`,
+                });
+              }
+            }
+          },
+        });
+      },
+    },
+    'no-important': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Disallow Tailwind important (!) modifiers outside src/components/ui/.',
+        },
+        schema: [],
+      },
+      create(context) {
+        return createClassRuleVisitor(context, {
+          onCheckExpr({ expr, visitedCalls, resolveVar }) {
+            const groups = extractClassGroupsFromExpr(expr, visitedCalls, [], resolveVar);
+            for (const group of groups) {
+              const tokens = splitTailwindTokens(group.text);
+              const badToken = tokens.find((t) => t.hasImportant);
+              if (badToken) {
+                context.report({
+                  node: group.node,
+                  message: `Avoid Tailwind important override "${badToken.raw}". Use documented component props/variants or adjust layout containers instead.`,
+                });
+              }
+            }
+          },
+        });
+      },
+    },
+    'no-rebuilt-overlay': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Disallow hand-rolled "fixed inset-0" overlay containers outside src/components/ui/; use <Dialog>, <AlertDialog>, or <Drawer>.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const openingTagStack = [];
+
+        return createClassRuleVisitor(context, {
+          captureContext: () => ({
+            tag: openingTagStack[openingTagStack.length - 1] || '',
+          }),
+          onCheckExpr({ expr, rootNode, visitedCalls, resolveVar, snapshot }) {
+            if (!OVERLAY_HTML_TAGS.has(snapshot?.tag)) return;
+            const branches = extractClassBranchesFromExpr(expr, { visitedCalls, resolveVar, rootNode });
+            const reportedNodes = new WeakSet();
+
+            for (const branch of branches) {
+              if (!branch.text || reportedNodes.has(branch.node)) continue;
+              const tokens = splitTailwindTokens(branch.text);
+              if (tokens.some((t) => t.base === 'sr-only')) continue;
+
+              const byVariant = new Map();
+              for (const token of tokens) {
+                let flags = byVariant.get(token.variant);
+                if (!flags) {
+                  flags = { hasFixed: false, hasInsetZero: false };
+                  byVariant.set(token.variant, flags);
+                }
+                if (token.base === 'fixed') flags.hasFixed = true;
+                if (token.base === 'inset-0') flags.hasInsetZero = true;
+              }
+
+              for (const flags of byVariant.values()) {
+                if (flags.hasFixed && flags.hasInsetZero) {
+                  reportedNodes.add(branch.node);
+                  context.report({
+                    node: branch.node,
+                    message:
+                      'Avoid hand-rolled "fixed inset-0" overlays. Use <Dialog>, <AlertDialog>, or <Drawer> from @/components/ui/ for accessible focus trapping and Escape dismissal.',
+                  });
+                  break;
+                }
+              }
+            }
+          },
+          createExtra: () => ({
+            JSXOpeningElement(node) {
+              const tag = node.name?.type === 'JSXIdentifier' ? node.name.name : '';
+              openingTagStack.push(tag);
+            },
+            'JSXOpeningElement:exit'() {
+              openingTagStack.pop();
+            },
+          }),
+        });
       },
     },
   },

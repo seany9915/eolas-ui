@@ -169,6 +169,7 @@ export const AntiPatternAuditBench: React.FC = () => {
         title="Anti-Pattern & Accessibility Visual Audit Bench"
         titleAs="h2"
         role="success"
+        ariaRole="note"
         icon="verified"
       >
         <p>
@@ -180,10 +181,10 @@ export const AntiPatternAuditBench: React.FC = () => {
       {/* Visual Comparison Cards */}
       <div className="flex flex-col gap-6">
         {auditChecks.map((check) => (
-          <Card key={check.id} variant="default" className="overflow-hidden">
+          <Card key={check.id} variant="default">
             <Card.Header className="flex flex-row items-center justify-between border-b border-outline-variant/60 pb-3">
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="soft" colorRole="primary" size="sm">
                     {check.category}
                   </Badge>
@@ -197,14 +198,18 @@ export const AntiPatternAuditBench: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* DON'T Column */}
                 <div className="p-4 rounded-xl border border-error/40 bg-error-container/20 flex flex-col gap-3">
-                  <div className="flex items-center justify-between border-b border-error/20 pb-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-error/20 pb-2">
                     <span className="font-heading text-xs font-bold text-error flex items-center gap-1.5">
                       <Icon name="cancel" size="xs" />
                       Don&apos;t (Banned Pattern)
                     </span>
                     <Badge variant="filled" colorRole="error" size="sm">Banned</Badge>
                   </div>
-                  <div className="min-h-16 flex items-center justify-center p-3 rounded-lg bg-surface border border-outline-variant/40">
+                  <div
+                    inert
+                    aria-hidden="true"
+                    className="min-h-16 flex items-center justify-center p-3 rounded-lg bg-surface border border-outline-variant/40"
+                  >
                     {check.dontExample}
                   </div>
                   <p className="font-sans text-xs text-on-surface-variant leading-relaxed">

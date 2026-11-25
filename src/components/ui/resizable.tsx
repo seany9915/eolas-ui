@@ -68,6 +68,7 @@ export const ResizablePanelGroup = React.forwardRef<
 ResizablePanelGroup.displayName = 'ResizablePanelGroup';
 
 export interface ResizablePanelProps extends PanelProps {
+  /** @deprecated Panel order is determined automatically by JSX position. */
   order?: number;
 }
 
@@ -102,15 +103,15 @@ export const ResizableHandle = React.forwardRef<
         'group relative flex items-center justify-center bg-outline-variant select-none touch-none',
         'transition-colors duration-quick ease-standard motion-reduce:transition-none',
         // Hover & Active States on track
-        'hover:bg-primary focus-visible:bg-primary data-[separator=hover]:bg-primary data-[separator=active]:bg-primary',
+        'hover:bg-primary focus-visible:bg-primary data-[separator=hover]:bg-primary data-[separator=active]:bg-primary forced-colors:bg-[ButtonText]',
         // Accessible Floating Focus Ring per DESIGN.md
         'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1 focus-visible:z-20',
         // Vertical Separator (Horizontal Layout: panels placed side-by-side)
         'h-full w-px cursor-col-resize [&[aria-orientation=vertical]]:w-px [&[aria-orientation=vertical]]:cursor-col-resize',
-        'after:absolute after:inset-y-0 after:left-1/2 after:w-6 pointer-coarse:after:w-8 after:-translate-x-1/2 after:content-[\'\']',
+        'after:absolute after:inset-y-0 after:left-1/2 after:w-6 pointer-coarse:after:w-11 after:-translate-x-1/2 after:content-[\'\']',
         // Horizontal Separator (Vertical Layout: panels stacked vertically)
         '[&[aria-orientation=horizontal]]:h-px [&[aria-orientation=horizontal]]:w-full [&[aria-orientation=horizontal]]:cursor-row-resize',
-        '[&[aria-orientation=horizontal]]:after:inset-x-0 [&[aria-orientation=horizontal]]:after:inset-y-auto [&[aria-orientation=horizontal]]:after:left-0 [&[aria-orientation=horizontal]]:after:top-1/2 [&[aria-orientation=horizontal]]:after:h-6 [&[aria-orientation=horizontal]]:pointer-coarse:after:h-8 [&[aria-orientation=horizontal]]:after:w-full [&[aria-orientation=horizontal]]:after:translate-x-0 [&[aria-orientation=horizontal]]:after:-translate-y-1/2',
+        '[&[aria-orientation=horizontal]]:after:inset-x-0 [&[aria-orientation=horizontal]]:after:inset-y-auto [&[aria-orientation=horizontal]]:after:left-0 [&[aria-orientation=horizontal]]:after:top-1/2 [&[aria-orientation=horizontal]]:after:h-6 [&[aria-orientation=horizontal]]:pointer-coarse:after:h-11 [&[aria-orientation=horizontal]]:after:w-full [&[aria-orientation=horizontal]]:after:translate-x-0 [&[aria-orientation=horizontal]]:after:-translate-y-1/2',
         className
       )}
       {...props}

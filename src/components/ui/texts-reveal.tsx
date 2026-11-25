@@ -63,6 +63,7 @@ export const TextsRevealLine = React.forwardRef<HTMLDivElement, TextsRevealLineP
     return (
       <div
         ref={ref}
+        data-slot="texts-reveal-line"
         style={{
           transitionDelay: isEntering ? `${delayMs}ms` : '0ms',
           ...style,
@@ -131,6 +132,7 @@ export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsReveal
       <TextsRevealContext.Provider value={{ show: visible, hasEntered }}>
         <div
           ref={ref}
+          data-slot="texts-reveal"
           className={cn(
             'flex flex-col gap-1 w-full',
             !show && 'pointer-events-none',

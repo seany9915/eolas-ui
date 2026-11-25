@@ -25,10 +25,10 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { InlineAlert } from '@/components/ui/inline-alert';
 import { NavigationBar } from '@/components/ui/navigation-bar';
 import { Icon } from '@/components/ui/icon';
 import { ComponentDemoProps } from '../types';
+import { assetUrl } from '@/lib/utils';
 
 export const TabsDemo: React.FC<ComponentDemoProps> = () => {
   return (
@@ -338,19 +338,23 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
         <SidebarProvider embedded defaultOpen={true}>
           <Sidebar collapsible="icon" className="border-r border-outline-variant bg-surface">
             <SidebarHeader className="p-3 border-b border-outline-variant">
-              <div className="flex items-center justify-between min-h-[36px]">
-                <div className="flex items-center gap-2 overflow-hidden group-data-[collapsible=icon]:hidden">
-                  <div className="size-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-                    <Icon name="record_voice_over" size="sm" className="text-primary" />
-                  </div>
-                  <span className="font-heading text-sm font-bold text-on-surface truncate">
-                    Speech Portal
-                  </span>
+              <div className="flex items-center justify-between min-h-[36px] group-data-[collapsible=icon]:justify-center">
+                <div className="flex items-center">
+                  <img
+                    src={assetUrl('/logos/horizontal-lockup.svg')}
+                    alt="Eolas Speech"
+                    className="h-6 w-auto group-data-[collapsible=icon]:hidden"
+                  />
+                  <img
+                    src={assetUrl('/logos/pictorial-mark.svg')}
+                    alt="Eolas Speech"
+                    className="hidden size-7 object-contain group-data-[collapsible=icon]:block"
+                  />
                 </div>
               </div>
             </SidebarHeader>
 
-            <SidebarContent className="p-2 flex flex-col gap-3">
+            <SidebarContent className="flex flex-col gap-3">
               <SidebarGroup>
                 <SidebarGroupLabel className="text-xs text-on-surface-variant font-medium px-2 py-1">
                   Practice
@@ -576,23 +580,6 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
         completeLabel="Save Plan"
         indicator="progress"
       />
-    </div>
-  );
-};
-
-export const SteppersLegacyDemo: React.FC<ComponentDemoProps> = () => {
-  return (
-    <div className="flex flex-col gap-4 max-w-md mx-auto">
-      <InlineAlert
-        role="warning"
-        title="Legacy Re-Export Alias"
-      >
-        steppers.tsx is an alias for number-field.tsx. New code should import NumberField directly from @/components/ui/number-field.
-      </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-mono">
-        <p className="text-on-surface">Modern replacement import:</p>
-        <p className="text-primary font-bold">import &#123; NumberField &#125; from '@/components/ui/number-field';</p>
-      </div>
     </div>
   );
 };

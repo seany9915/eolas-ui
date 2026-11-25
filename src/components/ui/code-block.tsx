@@ -177,55 +177,66 @@ CodeBlockActions.displayName = 'CodeBlockActions';
 /* -------------------------------------------------------------------------------------------------
  * CodeBlockCopyButton
  * -----------------------------------------------------------------------------------------------*/
-export interface CodeBlockCopyButtonProps {
+export interface CodeBlockCopyButtonProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof Button>, 'value' | 'onCopy' | 'children'> {
   value: string;
   label?: string;
   copiedLabel?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const CodeBlockCopyButton: React.FC<CodeBlockCopyButtonProps> = ({
-  value,
-  label = 'Copy code',
-  copiedLabel = 'Copied to clipboard',
-  className,
-}) => {
-  const [copied, setCopied] = React.useState(false);
+export const CodeBlockCopyButton = React.forwardRef<HTMLButtonElement, CodeBlockCopyButtonProps>(
+  ({ value, label = 'Copy code', copiedLabel = 'Copied to clipboard', className, onClick, ...props }, ref) => {
+    const [copied, setCopied] = React.useState(false);
+    const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(value);
-    } catch {
-      return;
-    }
-    setCopied(true);
-    announce(copiedLabel);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    React.useEffect(() => {
+      return () => {
+        if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      };
+    }, []);
 
-  return (
-    <Tooltip content={copied ? copiedLabel : label}>
-      <Button
-        type="button"
-        variant="text"
-        colorRole="neutral"
-        size="sm"
-        data-slot="code-block-copy-button"
-        onClick={handleCopy}
-        expandedTouchTarget
-        aria-label={copied ? copiedLabel : label}
-        className={cn(
-          'size-7 min-h-[28px] min-w-[28px] p-0 text-on-surface-variant hover:text-on-surface transition-colors',
-          copied && 'text-primary',
-          className
-        )}
-      >
-        <Icon name={copied ? 'check' : 'content_copy'} size="xs" aria-hidden="true" />
-      </Button>
-    </Tooltip>
-  );
-};
+    const handleCopy: NonNullable<CodeBlockCopyButtonProps['onClick']> = async (e) => {
+      e.stopPropagation();
+      onClick?.(e);
+      if (e.defaultPrevented) return;
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        return;
+      }
+      setCopied(true);
+      announce(copiedLabel);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+      <Tooltip content={copied ? copiedLabel : label}>
+        <Button
+          ref={ref}
+          type="button"
+          variant="text"
+          colorRole="neutral"
+          size="sm"
+          data-slot="code-block-copy-button"
+          onClick={handleCopy}
+          expandedTouchTarget
+          aria-label={copied ? copiedLabel : label}
+          className={cn(
+            'size-7 min-h-[28px] min-w-[28px] p-0 text-on-surface-variant hover:text-on-surface transition-colors motion-reduce:transition-none',
+            copied && 'text-primary',
+            className
+          )}
+          {...props}
+        >
+          <Icon name={copied ? 'check' : 'content_copy'} size="xs" aria-hidden="true" />
+        </Button>
+      </Tooltip>
+    );
+  }
+);
 CodeBlockCopyButton.displayName = 'CodeBlockCopyButton';
 
 /* -------------------------------------------------------------------------------------------------
@@ -268,12 +279,13 @@ export const CodeBlockContent = React.forwardRef<HTMLPreElement, CodeBlockConten
     return (
       <pre
         ref={ref}
+        dir="ltr"
         data-slot="code-block-content"
         data-wrap={wrap ? '' : undefined}
         data-line-numbers={lineNumbers ? '' : undefined}
         className={cn(
-          'overflow-x-auto font-mono leading-relaxed selection:bg-primary-container selection:text-on-primary-container',
-          size === 'sm' ? 'p-2.5 text-xs' : 'p-3.5 text-xs',
+          'overflow-x-auto font-mono leading-relaxed text-left [unicode-bidi:isolate] selection:bg-primary-container selection:text-on-primary-container',
+          size === 'sm' ? 'p-2.5 text-xs' : 'p-3.5 text-sm',
           variant === 'destructive' ? 'text-on-error-container' : 'text-on-surface',
           wrap && 'whitespace-pre-wrap break-words [&_[data-slot=code-block-line]]:min-w-0',
           '[scrollbar-width:thin] [scrollbar-color:color-mix(in_oklch,var(--outline-variant)_60%,transparent)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant/60 [&::-webkit-scrollbar-track]:bg-transparent',

@@ -25,6 +25,18 @@ import { Icon } from './icon';
 import { Tooltip } from './tooltip';
 import { cn } from '@/lib/utils';
 
+function resolveScrollBehavior(behavior: ScrollBehavior): ScrollBehavior {
+  if (
+    behavior === 'smooth' &&
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return 'auto';
+  }
+  return behavior;
+}
+
 /* -------------------------------------------------------------------------------------------------
  * Context
  * -----------------------------------------------------------------------------------------------*/
@@ -42,6 +54,7 @@ export interface MessageScrollerContextValue {
   contentRef: React.RefObject<HTMLDivElement | null>;
   unreadCount: number;
   scrollPreviousItemPeek: number;
+  scrollMargin: number;
   scrollable: { start: boolean; end: boolean };
   visibleMessageIds: string[];
   currentAnchorId: string | null;
@@ -94,6 +107,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
   defaultScrollPosition = 'end',
   scrollPreviousItemPeek = 64,
   scrollEdgeThreshold,
+  scrollMargin = 0,
   threshold = 48,
   children,
 }) => {
@@ -163,7 +177,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       if (!vp) return;
       vp.scrollTo({
         top: vp.scrollHeight,
-        behavior,
+        behavior: resolveScrollBehavior(behavior),
       });
       setIsAtBottom(true);
       setUnreadCount(0);
@@ -178,7 +192,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       if (!vp) return;
       vp.scrollTo({
         top: 0,
-        behavior,
+        behavior: resolveScrollBehavior(behavior),
       });
       setPendingScroll(false);
     },
@@ -190,14 +204,14 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       const vp = viewportRef.current;
       const el = itemsRef.current.get(id);
       if (!vp || !el) return false;
-      const targetTop = Math.max(0, el.offsetTop - scrollPreviousItemPeek);
+      const targetTop = Math.max(0, el.offsetTop - scrollPreviousItemPeek - scrollMargin);
       vp.scrollTo({
         top: targetTop,
-        behavior,
+        behavior: resolveScrollBehavior(behavior),
       });
       return true;
     },
-    [scrollPreviousItemPeek]
+    [scrollPreviousItemPeek, scrollMargin]
   );
 
   // Initial scroll position resolution
@@ -213,13 +227,13 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       const anchorNodes = Array.from(vp.querySelectorAll<HTMLElement>('[data-scroll-anchor]'));
       const lastAnchor = anchorNodes[anchorNodes.length - 1];
       if (lastAnchor) {
-        vp.scrollTop = Math.max(0, lastAnchor.offsetTop - scrollPreviousItemPeek);
+        vp.scrollTop = Math.max(0, lastAnchor.offsetTop - scrollPreviousItemPeek - scrollMargin);
       }
       setPendingScroll(false);
     } else {
       setPendingScroll(false);
     }
-  }, [defaultScrollPosition, scrollPreviousItemPeek, viewportEl]);
+  }, [defaultScrollPosition, scrollPreviousItemPeek, scrollMargin, viewportEl]);
 
   // ResizeObserver on content container to track incoming streamed tokens or expanding disclosures
   React.useEffect(() => {
@@ -330,6 +344,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
         contentRef,
         unreadCount,
         scrollPreviousItemPeek,
+        scrollMargin,
         scrollable,
         visibleMessageIds,
         currentAnchorId,
@@ -481,7 +496,7 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
       }
 
       prevFirstItemRef.current = firstItem ? { el: firstItem, offsetTop: firstItem.offsetTop } : null;
-    });
+    }, [children, preserveScrollOnPrepend, viewportRef, contentRef]);
 
     const mergedRef = React.useCallback(
       (node: HTMLDivElement | null) => {
@@ -495,13 +510,14 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
     return (
       <div
         ref={mergedRef}
+        role="region"
         data-slot="message-scroller-viewport"
         data-pending-scroll={pendingScroll ? '' : undefined}
         data-scrollable-start={scrollable.start ? '' : undefined}
         data-scrollable-end={scrollable.end ? '' : undefined}
         aria-label={ariaLabel}
         className={cn(
-          'flex-1 w-full overflow-y-auto overscroll-contain data-[pending-scroll]:invisible focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+          'relative flex-1 w-full overflow-y-auto overscroll-contain data-[pending-scroll]:invisible focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
           '[scrollbar-width:thin] [scrollbar-color:var(--outline-variant)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-outline-variant [&::-webkit-scrollbar-track]:bg-transparent',
           (scrollable.start || scrollable.end) &&
             '[mask-image:linear-gradient(to_bottom,transparent_0,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0,black_var(--fade-top,0px),black_calc(100%-var(--fade-bottom,0px)),transparent_100%)]',
@@ -567,9 +583,16 @@ export interface MessageScrollerItemProps extends React.HTMLAttributes<HTMLDivEl
 }
 
 export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrollerItemProps>(
-  ({ messageId, scrollAnchor = false, children, className, ...props }, ref) => {
+  ({ messageId, scrollAnchor = false, children, className, style, ...props }, ref) => {
     const itemRef = React.useRef<HTMLDivElement | null>(null);
-    const { viewportRef, scrollPreviousItemPeek, registerItem, notifyItemAdded, isReadyRef } = useMessageScroller();
+    const {
+      viewportRef,
+      scrollPreviousItemPeek,
+      scrollMargin,
+      registerItem,
+      notifyItemAdded,
+      isReadyRef,
+    } = useMessageScroller();
 
     // Determine whether this item mounted after initial mount inside effects rather than during render
     const isNewTurnRef = React.useRef<boolean | null>(null);
@@ -589,10 +612,10 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
         // Pin new user turns near the top, preserving scrollPreviousItemPeek pixels of previous item
         const vp = viewportRef.current;
         const itemTop = itemRef.current.offsetTop;
-        const targetScrollTop = Math.max(0, itemTop - scrollPreviousItemPeek);
-        vp.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+        const targetScrollTop = Math.max(0, itemTop - scrollPreviousItemPeek - scrollMargin);
+        vp.scrollTo({ top: targetScrollTop, behavior: resolveScrollBehavior('smooth') });
       }
-    }, [scrollAnchor, scrollPreviousItemPeek, viewportRef, isReadyRef]);
+    }, [scrollAnchor, scrollPreviousItemPeek, scrollMargin, viewportRef, isReadyRef]);
 
     React.useEffect(() => {
       if (!messageId || !itemRef.current) return;
@@ -609,6 +632,7 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
         data-slot="message-scroller-item"
         data-message-id={messageId}
         data-scroll-anchor={scrollAnchor ? '' : undefined}
+        style={scrollMargin ? { scrollMarginTop: scrollMargin, ...style } : style}
         className={cn('w-full shrink-0', className)}
         {...props}
       >
@@ -622,65 +646,69 @@ MessageScrollerItem.displayName = 'MessageScrollerItem';
 /* -------------------------------------------------------------------------------------------------
  * MessageScrollerButton (Floating jump-to-bottom/top control)
  * -----------------------------------------------------------------------------------------------*/
-export interface MessageScrollerButtonProps {
+export interface MessageScrollerButtonProps extends React.HTMLAttributes<HTMLDivElement> {
   direction?: 'start' | 'end';
   label?: string;
   className?: string;
 }
 
-export const MessageScrollerButton: React.FC<MessageScrollerButtonProps> = ({
-  direction = 'end',
-  label,
-  className,
-}) => {
-  const { isAtBottom, scrollable, scrollToBottom, scrollToTop, unreadCount } = useMessageScroller();
+export const MessageScrollerButton = React.forwardRef<HTMLDivElement, MessageScrollerButtonProps>(
+  ({ direction = 'end', label, className, ...props }, ref) => {
+    const { isAtBottom, scrollable, scrollToBottom, scrollToTop, unreadCount } = useMessageScroller();
 
-  const isVisible = direction === 'end' ? !isAtBottom : scrollable.start;
-  if (!isVisible) return null;
+    const isVisible = direction === 'end' ? !isAtBottom : scrollable.start;
+    if (!isVisible) return null;
 
-  const defaultLabel =
-    direction === 'end' ? 'Scroll to latest message' : 'Scroll to start of conversation';
-  const resolvedLabel = label ?? defaultLabel;
+    const defaultLabel =
+      direction === 'end' ? 'Scroll to latest message' : 'Scroll to start of conversation';
+    const resolvedLabel = label ?? defaultLabel;
+    const accessibleLabel =
+      direction === 'end' && unreadCount > 0
+        ? `${resolvedLabel} (${unreadCount} new update${unreadCount === 1 ? '' : 's'})`
+        : resolvedLabel;
 
-  return (
-    <div
-      data-slot="message-scroller-button-container"
-      data-direction={direction}
-      data-active={isVisible ? 'true' : 'false'}
-      className={cn(
-        'absolute z-20 transition-[opacity,transform] duration-quick ease-standard motion-reduce:transition-none',
-        direction === 'end' ? 'bottom-4 end-4' : 'top-4 end-4',
-        className
-      )}
-    >
-      <Tooltip
-        content={
-          direction === 'end' && unreadCount > 0
-            ? `${unreadCount} new update${unreadCount === 1 ? '' : 's'}`
-            : resolvedLabel
-        }
+    return (
+      <div
+        ref={ref}
+        data-slot="message-scroller-button-container"
+        data-direction={direction}
+        data-active={isVisible ? 'true' : 'false'}
+        className={cn(
+          'absolute z-20 transition-[opacity,transform] duration-quick ease-standard motion-reduce:transition-none',
+          direction === 'end' ? 'bottom-4 end-4' : 'top-4 end-4',
+          className
+        )}
+        {...props}
       >
-        <Button
-          type="button"
-          variant="filled"
-          colorRole="primary"
-          size="sm"
-          onClick={() => (direction === 'end' ? scrollToBottom('smooth') : scrollToTop('smooth'))}
-          aria-label={resolvedLabel}
-          expandedTouchTarget
-          className="rounded-full shadow-ambient flex items-center gap-1.5 px-3 py-1.5 h-9"
+        <Tooltip
+          content={
+            direction === 'end' && unreadCount > 0
+              ? `${unreadCount} new update${unreadCount === 1 ? '' : 's'}`
+              : resolvedLabel
+          }
         >
-          <Icon name={direction === 'end' ? 'arrow_downward' : 'arrow_upward'} size="xs" aria-hidden="true" />
-          {unreadCount > 0 && direction === 'end' && (
-            <span className="font-mono text-xs tabular-nums font-bold">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
-      </Tooltip>
-    </div>
-  );
-};
+          <Button
+            type="button"
+            variant="filled"
+            colorRole="primary"
+            size="sm"
+            onClick={() => (direction === 'end' ? scrollToBottom('smooth') : scrollToTop('smooth'))}
+            aria-label={accessibleLabel}
+            expandedTouchTarget
+            className="rounded-full shadow-ambient flex items-center gap-1.5 px-3 py-1.5 h-9"
+          >
+            <Icon name={direction === 'end' ? 'arrow_downward' : 'arrow_upward'} size="xs" aria-hidden="true" />
+            {unreadCount > 0 && direction === 'end' && (
+              <span className="font-mono text-xs tabular-nums font-bold">
+                {unreadCount}
+              </span>
+            )}
+          </Button>
+        </Tooltip>
+      </div>
+    );
+  }
+);
 MessageScrollerButton.displayName = 'MessageScrollerButton';
 
 /* -------------------------------------------------------------------------------------------------

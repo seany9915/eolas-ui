@@ -6,62 +6,39 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 
 # Anti-Patterns (Banned) → Required Alternatives
 
-## Chips, Badges & Color Roles
-- **Banned: Triple-Tint Monochrome** (pastel fill + matching-hue border + matching-hue text) → **Use one of:**
-  1. **Filled (`variant="filled"`):** Solid `primary`/`secondary`/`tertiary` fill + `on-*` text, no border.
-  2. **Outline (`variant="outline"`):** `1px` `primary`/`secondary` border (never `tertiary` Amber) + neutral `surface` fill (or `on-surface` on inverted surfaces) + matching text.
-  3. **Soft Wash (`variant="soft"`):** `*-container` fill + ultra-dark semantic `on-*-container` ink (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1C1A18`) + `border-transparent` on `<Badge/>`/`<Chip/>` pills. (Callouts, `InlineAlert`s, and tinted cards keep `#1C1A18` body text with no colored perimeter borders.)
-- **Banned: All-caps chips/badges or static status dots** → **Use:** Sentence case and plain text, `<Badge/>`, or functional icons (dots are strictly for live/real-time presence/recording paired with text).
+## Linter- & Hook-Enforced Bans (Quick Steer)
+- **Controls, Imports & Architecture:** Never write raw `<button>`/`<input>`/`<select>`/`<textarea>`/`<dialog>`, hand-rolled `fixed inset-0` overlays, unlabeled icon-only buttons, upward imports (`ui/` → `blocks/`/`features/`, `blocks/` → `features/`/`views/`), or runtime `@base-ui/react*` / `@radix-ui/*` / other headless imports outside `ui/`.
+- **Styling & Selectors:** Pass `className` for layout only — no component restyling, `[&_...]` reach-in selectors, `!` modifiers, `dark:*` (`inverted:*` only), inline styles, raw color hex/palette classes, or arbitrary spacing/sizing (`p-[13px]`).
+- **Shorthands & Motion:** Use `size-*` (not `w-X h-X`), `gap-*` (not `space-x/y-*`), `h-dvh` (not `h-screen`), sentence case (not `uppercase`), explicit `transition-[...]` (not `transition-all`), and `--ease-standard` (reserve spring/bounce for `SuccessCheck`).
+- **Color, Cards & Icons:** Never use triple-tint pills (pick Filled, Outline + neutral `surface`, or Soft Wash), light-surface `*-tertiary` accents, nested `<Card>`, sparkle icons (`stars`, `auto_awesome`, `auto_fix_high`), decorative emojis, or `<Icon>` `mr-*`/`ml-*`.
+- **Code & Copy Safety:** Never leave `// TODO` stubs, `any` / `as unknown as T` / `@ts-ignore`, unguarded `Enter` submission without `isComposing`, positive `tabIndex > 0`, AI cliché buzzwords, dev/DB/CSS jargon, or hardcoded secrets.
 
-## Accessibility & Interaction
-- **Banned: Raw unlabelled inputs / placeholder-only labels** → **Use:** `<FieldGroup className="gap-4">` + `<Field>` + `<FieldLabel>` (plus `<FieldDescription>` / `<FieldError>`).
-- **Banned: Hover-only actions** → **Use:** `:focus-within` support and persistent visible controls for touch.
-- **Banned: Pointer-only drag-and-drop** → **Use:** Visible up/down reorder buttons or keyboard move mode.
-- **Banned: Low-contrast focus rings or placeholders** → **Use:** 3:1+ focus ring contrast against adjacent backgrounds (WCAG 2.4.11) and AA-contrast supplementary placeholder text.
-- **Banned: Focus vs. selection ambiguity** (`outline-offset: 0` on borderless/selectable containers) → **Use:** Floating `outline-offset: 2px` for focus; flush `2px` border + surface wash for selection.
+## Non-Lintable Design, UX & Accessibility Anti-Patterns
 
-## Structural & Layout
-- **Banned: `space-y-*` / `space-x-*` child-margin hacks, `1fr`/`flex` overflow traps, or `order-*` on interactive controls** → **Use:** `flex flex-col gap-*` or `grid gap-*` (with $\ge 2\times$ gap between groups vs. within), `minmax(0, 1fr)` / `min-w-0`, and DOM order matching tab order.
-- **Banned: Verbose `w-* h-*` or multi-class truncation** → **Use:** `size-*` (`size-4`, `size-10`) and `truncate`.
-- **Banned: Unstructured cards** (raw `<h3>`/`<p>` dumped in `<Card>`) → **Use:** `<Card.Header>`, `<Card.Title>`, `<Card.Description>`, `<Card.Action>`, `<Card.Content>`, `<Card.Footer>` (media/game canvases exempt).
-- **Banned: Hardcoded Lorem Ipsum / missing zero-state** → **Use:** Loading, empty, and realistic populated states.
-- **Banned: Stacked vertical icon-over-text utility buttons** → **Use:** Inline icon left of label.
-- **Banned: Card Soup / Metric Card Grids ("Card Grid Rain") / nested cards** → **Use:** Low-prominence typography/dividers, tables, definition lists, or accordions; never nest `<Card>` inside `<Card>`.
-- **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (`variant="unboxed"` inside cards; `variant="surface"` or `variant="inset"` on canvas).
-- **Banned: `surface-container-low` / `surface-container-high` fill + `outline-variant` border** (low contrast) → **Use:** `outline` (`#706E6B`) border when a neutral fill needs a boundary.
-- **Banned: Single-sided accent borders on rounded cards** → **Use:** Borderless `border border-transparent` standard cards; reserve `rounded-s-none rounded-e` + `border-s-4` strictly for `<InlineAlert />` and `<Toast />`.
-- **Banned: Div Soup / toxic wrapper-itis** (`<Box>`, `<Flex>`, `<Spacer>`, redundant `<div>`/`<>`) → **Use:** Direct classes on semantic elements or plain layout `<div>`s (`flex`/`grid`).
-- **Banned: Desktop FABs or marketing hero banners on workspace/dashboard/tool views** → **Use:** Inline actions, side-drawers, or page headers, and open app/tool views directly into live content.
-- **Banned: Viewport breakpoints (`sm:`, `md:`, `lg:`) inside reusable components** → **Use:** `@container` on a defined-width wrapper `<div>` (`w-full` or grid cell, never `<table>`/`<tr>`/auto-sized flex) + `@sm:`/`@md:`/`@lg:`. Reserve viewport queries for page shells.
-- **Banned: Start-aligned numeric table columns** → **Use:** `text-end` + `tabular-nums` / `font-mono` on numeric `<th>` and `<td>` (or `numeric: true` on `<Table />`).
-- **Banned: Arbitrary or `0px` clamped nested radii in padded cards** → **Use:** $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ for nested media/panels (clamping to `rounded` / `8px`; tight `p-1` segmented shells still use `rounded-sm` / `4px`).
-- **Banned: Mismatched sibling control heights, +2px inner-border height drift, wrapping `ToggleGroup` labels in narrow columns, or asymmetric icon insets** → **Use:** The outer-box height tiers (`sm`: 44px, `md`: 48px, `lg`: 56px) and 3-family matrix in `DESIGN.md`, `Select`/`Radio` for multi-word options in narrow columns, `shrink-0 whitespace-nowrap` on row buttons, and symmetric icon padding.
+### Color, Badges & Surfaces
+- **Banned: Static status dots or text-less indicators** → **Use:** Plain text, `<Badge />`, or functional icons (dots are strictly for live/recording presence paired with text).
+- **Banned: `surface-container-low`/`high` fill + `outline-variant` border** → **Use:** `outline` (`#706E6B`) when a neutral tinted surface needs a boundary.
+- **Banned: Single-sided accent borders on rounded cards** → **Use:** `border border-transparent` cards; reserve `rounded-s-none rounded-e` + `border-s-4` for `<InlineAlert />` and `<Toast />`.
+- **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (`unboxed` in cards; `surface`/`inset` on canvas).
 
-## Iconography & Copy
-- **Banned: `mr-*` / `ml-*` on `<Icon>` inside flex containers** → **Use:** Parent `gap-*` (e.g. `<Button>`'s `gap-2`).
-- **Banned: Sparkle/magic icons (`stars`, `auto_awesome`, `auto_fix_high`) or emojis** → **Use:** Functional task icons (`translate`, `summarize`, `spellcheck`, `tune`, `bolt`).
-- **Banned: AI clichés, inflated nouns, or 3+ noun labels** ("Elevate", "Seamless", "Hub", "Matrix", "Repository", "Engine") → **Use:** Plain everyday terms, 1–2 nouns max ("Caseload", "Patients", "Notes", "Saved").
-- **Banned: Dev/DB/CSS jargon in UI copy** (`committed`, `synchronized`, `hydrated`, `unconstrained`, `affordance`, `telemetry`, `workflow`, `protocol`) → **Use:** User-outcome phrasing ("Patient added", "Preview: Full width").
-- **Banned: Pre-heading eyebrow kickers, decorative `01`/`02`/Roman heading prefixes, `LABEL // YEAR`, fabricated compliance/security claims, or invented metrics** → **Use:** Direct `<h1>`/`<h2>` headings (number only genuine sequences), verifiable app states ("Saved", "Synced", "Offline"), and `[metric]` placeholders.
-- **Banned: "Click here" or identical generic links** → **Use:** Descriptive action text or unique `aria-label` per link.
+### Interaction, Focus & Accessibility
+- **Banned: Hover-only actions or pointer-only drag-and-drop** → **Use:** `:focus-within`, persistent visible touch controls, and keyboard move actions.
+- **Banned: Focus vs. selection ambiguity** (`outline-offset: 0` on selectable containers) → **Use:** Floating `outline-offset: 2px` for focus; flush `2px` border + surface wash for selection.
+- **Banned: Unlabelled inputs or placeholder-only labels** → **Use:** `<FieldGroup>` + `<Field>` + `<FieldLabel>` (and `<FieldDescription>`/`<FieldError>`).
+- **Banned: Trigger downgrades (`render={<span />}`)** → **Use:** Real `<button>` triggers ("Behavior Wraps the Line").
+- **Banned: Titleless overlays or manual overlay `z-index` outside `ui/`** → **Use:** `<DialogTitle>`/`<DrawerTitle>` (or `sr-only`) and let `ui/` portals handle stacking.
+- **Banned: Ungrouped `*Item`s in `Select`/`Menu`/`ContextMenu`** → **Use:** `Select.Group`, `Menu.Group`, `ContextMenu.Group`.
 
-## Code Quality, Overlays & Component Library
-- **Banned: Placeholder stubs (`// TODO`) or `any` / `@ts-ignore` / `as unknown as T`** → **Use:** Complete runnable code (or `throw new Error('Not implemented: ...')`) and strict types / `zod`.
-- **Banned: Titleless overlays or manual `z-index` (`z-50`, `z-9999`) outside `ui/` portal primitives** → **Use:** `<DialogTitle>` / `<DrawerTitle>` (or `sr-only`) and let `src/components/ui/` portal primitives handle stacking.
-- **Banned: Heavy blurs for simple inputs or bloated multi-tier headers** → **Use:** Inline editing / side panels and consolidated top navigation.
-- **Banned: Manual `relative`/`absolute` buttons inside inputs** → **Use:** `<InputGroup>` + `<InputGroupAddon>` + `<InputGroupButton>`.
-- **Banned: Looped `<Button>` arrays for mode/filter bars** → **Use:** `<ToggleGroup>` (`role="radiogroup"` or `role="group"`).
-- **Banned: Ungrouped `*Item` in `Select` / `Menu` / `ContextMenu`** → **Use:** `<Select.Group>`, `<Menu.Group>`, `<ContextMenu.Group>`.
-- **Banned: Arbitrary theme/color/border/radius/font overrides via `className` at call sites** (`bg-red-500`, `font-serif`) → **Use:** `variant`, `colorRole`, `prominence`, `size` props (enforced by Oxlint `shadcn/no-restyle`). Layout classes (`w-full`, `max-w-md`, `mt-4`, `shrink-0`) are allowed.
-- **Banned: Pending approvals inside `<Trace>`** → **Use:** Standalone `<Confirmation>` blocks in the chat stream.
-- **Banned: Ad-hoc `@keyframes` / gradient sweeps** → **Use:** `<ShimmerText>` or `<Skeleton>` / `<Skeleton.Reveal>`.
-- **Banned: Trigger downgrades (`render={<span />}`)** → **Use:** Semantic `<button>` triggers ("Behavior Wraps the Line").
-- **Banned: `@radix-ui/*` imports, raw `<button>`/`<input>`/`<select>`/`<textarea>`/`<dialog>` outside `ui/`, or hand-rolled duplicates** → **Use:** Base UI primitives from `@/components/ui/` (or `<UnstyledButton>`).
-- **Banned: Registry bloat** (domain views or auth/SSE flows in `components/blocks/`) → **Use:** `src/features/` or `src/views/`.
+### Layout, Structure & Component Discipline
+- **Banned: `1fr`/`flex` overflow traps or `order-*` on interactive controls** → **Use:** `minmax(0, 1fr)` / `min-w-0`, and match DOM order to tab order.
+- **Banned: Unstructured cards, Card Soup ("Card Grid Rain"), or Div Soup wrappers** (`<Box>`, `<Flex>`, `<Spacer>`) → **Use:** `<Card.Header>`/`<Card.Title>`/`<Card.Description>`/`<Card.Action>`/`<Card.Content>`/`<Card.Footer>`, typography/dividers/tables/accordions, and plain semantic elements or `flex`/`grid` `<div>`s.
+- **Banned: Desktop FABs, marketing hero banners on workspace views, or empty/Lorem Ipsum mocks** → **Use:** Inline actions, side drawers, page headers, and realistic populated + loading + empty states.
+- **Banned: Viewport breakpoints inside reusable components** → **Use:** `@container` on a defined-width wrapper + `@sm:`/`@md:`/`@lg:`.
+- **Banned: Start-aligned numeric table columns, stacked vertical icon-over-text buttons, or `<Button>` loops for mode bars** → **Use:** `text-end tabular-nums font-mono`, inline icon + label, and `<ToggleGroup>`.
+- **Banned: Arbitrary `0px`-clamped nested radii, sibling height drift, wrapping `ToggleGroup` labels, or asymmetric icon insets** → **Use:** $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ (clean `p-1` segmented shells keep `rounded-sm`), matching `sm`/`md`/`lg` height tiers, `Select`/`Radio` in narrow columns, `shrink-0 whitespace-nowrap`, and symmetric icon padding.
+- **Banned: Manual `relative`/`absolute` input buttons, heavy blurs on inputs/overlays, or pending approvals inside `<Trace>`** → **Use:** `<InputGroup>`, inline editing / `opacity` + `transform` (keep `--blur-*` on micro-primitives), and standalone `<Confirmation>` blocks.
+- **Banned: Ad-hoc `@keyframes` shimmer sweeps, single-layer/black/faux shadows, uncapped staggers (>5 items / >200ms), or missing reduced-motion fallbacks** → **Use:** `<ShimmerText>`/`<Skeleton>`, `shadow-ambient`/`shadow-ambient-hover`/`shadow-modal` + real CSS borders, `40ms` stagger capped at 5 items, and `motion-reduce:transition-none`.
+- **Banned: Registry bloat** (`blocks/` containing auth/DB/SSE views) → **Use:** `src/features/` or `src/views/`.
 
-## Shadows & Motion
-- **Banned: Single-layer muddy shadows, pure black shadows, `shadow-xs`..`2xl` slop, faux `box-shadow` border rings, or shadows on flat controls** → **Use:** `shadow-ambient`, `shadow-ambient-hover`, `shadow-modal` (warm ink-tinted `rgba(28, 26, 24, ...)`), and real CSS borders for `forced-colors` safety.
-- **Banned: `transition-all` on containers** → **Use:** Explicit `transition-[box-shadow,border-color,background-color,transform]`, `transition-[opacity,transform]` (overlays), or `transition-[height]` (accordions).
-- **Banned: `filter: blur()` on large text overlays** → **Use:** `opacity` + `transform` on overlays; reserve `--blur-*` for micro-primitives.
-- **Banned: Bounce/spring easing on standard UI chrome or double-bounce on checkboxes/switches** → **Use:** `--ease-standard` (`150ms` micro-transitions on high-frequency controls); reserve bounce for celebratory `SuccessCheck`.
-- **Banned: Uncapped staggers (> 5 items / > 200ms), missing `prefers-reduced-motion`, or sub-44px dismiss buttons** → **Use:** 40ms stagger capped at 5 items, `motion-reduce:transition-none`, and `min-w-11 min-h-11` (`44px`) dismiss targets.
+### Editorial Copy
+- **Banned: Pre-heading eyebrow kickers, decorative `01`/Roman prefixes, `LABEL // YEAR`, invented metrics, or "Click here"/identical links** → **Use:** Direct headings, `[metric]` placeholders, plain everyday 1–2 noun labels, and descriptive unique link text.

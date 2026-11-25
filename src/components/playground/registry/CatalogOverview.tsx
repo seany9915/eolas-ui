@@ -4,9 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Icon } from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { UnstyledButton } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { TabsRoot, TabsList, Tab } from '@/components/ui/tabs';
 import { REGISTRY_CATEGORIES } from './registry-categories';
 import { REGISTRY_ENTRIES } from './registry-manifest';
 import { ComponentCategory, ComponentTier } from './types';
@@ -77,17 +76,17 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
   };
 
   return (
-    <section aria-labelledby="catalog-overview-title" className={cn('w-full space-y-8', className)}>
+    <section aria-labelledby="catalog-overview-title" className={cn('w-full flex flex-col gap-8', className)}>
       {/* Low Prominence Canvas Hero Header with Typographic Stats */}
-      <div className="space-y-6 pb-6 border-b border-outline-variant">
+      <div className="flex flex-col gap-6 pb-6 border-b border-outline-variant">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-3 max-w-2xl">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="soft"
                 colorRole="primary"
                 size="sm"
-              >Registry v5.0</Badge>
+              >Registry v6.0</Badge>
               <span className="font-mono text-xs px-2.5 py-1 rounded-md bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 Base UI (@base-ui/react)
               </span>
@@ -100,29 +99,29 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             </p>
           </div>
 
-          {/* Typographic Stats Lockup - No Card Soup, Accessible Contrast */}
-          <div className="flex items-center gap-6 sm:gap-8 bg-surface px-6 py-4 rounded-xl shadow-ambient shrink-0">
+          {/* Typographic Stats Lockup - Wraps cleanly on 320px/390px viewports */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-8 bg-surface px-5 sm:px-6 py-4 rounded-xl shadow-ambient shrink-0 max-w-full">
             <div>
               <span className="font-heading text-2xl sm:text-3xl font-bold text-on-surface block leading-none mb-1 tabular-nums">
                 {totalCount}
               </span>
               <span className="font-sans text-xs font-medium text-on-surface-variant">Total</span>
             </div>
-            <div className="h-8 w-px bg-outline-variant" />
+            <div className="hidden sm:block h-8 w-px bg-outline-variant" />
             <div>
               <span className="font-heading text-2xl sm:text-3xl font-bold text-primary block leading-none mb-1 tabular-nums">
                 {primitivesCount}
               </span>
               <span className="font-sans text-xs font-medium text-on-surface-variant">Primitives</span>
             </div>
-            <div className="h-8 w-px bg-outline-variant" />
+            <div className="hidden sm:block h-8 w-px bg-outline-variant" />
             <div>
               <span className="font-heading text-2xl sm:text-3xl font-bold text-secondary block leading-none mb-1 tabular-nums">
                 {blocksCount}
               </span>
               <span className="font-sans text-xs font-medium text-on-surface-variant">Blocks</span>
             </div>
-            <div className="h-8 w-px bg-outline-variant" />
+            <div className="hidden sm:block h-8 w-px bg-outline-variant" />
             <div>
               <span className="font-heading text-2xl sm:text-3xl font-bold text-on-surface-variant block leading-none mb-1 tabular-nums">
                 {utilitiesCount}
@@ -132,43 +131,46 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
           </div>
         </div>
 
-        {/* Category Navigation via Base UI Tabs */}
-        <div className="pt-2">
-          <TabsRoot
+        {/* Category Filter Bar */}
+        <div className="pt-2 overflow-x-auto max-w-full">
+          <ToggleGroup
+            type="single"
             value={selectedCategory}
-            onValueChange={(val) => handleCategorySelect(val as ComponentCategory | 'all')}
-            variant="line"
-            className="w-full"
+            onValueChange={(val) => {
+              if (val) handleCategorySelect(val as ComponentCategory | 'all');
+            }}
+            size="sm"
+            aria-label="Filter by category"
+            className="w-max min-w-full"
           >
-            <TabsList className="border-b border-outline-variant flex items-center gap-2 overflow-x-auto w-full pb-0">
-              <Tab value="all" className="whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                All Categories ({totalCount})
-              </Tab>
-              {REGISTRY_CATEGORIES.map((cat) => (
-                <Tab key={cat.id} value={cat.id} className="whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                  <Icon name={cat.icon} size="xs" className="mr-1.5" />
-                  {cat.title} ({getCategoryCount(cat.id)})
-                </Tab>
-              ))}
-            </TabsList>
-          </TabsRoot>
+            <ToggleGroupItem value="all" className="whitespace-nowrap shrink-0 text-xs sm:text-sm px-3">
+              All Categories ({totalCount})
+            </ToggleGroupItem>
+            {REGISTRY_CATEGORIES.map((cat) => (
+              <ToggleGroupItem key={cat.id} value={cat.id} className="whitespace-nowrap shrink-0 text-xs sm:text-sm px-3">
+                <Icon name={cat.icon} size="xs" />
+                {cat.title} ({getCategoryCount(cat.id)})
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
 
         {/* Filter Toolbar: Search Input + Tier ToggleGroup */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 pt-1 flex-wrap">
           <Input
             type="search"
+            enterKeyHint="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search across all components..."
             leadingIcon={<Icon name="search" size="sm" className="text-on-surface-variant" />}
             clearable={!!search}
             onClear={() => setSearch('')}
-            className="w-full lg:w-96 text-sm bg-surface"
+            className="w-full lg:w-96 text-base md:text-sm bg-surface"
             aria-label="Search across components"
           />
 
-          <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 max-w-full">
+          <div className="flex items-center justify-start lg:justify-end gap-3 max-w-full overflow-x-auto">
             <ToggleGroup
               type="single"
               value={selectedTier}
@@ -176,17 +178,19 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
                 if (val) handleTierSelect(val as ComponentTier | 'all');
               }}
               size="sm"
+              aria-label="Filter by component tier"
+              className="w-max"
             >
-              <ToggleGroupItem value="all" className="text-xs px-3">
+              <ToggleGroupItem value="all" className="text-xs px-3 whitespace-nowrap">
                 All ({totalCount})
               </ToggleGroupItem>
-              <ToggleGroupItem value="primitive" className="text-xs px-3">
+              <ToggleGroupItem value="primitive" className="text-xs px-3 whitespace-nowrap">
                 Primitives ({primitivesCount})
               </ToggleGroupItem>
-              <ToggleGroupItem value="block" className="text-xs px-3">
+              <ToggleGroupItem value="block" className="text-xs px-3 whitespace-nowrap">
                 Blocks ({blocksCount})
               </ToggleGroupItem>
-              <ToggleGroupItem value="utility" className="text-xs px-3">
+              <ToggleGroupItem value="utility" className="text-xs px-3 whitespace-nowrap">
                 Utilities ({utilitiesCount})
               </ToggleGroupItem>
             </ToggleGroup>
@@ -194,9 +198,9 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
         </div>
       </div>
 
-      {/* Grid of Components with Accessible Clickable Cards */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* Grid of Components with Accessible Stretched-Link Cards */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-heading text-sm font-bold text-on-surface">
             Showing {filteredEntries.length} {filteredEntries.length === 1 ? 'component' : 'components'}
             {selectedCategory !== 'all' && (
@@ -206,18 +210,21 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             )}
           </span>
           {search && (
-            <UnstyledButton
+            <Button
+              size="sm"
+              variant="text"
+              colorRole="primary"
               onClick={() => setSearch('')}
-              className="text-xs text-primary font-medium hover:underline focus-visible:outline-2 focus-visible:outline-primary rounded"
+              className="px-3 text-xs"
             >
               Clear search
-            </UnstyledButton>
+            </Button>
           )}
         </div>
 
         {filteredEntries.length === 0 ? (
-          <div className="py-16 px-4 text-center space-y-3 bg-surface rounded-xl shadow-ambient">
-            <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mx-auto text-on-surface-variant">
+          <div className="py-16 px-4 text-center flex flex-col gap-3 bg-surface rounded-xl shadow-ambient">
+            <div className="size-12 rounded-full bg-surface-container-high flex items-center justify-center mx-auto text-on-surface-variant">
               <Icon name="search_off" size="md" />
             </div>
             <h3 className="font-heading text-base font-bold text-on-surface">No components found</h3>
@@ -233,46 +240,39 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
               <Card
                 key={entry.id}
                 affordance="actionable"
-                className="group p-5 flex flex-col justify-between"
+                className="group p-5 flex flex-col justify-between gap-4"
               >
-                <UnstyledButton
-                  onClick={() => onSelect(entry.id)}
-                  className="w-full text-left flex flex-col justify-between h-full space-y-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded-lg"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-heading text-base font-bold text-on-surface group-hover:text-primary transition-colors truncate">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-heading text-base font-bold text-on-surface group-hover:text-primary transition-colors motion-reduce:transition-none min-w-0">
+                      <Card.Trigger
+                        onClick={() => onSelect(entry.id)}
+                        className="truncate block max-w-full"
+                      >
                         {entry.title}
-                      </h3>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {entry.isDeprecated && (
-                          <Badge
-                            variant="soft"
-                            colorRole="warning"
-                            size="sm"
-                          >{entry.tier === 'block' ? 'Deprecated' : 'Legacy'}</Badge>
-                        )}
-                        <Badge
-                          variant="soft"
-                          colorRole={entry.tier === 'block' ? 'secondary' : entry.tier === 'utility' ? 'neutral' : 'primary'}
-                          size="sm"
-                        >{entry.tier === 'block' ? 'Block' : entry.tier === 'utility' ? 'Utility' : 'Primitive'}</Badge>
-                      </div>
+                      </Card.Trigger>
+                    </h3>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Badge
+                        variant="soft"
+                        colorRole={entry.tier === 'block' ? 'secondary' : entry.tier === 'utility' ? 'neutral' : 'primary'}
+                        size="sm"
+                      >{entry.tier === 'block' ? 'Block' : entry.tier === 'utility' ? 'Utility' : 'Primitive'}</Badge>
                     </div>
-
-                    <p className="font-sans text-sm text-on-surface-variant line-clamp-2 leading-relaxed">
-                      {entry.description}
-                    </p>
                   </div>
 
-                  <div className="pt-3 border-t border-outline-variant flex items-center justify-between text-xs font-mono text-on-surface-variant w-full">
-                    <span className="truncate max-w-[150px]">{entry.basePrimitive}</span>
-                    <span className="text-primary font-heading font-bold text-xs flex items-center group-hover:translate-x-1 transition-transform">
-                      Inspect
-                      <Icon name="chevron_right" size="xs" className="ml-0.5" />
-                    </span>
-                  </div>
-                </UnstyledButton>
+                  <p className="font-sans text-sm text-on-surface-variant line-clamp-2 leading-relaxed">
+                    {entry.description}
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-outline-variant flex items-center justify-between text-xs font-mono text-on-surface-variant w-full">
+                  <span className="truncate max-w-[150px]">{entry.basePrimitive}</span>
+                  <span className="text-primary font-heading font-bold text-xs flex items-center gap-0.5 group-hover:translate-x-1 transition-transform motion-reduce:transition-none" aria-hidden="true">
+                    Inspect
+                    <Icon name="chevron_right" size="xs" directional />
+                  </span>
+                </div>
               </Card>
             ))}
           </div>

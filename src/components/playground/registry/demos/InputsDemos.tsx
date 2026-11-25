@@ -28,7 +28,6 @@ import { Slider } from '@/components/ui/slider';
 import { NumberField } from '@/components/ui/number-field';
 import { OTPField } from '@/components/ui/otp-field';
 import { Icon } from '@/components/ui/icon';
-import { InlineAlert } from '@/components/ui/inline-alert';
 import { Calendar, DateRange } from '@/components/ui/calendar';
 import { BlockDemoShell } from '../BlockDemoShell';
 import { StateMatrix } from '../StateMatrix';
@@ -40,7 +39,7 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
       name="Button"
       badge="Base UI Atom"
       description="Interactive trigger for actions, submissions, modal reveals, and workflow progression. Standardized with 48px touch floors, Atkinson Hyperlegible Next typography, and floating 2px focus rings."
-      whenToUse="Executing actions within the current screen (saving records, opening modals, initiating drills). Never use for page-level navigation â€” use NavigationMenu or semantic links."
+      whenToUse="Executing actions within the current screen (saving records, opening modals, initiating drills). Never use for page-level navigation — use NavigationMenu or semantic links."
       typicalExample={
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="filled" colorRole="primary">
@@ -137,8 +136,8 @@ export const ButtonDemo: React.FC<ComponentDemoProps> = () => {
             <span className="font-heading text-xs font-bold text-on-surface">Label Truncation with Maximum Width</span>
             <p className="font-sans text-xs text-on-surface-variant">Button labels with max-w-[220px] truncate gracefully without line breaks</p>
             <div className="pt-1">
-              <Button colorRole="primary" className="max-w-[220px] truncate">
-                Very Long Clinical Action Label That Truncates Safely
+              <Button colorRole="primary" className="max-w-[220px]">
+                <span className="truncate">Very Long Clinical Action Label That Truncates Safely</span>
               </Button>
             </div>
           </div>
@@ -284,13 +283,20 @@ export const FormDemo: React.FC<ComponentDemoProps> = () => {
   );
 };
 
+const PRACTICE_MODULES: Record<string, string> = {
+  'r-sound': 'Vocalic /r/ Practice',
+  's-blend': 'S-Blend Syllables',
+  vowels: 'Vowel Prolongation',
+  consonants: 'Consonant Repetition',
+};
+
 export const SelectDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState('r-sound');
   return (
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
       <div className="flex flex-col gap-1.5">
         <label className="font-label text-xs font-bold text-on-surface block">Practice Module</label>
-        <Select.Root value={val} onValueChange={(v) => v && setVal(v)}>
+        <Select.Root items={PRACTICE_MODULES} value={val} onValueChange={(v) => v && setVal(v)}>
           <Select.Trigger className="w-full">
             <Select.Value placeholder="Select practice module..." />
           </Select.Trigger>
@@ -632,43 +638,6 @@ export const OTPFieldDemo: React.FC<ComponentDemoProps> = () => {
   );
 };
 
-export const SelectionControlsLegacyDemo: React.FC<ComponentDemoProps> = () => {
-  return (
-    <div className="flex flex-col gap-4 max-w-md mx-auto">
-      <InlineAlert
-        role="warning"
-        title="Legacy Re-Export Barrel"
-      >
-        selection-controls.tsx re-exports Checkbox, Radio, and Switch. New code should import directly from @/components/ui/checkbox, @/components/ui/radio, or @/components/ui/switch.
-      </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-mono">
-        <p className="text-on-surface">Modern replacement imports:</p>
-        <p className="text-primary font-bold">import &#123; Checkbox &#125; from '@/components/ui/checkbox';</p>
-        <p className="text-primary font-bold">import &#123; Radio, RadioGroup &#125; from '@/components/ui/radio';</p>
-        <p className="text-primary font-bold">import &#123; Switch &#125; from '@/components/ui/switch';</p>
-      </div>
-    </div>
-  );
-};
-
-export const TogglesLegacyDemo: React.FC<ComponentDemoProps> = () => {
-  return (
-    <div className="flex flex-col gap-4 max-w-md mx-auto">
-      <InlineAlert
-        role="warning"
-        title="Legacy Re-Export Barrel"
-      >
-        toggles.tsx re-exports Toggle and ToggleGroup. New code should import directly from @/components/ui/toggle or @/components/ui/toggle-group.
-      </InlineAlert>
-      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant flex flex-col gap-2 text-xs font-mono">
-        <p className="text-on-surface">Modern replacement imports:</p>
-        <p className="text-primary font-bold">import &#123; Toggle &#125; from '@/components/ui/toggle';</p>
-        <p className="text-primary font-bold">import &#123; ToggleGroup &#125; from '@/components/ui/toggle-group';</p>
-      </div>
-    </div>
-  );
-};
-
 export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
@@ -951,7 +920,7 @@ export const ButtonGroupDemo: React.FC<ComponentDemoProps> = () => {
         </h4>
         <ButtonGroup className="w-full max-w-md">
           <ButtonGroup.Text>https://</ButtonGroup.Text>
-          <Input placeholder="clinic.example.com" className="flex-1" />
+          <Input placeholder="clinic.example.com" />
           <Button variant="filled" colorRole="primary" size="md">
             Connect
           </Button>

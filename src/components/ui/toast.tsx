@@ -14,21 +14,22 @@ import { Icon } from '@/components/ui/icon';
 
 export type ToastType = 'neutral' | 'info' | 'success' | 'warning' | 'error' | (string & {});
 
-export interface ToastProps {
+export interface ToastProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'className'> {
   title?: React.ReactNode;
   description?: React.ReactNode;
   type?: ToastType;
   onClose?: () => void;
+  closeLabel?: string;
   className?: BaseToast.Root.Props['className'];
 }
 
 const accentBorder: Record<string, string> = {
-  neutral: 'border-s-neutral',
-  info: 'border-s-neutral', // alias to neutral to preserve primary blue strictly for interactive controls
-  success: 'border-s-success',
-  warning: 'border-s-warning',
-  error: 'border-s-error',
-  loading: 'border-s-primary',
+  neutral: 'before:border-s-neutral',
+  info: 'before:border-s-neutral', // alias to neutral to preserve primary blue strictly for interactive controls
+  success: 'before:border-s-success',
+  warning: 'before:border-s-warning',
+  error: 'before:border-s-error',
+  loading: 'before:border-s-primary',
 };
 
 const iconMap: Record<string, { name: string; color: string }> = {
@@ -43,70 +44,86 @@ const iconMap: Record<string, { name: string; color: string }> = {
 /**
  * Static / Standalone Toast component for isolated use
  */
-const ToastComponent: React.FC<ToastProps> = ({
-  title,
-  description,
-  type = 'info',
-  onClose,
-  className,
-}) => {
-  const currentIcon = iconMap[type] || iconMap.info;
-
-  const toastObj = React.useMemo(
-    () => ({
-      id: 'static-toast',
+const ToastComponent = React.forwardRef<HTMLDivElement, ToastProps>(
+  (
+    {
       title,
       description,
-      type,
-    }),
-    [title, description, type]
-  );
+      type = 'info',
+      onClose,
+      closeLabel = 'Dismiss toast',
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const currentIcon = iconMap[type] || iconMap.info;
+    const toastId = React.useId();
 
-  return (
-    <BaseToast.Provider>
-      <BaseToast.Root
-        data-slot="toast"
-        toast={toastObj}
-        className={composeClassName(
-          [
-            'relative flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-            accentBorder[type] || accentBorder.info,
-          ],
-          className
-        )}
-      >
-        <BaseToast.Content data-slot="toast-content" className="flex items-start gap-3 w-full">
-          <Icon
-            name={currentIcon.name}
-            size="lg"
-            className={cn('shrink-0 mt-0.5 select-none', currentIcon.color)}
-            aria-hidden="true"
-          />
-          <div className="flex-1 min-w-0 pe-1">
-            <BaseToast.Title data-slot="toast-title" className="font-heading text-sm font-bold text-on-surface leading-snug">
-              {title}
-            </BaseToast.Title>
-            {description && (
-              <BaseToast.Description data-slot="toast-description" className="font-sans text-sm text-on-surface-variant mt-1 leading-normal">
-                {description}
-              </BaseToast.Description>
-            )}
-          </div>
-          {onClose && (
-            <BaseToast.Close
-              data-slot="toast-close"
-              onClick={onClose}
-              className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
-              aria-label="Dismiss toast"
-            >
-              <Icon name="close" size="sm" aria-hidden="true" />
-            </BaseToast.Close>
+    const toastObj = React.useMemo(
+      () => ({
+        id: `static-toast-${toastId}`,
+        title,
+        description,
+        type,
+      }),
+      [toastId, title, description, type]
+    );
+
+    return (
+      <BaseToast.Provider>
+        <BaseToast.Root
+          ref={ref}
+          data-slot="toast"
+          toast={toastObj}
+          className={composeClassName(
+            [
+              "relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
+              accentBorder[type] || accentBorder.info,
+            ],
+            className
           )}
-        </BaseToast.Content>
-      </BaseToast.Root>
-    </BaseToast.Provider>
-  );
-};
+          {...props}
+        >
+          <BaseToast.Content data-slot="toast-content" className="flex items-start gap-3 w-full">
+            <Icon
+              name={currentIcon.name}
+              size="lg"
+              className={cn('shrink-0 mt-0.5 select-none', currentIcon.color)}
+              aria-hidden="true"
+            />
+            <div className="flex-1 min-w-0 pe-1">
+              {title && (
+                <BaseToast.Title data-slot="toast-title" className="font-heading text-sm font-bold text-on-surface leading-snug">
+                  {title}
+                </BaseToast.Title>
+              )}
+              {description && (
+                <BaseToast.Description
+                  data-slot="toast-description"
+                  className={cn('font-sans text-sm text-on-surface-variant leading-normal', title && 'mt-1')}
+                >
+                  {description}
+                </BaseToast.Description>
+              )}
+            </div>
+            {onClose && (
+              <BaseToast.Close
+                data-slot="toast-close"
+                onClick={onClose}
+                className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+                aria-label={closeLabel}
+              >
+                <Icon name="close" size="sm" aria-hidden="true" />
+              </BaseToast.Close>
+            )}
+          </BaseToast.Content>
+        </BaseToast.Root>
+      </BaseToast.Provider>
+    );
+  }
+);
+ToastComponent.displayName = 'Toast';
 
 export interface ToastActionConfig {
   label: React.ReactNode;
@@ -349,7 +366,7 @@ const ActiveToastItem: React.FC<{
   );
 
   const commonDeckClasses = cn(
-    'pointer-events-auto flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-sm w-full select-none',
+    "pointer-events-auto flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-sm w-full select-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
     accentBorder[toastType] || accentBorder.info,
     // Calibrated 250ms enter / 150ms exit asymmetry (DESIGN.md)
     '[transition:transform_var(--duration-fast)_var(--ease-standard),opacity_var(--duration-fast)_var(--ease-standard),height_var(--duration-quick),box-shadow_var(--duration-quick)]',
@@ -380,7 +397,7 @@ const ActiveToastItem: React.FC<{
       className={
         isAnchored
           ? cn(
-              'pointer-events-auto relative flex items-start gap-3 p-4 ps-4 rounded-s-none rounded-e bg-surface border border-outline-variant border-s-4 shadow-ambient max-w-[min(24rem,var(--available-width))] w-full select-none',
+              "pointer-events-auto relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-[min(24rem,var(--available-width))] w-full select-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
               'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
               accentBorder[toastType] || accentBorder.info
             )
@@ -392,7 +409,7 @@ const ActiveToastItem: React.FC<{
         className={cn(
           'flex items-start gap-3 w-full min-w-0',
           !isAnchored &&
-            'transition-opacity duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] data-[behind]:opacity-0 data-[expanded]:opacity-100 motion-reduce:transition-none'
+            'transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[behind]:opacity-0 data-[expanded]:opacity-100 motion-reduce:transition-none'
         )}
       >
 
@@ -416,7 +433,10 @@ const ActiveToastItem: React.FC<{
             </BaseToast.Title>
           )}
           {t.description && (
-            <BaseToast.Description data-slot="toast-description" className="font-sans text-sm text-on-surface-variant mt-1 leading-normal break-words">
+            <BaseToast.Description
+              data-slot="toast-description"
+              className={cn('font-sans text-sm text-on-surface-variant leading-normal break-words', t.title && 'mt-1')}
+            >
               {t.description}
             </BaseToast.Description>
           )}
@@ -427,7 +447,7 @@ const ActiveToastItem: React.FC<{
           data-slot="toast-action"
           {...restFallbackAction}
           className={composeClassName(
-            'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer shrink-0 touch-target-expanded',
+            'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer shrink-0 touch-target-expanded',
             fallbackActionClassName
           )}
         />
@@ -435,7 +455,7 @@ const ActiveToastItem: React.FC<{
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close
           data-slot="toast-close"
-          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
           aria-label="Dismiss toast"
         >
           <Icon name="close" size="sm" aria-hidden="true" />
@@ -554,16 +574,129 @@ export const Toaster: React.FC<ToasterProps> = ({
   );
 };
 
-// Compound export mapping Base UI primitives
+export const ToastRoot = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Root>
+>(({ className, toast, ...props }, ref) => (
+  <BaseToast.Root
+    ref={ref}
+    data-slot="toast"
+    toast={toast}
+    className={composeClassName(
+      [
+        "relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
+        accentBorder[toast?.type || 'info'] || accentBorder.info,
+      ],
+      className
+    )}
+    {...props}
+  />
+));
+ToastRoot.displayName = 'ToastRoot';
+
+export const ToastContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Content>
+>(({ className, ...props }, ref) => (
+  <BaseToast.Content
+    ref={ref}
+    data-slot="toast-content"
+    className={composeClassName('flex items-start gap-3 w-full min-w-0', className)}
+    {...props}
+  />
+));
+ToastContent.displayName = 'ToastContent';
+
+export const ToastTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Title>
+>(({ className, ...props }, ref) => (
+  <BaseToast.Title
+    ref={ref}
+    data-slot="toast-title"
+    className={composeClassName('font-heading text-sm font-bold text-on-surface leading-snug', className)}
+    {...props}
+  />
+));
+ToastTitle.displayName = 'ToastTitle';
+
+export const ToastDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Description>
+>(({ className, ...props }, ref) => (
+  <BaseToast.Description
+    ref={ref}
+    data-slot="toast-description"
+    className={composeClassName('font-sans text-sm text-on-surface-variant leading-normal break-words', className)}
+    {...props}
+  />
+));
+ToastDescription.displayName = 'ToastDescription';
+
+export const ToastClose = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Close>
+>(({ className, 'aria-label': ariaLabel = 'Dismiss toast', ...props }, ref) => (
+  <BaseToast.Close
+    ref={ref}
+    data-slot="toast-close"
+    aria-label={ariaLabel}
+    className={composeClassName(
+      'size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none',
+      className
+    )}
+    {...props}
+  />
+));
+ToastClose.displayName = 'ToastClose';
+
+export const ToastAction = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Action>
+>(({ className, ...props }, ref) => (
+  <BaseToast.Action
+    ref={ref}
+    data-slot="toast-action"
+    className={composeClassName(
+      'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer shrink-0 touch-target-expanded',
+      className
+    )}
+    {...props}
+  />
+));
+ToastAction.displayName = 'ToastAction';
+
+export const ToastViewport = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Viewport>
+>(({ className, ...props }, ref) => (
+  <BaseToast.Viewport
+    ref={ref}
+    data-slot="toast-viewport"
+    className={composeClassName(
+      'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] focus:outline-none',
+      className
+    )}
+    {...props}
+  />
+));
+ToastViewport.displayName = 'ToastViewport';
+
+export const ToastArrow = BaseToast.Arrow;
+export const ToastProvider = BaseToast.Provider;
+export const ToastPortal = BaseToast.Portal;
+export const ToastPositioner = BaseToast.Positioner;
+
+// Compound export mapping styled Eolas Toast primitives
 export const Toast = Object.assign(ToastComponent, {
   Provider: BaseToast.Provider,
-  Viewport: BaseToast.Viewport,
-  Root: BaseToast.Root,
-  Content: BaseToast.Content,
-  Description: BaseToast.Description,
-  Title: BaseToast.Title,
-  Close: BaseToast.Close,
-  Action: BaseToast.Action,
+  Viewport: ToastViewport,
+  Root: ToastRoot,
+  Content: ToastContent,
+  Description: ToastDescription,
+  Title: ToastTitle,
+  Close: ToastClose,
+  Action: ToastAction,
   Portal: BaseToast.Portal,
   Positioner: BaseToast.Positioner,
   Arrow: BaseToast.Arrow,
@@ -573,17 +706,6 @@ export const Toast = Object.assign(ToastComponent, {
 
 // Re-export Base UI primitives for compound composition
 export { BaseToast };
-export const ToastRoot = BaseToast.Root;
-export const ToastContent = BaseToast.Content;
-export const ToastTitle = BaseToast.Title;
-export const ToastDescription = BaseToast.Description;
-export const ToastClose = BaseToast.Close;
-export const ToastAction = BaseToast.Action;
-export const ToastViewport = BaseToast.Viewport;
-export const ToastArrow = BaseToast.Arrow;
-export const ToastProvider = BaseToast.Provider;
-export const ToastPortal = BaseToast.Portal;
-export const ToastPositioner = BaseToast.Positioner;
 export const useToastManager = BaseToast.useToastManager;
 export const createToastManager = BaseToast.createToastManager;
 export type { ToastManagerPositionerProps };

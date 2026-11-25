@@ -36,6 +36,12 @@ export interface SupportingPaneBlockProps
   title?: React.ReactNode;
   /** Title of the supporting pane */
   supportingTitle?: React.ReactNode;
+  /** Heading tag used for the workspace title (supporting heading auto-steps down by 1). Defaults to `'h2'`. */
+  titleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5';
+  /** Custom accessible/visible label for opening the supporting pane. */
+  showLabel?: string;
+  /** Custom accessible/visible label for closing the supporting pane. */
+  hideLabel?: string;
   /** Optional badge for the supporting pane (e.g. "Tips", "Notes", "3 Items") */
   supportingBadge?: string;
   /** Color role for the supporting badge */
@@ -66,6 +72,9 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       supportingContent,
       title,
       supportingTitle = 'Supporting Details',
+      titleAs = 'h2',
+      showLabel,
+      hideLabel,
       supportingBadge,
       supportingBadgeColorRole = 'neutral',
       side = 'right',
@@ -95,7 +104,6 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       if (!isOpen && aside.contains(document.activeElement)) {
         toggleButtonRef.current?.focus();
       }
-      aside.inert = !isOpen;
     }, [isOpen]);
 
     const updateOpen = (next: boolean) => {
@@ -109,7 +117,15 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       updateOpen(!isOpen);
     };
 
-    const SupportingHeadingTag = title ? 'h3' : 'h2';
+    const headingLevels = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const;
+    const TitleTag = titleAs;
+    const SupportingHeadingTag =
+      title ? headingLevels[Math.min(headingLevels.indexOf(titleAs) + 1, headingLevels.length - 1)] : titleAs;
+
+    const supportingTitleText =
+      typeof supportingTitle === 'string' && supportingTitle.trim() ? supportingTitle.trim() : 'details';
+    const resolvedShowLabel = showLabel ?? `Show ${supportingTitleText}`;
+    const resolvedHideLabel = hideLabel ?? `Hide ${supportingTitleText}`;
 
     const primaryCanvas = (
       <section
@@ -136,26 +152,27 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         id={paneId}
         data-slot="supporting-pane"
         data-state={isOpen ? 'open' : 'closed'}
+        inert={!isOpen}
         aria-hidden={!isOpen}
         aria-labelledby={supportingTitle ? supportingHeadingId : undefined}
         aria-label={!supportingTitle ? 'Supporting details' : undefined}
         className={cn(
-          'flex flex-col bg-surface-container-low shrink-0 min-w-0 overflow-hidden transition-opacity duration-quick ease-standard motion-reduce:transition-none',
+          'flex flex-col bg-surface-container-low shrink-0 min-w-0 overflow-hidden',
           isOpen
             ? cn(
-                paneWidthClassName,
                 // Compact (<768px) stacked panel caps height so primary canvas keeps majority height
-                'w-full h-auto max-h-64 @sm:max-h-72 short:max-h-40 @3xl:max-h-none opacity-100',
+                'w-full h-auto max-h-64 @sm:max-h-72 short:max-h-40 @3xl:max-h-none opacity-100 transition-opacity duration-quick ease-standard motion-reduce:transition-none',
+                paneWidthClassName,
                 // Wide (@3xl+) full-height side panel
                 '@3xl:h-full',
                 side === 'left'
-                  ? 'border-b border-outline-variant @3xl:border-b-0 @3xl:border-e'
-                  : 'border-t border-outline-variant @3xl:border-t-0 @3xl:border-s'
+                  ? 'border-b border-outline @3xl:border-b-0 @3xl:border-e'
+                  : 'border-t border-outline @3xl:border-t-0 @3xl:border-s'
               )
             : 'w-full h-0 border-0 @3xl:w-0 @3xl:h-full @3xl:border-0 opacity-0 invisible pointer-events-none'
         )}
       >
-        <div className={cn(paneWidthClassName, 'w-full flex flex-col flex-1 min-h-0 shrink-0 min-w-0')}>
+        <div className={cn('w-full flex flex-col flex-1 min-h-0 shrink-0 min-w-0', paneWidthClassName)}>
           {/* Supporting Pane Header */}
           <div className="px-4 pt-4 pb-3 border-b border-outline-variant/60 flex items-center justify-between gap-2 bg-surface-container-low shrink-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -204,12 +221,12 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         {...props}
       >
         {/* Top Application Header Bar */}
-        <div className="min-h-14 short:min-h-13 py-2 px-4 @md:px-6 border-b border-outline-variant flex flex-wrap items-center justify-between gap-3 bg-surface shrink-0">
+        <div className="min-h-14 short:min-h-14 py-2 px-4 @md:px-6 border-b border-outline-variant flex flex-wrap items-center justify-between gap-3 bg-surface shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             {title && (
-              <h2 className="font-heading text-base @md:text-headline-sm font-semibold text-on-surface truncate">
+              <TitleTag className="font-heading text-base @md:text-headline-sm font-semibold text-on-surface truncate">
                 {title}
-              </h2>
+              </TitleTag>
             )}
           </div>
 
@@ -223,7 +240,8 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
               onClick={handleToggle}
               aria-expanded={isOpen}
               aria-controls={paneId}
-              aria-label={isOpen ? 'Hide details' : 'Show details'}
+              aria-label={isOpen ? resolvedHideLabel : resolvedShowLabel}
+              className="min-w-11"
             >
               <Icon.Toggle
                 active={isOpen}
@@ -233,7 +251,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
                 directional
               />
               <span className="hidden @sm:inline">
-                {isOpen ? 'Hide details' : 'Show details'}
+                {isOpen ? resolvedHideLabel : resolvedShowLabel}
               </span>
             </Button>
           </div>

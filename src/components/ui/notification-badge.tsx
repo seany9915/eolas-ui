@@ -45,32 +45,44 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
     },
     ref
   ) => {
-    const isCounted = !dot && count !== undefined;
-    const displayCount = isCounted ? count : undefined;
+    const hasDot = Boolean(dot);
+    const hasCount = !hasDot && count !== undefined && count !== null && count !== '';
+    const displayCount = hasCount ? count : undefined;
 
-    const visualBadge = visible ? (
+    if (!visible || (!hasDot && !hasCount)) {
+      if (!announce) {
+        return null;
+      }
+      return (
+        <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {visible ? (srLabel ?? '') : ''}
+        </span>
+      );
+    }
+
+    const visualBadge = (
       <span
-        key={displayCount !== undefined ? String(displayCount) : 'dot'}
         ref={ref}
+        data-slot="notification-badge"
         className={cn(
-          'absolute -top-1 -end-1 z-10 select-none pointer-events-none inline-flex items-center justify-center font-mono font-bold leading-none',
+          'absolute -top-1 -end-1 select-none pointer-events-none inline-flex items-center justify-center font-mono font-semibold leading-none',
           'animate-badge-pop motion-reduce:animate-none motion-reduce:transform-none',
           variant === 'primary' && 'bg-primary text-on-primary',
           variant === 'error' && 'bg-error text-on-error',
           variant === 'secondary' && 'bg-secondary text-on-secondary',
-          dot
-            ? 'size-2.5 rounded-full ring-2 ring-surface'
+          hasDot
+            ? 'size-2.5 rounded-full border-2 border-surface'
             : 'min-w-5 h-5 px-1.5 text-xs rounded-full border-2 border-surface',
           className
         )}
         {...props}
       >
-        {isCounted ? (
+        {hasCount ? (
           <span aria-hidden={Boolean(srLabel) || undefined}>{displayCount}</span>
         ) : null}
         {!announce && srLabel && <span className="sr-only">{srLabel}</span>}
       </span>
-    ) : null;
+    );
 
     if (!announce) {
       return visualBadge;
@@ -80,7 +92,7 @@ export const NotificationBadge = React.forwardRef<HTMLSpanElement, NotificationB
       <>
         {visualBadge}
         <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
-          {visible ? (srLabel ?? (isCounted ? String(displayCount) : '')) : ''}
+          {srLabel ?? (hasCount ? String(displayCount) : '')}
         </span>
       </>
     );

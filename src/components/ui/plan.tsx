@@ -127,16 +127,16 @@ export const PlanTrigger = React.forwardRef<HTMLButtonElement, PlanTriggerProps>
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
-          <TraceLine status={overallStatus} className={description ? 'items-start py-2' : 'items-center'}>
+          <TraceLine render={<span />} status={overallStatus} className={description ? 'items-start py-2' : 'items-center'}>
             <TraceIcon name="route" status="default" className={description ? 'mt-0.5' : undefined} />
-            <div className="flex flex-col min-w-0 flex-1 text-start leading-tight">
+            <span className="flex flex-col min-w-0 flex-1 text-start leading-tight">
               <TraceTitle className="truncate">{title}</TraceTitle>
               {description && (
                 <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
                   {description}
                 </span>
               )}
-            </div>
+            </span>
             <TraceDescription className="ms-auto shrink-0 ps-2">
               <span className="flex items-center gap-2">
                 <span className="font-mono tabular-nums">
@@ -192,7 +192,7 @@ export const PlanContent = React.forwardRef<HTMLDivElement, PlanContentProps>(
               <span className="font-medium">Plan Progress</span>
               <span className="font-mono tabular-nums font-semibold">{progressPercent}%</span>
             </div>
-            <Progress value={progressPercent} className="h-1.5" />
+            <Progress value={progressPercent} size="sm" aria-label="Plan progress" />
           </div>
 
           <div className="divide-y divide-outline-variant/30">{children}</div>
@@ -223,9 +223,16 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
       typeof duration === 'number' ? `${duration.toFixed(1)}s` : duration;
 
     const stepContent = children ?? details;
+    const isCollapsible = Boolean(stepContent);
 
     const stepLine = (
-      <TraceLine ref={ref} status={status} className={className} {...props}>
+      <TraceLine
+        ref={ref}
+        render={isCollapsible ? <span /> : undefined}
+        status={status}
+        className={className}
+        {...props}
+      >
         <TraceIcon status={status} stepNumber={status === 'pending' ? stepNumber : undefined} />
         <TraceTitle>{title}</TraceTitle>
         {(description || formattedDuration) && (
@@ -243,7 +250,7 @@ export const PlanStep = React.forwardRef<HTMLDivElement, PlanStepProps>(
       </TraceLine>
     );
 
-    if (stepContent) {
+    if (isCollapsible) {
       return (
         <TraceCollapsible defaultOpen={status === 'running'}>
           <TraceCollapsibleTrigger>
@@ -270,7 +277,7 @@ PlanStep.displayName = 'PlanStep';
 /* -------------------------------------------------------------------------------------------------
  * Plan (Root Container)
  * -----------------------------------------------------------------------------------------------*/
-export interface PlanProps {
+export interface PlanProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: string;
   description?: string;
   steps?: PlanStepItem[];
@@ -296,126 +303,136 @@ function collectStepStatuses(children: React.ReactNode): TraceStatus[] {
   return statuses;
 }
 
-export const PlanRoot: React.FC<PlanProps> = ({
-  title = 'Execution Plan',
-  description,
-  steps = [],
-  defaultOpen = true,
-  open,
-  onOpenChange,
-  variant,
-  children,
-  className,
-}) => {
-  const chatContext = useChatMessageContext();
-  const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
-  const statuses = steps.length > 0 ? steps.map((s) => s.status) : collectStepStatuses(children);
-  const completedCount = statuses.filter((s) => s === 'complete').length;
-  const runningCount = statuses.filter((s) => s === 'running').length;
-  const totalCount = statuses.length;
-  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+export const PlanRoot = React.forwardRef<HTMLDivElement, PlanProps>(
+  (
+    {
+      title = 'Execution Plan',
+      description,
+      steps = [],
+      defaultOpen = true,
+      open,
+      onOpenChange,
+      variant,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const chatContext = useChatMessageContext();
+    const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
+    const statuses = steps.length > 0 ? steps.map((s) => s.status) : collectStepStatuses(children);
+    const completedCount = statuses.filter((s) => s === 'complete').length;
+    const runningCount = statuses.filter((s) => s === 'running').length;
+    const totalCount = statuses.length;
+    const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  const overallStatus: TraceStatus =
-    runningCount > 0 ? 'running' : completedCount === totalCount && totalCount > 0 ? 'complete' : 'default';
+    const overallStatus: TraceStatus =
+      runningCount > 0 ? 'running' : completedCount === totalCount && totalCount > 0 ? 'complete' : 'default';
 
-  const isCompound = React.Children.toArray(children).some(
-    (child) =>
-      React.isValidElement(child) &&
-      (child.type === PlanTrigger ||
-        child.type === PlanHeader ||
-        child.type === PlanContent ||
-        (child.type as { displayName?: string })?.displayName === 'PlanTrigger' ||
-        (child.type as { displayName?: string })?.displayName === 'PlanHeader' ||
-        (child.type as { displayName?: string })?.displayName === 'PlanContent')
-  );
+    const isCompound = React.Children.toArray(children).some(
+      (child) =>
+        React.isValidElement(child) &&
+        (child.type === PlanTrigger ||
+          child.type === PlanHeader ||
+          child.type === PlanContent ||
+          (child.type as { displayName?: string })?.displayName === 'PlanTrigger' ||
+          (child.type as { displayName?: string })?.displayName === 'PlanHeader' ||
+          (child.type as { displayName?: string })?.displayName === 'PlanContent')
+    );
 
-  return (
-    <PlanContext.Provider
-      value={{
-        completedCount,
-        totalCount,
-        progressPercent,
-        overallStatus,
-      }}
-    >
-      <div data-slot="plan" className={cn('w-full', className)}>
-        <Trace variant={resolvedVariant}>
-          <TraceCollapsible
-            defaultOpen={defaultOpen}
-            open={open}
-            onOpenChange={onOpenChange}
-          >
-            {isCompound ? (
-              children
-            ) : (
-              <>
-                <PlanTrigger title={title} description={description} />
-                <PlanContent>
-                  {steps.map((step, idx) => {
-                    const stepContent = step.content ?? step.details;
-                    const formattedDuration = step.duration
-                      ? (typeof step.duration === 'number' ? `${step.duration}s` : step.duration)
-                      : null;
+    return (
+      <PlanContext.Provider
+        value={{
+          completedCount,
+          totalCount,
+          progressPercent,
+          overallStatus,
+        }}
+      >
+        <div ref={ref} data-slot="plan" className={cn('w-full', className)} {...props}>
+          <Trace variant={resolvedVariant}>
+            <TraceCollapsible
+              defaultOpen={defaultOpen}
+              open={open}
+              onOpenChange={onOpenChange}
+            >
+              {isCompound ? (
+                children
+              ) : (
+                <>
+                  <PlanTrigger title={title} description={description} />
+                  <PlanContent>
+                    {steps.map((step, idx) => {
+                      const stepContent = step.content ?? step.details;
+                      const formattedDuration = step.duration
+                        ? (typeof step.duration === 'number' ? `${step.duration}s` : step.duration)
+                        : null;
 
-                    const renderStepLine = (
-                      <TraceLine status={step.status} className={step.description ? 'items-start py-2' : 'items-center'}>
-                        <TraceIcon
+                      const renderStepLine = (
+                        <TraceLine
+                          render={stepContent ? <span /> : undefined}
                           status={step.status}
-                          stepNumber={step.status === 'pending' ? idx + 1 : undefined}
-                          className={step.description ? 'mt-0.5' : undefined}
-                        />
-                        <div className="flex flex-col min-w-0 flex-1 leading-tight text-start">
-                          <TraceTitle className="truncate">{step.title}</TraceTitle>
-                          {step.description && (
-                            <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
-                              {step.description}
-                            </span>
-                          )}
-                        </div>
-                        {formattedDuration && (
-                          <TraceDescription className="ms-auto shrink-0 ps-2">
-                            <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
-                              {formattedDuration}
-                            </span>
-                          </TraceDescription>
-                        )}
-                      </TraceLine>
-                    );
-
-                    if (stepContent) {
-                      return (
-                        <TraceCollapsible key={step.id} defaultOpen={step.status === 'running'}>
-                          <TraceCollapsibleTrigger>
-                            {renderStepLine}
-                          </TraceCollapsibleTrigger>
-                          <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
-                            {typeof stepContent === 'string' ? (
-                              <p>
-                                {stepContent}
-                              </p>
-                            ) : (
-                              stepContent
+                          className={step.description ? 'items-start py-2' : 'items-center'}
+                        >
+                          <TraceIcon
+                            status={step.status}
+                            stepNumber={step.status === 'pending' ? idx + 1 : undefined}
+                            className={step.description ? 'mt-0.5' : undefined}
+                          />
+                          <span className="flex flex-col min-w-0 flex-1 leading-tight text-start">
+                            <TraceTitle className="truncate">{step.title}</TraceTitle>
+                            {step.description && (
+                              <span className="font-sans text-xs text-on-surface-variant truncate mt-0.5 leading-normal">
+                                {step.description}
+                              </span>
                             )}
-                          </TraceCollapsibleContent>
-                        </TraceCollapsible>
+                          </span>
+                          {formattedDuration && (
+                            <TraceDescription className="ms-auto shrink-0 ps-2">
+                              <span className="font-mono text-xs tabular-nums text-on-surface-variant/80">
+                                {formattedDuration}
+                              </span>
+                            </TraceDescription>
+                          )}
+                        </TraceLine>
                       );
-                    }
 
-                    return (
-                      <React.Fragment key={step.id}>
-                        {renderStepLine}
-                      </React.Fragment>
-                    );
-                  })}
-                </PlanContent>
-              </>
-            )}
-          </TraceCollapsible>
-        </Trace>
-      </div>
-    </PlanContext.Provider>
-  );
-};
+                      if (stepContent) {
+                        return (
+                          <TraceCollapsible key={step.id} defaultOpen={step.status === 'running'}>
+                            <TraceCollapsibleTrigger>
+                              {renderStepLine}
+                            </TraceCollapsibleTrigger>
+                            <TraceCollapsibleContent unstyled className="px-3.5 pb-2.5 pt-1 ps-11 text-sm font-sans text-on-surface-variant leading-relaxed">
+                              {typeof stepContent === 'string' ? (
+                                <p>
+                                  {stepContent}
+                                </p>
+                              ) : (
+                                stepContent
+                              )}
+                            </TraceCollapsibleContent>
+                          </TraceCollapsible>
+                        );
+                      }
+
+                      return (
+                        <React.Fragment key={step.id}>
+                          {renderStepLine}
+                        </React.Fragment>
+                      );
+                    })}
+                  </PlanContent>
+                </>
+              )}
+            </TraceCollapsible>
+          </Trace>
+        </div>
+      </PlanContext.Provider>
+    );
+  }
+);
 PlanRoot.displayName = 'Plan';
 
 /* -------------------------------------------------------------------------------------------------

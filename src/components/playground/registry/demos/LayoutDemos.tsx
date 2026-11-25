@@ -67,7 +67,7 @@ export const CardDemo: React.FC<ComponentDemoProps> = () => {
         </Card.Footer>
       </Card>
 
-      {/* Divided Stat Strip inside a single Card (preferred over MetricCard grids) */}
+      {/* Divided Stat Strip inside a single Card */}
       <Card className="@container md:col-span-2">
         <Card.Header>
           <Card.Title>Weekly summary</Card.Title>
@@ -293,19 +293,19 @@ export const CarouselDemo: React.FC<ComponentDemoProps> = () => {
       <Carousel className="w-full">
         <CarouselContent>
           <CarouselItem className="p-4">
-            <div className="h-32 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
+            <div className="h-32 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
               Exercise 1: Initial /s/ Sounds
             </div>
           </CarouselItem>
           <CarouselItem className="p-4">
-            <div className="h-32 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-sm">
+            <div className="h-32 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-sm">
               Exercise 2: Medial /s/ Sounds
             </div>
           </CarouselItem>
         </CarouselContent>
         <div className="flex items-center justify-center gap-2 mt-2">
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious position="inline" />
+          <CarouselNext position="inline" />
         </div>
       </Carousel>
     </div>

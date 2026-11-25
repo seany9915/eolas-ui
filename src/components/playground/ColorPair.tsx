@@ -190,17 +190,17 @@ export const ColorPair: React.FC<ColorPairProps> = ({
         <div className="flex items-center gap-1">
           {wcag.passAA ? (
             <Badge variant="soft" colorRole={wcag.colorRole} size="sm">
-              <Icon name="check_circle" size="xs" className="mr-1 text-success" />
+              <Icon name="check_circle" size="xs" className="text-success" />
               {wcag.rating} Pass
             </Badge>
           ) : wcag.passAALarge ? (
             <Badge variant="soft" colorRole="warning" size="sm">
-              <Icon name="warning" size="xs" className="mr-1 text-warning" />
+              <Icon name="warning" size="xs" className="text-warning" />
               AA Large Only
             </Badge>
           ) : (
             <Badge variant="soft" colorRole="error" size="sm">
-              <Icon name="cancel" size="xs" className="mr-1 text-error" />
+              <Icon name="cancel" size="xs" className="text-error" />
               Fails 4.5:1 AA
             </Badge>
           )}
@@ -275,9 +275,10 @@ export const InteractiveColorPairChecker: React.FC = () => {
               size="sm"
               className="font-mono"
             />
-            <div className="size-10 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: fg }} />
+            <div className="size-11 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: fg }} />
           </div>
           <Select
+            aria-label="Select foreground color token"
             placeholder="Select a token..."
             options={selectOptions}
             value={fgTokenName}
@@ -299,9 +300,10 @@ export const InteractiveColorPairChecker: React.FC = () => {
               size="sm"
               className="font-mono"
             />
-            <div className="size-10 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: bg }} />
+            <div className="size-11 rounded border border-outline shrink-0 shadow-xs" style={{ backgroundColor: bg }} />
           </div>
           <Select
+            aria-label="Select background color token"
             placeholder="Select a token..."
             options={selectOptions}
             value={bgTokenName}

@@ -17,6 +17,8 @@ import {
   ChartLegend,
   ChartLegendContent,
   applySeriesOverrides,
+  resolveChartSeriesColor,
+  usePrefersReducedMotion,
   type ChartConfig,
 } from '@/components/ui/chart';
 
@@ -71,6 +73,7 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
     },
     ref
   ) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
     const shouldShowLegend = showLegend ?? series.length > 1;
     const resolvedContentClassName =
       contentClassName ?? (shouldShowLegend ? 'h-72 w-full' : 'h-64 w-full');
@@ -100,7 +103,6 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
           className="aspect-auto size-full"
         >
           <LineChart
-            aria-label={chartLabel ?? title}
             data={data}
             margin={{ left: showYAxis ? 0 : 16, right: 16, top: 12, bottom: 0 }}
           >
@@ -133,30 +135,34 @@ export const LineChartCard = React.forwardRef<HTMLDivElement, LineChartCardProps
             {(showLegend ?? series.length > 1) && (
               <ChartLegend content={<ChartLegendContent />} />
             )}
-            {series.map((item) => (
-              <Line
-                key={item.dataKey}
-                type="monotone"
-                dataKey={item.dataKey}
-                stroke={`var(--color-${item.dataKey})`}
-                strokeWidth={2}
-                strokeDasharray={item.strokeDasharray}
-                dot={
-                  item.showDots !== false
-                    ? {
-                        fill: `var(--color-${item.dataKey})`,
-                        r: 3,
-                        strokeWidth: 0,
-                      }
-                    : false
-                }
-                activeDot={{
-                  r: 5,
-                  strokeWidth: 2,
-                  stroke: 'var(--color-surface)',
-                }}
-              />
-            ))}
+            {series.map((item, index) => {
+              const { stroke } = resolveChartSeriesColor(resolvedConfig, item.dataKey, index);
+              return (
+                <Line
+                  key={item.dataKey}
+                  type="monotone"
+                  dataKey={item.dataKey}
+                  stroke={stroke}
+                  strokeWidth={2}
+                  strokeDasharray={item.strokeDasharray}
+                  isAnimationActive={!prefersReducedMotion}
+                  dot={
+                    item.showDots !== false
+                      ? {
+                          fill: stroke,
+                          r: 3,
+                          strokeWidth: 0,
+                        }
+                      : false
+                  }
+                  activeDot={{
+                    r: 5,
+                    strokeWidth: 2,
+                    stroke: 'var(--color-surface)',
+                  }}
+                />
+              );
+            })}
           </LineChart>
         </ChartContainer>
       </ChartCard>

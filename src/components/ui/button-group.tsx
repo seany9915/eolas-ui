@@ -42,21 +42,24 @@ export const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupProps
             'inline-flex isolate',
             isHorizontal
               ? [
-                  'flex-row max-w-full overflow-x-auto scrollbar-none p-1 -m-1 [&>*:not(:first-child)]:-ms-px',
-                  // Horizontal fused edges: collapse inner corners while preserving outer radius
-                  '[&>*:not(:first-child)]:rounded-s-none',
-                  '[&>*:not(:last-child)]:rounded-e-none',
+                  'flex-row max-w-full overflow-x-auto scrollbar-none p-1 -m-1 [&>*:not(:first-child)]:-ms-px [&>*[class*="border-2"]:not(:first-child)]:-ms-0.5',
+                  // Allow wrapper children (e.g. Input) to shrink without overriding explicit caller widths
+                  '[&>[data-slot=input-wrapper]]:min-w-0',
+                  // Horizontal fused edges: collapse inner corners while preserving outer radius (including wrapped Input)
+                  '[&>*:not(:first-child)]:rounded-s-none [&>*:not(:first-child)_[data-slot=input]]:rounded-s-none',
+                  '[&>*:not(:last-child)]:rounded-e-none [&>*:not(:last-child)_[data-slot=input]]:rounded-e-none',
                 ]
               : [
-                  'flex-col [&>*:not(:first-child)]:-mt-px',
-                  // Vertical fused edges: collapse inner corners while preserving outer radius
-                  '[&>*:not(:first-child)]:rounded-t-none',
-                  '[&>*:not(:last-child)]:rounded-b-none',
+                  'flex-col [&>*:not(:first-child)]:-mt-px [&>*[class*="border-2"]:not(:first-child)]:-mt-0.5',
+                  // Vertical fused edges: collapse inner corners while preserving outer radius (including wrapped Input)
+                  '[&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)_[data-slot=input]]:rounded-t-none',
+                  '[&>*:not(:last-child)]:rounded-b-none [&>*:not(:last-child)_[data-slot=input]]:rounded-b-none',
                 ],
             // Elevation and focus stacking so floating 2px outlines are never clipped
             '[&>*]:relative',
             '[&>*:hover]:z-10',
             '[&>*:focus-visible]:z-20',
+            '[&>*:focus-within]:z-20',
             '[&>*:active]:z-10',
             className
           )}
@@ -108,11 +111,18 @@ ButtonGroupSeparator.displayName = 'ButtonGroupSeparator';
  * ButtonGroupText
  * -----------------------------------------------------------------------------------------------*/
 export interface ButtonGroupTextProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: 'sm' | 'md' | 'lg';
   render?: useRender.RenderProp;
 }
 
+const textSizeClasses: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'min-h-[44px] h-11 px-3 text-xs',
+  md: 'min-h-[48px] h-12 px-4 text-sm',
+  lg: 'min-h-[56px] h-14 px-5 text-sm',
+};
+
 export const ButtonGroupText = React.forwardRef<HTMLDivElement, ButtonGroupTextProps>(
-  ({ className, render, children, ...props }, ref) =>
+  ({ className, size = 'md', render, children, ...props }, ref) =>
     useRender({
       render,
       ref,
@@ -120,7 +130,8 @@ export const ButtonGroupText = React.forwardRef<HTMLDivElement, ButtonGroupTextP
       props: {
         'data-slot': 'button-group-text',
         className: cn(
-          'flex items-center justify-center px-3 text-xs font-label font-medium text-on-surface-variant bg-surface-container-low border border-outline-variant select-none min-h-11',
+          'flex items-center justify-center rounded font-label font-medium text-on-surface-variant bg-surface-container-low border border-outline select-none',
+          textSizeClasses[size],
           className
         ),
         children,

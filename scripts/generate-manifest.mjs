@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import {
   CATEGORY_MAP,
-  DEPRECATED_ITEMS,
   PUBLIC_SYSTEM_LIBS,
   TRANSITIONS_DEV_MAP,
 } from './registry-meta.mjs';
@@ -11,9 +10,6 @@ const r = JSON.parse(fs.readFileSync('public/r/registry.json', 'utf8'));
 const IMPORT_STATEMENT_OVERRIDES = {
   'csp-provider': "import { CSPProvider } from '@/components/ui/csp-provider';",
   'otp-field': "import { OTPField } from '@/components/ui/otp-field';",
-  'selection-controls': "import { Checkbox, RadioGroup, Switch } from '@/components/ui/selection-controls';",
-  steppers: "import { NumberField } from '@/components/ui/steppers';",
-  toggles: "import { Toggle, ToggleGroup } from '@/components/ui/toggles';",
   utils: "import { cn, sanitizeUrl, mergeProps, useRender } from '@/lib/utils';",
   sanitize: "import { sanitizeHtml, SanitizedHtml } from '@/lib/sanitize';",
   scheduler: "import { yieldToMain, processChunked, useYieldingFilter } from '@/lib/scheduler';",
@@ -90,13 +86,8 @@ const registryEntries = items.map((item) => {
         ? 'https://developer.chrome.com'
         : undefined;
 
-  const deprecatedInfo = DEPRECATED_ITEMS[item.name];
-  const isDeprecated = Boolean(deprecatedInfo);
-  const deprecatedNote = deprecatedInfo?.deprecatedNote;
-  const replacedBy = deprecatedInfo?.replacedBy;
-
   const category = item.categories?.[0] || CATEGORY_MAP[item.name] || (isBlock ? 'blocks' : 'layout');
-  const tier = isBlock ? 'block' : isDeprecated || isLib ? 'utility' : 'primitive';
+  const tier = isBlock ? 'block' : isLib ? 'utility' : 'primitive';
 
   const title = item.title || item.name.split('-').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
   const description = TRANSITIONS_DEV_MAP[item.name] || item.description || `Eolas UI ${title} component.`;
@@ -116,7 +107,6 @@ const registryEntries = items.map((item) => {
     basePrimitive,
     ...(platformReference ? { platformReference } : {}),
     sourcePath: filePath,
-    ...(isDeprecated ? { isDeprecated: true, deprecatedNote, replacedBy } : {}),
     ...(taxonomy.length > 0 ? { taxonomy } : {}),
     ...(dependencies.length > 0 ? { dependencies } : {}),
     importStatement,

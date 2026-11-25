@@ -13,6 +13,7 @@
  */
 import * as React from 'react';
 import { Switch as BaseSwitch } from '@base-ui/react/switch';
+import { Icon } from './icon';
 import { cn, composeClassName } from '@/lib/utils';
 
 export type SwitchSize = 'sm' | 'md' | 'lg';
@@ -104,12 +105,14 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
         aria-labelledby={ariaLabelBy}
         className={composeClassName(
           cn(
-            'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:content-[\'\']',
+            'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] motion-reduce:transition-none relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:content-[\'\']',
             size === 'sm' ? 'after:-inset-y-3 after:-inset-x-1' : 'after:-inset-y-2.5 after:-inset-x-0.5',
-            'bg-surface-container-high',
-            error ? 'border-error focus-visible:outline-error' : 'border-outline',
-            'data-[checked]:bg-primary data-[checked]:border-primary',
-            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+            'bg-surface-container-high data-[checked]:bg-primary',
+            error
+              ? 'border-error data-[checked]:border-error focus-visible:outline-error'
+              : 'border-outline data-[checked]:border-primary focus-visible:outline-primary',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+            'forced-colors:data-[checked]:bg-[Highlight] forced-colors:data-[checked]:border-[Highlight]',
             'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
             currentSize.track
           ),
@@ -123,7 +126,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
           <BaseSwitch.Thumb
             data-slot="switch-thumb"
             className={cn(
-              'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none',
+              'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none forced-colors:bg-[HighlightText]',
               currentSize.thumb,
               currentSize.translate
             )}
@@ -139,7 +142,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
     return (
       <div
         className={cn(
-          'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors hover:bg-state-hover',
+          'flex w-full items-center justify-between gap-4 min-h-[44px] py-2 px-3 rounded transition-colors motion-reduce:transition-none hover:bg-state-hover',
           disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
           !isClassNameFn ? className : undefined
         )}
@@ -158,9 +161,7 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
           )}
           {hasErrorText && (
             <span id={errorId} className="flex items-center gap-1 font-sans text-sm font-semibold text-error mt-1 select-none">
-              <span className="material-symbols-outlined text-base shrink-0" aria-hidden="true">
-                error
-              </span>
+              <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
               <span>{error}</span>
             </span>
           )}
@@ -172,15 +173,66 @@ const SwitchComponent = React.forwardRef<HTMLElement, SwitchProps>(
 );
 SwitchComponent.displayName = 'Switch';
 
+export const SwitchRoot = React.forwardRef<
+  HTMLElement,
+  React.ComponentPropsWithoutRef<typeof BaseSwitch.Root> & { size?: SwitchSize; error?: boolean }
+>(({ className, size = 'md', error, ...props }, ref) => {
+  const currentSize = sizeConfig[size] || sizeConfig.md;
+  return (
+    <BaseSwitch.Root
+      ref={ref}
+      data-slot="switch"
+      className={composeClassName(
+        cn(
+          'rounded-full border transition-[background-color,border-color] duration-[var(--duration-quick)] motion-reduce:transition-none relative flex items-center shrink-0 cursor-pointer select-none after:absolute after:content-[\'\']',
+          size === 'sm' ? 'after:-inset-y-3 after:-inset-x-1' : 'after:-inset-y-2.5 after:-inset-x-0.5',
+          'bg-surface-container-high data-[checked]:bg-primary',
+          error
+            ? 'border-error data-[checked]:border-error focus-visible:outline-error'
+            : 'border-outline data-[checked]:border-primary focus-visible:outline-primary',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+          'forced-colors:data-[checked]:bg-[Highlight] forced-colors:data-[checked]:border-[Highlight]',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
+          currentSize.track
+        ),
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SwitchRoot.displayName = 'SwitchRoot';
+
+export const SwitchThumb = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseSwitch.Thumb> & { size?: SwitchSize }
+>(({ className, size = 'md', ...props }, ref) => {
+  const currentSize = sizeConfig[size] || sizeConfig.md;
+  return (
+    <BaseSwitch.Thumb
+      ref={ref}
+      data-slot="switch-thumb"
+      className={composeClassName(
+        cn(
+          'rounded-full bg-surface shadow-ambient transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] translate-x-0 motion-reduce:transition-none forced-colors:bg-[HighlightText]',
+          currentSize.thumb,
+          currentSize.translate
+        ),
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SwitchThumb.displayName = 'SwitchThumb';
+
 // Compound export mapping Base UI primitives
 export const Switch = Object.assign(SwitchComponent, {
-  Root: BaseSwitch.Root,
-  Thumb: BaseSwitch.Thumb,
+  Root: SwitchRoot,
+  Thumb: SwitchThumb,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseSwitch };
-export const SwitchRoot = BaseSwitch.Root;
-export const SwitchThumb = BaseSwitch.Thumb;
 
 export default Switch;

@@ -35,8 +35,8 @@ const SeparatorComponent = React.forwardRef<HTMLDivElement, SeparatorProps>(({
       aria-orientation={decorative ? undefined : orientation}
       className={composeClassName(
         cn(
-          'bg-outline-variant shrink-0',
-          orientation === 'horizontal' ? 'h-[1px] w-full' : 'w-[1px] h-full self-stretch'
+          'bg-outline-variant forced-colors:bg-[CanvasText] shrink-0',
+          orientation === 'horizontal' ? 'h-px w-full' : 'w-px h-full self-stretch'
         ),
         className
       )}

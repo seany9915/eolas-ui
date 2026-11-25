@@ -114,6 +114,7 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
       defaultTagName: 'div',
       props: {
         'data-slot': 'skeleton-reveal',
+        'aria-busy': loading || undefined,
         style: revealStyle,
         // Overlay both layers in a single-cell CSS Grid to avoid frame-1 container height snaps.
         // Clip only while cross-fading so focus rings on settled loaded content never clip.

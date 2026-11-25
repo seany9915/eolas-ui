@@ -18,6 +18,19 @@ export function App() {
   const [activeTab, setActiveTab] = React.useState(getInitialTab);
 
   React.useEffect(() => {
+    const tabTitles: Record<string, string> = {
+      tokens: 'Color Tokens — Eolas Design System',
+      components: 'Components — Eolas Design System',
+      icons: 'Icon Rules — Eolas Design System',
+      brand: 'Brand Assets — Eolas Design System',
+      audit: 'A11y Audit — Eolas Design System',
+    };
+    if (activeTab !== 'components') {
+      document.title = tabTitles[activeTab] || 'Eolas Design System';
+    }
+  }, [activeTab]);
+
+  React.useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').split('/')[0];
       const validTabs = ['tokens', 'components', 'icons', 'brand', 'audit'];
@@ -34,13 +47,20 @@ export function App() {
     if (!window.location.hash.replace(/^#\/?/, '').startsWith(tab)) {
       window.location.hash = tab;
     }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0 });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-dvh bg-background text-on-background flex flex-col font-sans transition-colors duration-200">
       {/* Skip Navigation Bypass Link */}
       <a
         href="#main-content"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById('main-content')?.focus();
+        }}
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-surface focus:text-primary focus:border-2 focus:border-primary focus:rounded-md focus:shadow-ambient focus:font-label focus:text-sm focus:font-semibold"
       >
         Skip to main content
@@ -55,8 +75,9 @@ export function App() {
       {/* Main Content Area */}
       <main
         id="main-content"
+        tabIndex={-1}
         className={cn(
-          'flex-1 w-full flex flex-col min-h-0',
+          'flex-1 w-full flex flex-col min-h-0 focus:outline-none',
           activeTab === 'components'
             ? 'max-w-none p-0'
             : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'
@@ -77,7 +98,7 @@ export function App() {
         <footer className="bg-surface border-t border-outline-variant py-8 mt-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol" className="h-7 w-7 object-contain" />
+              <img src={assetUrl('/logos/pictorial-mark.svg')} alt="Eolas Symbol" className="size-7 object-contain" />
               <span className="font-label text-sm font-bold text-on-surface">Eolas Design System & Registry</span>
             </div>
             <p className="font-sans text-xs text-on-surface-variant text-center sm:text-right">

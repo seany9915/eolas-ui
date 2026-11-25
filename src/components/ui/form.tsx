@@ -15,7 +15,7 @@ import * as React from 'react';
 import { Form as BaseForm } from '@base-ui/react/form';
 import { composeClassName } from '@/lib/utils';
 
-export interface FormProps<FormValues extends Record<string, any> = Record<string, any>>
+export interface FormProps<FormValues extends Record<string, unknown> = Record<string, unknown>>
   extends BaseForm.Props<FormValues> {
   children?: React.ReactNode;
 
@@ -43,7 +43,32 @@ export interface FormProps<FormValues extends Record<string, any> = Record<strin
   focusFirstInvalid?: boolean;
 }
 
-const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
+const FOCUSABLE_DESCENDANT_SELECTOR =
+  'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])';
+
+function isElementVisibleForFocus(el: HTMLElement): boolean {
+  if (el instanceof HTMLInputElement && el.type === 'hidden') return false;
+  if (el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true') return false;
+  if (el.hidden) return false;
+  const style = window.getComputedStyle(el);
+  return style.display !== 'none' && style.visibility !== 'hidden';
+}
+
+function isNativelyFocusableControl(el: HTMLElement): boolean {
+  if (
+    el instanceof HTMLInputElement ||
+    el instanceof HTMLSelectElement ||
+    el instanceof HTMLTextAreaElement ||
+    el instanceof HTMLButtonElement
+  ) {
+    return !el.disabled;
+  }
+  if (el instanceof HTMLAnchorElement && el.hasAttribute('href')) return true;
+  const tabIndexAttr = el.getAttribute('tabindex');
+  return tabIndexAttr !== null && tabIndexAttr !== '-1';
+}
+
+const FormComponent = React.forwardRef<HTMLFormElement, FormProps<Record<string, unknown>>>(
   (
     {
       onSubmit,
@@ -73,17 +98,33 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
     );
 
     const handleInvalidCapture = React.useCallback(
-      (event: Parameters<NonNullable<BaseForm.Props<any>['onInvalidCapture']>>[0]) => {
+      (event: Parameters<NonNullable<BaseForm.Props<Record<string, unknown>>['onInvalidCapture']>>[0]) => {
         onInvalidCapture?.(event);
         if (!focusFirstInvalid || event.defaultPrevented) return;
         window.requestAnimationFrame(() => {
           const formEl = internalRef.current;
           if (!formEl) return;
           const active = document.activeElement;
-          if (active && formEl.contains(active) && active.matches('[aria-invalid="true"], :invalid')) {
+          if (active && formEl.contains(active) && active.matches('[aria-invalid="true"], :invalid:not(form):not(fieldset)')) {
             return;
           }
-          formEl.querySelector<HTMLElement>('[aria-invalid="true"], :invalid')?.focus();
+          const candidates = formEl.querySelectorAll<HTMLElement>(
+            '[aria-invalid="true"], :invalid:not(form):not(fieldset)'
+          );
+          for (const candidate of candidates) {
+            if (!isElementVisibleForFocus(candidate)) continue;
+            if (isNativelyFocusableControl(candidate)) {
+              candidate.focus();
+              return;
+            }
+            const descendant = Array.from(
+              candidate.querySelectorAll<HTMLElement>(FOCUSABLE_DESCENDANT_SELECTOR)
+            ).find(isElementVisibleForFocus);
+            if (descendant) {
+              descendant.focus();
+              return;
+            }
+          }
         });
       },
       [focusFirstInvalid, onInvalidCapture]
@@ -105,7 +146,10 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
         onFormSubmit={onFormSubmit}
         onSubmit={onSubmit}
         onInvalidCapture={handleInvalidCapture}
-        className={composeClassName('flex flex-col gap-4 w-full transition-colors duration-quick', className)}
+        className={composeClassName(
+          'flex flex-col gap-4 w-full transition-colors duration-quick motion-reduce:transition-none',
+          className
+        )}
         {...webMcpProps}
         {...props}
       >
@@ -113,9 +157,10 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<any>>(
       </BaseForm>
     );
   }
-) as <FormValues extends Record<string, any> = Record<string, any>>(
+) as (<FormValues extends Record<string, unknown> = Record<string, unknown>>(
   props: FormProps<FormValues> & { ref?: React.Ref<HTMLFormElement> }
-) => React.JSX.Element;
+) => React.JSX.Element) & { displayName?: string };
+FormComponent.displayName = 'Form';
 
 // Compound Base UI exports
 export const Form = Object.assign(FormComponent, {

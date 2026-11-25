@@ -37,7 +37,7 @@ const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
         <div
           ref={ref}
           role={role}
-          data-slot="marker"
+          data-slot="checkpoint"
           data-variant="default"
           className={cn(
             'flex flex-wrap items-center justify-center gap-2 w-full py-2 px-3 text-xs text-on-surface-variant select-none',
@@ -55,7 +55,7 @@ const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
         <div
           ref={ref}
           role={role}
-          data-slot="marker"
+          data-slot="checkpoint"
           data-variant="border"
           className={cn(
             'flex flex-wrap items-center gap-2 w-full py-2.5 px-3 border-b border-outline-variant/60 text-xs text-on-surface-variant select-none',
@@ -71,9 +71,8 @@ const CheckpointRoot = React.forwardRef<HTMLDivElement, CheckpointRootProps>(
     return (
       <div
         ref={ref}
-        role={role ?? 'region'}
-        aria-label={props['aria-label'] ?? 'Conversation checkpoint'}
-        data-slot="checkpoint-root"
+        role={role}
+        data-slot="checkpoint"
         data-variant="separator"
         className={cn(
           'relative flex items-center justify-center w-full py-4 my-2 select-none',
@@ -97,23 +96,21 @@ export interface CheckpointIconProps extends React.HTMLAttributes<HTMLSpanElemen
   className?: string;
 }
 
-const CheckpointIcon: React.FC<CheckpointIconProps> = ({
-  name = 'bookmark',
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <span
-      data-slot="marker-icon"
-      className={cn('flex items-center justify-center text-primary shrink-0 [&>svg]:size-3.5', className)}
-      aria-hidden="true"
-      {...props}
-    >
-      {children ?? <Icon name={name} size="xs" />}
-    </span>
-  );
-};
+const CheckpointIcon = React.forwardRef<HTMLSpanElement, CheckpointIconProps>(
+  ({ name = 'bookmark', children, className, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        data-slot="checkpoint-icon"
+        className={cn('flex items-center justify-center text-primary shrink-0 [&>svg]:size-3.5', className)}
+        aria-hidden="true"
+        {...props}
+      >
+        {children ?? <Icon name={name} size="xs" />}
+      </span>
+    );
+  }
+);
 CheckpointIcon.displayName = 'Checkpoint.Icon';
 
 export interface CheckpointTitleProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -121,21 +118,20 @@ export interface CheckpointTitleProps extends React.HTMLAttributes<HTMLSpanEleme
   className?: string;
 }
 
-const CheckpointTitle: React.FC<CheckpointTitleProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <span
-      data-slot="marker-content"
-      className={cn('font-sans font-medium text-xs text-on-surface min-w-0 truncate', className)}
-      {...props}
-    >
-      {children}
-    </span>
-  );
-};
+const CheckpointTitle = React.forwardRef<HTMLSpanElement, CheckpointTitleProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        data-slot="checkpoint-title"
+        className={cn('font-sans font-medium text-xs text-on-surface min-w-0 truncate', className)}
+        {...props}
+      >
+        {children}
+      </span>
+    );
+  }
+);
 CheckpointTitle.displayName = 'Checkpoint.Title';
 
 export interface CheckpointDescriptionProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -143,50 +139,64 @@ export interface CheckpointDescriptionProps extends React.HTMLAttributes<HTMLSpa
   className?: string;
 }
 
-const CheckpointDescription: React.FC<CheckpointDescriptionProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <span
-      className={cn('font-sans text-xs text-on-surface-variant truncate', className)}
-      {...props}
-    >
-      {children}
-    </span>
-  );
-};
+const CheckpointDescription = React.forwardRef<HTMLSpanElement, CheckpointDescriptionProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        data-slot="checkpoint-description"
+        className={cn('font-sans text-xs text-on-surface-variant truncate', className)}
+        {...props}
+      >
+        {children}
+      </span>
+    );
+  }
+);
 CheckpointDescription.displayName = 'Checkpoint.Description';
 
-export interface CheckpointTimestampProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface CheckpointTimestampProps extends React.TimeHTMLAttributes<HTMLTimeElement> {
   timestamp: number | string;
   className?: string;
 }
 
-const CheckpointTimestamp: React.FC<CheckpointTimestampProps> = ({
-  timestamp,
-  className,
-  ...props
-}) => {
-  const formatted = React.useMemo(() => {
-    if (typeof timestamp === 'string') return timestamp;
-    return new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    }).format(new Date(timestamp));
-  }, [timestamp]);
+const CheckpointTimestamp = React.forwardRef<HTMLTimeElement, CheckpointTimestampProps>(
+  ({ timestamp, className, ...props }, ref) => {
+    const { formatted, isoDateTime } = React.useMemo(() => {
+      if (typeof timestamp === 'number') {
+        const date = new Date(timestamp);
+        if (Number.isNaN(date.getTime())) {
+          return { formatted: '', isoDateTime: undefined };
+        }
+        return {
+          formatted: new Intl.DateTimeFormat(undefined, {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          }).format(date),
+          isoDateTime: date.toISOString(),
+        };
+      }
+      const parsed = Date.parse(timestamp);
+      return {
+        formatted: timestamp,
+        isoDateTime: Number.isNaN(parsed) ? undefined : new Date(parsed).toISOString(),
+      };
+    }, [timestamp]);
 
-  return (
-    <span
-      className={cn('font-mono text-xs tabular-nums text-on-surface-variant/80', className)}
-      {...props}
-    >
-      {formatted}
-    </span>
-  );
-};
+    return (
+      <time
+        ref={ref}
+        dateTime={isoDateTime}
+        data-slot="checkpoint-timestamp"
+        className={cn('font-mono text-xs tabular-nums text-on-surface-variant/80', className)}
+        {...props}
+      >
+        {formatted}
+      </time>
+    );
+  }
+);
 CheckpointTimestamp.displayName = 'Checkpoint.Timestamp';
 
 export interface CheckpointTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -197,37 +207,33 @@ export interface CheckpointTriggerProps extends React.ButtonHTMLAttributes<HTMLB
   children?: React.ReactNode;
 }
 
-const CheckpointTrigger: React.FC<CheckpointTriggerProps> = ({
-  onRestore,
-  onClick,
-  label = 'Restore',
-  disabled = false,
-  className,
-  children,
-  ...props
-}) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    onClick?.(e);
-    onRestore?.();
-  };
+const CheckpointTrigger = React.forwardRef<HTMLButtonElement, CheckpointTriggerProps>(
+  ({ onRestore, onClick, label = 'Restore', disabled = false, className, children, ...props }, ref) => {
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(e);
+      onRestore?.();
+    };
 
-  return (
-    <Button
-      variant="ghost"
-      colorRole="primary"
-      size="sm"
-      disabled={disabled}
-      onClick={handleClick}
-      expandedTouchTarget
-      aria-label={typeof children === 'string' ? children : `${label} conversation to this checkpoint`}
-      className={cn('h-6 px-2 text-xs font-semibold gap-1 rounded-full', className)}
-      {...props}
-    >
-      <Icon name="history" size="xs" aria-hidden="true" />
-      <span>{children || label}</span>
-    </Button>
-  );
-};
+    return (
+      <Button
+        ref={ref}
+        data-slot="checkpoint-trigger"
+        variant="ghost"
+        colorRole="primary"
+        size="sm"
+        disabled={disabled}
+        onClick={handleClick}
+        expandedTouchTarget
+        aria-label={typeof children === 'string' ? children : `${label} conversation to this checkpoint`}
+        className={cn('h-6 min-h-0 px-2 text-xs font-semibold gap-1 rounded-full motion-reduce:transition-none', className)}
+        {...props}
+      >
+        <Icon name="history" size="xs" aria-hidden="true" />
+        <span>{children || label}</span>
+      </Button>
+    );
+  }
+);
 CheckpointTrigger.displayName = 'Checkpoint.Trigger';
 
 /* -------------------------------------------------------------------------------------------------
@@ -282,7 +288,7 @@ const CheckpointComponent = React.forwardRef<HTMLDivElement, CheckpointProps>(
             {timestamp && <CheckpointTimestamp timestamp={timestamp} />}
             {onRestore && (
               <>
-                <Separator orientation="vertical" className="h-3 my-0 mx-0.5 bg-outline-variant/80" />
+                <Separator orientation="vertical" className="h-3.5 self-center my-0 mx-0.5 bg-outline-variant/80" />
                 <CheckpointTrigger
                   onRestore={onRestore}
                   label={restoreLabel}

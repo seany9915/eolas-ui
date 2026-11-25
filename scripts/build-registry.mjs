@@ -1,6 +1,6 @@
 import nodeFs from 'node:fs';
 import path from 'node:path';
-import { CATEGORY_MAP, DESCRIPTION_OVERRIDES, stripComments } from './registry-meta.mjs';
+import { CATEGORY_MAP, DESCRIPTION_OVERRIDES, extractInternalRegistryImports, stripComments } from './registry-meta.mjs';
 
 // Normalise CRLF to LF so generated JSON is identical regardless of each machine's git line-ending settings.
 const fs = {
@@ -102,28 +102,6 @@ function detectNpmDeps(content) {
     }
   }
   return Array.from(deps).sort();
-}
-
-function detectLibDeps(content, excludeName = null) {
-  const clean = stripComments(content);
-  const deps = new Set();
-  const libPatterns = [
-    /(?:from|import)\s+['"](?:@\/lib\/|\.\.\/\.\.\/lib\/)([^'"]+)['"]/g,
-    /\bimport\s*\(\s*['"](?:@\/lib\/|\.\.\/\.\.\/lib\/)([^'"]+)['"]\s*\)/g,
-  ];
-  if (excludeName) {
-    libPatterns.push(/(?:from|import)\s+['"]\.\/([^'"]+)['"]/g);
-  }
-  for (const re of libPatterns) {
-    for (const match of clean.matchAll(re)) {
-      const libName = match[1].replace(/\.(ts|tsx|js|mjs)$/, '');
-      if (!libName || libName === excludeName) continue;
-      if (fs.existsSync(path.join(LIB_DIR, `${libName}.ts`))) {
-        deps.add(libName);
-      }
-    }
-  }
-  return Array.from(deps);
 }
 
 function parseComponentDoc(content, name) {
@@ -266,7 +244,9 @@ for (const libFile of standaloneLibs) {
   const libContent = fs.readFileSync(libPath, 'utf8');
   const docMeta = parseComponentDoc(libContent, libName);
   const npmDeps = detectNpmDeps(libContent);
-  const libRegDeps = detectLibDeps(libContent, libName).map(formatRegistryDep);
+  const libRegDeps = Array.from(
+    extractInternalRegistryImports(libContent, 'registry:lib', { fs, libDir: LIB_DIR, excludeName: libName })
+  ).map(formatRegistryDep);
 
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -479,23 +459,14 @@ console.log(`Found ${uiFiles.length} UI files to catalog.`);
 for (const file of uiFiles) {
   const name = file.replace('.tsx', '');
   const content = fs.readFileSync(path.join(UI_DIR, file), 'utf8');
-  const cleanContent = stripComments(content);
   const docMeta = parseComponentDoc(content, name);
 
-  // Detect internal UI component dependencies (from comment-stripped source)
-  const internalDeps = [];
-  const regex = /from\s+['"](?:\.\/|@\/components\/ui\/)([^'"]+)['"]/g;
-  let m;
-  while ((m = regex.exec(cleanContent)) !== null) {
-    const depName = m[1]?.replace(/\.(tsx?|jsx?)$/, '');
-    if (depName && depName !== name) {
-      internalDeps.push(depName);
-    }
-  }
-
+  // Detect internal registry dependencies (UI, blocks, and lib utilities from comment-stripped source)
   const npmDeps = detectNpmDeps(content);
-  const libDeps = detectLibDeps(content);
-  const regDeps = [...new Set([...libDeps, ...internalDeps])].map(formatRegistryDep);
+  const internalRefs = Array.from(
+    extractInternalRegistryImports(content, 'registry:ui', { fs, libDir: LIB_DIR, excludeName: name })
+  );
+  const regDeps = internalRefs.map(formatRegistryDep);
 
   const item = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -529,23 +500,13 @@ if (fs.existsSync(BLOCKS_DIR)) {
   for (const file of blockFiles) {
     const name = file.replace('.tsx', '');
     const content = fs.readFileSync(path.join(BLOCKS_DIR, file), 'utf8');
-    const cleanContent = stripComments(content);
     const docMeta = parseComponentDoc(content, name);
 
-    // Detect internal component dependencies (from comment-stripped UI and block imports)
-    const internalDeps = [];
-    const regex = /from\s+['"](?:\.\.\/ui\/|@\/components\/ui\/|\.\/|@\/components\/blocks\/)([^'"]+)['"]/g;
-    let m;
-    while ((m = regex.exec(cleanContent)) !== null) {
-      if (m[1] && m[1] !== name) {
-        const cleanDep = m[1].replace(/^\.\//, '').split('/')[0];
-        internalDeps.push(cleanDep);
-      }
-    }
-
     const npmDeps = detectNpmDeps(content);
-    const libDeps = detectLibDeps(content);
-    const regDeps = [...new Set([...libDeps, ...internalDeps])].map(formatRegistryDep);
+    const internalRefs = Array.from(
+      extractInternalRegistryImports(content, 'registry:block', { fs, libDir: LIB_DIR, excludeName: name })
+    );
+    const regDeps = internalRefs.map(formatRegistryDep);
 
     const item = {
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',

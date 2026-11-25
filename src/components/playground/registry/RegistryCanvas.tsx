@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
-import { InlineAlert } from '@/components/ui/inline-alert';
 import { TabsRoot, TabsList, Tab, TabsPanel } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { DirectionProvider } from '@/components/ui/direction-provider';
+import { announce } from '@/lib/announce';
 import { RegistryEntry, ViewportMode, ComponentDemoProps } from './types';
 
 export interface RegistryCanvasProps {
@@ -33,12 +33,21 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
 }) => {
   const [copiedType, setCopiedType] = React.useState<'import' | 'shadcn' | 'eolas' | null>(null);
   const [activeTab, setActiveTab] = React.useState<string>('preview');
+  const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const copyToClipboard = async (text: string, type: 'import' | 'shadcn' | 'eolas') => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedType(type);
-      setTimeout(() => setCopiedType(null), 2000);
+      announce(`Copied ${type} command to clipboard`);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopiedType(null), 2000);
     } catch (e) {
       console.error('Failed to copy', e);
     }
@@ -84,15 +93,15 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
       {/* Component Header Bar */}
       <Card className="p-5 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-          <div className="space-y-2 min-w-0">
+          <div className="flex flex-col gap-2 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <Button
-                variant="ghost"
+                variant="text"
                 size="sm"
                 onClick={onBackToCatalog}
-                className="text-xs px-2.5 h-7 -ml-2 text-on-surface-variant hover:text-on-surface"
+                className="text-xs px-2.5 -ms-2 text-on-surface-variant hover:text-on-surface"
               >
-                <Icon name="arrow_back" size="xs" className="mr-1" />
+                <Icon name="arrow_back" size="xs" directional />
                 Registry
               </Button>
               <span className="text-outline-variant">/</span>
@@ -111,14 +120,6 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               <span className="font-mono text-xs px-2 py-0.5 rounded bg-surface text-on-surface-variant font-medium border border-outline-variant">
                 {entry.basePrimitive}
               </span>
-              {entry.isDeprecated && (
-                <Badge
-                  variant="soft"
-                  colorRole="warning"
-                  size="sm"
-                  icon="warning"
-                >{entry.tier === 'block' ? 'Deprecated' : 'Legacy Re-export'}</Badge>
-              )}
             </div>
 
             <p className="font-sans text-sm text-on-surface-variant max-w-3xl leading-relaxed">
@@ -130,48 +131,36 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <Button
               size="sm"
-              variant="outlined"
+              variant="outline"
               onClick={() => copyToClipboard(importStatement, 'import')}
-              className="text-xs font-mono h-9 px-3"
+              className="text-xs font-mono px-3"
               title="Copy React import statement"
             >
-              <Icon name={copiedType === 'import' ? 'check' : 'content_copy'} size="xs" className="mr-1.5" />
+              <Icon name={copiedType === 'import' ? 'check' : 'content_copy'} size="xs" />
               {copiedType === 'import' ? 'Copied Import' : 'Copy Import'}
             </Button>
             <Button
               size="sm"
-              variant="tonal"
+              variant="soft"
               onClick={() => copyToClipboard(shadcnCliCommand, 'shadcn')}
-              className="text-xs font-mono h-9 px-3"
+              className="text-xs font-mono px-3"
               title={`Copy shadcn CLI command: ${shadcnCliCommand}`}
             >
-              <Icon name={copiedType === 'shadcn' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
+              <Icon name={copiedType === 'shadcn' ? 'check' : 'terminal'} size="xs" />
               {copiedType === 'shadcn' ? 'Copied shadcn' : 'shadcn add'}
             </Button>
             <Button
               size="sm"
-              variant="outlined"
+              variant="outline"
               onClick={() => copyToClipboard(eolasCliCommand, 'eolas')}
-              className="text-xs font-mono h-9 px-3"
+              className="text-xs font-mono px-3"
               title={`Copy Eolas CLI command: ${eolasCliCommand}`}
             >
-              <Icon name={copiedType === 'eolas' ? 'check' : 'terminal'} size="xs" className="mr-1.5" />
+              <Icon name={copiedType === 'eolas' ? 'check' : 'terminal'} size="xs" />
               {copiedType === 'eolas' ? 'Copied eolas-ui' : 'eolas-ui add'}
             </Button>
           </div>
         </div>
-
-        {/* Deprecation Notice if applicable */}
-        {entry.isDeprecated && (
-          <div className="mt-4">
-            <InlineAlert
-              role="warning"
-              title={entry.tier === 'block' ? 'Deprecated Block Notice' : 'Legacy Drift & Retirement Notice'}
-            >
-              {entry.deprecatedNote || 'This omnibus re-export exists for backward compatibility. Please migrate to direct primitives.'}
-            </InlineAlert>
-          </div>
-        )}
 
         {/* Canvas Toolbar & Tabs via Base UI Tabs and ToggleGroup */}
         <div className="mt-5 pt-4 border-t border-outline-variant flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
@@ -223,6 +212,8 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               variant="outline"
               colorRole="neutral"
               onClick={onDirectionToggle}
+              aria-pressed={direction === 'rtl'}
+              aria-label={`Toggle text direction (current: ${direction.toUpperCase()})`}
               className="font-mono"
               title="Toggle LTR / RTL text direction"
             >
@@ -235,9 +226,9 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
 
       {/* Main Content Area via Base UI TabsPanels */}
         <TabsPanel value="preview">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {/* Sandbox Ruler & Semantic Viewport Indicator - NO static status dots */}
-            <div className="flex items-center justify-between text-xs font-mono text-on-surface-variant px-1">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-on-surface-variant px-1">
               <span className="flex items-center gap-1.5">
                 <Icon name="crop_free" size="xs" className="text-primary" />
                 <span>Preview: <strong>{viewportLabel}</strong></span>
@@ -246,17 +237,20 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
             </div>
 
             {/* Preview Canvas */}
-            <Card className="p-4 sm:p-8 overflow-hidden min-h-[420px] flex items-center justify-center">
-              <div className={cn('transition-[max-width] duration-200 ease-in-out w-full', viewportWidthClass)}>
+            <Card className="p-4 sm:p-8 min-h-[420px] flex items-center justify-center">
+              <div
+                dir={direction}
+                className={cn('transition-[max-width] duration-200 ease-in-out motion-reduce:transition-none w-full min-w-0', viewportWidthClass)}
+              >
                 <DirectionProvider direction={direction}>
                   {DemoComponent ? (
                     <DemoComponent viewport={viewport} direction={direction} />
                   ) : (
-                    <div className="py-12 px-4 text-center space-y-4">
-                      <div className="w-12 h-12 rounded-full bg-primary-container text-primary flex items-center justify-center mx-auto">
+                    <div className="py-12 px-4 text-center flex flex-col gap-4">
+                      <div className="size-12 rounded-full bg-primary-container text-primary flex items-center justify-center mx-auto">
                         <Icon name="widgets" size="md" />
                       </div>
-                      <div className="space-y-1">
+                      <div className="flex flex-col gap-1">
                         <h3 className="font-heading text-base font-bold text-on-surface">
                           {entry.title} Component
                         </h3>
@@ -264,7 +258,7 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
                           Ready for clinical workflows. Defined at <code className="font-mono text-primary">{entry.sourcePath}</code>.
                         </p>
                       </div>
-                      <div className="bg-surface-container-low rounded-lg p-3 max-w-md mx-auto font-mono text-xs text-left border border-outline-variant">
+                      <div className="bg-surface-container-low rounded-lg p-3 max-w-md mx-auto font-mono text-xs text-left border border-outline-variant overflow-x-auto">
                         {importStatement}
                       </div>
                     </div>
@@ -276,40 +270,42 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
         </TabsPanel>
 
         <TabsPanel value="code">
-          <div className="max-w-4xl mx-auto space-y-6 pt-2">
-            <Card className="p-6 space-y-4">
+          <div className="max-w-4xl mx-auto flex flex-col gap-6 pt-2">
+            <Card className="p-6 flex flex-col gap-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="download" size="sm" className="text-primary" />
                 Installation via CLI
               </h3>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="font-sans text-xs text-on-surface-variant">
                   Install via the shadcn CLI (<code className="font-mono">@eolas</code> namespace in <code className="font-mono">components.json</code>):
                 </p>
-                <div className="bg-neutral text-on-neutral p-3.5 rounded-lg font-mono text-xs flex items-center justify-between gap-2">
+                <div className="bg-neutral text-on-neutral p-3 rounded-lg font-mono text-xs flex items-center justify-between gap-2 min-w-0">
                   <span className="truncate">{shadcnCliCommand}</span>
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="text"
+                    colorRole="neutral"
                     onClick={() => copyToClipboard(shadcnCliCommand, 'shadcn')}
-                    className="text-on-neutral hover:bg-neutral-container/20 h-7 px-2 text-xs shrink-0"
+                    className="text-on-neutral hover:bg-neutral-container/20 px-2.5 text-xs shrink-0"
                     aria-label="Copy shadcn CLI command"
                   >
                     <Icon name={copiedType === 'shadcn' ? 'check' : 'content_copy'} size="xs" />
                   </Button>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="font-sans text-xs text-on-surface-variant">
                   Or install directly via the bundled Eolas UI CLI:
                 </p>
-                <div className="bg-surface-container-low text-on-surface p-3.5 rounded-lg font-mono text-xs border border-outline-variant flex items-center justify-between gap-2">
+                <div className="bg-surface-container-low text-on-surface p-3 rounded-lg font-mono text-xs border border-outline-variant flex items-center justify-between gap-2 min-w-0">
                   <span className="truncate">{eolasCliCommand}</span>
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="text"
+                    colorRole="neutral"
                     onClick={() => copyToClipboard(eolasCliCommand, 'eolas')}
-                    className="h-7 px-2 text-xs shrink-0"
+                    className="px-2.5 text-xs shrink-0"
                     aria-label="Copy Eolas CLI command"
                   >
                     <Icon name={copiedType === 'eolas' ? 'check' : 'content_copy'} size="xs" />
@@ -318,17 +314,17 @@ export const RegistryCanvas: React.FC<RegistryCanvasProps> = ({
               </div>
             </Card>
 
-            <Card className="p-6 space-y-4">
+            <Card className="p-6 flex flex-col gap-4">
               <h3 className="font-heading text-base font-bold text-on-surface flex items-center gap-2">
                 <Icon name="code" size="sm" className="text-primary" />
                 Import & Usage
               </h3>
-              <div className="bg-surface-container-low p-3.5 rounded-lg font-mono text-xs border border-outline-variant">
-                {importStatement}
+              <div className="bg-surface-container-low p-3.5 rounded-lg font-mono text-xs border border-outline-variant overflow-x-auto">
+                <code className="whitespace-pre">{importStatement}</code>
               </div>
-              <div className="font-sans text-xs text-on-surface-variant space-y-2">
+              <div className="font-sans text-xs text-on-surface-variant flex flex-col gap-2">
                 <p>Source file location:</p>
-                <code className="block bg-surface-container-low px-2.5 py-1.5 rounded text-primary font-mono text-xs border border-outline-variant">
+                <code className="block bg-surface-container-low px-2.5 py-1.5 rounded text-primary font-mono text-xs border border-outline-variant overflow-x-auto">
                   {entry.sourcePath}
                 </code>
               </div>

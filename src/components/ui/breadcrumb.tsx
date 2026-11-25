@@ -5,19 +5,23 @@ import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
 
+const BreadcrumbContext = React.createContext<{ separator?: React.ReactNode }>({});
+
 export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {
   separator?: React.ReactNode;
 }
 
 export const BreadcrumbRoot = React.forwardRef<HTMLElement, BreadcrumbProps>(
-  ({ className, separator: _separator, ...props }, ref) => (
-    <nav
-      ref={ref}
-      aria-label="Breadcrumb"
-      data-slot="breadcrumb"
-      className={cn('@container relative w-full', className)}
-      {...props}
-    />
+  ({ className, separator, ...props }, ref) => (
+    <BreadcrumbContext.Provider value={{ separator }}>
+      <nav
+        ref={ref}
+        aria-label="Breadcrumb"
+        data-slot="breadcrumb"
+        className={cn('@container relative w-full', className)}
+        {...props}
+      />
+    </BreadcrumbContext.Provider>
   )
 );
 BreadcrumbRoot.displayName = 'Breadcrumb';
@@ -69,7 +73,7 @@ export const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLink
       props: {
         'data-slot': 'breadcrumb-link',
         className: cn(
-          'relative inline-flex items-center max-w-full transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm after:absolute after:inset-x-0 after:-inset-y-3 after:content-[\'\']',
+          'relative inline-flex items-center max-w-full transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm after:absolute after:inset-x-0 after:-inset-y-3 after:content-[\'\']',
           children === undefined && 'truncate max-w-[200px] @sm:max-w-none',
           className
         ),
@@ -87,8 +91,6 @@ export const BreadcrumbPage = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <span
     ref={ref}
-    role="link"
-    aria-disabled="true"
     aria-current="page"
     data-slot="breadcrumb-page"
     className={cn('font-medium text-on-surface truncate max-w-[200px] @sm:max-w-none', className)}
@@ -97,21 +99,24 @@ export const BreadcrumbPage = React.forwardRef<
 ));
 BreadcrumbPage.displayName = 'BreadcrumbPage';
 
-export const BreadcrumbSeparator = ({
-  children,
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'li'>) => (
-  <li
-    role="presentation"
-    aria-hidden="true"
-    data-slot="breadcrumb-separator"
-    className={cn('text-outline opacity-60 flex items-center select-none', className)}
-    {...props}
-  >
-    {children ?? <Icon name="chevron_right" size="sm" directional className="text-base" />}
-  </li>
-);
+export const BreadcrumbSeparator = React.forwardRef<
+  HTMLLIElement,
+  React.ComponentPropsWithoutRef<'li'>
+>(({ children, className, ...props }, ref) => {
+  const { separator } = React.useContext(BreadcrumbContext);
+  return (
+    <li
+      ref={ref}
+      role="presentation"
+      aria-hidden="true"
+      data-slot="breadcrumb-separator"
+      className={cn('text-outline opacity-60 flex items-center select-none', className)}
+      {...props}
+    >
+      {children ?? separator ?? <Icon name="chevron_right" size="sm" directional className="text-base" />}
+    </li>
+  );
+});
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 
 export interface BreadcrumbEllipsisProps extends React.ComponentPropsWithoutRef<'span'> {}
@@ -120,8 +125,6 @@ export const BreadcrumbEllipsis = React.forwardRef<HTMLSpanElement, BreadcrumbEl
   ({ className, children, ...props }, ref) => (
     <span
       ref={ref}
-      role="presentation"
-      aria-hidden="true"
       data-slot="breadcrumb-ellipsis"
       className={cn('inline-flex size-9 items-center justify-center', className)}
       {...props}

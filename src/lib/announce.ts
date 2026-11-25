@@ -56,11 +56,12 @@ function getOrCreateRegion(priority: AnnouncePriority): {
 }
 
 function promoteToTopLayer(node: HTMLElement): void {
+  if (typeof node.showPopover !== 'function') return;
   try {
     if (node.matches(':popover-open')) {
       node.hidePopover?.();
     }
-    node.showPopover?.();
+    node.showPopover();
   } catch {
     // Ignore when Popover API is unsupported or blocked.
   }
@@ -70,7 +71,7 @@ export function announce(
   message: string,
   priority: AnnouncePriority = 'polite'
 ): void {
-  if (typeof document === 'undefined' || !message) return;
+  if (typeof document === 'undefined' || !document.body || !message.trim()) return;
 
   if (announceTimer) clearTimeout(announceTimer);
   if (clearTimer) clearTimeout(clearTimer);
@@ -94,11 +95,12 @@ export function announce(
 
   // Newly mounted live regions need ~60ms for AT tree registration;
   // existing regions only need a brief clear-then-set gap.
+  // Do NOT call hidePopover()/showPopover() inside the timeout or VoiceOver/NVDA
+  // will drop the synchronous textContent mutation on display:none -> block.
   node.textContent = '';
   const delay = isNew ? 60 : 16;
 
   announceTimer = setTimeout(() => {
-    promoteToTopLayer(node);
     node.textContent = payload;
 
     clearTimer = setTimeout(() => {

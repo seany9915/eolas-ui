@@ -22,30 +22,28 @@ npx @seany9915/eolas-ui --version
 # List all available primitives, composite blocks, presets, rules, and utilities
 npx @seany9915/eolas-ui list
 
-# Add the design system theme, rules, and lint preset
-npx @seany9915/eolas-ui add theme design-md agent-rules lint
+# Add the design system theme, rules, lint preset, and brand logos
+npx @seany9915/eolas-ui add theme design-md agent-rules lint logos
 
 # Add specific components (auto-fetches internal dependencies and utils; accepts @eolas/ prefixes)
 npx @seany9915/eolas-ui add dialog select tabs
 npx @seany9915/eolas-ui add @eolas/button
 
-# Install all non-deprecated primitives, composite blocks, and utilities
+# Install all primitives, composite blocks, and utilities
 npx @seany9915/eolas-ui add --all
-npx @seany9915/eolas-ui add --all --include-deprecated
 
 # Preview changes without writing files
 npx @seany9915/eolas-ui add data-table --dry-run
 npx @seany9915/eolas-ui sync --dry-run
 
-# Update only already-installed items (components, blocks, utilities, theme, design-md, agent-rules, lint)
+# Update only already-installed items (components, blocks, utilities, theme, design-md, agent-rules, lint, logos)
 npx @seany9915/eolas-ui sync
 
 # Update specific items (and their dependencies) in place
 npx @seany9915/eolas-ui sync button dialog
 
-# Explicitly sync the full non-deprecated catalog (or include deprecated compatibility items)
+# Explicitly sync the full catalog
 npx @seany9915/eolas-ui sync --all
-npx @seany9915/eolas-ui sync --all --include-deprecated
 
 # Overwrite specific existing files to update to the latest version
 npx @seany9915/eolas-ui add tabs --overwrite
@@ -79,7 +77,7 @@ npm install @base-ui/react clsx tailwind-merge
 Specialized primitives/blocks also declare their optional packages (such as `recharts`, `react-day-picker`, `@tanstack/react-table`, `cmdk`, `react-resizable-panels`, `embla-carousel-react`, or `@dnd-kit/react`).
 
 ### 5. Agent Guardrails with `@shadcn/lint` & Oxlint
-Prevent AI coding agents and developers from eroding design tokens, overriding touch target floors (44px min), or introducing anti-patterns.
+Prevent AI coding agents and developers from eroding design tokens, overriding touch target floors (44px min), or introducing anti-patterns. Requires Node `>=20.19.0` and `oxlint >=1.80.0`.
 
 **Option A (Standalone files via CLI):**
 
@@ -106,7 +104,7 @@ Then extend the preset in `.oxlintrc.json`:
 ```
 
 This preset enforces:
-- **13 `eolas/*` AST guardrails**: `no-raw-html-controls`, `no-radix-imports`, `no-positive-tabindex`, `require-iscomposing-on-enter`, `no-static-clickable-elements`, `no-nested-card`, `no-sparkle-icons`, `no-triple-tint`, `no-light-surface-tertiary`, `no-transition-all`, `no-spring-easing`, `no-uppercase`, `no-unsafe-type-cast`, plus **`typescript/ban-ts-comment`**
+- **21 `eolas/*` AST guardrails**: `no-raw-html-controls`, `no-radix-imports`, `wrapped-libraries`, `one-way-imports`, `no-reach-in-selectors`, `no-positive-tabindex`, `require-iscomposing-on-enter`, `no-static-clickable-elements`, `icon-button-label`, `no-rebuilt-overlay`, `no-nested-card`, `no-sparkle-icons`, `no-triple-tint`, `no-light-surface-tertiary`, `no-dark-variant`, `no-important`, `prefer-shorthand`, `no-transition-all`, `no-spring-easing`, `no-uppercase`, `no-unsafe-type-cast`, plus **`typescript/ban-ts-comment`**
 - **6 `shadcn/*` rules**:
   - `shadcn/no-raw-colors` — enforces Eolas semantic tokens (`bg-primary`, `bg-surface-container-low`, `bg-surface-container-high`, `text-on-surface`, etc.)
   - `shadcn/no-arbitrary-values` — bans arbitrary bracket classes (`p-[13px]`), while allowing explicit `transition-[...]` motion properties

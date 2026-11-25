@@ -103,55 +103,54 @@ export interface ConfirmationMediaProps extends React.HTMLAttributes<HTMLDivElem
   className?: string;
 }
 
-const ConfirmationMedia: React.FC<ConfirmationMediaProps> = ({
-  status = 'pending',
-  approved,
-  variant = 'badge',
-  children,
-  className,
-  ...props
-}) => {
-  const isApproved = resolveApproved(status, approved);
-  const isDenied = resolveDenied(status, approved);
+const ConfirmationMedia = React.forwardRef<HTMLDivElement, ConfirmationMediaProps>(
+  ({ status: statusProp, approved: approvedProp, variant = 'badge', children, className, ...props }, ref) => {
+    const ctx = React.useContext(ConfirmationContext);
+    const status = statusProp ?? ctx?.status ?? 'pending';
+    const approved = approvedProp ?? ctx?.approved;
+    const isApproved = resolveApproved(status, approved);
+    const isDenied = resolveDenied(status, approved);
 
-  return (
-    <div
-      data-slot="confirmation-media"
-      className={cn(
-        'shrink-0 flex items-center justify-center select-none mt-0.5 transition-colors',
-        variant === 'badge'
-          ? cn(
-              'size-7 rounded-md text-xs',
-              isApproved && 'bg-success text-on-success font-bold',
-              isDenied && 'bg-surface-container-high text-on-surface-variant',
-              !isApproved && !isDenied && 'bg-warning-container text-on-warning-container'
-            )
-          : cn(
-              'size-5 text-xs',
-              isApproved && 'text-success',
-              isDenied && 'text-on-surface-variant',
-              !isApproved && !isDenied && 'text-warning'
-            ),
-        className
-      )}
-      aria-hidden="true"
-      {...props}
-    >
-      {children || (
-        <Icon
-          name={
-            isApproved
-              ? 'check_circle'
-              : isDenied
-              ? 'block'
-              : 'shield'
-          }
-          size="xs"
-        />
-      )}
-    </div>
-  );
-};
+    return (
+      <div
+        ref={ref}
+        data-slot="confirmation-media"
+        className={cn(
+          'shrink-0 flex items-center justify-center select-none mt-0.5 transition-colors motion-reduce:transition-none',
+          variant === 'badge'
+            ? cn(
+                'size-7 rounded-md text-xs',
+                isApproved && 'bg-success text-on-success font-semibold',
+                isDenied && 'bg-surface-container-high text-on-surface-variant',
+                !isApproved && !isDenied && 'bg-warning-container text-on-warning-container'
+              )
+            : cn(
+                'size-5 text-xs',
+                isApproved && 'text-success',
+                isDenied && 'text-on-surface-variant',
+                !isApproved && !isDenied && 'text-warning'
+              ),
+          className
+        )}
+        aria-hidden="true"
+        {...props}
+      >
+        {children || (
+          <Icon
+            name={
+              isApproved
+                ? 'check_circle'
+                : isDenied
+                ? 'block'
+                : 'shield'
+            }
+            size="xs"
+          />
+        )}
+      </div>
+    );
+  }
+);
 ConfirmationMedia.displayName = 'Confirmation.Media';
 
 export interface ConfirmationHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -159,20 +158,20 @@ export interface ConfirmationHeaderProps extends React.HTMLAttributes<HTMLDivEle
   className?: string;
 }
 
-const ConfirmationHeader: React.FC<ConfirmationHeaderProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <div
-      className={cn('flex items-start justify-between gap-3 mb-2', className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+const ConfirmationHeader = React.forwardRef<HTMLDivElement, ConfirmationHeaderProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="confirmation-header"
+        className={cn('flex items-start justify-between gap-3 mb-2', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 ConfirmationHeader.displayName = 'Confirmation.Header';
 
 export interface ConfirmationTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
@@ -180,20 +179,20 @@ export interface ConfirmationTitleProps extends React.HTMLAttributes<HTMLHeading
   className?: string;
 }
 
-const ConfirmationTitle: React.FC<ConfirmationTitleProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <h4
-      className={cn('font-heading text-sm font-semibold text-on-surface leading-snug', className)}
-      {...props}
-    >
-      {children}
-    </h4>
-  );
-};
+const ConfirmationTitle = React.forwardRef<HTMLHeadingElement, ConfirmationTitleProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <h4
+        ref={ref}
+        data-slot="confirmation-title"
+        className={cn('font-heading text-sm font-semibold text-on-surface leading-snug', className)}
+        {...props}
+      >
+        {children}
+      </h4>
+    );
+  }
+);
 ConfirmationTitle.displayName = 'Confirmation.Title';
 
 export interface ConfirmationDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
@@ -201,20 +200,20 @@ export interface ConfirmationDescriptionProps extends React.HTMLAttributes<HTMLP
   className?: string;
 }
 
-const ConfirmationDescription: React.FC<ConfirmationDescriptionProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <p
-      className={cn('font-sans text-xs text-on-surface-variant leading-relaxed mt-1', className)}
-      {...props}
-    >
-      {children}
-    </p>
-  );
-};
+const ConfirmationDescription = React.forwardRef<HTMLParagraphElement, ConfirmationDescriptionProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <p
+        ref={ref}
+        data-slot="confirmation-description"
+        className={cn('font-sans text-sm text-on-surface-variant leading-relaxed mt-1', className)}
+        {...props}
+      >
+        {children}
+      </p>
+    );
+  }
+);
 ConfirmationDescription.displayName = 'Confirmation.Description';
 
 export interface ConfirmationDetailsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -222,23 +221,23 @@ export interface ConfirmationDetailsProps extends React.HTMLAttributes<HTMLDivEl
   className?: string;
 }
 
-const ConfirmationDetails: React.FC<ConfirmationDetailsProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <div
-      className={cn(
-        'mt-2.5 p-2.5 rounded-sm bg-surface-container-low font-mono text-xs text-on-surface-variant overflow-x-auto',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+const ConfirmationDetails = React.forwardRef<HTMLDivElement, ConfirmationDetailsProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="confirmation-details"
+        className={cn(
+          'mt-2.5 p-2.5 rounded-sm bg-surface-container-low font-mono text-xs text-on-surface-variant overflow-x-auto',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 ConfirmationDetails.displayName = 'Confirmation.Details';
 
 export interface ConfirmationChangesProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -246,42 +245,54 @@ export interface ConfirmationChangesProps extends React.HTMLAttributes<HTMLDivEl
   children?: React.ReactNode;
 }
 
-const ConfirmationChanges: React.FC<ConfirmationChangesProps> = ({ changes, children, className, ...props }) => {
-  if (children) {
+const ConfirmationChanges = React.forwardRef<HTMLDivElement, ConfirmationChangesProps>(
+  ({ changes, children, className, ...props }, ref) => {
+    if (children) {
+      return (
+        <div
+          ref={ref}
+          data-slot="confirmation-changes"
+          className={cn('mt-2 text-xs font-mono flex flex-col gap-1', className)}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    if (!changes) return null;
+
+    const items = Array.isArray(changes)
+      ? changes
+      : Object.entries(changes).map(([key, val]) => ({ label: key, from: val.from, to: val.to }));
+
     return (
-      <div className={cn('mt-2 text-xs font-mono flex flex-col gap-1', className)} {...props}>
-        {children}
+      <div
+        ref={ref}
+        data-slot="confirmation-changes"
+        className={cn('mt-2.5 p-2 rounded-md bg-surface-container-low font-mono text-xs flex flex-col gap-1.5', className)}
+        {...props}
+      >
+        {items.map((item, idx) => (
+          <div key={item.label || idx} className="flex flex-wrap items-center justify-between gap-2 min-w-0 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
+            <span className="text-on-surface-variant font-semibold">{item.label}:</span>
+            <div className="flex items-center gap-1.5 min-w-0 max-w-full truncate">
+              {item.from !== undefined && (
+                <span className="text-error line-through truncate max-w-[120px]">{String(item.from)}</span>
+              )}
+              {item.from !== undefined && item.to !== undefined && (
+                <Icon name="arrow_forward" size="xs" directional className="text-on-surface-variant/60 shrink-0" />
+              )}
+              {item.to !== undefined && (
+                <span className="text-success font-semibold truncate max-w-[140px]">{String(item.to)}</span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
-
-  if (!changes) return null;
-
-  const items = Array.isArray(changes)
-    ? changes
-    : Object.entries(changes).map(([key, val]) => ({ label: key, from: val.from, to: val.to }));
-
-  return (
-    <div className={cn('mt-2.5 p-2 rounded-md bg-surface-container-low font-mono text-xs flex flex-col gap-1.5', className)} {...props}>
-      {items.map((item, idx) => (
-        <div key={idx} className="flex flex-wrap items-center justify-between gap-2 min-w-0 border-b border-outline-variant/30 last:border-0 pb-1 last:pb-0">
-          <span className="text-on-surface-variant font-semibold">{item.label}:</span>
-          <div className="flex items-center gap-1.5 min-w-0 max-w-full truncate">
-            {item.from !== undefined && (
-              <span className="text-error/80 line-through truncate max-w-[120px]">{String(item.from)}</span>
-            )}
-            {item.from !== undefined && item.to !== undefined && (
-              <Icon name="arrow_forward" size="xs" directional className="text-on-surface-variant/60 shrink-0" />
-            )}
-            {item.to !== undefined && (
-              <span className="text-success font-semibold truncate max-w-[140px]">{String(item.to)}</span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
+);
 ConfirmationChanges.displayName = 'Confirmation.Changes';
 
 export interface ConfirmationActionsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -289,88 +300,98 @@ export interface ConfirmationActionsProps extends React.HTMLAttributes<HTMLDivEl
   className?: string;
 }
 
-const ConfirmationActions: React.FC<ConfirmationActionsProps> = ({
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <div
-      className={cn('flex flex-wrap items-center justify-end gap-2.5 mt-3 pt-2.5 border-t border-outline-variant/40', className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+const ConfirmationActions = React.forwardRef<HTMLDivElement, ConfirmationActionsProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="confirmation-actions"
+        className={cn('flex flex-wrap items-center justify-end gap-2.5 mt-3 pt-2.5 border-t border-outline-variant/40', className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 ConfirmationActions.displayName = 'Confirmation.Actions';
 
-export interface ConfirmationApproveProps {
+export interface ConfirmationApproveProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof Button>, 'loading' | 'children'> {
   onApprove?: () => void;
   label?: string;
-  disabled?: boolean;
   isLoading?: boolean;
-  className?: string;
+  children?: React.ReactNode;
 }
 
-const ConfirmationApprove: React.FC<ConfirmationApproveProps> = ({
-  onApprove,
-  label = 'Approve',
-  disabled = false,
-  isLoading = false,
-  className,
-}) => {
-  return (
-    <Button
-      variant="filled"
-      colorRole="primary"
-      size="sm"
-      disabled={disabled || isLoading}
-      onClick={onApprove}
-      expandedTouchTarget
-      aria-label={label}
-      className={cn('min-h-[44px] px-3.5 text-xs font-semibold gap-1.5', className)}
-    >
-      {isLoading ? (
-        <Icon name="progress_activity" size="xs" className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
-      ) : (
-        <Icon name="check" size="xs" aria-hidden="true" />
-      )}
-      <span>{label}</span>
-    </Button>
-  );
-};
+const ConfirmationApprove = React.forwardRef<HTMLButtonElement, ConfirmationApproveProps>(
+  ({ onApprove, onClick, label = 'Approve', disabled = false, isLoading = false, className, children, ...props }, ref) => {
+    return (
+      <Button
+        ref={ref}
+        data-slot="confirmation-approve"
+        variant="filled"
+        colorRole="primary"
+        size="sm"
+        disabled={disabled}
+        loading={isLoading}
+        onClick={(e) => {
+          onClick?.(e);
+          if (!e.defaultPrevented) onApprove?.();
+        }}
+        expandedTouchTarget
+        aria-label={label}
+        className={cn('min-h-[44px] px-3.5 text-xs font-semibold gap-1.5', className)}
+        {...props}
+      >
+        {children ?? (
+          <>
+            {!isLoading && <Icon name="check" size="xs" aria-hidden="true" />}
+            <span>{label}</span>
+          </>
+        )}
+      </Button>
+    );
+  }
+);
 ConfirmationApprove.displayName = 'Confirmation.Approve';
 
-export interface ConfirmationDenyProps {
+export interface ConfirmationDenyProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof Button>, 'children'> {
   onDeny?: () => void;
   label?: string;
-  disabled?: boolean;
-  className?: string;
+  children?: React.ReactNode;
 }
 
-const ConfirmationDeny: React.FC<ConfirmationDenyProps> = ({
-  onDeny,
-  label = 'Deny',
-  disabled = false,
-  className,
-}) => {
-  return (
-    <Button
-      variant="outline"
-      colorRole="neutral"
-      size="sm"
-      disabled={disabled}
-      onClick={onDeny}
-      expandedTouchTarget
-      aria-label={label}
-      className={cn('min-h-[44px] px-3.5 text-xs font-semibold gap-1.5', className)}
-    >
-      <Icon name="close" size="xs" aria-hidden="true" />
-      <span>{label}</span>
-    </Button>
-  );
-};
+const ConfirmationDeny = React.forwardRef<HTMLButtonElement, ConfirmationDenyProps>(
+  ({ onDeny, onClick, label = 'Deny', disabled = false, className, children, ...props }, ref) => {
+    return (
+      <Button
+        ref={ref}
+        data-slot="confirmation-deny"
+        variant="outline"
+        colorRole="neutral"
+        size="sm"
+        disabled={disabled}
+        onClick={(e) => {
+          onClick?.(e);
+          if (!e.defaultPrevented) onDeny?.();
+        }}
+        expandedTouchTarget
+        aria-label={label}
+        className={cn('min-h-[44px] px-3.5 text-xs font-semibold gap-1.5', className)}
+        {...props}
+      >
+        {children ?? (
+          <>
+            <Icon name="close" size="xs" aria-hidden="true" />
+            <span>{label}</span>
+          </>
+        )}
+      </Button>
+    );
+  }
+);
 ConfirmationDeny.displayName = 'Confirmation.Deny';
 
 export interface ConfirmationActionProps extends React.ComponentPropsWithoutRef<typeof Button> {

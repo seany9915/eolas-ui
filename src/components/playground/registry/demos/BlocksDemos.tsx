@@ -8,7 +8,6 @@ import {
 } from '@/components/blocks/data-table';
 import type { DataTableFeatures } from '@/components/blocks/data-table';
 import { Badge } from '@/components/ui/badge';
-import { ApprovalCard } from '@/components/blocks/approval-card';
 import { ChartCard } from '@/components/blocks/chart-card';
 import { AreaChartCard } from '@/components/blocks/area-chart-card';
 import { BarChartCard } from '@/components/blocks/bar-chart-card';
@@ -32,8 +31,6 @@ import {
   QuestionnaireNext,
   QuestionnaireSubmit,
 } from '@/components/blocks/questionnaire';
-import { MetricCard } from '@/components/blocks/metric-card';
-import { DeleteConfirmationDialog } from '@/components/blocks/delete-confirmation-dialog';
 import { FilterToolbar } from '@/components/blocks/filter-toolbar';
 import { ListDetailBlock, type ListDetailItem } from '@/components/blocks/list-detail-block';
 import { SupportingPaneBlock } from '@/components/blocks/supporting-pane-block';
@@ -53,88 +50,7 @@ import { ToggleGroup } from '@/components/ui/toggle-group';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { ComponentDemoProps } from '../types';
-import { cn } from '@/lib/utils';
-
-export const ApprovalCardDemo: React.FC<ComponentDemoProps> = () => {
-  const [selected, setSelected] = React.useState('opt-1');
-  const [customInput, setCustomInput] = React.useState('');
-  const [confirmed, setConfirmed] = React.useState(false);
-  return (
-    <div className="w-full max-w-xl mx-auto py-6 flex flex-col gap-3">
-      <ApprovalCard
-        title="Update Weekly Practice Plan"
-        description="Select the target sound set for this week's practice sessions."
-        options={[
-          { id: 'opt-1', label: 'Vocalic /r/ Sound Practice', description: '15 minutes daily with audio feedback' },
-          { id: 'opt-2', label: 'S-Blend Syllables', description: '10 minutes daily with picture cards' },
-        ]}
-        selectedOptionId={selected}
-        onSelectOption={(id) => {
-          setSelected(id);
-          setConfirmed(false);
-        }}
-        customInputValue={customInput}
-        onCustomInputChange={(val) => {
-          setCustomInput(val);
-          setConfirmed(false);
-        }}
-        stepCurrent={1}
-        stepTotal={2}
-        confirmLabel={confirmed ? 'Plan Confirmed' : 'Confirm Practice Plan'}
-        onConfirm={() => setConfirmed(true)}
-      />
-    </div>
-  );
-};
-
-export const MetricCardDemo: React.FC<ComponentDemoProps> = () => {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl mx-auto py-6">
-      <MetricCard
-        title="Active Practice Sessions"
-        value={142}
-        icon="record_voice_over"
-        change="+8% vs last week"
-        changeType="positive"
-        description="Active sessions across groups"
-      />
-      <MetricCard
-        title="Daily Goal Completion"
-        value="92%"
-        icon="task_alt"
-        change="+4% this week"
-        changeType="positive"
-        description="Learners meeting daily goal"
-      />
-      <MetricCard
-        title="Average Session Time"
-        value="14 min"
-        icon="timer"
-        change="-3 min faster"
-        changeType="positive"
-        description="Median practice duration"
-      />
-    </div>
-  );
-};
-
-export const DeleteConfirmationDialogDemo: React.FC<ComponentDemoProps> = () => {
-  const [open, setOpen] = React.useState(false);
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-4 py-8">
-      <Button colorRole="error" onClick={() => setOpen(true)}>
-        <Icon name="delete" size="xs" />
-        Open Delete Confirmation
-      </Button>
-      <DeleteConfirmationDialog
-        open={open}
-        onOpenChange={setOpen}
-        itemName="Session Notes Template (Draft)"
-        onConfirm={() => setOpen(false)}
-      />
-    </div>
-  );
-};
+import { assetUrl, cn } from '@/lib/utils';
 
 export const FilterToolbarDemo: React.FC<ComponentDemoProps> = () => {
   const [q, setQ] = React.useState('');
@@ -1394,7 +1310,7 @@ export const AppShellDemo: React.FC<ComponentDemoProps> = () => {
     <div className="w-full max-w-4xl mx-auto rounded-lg border border-outline-variant overflow-hidden h-120 flex flex-col relative bg-surface">
       <AppShell
         embedded
-        title="Eolas Speech Portal"
+        title={destinations.find((item) => item.id === activeNav)?.label ?? 'Overview'}
         destinations={destinations}
         activeDestinationId={activeNav}
         onDestinationChange={setActiveNav}
@@ -1405,13 +1321,17 @@ export const AppShellDemo: React.FC<ComponentDemoProps> = () => {
           </Button>
         }
         sidebarHeader={
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-              <Icon name="record_voice_over" size="sm" />
-            </div>
-            <span className="font-heading font-bold text-sm text-on-surface group-data-[collapsible=icon]:hidden">
-              Eolas Speech
-            </span>
+          <div className="flex items-center">
+            <img
+              src={assetUrl('/logos/horizontal-lockup.svg')}
+              alt="Eolas Speech"
+              className="h-6 w-auto group-data-[collapsible=icon]:hidden"
+            />
+            <img
+              src={assetUrl('/logos/pictorial-mark.svg')}
+              alt="Eolas Speech"
+              className="hidden size-7 object-contain group-data-[collapsible=icon]:block"
+            />
           </div>
         }
       >

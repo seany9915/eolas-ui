@@ -16,7 +16,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInput,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 import { REGISTRY_CATEGORIES } from './registry-categories';
 import { REGISTRY_ENTRIES } from './registry-manifest';
@@ -117,14 +116,15 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
   return (
     <Sidebar
       collapsible="none"
+      aria-label="Component registry"
       className={cn(
-        'w-[var(--sidebar-width)] shrink-0 border-r border-outline-variant bg-surface sticky top-18 h-[calc(100vh-4.5rem)] flex flex-col z-20',
+        'w-full lg:w-[var(--sidebar-width)] shrink-0 lg:border-r lg:border-outline-variant bg-surface lg:sticky lg:top-18 h-full lg:h-[calc(100dvh-4.5rem)] flex flex-col',
         className
       )}
     >
       {/* Sidebar Header & Search */}
       <SidebarHeader className="p-3 border-b border-outline-variant flex flex-col gap-2.5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="font-heading text-sm font-bold text-on-surface">Registry</span>
             <Badge
@@ -135,11 +135,11 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
           </div>
           <Button
             size="sm"
-            variant={selectedId === null ? 'tonal' : 'ghost'}
+            variant={selectedId === null ? 'soft' : 'text'}
             onClick={() => onSelect(null)}
-            className="text-xs h-8 px-2.5 font-medium"
+            className="text-xs px-3 font-medium"
           >
-            <Icon name="grid_view" size="xs" className="mr-1.5" />
+            <Icon name="grid_view" size="xs" />
             Overview
           </Button>
         </div>
@@ -147,18 +147,20 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
         {/* Search Input */}
         <SidebarInput
           type="search"
+          enterKeyHint="search"
+          aria-label="Filter components"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Filter components..."
           leadingIcon={<Icon name="search" size="sm" className="text-on-surface-variant" />}
           clearable={!!searchQuery}
           onClear={() => onSearchChange('')}
-          className="w-full text-xs"
+          className="w-full text-base md:text-sm"
         />
 
         {/* Active Category Filter Pill */}
         {activeCategory !== 'all' && (
-          <div className="flex items-center justify-between gap-2 px-2 py-1 rounded bg-primary-container text-on-primary-container text-xs">
+          <div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded bg-primary-container text-on-primary-container text-xs">
             <span className="font-label font-semibold truncate capitalize">
               Category: {activeCategory}
             </span>
@@ -167,7 +169,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
               variant="text"
               colorRole="neutral"
               onClick={() => onCategoryChange('all')}
-              className="text-xs px-2 min-h-8 h-8"
+              className="text-xs px-2.5"
               aria-label="Clear category filter"
             >
               Clear
@@ -219,7 +221,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
               className="w-full"
             >
               <SidebarGroup className="p-0 mb-1">
-                <SidebarGroupLabel className="p-0 h-auto" render={(triggerProps) => (<Collapsible.Trigger {...triggerProps} hideChevron className={cn(triggerProps.className, "w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left hover:bg-state-hover transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1 group/cat-trigger cursor-pointer select-none min-h-[36px]")}>{triggerProps.children}</Collapsible.Trigger>)}>
+                <SidebarGroupLabel className="p-0 h-auto" render={(triggerProps) => (<Collapsible.Trigger {...triggerProps} hideChevron className={cn(triggerProps.className, "w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left hover:bg-state-hover transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-1 group/cat-trigger cursor-pointer select-none min-h-11")}>{triggerProps.children}</Collapsible.Trigger>)}>
                     <div className="flex items-center gap-2 min-w-0">
                       <Icon
                         name={category.icon}
@@ -232,7 +234,7 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0 text-on-surface-variant">
-                      <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-container-high font-medium">
+                      <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-surface-container-high font-semibold">
                         {categoryEntries.length}
                       </span>
                       <Icon
@@ -262,16 +264,8 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
                                 className="text-xs"
                               >
                                 <span className="truncate">{entry.title}</span>
-                                {entry.isDeprecated && (
-                                  <span
-                                    title={entry.tier === 'block' ? 'Deprecated block' : 'Legacy re-export'}
-                                    className="font-mono text-[10px] px-1 py-0.5 rounded bg-warning-container text-on-warning-container font-medium shrink-0"
-                                  >
-                                    {entry.tier === 'block' ? 'deprecated' : 'legacy'}
-                                  </span>
-                                )}
                                 {entry.tier === 'block' && (
-                                  <span className="font-mono text-[10px] px-1 py-0.5 rounded bg-secondary-container text-on-secondary-container font-bold shrink-0">
+                                  <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-secondary-container text-on-secondary-container font-semibold shrink-0">
                                     block
                                   </span>
                                 )}
@@ -288,8 +282,6 @@ export const RegistrySidebar: React.FC<RegistrySidebarProps> = ({
           );
         })}
       </SidebarContent>
-
-      <SidebarRail />
     </Sidebar>
   );
 };

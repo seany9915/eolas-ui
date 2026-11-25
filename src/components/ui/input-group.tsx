@@ -152,7 +152,7 @@ export const InputGroupInput = React.forwardRef<HTMLInputElement, InputGroupInpu
         className={composeClassName(
           cn(
             'w-full flex-1 min-w-0 bg-transparent border-0 px-3 py-2 font-sans text-on-surface leading-normal outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none',
-            size === 'sm' ? 'text-sm' : 'text-base',
+            size === 'sm' ? 'text-base sm:text-sm' : 'text-base',
             '[[data-slot=input-group-addon]+&]:ps-1.5',
             '[&:has(+[data-slot=input-group-addon])]:pe-1.5',
             'placeholder:text-on-surface-variant/80',
@@ -308,10 +308,10 @@ export interface InputGroupAddonProps extends React.HTMLAttributes<HTMLDivElemen
 export const InputGroupAddon = React.forwardRef<HTMLDivElement, InputGroupAddonProps>(
   ({ className, align = 'inline-start', render, children, onClick, ...props }, ref) => {
     const alignClasses = cn(
-      align === 'inline-start' && 'order-first flex items-center gap-1.5 ps-3 pe-1 text-on-surface-variant select-none shrink-0',
-      align === 'inline-end' && 'order-last flex items-center gap-1.5 pe-3 ps-1 ms-auto text-on-surface-variant select-none shrink-0',
-      align === 'block-start' && 'order-first flex flex-wrap items-center justify-between gap-2 px-3 pt-2.5 pb-1 w-full text-on-surface-variant',
-      align === 'block-end' && 'order-last flex flex-wrap items-center justify-between gap-2 px-3 pb-2.5 pt-1 mt-auto w-full text-on-surface-variant'
+      align === 'inline-start' && 'flex items-center gap-2 ps-3 pe-1 text-on-surface-variant select-none shrink-0',
+      align === 'inline-end' && 'flex items-center gap-2 pe-3 ps-1 ms-auto text-on-surface-variant select-none shrink-0',
+      align === 'block-start' && 'flex flex-wrap items-center justify-between gap-2 px-3 pt-2.5 pb-1 w-full text-on-surface-variant',
+      align === 'block-end' && 'flex flex-wrap items-center justify-between gap-2 px-3 pb-2.5 pt-1 mt-auto w-full text-on-surface-variant'
     );
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -370,14 +370,14 @@ export const InputGroupButton = React.forwardRef<HTMLButtonElement, InputGroupBu
     },
     ref
   ) => {
-    // Map custom input group icon sizes to button styling
+    // Map custom input group icon sizes to button styling (vertical hit expansion avoids overlapping adjacent buttons)
     const sizeClasses = cn(
-      size === 'icon-xs' && 'size-6 min-h-[24px] min-w-[24px] p-0 rounded-sm',
-      size === 'icon-sm' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-full',
-      size === 'icon' && 'size-8 min-h-[32px] min-w-[32px] p-0 rounded-sm',
-      size === 'xs' && 'h-6 min-h-[24px] px-2 text-xs rounded-sm',
-      size === 'sm' && 'h-8 min-h-[32px] px-2.5 text-xs rounded-sm',
-      size === 'md' && 'h-9 min-h-[36px] px-3 text-sm rounded-sm'
+      size === 'icon-xs' && "relative size-6 min-h-[24px] min-w-[24px] p-0 rounded-sm after:absolute after:-inset-y-2.5 after:inset-x-0 after:content-['']",
+      size === 'icon-sm' && "relative size-8 min-h-[32px] min-w-[32px] p-0 rounded-full after:absolute after:-inset-y-1.5 after:inset-x-0 after:content-['']",
+      size === 'icon' && "relative size-8 min-h-[32px] min-w-[32px] p-0 rounded-sm after:absolute after:-inset-y-1.5 after:inset-x-0 after:content-['']",
+      size === 'xs' && "relative h-6 min-h-[24px] px-2 text-xs rounded-sm after:absolute after:-inset-y-2.5 after:inset-x-0 after:content-['']",
+      size === 'sm' && "relative h-8 min-h-[32px] px-2.5 text-xs rounded-sm after:absolute after:-inset-y-1.5 after:inset-x-0 after:content-['']",
+      size === 'md' && "relative h-9 min-h-[36px] px-3 text-sm rounded-sm after:absolute after:-inset-y-1 after:inset-x-0 after:content-['']"
     );
 
     const buttonSize =
@@ -395,7 +395,6 @@ export const InputGroupButton = React.forwardRef<HTMLButtonElement, InputGroupBu
         colorRole={colorRole}
         size={buttonSize as ButtonProps['size']}
         data-slot="input-group-button"
-        expandedTouchTarget
         className={composeClassName(sizeClasses, className)}
         {...props}
       >

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 /**
  * Prominence tiers for Card containers:
@@ -109,16 +109,16 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
   );
 
   // Body copy uses warm off-white (text-on-neutral) on dark stone (bg-neutral) to avoid glare; tertiary accents apply to headlines/icons
-  const invertedStyles = 'bg-neutral text-on-neutral border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient';
+  const invertedStyles = 'bg-neutral text-on-neutral border border-transparent forced-colors:border-[CanvasText] shadow-ambient';
 
   const prominenceStyles: Record<CardProminence, string> = {
-    default: 'bg-surface border-0 forced-colors:border forced-colors:border-[CanvasText] text-on-surface shadow-card',
-    accent: 'bg-surface border-0 forced-colors:border forced-colors:border-[CanvasText] text-on-surface shadow-card', // @deprecated: falls back to default borderless card
+    default: 'bg-surface border border-transparent forced-colors:border-[CanvasText] text-on-surface shadow-card',
+    accent: 'bg-surface border border-transparent forced-colors:border-[CanvasText] text-on-surface shadow-card', // @deprecated: falls back to default borderless card
     filled: colorRole === 'secondary'
-      ? 'bg-secondary text-on-secondary border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient'
+      ? 'bg-secondary text-on-secondary border border-transparent forced-colors:border-[CanvasText] shadow-ambient'
       : colorRole === 'tertiary'
-        ? 'bg-tertiary text-on-tertiary border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient'
-        : 'bg-primary text-on-primary border-0 forced-colors:border forced-colors:border-[CanvasText] shadow-ambient',
+        ? 'bg-tertiary text-on-tertiary border border-transparent forced-colors:border-[CanvasText] shadow-ambient'
+        : 'bg-primary text-on-primary border border-transparent forced-colors:border-[CanvasText] shadow-ambient',
     spotlight: invertedStyles,
     inverted: invertedStyles,
   };
@@ -140,7 +140,7 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     );
   } else if (isActionable) {
     affordanceStyles = cn(
-      'cursor-pointer active:scale-[0.99] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
+      'cursor-pointer active:scale-[0.99] motion-reduce:active:scale-100 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[[data-card-trigger]:focus-visible]:outline-2 has-[[data-card-trigger]:focus-visible]:outline-offset-2 has-[[data-card-trigger]:focus-visible]:outline-primary',
       lift ? 'card-lift shadow-none' : 'hover:shadow-ambient-hover'
     );
   } else if (isLink) {
@@ -179,7 +179,7 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
         } as React.CSSProperties}
         className={cn(
           baseStyles,
-          prominenceStyles[resolvedProminence],
+          prominenceStyles[effectiveProminence],
           affordanceStyles,
           subgrid ? 'card-subgrid' : 'flex flex-col gap-4',
           className
@@ -220,7 +220,7 @@ export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
     const isInverted = prominence === 'inverted' || prominence === 'spotlight';
     const textTone = isInverted
       ? invertedAccent === 'neutral'
-        ? 'text-surface'
+        ? 'text-on-neutral'
         : 'text-tertiary'
       : prominence === 'filled'
         ? 'text-current'
@@ -249,7 +249,7 @@ export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescri
     const { prominence } = React.useContext(CardContext);
     const isInverted = prominence === 'inverted' || prominence === 'spotlight';
     const textTone = isInverted
-      ? 'text-surface'
+      ? 'text-on-neutral'
       : prominence === 'filled'
         ? 'text-current'
         : 'text-on-surface-variant';
@@ -326,7 +326,7 @@ export const CardLink = React.forwardRef<HTMLAnchorElement, CardLinkProps>(
     <a
       ref={ref}
       data-card-trigger=""
-      className={cn('card-link focus:outline-none', className)}
+      className={cn('card-link', className)}
       {...props}
     />
   )
@@ -344,7 +344,7 @@ export interface CardTriggerProps
  * keeping the outer `<Card>` semantic so internal headings and lists stay intact for screen readers.
  */
 export const CardTrigger = React.forwardRef<HTMLButtonElement, CardTriggerProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, render, nativeButton, ...props }, ref) => {
     const { prominence, isSelectable, selected } = React.useContext(CardContext);
     const isRadio = props.role === 'radio';
     const isLightSurface = prominence === 'default' || prominence === 'accent';
@@ -354,9 +354,13 @@ export const CardTrigger = React.forwardRef<HTMLButtonElement, CardTriggerProps>
         ref={ref}
         data-slot="card-trigger"
         data-card-trigger=""
-        className={cn(
-          'card-link text-start cursor-pointer transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-          isLightSurface ? 'hover:text-primary' : 'hover:underline underline-offset-4',
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
+        className={composeClassName(
+          cn(
+            'card-link text-start cursor-pointer transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            isLightSurface ? 'hover:text-primary' : 'hover:underline underline-offset-4'
+          ),
           className
         )}
         {...props}

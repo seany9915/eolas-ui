@@ -85,7 +85,7 @@ export const AttachmentGroup = React.forwardRef<HTMLDivElement, AttachmentGroupP
         className: cn(
           'flex gap-2 max-w-full',
           scrollable
-            ? 'overflow-x-auto px-1 py-1 pe-4 scrollbar-none snap-x snap-mandatory scroll-smooth scroll-fade-x'
+            ? 'overflow-x-auto px-1 py-2.5 -my-1.5 pe-4 scrollbar-none snap-x snap-mandatory motion-safe:scroll-smooth scroll-fade-x'
             : 'flex-wrap items-center',
           className
         ),
@@ -209,10 +209,10 @@ export const AttachmentMedia = React.forwardRef<HTMLDivElement, AttachmentMediaP
     const isCompact = size === 'sm';
 
     const sizeClasses = isMicro
-      ? 'size-5 rounded'
+      ? 'size-5 rounded-sm'
       : isCompact
-      ? 'size-7 rounded'
-      : 'size-10 rounded-md';
+      ? 'size-7 rounded-sm'
+      : 'size-10 rounded-sm';
 
     return useRender({
       render,
@@ -228,7 +228,7 @@ export const AttachmentMedia = React.forwardRef<HTMLDivElement, AttachmentMediaP
           sizeClasses,
           isImage
             ? 'bg-surface-container-high object-cover [&>img]:size-full [&>img]:object-cover [&>img]:rounded-[inherit]'
-            : 'bg-surface-container-high text-on-surface-variant',
+            : 'bg-surface-container-high text-on-surface',
           className
         ),
         children,
@@ -424,21 +424,26 @@ AttachmentAction.displayName = 'AttachmentAction';
 // AttachmentTrigger
 // ============================================================================
 
-export interface AttachmentTriggerProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface AttachmentTriggerProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  href?: string;
+  target?: string;
+  rel?: string;
   render?: useRender.RenderProp;
 }
 
-export const AttachmentTrigger = React.forwardRef<HTMLAnchorElement, AttachmentTriggerProps>(
-  ({ className, render, children, ...props }, ref) => {
+export const AttachmentTrigger = React.forwardRef<HTMLElement, AttachmentTriggerProps>(
+  ({ className, render, href, type, children, ...props }, ref) => {
+    const isAnchor = Boolean(href);
     return useRender({
       render,
       ref,
-      defaultTagName: 'a',
+      defaultTagName: isAnchor ? 'a' : 'button',
       props: {
         'data-slot': 'attachment-trigger',
-        tabIndex: 0,
+        ...(isAnchor ? { href } : { type: type ?? 'button' }),
         className: cn(
-          'absolute inset-0 z-0 rounded-lg cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'absolute inset-0 z-0 rounded-lg cursor-pointer transition-colors motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           className
         ),
         children,

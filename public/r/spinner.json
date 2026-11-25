@@ -3,7 +3,7 @@
   "name": "spinner",
   "type": "registry:ui",
   "title": "Spinner",
-  "description": "Spinner primitive.",
+  "description": "Minimal SVG loading indicator with slowed reduced-motion fallback and screen-reader status text.",
   "categories": [
     "feedback"
   ],

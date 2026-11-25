@@ -91,6 +91,16 @@ export interface RegisteredChoice {
   disabled?: boolean;
 }
 
+export type QuestionnaireValue =
+  | string
+  | number
+  | boolean
+  | readonly string[]
+  | null
+  | undefined;
+
+const EMPTY_VALUES: Record<string, QuestionnaireValue> = {};
+
 /* -------------------------------------------------------------------------------------------------
  * Root Context
  * -----------------------------------------------------------------------------------------------*/
@@ -102,6 +112,7 @@ export interface QuestionnaireContextValue {
   getItemMeta: (name: string) => QuestionnaireItemMeta | undefined;
   registerInput: (itemName: string, fieldName: string) => void;
   getInputNames: (itemName: string) => string[];
+  isItemReachable: (name: string) => boolean;
   activeItem: string;
   setActiveItem: (name: string) => void;
   direction: 'forward' | 'backward';
@@ -116,8 +127,8 @@ export interface QuestionnaireContextValue {
   activeIndex: number;
   totalItems: number;
   percentage: number;
-  values: Record<string, any>;
-  setAnswer: (fieldName: string, value: any, itemName?: string) => void;
+  values: Record<string, QuestionnaireValue>;
+  setAnswer: (fieldName: string, value: QuestionnaireValue, itemName?: string) => void;
   errors: Record<string, string>;
   setError: (name: string, error: string | null) => void;
   shortcuts?: 'letters' | 'numbers' | boolean;
@@ -151,6 +162,7 @@ export interface QuestionnaireItemContextValue {
   getShortcutForChoice: (choiceValue: string, explicitShortcut?: string) => string | undefined;
   error?: string;
   titleId: string;
+  errorId: string;
   hiddenUntilFound?: boolean;
 }
 
@@ -201,23 +213,23 @@ export interface QuestionnaireProps
   /** Alias for onItemChange */
   onValueChange?: (item: string) => void;
   /** Controlled answers map */
-  values?: Record<string, any>;
+  values?: Record<string, QuestionnaireValue>;
   /** Alias for values */
-  answers?: Record<string, any>;
+  answers?: Record<string, QuestionnaireValue>;
   /** Uncontrolled initial answers map */
-  defaultValues?: Record<string, any>;
+  defaultValues?: Record<string, QuestionnaireValue>;
   /** Alias for defaultValues */
-  defaultAnswers?: Record<string, any>;
+  defaultAnswers?: Record<string, QuestionnaireValue>;
   /** Callback fired when answers update */
-  onValuesChange?: (values: Record<string, any>) => void;
+  onValuesChange?: (values: Record<string, QuestionnaireValue>) => void;
   /** Alias for onValuesChange */
-  onAnswersChange?: (answers: Record<string, any>) => void;
+  onAnswersChange?: (answers: Record<string, QuestionnaireValue>) => void;
   /** Keyboard shortcuts mode: 'letters' (A-Z), 'numbers' (1-9), or boolean */
   shortcuts?: 'letters' | 'numbers' | boolean;
   /** Native form submit handler */
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   /** Completion handler called with finalized answers on last step */
-  onComplete?: (data: Record<string, any>) => void;
+  onComplete?: (data: Record<string, QuestionnaireValue>) => void;
   /** Callback fired when navigating backward */
   onPrevious?: (item: string) => void;
   /** Callback fired when navigating forward */
@@ -248,7 +260,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       onValueChange,
       values: controlledValuesProp,
       answers: controlledAnswersProp,
-      defaultValues = {},
+      defaultValues = EMPTY_VALUES,
       defaultAnswers,
       onValuesChange,
       onAnswersChange,
@@ -335,11 +347,29 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
 
     // Free-text field names per item; kept across unmounts so inactive steps still serialize and validate
     const inputNamesRef = React.useRef<Map<string, Set<string>>>(new Map());
+    const [registeredInputNames, setRegisteredInputNames] = React.useState<Set<string>>(() => {
+      const set = new Set<string>();
+      if (items) {
+        for (const it of items) {
+          set.add(`${it.name}_text`);
+          if (it.input?.name) set.add(it.input.name);
+        }
+      }
+      return set;
+    });
 
     const registerInput = React.useCallback((itemName: string, fieldName: string) => {
       const set = inputNamesRef.current.get(itemName) ?? new Set<string>();
-      set.add(fieldName);
-      inputNamesRef.current.set(itemName, set);
+      if (!set.has(fieldName)) {
+        set.add(fieldName);
+        inputNamesRef.current.set(itemName, set);
+      }
+      setRegisteredInputNames((prev) => {
+        if (prev.has(fieldName)) return prev;
+        const next = new Set(prev);
+        next.add(fieldName);
+        return next;
+      });
     }, []);
 
     const getInputNames = React.useCallback(
@@ -383,7 +413,8 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
     const percentage = totalItems > 0 ? ((activeIndex + 1) / totalItems) * 100 : 0;
 
     // Answer / Values state
-    const [internalValues, setInternalValues] = React.useState<Record<string, any>>(initialValues);
+    const [internalValues, setInternalValues] =
+      React.useState<Record<string, QuestionnaireValue>>(initialValues);
     const values = controlledValues !== undefined ? controlledValues : internalValues;
     const valuesRef = React.useRef(values);
     valuesRef.current = values;
@@ -404,7 +435,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
     }, []);
 
     const setAnswer = React.useCallback(
-      (fieldName: string, value: any, itemName?: string) => {
+      (fieldName: string, value: QuestionnaireValue, itemName?: string) => {
         const nextValues = { ...valuesRef.current, [fieldName]: value };
         valuesRef.current = nextValues;
         if (controlledValues === undefined) {
@@ -431,23 +462,52 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       [controlledItem, handleItemChange]
     );
 
+    const setActiveItem = React.useCallback(
+      (name: string) => changeActiveItem(name, 'forward'),
+      [changeActiveItem]
+    );
+
+    const isItemAnswered = React.useCallback(
+      (targetName: string): boolean => {
+        const answer = values[targetName];
+        const hasChoice = Array.isArray(answer)
+          ? answer.length > 0
+          : answer !== undefined && answer !== null && answer !== '';
+        const hasText = getInputNames(targetName).some((fieldName) => {
+          const textAnswer = values[fieldName];
+          return (
+            textAnswer !== undefined &&
+            textAnswer !== null &&
+            String(textAnswer).trim().length > 0
+          );
+        });
+        return Boolean(hasChoice || hasText);
+      },
+      [values, getInputNames]
+    );
+
     // Pure validity check without any state-setting side effects
     const isCurrentValid = React.useCallback((): boolean => {
       if (!activeItem) return true;
       const meta = getItemMeta(activeItem);
-      if (meta?.required) {
-        const answer = values[activeItem];
-        const hasChoice =
-          Array.isArray(answer) ? answer.length > 0 : answer !== undefined && answer !== null && answer !== '';
-        const hasText = getInputNames(activeItem).some((fieldName) => {
-          const textAnswer = values[fieldName];
-          return textAnswer !== undefined && textAnswer !== null && String(textAnswer).trim().length > 0;
-        });
+      return meta?.required ? isItemAnswered(activeItem) : true;
+    }, [activeItem, getItemMeta, isItemAnswered]);
 
-        return Boolean(hasChoice || hasText);
-      }
-      return true;
-    }, [activeItem, getItemMeta, getInputNames, values]);
+    const isItemReachable = React.useCallback(
+      (targetName: string): boolean => {
+        const targetIdx = itemNames.indexOf(targetName);
+        if (targetIdx === -1 || targetIdx <= activeIndex) return true;
+        for (let i = 0; i < targetIdx; i++) {
+          const prevName = itemNames[i];
+          const prevMeta = getItemMeta(prevName);
+          if (prevMeta?.required && !isItemAnswered(prevName)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      [itemNames, activeIndex, getItemMeta, isItemAnswered]
+    );
 
     // Validation for current step on user actions (e.g. Next, Submit)
     const validateCurrent = React.useCallback((): boolean => {
@@ -565,36 +625,90 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       }
     };
 
-    const contextValue: QuestionnaireContextValue = {
-      itemNames,
-      registerItem,
-      updateItemMeta,
-      getItemMeta,
-      registerInput,
-      getInputNames,
-      activeItem,
-      setActiveItem: (name) => changeActiveItem(name, 'forward'),
-      direction,
-      goToPrevious,
-      goToNext,
-      skipCurrent,
-      resetQuestionnaire,
-      isFirst,
-      isLast,
-      canGoBack,
-      canSkip,
-      activeIndex,
-      totalItems,
-      percentage,
-      values,
-      setAnswer,
-      errors,
-      setError,
-      shortcuts,
-      items,
-      hiddenUntilFound,
-      hasUserNavigatedRef,
-    };
+    const contextValue = React.useMemo<QuestionnaireContextValue>(
+      () => ({
+        itemNames,
+        registerItem,
+        updateItemMeta,
+        getItemMeta,
+        registerInput,
+        getInputNames,
+        isItemReachable,
+        activeItem,
+        setActiveItem,
+        direction,
+        goToPrevious,
+        goToNext,
+        skipCurrent,
+        resetQuestionnaire,
+        isFirst,
+        isLast,
+        canGoBack,
+        canSkip,
+        activeIndex,
+        totalItems,
+        percentage,
+        values,
+        setAnswer,
+        errors,
+        setError,
+        shortcuts,
+        items,
+        hiddenUntilFound,
+        hasUserNavigatedRef,
+      }),
+      [
+        itemNames,
+        registerItem,
+        updateItemMeta,
+        getItemMeta,
+        registerInput,
+        getInputNames,
+        isItemReachable,
+        activeItem,
+        setActiveItem,
+        direction,
+        goToPrevious,
+        goToNext,
+        skipCurrent,
+        resetQuestionnaire,
+        isFirst,
+        isLast,
+        canGoBack,
+        canSkip,
+        activeIndex,
+        totalItems,
+        percentage,
+        values,
+        setAnswer,
+        errors,
+        setError,
+        shortcuts,
+        items,
+        hiddenUntilFound,
+      ]
+    );
+
+    // Serialize default/external answer keys whose compound <Questionnaire.Input> hasn't mounted yet
+    const itemNameSet = React.useMemo(() => new Set(itemNames), [itemNames]);
+    const unmountedValueInputs = React.useMemo(() => {
+      const nodes: React.ReactNode[] = [];
+      for (const [key, val] of Object.entries(values)) {
+        if (itemNameSet.has(key) || registeredInputNames.has(key)) continue;
+        if (Array.isArray(val)) {
+          val.forEach((entry, idx) => {
+            if (entry !== undefined && entry !== null && entry !== '') {
+              nodes.push(
+                <Input key={`${key}-${idx}`} type="hidden" name={key} value={String(entry)} />
+              );
+            }
+          });
+        } else if (val !== undefined && val !== null && val !== '') {
+          nodes.push(<Input key={key} type="hidden" name={key} value={String(val)} />);
+        }
+      }
+      return nodes;
+    }, [values, itemNameSet, registeredInputNames]);
 
     // Auto-render data-driven items when items array is provided without children
     const renderedChildren =
@@ -660,11 +774,12 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           className={cn(
             '@container w-full max-w-2xl mx-auto flex flex-col',
             variant === 'card' &&
-              'bg-surface rounded-lg border border-outline-variant shadow-ambient',
+              'bg-surface rounded-lg border border-transparent shadow-card forced-colors:border-on-surface',
             className
           )}
           {...props}
         >
+          {unmountedValueInputs}
           <div className={cn('w-full flex flex-col', variant === 'card' && 'p-4 @sm:p-6 @md:p-8')}>
             {renderedChildren}
           </div>
@@ -759,10 +874,12 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
   ) => {
     const type = resolveItemType(multiple, typeProp);
     const titleId = React.useId();
+    const errorId = `${titleId}-error`;
     const {
       registerItem,
       updateItemMeta,
       getInputNames,
+      isItemReachable,
       activeItem,
       setActiveItem,
       direction,
@@ -775,6 +892,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
     } = useQuestionnaire();
 
     const shouldHiddenUntilFound = itemHiddenUntilFound ?? rootHiddenUntilFound ?? false;
+    const canRevealUntilFound = shouldHiddenUntilFound && isItemReachable(name);
 
     const fieldsetRef = React.useRef<HTMLFieldSetElement | null>(null);
 
@@ -857,22 +975,28 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
         if (!prevIsActiveRef.current && hasUserNavigatedRef.current) {
           el.focus();
         }
+      } else if (canRevealUntilFound) {
+        el.removeAttribute('inert');
       } else {
         el.setAttribute('inert', '');
       }
       prevIsActiveRef.current = isActive;
-    }, [isActive, hasUserNavigatedRef]);
+    }, [isActive, canRevealUntilFound, hasUserNavigatedRef]);
 
     // Hidden until found support (beforematch event for browser Ctrl+F find-in-page)
     React.useEffect(() => {
       const el = fieldsetRef.current;
       if (!el || !shouldHiddenUntilFound) return;
 
-      if (!isActive) {
+      if (isActive) {
+        el.removeAttribute('hidden');
+      } else if (canRevealUntilFound) {
         el.setAttribute('hidden', 'until-found');
       } else {
-        el.removeAttribute('hidden');
+        el.setAttribute('hidden', '');
       }
+
+      if (!canRevealUntilFound) return;
 
       const handleBeforeMatch = () => {
         setActiveItem(name);
@@ -882,7 +1006,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       return () => {
         el.removeEventListener('beforematch', handleBeforeMatch);
       };
-    }, [isActive, shouldHiddenUntilFound, setActiveItem, name]);
+    }, [isActive, shouldHiddenUntilFound, canRevealUntilFound, setActiveItem, name]);
 
     // Keyboard shortcuts listener when active
     React.useEffect(() => {
@@ -932,33 +1056,59 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isActive, shortcuts, choices, getShortcutForChoice, type, values, name, setAnswer]);
 
-    const itemContextValue: QuestionnaireItemContextValue = {
-      name,
-      required,
-      type,
-      isActive,
-      direction,
-      registerChoice,
-      choices,
-      getShortcutForChoice,
-      error: errors[name],
-      titleId,
-      hiddenUntilFound: shouldHiddenUntilFound,
-    };
+    const currentError = errors[name];
+    const itemContextValue = React.useMemo<QuestionnaireItemContextValue>(
+      () => ({
+        name,
+        required,
+        type,
+        isActive,
+        direction,
+        registerChoice,
+        choices,
+        getShortcutForChoice,
+        error: currentError,
+        titleId,
+        errorId,
+        hiddenUntilFound: shouldHiddenUntilFound,
+      }),
+      [
+        name,
+        required,
+        type,
+        isActive,
+        direction,
+        registerChoice,
+        choices,
+        getShortcutForChoice,
+        currentError,
+        titleId,
+        errorId,
+        shouldHiddenUntilFound,
+      ]
+    );
 
     // One entry per selected value, matching FormData.getAll(name)
+    const rawValue = values[name];
     const hiddenInputs =
       type === 'multiple'
-        ? (Array.isArray(values[name]) ? values[name] : []).map((val: string) => (
-            <Input key={val} type="hidden" name={name} value={val} />
-          ))
-        : values[name] !== undefined && (
-            <Input type="hidden" name={name} value={String(values[name])} />
+        ? (Array.isArray(rawValue) ? rawValue : [])
+            .filter((val) => val !== undefined && val !== null && val !== '')
+            .map((val) => (
+              <Input key={String(val)} type="hidden" name={name} value={String(val)} />
+            ))
+        : rawValue !== undefined &&
+          rawValue !== null &&
+          rawValue !== '' && (
+            <Input type="hidden" name={name} value={String(rawValue)} />
           );
 
     // Free-text inputs unmount with inactive items, so keep their answers in the form
     const inactiveTextInputs = getInputNames(name)
-      .filter((fieldName) => values[fieldName] !== undefined && values[fieldName] !== '')
+      .filter((fieldName) => {
+        const v = values[fieldName];
+        return v !== undefined && v !== null && v !== '';
+      })
       .map((fieldName) => (
         <Input key={fieldName} type="hidden" name={fieldName} value={String(values[fieldName])} />
       ));
@@ -986,9 +1136,9 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
         <fieldset
           ref={setRefs}
           tabIndex={-1}
-          aria-hidden={!isActive ? true : undefined}
+          aria-hidden={!isActive && !canRevealUntilFound ? true : undefined}
           aria-invalid={hasError ? true : undefined}
-          aria-describedby={hasError ? `${name}-error` : undefined}
+          aria-describedby={hasError ? errorId : undefined}
           data-state={isActive ? 'active' : 'inactive'}
           data-active={isActive ? '' : undefined}
           data-required={required ? '' : undefined}
@@ -1083,7 +1233,7 @@ export const QuestionnaireChoices = React.forwardRef<HTMLDivElement, Questionnai
           'w-full',
           columns === 1 && 'flex flex-col gap-2.5',
           columns === 2 && 'grid grid-cols-1 @xl:grid-cols-2 gap-2.5',
-          columns === 3 && 'grid grid-cols-1 @lg:grid-cols-2 @2xl:grid-cols-3 gap-2.5',
+          columns === 3 && 'grid grid-cols-1 @lg:grid-cols-2 @xl:grid-cols-3 gap-2.5',
           className
         )}
         {...props}
@@ -1209,17 +1359,30 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
     const choiceUid = React.useId();
     const labelId = `${choiceUid}-label`;
     const descriptionId = `${choiceUid}-desc`;
+    const isMultipleBool = Boolean(isMultiple);
 
-    const choiceContextValue: QuestionnaireChoiceContextValue = {
-      value,
-      isSelected,
-      isMultiple: Boolean(isMultiple),
-      shortcutKey,
-      disabled,
-      description,
-      labelId,
-      descriptionId,
-    };
+    const choiceContextValue = React.useMemo<QuestionnaireChoiceContextValue>(
+      () => ({
+        value,
+        isSelected,
+        isMultiple: isMultipleBool,
+        shortcutKey,
+        disabled,
+        description,
+        labelId,
+        descriptionId,
+      }),
+      [
+        value,
+        isSelected,
+        isMultipleBool,
+        shortcutKey,
+        disabled,
+        description,
+        labelId,
+        descriptionId,
+      ]
+    );
 
     return (
       <QuestionnaireChoiceContext.Provider value={choiceContextValue}>
@@ -1393,6 +1556,7 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
   className,
   value,
   onChange,
+  error,
   ...props
 }) => {
   const itemContext = useQuestionnaireItem();
@@ -1407,7 +1571,8 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
     if (itemName) registerInput(itemName, fieldName);
   }, [registerInput, itemName, fieldName]);
 
-  const textValue = (value !== undefined ? value : rootContext?.values[fieldName]) ?? '';
+  const rawValue = value !== undefined ? value : rootContext?.values[fieldName];
+  const textValue = (typeof rawValue === 'boolean' ? '' : rawValue) ?? '';
 
   const handleChange: React.ComponentPropsWithoutRef<typeof Input>['onChange'] = (e) => {
     if (onChange) {
@@ -1420,13 +1585,15 @@ export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
 
   return (
     <Field.Root className={cn('w-full mt-3', className)}>
-      {label && <Field.Label htmlFor={inputId}>{label}</Field.Label>}
+      <Field.Label htmlFor={inputId} className={label ? undefined : 'sr-only'}>
+        {label ?? 'Another answer'}
+      </Field.Label>
       <Input
         name={fieldName}
-        aria-label={label ? undefined : 'Another answer'}
         value={textValue}
         onChange={handleChange}
         placeholder={placeholder}
+        error={error ?? Boolean(itemContext?.error)}
         className="w-full"
         {...props}
         id={inputId}
@@ -1458,10 +1625,18 @@ export const QuestionnaireError: React.FC<QuestionnaireErrorProps> = ({
 
   if (!errorText) return null;
 
+  const resolvedErrorId =
+    props.id ??
+    (itemContext && (!name || name === itemContext.name)
+      ? itemContext.errorId
+      : itemName
+        ? `${itemName}-error`
+        : undefined);
+
   return (
     <div
       role="alert"
-      id={itemName ? `${itemName}-error` : undefined}
+      id={resolvedErrorId}
       aria-live="assertive"
       data-state="visible"
       className={cn(

@@ -50,18 +50,21 @@ export const DeferredView = React.forwardRef<HTMLDivElement, DeferredViewProps>(
 
     const dynamicStyle: React.CSSProperties = {
       ...style,
-      ...(intrinsicHeight || intrinsicWidth
-        ? { containIntrinsicSize: `auto ${intrinsicWidth ?? 'none'} auto ${intrinsicHeight ?? 'none'}` }
-        : {}),
+      ...(intrinsicHeight ? { containIntrinsicBlockSize: `auto ${intrinsicHeight}` } : {}),
+      ...(intrinsicWidth ? { containIntrinsicInlineSize: `auto ${intrinsicWidth}` } : {}),
     };
+
+    const isHidden = mode === 'hidden';
 
     return (
       <div
         ref={ref}
         style={dynamicStyle}
+        inert={isHidden || undefined}
+        aria-hidden={isHidden || undefined}
         className={cn(
           mode === 'auto' && 'content-visibility-auto',
-          mode === 'hidden' && 'content-visibility-hidden',
+          isHidden && 'content-visibility-hidden',
           className
         )}
         {...props}

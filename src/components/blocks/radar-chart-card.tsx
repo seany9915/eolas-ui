@@ -17,6 +17,8 @@ import {
   ChartLegend,
   ChartLegendContent,
   applySeriesOverrides,
+  resolveChartSeriesColor,
+  usePrefersReducedMotion,
   type ChartConfig,
 } from '@/components/ui/chart';
 
@@ -65,6 +67,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
     },
     ref
   ) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
     const shouldShowLegend = showLegend ?? series.length > 1;
     const resolvedContentClassName =
       contentClassName ?? (shouldShowLegend ? 'h-72 @xs:h-80 w-full' : 'h-56 @xs:h-64 w-full');
@@ -83,6 +86,7 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
         contentClassName={resolvedContentClassName}
+        skeletonShape="circle"
         className={className}
         {...props}
       >
@@ -93,27 +97,34 @@ export const RadarChartCard = React.forwardRef<HTMLDivElement, RadarChartCardPro
           className="aspect-auto size-full"
         >
           <RadarChart
-            aria-label={chartLabel ?? title}
             data={data}
-            outerRadius="65%"
-            margin={{ top: 16, right: 32, bottom: 16, left: 32 }}
+            outerRadius="58%"
+            margin={{ top: 16, right: 40, bottom: 16, left: 40 }}
           >
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarAngleAxis
               dataKey={angleKey}
+              tickFormatter={(value) => {
+                const str = String(value ?? '');
+                return str.length > 14 ? `${str.slice(0, 13).trimEnd()}…` : str;
+              }}
               className="text-xs font-sans font-medium text-on-surface-variant"
             />
             <PolarGrid className="stroke-outline-variant/40" />
-            {series.map((item) => (
-              <Radar
-                key={item.dataKey}
-                dataKey={item.dataKey}
-                stroke={`var(--color-${item.dataKey})`}
-                fill={`var(--color-${item.dataKey})`}
-                fillOpacity={item.fillOpacity ?? 0.3}
-                strokeWidth={2}
-              />
-            ))}
+            {series.map((item, index) => {
+              const { fill, stroke } = resolveChartSeriesColor(resolvedConfig, item.dataKey, index);
+              return (
+                <Radar
+                  key={item.dataKey}
+                  dataKey={item.dataKey}
+                  stroke={stroke}
+                  fill={fill}
+                  fillOpacity={item.fillOpacity ?? 0.3}
+                  strokeWidth={2}
+                  isAnimationActive={!prefersReducedMotion}
+                />
+              );
+            })}
             {(showLegend ?? series.length > 1) && (
               <ChartLegend content={<ChartLegendContent />} />
             )}

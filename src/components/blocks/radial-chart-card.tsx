@@ -16,6 +16,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  isTertiaryChartColor,
+  usePrefersReducedMotion,
   type ChartConfig,
 } from '@/components/ui/chart';
 
@@ -83,30 +85,48 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
     },
     ref
   ) => {
-    const arcColor = 'value' in config ? 'var(--color-value)' : 'var(--color-primary)';
+    const prefersReducedMotion = usePrefersReducedMotion();
+    const valueConfig = config.value;
+    const rawValueColor =
+      valueConfig && 'color' in valueConfig
+        ? valueConfig.color
+        : valueConfig && 'theme' in valueConfig
+          ? valueConfig.theme?.light
+          : undefined;
+    const arcColor =
+      'value' in config ? 'var(--color-value, var(--color-primary))' : 'var(--color-primary)';
+    const isTertiary = isTertiaryChartColor(rawValueColor);
     const clampedValue = total > 0 ? Math.min(Math.max(0, value), total) : 0;
     const chartData = React.useMemo(
       () => [{ value: clampedValue, fill: arcColor }],
       [clampedValue, arcColor]
     );
     const displayValue = `${value}${unit}`;
+    const resolvedCaption = caption ?? `of ${total}${unit}`;
+    const truncatedCaption =
+      resolvedCaption.length > 22
+        ? `${resolvedCaption.slice(0, 21).trimEnd()}…`
+        : resolvedCaption;
     const resolvedStatusLabel = statusLabel ?? defaultStatusLabelMap[status];
     const resolvedEmpty =
       isEmpty ?? (value === undefined || value === null || Number.isNaN(value) || total <= 0);
+    const resolvedChartLabel = chartLabel ?? `${title}: ${displayValue} (${resolvedCaption})`;
 
     return (
       <ChartCard
         ref={ref}
         title={title}
         titleBadge={
-          <Badge
-            variant="outline"
-            colorRole={statusRoleMap[status]}
-            size="sm"
-            icon={statusIconMap[status]}
-          >
-            {resolvedStatusLabel}
-          </Badge>
+          !loading && !resolvedEmpty ? (
+            <Badge
+              variant="outline"
+              colorRole={statusRoleMap[status]}
+              size="sm"
+              icon={statusIconMap[status]}
+            >
+              {resolvedStatusLabel}
+            </Badge>
+          ) : undefined
         }
         description={description}
         action={action}
@@ -122,12 +142,11 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
       >
         <ChartContainer
           role="figure"
-          aria-label={chartLabel ?? `${title}: ${displayValue} of ${total}${unit}`}
+          aria-label={resolvedChartLabel}
           config={config}
           className="aspect-auto size-full"
         >
           <RadialBarChart
-            aria-label={chartLabel ?? `${title}: ${displayValue} of ${total}${unit}`}
             data={chartData}
             startAngle={180}
             endAngle={0}
@@ -163,7 +182,7 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
                           y={(viewBox.cy || 0) + 12}
                           className="fill-on-surface-variant text-xs font-sans font-medium"
                         >
-                          {caption ?? `of ${total}${unit}`}
+                          {truncatedCaption}
                         </tspan>
                       </text>
                     );
@@ -176,6 +195,9 @@ export const RadialChartCard = React.forwardRef<HTMLDivElement, RadialChartCardP
               dataKey="value"
               angleAxisId={0}
               fill={arcColor}
+              stroke={isTertiary ? 'var(--color-outline)' : undefined}
+              strokeWidth={isTertiary ? 1 : undefined}
+              isAnimationActive={!prefersReducedMotion}
               background={{ fill: 'var(--color-surface-container-high)' }}
               cornerRadius={6}
             />

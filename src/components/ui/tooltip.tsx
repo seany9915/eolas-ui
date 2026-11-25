@@ -13,7 +13,7 @@ export interface TooltipProviderProps {
 
 export const TooltipProvider: React.FC<TooltipProviderProps> = ({
   children,
-  delay,
+  delay = 150,
   closeDelay,
   timeout = 400,
 }) => (
@@ -56,6 +56,7 @@ export interface TooltipProps<Payload = unknown> {
   defaultTriggerId?: string | null;
   actionsRef?: React.RefObject<BaseTooltip.Root.Actions | null>;
   portal?: boolean;
+  container?: BaseTooltip.Portal.Props['container'];
   keepMounted?: boolean;
   className?: BaseTooltip.Popup.Props['className'];
 }
@@ -73,7 +74,7 @@ function TooltipComponentInner<Payload = unknown>(
     defaultOpen,
     onOpenChange,
     onOpenChangeComplete,
-    delay = 80,
+    delay,
     closeDelay,
     closeOnClick = true,
     trackCursorAxis,
@@ -85,6 +86,7 @@ function TooltipComponentInner<Payload = unknown>(
     defaultTriggerId,
     actionsRef,
     portal = true,
+    container,
     keepMounted,
     className,
   }: TooltipProps<Payload>,
@@ -156,13 +158,13 @@ function TooltipComponentInner<Payload = unknown>(
         <BaseTooltip.Trigger
           data-slot="tooltip-trigger"
           render={React.isValidElement(children) ? children : undefined}
-          delay={delay}
-          closeDelay={closeDelay}
+          {...(delay !== undefined ? { delay } : {})}
+          {...(closeDelay !== undefined ? { closeDelay } : {})}
           closeOnClick={closeOnClick}
         >
           {!React.isValidElement(children) && typeof children !== 'function' ? children : undefined}
         </BaseTooltip.Trigger>
-        {portal ? <BaseTooltip.Portal keepMounted={keepMounted}>{popup}</BaseTooltip.Portal> : popup}
+        {portal ? <BaseTooltip.Portal container={container} keepMounted={keepMounted}>{popup}</BaseTooltip.Portal> : popup}
       </BaseTooltip.Root>
     </TooltipContext.Provider>
   );
@@ -221,8 +223,8 @@ export const TooltipTrigger = React.forwardRef<
     <BaseTooltip.Trigger
       ref={ref}
       data-slot="tooltip-trigger"
-      delay={resolvedDelay}
-      closeDelay={resolvedCloseDelay}
+      {...(resolvedDelay !== undefined ? { delay: resolvedDelay } : {})}
+      {...(resolvedCloseDelay !== undefined ? { closeDelay: resolvedCloseDelay } : {})}
       closeOnClick={resolvedCloseOnClick}
       className={composeClassName('inline-flex cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary', className)}
       {...props}
@@ -243,6 +245,7 @@ export interface TooltipContentProps
   showArrow?: boolean;
   containerClassName?: BaseTooltip.Positioner.Props['className'];
   portal?: boolean;
+  container?: BaseTooltip.Portal.Props['container'];
   keepMounted?: boolean;
 }
 
@@ -262,6 +265,7 @@ export const TooltipContent = React.forwardRef<
       showArrow = true,
       containerClassName,
       portal = true,
+      container,
       keepMounted,
       ...props
     },
@@ -296,7 +300,7 @@ export const TooltipContent = React.forwardRef<
       return content;
     }
 
-    return <BaseTooltip.Portal keepMounted={keepMounted}>{content}</BaseTooltip.Portal>;
+    return <BaseTooltip.Portal container={container} keepMounted={keepMounted}>{content}</BaseTooltip.Portal>;
   }
 );
 TooltipContent.displayName = 'TooltipContent';

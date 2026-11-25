@@ -28,6 +28,7 @@ export interface AlertDialogProps<Payload = unknown> {
   initialFocus?: BaseAlertDialog.Popup.Props['initialFocus'];
   finalFocus?: BaseAlertDialog.Popup.Props['finalFocus'];
   keepMounted?: boolean;
+  container?: BaseAlertDialog.Portal.Props['container'];
   className?: BaseAlertDialog.Popup.Props['className'];
 }
 
@@ -53,6 +54,7 @@ function AlertDialogComponent<Payload = unknown>({
   initialFocus,
   finalFocus,
   keepMounted,
+  container,
   className,
 }: AlertDialogProps<Payload>): React.JSX.Element {
   // If used as composable compound root (<AlertDialog open={...}><AlertDialogContent>...</AlertDialogContent></AlertDialog>)
@@ -98,7 +100,7 @@ function AlertDialogComponent<Payload = unknown>({
               {!React.isValidElement(trigger) ? trigger : undefined}
             </BaseAlertDialog.Trigger>
           )}
-          <BaseAlertDialog.Portal keepMounted={keepMounted}>
+          <BaseAlertDialog.Portal container={container} keepMounted={keepMounted}>
             <BaseAlertDialog.Backdrop data-slot="alert-dialog-overlay" className="fixed inset-0 bg-on-surface/50 z-50 transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
             <BaseAlertDialog.Viewport
               data-slot="alert-dialog-viewport"
@@ -127,11 +129,11 @@ function AlertDialogComponent<Payload = unknown>({
                     warning
                   </span>
                   <div className="min-w-0 flex-1">
-                    <BaseAlertDialog.Title data-slot="alert-dialog-title" className={cn('font-heading text-lg font-bold text-on-surface', !title && 'sr-only')}>
+                    <BaseAlertDialog.Title data-slot="alert-dialog-title" className={cn('text-headline-sm text-on-surface', !title && 'sr-only')}>
                       {title || 'Alert'}
                     </BaseAlertDialog.Title>
                     {description && (
-                      <BaseAlertDialog.Description data-slot="alert-dialog-description" className="font-sans text-sm text-on-surface-variant mt-1 leading-relaxed">
+                      <BaseAlertDialog.Description data-slot="alert-dialog-description" className="font-sans text-base text-on-surface-variant mt-1 leading-relaxed text-pretty">
                         {description}
                       </BaseAlertDialog.Description>
                     )}
@@ -191,16 +193,17 @@ export interface AlertDialogContentProps
   size?: DialogSize;
   scroll?: 'inside' | 'outside';
   keepMounted?: boolean;
+  container?: BaseAlertDialog.Portal.Props['container'];
   containerClassName?: BaseAlertDialog.Viewport.Props['className'];
   backdropClassName?: BaseAlertDialog.Backdrop.Props['className'];
 }
 
 // Standard composable compound slots
 export const AlertDialogContent = React.forwardRef<HTMLDivElement, AlertDialogContentProps>(
-  ({ className, children, size = 'md', scroll = 'inside', keepMounted, containerClassName, backdropClassName, ...props }, ref) => {
+  ({ className, children, size = 'md', scroll = 'inside', keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => {
     const isOutsideScroll = scroll === 'outside';
     return (
-      <BaseAlertDialog.Portal keepMounted={keepMounted}>
+      <BaseAlertDialog.Portal container={container} keepMounted={keepMounted}>
         <BaseAlertDialog.Backdrop
           data-slot="alert-dialog-overlay"
           className={composeClassName(
@@ -299,7 +302,7 @@ export const AlertDialogTitle = React.forwardRef<
   <BaseAlertDialog.Title
     ref={ref}
     data-slot="alert-dialog-title"
-    className={composeClassName('font-heading text-lg font-bold text-on-surface', className)}
+    className={composeClassName('text-headline-sm text-on-surface', className)}
     {...props}
   />
 ));
@@ -312,7 +315,7 @@ export const AlertDialogDescription = React.forwardRef<
   <BaseAlertDialog.Description
     ref={ref}
     data-slot="alert-dialog-description"
-    className={composeClassName('font-sans text-sm text-on-surface-variant leading-relaxed', className)}
+    className={composeClassName('font-sans text-base text-on-surface-variant leading-relaxed text-pretty', className)}
     {...props}
   />
 ));
@@ -331,7 +334,7 @@ export const AlertDialogAction = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'inline-flex items-center justify-center font-label text-sm font-semibold rounded h-12 px-5 min-h-[48px] bg-error text-on-error hover:brightness-95 active:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'inline-flex items-center justify-center font-label text-sm font-semibold rounded h-12 px-5 min-h-[48px] bg-error text-on-error hover:brightness-95 active:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error transition-colors motion-reduce:transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }
@@ -353,7 +356,7 @@ export const AlertDialogCancel = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'inline-flex items-center justify-center font-label text-sm font-semibold rounded h-12 px-5 min-h-[48px] bg-surface text-on-surface border-2 border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'inline-flex items-center justify-center font-label text-sm font-semibold rounded h-12 px-5 min-h-[48px] bg-surface text-on-surface border-2 border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors motion-reduce:transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }
@@ -375,7 +378,7 @@ export const AlertDialogClose = React.forwardRef<
       render
         ? className
         : composeClassName(
-            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
             className
           )
     }

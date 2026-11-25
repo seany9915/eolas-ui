@@ -531,14 +531,15 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
           readOnly={readOnly}
           required={required}
           autoComplete={autoComplete}
+          enterKeyHint="search"
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
           className={composeClassName(
             [
-              'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none transition-[border-color,box-shadow]',
+              'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 outline-none transition-[border-color,box-shadow] motion-reduce:transition-none',
               'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
               '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0 [[data-slot=autocomplete-input-group]_&]:h-auto [[data-slot=autocomplete-input-group]_&]:min-h-0 [[data-slot=autocomplete-input-group]_&]:self-stretch',
-              size === 'sm' && 'py-1.5 text-xs',
+              size === 'sm' && 'py-1.5 text-base sm:text-sm',
               size === 'md' && 'py-2 text-sm',
               size === 'lg' && 'py-2.5 text-base',
               hasLeading ? 'ps-1' : 'ps-3.5',
@@ -652,7 +653,7 @@ function AutocompleteComponentInner<ItemValue = AutocompleteOption>(
               </AutocompleteLabel>
             )}
             {description && (
-              <p id={descriptionId} className="text-xs text-on-surface-variant font-sans">
+              <p id={descriptionId} className="text-sm text-on-surface-variant font-sans">
                 {description}
               </p>
             )}
@@ -754,7 +755,7 @@ export const AutocompleteInputGroup = React.forwardRef<
     ref={ref}
     className={composeClassName(
       [
-        'relative flex items-stretch w-full rounded border border-outline bg-surface transition-[border-color,outline-color]',
+        'relative flex items-stretch w-full rounded border border-outline bg-surface transition-[border-color,outline-color] [&:has(>[data-slot=autocomplete-trigger],>[data-slot=autocomplete-clear])]:gap-1.5 [&:has(>[data-slot=autocomplete-trigger],>[data-slot=autocomplete-clear])]:pe-1.5',
         size === 'sm' && 'min-h-11',
         size === 'md' && 'min-h-12',
         size === 'lg' && 'min-h-14',
@@ -778,16 +779,17 @@ export interface AutocompleteInputProps
 export const AutocompleteInput = React.forwardRef<
   React.ComponentRef<typeof BaseAutocomplete.Input>,
   AutocompleteInputProps
->(({ className, size = 'md', ...props }, ref) => (
+>(({ className, size = 'md', enterKeyHint = 'search', ...props }, ref) => (
   <BaseAutocomplete.Input
     data-slot="autocomplete-input"
     ref={ref}
+    enterKeyHint={enterKeyHint}
     className={composeClassName(
       [
-        'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 transition-[border-color,box-shadow]',
+        'w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm placeholder:text-on-surface-variant/80 transition-[border-color,box-shadow] motion-reduce:transition-none',
         'hover:border-on-surface-variant/80 px-3.5 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         '[[data-slot=autocomplete-input-group]_&]:border-0 [[data-slot=autocomplete-input-group]_&]:bg-transparent [[data-slot=autocomplete-input-group]_&]:rounded-none [[data-slot=autocomplete-input-group]_&]:focus-visible:outline-none [[data-slot=autocomplete-input-group]_&]:hover:border-0 [[data-slot=autocomplete-input-group]_&]:flex-1 [[data-slot=autocomplete-input-group]_&]:min-w-0 [[data-slot=autocomplete-input-group]_&]:h-auto [[data-slot=autocomplete-input-group]_&]:min-h-0 [[data-slot=autocomplete-input-group]_&]:self-stretch',
-        size === 'sm' && 'h-11 min-h-[44px] text-xs',
+        size === 'sm' && 'h-11 min-h-[44px] text-base sm:text-sm',
         size === 'md' && 'h-12 min-h-[48px] text-sm',
         size === 'lg' && 'h-14 min-h-[56px] text-base',
         'disabled:cursor-not-allowed',
@@ -805,9 +807,10 @@ export const AutocompleteTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Trigger
     ref={ref}
+    data-slot="autocomplete-trigger"
     className={composeClassName(
       [
-        'relative size-8 min-w-[32px] min-h-[32px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\']',
+        'relative self-center shrink-0 size-8 min-w-[32px] min-h-[32px] rounded-sm text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\']',
         'data-[popup-open]:rotate-180 transition-transform duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
       ],
@@ -849,9 +852,10 @@ export const AutocompleteClear = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseAutocomplete.Clear
     ref={ref}
+    data-slot="autocomplete-clear"
     className={composeClassName(
       [
-        'relative size-8 min-w-[32px] min-h-[32px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\']',
+        'relative self-center shrink-0 size-8 min-w-[32px] min-h-[32px] rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer flex items-center justify-center after:absolute after:-inset-y-1.5 after:-inset-x-0.5 after:content-[\'\']',
         'transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
         'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
         'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
@@ -996,9 +1000,9 @@ export const AutocompleteItem = React.forwardRef<
       ref={ref}
       className={composeClassName(
         [
-          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+          'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors motion-reduce:transition-none',
           'hover:bg-state-hover hover:text-on-surface',
-          'data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
+          'data-[highlighted]:bg-surface-container-low data-[highlighted]:text-primary',
           'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed',
         ],
         className
@@ -1031,7 +1035,7 @@ export const AutocompleteGroupLabel = React.forwardRef<
   <BaseAutocomplete.GroupLabel
     ref={ref}
     className={composeClassName(
-      'sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none',
+      'sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-semibold text-on-surface-variant border-b border-outline-variant/40 select-none',
       className
     )}
     {...props}

@@ -200,16 +200,16 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
   const [density, setDensity] = React.useState('normal');
 
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-xl border border-outline-variant bg-surface overflow-hidden">
+    <div className="w-full max-w-2xl mx-auto rounded-lg border border-outline-variant bg-surface overflow-hidden">
       {/* Top Application Menubar Chrome */}
       <Menubar variant="flush" className="bg-surface-container-low px-2 py-1">
         <Menubar.Menu>
           <Menubar.Trigger>File</Menubar.Trigger>
           <Menubar.Content>
-            <Menubar.Item icon="person_add" shortcut="âŒ˜N">
+            <Menubar.Item icon="person_add" shortcut="⌘N">
               New Learner Profile
             </Menubar.Item>
-            <Menubar.Item icon="file_download" shortcut="âŒ˜E">
+            <Menubar.Item icon="file_download" shortcut="⌘E">
               Export Practice Summary
             </Menubar.Item>
             <Menubar.Separator />
@@ -222,10 +222,10 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
         <Menubar.Menu>
           <Menubar.Trigger>Edit</Menubar.Trigger>
           <Menubar.Content>
-            <Menubar.Item icon="undo" shortcut="âŒ˜Z">
+            <Menubar.Item icon="undo" shortcut="⌘Z">
               Undo Session Note
             </Menubar.Item>
-            <Menubar.Item icon="redo" shortcut="â‡§âŒ˜Z">
+            <Menubar.Item icon="redo" shortcut="⇧⌘Z">
               Redo Entry
             </Menubar.Item>
             <Menubar.Separator />
@@ -295,7 +295,7 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex items-center justify-between pb-2 border-b border-outline-variant/60">
           <div>
             <h5 className="font-heading text-sm font-semibold text-on-surface">Practice Session: Learner #4892</h5>
-            <p className="font-sans text-xs text-on-surface-variant">Speech Therapy â€” Morning Studio Group</p>
+            <p className="font-sans text-xs text-on-surface-variant">Speech Therapy — Morning Studio Group</p>
           </div>
           <div className="flex items-center gap-2">
             {showVitals && (
@@ -467,7 +467,7 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-6 py-4">
       {/* Trigger bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-xl bg-surface border border-outline-variant shadow-ambient">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-lg bg-surface border border-outline-variant shadow-ambient">
         <div className="flex flex-col gap-0.5 text-left">
           <p className="font-heading text-sm font-semibold text-on-surface">
             Quick Actions & Patient Search
@@ -484,7 +484,7 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
         >
           <Icon name="search" size="xs" aria-hidden="true" />
           <span>Open Menu</span>
-          <Kbd size="sm" className="ml-1.5">âŒ˜K</Kbd>
+          <Kbd size="sm">⌘K</Kbd>
         </Button>
       </div>
 
@@ -528,21 +528,21 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
                 <Icon name="add" size="sm" aria-hidden="true" />
                 <span>New Consultation</span>
                 <CommandShortcut>
-                  <Kbd size="sm">âŒ˜N</Kbd>
+                  <Kbd size="sm">⌘N</Kbd>
                 </CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => setLastAction('Record Audio Drill')}>
                 <Icon name="mic" size="sm" aria-hidden="true" />
                 <span>Record Audio Drill</span>
                 <CommandShortcut>
-                  <Kbd size="sm">âŒ˜R</Kbd>
+                  <Kbd size="sm">⌘R</Kbd>
                 </CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => setLastAction('Download Care Plan')}>
                 <Icon name="download" size="sm" aria-hidden="true" />
                 <span>Download Care Plan</span>
                 <CommandShortcut>
-                  <Kbd size="sm">âŒ˜D</Kbd>
+                  <Kbd size="sm">⌘D</Kbd>
                 </CommandShortcut>
               </CommandItem>
             </CommandGroup>
@@ -572,12 +572,12 @@ export const CommandDemo: React.FC<ComponentDemoProps> = () => {
             <CommandItem onSelect={() => handleSelect('New Consultation')}>
               <Icon name="add" size="sm" aria-hidden="true" />
               <span>New Consultation</span>
-              <CommandShortcut><Kbd size="sm">âŒ˜N</Kbd></CommandShortcut>
+              <CommandShortcut><Kbd size="sm">⌘N</Kbd></CommandShortcut>
             </CommandItem>
             <CommandItem onSelect={() => handleSelect('Record Audio Drill')}>
               <Icon name="mic" size="sm" aria-hidden="true" />
               <span>Record Audio Drill</span>
-              <CommandShortcut><Kbd size="sm">âŒ˜R</Kbd></CommandShortcut>
+              <CommandShortcut><Kbd size="sm">⌘R</Kbd></CommandShortcut>
             </CommandItem>
           </CommandGroup>
         </CommandList>

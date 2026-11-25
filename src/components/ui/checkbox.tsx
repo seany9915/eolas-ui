@@ -84,7 +84,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
         inputRef={inputRef}
         className={composeClassName(
           cn(
-            'relative size-5 rounded-sm border bg-surface transition-[background-color,border-color,box-shadow] flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
+            'relative size-5 rounded-sm border bg-surface transition-[background-color,border-color,box-shadow] motion-reduce:transition-none flex items-center justify-center shrink-0 cursor-pointer select-none after:absolute after:-inset-3 after:content-[\'\']',
             'data-[checked]:bg-primary data-[checked]:border-primary text-on-primary',
             'data-[indeterminate]:bg-primary data-[indeterminate]:border-primary text-on-primary',
             'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
@@ -102,7 +102,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           render={(indicatorProps, state) => (
             <span
               {...indicatorProps}
-              className="flex items-center justify-center transition-[transform,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:scale-75 data-[starting-style]:opacity-0"
+              className="flex items-center justify-center transition-[transform,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none data-[starting-style]:scale-75 data-[starting-style]:opacity-0"
             >
               <Icon
                 name={state.indeterminate ? 'remove' : 'check'}
@@ -141,7 +141,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
     return (
       <div
         className={cn(
-          'flex items-start gap-3 group rounded transition-colors',
+          'flex items-start gap-3 group rounded transition-colors motion-reduce:transition-none',
           compact
             ? 'p-1'
             : 'w-full min-h-[44px] py-2 px-3 hover:bg-state-hover',
@@ -150,7 +150,7 @@ const CheckboxComponent = React.forwardRef<HTMLElement, CheckboxProps>(
           !isClassNameFn ? className : undefined
         )}
       >
-        <div className="relative flex items-center justify-center min-w-[24px] h-6 mt-0.5">
+        <div className="relative flex items-center justify-center size-6 mt-0.5">
           {checkboxNode}
         </div>
         <div className="flex flex-col flex-1 min-w-0 break-words">

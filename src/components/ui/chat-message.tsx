@@ -23,6 +23,7 @@ import { BotAvatar, type BotAvatarType } from './bot-avatar';
 import { Trace } from './trace';
 import { Reasoning } from './reasoning';
 import { Tooltip } from './tooltip';
+import { announce } from '@/lib/announce';
 import { cn } from '@/lib/utils';
 
 import {
@@ -105,55 +106,68 @@ export interface ChatMessageHeaderProps extends React.HTMLAttributes<HTMLDivElem
   className?: string;
 }
 
-const ChatMessageHeader: React.FC<ChatMessageHeaderProps> = ({
-  role,
-  authorName,
-  timestamp,
-  botType,
-  children,
-  className,
-  ...props
-}) => {
-  const chatContext = useChatMessageContext();
-  const resolvedRole: ChatRole = role ?? (chatContext.inMessage ? chatContext.role : 'assistant');
-  const defaultName = resolvedRole === 'user' ? 'You' : resolvedRole === 'assistant' ? 'Assistant' : 'System';
-  const displayName = authorName || defaultName;
-  const showDefaultName = authorName !== undefined || children === undefined;
+const ChatMessageHeader = React.forwardRef<HTMLDivElement, ChatMessageHeaderProps>(
+  ({ role, authorName, timestamp, botType, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedRole: ChatRole = role ?? (chatContext.inMessage ? chatContext.role : 'assistant');
+    const defaultName = resolvedRole === 'user' ? 'You' : resolvedRole === 'assistant' ? 'Assistant' : 'System';
+    const displayName = authorName || defaultName;
+    const showDefaultName = authorName !== undefined || children === undefined;
 
-  const formattedTime = React.useMemo(() => {
-    if (!timestamp) return null;
-    if (typeof timestamp === 'string') return timestamp;
-    return new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(timestamp));
-  }, [timestamp]);
+    const { formattedTime, isoDateTime } = React.useMemo(() => {
+      if (timestamp === undefined || timestamp === null || timestamp === '') {
+        return { formattedTime: null, isoDateTime: undefined };
+      }
+      if (typeof timestamp === 'number') {
+        const date = new Date(timestamp);
+        if (Number.isNaN(date.getTime())) {
+          return { formattedTime: null, isoDateTime: undefined };
+        }
+        return {
+          formattedTime: new Intl.DateTimeFormat(undefined, {
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(date),
+          isoDateTime: date.toISOString(),
+        };
+      }
+      const parsed = Date.parse(timestamp);
+      return {
+        formattedTime: timestamp,
+        isoDateTime: Number.isNaN(parsed) ? undefined : new Date(parsed).toISOString(),
+      };
+    }, [timestamp]);
 
-  return (
-    <div
-      data-slot="message-header"
-      {...props}
-      className={cn(
-        'flex items-center gap-2 text-xs font-label text-on-surface-variant select-none',
-        resolvedRole === 'user' ? 'flex-row-reverse' : 'flex-row',
-        className
-      )}
-    >
-      {resolvedRole === 'assistant' && botType && (
-        <BotAvatar type={botType} size="sm" className="shrink-0" />
-      )}
-      {showDefaultName && (
-        <span className="font-semibold text-on-surface">{displayName}</span>
-      )}
-      {formattedTime && (
-        <span className="text-xs font-mono tabular-nums text-on-surface-variant/80">
-          {formattedTime}
-        </span>
-      )}
-      {children}
-    </div>
-  );
-};
+    return (
+      <div
+        ref={ref}
+        data-slot="message-header"
+        {...props}
+        className={cn(
+          'flex items-center gap-2 text-xs font-label text-on-surface-variant select-none',
+          resolvedRole === 'user' ? 'flex-row-reverse' : 'flex-row',
+          className
+        )}
+      >
+        {resolvedRole === 'assistant' && botType && (
+          <BotAvatar type={botType} size="sm" className="shrink-0" />
+        )}
+        {showDefaultName && (
+          <span className="font-semibold text-on-surface">{displayName}</span>
+        )}
+        {formattedTime && (
+          <time
+            dateTime={isoDateTime}
+            className="text-xs font-mono tabular-nums text-on-surface-variant/80"
+          >
+            {formattedTime}
+          </time>
+        )}
+        {children}
+      </div>
+    );
+  }
+);
 ChatMessageHeader.displayName = 'ChatMessage.Header';
 
 export type BubbleVariant =
@@ -229,7 +243,7 @@ const ChatMessageBubble = React.forwardRef<HTMLDivElement, ChatMessageBubbleProp
         data-align={resolvedAlign}
         data-variant={resolvedVariant}
         className={cn(
-          'relative flex flex-col min-w-0 p-4 text-base font-sans leading-relaxed transition-colors',
+          'relative flex flex-col min-w-0 p-4 text-base font-sans leading-relaxed transition-colors motion-reduce:transition-none',
           cornerClass,
           variantClass,
           className
@@ -278,7 +292,7 @@ const BubbleReactions = React.forwardRef<HTMLDivElement, BubbleReactionsProps>(
       data-align={align}
       className={cn(
         'flex flex-wrap items-center gap-1',
-        side === 'top' ? 'order-first mb-1.5 -mt-1' : 'order-last mt-1.5 -mb-1',
+        side === 'top' ? 'mb-1.5 -mt-1' : 'mt-1.5 -mb-1',
         align === 'end' ? 'justify-end' : 'justify-start',
         className
       )}
@@ -332,62 +346,65 @@ export interface ChatMessageAvatarProps
   className?: string;
 }
 
-const ChatMessageAvatar: React.FC<ChatMessageAvatarProps> = ({
-  role,
-  botType,
-  src,
-  name,
-  fallback,
-  children,
-  className,
-  ...props
-}) => {
-  const chatContext = useChatMessageContext();
-  const resolvedRole: ChatRole = role ?? (chatContext.inMessage ? chatContext.role : 'assistant');
+const ChatMessageAvatar = React.forwardRef<HTMLElement, ChatMessageAvatarProps>(
+  ({ role, botType, src, name, fallback, children, className, ...props }, ref) => {
+    const chatContext = useChatMessageContext();
+    const resolvedRole: ChatRole = role ?? (chatContext.inMessage ? chatContext.role : 'assistant');
 
-  if (children !== undefined) {
+    if (children !== undefined) {
+      return (
+        <div
+          ref={ref as React.Ref<HTMLDivElement>}
+          data-slot="message-avatar"
+          className={cn('shrink-0 flex items-start', className)}
+          {...(props as React.HTMLAttributes<HTMLDivElement>)}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    if (resolvedRole === 'assistant' && botType) {
+      return (
+        <BotAvatar
+          ref={ref as React.Ref<HTMLDivElement>}
+          type={botType}
+          size="sm"
+          className={className}
+        />
+      );
+    }
+
+    const initials = name
+      ? name
+          .split(' ')
+          .map((p) => p[0])
+          .slice(0, 2)
+          .join('')
+          .toUpperCase()
+      : resolvedRole === 'user'
+      ? 'U'
+      : 'AI';
+
     return (
-      <div
-        data-slot="message-avatar"
-        className={cn('shrink-0 flex items-start', className)}
-      >
-        {children}
-      </div>
+      <Avatar
+        ref={ref as React.Ref<HTMLSpanElement>}
+        src={src}
+        alt={name || (resolvedRole === 'user' ? 'User avatar' : 'Assistant avatar')}
+        fallback={fallback || initials}
+        size="sm"
+        className={cn(
+          'size-8 text-xs shrink-0 select-none border',
+          resolvedRole === 'user'
+            ? 'bg-primary text-on-primary border-primary'
+            : 'bg-surface-container-high text-on-surface border-outline-variant',
+          className
+        )}
+        {...props}
+      />
     );
   }
-
-  if (resolvedRole === 'assistant' && botType) {
-    return <BotAvatar type={botType} size="sm" className={className} />;
-  }
-
-  const initials = name
-    ? name
-        .split(' ')
-        .map((p) => p[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase()
-    : resolvedRole === 'user'
-    ? 'U'
-    : 'AI';
-
-  return (
-    <Avatar
-      src={src}
-      alt={name || (resolvedRole === 'user' ? 'User avatar' : 'Assistant avatar')}
-      fallback={fallback || initials}
-      size="sm"
-      className={cn(
-        'size-7 text-xs shrink-0 select-none border',
-        resolvedRole === 'user'
-          ? 'bg-primary text-on-primary border-primary'
-          : 'bg-surface-container-high text-on-surface border-outline-variant',
-        className
-      )}
-      {...props}
-    />
-  );
-};
+);
 ChatMessageAvatar.displayName = 'ChatMessage.Avatar';
 
 export interface ChatMessageGroupProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -438,22 +455,27 @@ export interface ChatMessageActionsProps extends React.HTMLAttributes<HTMLDivEle
   className?: string;
 }
 
-const ChatMessageActions: React.FC<ChatMessageActionsProps> = ({ children, className, ...props }) => {
-  return (
-    <div
-      {...props}
-      className={cn(
-        'flex flex-wrap items-center gap-1 mt-1 px-1 text-on-surface-variant',
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-};
+const ChatMessageActions = React.forwardRef<HTMLDivElement, ChatMessageActionsProps>(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="message-actions"
+        {...props}
+        className={cn(
+          'flex flex-wrap items-center gap-1 mt-1 px-1 text-on-surface-variant',
+          className
+        )}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 ChatMessageActions.displayName = 'ChatMessage.Actions';
 
-export interface ChatMessageProps {
+export interface ChatMessageProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   role?: ChatRole;
   align?: 'start' | 'end';
   content?: React.ReactNode;
@@ -503,16 +525,24 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
       onRetry,
       extraActions,
       className,
+      ...props
     },
     ref
   ) => {
     const role: ChatRole = roleProp ?? (align === 'end' ? 'user' : 'assistant');
     const resolvedVariant = variant ?? (role === 'assistant' ? 'ghost' : 'card');
     const [copied, setCopied] = React.useState(false);
+    const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    React.useEffect(() => {
+      return () => {
+        if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      };
+    }, []);
 
     if (children !== undefined && content === undefined) {
       return (
-        <ChatMessageRoot ref={ref} role={role} align={align} className={className}>
+        <ChatMessageRoot ref={ref} role={role} align={align} className={className} {...props}>
           {children}
         </ChatMessageRoot>
       );
@@ -529,11 +559,13 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
         return;
       }
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      announce('Copied to clipboard');
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
     };
 
     return (
-      <ChatMessageRoot ref={ref} role={role} align={align} className={className}>
+      <ChatMessageRoot ref={ref} role={role} align={align} className={className} {...props}>
         <ChatMessageHeader
           role={role}
           authorName={authorName}
@@ -578,7 +610,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                 <Trace variant="ghost">
                   <Trace.Collapsible defaultOpen={false}>
                     <Trace.CollapsibleTrigger>
-                      <Trace.Line status="complete">
+                      <Trace.Line render={<span />} status="complete">
                         <Trace.Icon name="checklist" status="complete" />
                         <Trace.Title>
                           Reasoning ({thoughtSteps!.length} step{thoughtSteps!.length > 1 ? 's' : ''})
@@ -665,14 +697,14 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             )}
 
             {onRetry && (
-              <Tooltip content="Regenerate response">
+              <Tooltip content="Retry generating response">
                 <Button
                   variant="text"
                   colorRole="neutral"
                   size="sm"
                   onClick={onRetry}
                   expandedTouchTarget
-                  aria-label="Regenerate response"
+                  aria-label="Retry generating response"
                   className="text-xs gap-1 h-8 min-h-[32px] px-2"
                 >
                   <Icon name="refresh" size="xs" aria-hidden="true" />

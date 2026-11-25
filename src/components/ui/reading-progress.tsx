@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Progress as BaseProgress } from '@base-ui/react/progress';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName } from '@/lib/utils';
 
 export type ReadingProgressColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error';
 export type ReadingProgressHeight = 'xs' | 'sm' | 'md';
@@ -37,7 +37,6 @@ export interface ReadingProgressProps
   announceProgress?: boolean;
   /** Accessible label for screen readers when announceProgress is enabled */
   label?: string;
-  className?: string;
   trackClassName?: string;
   indicatorClassName?: string;
 }
@@ -57,7 +56,7 @@ const heightClasses: Record<ReadingProgressHeight, string> = {
 };
 
 const positionClasses: Record<ReadingProgressPosition, string> = {
-  fixed: 'fixed top-0 left-0 right-0 z-50',
+  fixed: 'fixed top-0 inset-x-0 z-50',
   sticky: 'sticky top-0 z-40',
   relative: 'relative w-full',
 };
@@ -171,11 +170,32 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
       const customEl = targetRef?.current;
       const target: EventTarget = customEl || window;
       target.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener('resize', handleScroll, { passive: true });
+
+      const resizeObserver =
+        typeof ResizeObserver === 'function'
+          ? new ResizeObserver(() => handleScroll())
+          : undefined;
+      if (resizeObserver) {
+        if (customEl) {
+          resizeObserver.observe(customEl);
+          if (customEl.firstElementChild) {
+            resizeObserver.observe(customEl.firstElementChild);
+          }
+        } else {
+          resizeObserver.observe(document.documentElement);
+          if (document.body) {
+            resizeObserver.observe(document.body);
+          }
+        }
+      }
 
       return () => {
         cancelAnimationFrame(rafId);
         if (throttleTimerId !== undefined) clearTimeout(throttleTimerId);
         target.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
+        resizeObserver?.disconnect();
       };
     }, [targetRef, useCssDriven, announceProgress]);
 
@@ -193,9 +213,8 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         format={format}
         locale={locale}
         aria-hidden={resolvedAriaHidden}
-        className={cn(
-          positionClasses[position],
-          'w-full select-none pointer-events-none',
+        className={composeClassName(
+          cn(positionClasses[position], 'w-full select-none pointer-events-none'),
           className
         )}
         {...props}
@@ -210,7 +229,7 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         <div className={cn('w-full overflow-hidden', heightClasses[height], colors.track, trackClassName)}>
           <div
             className={cn(
-              'h-full origin-left rtl:origin-right',
+              'h-full origin-left rtl:origin-right forced-colors:bg-[Highlight]',
               colors.indicator,
               useCssDriven
                 ? 'reading-progress-root-driven'
@@ -231,7 +250,6 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         {showPercentage && (
           <div className="absolute top-3 end-4 pointer-events-auto">
             <span className="font-mono text-xs font-semibold tabular-nums text-on-surface bg-surface/90 backdrop-blur-sm border border-outline-variant px-2.5 py-1 rounded-full shadow-card flex items-center gap-1.5">
-              <span className={cn('size-1.5 rounded-full', colors.indicator)} aria-hidden="true" />
               <BaseProgress.Value>
                 {(formatted, val) => formatted || `${val ?? progress}%`}
               </BaseProgress.Value>

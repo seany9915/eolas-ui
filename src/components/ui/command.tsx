@@ -122,31 +122,73 @@ export interface CommandInputProps
 export const CommandInput = React.forwardRef<
   React.ComponentRef<typeof CommandPrimitive.Input>,
   CommandInputProps
->(({ className, icon, wrapperClassName, ...props }, ref) => (
-  <div
-    data-slot="command-input-wrapper"
-    className={cn('flex items-center gap-2 border-b border-outline-variant px-3 transition-colors duration-[var(--duration-quick)] focus-within:border-b-primary', wrapperClassName)}
-    cmdk-input-wrapper=""
-  >
-    {icon ?? (
-      <span
-        className="material-symbols-outlined shrink-0 text-lg text-on-surface-variant select-none"
-        aria-hidden="true"
+>(
+  (
+    {
+      className,
+      icon,
+      wrapperClassName,
+      enterKeyHint = 'search',
+      onCompositionEnd,
+      onKeyDownCapture,
+      ...props
+    },
+    ref
+  ) => {
+    const lastCompositionEndRef = React.useRef<number>(0);
+
+    const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+      lastCompositionEndRef.current = performance.now();
+      onCompositionEnd?.(e);
+    };
+
+    const handleKeyDownCapture = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      const isImeComposing =
+        e.nativeEvent.isComposing ||
+        e.keyCode === 229 ||
+        (lastCompositionEndRef.current > 0 &&
+          performance.now() - lastCompositionEndRef.current < 50);
+      if (e.key === 'Enter' && isImeComposing) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      onKeyDownCapture?.(e);
+    };
+
+    return (
+      <div
+        data-slot="command-input-wrapper"
+        className={cn(
+          'flex items-center gap-2 border-b border-outline-variant px-3 transition-colors duration-[var(--duration-quick)] motion-reduce:transition-none focus-within:border-b-primary',
+          wrapperClassName
+        )}
+        cmdk-input-wrapper=""
       >
-        search
-      </span>
-    )}
-    <CommandPrimitive.Input
-      ref={ref}
-      data-slot="command-input"
-      className={cn(
-        'flex h-11 w-full bg-transparent py-3 text-sm font-sans text-on-surface outline-none placeholder:text-on-surface-variant focus:outline-none focus-visible:outline-none focus:ring-0 border-none shadow-none disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
-      {...props}
-    />
-  </div>
-));
+        {icon ?? (
+          <span
+            className="material-symbols-outlined shrink-0 text-lg text-on-surface-variant select-none"
+            aria-hidden="true"
+          >
+            search
+          </span>
+        )}
+        <CommandPrimitive.Input
+          ref={ref}
+          data-slot="command-input"
+          enterKeyHint={enterKeyHint}
+          onCompositionEnd={handleCompositionEnd}
+          onKeyDownCapture={handleKeyDownCapture}
+          className={cn(
+            'flex h-11 w-full bg-transparent py-3 text-base sm:text-sm font-sans text-on-surface outline-none placeholder:text-on-surface-variant focus:outline-none focus-visible:outline-none focus:ring-0 border-none shadow-none disabled:cursor-not-allowed disabled:opacity-50',
+            className
+          )}
+          {...props}
+        />
+      </div>
+    );
+  }
+);
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
 export const CommandList = React.forwardRef<
@@ -218,7 +260,7 @@ export const CommandItem = React.forwardRef<
     ref={ref}
     data-slot="command-item"
     className={cn(
-      'relative flex cursor-pointer select-none items-center gap-2 rounded px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
+      'relative flex cursor-pointer select-none items-center gap-2 rounded px-3 py-2 min-h-[44px] text-sm font-sans outline-none transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] motion-reduce:transition-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary-container data-[selected=true]:text-on-primary-container aria-selected:bg-primary-container aria-selected:text-on-primary-container data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_.material-symbols-outlined]:pointer-events-none [&_.material-symbols-outlined]:text-lg [&_.material-symbols-outlined]:shrink-0',
       className
     )}
     {...props}

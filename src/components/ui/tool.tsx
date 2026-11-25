@@ -51,6 +51,7 @@ interface ToolLineRowProps {
   status: ToolStatus;
   duration?: string | number;
   iconName?: string;
+  inline?: boolean;
   children?: React.ReactNode;
 }
 
@@ -59,6 +60,7 @@ const ToolLineRow: React.FC<ToolLineRowProps> = ({
   status,
   duration,
   iconName,
+  inline = false,
   children,
 }) => {
   const traceStatus = toTraceStatus(status);
@@ -72,7 +74,7 @@ const ToolLineRow: React.FC<ToolLineRowProps> = ({
     status === 'calling' || status === 'error' ? undefined : iconName || 'terminal';
 
   return (
-    <TraceLine status={traceStatus}>
+    <TraceLine render={inline ? <span /> : undefined} status={traceStatus}>
       <TraceIcon name={resolvedIconName} status={traceStatus} />
       <TraceTitle className="font-mono" title={name}>
         {name}
@@ -80,7 +82,7 @@ const ToolLineRow: React.FC<ToolLineRowProps> = ({
       {formattedDuration && (
         <TraceDescription duration={formattedDuration} className="hidden @sm:flex" />
       )}
-      <div className="flex items-center gap-2 shrink-0">
+      <span className="flex items-center gap-2 shrink-0">
         {status === 'calling' ? (
           <Badge size="sm" variant="outline" colorRole="neutral" className="text-xs leading-none h-5 py-0.5 px-2">
             Running
@@ -95,7 +97,7 @@ const ToolLineRow: React.FC<ToolLineRowProps> = ({
           </Badge>
         )}
         {children}
-      </div>
+      </span>
     </TraceLine>
   );
 };
@@ -163,6 +165,7 @@ const ToolHeader = React.forwardRef<HTMLButtonElement, ToolHeaderProps>(
         {...props}
       >
         <ToolLineRow
+          inline
           name={name}
           status={status}
           duration={duration}
@@ -244,36 +247,32 @@ export interface ToolInputProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-const ToolInput: React.FC<ToolInputProps> = ({
-  input,
-  title = 'Arguments',
-  children,
-  className,
-  ...props
-}) => {
-  const codeString = React.useMemo(() => safeStringify(input), [input]);
+const ToolInput = React.forwardRef<HTMLDivElement, ToolInputProps>(
+  ({ input, title = 'Arguments', children, className, ...props }, ref) => {
+    const codeString = React.useMemo(() => safeStringify(input), [input]);
 
-  return (
-    <div className={cn('flex flex-col gap-1.5', className)} {...props}>
-      <span className="font-label text-xs font-semibold text-on-surface-variant">
-        {title}
-      </span>
-      {children ? (
-        children
-      ) : codeString ? (
-        <CodeBlock language="json" size="sm" variant="flush">
-          <CodeBlock.Header className="px-3 py-1 bg-surface-container-high/60">
-            <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">arguments.json</CodeBlock.Title>
-            <CodeBlock.CopyButton value={codeString} />
-          </CodeBlock.Header>
-          <CodeBlock.Content wrap className="max-h-64">
-            <code>{codeString}</code>
-          </CodeBlock.Content>
-        </CodeBlock>
-      ) : null}
-    </div>
-  );
-};
+    return (
+      <div ref={ref} className={cn('flex flex-col gap-1.5', className)} {...props}>
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          {title}
+        </span>
+        {children ? (
+          children
+        ) : codeString ? (
+          <CodeBlock language="json" size="sm" variant="flush">
+            <CodeBlock.Header className="px-3 py-1 bg-surface-container-high/60">
+              <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">arguments.json</CodeBlock.Title>
+              <CodeBlock.CopyButton value={codeString} />
+            </CodeBlock.Header>
+            <CodeBlock.Content wrap className="max-h-64">
+              <code>{codeString}</code>
+            </CodeBlock.Content>
+          </CodeBlock>
+        ) : null}
+      </div>
+    );
+  }
+);
 ToolInput.displayName = 'Tool.Input';
 
 export interface ToolOutputProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -283,36 +282,32 @@ export interface ToolOutputProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-const ToolOutput: React.FC<ToolOutputProps> = ({
-  output,
-  title = 'Result',
-  children,
-  className,
-  ...props
-}) => {
-  const codeString = React.useMemo(() => safeStringify(output), [output]);
+const ToolOutput = React.forwardRef<HTMLDivElement, ToolOutputProps>(
+  ({ output, title = 'Result', children, className, ...props }, ref) => {
+    const codeString = React.useMemo(() => safeStringify(output), [output]);
 
-  return (
-    <div className={cn('flex flex-col gap-1.5', className)} {...props}>
-      <span className="font-label text-xs font-semibold text-on-surface-variant">
-        {title}
-      </span>
-      {children ? (
-        children
-      ) : codeString ? (
-        <CodeBlock language="json" size="sm" variant="flush">
-          <CodeBlock.Header className="px-3 py-1 bg-surface-container-high/60">
-            <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">result.json</CodeBlock.Title>
-            <CodeBlock.CopyButton value={codeString} />
-          </CodeBlock.Header>
-          <CodeBlock.Content wrap className="max-h-64">
-            <code>{codeString}</code>
-          </CodeBlock.Content>
-        </CodeBlock>
-      ) : null}
-    </div>
-  );
-};
+    return (
+      <div ref={ref} className={cn('flex flex-col gap-1.5', className)} {...props}>
+        <span className="font-label text-xs font-semibold text-on-surface-variant">
+          {title}
+        </span>
+        {children ? (
+          children
+        ) : codeString ? (
+          <CodeBlock language="json" size="sm" variant="flush">
+            <CodeBlock.Header className="px-3 py-1 bg-surface-container-high/60">
+              <CodeBlock.Title className="text-xs font-mono text-on-surface-variant font-normal">result.json</CodeBlock.Title>
+              <CodeBlock.CopyButton value={codeString} />
+            </CodeBlock.Header>
+            <CodeBlock.Content wrap className="max-h-64">
+              <code>{codeString}</code>
+            </CodeBlock.Content>
+          </CodeBlock>
+        ) : null}
+      </div>
+    );
+  }
+);
 ToolOutput.displayName = 'Tool.Output';
 
 export interface ToolErrorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role'> {
@@ -322,24 +317,21 @@ export interface ToolErrorProps extends Omit<React.HTMLAttributes<HTMLDivElement
   className?: string;
 }
 
-const ToolError: React.FC<ToolErrorProps> = ({
-  error,
-  title = 'Error',
-  children,
-  className,
-  ...props
-}) => {
-  return (
-    <InlineAlert
-      role="error"
-      title={title}
-      className={cn('font-mono text-xs', className)}
-      {...props}
-    >
-      {children || error}
-    </InlineAlert>
-  );
-};
+const ToolError = React.forwardRef<HTMLDivElement, ToolErrorProps>(
+  ({ error, title = 'Error', children, className, ...props }, ref) => {
+    return (
+      <InlineAlert
+        ref={ref}
+        role="error"
+        title={title}
+        className={cn('font-mono text-xs', className)}
+        {...props}
+      >
+        {children || error}
+      </InlineAlert>
+    );
+  }
+);
 ToolError.displayName = 'Tool.Error';
 
 /* -------------------------------------------------------------------------------------------------

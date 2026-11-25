@@ -6,32 +6,22 @@ description: Project-level design system and WCAG 2.2 AA implementation rules fo
 
 # Design System & Accessibility Rules
 
-**Source of truth:** @/DESIGN.md — canonical over anything below for all token values, contrast pairings, motion scales, and component specs. Check [anti-patterns.md](../rules/anti-patterns.md) before finishing any UI task.
+**Source of truth:** [DESIGN.md](../../DESIGN.md). *(Oxlint already enforces raw colors, arbitrary values, `size-*`/`gap-*`/`h-dvh` shorthands, `dark:*`, `!`, `uppercase`, `transition-all`, spring easing, triple-tint, light-surface `*-tertiary`, icon margins/labels, and component restyle contracts.)* Check [anti-patterns.md](../rules/anti-patterns.md) before finishing.
 
-## Styling & Token Directives
-- **Tailwind v4:** Theme tokens live in `src/globals.css` under `@theme`. Never create a `tailwind.config.js`/`.ts` file or invent custom hex codes.
-- **Component library:** Base UI (`@base-ui/react`) — see [component-library.md](../rules/component-library.md).
-- **Shorthands:** Enforce `size-*` (`size-4`, `size-10`) over `w-* h-*` for square elements, and `truncate` over multi-class ellipsis strings.
-- **Flex/Grid gaps:** Never use `space-y-*` or `space-x-*`; use `flex flex-col gap-*` or `grid gap-*`.
-- **Icons:** Material Symbols only via `<Icon size="..." />` (`src/components/ui/icon.tsx`)—never add `mr-*`/`ml-*` inside buttons/flex containers (parent `gap-2` governs spacing). Use `aria-hidden="true"` on decorative icons, `aria-label`/`.sr-only` on standalone interactive icons, and `<Icon.Toggle />` / `<Icon.CrossFade />` for dual-state swaps.
-- **Centralized loading/shimmer:** Never write ad-hoc `@keyframes` or gradient sweeps; use `<ShimmerText />` for text/reasoning and `<Skeleton />` / `<Skeleton.Reveal />` for spatial placeholders.
-- **Descendant-scoped inverted surfaces:** For `<Card prominence="inverted">` (`bg-neutral`, Dark Stone `#2F2E2B`), scope child styling via `[data-surface="inverted"]` or `&:is([data-surface="inverted"] *)` rather than `.dark` (reserved for a potential app-wide dark theme).
-- **Container text split:** Callouts, `InlineAlert`s, and tinted cards keep `#1C1A18` (`text-on-surface`) body copy with no colored perimeter borders. Small `<Badge />` and `<Chip />` soft pills (`variant="soft"`) drop the border (`border-transparent`) and use their ultra-dark semantic `on-*-container` tokens (`#001849`, `#00201c`, `#261900`, `#450a0a`, `#331400`, `#1C1A18`).
+## Styling & Surface Judgment
+- **Tailwind v4:** Theme tokens live in `src/globals.css` (or `src/eolas-theme.css`). Never create `tailwind.config.js`/`.ts` or invent custom hex codes.
+- **Icons & Loading:** Material Symbols only via `<Icon size="..." />` (`src/components/ui/icon.tsx`); use `<Icon.Toggle />` / `<Icon.CrossFade />` for state swaps, `<ShimmerText />` for text shimmer, and `<Skeleton />` / `<Skeleton.Reveal />` for placeholders.
+- **Inverted Surfaces (`<Card prominence="inverted">`):** Scope styling via `[data-surface="inverted"]` / `inverted:*`, not `.dark`.
+- **Container Text Split:** Callouts, `InlineAlert`s, and tinted cards keep `#1C1A18` (`text-on-surface`) body copy without colored perimeter borders; `<Badge />`/`<Chip />` `variant="soft"` pills drop borders and use semantic `on-*-container` ink.
 
-## Layout, Typography & Responsive Architecture
-- **Units & scales:** Relative units (`rem`/`em`) only. Body copy/tips start at `1rem` (`body-md`); dense tables/sidebars/metadata use `body-sm`/`caption` (`0.875rem`). Headings use `font-heading` + `text-wrap: balance`; paragraphs/prose use `font-sans` + `text-wrap: pretty`.
-- **No uppercase or justified text:** Never apply `uppercase` (`text-transform: uppercase`) or `text-align: justify`.
-- **Data tables:** End-align (`text-end`) numeric columns (headers `<th>` and cells `<td>`) with `tabular-nums font-mono` (or `numeric: true` on `<Table />`).
-- **Control height synchrony:** The rendered outer bounding box (including wrapper border/padding) of sibling single-row and growable controls must match across the `sm` (44px) / `md` (48px) / `lg` (56px) tiers—see the canonical 3-family matrix in `DESIGN.md` (Elevation & Depth). Match `size` props across siblings in a row/grid, use `Select`/`Radio` instead of wrapping `ToggleGroup` labels in narrow columns, and keep `shrink-0 whitespace-nowrap` on row buttons.
-- **Concentric nested radii:** Tight `p-1` segmented shells (`ToggleGroup`) step down to `rounded-sm` (`4px`). Nested media/cards/panels follow $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ (clamping to `rounded` / `8px` rather than `0px`).
-- **Container vs. viewport queries:** Reusable components/blocks declare `@container` on a block-level wrapper with defined width (`w-full` or grid cell) and use `@sm:`/`@md:`/`@lg:` internally—never `<table>`, `<tr>`, or auto-sized flex items. Viewport breakpoints (`sm:`, `md:`, `lg:`) are reserved for page-level shells and the 12/8/4 grid in `DESIGN.md`.
+## Layout, Typography & Responsive Structure
+- **Units & Type:** Relative units (`rem`/`em`) only. Body copy starts at `1rem` (`body-md`); dense tables/sidebars/metadata use `body-sm`/`caption` (`0.875rem`). Headings use `font-heading` + `text-wrap: balance`; prose uses `font-sans` + `text-wrap: pretty`. Never justify text.
+- **Data Tables:** End-align (`text-end`) numeric `<th>`/`<td>` cells with `tabular-nums font-mono` (or `numeric: true` on `<Table />`).
+- **Control Height Synchrony:** Match outer bounding-box tiers (`sm` 44px, `md` 48px, `lg` 56px per `DESIGN.md` 3-family matrix) across row/grid siblings. Use `Select`/`Radio` when `ToggleGroup` labels would wrap in narrow columns, and keep `shrink-0 whitespace-nowrap` on row buttons.
+- **Concentric Radii:** Tight `p-1` segmented shells (`ToggleGroup`) step down to `rounded-sm` (`4px`); nested cards/media follow $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ (clamped to `rounded` / `8px`).
+- **Container vs. Viewport Queries:** Declare `@container` (`w-full` or grid cell — never `<table>`, `<tr>`, or auto-sized flex) + `@sm:`/`@md:`/`@lg:` inside reusable components/blocks; reserve viewport breakpoints (`sm:`, `md:`, `lg:`) for page shells and the 12/8/4 grid.
 
-## Strict Accessibility (WCAG 2.2 AA) & Copy
-- **Contrast & color independence:** Follow `DESIGN.md` pairings exactly; never convey state by color alone.
-- **Touch targets:** Minimum `24×24px` (WCAG 2.2 SC 2.5.8 AA) everywhere, targeting `44×44px` (`2.75rem`, SC 2.5.5 Enhanced) for standalone controls and dismiss buttons without creating horizontal hit-target overlap in dense grids (such as calendars or flush segmented controls).
-- **Forms, auth & landmarks:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>` (never placeholder-only labels), auto-focus the first `[aria-invalid="true"]` control on invalid submit (`<Form focusFirstInvalid />`), never block paste/autofill on auth inputs (WCAG 3.3.8), and keep `scroll-padding-block-start`/`end` for sticky bars (WCAG 2.4.11). Set explicit `enterKeyHint` (`send` on chat composers, `search` on search/filter inputs), `inputMode` (`numeric` on OTP/number fields), and `autoComplete` on specialized inputs. Use semantic landmarks (`<nav>`, `<header>`, `<main>`, `<aside>`, `<section>`).
-- **Sticky composers & keyboard shortcuts:** Docked bottom composers (`Chat`, `PromptInput`) targeting mobile webviews should account for virtual keyboards (`visualViewport` / safe bottom insets) so the input stays visible. Format `mod+` shortcuts per platform (`⌘` on macOS, `Ctrl` elsewhere) in `<Kbd>` and pair hotkey-bound triggers with `aria-keyshortcuts`.
-- **Focus & CSS content:** Never remove `:focus-visible` outlines. Never convey meaningful text solely via CSS `content` without alternative speech text (WCAG F87).
-- **Motion:** Use `DESIGN.md` durations/easings, explicit `transition-[...]` (never `transition-all`), and mandatory `motion-reduce:transition-none` / `prefers-reduced-motion`. Restrict `--blur-*` to micro-primitives (`<TextSwap />`, `<Skeleton.Reveal />`, `<Icon.Toggle />`), never large text overlays.
-- **Plain-English UI copy:** 1–2 simple nouns per label, user-outcome phrasing, zero dev/DB/CSS jargon.
-- **Verification:** When a live page is available, audit contrast, focus order, and tap targets with the `a11y-debugging` skill (Chrome DevTools MCP), and inspect desktop (initial + scrolled below-the-fold) and `390×844` mobile views for sticky-header separation and zero horizontal overflow.
+## WCAG 2.2 AA & Verification
+- **Contrast & Tap Targets:** Never convey state by color alone. Maintain `24×24px` minimum everywhere and `44×44px` (`2.75rem`) for standalone controls/dismiss actions without horizontal hit-target overlap in dense grids.
+- **Forms, Auth & Focus:** Wrap inputs in `<FieldGroup>` + `<Field>` + `<FieldLabel>` (never placeholder-only), auto-focus invalid controls (`<Form focusFirstInvalid />`), never block paste/autofill on auth inputs, keep `scroll-padding-block-start`/`end` for sticky bars, set `enterKeyHint`/`inputMode`/`autoComplete`, use semantic landmarks, never hide `:focus-visible` outlines, and never convey meaningful text solely via CSS `content`.
+- **Composers, Shortcuts & Motion:** Handle mobile virtual keyboards (`visualViewport`/safe bottom insets) on docked composers, format `mod+` per OS in `<Kbd>` with `aria-keyshortcuts`, restrict `--blur-*` to micro-primitives (`<TextSwap />`, `<Skeleton.Reveal />`, `<Icon.Toggle />`), include `motion-reduce:transition-none`, use plain everyday English UI copy, and verify live desktop (top + scrolled) and `390×844` mobile views with `a11y-debugging`.

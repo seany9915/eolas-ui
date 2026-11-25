@@ -118,7 +118,7 @@ export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps
         : '';
 
     return (
-      <div ref={setRef} className={cn('relative', className)} {...props}>
+      <div ref={setRef} data-slot="text-highlight" className={cn('relative', className)} {...props}>
         {/* Permanently mounted sr-only live region so assistive tech reliably announces updates */}
         {announceMatches && (
           <span data-text-highlight-status className="sr-only" aria-live="polite" aria-atomic="true">

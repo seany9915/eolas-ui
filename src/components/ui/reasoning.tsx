@@ -79,7 +79,7 @@ export const ReasoningTrigger = React.forwardRef<HTMLButtonElement, ReasoningTri
     return (
       <TraceCollapsibleTrigger ref={ref} className={className} {...props}>
         {children ?? (
-          <TraceLine status={computedStatus}>
+          <TraceLine render={<span />} status={computedStatus}>
             <TraceIcon
               name={isRunning ? 'progress_activity' : 'psychology'}
               status={isRunning ? 'running' : 'default'}
@@ -107,38 +107,52 @@ export const ReasoningTrigger = React.forwardRef<HTMLButtonElement, ReasoningTri
 );
 ReasoningTrigger.displayName = 'ReasoningTrigger';
 
-export interface ReasoningCopyButtonProps {
+export interface ReasoningCopyButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value'> {
   value: string;
   className?: string;
 }
 
-export const ReasoningCopyButton: React.FC<ReasoningCopyButtonProps> = ({ value, className }) => {
-  const [copied, setCopied] = React.useState(false);
-  const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(value);
-    } catch {
-      return;
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+export const ReasoningCopyButton = React.forwardRef<HTMLButtonElement, ReasoningCopyButtonProps>(
+  ({ value, className, onClick, ...props }, ref) => {
+    const [copied, setCopied] = React.useState(false);
+    const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  return (
-    <Button
-      variant="ghost"
-      colorRole="neutral"
-      size="sm"
-      onClick={handleCopy}
-      expandedTouchTarget
-      aria-label={copied ? 'Copied thoughts' : 'Copy thoughts'}
-      className={cn('size-7 min-h-[28px] min-w-[28px] p-0 text-on-surface-variant hover:text-on-surface', className)}
-    >
-      <Icon name={copied ? 'check' : 'content_copy'} size="xs" aria-hidden="true" />
-    </Button>
-  );
-};
+    React.useEffect(() => {
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
+    }, []);
+
+    const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      onClick?.(e);
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch {
+        return;
+      }
+      setCopied(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+      <Button
+        ref={ref}
+        variant="ghost"
+        colorRole="neutral"
+        size="sm"
+        onClick={handleCopy}
+        expandedTouchTarget
+        aria-label={copied ? 'Copied thoughts' : 'Copy thoughts'}
+        className={cn('size-7 min-h-[28px] min-w-[28px] p-0 text-on-surface-variant hover:text-on-surface', className)}
+        {...props}
+      >
+        <Icon name={copied ? 'check' : 'content_copy'} size="xs" aria-hidden="true" />
+      </Button>
+    );
+  }
+);
 ReasoningCopyButton.displayName = 'ReasoningCopyButton';
 
 /* -------------------------------------------------------------------------------------------------
@@ -167,7 +181,7 @@ ReasoningContent.displayName = 'ReasoningContent';
 /* -------------------------------------------------------------------------------------------------
  * Reasoning (Root Container)
  * -----------------------------------------------------------------------------------------------*/
-export interface ReasoningProps {
+export interface ReasoningProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   isStreaming?: boolean;
   status?: TraceStatus;
   duration?: string | number;
@@ -193,6 +207,7 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
       children,
       variant,
       className,
+      ...props
     },
     ref
   ) => {
@@ -244,7 +259,7 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
           formattedDuration,
         }}
       >
-        <div ref={ref} data-slot="reasoning" className={cn('w-full', className)}>
+        <div ref={ref} data-slot="reasoning" className={cn('w-full', className)} {...props}>
           <Trace variant={resolvedVariant}>
             <TraceCollapsible
               open={open ?? internalOpen}

@@ -32,7 +32,7 @@
       "name": "announce",
       "type": "registry:lib",
       "title": "Announce",
-      "description": "Imperative screen-reader live-region announcer.",
+      "description": "Imperative ARIA live-region announcer utility and component for conveying dynamic status updates to screen readers.",
       "categories": [
         "system"
       ],
@@ -80,7 +80,7 @@
       "name": "format-duration",
       "type": "registry:lib",
       "title": "Format Duration",
-      "description": "Duration Formatting Utility and Hook",
+      "description": "Locale-safe duration formatter and hook converting seconds or milliseconds into concise human-readable clinical labels.",
       "categories": [
         "system"
       ],
@@ -96,7 +96,7 @@
       "name": "sanitize",
       "type": "registry:lib",
       "title": "Sanitize",
-      "description": "Untrusted HTML Sanitizer Utility & React Component.",
+      "description": "DOMParser-based HTML sanitizer utility and React component blocking unsafe scripts, handlers, and dangerous URLs.",
       "categories": [
         "system"
       ],
@@ -112,7 +112,7 @@
       "name": "scheduler",
       "type": "registry:lib",
       "title": "Scheduler",
-      "description": "Cooperative Task Scheduling & Yielding Utilities.",
+      "description": "Cooperative task scheduling and yielding helpers keeping main-thread interactions responsive during heavy updates.",
       "categories": [
         "system"
       ],
@@ -128,7 +128,7 @@
       "name": "scroll-completion",
       "type": "registry:lib",
       "title": "Scroll Completion",
-      "description": "Programmatic scroll completion utilities.",
+      "description": "Programmatic smooth-scroll helper resolving cleanly when animated scrolling reaches its target or is cancelled.",
       "categories": [
         "system"
       ],
@@ -160,7 +160,7 @@
       "name": "use-text-highlight",
       "type": "registry:lib",
       "title": "Use Text Highlight",
-      "description": "useTextHighlight Hook",
+      "description": "React hook splitting strings into highlighted and plain segments for live search filtering.",
       "categories": [
         "system"
       ],
@@ -176,7 +176,7 @@
       "name": "use-web-otp",
       "type": "registry:lib",
       "title": "Use Web OTP",
-      "description": "WebOTP API auto-extraction hook.",
+      "description": "React hook subscribing to navigator.credentials WebOTP one-time verification codes with abort cleanup.",
       "categories": [
         "system"
       ],
@@ -192,7 +192,7 @@
       "name": "view-transitions",
       "type": "registry:lib",
       "title": "View Transitions",
-      "description": "View Transitions API React hook and utility.",
+      "description": "React hook and helper wrapping document.startViewTransition with graceful reduced-motion and fallback handling.",
       "categories": [
         "system"
       ],

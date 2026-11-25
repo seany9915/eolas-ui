@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Select as BaseSelect } from '@base-ui/react/select';
+import { Icon } from './icon';
 import { cn, composeClassName } from '@/lib/utils';
 
 export interface SelectOption {
@@ -260,7 +261,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           </BaseSelect.Label>
         )}
         {description && (
-          <p id={descriptionId} className="text-xs text-on-surface-variant font-sans">
+          <p id={descriptionId} className="text-sm text-on-surface-variant font-sans">
             {description}
           </p>
         )}
@@ -270,29 +271,28 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           id={selectId}
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
-          aria-invalid={!!error}
+          aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover transition-colors cursor-pointer',
-            'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
-            'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
-            size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
+            'inline-flex items-center justify-between gap-2 w-full rounded border bg-surface text-on-surface font-sans text-sm hover:bg-state-hover transition-colors motion-reduce:transition-none cursor-pointer',
+            error
+              ? 'border-error focus-visible:border-error focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-error data-[popup-open]:border-error data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-error'
+              : 'border-outline hover:border-on-surface-variant/80 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
+            size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-base sm:text-sm',
             size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
             size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-            'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
-            error && 'border-error focus-visible:outline-error'
+            'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed'
           )}
         >
           <BaseSelect.Value data-slot="select-value" placeholder={placeholder} className="truncate font-sans text-sm" />
           <BaseSelect.Icon data-slot="select-icon" className="shrink-0 text-on-surface-variant">
-            <span className="material-symbols-outlined text-lg" aria-hidden="true">
-              unfold_more
-            </span>
+            <Icon name="unfold_more" size="sm" aria-hidden="true" />
           </BaseSelect.Icon>
         </BaseSelect.Trigger>
         {error && (
-          <p id={errorId} className="text-xs text-error font-sans font-medium">
-            {error}
+          <p id={errorId} className="flex items-center gap-1.5 text-sm text-error font-sans font-semibold">
+            <Icon name="error" size="xs" className="shrink-0" aria-hidden="true" />
+            <span>{error}</span>
           </p>
         )}
         <BaseSelect.Portal container={container}>
@@ -335,7 +335,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
                   groups.map((group) => (
                     <BaseSelect.Group key={group.label} data-slot="select-group" className="flex flex-col gap-1 py-1">
                       {group.label && (
-                        <BaseSelect.GroupLabel data-slot="select-label" className="sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none">
+                        <BaseSelect.GroupLabel data-slot="select-group-label" className="sticky top-0 bg-surface/95 backdrop-blur-sm z-10 px-3 py-1 font-label text-xs font-semibold text-on-surface-variant border-b border-outline-variant/40 select-none">
                           {group.label}
                         </BaseSelect.GroupLabel>
                       )}
@@ -351,27 +351,33 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
                     </BaseSelect.Group>
                   ))
                 ) : options ? (
-                  options.map((opt) => (
-                    <SelectItem
-                      key={opt.value}
-                      value={opt.value}
-                      disabled={opt.disabled}
-                    >
-                      {opt.label}
-                    </SelectItem>
-                  ))
+                  <BaseSelect.Group data-slot="select-group" className="flex flex-col gap-1">
+                    {options.map((opt) => (
+                      <SelectItem
+                        key={opt.value}
+                        value={opt.value}
+                        disabled={opt.disabled}
+                      >
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </BaseSelect.Group>
                 ) : Array.isArray(items) ? (
-                  (items as Array<{ value: Value; label?: React.ReactNode; disabled?: boolean }>).map((item) => (
-                    <SelectItem key={String(item.value)} value={item.value} disabled={item.disabled}>
-                      {item.label ?? String(item.value)}
-                    </SelectItem>
-                  ))
+                  <BaseSelect.Group data-slot="select-group" className="flex flex-col gap-1">
+                    {(items as Array<{ value: Value; label?: React.ReactNode; disabled?: boolean }>).map((item) => (
+                      <SelectItem key={String(item.value)} value={item.value} disabled={item.disabled}>
+                        {item.label ?? String(item.value)}
+                      </SelectItem>
+                    ))}
+                  </BaseSelect.Group>
                 ) : items ? (
-                  Object.entries(items as Record<string, React.ReactNode>).map(([itemValue, itemLabel]) => (
-                    <SelectItem key={itemValue} value={itemValue as Value}>
-                      {itemLabel}
-                    </SelectItem>
-                  ))
+                  <BaseSelect.Group data-slot="select-group" className="flex flex-col gap-1">
+                    {Object.entries(items as Record<string, React.ReactNode>).map(([itemValue, itemLabel]) => (
+                      <SelectItem key={itemValue} value={itemValue as Value}>
+                        {itemLabel}
+                      </SelectItem>
+                    ))}
+                  </BaseSelect.Group>
                 ) : null}
               </BaseSelect.List>
               {showScrollArrows && <SelectScrollDownArrow />}
@@ -434,14 +440,14 @@ export const SelectTrigger = React.forwardRef<
       ref={mergedRef}
       className={composeClassName(
         [
-          'inline-flex items-center justify-between gap-2 w-full rounded border border-outline bg-surface text-on-surface font-sans text-sm hover:border-on-surface-variant/80 hover:bg-state-hover transition-colors cursor-pointer',
-          'data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
-          size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-xs',
+          'inline-flex items-center justify-between gap-2 w-full rounded border bg-surface text-on-surface font-sans text-sm hover:bg-state-hover transition-colors motion-reduce:transition-none cursor-pointer',
+          error
+            ? 'border-error focus-visible:border-error focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-error data-[popup-open]:border-error data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-error'
+            : 'border-outline hover:border-on-surface-variant/80 focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary data-[popup-open]:border-primary data-[popup-open]:outline-2 data-[popup-open]:-outline-offset-1 data-[popup-open]:outline-primary',
+          size === 'sm' && 'h-11 px-3.5 min-h-[44px] text-base sm:text-sm',
           size === 'md' && 'h-12 px-4 min-h-[48px] text-sm',
           size === 'lg' && 'h-14 px-5 min-h-[56px] text-base',
-          'focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
           'data-[disabled]:bg-surface-container-low data-[disabled]:border-outline-variant data-[disabled]:text-on-surface-variant/60 data-[disabled]:cursor-not-allowed',
-          error && 'border-error focus-visible:outline-error',
         ],
         className
       )}
@@ -450,11 +456,7 @@ export const SelectTrigger = React.forwardRef<
       {children}
       {showIcon && !hasIconChild && (
         <BaseSelect.Icon data-slot="select-icon" className="shrink-0 text-on-surface-variant">
-          {icon ?? (
-            <span className="material-symbols-outlined text-lg" aria-hidden="true">
-              unfold_more
-            </span>
-          )}
+          {icon ?? <Icon name="unfold_more" size="sm" aria-hidden="true" />}
         </BaseSelect.Icon>
       )}
     </BaseSelect.Trigger>
@@ -656,7 +658,7 @@ export const SelectItem = React.forwardRef<
     data-slot="select-item"
     className={composeClassName(
       [
-        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors',
+        'relative flex items-center justify-between px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium text-on-surface cursor-pointer select-none outline-none transition-colors motion-reduce:transition-none',
         'hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface',
         'data-[selected]:bg-surface-container-low data-[selected]:text-primary data-[selected]:font-semibold',
         'data-[selected]:hover:bg-primary-container data-[selected]:hover:text-on-primary-container data-[selected]:data-[highlighted]:bg-primary-container data-[selected]:data-[highlighted]:text-on-primary-container',
@@ -670,11 +672,7 @@ export const SelectItem = React.forwardRef<
     <BaseSelect.ItemText data-slot="select-item-text" className="truncate">{children}</BaseSelect.ItemText>
     {showIndicator && (
       <BaseSelect.ItemIndicator data-slot="select-item-indicator" className="shrink-0 text-primary flex items-center justify-center">
-        {indicator ?? (
-          <span className="material-symbols-outlined text-sm font-bold" aria-hidden="true">
-            check
-          </span>
-        )}
+        {indicator ?? <Icon name="check" size="xs" aria-hidden="true" />}
       </BaseSelect.ItemIndicator>
     )}
   </BaseSelect.Item>
@@ -723,9 +721,9 @@ export const SelectGroupLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <BaseSelect.GroupLabel
     ref={ref}
-    data-slot="select-label"
+    data-slot="select-group-label"
     className={composeClassName(
-      'px-3 py-1 font-label text-xs font-bold text-on-surface-variant border-b border-outline-variant/40 select-none sticky top-0 bg-surface/95 backdrop-blur-sm z-10',
+      'px-3 py-1 font-label text-xs font-semibold text-on-surface-variant border-b border-outline-variant/40 select-none sticky top-0 bg-surface/95 backdrop-blur-sm z-10',
       className
     )}
     {...props}
@@ -786,12 +784,12 @@ export const SelectScrollUpArrow = React.forwardRef<
     ref={ref}
     data-slot="select-scroll-up-button"
     className={composeClassName(
-      'top-0 left-0 right-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-b border-outline-variant/30',
+      'top-0 inset-x-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-b border-outline-variant/30',
       className
     )}
     {...props}
   >
-    {children ?? <span className="material-symbols-outlined text-sm" aria-hidden="true">keyboard_arrow_up</span>}
+    {children ?? <Icon name="keyboard_arrow_up" size="xs" aria-hidden="true" />}
   </BaseSelect.ScrollUpArrow>
 ));
 SelectScrollUpArrow.displayName = 'SelectScrollUpArrow';
@@ -804,12 +802,12 @@ export const SelectScrollDownArrow = React.forwardRef<
     ref={ref}
     data-slot="select-scroll-down-button"
     className={composeClassName(
-      'bottom-0 left-0 right-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-t border-outline-variant/30',
+      'bottom-0 inset-x-0 z-10 flex h-6 w-full items-center justify-center cursor-default text-on-surface-variant bg-surface/95 backdrop-blur-xs select-none border-t border-outline-variant/30',
       className
     )}
     {...props}
   >
-    {children ?? <span className="material-symbols-outlined text-sm" aria-hidden="true">keyboard_arrow_down</span>}
+    {children ?? <Icon name="keyboard_arrow_down" size="xs" aria-hidden="true" />}
   </BaseSelect.ScrollDownArrow>
 ));
 SelectScrollDownArrow.displayName = 'SelectScrollDownArrow';
@@ -824,11 +822,7 @@ export const SelectIcon = React.forwardRef<
     className={composeClassName('shrink-0 text-on-surface-variant', className)}
     {...props}
   >
-    {children ?? (
-      <span className="material-symbols-outlined text-lg" aria-hidden="true">
-        unfold_more
-      </span>
-    )}
+    {children ?? <Icon name="unfold_more" size="sm" aria-hidden="true" />}
   </BaseSelect.Icon>
 ));
 SelectIcon.displayName = 'SelectIcon';

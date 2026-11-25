@@ -7,6 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
 
 const IGNORED_PREFIXES = [
@@ -52,28 +53,30 @@ function main(input) {
 
   const fallbackCwd = path.basename(process.cwd()) === '.agents' ? path.resolve(process.cwd(), '..') : process.cwd();
   const workspaceRoot = (input.workspacePaths && input.workspacePaths[0]) || input.cwd || fallbackCwd;
+  const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
 
   const oxlintRc = path.join(workspaceRoot, '.oxlintrc.json');
-  const oxlintScript = path.join(workspaceRoot, 'node_modules', 'oxlint', 'bin', 'oxlint');
-  const oxlintBin = path.join(
-    workspaceRoot,
-    'node_modules',
-    '.bin',
-    process.platform === 'win32' ? 'oxlint.cmd' : 'oxlint'
-  );
-
   if (!fs.existsSync(oxlintRc)) {
     return respond({});
   }
-  const hasScript = fs.existsSync(oxlintScript);
-  const hasBin = fs.existsSync(oxlintBin);
-  if (!hasScript && !hasBin) {
+
+  const topRes = spawnSync('git', ['rev-parse', '--show-toplevel'], {
+    cwd: workspaceRoot,
+    encoding: 'utf8',
+    timeout: 5000,
+  });
+  const hasGitRepo = !topRes.error && topRes.status === 0 && Boolean(topRes.stdout?.trim());
+  const gitTopLevel = hasGitRepo ? safeRealpath(topRes.stdout.trim()) : null;
+
+  const resolvedOxlint = resolveOxlintBinary(resolvedWorkspaceRoot, gitTopLevel);
+  if (!resolvedOxlint) {
     return respond({});
   }
 
   const ignoredPrefixes = [...IGNORED_PREFIXES];
   try {
-    const oxlintCfg = JSON.parse(fs.readFileSync(oxlintRc, 'utf8'));
+    const rawRc = fs.readFileSync(oxlintRc, 'utf8');
+    const oxlintCfg = JSON.parse(stripJsonCommentsAndTrailingCommas(rawRc));
     if (Array.isArray(oxlintCfg?.ignorePatterns)) {
       for (const pattern of oxlintCfg.ignorePatterns) {
         if (typeof pattern !== 'string') continue;
@@ -96,7 +99,6 @@ function main(input) {
   const seen = new Set();
 
   if (scopedEnv && scopedEnv.trim()) {
-    const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
     for (const entry of scopedEnv.split(/[,\r\n]+/)) {
       const rawFile = entry.trim();
       if (!rawFile) continue;
@@ -122,18 +124,9 @@ function main(input) {
       }
     }
   } else {
-    const topRes = spawnSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd: workspaceRoot,
-      encoding: 'utf8',
-      timeout: 5000,
-    });
-
-    if (topRes.error || topRes.status !== 0 || !topRes.stdout) {
+    if (!gitTopLevel) {
       return respond({});
     }
-
-    const gitTopLevel = safeRealpath(topRes.stdout.trim());
-    const resolvedWorkspaceRoot = safeRealpath(workspaceRoot);
 
     const gitRes = spawnSync('git', ['status', '--porcelain', '-uall', '-z'], {
       cwd: workspaceRoot,
@@ -185,16 +178,16 @@ function main(input) {
     return respond({});
   }
 
-  const lintRes = hasScript
-    ? spawnSync(process.execPath, [oxlintScript, ...filesToLint], {
+  const lintRes = resolvedOxlint.isJsScript
+    ? spawnSync(process.execPath, [resolvedOxlint.binPath, ...filesToLint], {
         cwd: workspaceRoot,
         encoding: 'utf8',
         timeout: 20000,
       })
-    : spawnSync(oxlintBin, filesToLint, {
+    : spawnSync(resolvedOxlint.binPath, filesToLint, {
         cwd: workspaceRoot,
         encoding: 'utf8',
-        shell: process.platform === 'win32',
+        shell: false,
         timeout: 20000,
       });
 
@@ -205,7 +198,7 @@ function main(input) {
 
   if (lintRes.status !== 0) {
     const combined = [lintRes.stdout, lintRes.stderr].filter(Boolean).join('\n').trim();
-    if (/No files found to lint|Finished in \d+m?s on 0 files/i.test(combined)) {
+    if (/No files found to lint|Finished in \d+(?:\.\d+)?(?:ms|s) on 0 files/i.test(combined)) {
       return respond({});
     }
     const trimmed = combined.length > 3000 ? `${combined.slice(0, 3000)}\n... (truncated)` : combined;
@@ -216,6 +209,136 @@ function main(input) {
   }
 
   return respond({});
+}
+
+function isWithinPath(childPath, parentPath) {
+  const rel = path.relative(parentPath, childPath);
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+function isNodeJsScript(filePath) {
+  if (/\.(?:cmd|bat|ps1|exe|sh)$/i.test(filePath)) return false;
+  if (/\.(?:js|mjs|cjs)$/i.test(filePath)) return true;
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buf = Buffer.alloc(512);
+    const bytesRead = fs.readSync(fd, buf, 0, 512, 0);
+    fs.closeSync(fd);
+    if (bytesRead === 0) return false;
+    const slice = buf.subarray(0, bytesRead);
+    if (slice.includes(0)) return false;
+    if (slice[0] === 0x4d && slice[1] === 0x5a) return false; // PE MZ
+    if (slice[0] === 0x7f && slice[1] === 0x45 && slice[2] === 0x4c && slice[3] === 0x46) return false; // ELF
+    const text = slice.toString('utf8');
+    if (text.startsWith('#!')) {
+      const firstLine = text.split(/\r?\n/, 1)[0];
+      return /\b(?:node|nodejs)\b/i.test(firstLine);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function resolveOxlintBinary(resolvedWorkspaceRoot, gitTopLevel) {
+  const stopBound = gitTopLevel && isWithinPath(resolvedWorkspaceRoot, gitTopLevel)
+    ? gitTopLevel
+    : path.parse(resolvedWorkspaceRoot).root;
+
+  let curr = resolvedWorkspaceRoot;
+  while (curr) {
+    // 1. Package manager resolution (supports npm, hoisted monorepos, pnpm, Yarn PnP)
+    try {
+      const req = createRequire(path.join(curr, 'package.json'));
+      const pkgJsonPath = req.resolve('oxlint/package.json');
+      if (!gitTopLevel || isWithinPath(path.resolve(pkgJsonPath), stopBound)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+        const binRel = typeof pkg.bin === 'string' ? pkg.bin : pkg.bin?.oxlint || 'bin/oxlint';
+        const binPath = path.resolve(path.dirname(pkgJsonPath), binRel);
+        if (fs.existsSync(binPath)) {
+          return { binPath, isJsScript: isNodeJsScript(binPath) };
+        }
+      }
+    } catch {
+      // Fall through to direct node_modules lookup
+    }
+
+    // 2. Direct node_modules lookup (handles shims or packages without ./package.json export)
+    const directPkgJson = path.join(curr, 'node_modules', 'oxlint', 'package.json');
+    if (fs.existsSync(directPkgJson)) {
+      try {
+        const pkg = JSON.parse(fs.readFileSync(directPkgJson, 'utf8'));
+        const binRel = typeof pkg.bin === 'string' ? pkg.bin : pkg.bin?.oxlint || 'bin/oxlint';
+        const binPath = path.resolve(path.dirname(directPkgJson), binRel);
+        if (fs.existsSync(binPath)) {
+          return { binPath, isJsScript: isNodeJsScript(binPath) };
+        }
+      } catch {
+        // Ignore malformed package.json
+      }
+    }
+
+    const directBinScript = path.join(curr, 'node_modules', 'oxlint', 'bin', 'oxlint');
+    if (fs.existsSync(directBinScript)) {
+      return { binPath: directBinScript, isJsScript: isNodeJsScript(directBinScript) };
+    }
+
+    const dotBin = path.join(
+      curr,
+      'node_modules',
+      '.bin',
+      process.platform === 'win32' ? 'oxlint.exe' : 'oxlint'
+    );
+    if (fs.existsSync(dotBin)) {
+      return { binPath: dotBin, isJsScript: isNodeJsScript(dotBin) };
+    }
+
+    if (curr === stopBound) break;
+    const parent = path.dirname(curr);
+    if (parent === curr) break;
+    curr = parent;
+  }
+
+  return null;
+}
+
+function stripJsonCommentsAndTrailingCommas(text) {
+  let out = '';
+  let inString = false;
+  let quote = '';
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (inString) {
+      out += ch;
+      if (ch === '\\' && i + 1 < text.length) {
+        out += next;
+        i += 1;
+      } else if (ch === quote) {
+        inString = false;
+      }
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      inString = true;
+      quote = ch;
+      out += ch;
+      continue;
+    }
+    if (ch === '/' && next === '/') {
+      while (i + 1 < text.length && text[i + 1] !== '\n') i += 1;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      const closeIdx = text.indexOf('*/', i + 2);
+      if (closeIdx !== -1) {
+        i = closeIdx + 1;
+        continue;
+      }
+    }
+    out += ch;
+  }
+  return out.replace(/,\s*([}\]])/g, '$1');
 }
 
 function safeRealpath(targetPath) {

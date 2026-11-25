@@ -5,15 +5,16 @@
       "name": "app-shell",
       "type": "registry:block",
       "title": "App Shell",
-      "description": "AppShell composite block.",
+      "description": "Controlled responsive workspace shell composing collapsible sidebar navigation, mobile drawer, header bar, and main viewport.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/sidebar",
         "seany9915/eolas-ui/navigation-bar",
-        "seany9915/eolas-ui/icon"
+        "seany9915/eolas-ui/button",
+        "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -33,31 +34,6 @@
           "Zero direct `<button>` tags outside primitives."
         ]
       }
-    },
-    {
-      "name": "approval-card",
-      "type": "registry:block",
-      "title": "Approval Card",
-      "description": "Deprecated block. Use Confirmation for [Approve] / [Deny] AI tool approval gates, or Questionnaire for structured choice and clarification prompts.",
-      "categories": [
-        "blocks"
-      ],
-      "registryDependencies": [
-        "seany9915/eolas-ui/utils",
-        "seany9915/eolas-ui/button",
-        "seany9915/eolas-ui/card",
-        "seany9915/eolas-ui/field",
-        "seany9915/eolas-ui/icon",
-        "seany9915/eolas-ui/radio",
-        "seany9915/eolas-ui/input"
-      ],
-      "files": [
-        {
-          "path": "approval-card.tsx",
-          "type": "registry:block",
-          "target": "@components/blocks/approval-card.tsx"
-        }
-      ]
     },
     {
       "name": "area-chart-card",
@@ -116,12 +92,12 @@
         "blocks"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/card",
         "seany9915/eolas-ui/badge",
         "seany9915/eolas-ui/skeleton",
         "seany9915/eolas-ui/empty",
-        "seany9915/eolas-ui/icon"
+        "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -135,18 +111,18 @@
       "name": "chat",
       "type": "registry:block",
       "title": "Chat",
-      "description": "Chat composite block.",
+      "description": "Controlled clinical AI conversation block uniting MessageScroller, ChatMessage, Sources, Trace, Confirmation, and PromptInput.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/message-scroller",
         "seany9915/eolas-ui/chat-message",
         "seany9915/eolas-ui/reasoning",
         "seany9915/eolas-ui/prompt-input",
         "seany9915/eolas-ui/suggestion-chips",
-        "seany9915/eolas-ui/empty"
+        "seany9915/eolas-ui/empty",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -170,7 +146,7 @@
       "name": "data-table",
       "type": "registry:block",
       "title": "Data Table",
-      "description": "DataTable composite block.",
+      "description": "Controlled sortable, filterable, and selectable data table block powered by @tanstack/react-table with pagination and bulk actions.",
       "categories": [
         "blocks"
       ],
@@ -208,27 +184,6 @@
       }
     },
     {
-      "name": "delete-confirmation-dialog",
-      "type": "registry:block",
-      "title": "Delete Confirmation Dialog",
-      "description": "Deprecated wrapper block. Use AlertDialog directly with controlled open state and closeOnConfirm={false} for async destructive confirmations.",
-      "categories": [
-        "blocks"
-      ],
-      "registryDependencies": [
-        "seany9915/eolas-ui/alert-dialog",
-        "seany9915/eolas-ui/button",
-        "seany9915/eolas-ui/icon"
-      ],
-      "files": [
-        {
-          "path": "delete-confirmation-dialog.tsx",
-          "type": "registry:block",
-          "target": "@components/blocks/delete-confirmation-dialog.tsx"
-        }
-      ]
-    },
-    {
       "name": "filter-toolbar",
       "type": "registry:block",
       "title": "Filter Toolbar",
@@ -237,13 +192,13 @@
         "blocks"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/field",
         "seany9915/eolas-ui/input",
         "seany9915/eolas-ui/select",
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/chip",
-        "seany9915/eolas-ui/icon"
+        "seany9915/eolas-ui/icon",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -281,12 +236,11 @@
       "name": "list-detail-block",
       "type": "registry:block",
       "title": "List Detail Block",
-      "description": "ListDetailBlock composite block.",
+      "description": "Controlled two-pane master-detail workspace adapting between side-by-side split panes and mobile drill-down navigation.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/field",
         "seany9915/eolas-ui/input-group",
@@ -294,7 +248,8 @@
         "seany9915/eolas-ui/badge",
         "seany9915/eolas-ui/icon",
         "seany9915/eolas-ui/empty",
-        "seany9915/eolas-ui/skeleton"
+        "seany9915/eolas-ui/skeleton",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -317,28 +272,6 @@
       }
     },
     {
-      "name": "metric-card",
-      "type": "registry:block",
-      "title": "Metric Card",
-      "description": "Deprecated block. Compose Card with a divided stat strip, Item.Group, RadialChartCard, or numeric Table directly instead of metric card grids.",
-      "categories": [
-        "blocks"
-      ],
-      "registryDependencies": [
-        "seany9915/eolas-ui/utils",
-        "seany9915/eolas-ui/card",
-        "seany9915/eolas-ui/badge",
-        "seany9915/eolas-ui/icon"
-      ],
-      "files": [
-        {
-          "path": "metric-card.tsx",
-          "type": "registry:block",
-          "target": "@components/blocks/metric-card.tsx"
-        }
-      ]
-    },
-    {
       "name": "pie-chart-card",
       "type": "registry:block",
       "title": "Pie Chart Card",
@@ -351,9 +284,9 @@
         "recharts@^3.0.0"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/chart-card",
-        "seany9915/eolas-ui/chart"
+        "seany9915/eolas-ui/chart",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -367,7 +300,7 @@
       "name": "questionnaire",
       "type": "registry:block",
       "title": "Questionnaire",
-      "description": "Questionnaire composite block.",
+      "description": "Controlled multi-question assessment block with choice controls, validation summaries, and conditional step progression.",
       "categories": [
         "blocks"
       ],
@@ -449,7 +382,7 @@
       "name": "step-wizard",
       "type": "registry:block",
       "title": "Step Wizard",
-      "description": "StepWizard composite block.",
+      "description": "Controlled multi-step workflow block with step sidebar, validation gates, hidden until-found preservation, and review actions.",
       "categories": [
         "blocks"
       ],
@@ -481,15 +414,15 @@
       "name": "supporting-pane-block",
       "type": "registry:block",
       "title": "Supporting Pane Block",
-      "description": "SupportingPaneBlock composite block.",
+      "description": "Controlled main workspace plus collapsible right-hand context pane for clinical references, notes, or AI assistance.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils",
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/icon",
-        "seany9915/eolas-ui/badge"
+        "seany9915/eolas-ui/badge",
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {

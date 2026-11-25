@@ -14,7 +14,7 @@
  */
 import * as React from 'react';
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 export interface AccordionItemData {
   id: string;
@@ -65,13 +65,15 @@ export interface AccordionTriggerProps extends React.ComponentPropsWithoutRef<ty
 }
 
 export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
-  ({ children, className, hideChevron = false, ...props }, ref) => (
+  ({ children, className, hideChevron = false, render, nativeButton, ...props }, ref) => (
     <BaseAccordion.Trigger
       ref={ref}
       data-slot="accordion-trigger"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
       className={composeClassName(
         cn(
-          'flex items-center justify-between w-full py-4 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors cursor-pointer text-start group rounded',
+          'flex items-center justify-between w-full py-4 min-h-[48px] font-heading text-base font-semibold text-on-surface hover:text-primary transition-colors motion-reduce:transition-none cursor-pointer text-start group rounded',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'disabled:cursor-not-allowed disabled:opacity-50'
         ),
@@ -222,7 +224,8 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
       className={composeClassName(
         cn(
           'w-full',
-          level === 2 && 'p-4 rounded-lg bg-surface border-none shadow-card'
+          level === 2 &&
+            'p-4 rounded-lg bg-surface border-none shadow-card forced-colors:border forced-colors:border-solid forced-colors:border-[CanvasText]'
         ),
         className
       )}

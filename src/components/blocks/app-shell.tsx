@@ -21,6 +21,7 @@
 import * as React from 'react';
 import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { NavigationBar } from '@/components/ui/navigation-bar';
+import { Button, UnstyledButton } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
@@ -60,7 +61,31 @@ export interface AppShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   embedded?: boolean;
   /** When true, removes default main workspace padding (`p-4 @md:p-6`) for full-bleed child layouts such as `ListDetailBlock variant="flush"` or chat panes */
   flush?: boolean;
+  /** Accessible label for the skip-to-content link. Defaults to 'Skip to content'. */
+  skipToContentLabel?: string;
+  /** Accessible label for the mobile bottom navigation landmark. */
+  navigationBarLabel?: string;
+  /** Accessible label for closing the embedded mobile sidebar overlay. Defaults to 'Close navigation'. */
+  closeSidebarLabel?: string;
   className?: string;
+}
+
+type AppShellSizeClass = 'mobile' | 'tablet' | 'desktop';
+
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+
+function getViewportBreakpointSnapshot(): AppShellSizeClass {
+  if (typeof window === 'undefined') return 'desktop';
+  if (window.innerWidth < 640) return 'mobile';
+  if (window.innerWidth < 1024) return 'tablet';
+  return 'desktop';
+}
+
+function subscribeViewportResize(callback: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
+  window.addEventListener('resize', callback);
+  return () => window.removeEventListener('resize', callback);
 }
 
 interface AppShellDestinationMenuProps {
@@ -127,6 +152,9 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       defaultOpen,
       embedded = false,
       flush = false,
+      skipToContentLabel = 'Skip to content',
+      navigationBarLabel,
+      closeSidebarLabel = 'Close navigation',
       className,
       ...props
     },
@@ -136,6 +164,8 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       destinations[0]?.id || ''
     );
     const rootRef = React.useRef<HTMLDivElement | null>(null);
+    const sidebarTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const focusRestoreRafRef = React.useRef<number | null>(null);
 
     const assignRefs = React.useCallback(
       (node: HTMLDivElement | null) => {
@@ -149,48 +179,43 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       [ref]
     );
 
-    const getWindowBreakpoint = React.useCallback((): 'mobile' | 'tablet' | 'desktop' => {
-      if (typeof window === 'undefined') return 'desktop';
-      if (window.innerWidth < 640) return 'mobile';
-      if (window.innerWidth < 1024) return 'tablet';
-      return 'desktop';
-    }, []);
-
-    const [sizeClass, setSizeClass] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-
-    React.useEffect(() => {
-      if (embedded) {
-        const node = rootRef.current;
-        if (!node) return;
-        const updateFromWidth = (width: number) => {
-          setSizeClass(width < 640 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop');
-        };
-        updateFromWidth(node.getBoundingClientRect().width);
-        if (typeof ResizeObserver === 'undefined') return;
-        const observer = new ResizeObserver((entries) => {
-          for (const entry of entries) {
-            updateFromWidth(entry.contentRect.width);
-          }
-        });
-        observer.observe(node);
-        return () => observer.disconnect();
-      }
-
-      const handleResize = () => setSizeClass(getWindowBreakpoint());
-      handleResize();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, [embedded, getWindowBreakpoint]);
-
-    const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(() =>
-      defaultOpen !== undefined ? defaultOpen : sizeClass === 'desktop'
+    const viewportSizeClass = React.useSyncExternalStore(
+      subscribeViewportResize,
+      getViewportBreakpointSnapshot,
+      () => 'desktop' as const
     );
+    const [embeddedSizeClass, setEmbeddedSizeClass] = React.useState<AppShellSizeClass>('desktop');
+
+    useIsomorphicLayoutEffect(() => {
+      if (!embedded) return;
+      const node = rootRef.current;
+      if (!node) return;
+      const updateFromWidth = (width: number) => {
+        setEmbeddedSizeClass(width < 640 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop');
+      };
+      updateFromWidth(node.getBoundingClientRect().width);
+      if (typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          updateFromWidth(entry.contentRect.width);
+        }
+      });
+      observer.observe(node);
+      return () => observer.disconnect();
+    }, [embedded]);
+
+    const sizeClass = embedded ? embeddedSizeClass : viewportSizeClass;
+
+    const [userSidebarOpen, setUserSidebarOpen] = React.useState<boolean | undefined>(undefined);
 
     React.useEffect(() => {
       if (defaultOpen === undefined) {
-        setSidebarOpen(sizeClass === 'desktop');
+        setUserSidebarOpen(undefined);
       }
     }, [defaultOpen, sizeClass]);
+
+    const sidebarOpen =
+      userSidebarOpen ?? (defaultOpen !== undefined ? defaultOpen : sizeClass === 'desktop');
 
     const activeId =
       activeDestinationId !== undefined
@@ -204,7 +229,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         setInternalActiveId(id);
       }
       if (embedded && sizeClass === 'mobile') {
-        setSidebarOpen(false);
+        setUserSidebarOpen(false);
       }
       onDestinationChange?.(id);
     };
@@ -217,6 +242,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         ? false
         : !embedded || sizeClass !== 'mobile' || hasCustomSidebarDrawer;
     const isEmbeddedMobileOverlay = embedded && sizeClass === 'mobile' && showSidebar;
+    const isOverlayActive = isEmbeddedMobileOverlay && sidebarOpen;
     const effectiveCollapsible =
       embedded && sizeClass === 'mobile' && collapsible === 'icon' ? 'offcanvas' : collapsible;
     const showMobileBar = destinations.length > 0 && (!embedded || sizeClass === 'mobile');
@@ -225,11 +251,43 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       showSidebarTriggerOnMobile ??
       Boolean(sidebarContent || sidebarFooter || destinations.length === 0);
 
+    const closeEmbeddedOverlay = React.useCallback(() => {
+      setUserSidebarOpen(false);
+      if (focusRestoreRafRef.current !== null) {
+        cancelAnimationFrame(focusRestoreRafRef.current);
+      }
+      focusRestoreRafRef.current = window.requestAnimationFrame(() => {
+        focusRestoreRafRef.current = null;
+        sidebarTriggerRef.current?.focus();
+      });
+    }, []);
+
+    React.useEffect(() => {
+      return () => {
+        if (focusRestoreRafRef.current !== null) {
+          cancelAnimationFrame(focusRestoreRafRef.current);
+        }
+      };
+    }, []);
+
+    React.useEffect(() => {
+      if (!isOverlayActive) return;
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && !event.defaultPrevented) {
+          event.preventDefault();
+          event.stopPropagation();
+          closeEmbeddedOverlay();
+        }
+      };
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOverlayActive, closeEmbeddedOverlay]);
+
     return (
       <Sidebar.Provider
         ref={assignRefs}
         open={sidebarOpen}
-        onOpenChange={setSidebarOpen}
+        onOpenChange={setUserSidebarOpen}
         mobileBreakpoint={640}
         mobileBehavior={embedded ? 'inline' : 'drawer'}
         embedded={embedded}
@@ -248,8 +306,19 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 focus:inline-flex focus:items-center focus:min-h-11 focus:px-4 focus:rounded focus:bg-primary focus:text-on-primary focus:font-label focus:text-sm focus:font-semibold focus:outline-2 focus:outline-offset-2 focus:outline-primary"
           >
-            Skip to content
+            {skipToContentLabel}
           </a>
+        )}
+
+        {/* Dismissible backdrop for embedded mobile overlays */}
+        {isOverlayActive && (
+          <UnstyledButton
+            type="button"
+            tabIndex={-1}
+            aria-label={closeSidebarLabel}
+            onClick={closeEmbeddedOverlay}
+            className="absolute inset-0 z-30 bg-on-surface/40 cursor-default"
+          />
         )}
 
         {/* Desktop & Tablet Collapsible Navigation Sidebar */}
@@ -259,9 +328,23 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             embedded={embedded}
             overlay={isEmbeddedMobileOverlay}
           >
-            {sidebarHeader && (
+            {(sidebarHeader || isEmbeddedMobileOverlay) && (
               <Sidebar.Header className="min-h-16 short:min-h-14 justify-center">
-                {sidebarHeader}
+                <div className="flex items-center justify-between gap-2 w-full group-data-[collapsible=icon]:justify-center">
+                  <div className="flex-1 min-w-0 group-data-[collapsible=icon]:flex-none">{sidebarHeader}</div>
+                  {isEmbeddedMobileOverlay && (
+                    <Button
+                      type="button"
+                      variant="text"
+                      size="icon"
+                      colorRole="neutral"
+                      aria-label={closeSidebarLabel}
+                      onClick={closeEmbeddedOverlay}
+                    >
+                      <Icon name="close" size="sm" aria-hidden="true" />
+                    </Button>
+                  )}
+                </div>
               </Sidebar.Header>
             )}
             <Sidebar.Content>
@@ -284,6 +367,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         <Sidebar.Inset
           render={<div />}
           embedded={embedded}
+          inert={isOverlayActive}
           className={cn(
             'flex flex-col flex-1 min-w-0',
             flush && !embedded && 'h-full min-h-0'
@@ -314,7 +398,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                         : 'hidden sm:block short:block')
                   )}
                 >
-                  <Sidebar.Trigger />
+                  <Sidebar.Trigger ref={sidebarTriggerRef} />
                 </div>
               )}
               {title && (
@@ -360,22 +444,33 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 id={!embedded ? 'main-content' : undefined}
                 tabIndex={!embedded ? -1 : undefined}
                 data-slot="app-shell-main"
-                className="@container flex-1 flex flex-col min-h-0 overflow-y-auto focus:outline-none"
+                className={cn(
+                  '@container flex-1 flex flex-col min-h-0 overflow-y-auto focus:outline-none',
+                  !embedded &&
+                    destinations.length > 0 &&
+                    (flush
+                      ? canOpenSidebarOnShortMobile
+                        ? 'scroll-pb-24 sm:scroll-pb-0 short:scroll-pb-0'
+                        : 'scroll-pb-24 sm:scroll-pb-0'
+                      : canOpenSidebarOnShortMobile
+                        ? 'scroll-pb-28 sm:scroll-pb-0 short:scroll-pb-0'
+                        : 'scroll-pb-28 sm:scroll-pb-0')
+                )}
               >
                 <div
                   className={cn(
                     'flex-1 flex flex-col min-h-0',
                     flush ? 'p-0' : 'p-4 @md:p-6',
                     embedded
-                      ? !flush && destinations.length > 0 && 'pb-4'
+                      ? !flush && destinations.length > 0 && 'pb-4 @md:pb-6'
                       : destinations.length > 0 &&
                           (flush
                             ? canOpenSidebarOnShortMobile
                               ? 'pb-24 sm:pb-0 short:pb-0'
                               : 'pb-24 sm:pb-0'
                             : canOpenSidebarOnShortMobile
-                              ? 'pb-28 sm:pb-6 short:pb-6'
-                              : 'pb-28 sm:pb-6')
+                              ? 'pb-28 sm:pb-4 @md:pb-6 short:pb-4 @md:short:pb-6'
+                              : 'pb-28 sm:pb-4 @md:pb-6')
                   )}
                 >
                   {children}
@@ -391,6 +486,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 value={activeId}
                 onValueChange={handleSelectDestination}
                 fixed={!embedded}
+                aria-label={navigationBarLabel ?? (embedded ? 'Section navigation' : 'Primary navigation')}
               >
                 {destinations.map((dest) => (
                   <NavigationBar.Item

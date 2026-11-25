@@ -30,9 +30,6 @@ export interface RegistryEntry {
   basePrimitive: string;
   platformReference?: string;
   sourcePath: string;
-  isDeprecated?: boolean;
-  deprecatedNote?: string;
-  replacedBy?: string;
   taxonomy?: string[];
   dependencies?: string[];
   importStatement?: string;

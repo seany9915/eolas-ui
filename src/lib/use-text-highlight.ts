@@ -79,6 +79,8 @@ export function findNormalizedMatchRanges(
   caseSensitive: boolean
 ): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
+  if (!trimmedQuery) return ranges;
+
   if (caseSensitive) {
     let startIndex = textContent.indexOf(trimmedQuery);
     while (startIndex !== -1) {
@@ -92,6 +94,7 @@ export function findNormalizedMatchRanges(
   }
 
   const targetQuery = trimmedQuery.toLowerCase();
+  if (!targetQuery) return ranges;
   const textToSearch = textContent.toLowerCase();
 
   // Fast path: 1:1 UTF-16 length match
@@ -150,6 +153,17 @@ function resolveContainerElement(
   return containerTarget instanceof HTMLElement ? containerTarget : containerTarget?.current ?? null;
 }
 
+const emptySubscribe = () => () => {};
+
+function getTextHighlightSupport(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof CSS !== 'undefined' &&
+    Boolean(CSS.highlights) &&
+    typeof window.Highlight === 'function'
+  );
+}
+
 export function useTextHighlight(
   containerTarget: HTMLElement | null | React.RefObject<HTMLElement | null>,
   query: string,
@@ -157,7 +171,11 @@ export function useTextHighlight(
 ): UseTextHighlightResult {
   const { highlightName = 'search-results', caseSensitive = false } = options;
   const [matchCount, setMatchCount] = React.useState<number>(0);
-  const [isSupported, setIsSupported] = React.useState<boolean>(true);
+  const isSupported = React.useSyncExternalStore(
+    emptySubscribe,
+    getTextHighlightSupport,
+    () => false
+  );
   const [contentVersion, setContentVersion] = React.useState(0);
   const ownerRef = React.useRef<symbol>(Symbol('highlight-owner'));
   const cachedTextNodesRef = React.useRef<Text[]>([]);
@@ -213,21 +231,11 @@ export function useTextHighlight(
   }, [containerTarget, containerElement, contentVersion]);
 
   React.useEffect(() => {
-    if (typeof window === 'undefined' || typeof CSS === 'undefined') {
-      setIsSupported(false);
-      return;
-    }
-
-    const registry = CSS.highlights;
-    const HighlightClass = window.Highlight;
-
-    if (!registry || !HighlightClass) {
-      setIsSupported(false);
+    if (!isSupported) {
       setMatchCount(0);
       return;
     }
 
-    setIsSupported(true);
     const container = resolveContainerElement(containerTarget);
     const owner = ownerRef.current;
 
@@ -260,7 +268,7 @@ export function useTextHighlight(
     return () => {
       setOwnerRanges(highlightName, owner, []);
     };
-  }, [containerTarget, containerElement, query, highlightName, caseSensitive, contentVersion]);
+  }, [containerTarget, containerElement, query, highlightName, caseSensitive, contentVersion, isSupported]);
 
   return { matchCount, isSupported };
 }

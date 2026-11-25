@@ -121,7 +121,7 @@ export const TableRow = React.forwardRef<
     ref={ref}
     data-slot="table-row"
     className={cn(
-      'border-b border-outline-variant transition-colors hover:bg-state-hover data-[state=selected]:bg-surface-container-low data-[state=selected]:hover:bg-surface-container-high min-h-[var(--density-table-row-min-h,3.5rem)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+      'border-b border-outline-variant transition-colors motion-reduce:transition-none hover:bg-state-hover data-[state=selected]:bg-surface-container-low data-[state=selected]:hover:bg-surface-container-high data-[selected]:bg-surface-container-low data-[selected]:hover:bg-surface-container-high min-h-[var(--density-table-row-min-h,3.5rem)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
       className
     )}
     {...props}
@@ -178,192 +178,35 @@ TableCaption.displayName = 'TableCaption';
 /* -------------------------------------------------------------------------------------------------
  * Root Table Component (Supports both compound children and declarative data mode)
  * -----------------------------------------------------------------------------------------------*/
-export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>>(
-  (props, ref) => {
-    const isDataDriven = 'columns' in props && Array.isArray(props.columns) && Array.isArray(props.data);
-    const responsive = props.responsive ?? 'scroll';
-    const density = props.density;
-    const isStack = responsive === 'stack';
-    const captionId = React.useId();
-    const { ref: scrollFadeRef, isScrollable } = useHorizontalScrollFade<HTMLDivElement>(undefined, {
-      disabled: isStack,
-    });
+function TableInner<T = unknown>(
+  props: TableProps<T>,
+  ref: React.ForwardedRef<HTMLTableElement>
+) {
+  const isDataDriven = 'columns' in props && Array.isArray(props.columns) && Array.isArray(props.data);
+  const responsive = props.responsive ?? 'scroll';
+  const density = props.density;
+  const isStack = responsive === 'stack';
+  const captionId = React.useId();
+  const { ref: scrollFadeRef, isScrollable } = useHorizontalScrollFade<HTMLDivElement>(undefined, {
+    disabled: isStack,
+  });
 
-    // Declarative data-driven mode
-    if (isDataDriven) {
-      const {
-        columns,
-        data,
-        keyExtractor,
-        className,
-        containerClassName,
-        elevated,
-        caption,
-        'aria-label': ariaLabel,
-        'aria-labelledby': ariaLabelledBy,
-      } = props as DataDrivenTableProps<any>;
-
-      const regionAriaLabel = ariaLabel;
-      const regionAriaLabelledBy = ariaLabelledBy ?? (caption ? captionId : undefined);
-      const hasAccessibleName = Boolean(regionAriaLabel || regionAriaLabelledBy);
-
-      return (
-        <div
-          ref={scrollFadeRef}
-          data-slot="table-container"
-          data-density={density}
-          role={hasAccessibleName ? 'region' : undefined}
-          aria-label={hasAccessibleName ? regionAriaLabel : undefined}
-          aria-labelledby={hasAccessibleName ? regionAriaLabelledBy : undefined}
-          tabIndex={isScrollable ? 0 : undefined}
-          style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
-          className={cn(
-            'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
-            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-            elevated && 'shadow-ambient',
-            !isStack && 'scroll-shadow-x',
-            isStack && '@container',
-            containerClassName
-          )}
-        >
-          <table
-            ref={ref}
-            data-slot="table"
-            aria-label={ariaLabel}
-            aria-labelledby={ariaLabelledBy}
-            className={cn('w-full caption-bottom text-start border-collapse font-sans text-sm', className)}
-          >
-            {caption && (
-              <TableCaption id={captionId}>{caption}</TableCaption>
-            )}
-            <thead className={cn(isStack && '@max-lg:hidden')}>
-              <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container-high/50 text-on-surface font-label font-bold text-sm">
-                {columns.map((col, idx) => {
-                  const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
-                  const alignClass =
-                    effectiveAlign === 'right'
-                      ? 'text-end'
-                      : effectiveAlign === 'center'
-                        ? 'text-center'
-                        : 'text-start';
-                  const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
-
-                  return (
-                    <th
-                      key={idx}
-                      scope="col"
-                      data-slot="table-head"
-                      className={cn(
-                        'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] font-semibold',
-                        alignClass,
-                        numericClass,
-                        col.className
-                      )}
-                    >
-                      {col.header}
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody
-              className={cn(
-                'divide-y divide-outline-variant',
-                isStack && '@max-lg:divide-y-0 @max-lg:flex @max-lg:flex-col @max-lg:gap-3 @max-lg:p-3'
-              )}
-            >
-              {data.map((row) => (
-                <tr
-                  key={keyExtractor(row)}
-                  data-slot="table-row"
-                  className={cn(
-                    'min-h-[var(--density-table-row-min-h,3.5rem)] hover:bg-state-hover transition-colors',
-                    isStack &&
-                      '@max-lg:block @max-lg:p-4 @max-lg:rounded-lg @max-lg:border @max-lg:border-outline-variant @max-lg:bg-surface'
-                  )}
-                >
-                  {columns.map((col, cIdx) => {
-                    const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
-                    const alignClass =
-                      effectiveAlign === 'right'
-                        ? 'text-end'
-                        : effectiveAlign === 'center'
-                          ? 'text-center'
-                          : 'text-start';
-                    const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
-
-                    return (
-                      <td
-                        key={cIdx}
-                        data-slot="table-cell"
-                        className={cn(
-                          'px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] text-on-surface',
-                          alignClass,
-                          numericClass,
-                          col.className,
-                          isStack &&
-                            '@max-lg:flex @max-lg:items-center @max-lg:justify-between @max-lg:px-0 @max-lg:py-2 @max-lg:border-b @max-lg:border-outline-variant/40 @max-lg:last:border-b-0'
-                        )}
-                      >
-                        {isStack && (
-                          <span className="hidden @max-lg:inline-block font-label text-xs font-semibold text-on-surface-variant me-3 select-none">
-                            {col.header}
-                          </span>
-                        )}
-                        <span className={cn(effectiveAlign === 'right' && isStack && '@max-lg:text-end')}>
-                          {typeof col.accessor === 'function'
-                            ? col.accessor(row)
-                            : (row[col.accessor] as React.ReactNode)}
-                        </span>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
-    }
-
-    // Composable compound mode (shadcn standard anatomy)
+  // Declarative data-driven mode
+  if (isDataDriven) {
     const {
+      columns,
+      data,
+      keyExtractor,
       className,
       containerClassName,
-      children,
-      responsive: _responsive,
-      density: _density,
       elevated,
       caption,
-      ...tableProps
-    } = props as React.HTMLAttributes<HTMLTableElement> & {
-      containerClassName?: string;
-      responsive?: 'scroll' | 'stack';
-      density?: TableDensity;
-      elevated?: boolean;
-      caption?: string;
-    };
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+    } = props as DataDrivenTableProps<T>;
 
-    let inferredCaptionLabel: string | undefined;
-    let inferredCaptionId: string | undefined;
-    if (!tableProps['aria-label'] && !tableProps['aria-labelledby'] && !caption) {
-      React.Children.forEach(children, (child) => {
-        if (
-          React.isValidElement<{ id?: string; children?: React.ReactNode }>(child) &&
-          (child.type === TableCaption || child.type === 'caption')
-        ) {
-          if (child.props.id) {
-            inferredCaptionId = child.props.id;
-          } else if (typeof child.props.children === 'string' && child.props.children.trim()) {
-            inferredCaptionLabel = child.props.children.trim();
-          }
-        }
-      });
-    }
-
-    const regionAriaLabel = tableProps['aria-label'] ?? inferredCaptionLabel;
-    const regionAriaLabelledBy =
-      tableProps['aria-labelledby'] ?? (caption ? captionId : inferredCaptionId);
+    const regionAriaLabel = ariaLabel;
+    const regionAriaLabelledBy = ariaLabelledBy ?? (caption ? captionId : undefined);
     const hasAccessibleName = Boolean(regionAriaLabel || regionAriaLabelledBy);
 
     return (
@@ -377,7 +220,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         tabIndex={isScrollable ? 0 : undefined}
         style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
         className={cn(
-          'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+          'w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           elevated && 'shadow-ambient',
           !isStack && 'scroll-shadow-x',
@@ -388,16 +231,178 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
         <table
           ref={ref}
           data-slot="table"
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           className={cn('w-full caption-bottom text-start border-collapse font-sans text-sm', className)}
-          {...tableProps}
         >
-          {caption && <TableCaption id={captionId}>{caption}</TableCaption>}
-          {children}
+          {caption && (
+            <TableCaption id={captionId}>{caption}</TableCaption>
+          )}
+          <thead className={cn(isStack && '@max-lg:hidden')}>
+            <tr data-slot="table-row" className="border-b border-outline-variant bg-surface-container-high/50 text-on-surface font-label font-bold text-sm">
+              {columns.map((col, idx) => {
+                const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
+                const alignClass =
+                  effectiveAlign === 'right'
+                    ? 'text-end'
+                    : effectiveAlign === 'center'
+                      ? 'text-center'
+                      : 'text-start';
+                const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
+
+                return (
+                  <th
+                    key={idx}
+                    scope="col"
+                    data-slot="table-head"
+                    className={cn(
+                      'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] font-semibold',
+                      alignClass,
+                      numericClass,
+                      col.className
+                    )}
+                  >
+                    {col.header}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody
+            className={cn(
+              'divide-y divide-outline-variant',
+              isStack && '@max-lg:divide-y-0 @max-lg:flex @max-lg:flex-col @max-lg:gap-3 @max-lg:p-3'
+            )}
+          >
+            {data.map((row) => (
+              <tr
+                key={keyExtractor(row)}
+                data-slot="table-row"
+                className={cn(
+                  'min-h-[var(--density-table-row-min-h,3.5rem)] hover:bg-state-hover data-[state=selected]:bg-surface-container-low data-[state=selected]:hover:bg-surface-container-high data-[selected]:bg-surface-container-low data-[selected]:hover:bg-surface-container-high transition-colors motion-reduce:transition-none',
+                  isStack &&
+                    '@max-lg:block @max-lg:p-4 @max-lg:rounded-lg @max-lg:border @max-lg:border-outline-variant @max-lg:bg-surface'
+                )}
+              >
+                {columns.map((col, cIdx) => {
+                  const effectiveAlign = col.align ?? (col.numeric ? 'right' : 'left');
+                  const alignClass =
+                    effectiveAlign === 'right'
+                      ? 'text-end'
+                      : effectiveAlign === 'center'
+                        ? 'text-center'
+                        : 'text-start';
+                  const numericClass = col.numeric ? 'font-mono tabular-nums' : '';
+
+                  return (
+                    <td
+                      key={cIdx}
+                      data-slot="table-cell"
+                      className={cn(
+                        'px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] text-on-surface',
+                        alignClass,
+                        numericClass,
+                        col.className,
+                        isStack &&
+                          '@max-lg:flex @max-lg:items-center @max-lg:justify-between @max-lg:px-0 @max-lg:py-2 @max-lg:border-b @max-lg:border-outline-variant/40 @max-lg:last:border-b-0'
+                      )}
+                    >
+                      {isStack && (
+                        <span className="hidden @max-lg:inline-block font-label text-xs font-semibold text-on-surface-variant me-3 select-none">
+                          {col.header}
+                        </span>
+                      )}
+                      <span className={cn(effectiveAlign === 'right' && isStack && '@max-lg:text-end')}>
+                        {typeof col.accessor === 'function'
+                          ? col.accessor(row)
+                          : (row[col.accessor] as React.ReactNode)}
+                      </span>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     );
   }
-);
+
+  // Composable compound mode (shadcn standard anatomy)
+  const {
+    className,
+    containerClassName,
+    children,
+    responsive: _responsive,
+    density: _density,
+    elevated,
+    caption,
+    ...tableProps
+  } = props as React.HTMLAttributes<HTMLTableElement> & {
+    containerClassName?: string;
+    responsive?: 'scroll' | 'stack';
+    density?: TableDensity;
+    elevated?: boolean;
+    caption?: string;
+  };
+
+  let inferredCaptionLabel: string | undefined;
+  let inferredCaptionId: string | undefined;
+  if (!tableProps['aria-label'] && !tableProps['aria-labelledby'] && !caption) {
+    React.Children.forEach(children, (child) => {
+      if (
+        React.isValidElement<{ id?: string; children?: React.ReactNode }>(child) &&
+        (child.type === TableCaption || child.type === 'caption')
+      ) {
+        if (child.props.id) {
+          inferredCaptionId = child.props.id;
+        } else if (typeof child.props.children === 'string' && child.props.children.trim()) {
+          inferredCaptionLabel = child.props.children.trim();
+        }
+      }
+    });
+  }
+
+  const regionAriaLabel = tableProps['aria-label'] ?? inferredCaptionLabel;
+  const regionAriaLabelledBy =
+    tableProps['aria-labelledby'] ?? (caption ? captionId : inferredCaptionId);
+  const hasAccessibleName = Boolean(regionAriaLabel || regionAriaLabelledBy);
+
+  return (
+    <div
+      ref={scrollFadeRef}
+      data-slot="table-container"
+      data-density={density}
+      role={hasAccessibleName ? 'region' : undefined}
+      aria-label={hasAccessibleName ? regionAriaLabel : undefined}
+      aria-labelledby={hasAccessibleName ? regionAriaLabelledBy : undefined}
+      tabIndex={isScrollable ? 0 : undefined}
+      style={density ? ({ '--density': density } as React.CSSProperties) : undefined}
+      className={cn(
+        'relative w-full overflow-x-auto rounded-md border border-outline-variant bg-surface',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        elevated && 'shadow-ambient',
+        !isStack && 'scroll-shadow-x',
+        isStack && '@container',
+        containerClassName
+      )}
+    >
+      <table
+        ref={ref}
+        data-slot="table"
+        className={cn('w-full caption-bottom text-start border-collapse font-sans text-sm', className)}
+        {...tableProps}
+      >
+        {caption && <TableCaption id={captionId}>{caption}</TableCaption>}
+        {children}
+      </table>
+    </div>
+  );
+}
+
+export const TableComponent = React.forwardRef(TableInner) as (<T = unknown>(
+  props: TableProps<T> & React.RefAttributes<HTMLTableElement>
+) => React.JSX.Element) & { displayName?: string };
 TableComponent.displayName = 'Table';
 
 /* -------------------------------------------------------------------------------------------------

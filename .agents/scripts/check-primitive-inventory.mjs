@@ -114,37 +114,160 @@ function stripJsonCommentsAndTrailingCommas(text) {
   return out.replace(/,\s*([}\]])/g, '$1');
 }
 
-function loadTsconfigPaths(workspaceRoot) {
-  const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
-  if (!fs.existsSync(tsconfigPath)) return null;
-  try {
-    const raw = fs.readFileSync(tsconfigPath, 'utf8');
-    const parsed = JSON.parse(stripJsonCommentsAndTrailingCommas(raw));
-    const paths = parsed?.compilerOptions?.paths;
-    return paths && typeof paths === 'object' ? paths : null;
-  } catch {
-    return null;
+function resolveTsconfigFile(fromDir, spec) {
+  if (typeof spec !== 'string' || !spec.trim()) return null;
+  const candidate = path.resolve(fromDir, spec);
+  if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+    return candidate;
   }
+  if (!candidate.endsWith('.json') && fs.existsSync(`${candidate}.json`) && fs.statSync(`${candidate}.json`).isFile()) {
+    return `${candidate}.json`;
+  }
+  if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+    const tsInDir = path.join(candidate, 'tsconfig.json');
+    if (fs.existsSync(tsInDir) && fs.statSync(tsInDir).isFile()) return tsInDir;
+    const jsInDir = path.join(candidate, 'jsconfig.json');
+    if (fs.existsSync(jsInDir) && fs.statSync(jsInDir).isFile()) return jsInDir;
+  }
+  return null;
 }
 
-function resolveFromTsconfigPaths(rawAlias, tsconfigPaths) {
-  if (!tsconfigPaths) return null;
-  for (const [pattern, targets] of Object.entries(tsconfigPaths)) {
+function loadTsconfigRecursive(configPath, ancestorChain = new Set(), refVisited = new Set()) {
+  const absPath = path.resolve(configPath);
+  if (ancestorChain.has(absPath)) {
+    return { baseUrlAbs: null, refBaseUrls: [], entries: [] };
+  }
+
+  let parsed;
+  try {
+    const raw = fs.readFileSync(absPath, 'utf8');
+    parsed = JSON.parse(stripJsonCommentsAndTrailingCommas(raw));
+  } catch {
+    return { baseUrlAbs: null, refBaseUrls: [], entries: [] };
+  }
+
+  const nextAncestors = new Set(ancestorChain);
+  nextAncestors.add(absPath);
+  refVisited.add(absPath);
+
+  const configDir = path.dirname(absPath);
+  let inheritedBaseUrlAbs = null;
+  const entryMap = new Map();
+
+  const extendsList = Array.isArray(parsed?.extends)
+    ? parsed.extends
+    : typeof parsed?.extends === 'string'
+      ? [parsed.extends]
+      : [];
+
+  for (const ext of extendsList) {
+    const extPath = resolveTsconfigFile(configDir, ext);
+    if (!extPath) continue;
+    const parent = loadTsconfigRecursive(extPath, nextAncestors, refVisited);
+    if (parent.baseUrlAbs) {
+      inheritedBaseUrlAbs = parent.baseUrlAbs;
+    }
+    for (const entry of parent.entries) {
+      entryMap.set(entry.pattern, entry);
+    }
+  }
+
+  const ownBaseUrl = parsed?.compilerOptions?.baseUrl;
+  const effectiveBaseUrlAbs =
+    typeof ownBaseUrl === 'string' && ownBaseUrl.trim()
+      ? path.resolve(configDir, ownBaseUrl)
+      : inheritedBaseUrlAbs;
+
+  const pathsRoot = effectiveBaseUrlAbs || configDir;
+  const ownPaths = parsed?.compilerOptions?.paths;
+  if (ownPaths && typeof ownPaths === 'object') {
+    for (const [pattern, targets] of Object.entries(ownPaths)) {
+      entryMap.set(pattern, { pattern, targets, resolveRoot: pathsRoot });
+    }
+  }
+
+  const refBaseUrls = [];
+  if (Array.isArray(parsed?.references)) {
+    for (const ref of parsed.references) {
+      if (!ref || typeof ref.path !== 'string') continue;
+      const refPath = resolveTsconfigFile(configDir, ref.path);
+      if (!refPath || refVisited.has(path.resolve(refPath))) continue;
+      const refData = loadTsconfigRecursive(refPath, nextAncestors, refVisited);
+      if (refData.baseUrlAbs && !refBaseUrls.includes(refData.baseUrlAbs)) {
+        refBaseUrls.push(refData.baseUrlAbs);
+      }
+      for (const candidate of refData.refBaseUrls) {
+        if (!refBaseUrls.includes(candidate)) refBaseUrls.push(candidate);
+      }
+      for (const entry of refData.entries) {
+        if (!entryMap.has(entry.pattern)) {
+          entryMap.set(entry.pattern, entry);
+        }
+      }
+    }
+  }
+
+  return {
+    baseUrlAbs: effectiveBaseUrlAbs,
+    refBaseUrls,
+    entries: Array.from(entryMap.values()),
+  };
+}
+
+function loadTsconfigPaths(workspaceRoot) {
+  const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
+  const jsconfigPath = path.join(workspaceRoot, 'jsconfig.json');
+  const rootConfig = fs.existsSync(tsconfigPath)
+    ? tsconfigPath
+    : fs.existsSync(jsconfigPath)
+      ? jsconfigPath
+      : null;
+
+  if (!rootConfig) return null;
+
+  const result = loadTsconfigRecursive(rootConfig);
+  if (result.entries.length === 0 && !result.baseUrlAbs && result.refBaseUrls.length === 0) {
+    return null;
+  }
+  return result;
+}
+
+function resolveFromTsconfigPaths(rawAlias, tsconfigPaths, workspaceRoot) {
+  if (!tsconfigPaths || !Array.isArray(tsconfigPaths.entries)) return null;
+
+  const sortedEntries = [...tsconfigPaths.entries].sort((a, b) => {
+    const aWild = a.pattern.includes('*');
+    const bWild = b.pattern.includes('*');
+    if (aWild !== bWild) return aWild ? 1 : -1;
+    return b.pattern.length - a.pattern.length;
+  });
+
+  for (const { pattern, targets, resolveRoot } of sortedEntries) {
     if (!Array.isArray(targets) || targets.length === 0) continue;
     const firstTarget = targets[0];
     if (typeof firstTarget !== 'string') continue;
 
-    if (pattern.endsWith('/*') && firstTarget.endsWith('/*')) {
-      const prefix = pattern.slice(0, -1);
-      const targetPrefix = firstTarget.slice(0, -1).replace(/^\.\//, '');
-      if (rawAlias.startsWith(prefix)) {
-        return `${targetPrefix}${rawAlias.slice(prefix.length)}`.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
-      }
-      if (rawAlias === prefix.slice(0, -1)) {
-        return targetPrefix.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+    let mapped = null;
+    if (pattern.includes('*') && firstTarget.includes('*')) {
+      const [patPrefix, patSuffix] = pattern.split('*');
+      const [tgtPrefix, tgtSuffix] = firstTarget.split('*');
+      if (
+        rawAlias.length >= patPrefix.length + patSuffix.length &&
+        rawAlias.startsWith(patPrefix) &&
+        rawAlias.endsWith(patSuffix)
+      ) {
+        const matched = rawAlias.slice(patPrefix.length, rawAlias.length - patSuffix.length);
+        mapped = `${tgtPrefix}${matched}${tgtSuffix}`;
+      } else if (patSuffix === '' && patPrefix.endsWith('/') && rawAlias === patPrefix.slice(0, -1)) {
+        mapped = tgtPrefix.replace(/\/+$/, '') || '.';
       }
     } else if (pattern === rawAlias) {
-      return firstTarget.replace(/^\.\//, '').replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+      mapped = firstTarget;
+    }
+
+    if (mapped !== null) {
+      const absTarget = path.resolve(resolveRoot, mapped);
+      return path.relative(workspaceRoot, absTarget).replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
     }
   }
   return null;
@@ -152,14 +275,23 @@ function resolveFromTsconfigPaths(rawAlias, tsconfigPaths) {
 
 function resolveAliasDir(rawAlias, workspaceRoot, hasSrc, tsconfigPaths = null) {
   if (!rawAlias || typeof rawAlias !== 'string') return null;
-  const tsMapped = resolveFromTsconfigPaths(rawAlias, tsconfigPaths);
+  const tsMapped = resolveFromTsconfigPaths(rawAlias, tsconfigPaths, workspaceRoot);
   if (tsMapped) return tsMapped;
-  if (rawAlias.startsWith('@/')) {
+  if (rawAlias.startsWith('@/') || rawAlias.startsWith('~/')) {
     const stripped = rawAlias.slice(2).replace(/^\/+|\/+$/g, '');
     return hasSrc && !stripped.startsWith('src/') ? `src/${stripped}` : stripped;
   }
-  if (rawAlias.startsWith('~/')) {
-    return rawAlias.slice(2).replace(/^\/+|\/+$/g, '');
+  if (!rawAlias.startsWith('.') && !path.isAbsolute(rawAlias)) {
+    const baseCandidates = [
+      ...(tsconfigPaths?.baseUrlAbs ? [tsconfigPaths.baseUrlAbs] : []),
+      ...(tsconfigPaths?.refBaseUrls || []),
+    ];
+    if (baseCandidates.length > 0) {
+      const matchedBase =
+        baseCandidates.find((base) => fs.existsSync(path.resolve(base, rawAlias))) || baseCandidates[0];
+      const absTarget = path.resolve(matchedBase, rawAlias);
+      return path.relative(workspaceRoot, absTarget).replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+    }
   }
   return rawAlias.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
 }

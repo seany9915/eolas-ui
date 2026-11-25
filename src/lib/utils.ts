@@ -17,13 +17,13 @@ const customTwMerge = extendTailwindMerge({
       ],
       duration: [
         'duration-stagger',
-        'duration-instant',
         'duration-micro',
         'duration-quick',
         'duration-fast',
         'duration-medium',
         'duration-slow',
         'duration-emphasis',
+        'duration-very-slow',
       ],
       'font-size': [
         'text-display-lg',
@@ -128,19 +128,22 @@ export function sanitizeUrl(url?: string | null): string | undefined {
   if (typeof url !== 'string') return undefined;
   const cleaned = stripControlChars(url).trim();
   if (!cleaned) return undefined;
-  if (cleaned.startsWith('//')) return undefined;
+
+  const collapsed = cleaned.replace(/\s+/g, '');
+  if (collapsed.startsWith('//') || collapsed.startsWith('/\\') || collapsed.startsWith('\\')) {
+    return undefined;
+  }
 
   if (
-    cleaned.startsWith('/') ||
-    cleaned.startsWith('./') ||
-    cleaned.startsWith('../') ||
-    cleaned.startsWith('#') ||
-    cleaned.startsWith('?')
+    collapsed.startsWith('/') ||
+    collapsed.startsWith('./') ||
+    collapsed.startsWith('../') ||
+    collapsed.startsWith('#') ||
+    collapsed.startsWith('?')
   ) {
     return cleaned;
   }
 
-  const collapsed = cleaned.replace(/\s+/g, '');
   const beforeDelimiter = collapsed.split(/[/?#]/, 1)[0];
   const colonIdx = beforeDelimiter.indexOf(':');
   if (colonIdx !== -1) {

@@ -229,7 +229,7 @@ const CarouselComponent = React.forwardRef<
           role="region"
           aria-roledescription="carousel"
           {...props}
-          aria-label={props['aria-label'] || 'Carousel'}
+          aria-label={props['aria-label'] ?? (props['aria-labelledby'] ? undefined : 'Carousel')}
           onKeyDown={handleKeyDown}
         >
           {children}
@@ -293,26 +293,30 @@ export interface CarouselControlProps
 export const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   CarouselControlProps
->(({ className, variant = 'outline', size = 'icon', position, onClick, disabled, ...props }, ref) => {
+>(({ className, variant = 'outline', colorRole = 'neutral', size = 'icon', position, onClick, disabled, ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   const isInline =
     position === 'inline' ||
     (typeof className === 'string' &&
       (className.includes('relative') || className.includes('static')));
+  const isDefaultNeutralOutline = variant === 'outline' && colorRole === 'neutral';
 
   return (
     <Button
       ref={ref}
       data-slot="carousel-previous"
       variant={variant}
+      colorRole={colorRole}
       size={size}
       className={composeClassName(
         [
-          'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
-          'hover:bg-state-hover hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+          'rounded-full size-11 min-h-[44px] min-w-[44px] shadow-ambient',
+          isDefaultNeutralOutline &&
+            'border border-outline-variant bg-surface text-on-surface hover:bg-state-hover hover:border-outline',
+          'active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-          'disabled:opacity-30 disabled:pointer-events-none',
+          'disabled:opacity-40 disabled:pointer-events-none',
           'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
           !isInline && [
             'absolute z-10',
@@ -346,26 +350,30 @@ CarouselPrevious.displayName = 'CarouselPrevious';
 export const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   CarouselControlProps
->(({ className, variant = 'outline', size = 'icon', position, onClick, disabled, ...props }, ref) => {
+>(({ className, variant = 'outline', colorRole = 'neutral', size = 'icon', position, onClick, disabled, ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   const isInline =
     position === 'inline' ||
     (typeof className === 'string' &&
       (className.includes('relative') || className.includes('static')));
+  const isDefaultNeutralOutline = variant === 'outline' && colorRole === 'neutral';
 
   return (
     <Button
       ref={ref}
       data-slot="carousel-next"
       variant={variant}
+      colorRole={colorRole}
       size={size}
       className={composeClassName(
         [
-          'rounded-full size-11 min-h-[44px] min-w-[44px] border border-outline-variant bg-surface text-on-surface shadow-ambient',
-          'hover:bg-state-hover hover:border-outline active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
+          'rounded-full size-11 min-h-[44px] min-w-[44px] shadow-ambient',
+          isDefaultNeutralOutline &&
+            'border border-outline-variant bg-surface text-on-surface hover:bg-state-hover hover:border-outline',
+          'active:scale-95 motion-reduce:active:scale-100 motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
-          'disabled:opacity-30 disabled:pointer-events-none',
+          'disabled:opacity-40 disabled:pointer-events-none',
           'transition-[color,background-color,border-color,box-shadow,transform] duration-quick ease-standard',
           !isInline && [
             'absolute z-10',
@@ -419,7 +427,7 @@ export const CarouselProgressBar = React.forwardRef<
       aria-valuemin={1}
       aria-valuemax={total}
       className={cn(
-        'relative h-1 w-full max-w-[160px] overflow-hidden rounded-full bg-outline-variant/50 select-none',
+        'relative h-1 w-full max-w-[160px] overflow-hidden rounded-full bg-surface-container-high border border-outline-variant select-none',
         className
       )}
       {...props}

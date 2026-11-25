@@ -71,12 +71,12 @@ export const NavigationMenuTrigger = React.forwardRef<
     aria-current={active ? 'page' : undefined}
     className={composeClassName(
       cn(
-        'group relative inline-flex shrink-0 whitespace-nowrap min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none text-on-surface-variant',
+        'group relative inline-flex shrink-0 whitespace-nowrap min-h-[44px] h-full w-max items-center justify-center gap-2 px-4 py-2 font-sans text-sm font-semibold transition-colors motion-reduce:transition-none outline-none cursor-pointer rounded-none text-on-surface-variant',
         'hover:text-on-surface hover:bg-state-hover',
         'data-[popup-open]:text-primary data-[popup-open]:bg-state-hover',
         'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
         active
-          ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none after:z-10'
+          ? 'text-primary after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
           : 'after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none'
       ),
       className
@@ -97,8 +97,8 @@ export const NavigationMenuContent = React.forwardRef<
     data-slot="navigation-menu-content"
     className={composeClassName(
       cn(
-        'h-full max-h-[var(--available-height)] overflow-y-auto overscroll-contain w-[min(calc(100vw-2rem),var(--available-width))] p-2 min-[500px]:w-max min-[500px]:min-w-[260px] min-[500px]:max-w-[min(420px,var(--available-width))]',
-        'transition-[opacity,transform,translate] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
+        'h-full max-h-[var(--available-height)] overflow-y-auto overscroll-contain w-[min(26rem,var(--available-width))] min-w-[min(220px,var(--available-width))] p-2',
+        'transition-[opacity,transform,translate] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
         'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
         'data-[starting-style]:data-[activation-direction=left]:translate-x-[-20%]',
         'data-[starting-style]:data-[activation-direction=right]:translate-x-[20%]',
@@ -135,17 +135,17 @@ export const NavigationMenuLink = React.forwardRef<
       className={composeClassName(
         isBar
           ? cn(
-              'group relative inline-flex shrink-0 whitespace-nowrap min-h-[44px] h-full w-max items-center justify-center gap-2 px-3 sm:px-4 py-2 font-sans text-sm font-semibold transition-colors outline-none cursor-pointer rounded-none',
+              'group relative inline-flex shrink-0 whitespace-nowrap min-h-[44px] h-full w-max items-center justify-center gap-2 px-3.5 py-2 font-sans text-sm font-semibold transition-colors motion-reduce:transition-none outline-none cursor-pointer rounded-none',
               active
-                ? 'text-primary font-bold after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none after:z-10'
+                ? 'text-primary after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-primary after:rounded-none'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover after:absolute after:bottom-0 after:inset-x-0 after:h-[2px] after:bg-transparent after:rounded-none',
               'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary'
             )
           : cn(
-              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded-sm transition-colors cursor-pointer outline-none select-none',
+              'flex flex-col gap-0.5 px-3 py-2 min-h-[44px] rounded-sm transition-colors motion-reduce:transition-none cursor-pointer outline-none select-none',
               active
                 ? 'bg-primary-container text-on-primary-container font-semibold'
-                : 'text-on-surface hover:bg-state-hover focus:bg-state-hover',
+                : 'text-on-surface hover:bg-state-hover focus-visible:bg-state-hover',
               'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary'
             ),
         className
@@ -184,7 +184,7 @@ export const NavigationMenuPopup = React.forwardRef<
       cn(
         'relative h-[var(--popup-height)] w-[var(--popup-width)] max-w-[var(--available-width)] max-h-[var(--available-height)] origin-[var(--transform-origin)]',
         'rounded bg-surface border border-outline-variant shadow-ambient outline-none',
-        'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]',
+        'transition-[opacity,transform,width,height] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
         'data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)]',
         'data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-tiny)]',
         'motion-reduce:transition-none motion-reduce:transform-none [[data-instant]_&]:transition-none [[data-instant]_&]:transform-none'
@@ -215,7 +215,7 @@ export const NavigationMenuArrow = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <BaseNavigationMenu.Arrow
     ref={ref}
-    data-slot="navigation-menu-indicator"
+    data-slot="navigation-menu-arrow"
     className={composeClassName(
       cn(
         'z-10 flex transition-[left,top] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [[data-instant]_&]:transition-none [[data-instant]_&]:transform-none motion-reduce:transition-none',
@@ -249,7 +249,7 @@ export const NavigationMenuIcon = React.forwardRef<
     ref={ref}
     data-slot="navigation-menu-icon"
     className={composeClassName(
-      'transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] group-data-[popup-open]:rotate-180 text-on-surface-variant',
+      'transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none group-data-[popup-open]:rotate-180 text-on-surface-variant',
       className
     )}
     {...props}
@@ -306,7 +306,7 @@ function NavigationMenuComponentInner<Value = string>(
       delay={delay}
       closeDelay={closeDelay}
       orientation={orientation}
-      className={composeClassName('relative z-10 flex w-full min-w-0 h-full items-stretch', className)}
+      className={composeClassName('@container relative flex w-full min-w-0 h-full items-stretch', className)}
       {...props}
     >
       {children ? (

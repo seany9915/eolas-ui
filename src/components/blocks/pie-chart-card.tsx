@@ -17,6 +17,8 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  isTertiaryChartColor,
+  usePrefersReducedMotion,
   type ChartConfig,
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
@@ -87,11 +89,28 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
     },
     ref
   ) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
     const resolvedContentClassName =
       contentClassName ?? (showLegend ? 'h-72 @xs:h-80 w-full' : 'h-56 @xs:h-64 w-full');
     const [internalActiveIndex, setInternalActiveIndex] = React.useState<number | undefined>(undefined);
     const isControlled = activeIndex !== undefined;
     const currentActiveIndex = isControlled ? (activeIndex ?? undefined) : internalActiveIndex;
+
+    const setActiveIndexValue = React.useCallback(
+      (index: number | undefined) => {
+        if (!interactive) return;
+        if (!isControlled) setInternalActiveIndex(index);
+        onActiveIndexChange?.(index);
+      },
+      [interactive, isControlled, onActiveIndexChange]
+    );
+
+    const toggleActiveIndex = React.useCallback(
+      (index: number) => {
+        setActiveIndexValue(currentActiveIndex === index ? undefined : index);
+      },
+      [currentActiveIndex, setActiveIndexValue]
+    );
 
     const slicedData = React.useMemo<Array<Record<string, unknown>>>(() => {
       if (!maxSlices || maxSlices < 2 || data.length <= maxSlices) {
@@ -154,7 +173,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
             ? String(configEntry.theme?.light ?? '')
             : '';
         const fillStr = String(item.fill ?? '');
-        if (fillStr.includes('tertiary') || configColor.includes('tertiary')) {
+        if (isTertiaryChartColor(fillStr) || isTertiaryChartColor(configColor)) {
           indices.add(index);
         }
       });
@@ -184,8 +203,13 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
         ? centerLabel.value
         : totalSum.toLocaleString();
 
+    const activeKey = activeItem ? String(activeItem[nameKey] ?? '') : undefined;
+    const activeConfigLabel =
+      activeKey && resolvedConfig[activeKey]?.label !== undefined
+        ? String(resolvedConfig[activeKey].label)
+        : activeKey;
     const displayLabel = activeItem
-      ? `${String(activeItem[nameKey])}${activePercentage ? ` (${activePercentage})` : ''}`
+      ? `${activeConfigLabel ?? ''}${activePercentage ? ` (${activePercentage})` : ''}`
       : centerLabel?.label || 'Total';
 
     const resolvedEmpty = isEmpty ?? (normalizedData.length === 0 || totalSum <= 0);
@@ -212,7 +236,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
           config={resolvedConfig}
           className="aspect-auto size-full"
         >
-          <PieChart aria-label={chartLabel ?? title}>
+          <PieChart>
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
@@ -225,6 +249,7 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
               outerRadius="82%"
               strokeWidth={2}
               stroke="var(--color-surface)"
+              isAnimationActive={!prefersReducedMotion}
               shape={(shapeProps: PieSectorShapeProps) => {
                 const isHovered = shapeProps.index === currentActiveIndex;
                 const isTertiary = tertiaryIndices.has(shapeProps.index);
@@ -236,25 +261,24 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                     outerRadius={(shapeProps.outerRadius || 85) + (isHovered ? 6 : 0)}
                     className={cn(
                       interactive &&
-                        'transition-opacity duration-quick ease-out motion-reduce:transition-none cursor-pointer'
+                        'transition-opacity duration-quick ease-standard motion-reduce:transition-none cursor-pointer'
                     )}
                   />
                 );
               }}
+              onClick={
+                interactive
+                  ? (_, index) => toggleActiveIndex(index)
+                  : undefined
+              }
               onMouseEnter={
                 interactive
-                  ? (_, index) => {
-                      if (!isControlled) setInternalActiveIndex(index);
-                      onActiveIndexChange?.(index);
-                    }
+                  ? (_, index) => setActiveIndexValue(index)
                   : undefined
               }
               onMouseLeave={
                 interactive
-                  ? () => {
-                      if (!isControlled) setInternalActiveIndex(undefined);
-                      onActiveIndexChange?.(undefined);
-                    }
+                  ? () => setActiveIndexValue(undefined)
                   : undefined
               }
             >
@@ -270,14 +294,14 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                       >
                         <tspan
                           x={viewBox.cx}
-                          y={viewBox.cy}
+                          y={(viewBox.cy || 0) - 6}
                           className="fill-on-surface text-xl @xs:text-2xl font-bold font-mono tracking-tight"
                         >
                           {displayValue}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 20}
+                          y={(viewBox.cy || 0) + 14}
                           className="fill-on-surface-variant text-xs font-sans font-medium"
                         >
                           {typeof displayLabel === 'string' && displayLabel.length > 18
@@ -296,6 +320,8 @@ export const PieChartCard = React.forwardRef<HTMLDivElement, PieChartCardProps>(
                 content={
                   <ChartLegendContent
                     nameKey={nameKey}
+                    activeIndex={interactive ? currentActiveIndex : undefined}
+                    onItemClick={interactive ? toggleActiveIndex : undefined}
                     className="flex-wrap"
                   />
                 }

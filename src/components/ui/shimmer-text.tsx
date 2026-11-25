@@ -53,6 +53,7 @@ export const ShimmerText = React.forwardRef<HTMLElement, ShimmerTextProps>(
     return (
       <Component
         ref={ref as never}
+        data-slot="shimmer-text"
         className={cn(
           'inline-block font-sans text-on-surface-variant',
           active && 'animate-shimmer-sweep',

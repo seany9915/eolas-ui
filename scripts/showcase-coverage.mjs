@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { stripComments } from './registry-meta.mjs';
 
 const ROOT = process.cwd();
 const UI_DIR = path.resolve(ROOT, 'src/components/ui');
@@ -36,12 +37,12 @@ if (!demoMapMatch) {
   process.exit(1);
 }
 
-const mapBody = demoMapMatch[1];
+const cleanMapBody = stripComments(demoMapMatch[1]);
 const registeredDemoKeys = new Set();
-const keyRegex = /['"]([a-z0-9-]+)['"]\s*:/g;
+const keyRegex = /(?:^|[,{\n])\s*(?:['"]([a-z0-9-]+)['"]|([a-zA-Z_$][a-zA-Z0-9_$]*))\s*:/g;
 let match;
-while ((match = keyRegex.exec(mapBody)) !== null) {
-  registeredDemoKeys.add(match[1]);
+while ((match = keyRegex.exec(cleanMapBody)) !== null) {
+  registeredDemoKeys.add(match[1] || match[2]);
 }
 
 // 4. Extract all manifest entry IDs from registry-manifest.ts

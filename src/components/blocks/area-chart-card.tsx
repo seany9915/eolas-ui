@@ -16,6 +16,8 @@ import {
   ChartLegend,
   ChartLegendContent,
   applySeriesOverrides,
+  resolveChartSeriesColor,
+  usePrefersReducedMotion,
   type ChartConfig,
 } from '@/components/ui/chart';
 
@@ -70,6 +72,7 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
     },
     ref
   ) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
     const gradientIdPrefix = React.useId().replace(/:/g, '');
     const shouldShowLegend = showLegend ?? (series.length > 1);
     const resolvedContentClassName =
@@ -100,32 +103,35 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
           className="aspect-auto size-full"
         >
           <AreaChart
-            aria-label={chartLabel ?? title}
             data={data}
             margin={{ left: showYAxis ? 0 : 12, right: 12, top: 12, bottom: 0 }}
           >
             <defs>
-              {series.map((item) => (
-                <linearGradient
-                  key={item.dataKey}
-                  id={`area-gradient-${gradientIdPrefix}-${item.dataKey}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop
-                    offset="5%"
-                    stopColor={`var(--color-${item.dataKey})`}
-                    stopOpacity={0.4}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor={`var(--color-${item.dataKey})`}
-                    stopOpacity={0.02}
-                  />
-                </linearGradient>
-              ))}
+              {series.map((item, index) => {
+                const safeKey = item.dataKey.replace(/[^a-zA-Z0-9_-]/g, '_');
+                const { fill } = resolveChartSeriesColor(resolvedConfig, item.dataKey, index);
+                return (
+                  <linearGradient
+                    key={item.dataKey}
+                    id={`area-gradient-${gradientIdPrefix}-${safeKey}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="5%"
+                      stopColor={fill}
+                      stopOpacity={0.4}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor={fill}
+                      stopOpacity={0.02}
+                    />
+                  </linearGradient>
+                );
+              })}
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -156,17 +162,22 @@ export const AreaChartCard = React.forwardRef<HTMLDivElement, AreaChartCardProps
             {shouldShowLegend && (
               <ChartLegend content={<ChartLegendContent />} />
             )}
-            {series.map((item) => (
-              <Area
-                key={item.dataKey}
-                type="monotone"
-                dataKey={item.dataKey}
-                stackId={item.stackId}
-                stroke={`var(--color-${item.dataKey})`}
-                strokeWidth={2}
-                fill={`url(#area-gradient-${gradientIdPrefix}-${item.dataKey})`}
-              />
-            ))}
+            {series.map((item, index) => {
+              const safeKey = item.dataKey.replace(/[^a-zA-Z0-9_-]/g, '_');
+              const { stroke } = resolveChartSeriesColor(resolvedConfig, item.dataKey, index);
+              return (
+                <Area
+                  key={item.dataKey}
+                  type="monotone"
+                  dataKey={item.dataKey}
+                  stackId={item.stackId}
+                  stroke={stroke}
+                  strokeWidth={2}
+                  isAnimationActive={!prefersReducedMotion}
+                  fill={`url(#area-gradient-${gradientIdPrefix}-${safeKey})`}
+                />
+              );
+            })}
           </AreaChart>
         </ChartContainer>
       </ChartCard>

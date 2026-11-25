@@ -60,6 +60,9 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
     const generatedId = React.useId();
     const labelId = label ? `${generatedId}-label` : undefined;
     const descId = description ? `${generatedId}-desc` : undefined;
+    const errorId = error ? `${generatedId}-error` : undefined;
+    const describedBy =
+      [props['aria-describedby'], descId, errorId].filter(Boolean).join(' ') || undefined;
 
     return (
       <BaseCheckboxGroup
@@ -70,9 +73,10 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
         onValueChange={onValueChange}
         disabled={disabled}
         aria-labelledby={labelId}
-        aria-describedby={descId}
         className={composeClassName('w-full', className)}
         {...props}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={describedBy}
       >
         {(label || description) && (
           <div className="flex flex-col gap-0.5 mb-2.5">
@@ -107,8 +111,11 @@ const CheckboxGroupComponent = React.forwardRef<HTMLDivElement, CheckboxGroupPro
               ))}
         </div>
         {error && (
-          <span className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none mt-1.5">
-            <Icon name="error" size="sm" className="shrink-0" />
+          <span
+            id={errorId}
+            className="flex items-center gap-1 font-sans text-sm font-semibold text-error select-none mt-1.5"
+          >
+            <Icon name="error" size="sm" className="shrink-0" aria-hidden="true" />
             <span>{error}</span>
           </span>
         )}

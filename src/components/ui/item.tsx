@@ -33,7 +33,7 @@ import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
-import { cn } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 const ItemGroupContext = React.createContext(false);
 
@@ -141,12 +141,14 @@ export const ItemRoot = React.forwardRef<HTMLDivElement, ItemProps>(
       className,
     });
 
-    const implicitA11yProps =
-      isInteractive && !render
-        ? { tabIndex: 0, role: 'button' }
-        : inGroup
-          ? { role: 'listitem' }
-          : {};
+    const implicitA11yProps = inGroup
+      ? {
+          role: 'listitem' as const,
+          ...(isInteractive && !render ? { tabIndex: 0 } : {}),
+        }
+      : isInteractive && !render
+        ? { tabIndex: 0, role: 'button' as const }
+        : {};
 
     return useRender({
       render,
@@ -224,7 +226,7 @@ export const ItemSeparator = React.forwardRef<HTMLDivElement, ItemSeparatorProps
         role={role ?? (inGroup ? 'none' : 'separator')}
         className={cn(
           'bg-outline-variant/60 shrink-0 select-none',
-          orientation === 'horizontal' ? 'h-[1px] w-full my-0' : 'w-[1px] h-full mx-0 self-stretch',
+          orientation === 'horizontal' ? 'h-px w-full my-0' : 'w-px h-full mx-0 self-stretch',
           className
         )}
         {...props}
@@ -247,7 +249,7 @@ export interface ItemMediaProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const mediaVariantStyles: Record<ItemMediaVariant, string> = {
   default: 'bg-transparent flex items-center justify-center shrink-0 [&_svg]:size-4 [&_.material-symbols-outlined]:text-base',
-  icon: 'size-9 rounded-md bg-surface-container-high text-on-surface-variant group-data-[variant=selected]/item:bg-surface group-data-[variant=selected]/item:text-primary flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
+  icon: 'size-9 rounded-md bg-surface-container-high text-on-surface group-data-[variant=selected]/item:bg-surface group-data-[variant=selected]/item:text-primary flex items-center justify-center [&_svg]:size-5 [&_.material-symbols-outlined]:text-xl transition-colors duration-[var(--duration-micro)] ease-[var(--ease-standard)] motion-reduce:transition-none',
   avatar: 'size-10 rounded-full overflow-hidden flex items-center justify-center shrink-0',
   image: 'size-12 rounded-md overflow-hidden object-cover flex items-center justify-center shrink-0',
 };
@@ -393,13 +395,15 @@ export interface ItemTriggerProps
  * allowing sibling buttons in `<Item.Actions>` without nesting interactive controls.
  */
 export const ItemTrigger = React.forwardRef<HTMLButtonElement, ItemTriggerProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, render, nativeButton, ...props }, ref) => (
     <BaseButton
       ref={ref}
       data-slot="item-trigger"
       data-item-trigger=""
-      className={cn(
-        'card-link text-start cursor-pointer transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-primary motion-reduce:transition-none focus:outline-none',
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      className={composeClassName(
+        'card-link text-start cursor-pointer transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-primary motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         className
       )}
       {...props}
@@ -423,7 +427,7 @@ export const ItemLink = React.forwardRef<HTMLAnchorElement, ItemLinkProps>(
       data-slot="item-link"
       data-item-trigger=""
       className={cn(
-        'card-link transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-primary motion-reduce:transition-none focus:outline-none',
+        'card-link transition-colors duration-[var(--duration-quick)] ease-[var(--ease-standard)] hover:text-primary motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         className
       )}
       {...props}

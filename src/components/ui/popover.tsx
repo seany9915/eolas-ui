@@ -48,6 +48,40 @@ export interface PopoverProps<Payload = unknown> {
   className?: BasePopover.Popup.Props['className'];
 }
 
+const POPOVER_PART = Symbol.for('eolas.popover.part');
+const POPOVER_PART_NAMES = new Set([
+  'PopoverTrigger',
+  'PopoverContent',
+  'PopoverPortal',
+  'PopoverPositioner',
+  'PopoverPopup',
+]);
+
+function hasPopoverCompoundChild(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) return false;
+    if (child.type === React.Fragment) {
+      return hasPopoverCompoundChild(child.props.children);
+    }
+    if (
+      child.type === BasePopover.Trigger ||
+      child.type === BasePopover.Portal ||
+      child.type === BasePopover.Positioner ||
+      child.type === BasePopover.Popup
+    ) {
+      return true;
+    }
+    if (typeof child.type === 'object' || typeof child.type === 'function') {
+      if (POPOVER_PART in child.type) return true;
+      const maybeNamed = child.type as { displayName?: string };
+      if (maybeNamed.displayName && POPOVER_PART_NAMES.has(maybeNamed.displayName)) {
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
 function PopoverComponentInner<Payload = unknown>(
   {
     label,
@@ -88,20 +122,11 @@ function PopoverComponentInner<Payload = unknown>(
   const popoverId = `popover-${generatedId}`;
 
   const isCompoundUsage = React.useMemo(() => {
-    if (trigger) return false;
+    if (trigger !== undefined || anchor !== undefined) return false;
     if (!title && !description) return true;
     if (typeof children === 'function') return false;
-    return React.Children.toArray(children).some(
-      (child) =>
-        React.isValidElement(child) &&
-        (child.type === PopoverTrigger ||
-          child.type === PopoverContent ||
-          child.type === BasePopover.Trigger ||
-          child.type === BasePopover.Portal ||
-          child.type === BasePopover.Positioner ||
-          child.type === BasePopover.Popup)
-    );
-  }, [trigger, title, description, children]);
+    return hasPopoverCompoundChild(children);
+  }, [trigger, anchor, title, description, children]);
 
   // If used as a composable compound root (<Popover open={...}><PopoverTrigger /><PopoverContent /></Popover>)
   if (isCompoundUsage) {
@@ -280,87 +305,93 @@ export interface PopoverContentProps
   keepMounted?: boolean;
 }
 
-export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  (
-    {
-      className,
-      children,
-      side,
-      align,
-      sideOffset = 8,
-      alignOffset,
-      collisionPadding = 8,
-      anchor,
-      showArrow = true,
-      containerClassName,
-      portal = true,
-      keepMounted,
-      ...props
-    },
-    ref
-  ) => {
-    const content = (
-      <BasePopover.Positioner
-        anchor={anchor}
-        side={side}
-        align={align}
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
-        collisionPadding={collisionPadding}
-        className={composeClassName('z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none', containerClassName)}
-      >
-        <BasePopover.Popup
-          ref={ref}
-          data-slot="popover-content"
-          className={composeClassName(
-            'relative flex flex-col w-80 max-w-full max-h-[var(--available-height)] p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-            className
-          )}
-          {...props}
+export const PopoverContent = Object.assign(
+  React.forwardRef<HTMLDivElement, PopoverContentProps>(
+    (
+      {
+        className,
+        children,
+        side,
+        align,
+        sideOffset = 8,
+        alignOffset,
+        collisionPadding = 8,
+        anchor,
+        showArrow = true,
+        containerClassName,
+        portal = true,
+        keepMounted,
+        ...props
+      },
+      ref
+    ) => {
+      const content = (
+        <BasePopover.Positioner
+          anchor={anchor}
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          alignOffset={alignOffset}
+          collisionPadding={collisionPadding}
+          className={composeClassName('z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none', containerClassName)}
         >
-          {showArrow && <PopoverArrow />}
-          <div data-slot="popover-body" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-            {children}
-          </div>
-        </BasePopover.Popup>
-      </BasePopover.Positioner>
-    );
+          <BasePopover.Popup
+            ref={ref}
+            data-slot="popover-content"
+            className={composeClassName(
+              'relative flex flex-col w-80 max-w-full max-h-[var(--available-height)] p-5 rounded bg-surface border border-outline-variant shadow-ambient focus:outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
+              className
+            )}
+            {...props}
+          >
+            {showArrow && <PopoverArrow />}
+            <div data-slot="popover-body" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+              {children}
+            </div>
+          </BasePopover.Popup>
+        </BasePopover.Positioner>
+      );
 
-    if (!portal) {
-      return content;
+      if (!portal) {
+        return content;
+      }
+
+      return <BasePopover.Portal keepMounted={keepMounted}>{content}</BasePopover.Portal>;
     }
-
-    return <BasePopover.Portal keepMounted={keepMounted}>{content}</BasePopover.Portal>;
-  }
+  ),
+  { [POPOVER_PART]: true }
 );
 PopoverContent.displayName = 'PopoverContent';
 
 export interface PopoverTriggerProps
   extends React.ComponentPropsWithoutRef<typeof BasePopover.Trigger> {}
 
-export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
-  ({ className, children, openOnHover, delay, closeDelay, render, nativeButton, ...props }, ref) => {
-    const context = usePopoverContext();
-    const resolvedOpenOnHover = openOnHover ?? context.openOnHover;
-    const resolvedDelay = delay ?? context.delay;
-    const resolvedCloseDelay = closeDelay ?? context.closeDelay;
+export const PopoverTrigger = Object.assign(
+  React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
+    ({ className, children, openOnHover, delay, closeDelay, render, nativeButton, ...props }, ref) => {
+      const context = usePopoverContext();
+      const resolvedOpenOnHover = openOnHover ?? context.openOnHover;
+      const resolvedDelay = delay ?? context.delay;
+      const resolvedCloseDelay = closeDelay ?? context.closeDelay;
 
-    return (
-      <BasePopover.Trigger
-        ref={ref}
-        data-slot="popover-trigger"
-        render={render}
-        nativeButton={resolveNativeButton(render, nativeButton)}
-        openOnHover={resolvedOpenOnHover}
-        delay={resolvedDelay}
-        closeDelay={resolvedCloseDelay}
-        className={className}
-        {...props}
-      >
-        {children}
-      </BasePopover.Trigger>
-    );
-  }
+      return (
+        <BasePopover.Trigger
+          ref={ref}
+          data-slot="popover-trigger"
+          render={render}
+          nativeButton={resolveNativeButton(render, nativeButton)}
+          openOnHover={resolvedOpenOnHover}
+          {...(resolvedDelay !== undefined ? { delay: resolvedDelay } : {})}
+          {...(resolvedCloseDelay !== undefined ? { closeDelay: resolvedCloseDelay } : {})}
+          className={className}
+          {...props}
+        >
+          {children}
+        </BasePopover.Trigger>
+      );
+    }
+  ),
+  { [POPOVER_PART]: true }
 );
 PopoverTrigger.displayName = 'PopoverTrigger';
 

@@ -133,20 +133,32 @@ export async function processChunked<T, R>(
     typeof chunkSizeOrOptions === 'object' && chunkSizeOrOptions !== null
       ? chunkSizeOrOptions
       : {};
+  const chunkSize =
+    typeof chunkSizeOrOptions === 'number' &&
+    Number.isFinite(chunkSizeOrOptions) &&
+    chunkSizeOrOptions >= 1
+      ? Math.floor(chunkSizeOrOptions)
+      : undefined;
   const budgetMs = options.budgetMs ?? DEFAULT_FRAME_BUDGET_MS;
   const { signal } = options;
 
   const results: R[] = [];
   let sliceStart = getNow();
+  let itemsSinceYield = 0;
 
   for (let i = 0; i < items.length; i++) {
     if (signal?.aborted) {
       throw signal.reason ?? new DOMException('Task aborted', 'AbortError');
     }
     results.push(processFn(items[i], i));
-    if (i < items.length - 1 && shouldYield(sliceStart, budgetMs)) {
+    itemsSinceYield++;
+    if (
+      i < items.length - 1 &&
+      ((chunkSize !== undefined && itemsSinceYield >= chunkSize) || shouldYield(sliceStart, budgetMs))
+    ) {
       await yieldToMain();
       sliceStart = getNow();
+      itemsSinceYield = 0;
     }
   }
 
@@ -169,6 +181,12 @@ export function useYieldingFilter<T>(
     typeof chunkSizeOrOptions === 'object' && chunkSizeOrOptions !== null
       ? (chunkSizeOrOptions.budgetMs ?? DEFAULT_FRAME_BUDGET_MS)
       : DEFAULT_FRAME_BUDGET_MS;
+  const chunkSize =
+    typeof chunkSizeOrOptions === 'number' &&
+    Number.isFinite(chunkSizeOrOptions) &&
+    chunkSizeOrOptions >= 1
+      ? Math.floor(chunkSizeOrOptions)
+      : undefined;
   const resolvedDeps =
     typeof chunkSizeOrOptions === 'object' && chunkSizeOrOptions !== null
       ? (chunkSizeOrOptions.deps ?? deps)
@@ -180,7 +198,16 @@ export function useYieldingFilter<T>(
   const prevDepsRef = React.useRef<React.DependencyList | undefined>(undefined);
   const prevItemsRef = React.useRef<T[] | undefined>(undefined);
   const prevBudgetRef = React.useRef<number | undefined>(undefined);
+  const prevChunkSizeRef = React.useRef<number | undefined>(undefined);
   const runIdRef = React.useRef(0);
+  const mountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   React.useEffect(() => {
     predicateRef.current = predicate;
@@ -189,6 +216,7 @@ export function useYieldingFilter<T>(
   React.useEffect(() => {
     const itemsChanged = !Object.is(prevItemsRef.current, items);
     const budgetChanged = !Object.is(prevBudgetRef.current, budgetMs);
+    const chunkSizeChanged = !Object.is(prevChunkSizeRef.current, chunkSize);
     let depsChanged = false;
 
     if (resolvedDeps !== undefined) {
@@ -199,48 +227,50 @@ export function useYieldingFilter<T>(
         resolvedDeps.some((value, index) => !Object.is(value, prev[index]));
     }
 
-    if (!itemsChanged && !budgetChanged && !depsChanged) {
+    if (!itemsChanged && !budgetChanged && !chunkSizeChanged && !depsChanged) {
       return;
     }
 
     prevItemsRef.current = items;
     prevBudgetRef.current = budgetMs;
+    prevChunkSizeRef.current = chunkSize;
     prevDepsRef.current = resolvedDeps;
 
     const currentRunId = ++runIdRef.current;
-    let active = true;
     setIsFiltering(true);
 
     async function runFilter() {
       const matched: T[] = [];
       let sliceStart = getNow();
+      let itemsSinceYield = 0;
 
       for (let i = 0; i < items.length; i++) {
-        if (!active || runIdRef.current !== currentRunId) return;
+        if (!mountedRef.current || runIdRef.current !== currentRunId) return;
         if (predicateRef.current(items[i])) {
           matched.push(items[i]);
         }
-        if (i < items.length - 1 && shouldYield(sliceStart, budgetMs)) {
+        itemsSinceYield++;
+        if (
+          i < items.length - 1 &&
+          ((chunkSize !== undefined && itemsSinceYield >= chunkSize) || shouldYield(sliceStart, budgetMs))
+        ) {
           await yieldToMain();
           sliceStart = getNow();
+          itemsSinceYield = 0;
         }
       }
-      if (active && runIdRef.current === currentRunId) {
+      if (mountedRef.current && runIdRef.current === currentRunId) {
         setFiltered(matched);
         setIsFiltering(false);
       }
     }
 
     runFilter().catch(() => {
-      if (active && runIdRef.current === currentRunId) {
+      if (mountedRef.current && runIdRef.current === currentRunId) {
         setIsFiltering(false);
       }
     });
-
-    return () => {
-      active = false;
-    };
-  }, [items, budgetMs, resolvedDeps]);
+  }, [items, budgetMs, chunkSize, resolvedDeps]);
 
   return { filtered, isFiltering };
 }

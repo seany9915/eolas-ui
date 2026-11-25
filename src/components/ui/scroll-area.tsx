@@ -71,12 +71,12 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
         data-slot="scroll-area-viewport"
         style={maxHeight !== undefined ? { maxHeight } : undefined}
         className={cn(
-          'size-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          'size-full focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
           fadeMaskClass,
           viewportClassName
         )}
       >
-        <BaseScrollArea.Content className={contentClassName}>
+        <BaseScrollArea.Content data-slot="scroll-area-content" className={contentClassName}>
           {children}
         </BaseScrollArea.Content>
       </BaseScrollArea.Viewport>
@@ -85,9 +85,9 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
         <BaseScrollArea.Scrollbar
           data-slot="scroll-area-scrollbar"
           orientation="vertical"
-          className="flex select-none touch-none p-0.5 w-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
+          className="flex select-none touch-none p-0.5 w-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] motion-reduce:transition-none opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
         >
-          <BaseScrollArea.Thumb data-slot="scroll-area-thumb" className="w-full bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline rounded-full transition-colors" />
+          <BaseScrollArea.Thumb data-slot="scroll-area-thumb" className="w-full bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline forced-colors:bg-[ButtonText] rounded-full transition-colors motion-reduce:transition-none" />
         </BaseScrollArea.Scrollbar>
       )}
 
@@ -95,14 +95,14 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
         <BaseScrollArea.Scrollbar
           data-slot="scroll-area-scrollbar"
           orientation="horizontal"
-          className="flex select-none touch-none p-0.5 h-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
+          className="flex select-none touch-none p-0.5 h-2.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] motion-reduce:transition-none opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto"
         >
-          <BaseScrollArea.Thumb data-slot="scroll-area-thumb" className="h-full bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline rounded-full transition-colors" />
+          <BaseScrollArea.Thumb data-slot="scroll-area-thumb" className="h-full bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline forced-colors:bg-[ButtonText] rounded-full transition-colors motion-reduce:transition-none" />
         </BaseScrollArea.Scrollbar>
       )}
 
       {orientation === 'both' && (
-        <BaseScrollArea.Corner className="bg-transparent" />
+        <BaseScrollArea.Corner data-slot="scroll-area-corner" className="bg-transparent" />
       )}
     </BaseScrollArea.Root>
   );
@@ -113,40 +113,93 @@ ScrollAreaComponent.displayName = 'ScrollArea';
 export const ScrollAreaRoot = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseScrollArea.Root>
->((props, ref) => <BaseScrollArea.Root ref={ref} data-slot="scroll-area" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseScrollArea.Root
+    ref={ref}
+    data-slot="scroll-area"
+    className={composeClassName('relative overflow-hidden w-full', className)}
+    {...props}
+  />
+));
 ScrollAreaRoot.displayName = 'ScrollAreaRoot';
 
 export const ScrollAreaViewport = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseScrollArea.Viewport>
->((props, ref) => <BaseScrollArea.Viewport ref={ref} data-slot="scroll-area-viewport" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseScrollArea.Viewport
+    ref={ref}
+    data-slot="scroll-area-viewport"
+    className={composeClassName(
+      'size-full focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary',
+      className
+    )}
+    {...props}
+  />
+));
 ScrollAreaViewport.displayName = 'ScrollAreaViewport';
 
 export const ScrollAreaScrollbar = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseScrollArea.Scrollbar>
->((props, ref) => <BaseScrollArea.Scrollbar ref={ref} data-slot="scroll-area-scrollbar" {...props} />);
+>(({ className, orientation = 'vertical', ...props }, ref) => (
+  <BaseScrollArea.Scrollbar
+    ref={ref}
+    data-slot="scroll-area-scrollbar"
+    orientation={orientation}
+    className={composeClassName(
+      cn(
+        'flex select-none touch-none p-0.5 bg-transparent hover:bg-on-surface/5 transition-opacity duration-[var(--duration-fast)] motion-reduce:transition-none opacity-0 pointer-events-none data-hovering:opacity-100 data-hovering:pointer-events-auto data-scrolling:opacity-100 data-scrolling:duration-0 data-scrolling:pointer-events-auto',
+        orientation === 'horizontal' ? 'h-2.5' : 'w-2.5'
+      ),
+      className
+    )}
+    {...props}
+  />
+));
 ScrollAreaScrollbar.displayName = 'ScrollAreaScrollbar';
 
 export const ScrollAreaThumb = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseScrollArea.Thumb>
->((props, ref) => <BaseScrollArea.Thumb ref={ref} data-slot="scroll-area-thumb" {...props} />);
+>(({ className, ...props }, ref) => (
+  <BaseScrollArea.Thumb
+    ref={ref}
+    data-slot="scroll-area-thumb"
+    className={composeClassName(
+      'flex-1 bg-outline/60 hover:bg-outline contrast-more:bg-on-surface contrast-more:opacity-100 contrast-more:border contrast-more:border-outline forced-colors:bg-[ButtonText] rounded-full transition-colors motion-reduce:transition-none',
+      className
+    )}
+    {...props}
+  />
+));
 ScrollAreaThumb.displayName = 'ScrollAreaThumb';
+
+export const ScrollAreaContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseScrollArea.Content>
+>((props, ref) => <BaseScrollArea.Content ref={ref} data-slot="scroll-area-content" {...props} />);
+ScrollAreaContent.displayName = 'ScrollAreaContent';
+
+export const ScrollAreaCorner = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseScrollArea.Corner>
+>(({ className, ...props }, ref) => (
+  <BaseScrollArea.Corner ref={ref} data-slot="scroll-area-corner" className={composeClassName('bg-transparent', className)} {...props} />
+));
+ScrollAreaCorner.displayName = 'ScrollAreaCorner';
 
 // Compound export mapping Base UI primitives
 export const ScrollArea = Object.assign(ScrollAreaComponent, {
   Root: ScrollAreaRoot,
   Viewport: ScrollAreaViewport,
-  Content: BaseScrollArea.Content,
+  Content: ScrollAreaContent,
   Scrollbar: ScrollAreaScrollbar,
   Thumb: ScrollAreaThumb,
-  Corner: BaseScrollArea.Corner,
+  Corner: ScrollAreaCorner,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseScrollArea };
-export const ScrollAreaContent = BaseScrollArea.Content;
-export const ScrollAreaCorner = BaseScrollArea.Corner;
 
 export default ScrollArea;

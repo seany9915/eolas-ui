@@ -28,7 +28,7 @@
       "name": "announce",
       "type": "registry:lib",
       "title": "Announce",
-      "description": "Imperative screen-reader live-region announcer.",
+      "description": "Imperative ARIA live-region announcer utility and component for conveying dynamic status updates to screen readers.",
       "categories": [
         "system"
       ],
@@ -76,7 +76,7 @@
       "name": "format-duration",
       "type": "registry:lib",
       "title": "Format Duration",
-      "description": "Duration Formatting Utility and Hook",
+      "description": "Locale-safe duration formatter and hook converting seconds or milliseconds into concise human-readable clinical labels.",
       "categories": [
         "system"
       ],
@@ -92,7 +92,7 @@
       "name": "sanitize",
       "type": "registry:lib",
       "title": "Sanitize",
-      "description": "Untrusted HTML Sanitizer Utility & React Component.",
+      "description": "DOMParser-based HTML sanitizer utility and React component blocking unsafe scripts, handlers, and dangerous URLs.",
       "categories": [
         "system"
       ],
@@ -108,7 +108,7 @@
       "name": "scheduler",
       "type": "registry:lib",
       "title": "Scheduler",
-      "description": "Cooperative Task Scheduling & Yielding Utilities.",
+      "description": "Cooperative task scheduling and yielding helpers keeping main-thread interactions responsive during heavy updates.",
       "categories": [
         "system"
       ],
@@ -124,7 +124,7 @@
       "name": "scroll-completion",
       "type": "registry:lib",
       "title": "Scroll Completion",
-      "description": "Programmatic scroll completion utilities.",
+      "description": "Programmatic smooth-scroll helper resolving cleanly when animated scrolling reaches its target or is cancelled.",
       "categories": [
         "system"
       ],
@@ -156,7 +156,7 @@
       "name": "use-text-highlight",
       "type": "registry:lib",
       "title": "Use Text Highlight",
-      "description": "useTextHighlight Hook",
+      "description": "React hook splitting strings into highlighted and plain segments for live search filtering.",
       "categories": [
         "system"
       ],
@@ -172,7 +172,7 @@
       "name": "use-web-otp",
       "type": "registry:lib",
       "title": "Use Web OTP",
-      "description": "WebOTP API auto-extraction hook.",
+      "description": "React hook subscribing to navigator.credentials WebOTP one-time verification codes with abort cleanup.",
       "categories": [
         "system"
       ],
@@ -188,7 +188,7 @@
       "name": "view-transitions",
       "type": "registry:lib",
       "title": "View Transitions",
-      "description": "View Transitions API React hook and utility.",
+      "description": "React hook and helper wrapping document.startViewTransition with graceful reduced-motion and fallback handling.",
       "categories": [
         "system"
       ],
@@ -425,7 +425,7 @@
       "name": "accordion",
       "type": "registry:ui",
       "title": "Accordion",
-      "description": "Accordion primitive (@base-ui/react/accordion).",
+      "description": "Expandable and collapsible content sections supporting single or multiple open panels and keyboard navigation on Base UI Accordion.",
       "categories": [
         "navigation"
       ],
@@ -462,8 +462,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/dialog.json"
       ],
       "files": [
@@ -478,7 +478,7 @@
       "name": "attachment",
       "type": "registry:ui",
       "title": "Attachment",
-      "description": "Attachment component system.",
+      "description": "File attachment display and management primitive with file-type metadata, previews, upload progress, and remove actions.",
       "categories": [
         "layout"
       ],
@@ -503,7 +503,7 @@
       "name": "autocomplete",
       "type": "registry:ui",
       "title": "Autocomplete",
-      "description": "Autocomplete primitive (@base-ui/react/autocomplete).",
+      "description": "Filterable text input with live popup suggestions, clear button, and grouped results built on Base UI Autocomplete.",
       "categories": [
         "inputs"
       ],
@@ -532,7 +532,7 @@
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",
-      "description": "Avatar primitive (@base-ui/react/avatar).",
+      "description": "Circular user or clinician identity badge displaying photography with automatic initials or icon fallback on Base UI Avatar.",
       "categories": [
         "layout"
       ],
@@ -562,7 +562,7 @@
       "name": "badge",
       "type": "registry:ui",
       "title": "Badge",
-      "description": "Badge primitive.",
+      "description": "Compact high-contrast status and category pill enforcing filled, outline, and soft-wash clinical palette rules.",
       "categories": [
         "feedback"
       ],
@@ -605,6 +605,7 @@
         "bot-avatars"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -642,7 +643,7 @@
       "name": "button-group",
       "type": "registry:ui",
       "title": "Button Group",
-      "description": "ButtonGroup primitive.",
+      "description": "Segmented horizontal or vertical container joining adjacent buttons, inputs, and addons with shared borders and focus layering.",
       "categories": [
         "inputs"
       ],
@@ -673,7 +674,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "Button primitive (@base-ui/react/button).",
+      "description": "Interactive push button with filled, soft, outline, and text variants, 44px minimum touch targets, and reduced-motion loading feedback on Base UI Button.",
       "categories": [
         "inputs"
       ],
@@ -704,7 +705,7 @@
       "name": "calendar",
       "type": "registry:ui",
       "title": "Calendar",
-      "description": "Calendar primitive (React DayPicker).",
+      "description": "Single-date and date-range month calendar built on React DayPicker with 44px day cells, month selectors, and keyboard navigation.",
       "categories": [
         "inputs"
       ],
@@ -790,15 +791,15 @@
       "name": "chain-of-thought",
       "type": "registry:ui",
       "title": "Chain Of Thought",
-      "description": "ChainOfThought primitive.",
+      "description": "Collapsible multi-step AI reasoning trace showing step status, search results, sources, and elapsed timings.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -860,12 +861,11 @@
       "name": "chat-message",
       "type": "registry:ui",
       "title": "Chat Message",
-      "description": "ChatMessage primitive.",
+      "description": "Structured conversation message row supporting user, assistant, and system alignments, markdown prose, actions, and status metadata.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/avatar.json",
@@ -873,6 +873,8 @@
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/reasoning.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
+        "https://seany9915.github.io/eolas-ui/r/announce.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
       ],
       "files": [
@@ -905,9 +907,9 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/checkbox.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -929,7 +931,7 @@
       "name": "checkbox",
       "type": "registry:ui",
       "title": "Checkbox",
-      "description": "Checkbox primitive (@base-ui/react/checkbox).",
+      "description": "Accessible binary and indeterminate selection control with 44px touch target, error state, and keyboard toggle on Base UI Checkbox.",
       "categories": [
         "inputs"
       ],
@@ -960,16 +962,16 @@
       "name": "checkpoint",
       "type": "registry:ui",
       "title": "Checkpoint",
-      "description": "Checkpoint primitive.",
+      "description": "Inline conversation milestone divider marking saved thread states with a one-click restore trigger.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
-        "https://seany9915.github.io/eolas-ui/r/separator.json"
+        "https://seany9915.github.io/eolas-ui/r/separator.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1048,16 +1050,16 @@
       "name": "code-block",
       "type": "registry:ui",
       "title": "Code Block",
-      "description": "CodeBlock primitive.",
+      "description": "Syntax-styled code viewer supporting language labels, optional line numbers, copy button, and scrollable horizontal overflow.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/announce.json",
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+        "https://seany9915.github.io/eolas-ui/r/tooltip.json",
+        "https://seany9915.github.io/eolas-ui/r/announce.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1078,7 +1080,7 @@
       "name": "collapsible",
       "type": "registry:ui",
       "title": "Collapsible",
-      "description": "Collapsible primitive (@base-ui/react/collapsible).",
+      "description": "Accessible disclosure container with animated panel height and reduced-motion fallback built on Base UI Collapsible.",
       "categories": [
         "layout"
       ],
@@ -1107,7 +1109,7 @@
       "name": "combobox",
       "type": "registry:ui",
       "title": "Combobox",
-      "description": "Combobox primitive (@base-ui/react/combobox).",
+      "description": "Searchable single- and multi-select dropdown with chips, grouped options, and clear control built on Base UI Combobox.",
       "categories": [
         "inputs"
       ],
@@ -1115,6 +1117,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -1137,7 +1140,7 @@
       "name": "command",
       "type": "registry:ui",
       "title": "Command",
-      "description": "Command primitive (cmdk + Base UI Dialog).",
+      "description": "Modal keyboard command palette and fuzzy filter list combining cmdk search with accessible Base UI Dialog focus management.",
       "categories": [
         "overlays"
       ],
@@ -1169,16 +1172,16 @@
       "name": "confirmation",
       "type": "registry:ui",
       "title": "Confirmation",
-      "description": "Confirmation primitive.",
+      "description": "Inline clinical or tool approval prompt requesting explicit accept or reject confirmation with outcome feedback.",
       "categories": [
         "overlays"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1244,7 +1247,7 @@
       "name": "deferred-view",
       "type": "registry:ui",
       "title": "Deferred View",
-      "description": "DeferredView primitive.",
+      "description": "Progressive rendering wrapper deferring heavy offscreen subtrees until idle or visible in the viewport.",
       "categories": [
         "layout"
       ],
@@ -1279,8 +1282,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/button.json"
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1313,7 +1316,7 @@
       "name": "drawer",
       "type": "registry:ui",
       "title": "Drawer",
-      "description": "Drawer primitive (@base-ui/react/drawer).",
+      "description": "Viewport-edge slide-over panel with backdrop blur, focus trapping, and logical RTL-aware anchoring on Base UI Drawer.",
       "categories": [
         "overlays"
       ],
@@ -1321,6 +1324,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -1339,29 +1344,10 @@
       }
     },
     {
-      "name": "empty-state",
-      "type": "registry:ui",
-      "title": "Empty State",
-      "description": "EmptyState primitive (backward-compatibility alias for Empty).",
-      "categories": [
-        "feedback"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/empty.json"
-      ],
-      "files": [
-        {
-          "path": "ui/empty-state.tsx",
-          "type": "registry:ui",
-          "target": "@ui/empty-state.tsx"
-        }
-      ]
-    },
-    {
       "name": "empty",
       "type": "registry:ui",
       "title": "Empty",
-      "description": "Empty primitive.",
+      "description": "Centered empty and zero-data placeholder displaying a functional icon, plain-English heading, guidance text, and optional action.",
       "categories": [
         "feedback"
       ],
@@ -1400,6 +1386,7 @@
         "motion"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -1414,7 +1401,7 @@
       "name": "field",
       "type": "registry:ui",
       "title": "Field",
-      "description": "Field primitive (@base-ui/react/field).",
+      "description": "Form field wrapper binding accessible labels, descriptions, validation errors, and invalid state via Base UI Field.",
       "categories": [
         "inputs"
       ],
@@ -1422,8 +1409,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/fieldset.json"
       ],
       "files": [
@@ -1446,7 +1433,7 @@
       "name": "fieldset",
       "type": "registry:ui",
       "title": "Fieldset",
-      "description": "Fieldset primitive (@base-ui/react/fieldset).",
+      "description": "Accessible group container with semantic legend and shared description styling on Base UI Fieldset.",
       "categories": [
         "inputs"
       ],
@@ -1475,7 +1462,7 @@
       "name": "form",
       "type": "registry:ui",
       "title": "Form",
-      "description": "Form primitive (@base-ui/react/form).",
+      "description": "Client and schema validation form root coordinating field submission state and error summaries via Base UI Form.",
       "categories": [
         "inputs"
       ],
@@ -1522,7 +1509,7 @@
       "name": "inline-alert",
       "type": "registry:ui",
       "title": "Inline Alert",
-      "description": "InlineAlert primitive.",
+      "description": "Rectangular in-flow feedback banner with a 4px semantic start accent bar, functional icon, description, and optional dismiss control.",
       "categories": [
         "feedback"
       ],
@@ -1554,7 +1541,7 @@
       "name": "inline-citation",
       "type": "registry:ui",
       "title": "Inline Citation",
-      "description": "Inline Citation primitive.",
+      "description": "Superscript inline source marker and hoverable citation card linking generated claims to verified references.",
       "categories": [
         "clinical-ai"
       ],
@@ -1562,11 +1549,11 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/skeleton.json",
-        "https://seany9915.github.io/eolas-ui/r/carousel.json"
+        "https://seany9915.github.io/eolas-ui/r/carousel.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1599,9 +1586,9 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
-        "https://seany9915.github.io/eolas-ui/r/textarea.json"
+        "https://seany9915.github.io/eolas-ui/r/textarea.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1625,7 +1612,7 @@
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
-      "description": "Input primitive (@base-ui/react/input).",
+      "description": "Single-line text input supporting 44px/48px touch floors, error borders, and clear invalid messaging on Base UI Input.",
       "categories": [
         "inputs"
       ],
@@ -1633,6 +1620,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -1689,7 +1677,7 @@
       "name": "kbd",
       "type": "registry:ui",
       "title": "Kbd",
-      "description": "Keyboard key primitive (Kbd).",
+      "description": "Compact monospace keycap indicator for displaying keyboard shortcuts inside menus, tooltips, and action buttons.",
       "categories": [
         "layout"
       ],
@@ -1764,15 +1752,15 @@
       "name": "message-scroller",
       "type": "registry:ui",
       "title": "Message Scroller",
-      "description": "MessageScroller primitive suite.",
+      "description": "Auto-pinning conversation scroll viewport with smooth stick-to-bottom behavior and a jump-to-latest button when scrolled up.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+        "https://seany9915.github.io/eolas-ui/r/tooltip.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1797,7 +1785,7 @@
       "name": "meter",
       "type": "registry:ui",
       "title": "Meter",
-      "description": "Meter primitive (@base-ui/react/meter).",
+      "description": "Accessible scalar measurement bar showing current values within a bounded range and high-contrast fill on Base UI Meter.",
       "categories": [
         "feedback"
       ],
@@ -1826,16 +1814,16 @@
       "name": "model-selector",
       "type": "registry:ui",
       "title": "Model Selector",
-      "description": "ModelSelector primitive.",
+      "description": "Popover-backed AI model picker with capability badges, search filtering, and keyboard selection.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/select.json",
         "https://seany9915.github.io/eolas-ui/r/combobox.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
-        "https://seany9915.github.io/eolas-ui/r/badge.json"
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1866,8 +1854,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/badge.json"
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -1937,7 +1925,7 @@
       "name": "number-field",
       "type": "registry:ui",
       "title": "Number Field",
-      "description": "NumberField primitive (@base-ui/react/number-field).",
+      "description": "Numeric stepper input with increment/decrement buttons, scrub area, and keyboard step controls on Base UI NumberField.",
       "categories": [
         "inputs"
       ],
@@ -1982,30 +1970,10 @@
       ]
     },
     {
-      "name": "number-roll",
-      "type": "registry:ui",
-      "title": "Number Roll",
-      "description": "Deprecated facade over NumberPopIn and SpinningCounter for tabular number transitions. Prefer importing NumberPopIn or SpinningCounter directly.",
-      "categories": [
-        "motion"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/number-pop-in.json",
-        "https://seany9915.github.io/eolas-ui/r/spinning-counter.json"
-      ],
-      "files": [
-        {
-          "path": "ui/number-roll.tsx",
-          "type": "registry:ui",
-          "target": "@ui/number-roll.tsx"
-        }
-      ]
-    },
-    {
       "name": "otp-field",
       "type": "registry:ui",
       "title": "OTP Field",
-      "description": "OTPField primitive (@base-ui/react/otp-field).",
+      "description": "Segmented one-time passcode input supporting paste splitting, arrow navigation, and WebOTP autocomplete on Base UI OTPField.",
       "categories": [
         "inputs"
       ],
@@ -2062,10 +2030,10 @@
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/progress.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2116,7 +2084,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json"
       ],
       "files": [
         {
@@ -2130,7 +2099,7 @@
       "name": "progress-ring",
       "type": "registry:ui",
       "title": "Progress Ring",
-      "description": "ProgressRing primitive (@base-ui/react/progress).",
+      "description": "Circular SVG progress gauge displaying task completion percentage with tabular center numerals on Base UI Progress.",
       "categories": [
         "feedback"
       ],
@@ -2160,7 +2129,7 @@
       "name": "progress",
       "type": "registry:ui",
       "title": "Progress",
-      "description": "Progress primitive (@base-ui/react/progress).",
+      "description": "Linear task progress bar supporting determinate percentages and reduced-motion indeterminate sweeps on Base UI Progress.",
       "categories": [
         "feedback"
       ],
@@ -2168,8 +2137,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/skeleton.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2190,19 +2158,19 @@
       "name": "prompt-input",
       "type": "registry:ui",
       "title": "Prompt Input",
-      "description": "PromptInput primitive.",
+      "description": "Composer bar for AI prompts with auto-sizing textarea, file attachments, IME-safe Enter submission, character limits, and action controls.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
         "https://seany9915.github.io/eolas-ui/r/attachment.json",
         "https://seany9915.github.io/eolas-ui/r/menu.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
-        "https://seany9915.github.io/eolas-ui/r/input-group.json"
+        "https://seany9915.github.io/eolas-ui/r/input-group.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2230,10 +2198,10 @@
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2262,6 +2230,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -2283,7 +2252,7 @@
       "name": "reading-progress",
       "type": "registry:ui",
       "title": "Reading Progress",
-      "description": "ReadingProgress primitive (@base-ui/react/progress).",
+      "description": "Fixed viewport progress indicator tracking scroll depth through long clinical notes or documents.",
       "categories": [
         "feedback"
       ],
@@ -2313,17 +2282,17 @@
       "name": "reasoning",
       "type": "registry:ui",
       "title": "Reasoning",
-      "description": "Reasoning primitive.",
+      "description": "Expandable AI thought-process container displaying streaming durations and collapsible reasoning text.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/shimmer-text.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2377,7 +2346,7 @@
       "name": "scroll-area",
       "type": "registry:ui",
       "title": "Scroll Area",
-      "description": "ScrollArea primitive (@base-ui/react/scroll-area).",
+      "description": "Custom-styled scrollable container with unobtrusive auto-hiding scrollbars and focus-safe viewport padding on Base UI ScrollArea.",
       "categories": [
         "navigation"
       ],
@@ -2406,7 +2375,7 @@
       "name": "scrollspy",
       "type": "registry:ui",
       "title": "Scrollspy",
-      "description": "Scrollspy primitive.",
+      "description": "Intersection-driven section tracker highlighting active navigation links and syncing hash navigation.",
       "categories": [
         "navigation"
       ],
@@ -2443,6 +2412,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -2454,32 +2424,10 @@
       ]
     },
     {
-      "name": "selection-controls",
-      "type": "registry:ui",
-      "title": "Selection Controls",
-      "description": "Re-exports selection control primitives for backward compatibility.",
-      "categories": [
-        "inputs"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/checkbox.json",
-        "https://seany9915.github.io/eolas-ui/r/checkbox-group.json",
-        "https://seany9915.github.io/eolas-ui/r/radio.json",
-        "https://seany9915.github.io/eolas-ui/r/switch.json"
-      ],
-      "files": [
-        {
-          "path": "ui/selection-controls.tsx",
-          "type": "registry:ui",
-          "target": "@ui/selection-controls.tsx"
-        }
-      ]
-    },
-    {
       "name": "separator",
       "type": "registry:ui",
       "title": "Separator",
-      "description": "Separator primitive (@base-ui/react/separator).",
+      "description": "Horizontal or vertical hairline divider with accessible orientation semantics on Base UI Separator.",
       "categories": [
         "layout"
       ],
@@ -2535,13 +2483,13 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/input.json",
         "https://seany9915.github.io/eolas-ui/r/separator.json",
         "https://seany9915.github.io/eolas-ui/r/skeleton.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2585,7 +2533,7 @@
       "name": "slider",
       "type": "registry:ui",
       "title": "Slider",
-      "description": "Slider primitive (@base-ui/react/slider).",
+      "description": "Single-thumb and range value slider with keyboard steps, tick marks, and tabular value readouts on Base UI Slider.",
       "categories": [
         "inputs"
       ],
@@ -2637,18 +2585,18 @@
       "name": "sources",
       "type": "registry:ui",
       "title": "Sources",
-      "description": "Sources primitive.",
+      "description": "Collapsible footnote and reference tray listing retrieved clinical documents, favicons, and external links.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/skeleton.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/inline-citation.json"
       ],
       "files": [
@@ -2675,7 +2623,7 @@
       "name": "spinner",
       "type": "registry:ui",
       "title": "Spinner",
-      "description": "Spinner primitive.",
+      "description": "Minimal SVG loading indicator with slowed reduced-motion fallback and screen-reader status text.",
       "categories": [
         "feedback"
       ],
@@ -2718,29 +2666,10 @@
       ]
     },
     {
-      "name": "steppers",
-      "type": "registry:ui",
-      "title": "Steppers",
-      "description": "Backward-compatibility alias for NumberField.",
-      "categories": [
-        "navigation"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/number-field.json"
-      ],
-      "files": [
-        {
-          "path": "ui/steppers.tsx",
-          "type": "registry:ui",
-          "target": "@ui/steppers.tsx"
-        }
-      ]
-    },
-    {
       "name": "sticky-container",
       "type": "registry:ui",
       "title": "Sticky Container",
-      "description": "StickyContainer primitive.",
+      "description": "IntersectionObserver-backed sticky header wrapper applying ambient elevation once content scrolls beneath it.",
       "categories": [
         "layout"
       ],
@@ -2787,14 +2716,14 @@
       "name": "suggestion-chips",
       "type": "registry:ui",
       "title": "Suggestion Chips",
-      "description": "SuggestionChips primitive.",
+      "description": "Keyboard-navigable prompt suggestion list supporting horizontal scrolling, wrapping rows, and single-click submission.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2819,7 +2748,7 @@
       "name": "swipe-reveal",
       "type": "registry:ui",
       "title": "Swipe Reveal",
-      "description": "SwipeReveal primitive.",
+      "description": "Touch swipeable row revealing trailing actions alongside an accessible toggle button for pointer and keyboard users.",
       "categories": [
         "layout"
       ],
@@ -2827,6 +2756,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -2849,7 +2779,7 @@
       "name": "switch",
       "type": "registry:ui",
       "title": "Switch",
-      "description": "Switch primitive (@base-ui/react/switch).",
+      "description": "Accessible two-state toggle switch with 44px hit target, labels, and reduced-motion thumb slide on Base UI Switch.",
       "categories": [
         "inputs"
       ],
@@ -2857,6 +2787,7 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
@@ -2878,7 +2809,7 @@
       "name": "table",
       "type": "registry:ui",
       "title": "Table",
-      "description": "Table primitive.",
+      "description": "Semantic data table primitives with tabular numeric alignment, hover states, selected rows, and responsive horizontal overflow.",
       "categories": [
         "layout"
       ],
@@ -2905,7 +2836,7 @@
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",
-      "description": "Tabs primitive (@base-ui/react/tabs).",
+      "description": "Tabbed view switcher in line, pills, and contained styles with animated selection indicator on Base UI Tabs.",
       "categories": [
         "navigation"
       ],
@@ -2914,8 +2845,8 @@
       ],
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/use-horizontal-scroll-fade.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/use-horizontal-scroll-fade.json"
       ],
       "files": [
         {
@@ -2939,15 +2870,15 @@
       "name": "task",
       "type": "registry:ui",
       "title": "Task",
-      "description": "Task primitive.",
+      "description": "Expandable task execution item displaying step label, completion badge, and nested subtask trace.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2970,7 +2901,7 @@
       "name": "text-highlight",
       "type": "registry:ui",
       "title": "Text Highlight",
-      "description": "TextHighlight primitive.",
+      "description": "Inline text highlighter wrapping matched search terms with accessible <mark> contrast.",
       "categories": [
         "layout"
       ],
@@ -3017,7 +2948,7 @@
       "name": "textarea",
       "type": "registry:ui",
       "title": "Textarea",
-      "description": "Textarea primitive.",
+      "description": "Multi-line text input with clean focus rings, error states, and consistent clinical typography tokens.",
       "categories": [
         "inputs"
       ],
@@ -3114,7 +3045,7 @@
       "name": "toggle-group",
       "type": "registry:ui",
       "title": "Toggle Group",
-      "description": "ToggleGroup primitive (@base-ui/react/toggle-group).",
+      "description": "Single- or multi-select grouped toggle control in segmented and outline styles on Base UI ToggleGroup.",
       "categories": [
         "inputs"
       ],
@@ -3147,7 +3078,7 @@
       "name": "toggle",
       "type": "registry:ui",
       "title": "Toggle",
-      "description": "Toggle primitive (@base-ui/react/toggle).",
+      "description": "Stateful two-state pressed button for toolbar formatting and filter switches on Base UI Toggle.",
       "categories": [
         "inputs"
       ],
@@ -3174,40 +3105,20 @@
       }
     },
     {
-      "name": "toggles",
-      "type": "registry:ui",
-      "title": "Toggles",
-      "description": "Re-exports toggle primitives for backward compatibility.",
-      "categories": [
-        "inputs"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/toggle.json",
-        "https://seany9915.github.io/eolas-ui/r/toggle-group.json"
-      ],
-      "files": [
-        {
-          "path": "ui/toggles.tsx",
-          "type": "registry:ui",
-          "target": "@ui/toggles.tsx"
-        }
-      ]
-    },
-    {
       "name": "tool",
       "type": "registry:ui",
       "title": "Tool",
-      "description": "Tool primitive (ToolCall).",
+      "description": "Collapsible AI tool call inspector showing invocation status, formatted input parameters, output payloads, and errors.",
       "categories": [
         "clinical-ai"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
         "https://seany9915.github.io/eolas-ui/r/code-block.json",
         "https://seany9915.github.io/eolas-ui/r/inline-alert.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3231,7 +3142,7 @@
       "name": "toolbar",
       "type": "registry:ui",
       "title": "Toolbar",
-      "description": "Toolbar primitive (@base-ui/react/toolbar).",
+      "description": "Roving-focus horizontal action strip grouping buttons, toggles, and separators on Base UI Toolbar.",
       "categories": [
         "layout"
       ],
@@ -3239,8 +3150,9 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/tooltip.json"
+        "https://seany9915.github.io/eolas-ui/r/tooltip.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3286,7 +3198,7 @@
       "name": "trace",
       "type": "registry:ui",
       "title": "Trace",
-      "description": "Trace primitive suite.",
+      "description": "Compact execution trace container summarizing AI agent tool calls, timing, and expandable step details.",
       "categories": [
         "clinical-ai"
       ],
@@ -3294,11 +3206,11 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/shimmer-text.json",
-        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json"
+        "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3320,7 +3232,7 @@
       "name": "view-transition",
       "type": "registry:ui",
       "title": "View Transition",
-      "description": "ViewTransition primitive (@base-ui/react/button).",
+      "description": "Declarative React 19 view-transition wrapper and trigger applying temporary transition names during updates.",
       "categories": [
         "motion"
       ],
@@ -3352,15 +3264,16 @@
       "name": "app-shell",
       "type": "registry:block",
       "title": "App Shell",
-      "description": "AppShell composite block.",
+      "description": "Controlled responsive workspace shell composing collapsible sidebar navigation, mobile drawer, header bar, and main viewport.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/sidebar.json",
         "https://seany9915.github.io/eolas-ui/r/navigation-bar.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/button.json",
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3380,31 +3293,6 @@
           "Zero direct `<button>` tags outside primitives."
         ]
       }
-    },
-    {
-      "name": "approval-card",
-      "type": "registry:block",
-      "title": "Approval Card",
-      "description": "Deprecated block. Use Confirmation for [Approve] / [Deny] AI tool approval gates, or Questionnaire for structured choice and clarification prompts.",
-      "categories": [
-        "blocks"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/button.json",
-        "https://seany9915.github.io/eolas-ui/r/card.json",
-        "https://seany9915.github.io/eolas-ui/r/field.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/radio.json",
-        "https://seany9915.github.io/eolas-ui/r/input.json"
-      ],
-      "files": [
-        {
-          "path": "blocks/approval-card.tsx",
-          "type": "registry:block",
-          "target": "@components/blocks/approval-card.tsx"
-        }
-      ]
     },
     {
       "name": "area-chart-card",
@@ -3463,12 +3351,12 @@
         "blocks"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/card.json",
         "https://seany9915.github.io/eolas-ui/r/badge.json",
         "https://seany9915.github.io/eolas-ui/r/skeleton.json",
         "https://seany9915.github.io/eolas-ui/r/empty.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3482,18 +3370,18 @@
       "name": "chat",
       "type": "registry:block",
       "title": "Chat",
-      "description": "Chat composite block.",
+      "description": "Controlled clinical AI conversation block uniting MessageScroller, ChatMessage, Sources, Trace, Confirmation, and PromptInput.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/message-scroller.json",
         "https://seany9915.github.io/eolas-ui/r/chat-message.json",
         "https://seany9915.github.io/eolas-ui/r/reasoning.json",
         "https://seany9915.github.io/eolas-ui/r/prompt-input.json",
         "https://seany9915.github.io/eolas-ui/r/suggestion-chips.json",
-        "https://seany9915.github.io/eolas-ui/r/empty.json"
+        "https://seany9915.github.io/eolas-ui/r/empty.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3517,7 +3405,7 @@
       "name": "data-table",
       "type": "registry:block",
       "title": "Data Table",
-      "description": "DataTable composite block.",
+      "description": "Controlled sortable, filterable, and selectable data table block powered by @tanstack/react-table with pagination and bulk actions.",
       "categories": [
         "blocks"
       ],
@@ -3555,27 +3443,6 @@
       }
     },
     {
-      "name": "delete-confirmation-dialog",
-      "type": "registry:block",
-      "title": "Delete Confirmation Dialog",
-      "description": "Deprecated wrapper block. Use AlertDialog directly with controlled open state and closeOnConfirm={false} for async destructive confirmations.",
-      "categories": [
-        "blocks"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/alert-dialog.json",
-        "https://seany9915.github.io/eolas-ui/r/button.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
-      ],
-      "files": [
-        {
-          "path": "blocks/delete-confirmation-dialog.tsx",
-          "type": "registry:block",
-          "target": "@components/blocks/delete-confirmation-dialog.tsx"
-        }
-      ]
-    },
-    {
       "name": "filter-toolbar",
       "type": "registry:block",
       "title": "Filter Toolbar",
@@ -3584,13 +3451,13 @@
         "blocks"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/field.json",
         "https://seany9915.github.io/eolas-ui/r/input.json",
         "https://seany9915.github.io/eolas-ui/r/select.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/chip.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
+        "https://seany9915.github.io/eolas-ui/r/icon.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3628,12 +3495,11 @@
       "name": "list-detail-block",
       "type": "registry:block",
       "title": "List Detail Block",
-      "description": "ListDetailBlock composite block.",
+      "description": "Controlled two-pane master-detail workspace adapting between side-by-side split panes and mobile drill-down navigation.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/field.json",
         "https://seany9915.github.io/eolas-ui/r/input-group.json",
@@ -3641,7 +3507,8 @@
         "https://seany9915.github.io/eolas-ui/r/badge.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/empty.json",
-        "https://seany9915.github.io/eolas-ui/r/skeleton.json"
+        "https://seany9915.github.io/eolas-ui/r/skeleton.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3664,28 +3531,6 @@
       }
     },
     {
-      "name": "metric-card",
-      "type": "registry:block",
-      "title": "Metric Card",
-      "description": "Deprecated block. Compose Card with a divided stat strip, Item.Group, RadialChartCard, or numeric Table directly instead of metric card grids.",
-      "categories": [
-        "blocks"
-      ],
-      "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/card.json",
-        "https://seany9915.github.io/eolas-ui/r/badge.json",
-        "https://seany9915.github.io/eolas-ui/r/icon.json"
-      ],
-      "files": [
-        {
-          "path": "blocks/metric-card.tsx",
-          "type": "registry:block",
-          "target": "@components/blocks/metric-card.tsx"
-        }
-      ]
-    },
-    {
       "name": "pie-chart-card",
       "type": "registry:block",
       "title": "Pie Chart Card",
@@ -3698,9 +3543,9 @@
         "recharts@^3.0.0"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/chart-card.json",
-        "https://seany9915.github.io/eolas-ui/r/chart.json"
+        "https://seany9915.github.io/eolas-ui/r/chart.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -3714,7 +3559,7 @@
       "name": "questionnaire",
       "type": "registry:block",
       "title": "Questionnaire",
-      "description": "Questionnaire composite block.",
+      "description": "Controlled multi-question assessment block with choice controls, validation summaries, and conditional step progression.",
       "categories": [
         "blocks"
       ],
@@ -3796,7 +3641,7 @@
       "name": "step-wizard",
       "type": "registry:block",
       "title": "Step Wizard",
-      "description": "StepWizard composite block.",
+      "description": "Controlled multi-step workflow block with step sidebar, validation gates, hidden until-found preservation, and review actions.",
       "categories": [
         "blocks"
       ],
@@ -3828,15 +3673,15 @@
       "name": "supporting-pane-block",
       "type": "registry:block",
       "title": "Supporting Pane Block",
-      "description": "SupportingPaneBlock composite block.",
+      "description": "Controlled main workspace plus collapsible right-hand context pane for clinical references, notes, or AI assistance.",
       "categories": [
         "blocks"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/badge.json"
+        "https://seany9915.github.io/eolas-ui/r/badge.json",
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {

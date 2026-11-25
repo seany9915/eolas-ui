@@ -23,21 +23,21 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
 ) {
   const { fadeSize = 20, disabled = false } = options;
   const internalRef = React.useRef<T | null>(null);
+  const externalRefObj = React.useRef(externalRef);
+  externalRefObj.current = externalRef;
   const [element, setElement] = React.useState<T | null>(null);
   const [isScrollable, setIsScrollable] = React.useState(false);
 
-  const setRef = React.useCallback(
-    (node: T | null) => {
-      internalRef.current = node;
-      setElement(node);
-      if (typeof externalRef === 'function') {
-        externalRef(node);
-      } else if (externalRef) {
-        externalRef.current = node;
-      }
-    },
-    [externalRef]
-  );
+  const setRef = React.useCallback((node: T | null) => {
+    internalRef.current = node;
+    setElement(node);
+    const currentExternal = externalRefObj.current;
+    if (typeof currentExternal === 'function') {
+      currentExternal(node);
+    } else if (currentExternal) {
+      currentExternal.current = node;
+    }
+  }, []);
 
   React.useEffect(() => {
     const el = element ?? internalRef.current;
@@ -50,8 +50,9 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
       return;
     }
 
-    // Cache writing direction on mount and ResizeObserver so scroll events never trigger forced style recalc
+    // Cache writing direction on mount, ResizeObserver, and dir-attribute mutations
     let isRtl = getComputedStyle(el).direction === 'rtl';
+    let rafId = 0;
 
     const updateFades = () => {
       const { scrollLeft, scrollWidth, clientWidth } = el;
@@ -68,6 +69,15 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
       el.style.setProperty('--fade-end', `${endFade}px`);
     };
 
+    const scheduleRefresh = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        isRtl = getComputedStyle(el).direction === 'rtl';
+        updateFades();
+      });
+    };
+
     const handleResize = () => {
       isRtl = getComputedStyle(el).direction === 'rtl';
       updateFades();
@@ -80,11 +90,34 @@ export function useHorizontalScrollFade<T extends HTMLElement = HTMLElement>(
     if (typeof ResizeObserver !== 'undefined') {
       ro = new ResizeObserver(handleResize);
       ro.observe(el);
+      if (el.firstElementChild) {
+        ro.observe(el.firstElementChild);
+      }
+    }
+
+    let contentMo: MutationObserver | undefined;
+    let dirMo: MutationObserver | undefined;
+    if (typeof MutationObserver !== 'undefined') {
+      contentMo = new MutationObserver(scheduleRefresh);
+      contentMo.observe(el, { childList: true, subtree: true });
+
+      dirMo = new MutationObserver(scheduleRefresh);
+      const dirTargets = new Set<Element>();
+      if (document.documentElement) dirTargets.add(document.documentElement);
+      const closestDir = el.closest('[dir]');
+      if (closestDir) dirTargets.add(closestDir);
+      dirTargets.add(el);
+      for (const target of dirTargets) {
+        dirMo.observe(target, { attributes: true, attributeFilter: ['dir'] });
+      }
     }
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       el.removeEventListener('scroll', updateFades);
       ro?.disconnect();
+      contentMo?.disconnect();
+      dirMo?.disconnect();
     };
   }, [element, fadeSize, disabled]);
 

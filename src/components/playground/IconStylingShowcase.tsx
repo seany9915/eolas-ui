@@ -125,9 +125,9 @@ export const IconStylingShowcase: React.FC = () => {
               <div className="flex items-center gap-4 p-3 bg-surface-container-low rounded">
                 <Tooltip content="Print therapy summary">
                   <Button
-                    variant="outlined"
+                    variant="outline"
                     size="icon"
-                    aria-label="Print summary"
+                    aria-label="Print therapy summary"
                   >
                     <Icon name="print" size="md" />
                     <span className="sr-only">Print therapy summary</span>
@@ -144,8 +144,8 @@ export const IconStylingShowcase: React.FC = () => {
       </section>
 
       {/* Soft Tonal Icon Containers (Tonal Icon Tiles) */}
-      <section className="space-y-4">
-        <div className="border-b border-outline-variant pb-2 flex items-center justify-between">
+      <section className="flex flex-col gap-4">
+        <div className="border-b border-outline-variant pb-2 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-heading text-xl font-bold text-on-surface">2. Soft Tonal Icon Containers (Tonal Icon Tiles)</h3>
             <p className="font-sans text-xs text-on-surface-variant">
@@ -161,7 +161,7 @@ export const IconStylingShowcase: React.FC = () => {
           {/* Primary Soft Container Tile */}
           <Card>
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-md bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+              <div className="size-12 rounded-md bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
                 <Icon name="graphic_eq" size="lg" />
               </div>
               <div>
@@ -174,7 +174,7 @@ export const IconStylingShowcase: React.FC = () => {
           {/* Surface-Variant Soft Tile */}
           <Card>
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-md bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
+              <div className="size-12 rounded-md bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
                 <Icon name="record_voice_over" size="lg" />
               </div>
               <div>
@@ -187,7 +187,7 @@ export const IconStylingShowcase: React.FC = () => {
           {/* Tertiary Soft Tile */}
           <Card>
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-md bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+              <div className="size-12 rounded-md bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
                 <Icon name="tune" size="lg" />
               </div>
               <div>
@@ -200,32 +200,32 @@ export const IconStylingShowcase: React.FC = () => {
       </section>
 
       {/* 3. Solid Amber Badge vs Bare Amber Icon Contrast Rule */}
-      <section className="space-y-4">
-        <div className="border-b border-outline-variant pb-2 flex items-center justify-between">
+      <section className="flex flex-col gap-4">
+        <div className="border-b border-outline-variant pb-2 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-heading text-xl font-bold text-on-surface">3. Solid Tertiary-Amber Icon Badge (WCAG AA Contrast Solution)</h3>
             <p className="font-sans text-xs text-on-surface-variant">
-              Bare Sunny Amber (<code className="font-mono font-bold bg-tertiary-container text-on-tertiary-container px-1 rounded">#F9A825</code>) icon glyphs fail contrast (1.99:1) on white. <code className="font-mono font-bold">DESIGN.md</code> requires a solid amber badge with charcoal (<code className="font-mono">#1C1A18</code>) icon inside.
+              Bare Sunny Amber (<code className="font-mono font-bold bg-tertiary-container text-on-tertiary-container px-1 rounded">#F9A825</code>) icon glyphs fail contrast (1.97:1) on white. <code className="font-mono font-bold">DESIGN.md</code> requires a solid amber badge with charcoal (<code className="font-mono">#1C1A18</code>) icon inside.
             </p>
           </div>
           <Badge variant="soft" colorRole="tertiary" size="sm">
-            8.66:1 AA Compliant
+            8.80:1 AAA Compliant
           </Badge>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Compliant Pattern */}
-          <div className="rounded-lg bg-surface border-2 border-success p-5 space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="rounded-lg bg-surface border-2 border-success p-5 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-label text-xs font-bold text-success flex items-center gap-1">
                 <Icon name="check_circle" size="xs" />
                 DESIGN.md Compliant: Solid Tertiary Badge
               </span>
-              <span className="font-mono text-xs font-bold text-success">8.66:1 Contrast</span>
+              <span className="font-mono text-xs font-bold text-success">8.80:1 Contrast</span>
             </div>
             <div className="p-4 bg-surface-container-low rounded flex items-center gap-4">
               {/* Solid Amber Badge */}
-              <div className="h-10 w-10 rounded bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-xs font-bold">
+              <div className="size-10 rounded bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-xs font-bold">
                 <Icon name="emoji_events" size="md" />
               </div>
               <div>
@@ -236,17 +236,21 @@ export const IconStylingShowcase: React.FC = () => {
           </div>
 
           {/* Banned Anti-Pattern */}
-          <div className="rounded-lg bg-surface border-2 border-error p-5 space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="rounded-lg bg-surface border-2 border-error p-5 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-label text-xs font-bold text-error flex items-center gap-1">
                 <Icon name="cancel" size="xs" />
                 Banned Anti-Pattern: Bare Amber Glyph on White
               </span>
-              <span className="font-mono text-xs font-bold text-error">1.99:1 FAIL</span>
+              <span className="font-mono text-xs font-bold text-error">1.97:1 FAIL</span>
             </div>
             <div className="p-4 bg-surface-container-low rounded flex items-center gap-4">
-              {/* Bare Amber Icon (FAILS CONTRAST) */}
-              <div className="h-10 w-10 rounded bg-surface border border-outline-variant flex items-center justify-center shrink-0 text-secondary">
+              {/* Bare Amber Icon (FAILS CONTRAST - intentional banned demo) */}
+              <div
+                className="size-10 rounded bg-surface border border-outline-variant flex items-center justify-center shrink-0"
+                style={{ color: 'var(--tertiary)' }}
+                aria-hidden="true"
+              >
                 <Icon name="emoji_events" size="md" />
               </div>
               <div>
@@ -258,33 +262,33 @@ export const IconStylingShowcase: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Inverted Fill Icons (Spotlight Dark Card Sub-Variant) */}
-      <section className="space-y-4">
+      {/* 4. Inverted Fill Icons (Spotlight Dark Card Sub-Variant) */}
+      <section className="flex flex-col gap-4">
         <div className="border-b border-outline-variant pb-2">
-          <h3 className="font-heading text-xl font-bold text-on-surface">3. Inverted Fill Accent Icons (Spotlight Charcoal Cards)</h3>
+          <h3 className="font-heading text-xl font-bold text-on-surface">4. Inverted Fill Accent Icons (Spotlight Charcoal Cards)</h3>
           <p className="font-sans text-xs text-on-surface-variant">
-            Solid charcoal <code className="font-mono text-on-surface">on-surface</code> (<code className="font-mono">#1C1A18</code>) backdrop paired with <code className="font-mono bg-tertiary-container text-on-tertiary-container px-1 rounded">tertiary</code> (amber) or <code className="font-mono text-secondary">secondary</code> (emerald) icons. <code className="font-mono text-error">Electric Blue (primary)</code> is explicitly excluded due to ~2.97:1 contrast failure.
+            Solid charcoal <code className="font-mono text-on-surface">neutral</code> (<code className="font-mono">#2F2E2B</code>) backdrop paired with <code className="font-mono bg-tertiary-container text-on-tertiary-container px-1 rounded">tertiary</code> (amber) or <code className="font-mono text-secondary">secondary-container</code> icons. <code className="font-mono text-error">Electric Blue (primary)</code> is excluded due to low contrast on dark stone.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Spotlight Tertiary Amber Icon */}
           <Card variant="inverted" invertedAccent="tertiary">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-label text-xs font-bold text-tertiary flex items-center gap-1">
                   <Icon name="verified" size="xs" />
                   Amber Accent Icon
                 </span>
-                <span className="font-mono text-xs bg-tertiary/20 text-tertiary px-2 py-0.5 rounded font-bold">8.66:1 AA</span>
+                <span className="font-mono text-xs bg-tertiary/20 text-tertiary px-2 py-0.5 rounded font-bold">6.89:1 AA</span>
               </div>
               <div className="flex items-center gap-3 pt-2">
-                <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center text-tertiary">
+                <div className="size-10 rounded bg-white/10 flex items-center justify-center text-tertiary shrink-0">
                   <Icon name="workspace_premium" size="lg" />
                 </div>
                 <div>
-                  <p className="font-sans text-sm font-bold text-white">Milestone Highlight</p>
-                  <p className="font-sans text-xs text-white/70">Tertiary amber icon glyph on charcoal card.</p>
+                  <p className="font-sans text-sm font-bold text-on-neutral">Milestone Highlight</p>
+                  <p className="font-sans text-xs text-on-neutral/80">Tertiary amber icon glyph on charcoal card.</p>
                 </div>
               </div>
             </div>
@@ -292,21 +296,21 @@ export const IconStylingShowcase: React.FC = () => {
 
           {/* Spotlight Secondary Emerald Icon */}
           <Card variant="inverted">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-label text-xs font-bold text-secondary-container flex items-center gap-1">
                   <Icon name="nature" size="xs" />
                   Emerald Accent Icon
                 </span>
-                <span className="font-mono text-xs bg-secondary/30 text-secondary-container px-2 py-0.5 rounded font-bold">3.2:1+ AA</span>
+                <span className="font-mono text-xs bg-secondary/30 text-secondary-container px-2 py-0.5 rounded font-bold">10.5:1+ AAA</span>
               </div>
               <div className="flex items-center gap-3 pt-2">
-                <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center text-secondary-container">
+                <div className="size-10 rounded bg-white/10 flex items-center justify-center text-secondary-container shrink-0">
                   <Icon name="psychology" size="lg" />
                 </div>
                 <div>
-                  <p className="font-sans text-sm font-bold text-white">Clinical Guidance</p>
-                  <p className="font-sans text-xs text-white/70">High-contrast emerald icon glyph on charcoal card.</p>
+                  <p className="font-sans text-sm font-bold text-on-neutral">Clinical Guidance</p>
+                  <p className="font-sans text-xs text-on-neutral/80">High-contrast emerald-container icon glyph on charcoal card.</p>
                 </div>
               </div>
             </div>
@@ -314,21 +318,21 @@ export const IconStylingShowcase: React.FC = () => {
 
           {/* Excluded Electric Blue Icon */}
           <Card variant="inverted">
-            <div className="opacity-80 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-label text-xs font-bold text-error flex items-center gap-1">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-label text-xs font-bold text-error-container flex items-center gap-1">
                   <Icon name="block" size="xs" />
                   Primary Blue (Excluded)
                 </span>
-                <span className="font-mono text-xs bg-error/30 text-error px-2 py-0.5 rounded font-bold">2.97:1 FAIL</span>
+                <span className="font-mono text-xs bg-error-container text-on-error-container px-2 py-0.5 rounded font-semibold">2.97:1 FAIL</span>
               </div>
               <div className="flex items-center gap-3 pt-2">
-                <div className="h-10 w-10 rounded bg-white/10 flex items-center justify-center text-primary">
+                <div className="size-10 rounded bg-white/10 flex items-center justify-center text-primary shrink-0" aria-hidden="true">
                   <Icon name="local_hospital" size="lg" />
                 </div>
                 <div>
-                  <p className="font-sans text-sm font-bold text-white">Electric Blue (Banned)</p>
-                  <p className="font-sans text-xs text-error font-medium">Excluded from Spotlight cards due to contrast failure on charcoal.</p>
+                  <p className="font-sans text-sm font-bold text-on-neutral">Electric Blue (Banned)</p>
+                  <p className="font-sans text-xs text-error-container font-medium">Excluded from Spotlight cards due to contrast failure on charcoal.</p>
                 </div>
               </div>
             </div>
@@ -336,10 +340,10 @@ export const IconStylingShowcase: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Role-Colored Leading Icons in Flat Callout Banners */}
-      <section className="space-y-4">
+      {/* 5. Role-Colored Leading Icons in Flat Callout Banners */}
+      <section className="flex flex-col gap-4">
         <div className="border-b border-outline-variant pb-2">
-          <h3 className="font-heading text-xl font-bold text-on-surface">4. Role-Colored Leading Icons (Flat Callout Banners)</h3>
+          <h3 className="font-heading text-xl font-bold text-on-surface">5. Role-Colored Leading Icons (Flat Callout Banners)</h3>
           <p className="font-sans text-xs text-on-surface-variant">
             Flat white <code className="font-mono text-on-surface">surface</code> background with an accent bar paired with a role-colored leading icon glyph for instant dual-coded visual recognition.
           </p>
