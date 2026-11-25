@@ -73,10 +73,12 @@ export function itemVariants({
   interactive = false,
   className,
 }: ItemVariantsProps = {}): string {
+  const isPassiveDefault = variant === 'default' && !interactive;
   return cn(
     'group/item relative flex items-center has-[[data-slot=item-description]]:items-start rounded-md text-start transition-[background-color,border-color,color,transform] duration-[var(--duration-micro)] ease-[var(--ease-standard)]',
     variantStyles[variant] ?? variantStyles.default,
     sizeStyles[size] ?? sizeStyles.default,
+    isPassiveDefault && 'px-0 border-0 has-[[data-item-trigger]]:px-3 has-[[data-item-trigger]]:border-2',
     'aria-disabled:opacity-50 aria-disabled:pointer-events-none',
     'has-[[data-item-trigger]]:cursor-pointer has-[[data-item-trigger]]:select-none has-[[data-item-trigger]:focus-visible]:outline has-[[data-item-trigger]:focus-visible]:outline-2 has-[[data-item-trigger]:focus-visible]:outline-offset-2 has-[[data-item-trigger]:focus-visible]:outline-primary',
     variant !== 'selected' && 'has-[[data-item-trigger]]:hover:bg-state-hover',
@@ -341,7 +343,7 @@ export const ItemDescription = React.forwardRef<HTMLParagraphElement, ItemDescri
       props: {
         'data-slot': 'item-description',
         className: cn(
-          'font-sans text-xs group-data-[size=lg]/item:text-sm text-on-surface-variant group-data-[variant=selected]/item:text-on-primary-container leading-relaxed text-pretty',
+          'font-sans text-sm group-data-[size=lg]/item:text-base text-on-surface-variant group-data-[variant=selected]/item:text-on-primary-container leading-relaxed text-pretty',
           className
         ),
         children,
@@ -475,7 +477,7 @@ export const ItemFooter = React.forwardRef<HTMLDivElement, ItemFooterProps>(
       props: {
         'data-slot': 'item-footer',
         className: cn(
-          'flex items-center justify-between text-xs font-sans text-on-surface-variant mt-1 w-full',
+          'flex items-center justify-between text-sm font-sans text-on-surface-variant mt-1 w-full',
           className
         ),
         children,

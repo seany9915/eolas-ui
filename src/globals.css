@@ -992,11 +992,6 @@ select:autofill {
     overflow-wrap: break-word;
   }
 
-  /* Prevent top margin leak on first child in articles, dialogs, or chat bubbles */
-  .typeset > :first-child {
-    margin-top: 0;
-  }
-
   /* Headings */
   .typeset :is(h1, h2, h3, h4, h5, h6):not(:where(.not-typeset, .not-typeset *, [data-not-typeset], [data-not-typeset] *)) {
     font-family: var(--typeset-font-heading);
@@ -1175,16 +1170,14 @@ select:autofill {
   }
 
   /* Typeset opt-out isolation for embedded cards & interactive primitives */
-  .typeset .not-typeset,
-  .typeset [data-not-typeset] {
+  .typeset :where(.not-typeset, [data-not-typeset]) {
     margin-top: var(--typeset-flow);
     margin-bottom: var(--typeset-flow);
     font-size: 1rem;
     line-height: 1.5;
   }
 
-  .typeset .not-typeset p:last-child,
-  .typeset [data-not-typeset] p:last-child {
+  .typeset :where(.not-typeset, [data-not-typeset]) p:last-child {
     margin-bottom: 0;
   }
 
@@ -1192,6 +1185,15 @@ select:autofill {
   .typeset:is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]),
   .typeset :is(.flex, .grid) > :is(.not-typeset, [data-not-typeset]) {
     margin-block: 0;
+  }
+
+  /* Prevent top/bottom margin leak on first and last children in articles, dialogs, or chat bubbles */
+  .typeset > :first-child {
+    margin-top: 0;
+  }
+
+  .typeset > :last-child {
+    margin-bottom: 0;
   }
 
   .typeset-chat {

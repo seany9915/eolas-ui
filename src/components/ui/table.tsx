@@ -169,7 +169,7 @@ export const TableCaption = React.forwardRef<
   <caption
     ref={ref}
     data-slot="table-caption"
-    className={cn('mt-4 text-xs font-sans text-on-surface-variant', className)}
+    className={cn('mt-4 text-sm font-sans text-on-surface-variant', className)}
     {...props}
   />
 ));
@@ -253,7 +253,12 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                       key={idx}
                       scope="col"
                       data-slot="table-head"
-                      className={cn('h-12 px-4 py-3.5 font-semibold', alignClass, numericClass, col.className)}
+                      className={cn(
+                        'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.75rem)] font-semibold',
+                        alignClass,
+                        numericClass,
+                        col.className
+                      )}
                     >
                       {col.header}
                     </th>
@@ -272,7 +277,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                   key={keyExtractor(row)}
                   data-slot="table-row"
                   className={cn(
-                    'min-h-14 hover:bg-state-hover transition-colors',
+                    'min-h-[var(--density-table-row-min-h,3.5rem)] hover:bg-state-hover transition-colors',
                     isStack &&
                       '@max-lg:block @max-lg:p-4 @max-lg:rounded-lg @max-lg:border @max-lg:border-outline-variant @max-lg:bg-surface'
                   )}
@@ -292,7 +297,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                         key={cIdx}
                         data-slot="table-cell"
                         className={cn(
-                          'px-4 py-3.5 text-on-surface',
+                          'px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] text-on-surface',
                           alignClass,
                           numericClass,
                           col.className,

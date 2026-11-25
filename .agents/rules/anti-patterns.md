@@ -31,7 +31,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: `surface-container-low` / `surface-container-high` fill + `outline-variant` border** (low contrast) → **Use:** `outline` (`#706E6B`) border when a neutral fill needs a boundary.
 - **Banned: Single-sided accent borders on rounded cards** → **Use:** Borderless `border border-transparent` standard cards; reserve `rounded-s-none rounded-e` + `border-s-4` strictly for `<InlineAlert />` and `<Toast />`.
 - **Banned: Div Soup / toxic wrapper-itis** (`<Box>`, `<Flex>`, `<Spacer>`, redundant `<div>`/`<>`) → **Use:** Direct classes on semantic elements or plain layout `<div>`s (`flex`/`grid`).
-- **Banned: Desktop FABs** → **Use:** Inline actions, side-drawers, or page headers.
+- **Banned: Desktop FABs or marketing hero banners on workspace/dashboard/tool views** → **Use:** Inline actions, side-drawers, or page headers, and open app/tool views directly into live content.
 - **Banned: Viewport breakpoints (`sm:`, `md:`, `lg:`) inside reusable components** → **Use:** `@container` on a defined-width wrapper `<div>` (`w-full` or grid cell, never `<table>`/`<tr>`/auto-sized flex) + `@sm:`/`@md:`/`@lg:`. Reserve viewport queries for page shells.
 - **Banned: Start-aligned numeric table columns** → **Use:** `text-end` + `tabular-nums` / `font-mono` on numeric `<th>` and `<td>` (or `numeric: true` on `<Table />`).
 - **Banned: Arbitrary or `0px` clamped nested radii in padded cards** → **Use:** $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ for nested media/panels (clamping to `rounded` / `8px`; tight `p-1` segmented shells still use `rounded-sm` / `4px`).
@@ -42,7 +42,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 - **Banned: Sparkle/magic icons (`stars`, `auto_awesome`, `auto_fix_high`) or emojis** → **Use:** Functional task icons (`translate`, `summarize`, `spellcheck`, `tune`, `bolt`).
 - **Banned: AI clichés, inflated nouns, or 3+ noun labels** ("Elevate", "Seamless", "Hub", "Matrix", "Repository", "Engine") → **Use:** Plain everyday terms, 1–2 nouns max ("Caseload", "Patients", "Notes", "Saved").
 - **Banned: Dev/DB/CSS jargon in UI copy** (`committed`, `synchronized`, `hydrated`, `unconstrained`, `affordance`, `telemetry`, `workflow`, `protocol`) → **Use:** User-outcome phrasing ("Patient added", "Preview: Full width").
-- **Banned: Fabricated compliance/security claims, invented metrics, or `LABEL // YEAR`** → **Use:** Verifiable app states ("Saved", "Synced", "Offline") and `[metric]` placeholders.
+- **Banned: Pre-heading eyebrow kickers, decorative `01`/`02`/Roman heading prefixes, `LABEL // YEAR`, fabricated compliance/security claims, or invented metrics** → **Use:** Direct `<h1>`/`<h2>` headings (number only genuine sequences), verifiable app states ("Saved", "Synced", "Offline"), and `[metric]` placeholders.
 - **Banned: "Click here" or identical generic links** → **Use:** Descriptive action text or unique `aria-label` per link.
 
 ## Code Quality, Overlays & Component Library

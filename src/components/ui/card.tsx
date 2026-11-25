@@ -181,7 +181,7 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
           baseStyles,
           prominenceStyles[resolvedProminence],
           affordanceStyles,
-          subgrid && 'card-subgrid',
+          subgrid ? 'card-subgrid' : 'flex flex-col gap-4',
           className
         )}
       >
@@ -291,7 +291,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
     <div
       ref={ref}
       data-slot="card-content"
-      className={cn('pt-4', className)}
+      className={cn(className)}
       {...props}
     />
   )
@@ -305,7 +305,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
     <div
       ref={ref}
       data-slot="card-footer"
-      className={cn('flex flex-wrap items-center pt-4 mt-auto gap-3', className)}
+      className={cn('flex flex-wrap items-center mt-auto gap-3', className)}
       {...props}
     />
   )

@@ -70,7 +70,7 @@ export const InlineAlertDescription = React.forwardRef<HTMLDivElement, InlineAle
     <div
       ref={ref}
       data-slot="inline-alert-description"
-      className={cn('font-sans text-sm text-on-surface-variant leading-relaxed text-pretty', className)}
+      className={cn('font-sans text-base text-on-surface-variant leading-relaxed text-pretty', className)}
       {...props}
     />
   )
@@ -195,7 +195,7 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-role={resolvedRole}
       data-appearance={appearance}
       className={cn(
-        'relative flex items-start gap-4 p-5 ps-5 rounded-s-none rounded-e border-s-4 text-start',
+        'relative flex items-start gap-4 p-5 rounded-s-none rounded-e border-s-4 text-start',
         accentBorderClasses[resolvedRole],
         appearance === 'surface'
           ? 'bg-surface border-t border-e border-b border-outline-variant shadow-card'

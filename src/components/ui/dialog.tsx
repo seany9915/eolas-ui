@@ -145,20 +145,20 @@ function DialogComponent<Payload = unknown>({
                   className
                 )}
               >
-                <div data-slot="dialog-header" className="flex items-center justify-between mb-2">
-                  <BaseDialog.Title data-slot="dialog-title" className={cn('font-heading text-xl font-bold text-on-surface text-balance', !title && 'sr-only')}>
+                <div data-slot="dialog-header" className="flex items-start justify-between gap-2 mb-2">
+                  <BaseDialog.Title data-slot="dialog-title" className={cn('text-headline-sm text-on-surface', !title && 'sr-only')}>
                     {title || 'Dialog'}
                   </BaseDialog.Title>
                   <BaseDialog.Close
                     data-slot="dialog-close"
-                    className="size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="size-11 min-w-[44px] min-h-[44px] -me-3 -mt-3 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Close dialog"
                   >
                     <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
                   </BaseDialog.Close>
                 </div>
                 {description && (
-                  <BaseDialog.Description data-slot="dialog-description" className="font-sans text-sm text-on-surface-variant mb-6 leading-relaxed text-pretty">
+                  <BaseDialog.Description data-slot="dialog-description" className="font-sans text-base text-on-surface-variant mb-6 leading-relaxed text-pretty">
                     {description}
                   </BaseDialog.Description>
                 )}
@@ -335,7 +335,7 @@ export const DialogTitle = React.forwardRef<
   <BaseDialog.Title
     ref={ref}
     data-slot="dialog-title"
-    className={composeClassName('font-heading text-xl font-bold text-on-surface text-balance', className)}
+    className={composeClassName('text-headline-sm text-on-surface', className)}
     {...props}
   />
 ));
@@ -348,7 +348,7 @@ export const DialogDescription = React.forwardRef<
   <BaseDialog.Description
     ref={ref}
     data-slot="dialog-description"
-    className={composeClassName('font-sans text-sm text-on-surface-variant leading-relaxed text-pretty', className)}
+    className={composeClassName('font-sans text-base text-on-surface-variant leading-relaxed text-pretty', className)}
     {...props}
   />
 ));

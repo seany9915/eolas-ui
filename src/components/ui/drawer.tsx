@@ -174,7 +174,7 @@ export const DrawerHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribute
       ref={ref}
       data-slot="drawer-header"
       className={cn(
-        'grid auto-rows-min items-start gap-1.5 text-start mb-4 has-[>[data-slot=drawer-close]]:grid-cols-[minmax(0,1fr)_auto] [&>[data-slot=drawer-close]]:col-start-2 [&>[data-slot=drawer-close]]:row-start-1 [&>[data-slot=drawer-close]]:self-start [&>[data-slot=drawer-close]]:justify-self-end has-[>[data-slot=drawer-description]]:[&>[data-slot=drawer-close]]:row-span-2',
+        'grid auto-rows-min items-start gap-1.5 text-start mb-4 has-[>[data-slot=drawer-close]]:grid-cols-[minmax(0,1fr)_auto] [&>[data-slot=drawer-close]]:col-start-2 [&>[data-slot=drawer-close]]:row-start-1 [&>[data-slot=drawer-close]]:self-start [&>[data-slot=drawer-close]]:justify-self-end [&>[data-slot=drawer-close]]:-me-3 [&>[data-slot=drawer-close]]:-mt-3 has-[>[data-slot=drawer-description]]:[&>[data-slot=drawer-close]]:row-span-2',
         className
       )}
       {...props}
@@ -185,14 +185,14 @@ DrawerHeader.displayName = 'DrawerHeader';
 
 export const DrawerBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="drawer-body" className={cn('py-2 flex-1 overflow-y-auto min-h-0', className)} {...props} />
+    <div ref={ref} data-slot="drawer-body" className={cn('flex-1 overflow-y-auto min-h-0', className)} {...props} />
   )
 );
 DrawerBody.displayName = 'DrawerBody';
 
 export const DrawerFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="drawer-footer" className={cn('pt-6 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-6', className)} {...props} />
+    <div ref={ref} data-slot="drawer-footer" className={cn('pt-4 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4', className)} {...props} />
   )
 );
 DrawerFooter.displayName = 'DrawerFooter';
@@ -204,7 +204,7 @@ export const DrawerTitle = React.forwardRef<
   <BaseDrawer.Title
     ref={ref}
     data-slot="drawer-title"
-    className={composeClassName('font-heading text-xl font-bold text-on-surface', className)}
+    className={composeClassName('text-headline-sm text-on-surface', className)}
     {...props}
   />
 ));
@@ -217,7 +217,7 @@ export const DrawerDescription = React.forwardRef<
   <BaseDrawer.Description
     ref={ref}
     data-slot="drawer-description"
-    className={composeClassName('font-sans text-base text-on-surface-variant mb-4', className)}
+    className={composeClassName('font-sans text-base text-on-surface-variant leading-relaxed text-pretty', className)}
     {...props}
   />
 ));
@@ -489,23 +489,23 @@ function DrawerComponentInner<Payload = unknown>(
                   {...props}
                 >
                   <DrawerContent className="flex flex-col h-full min-h-0">
-                    <div data-slot="drawer-header" className="shrink-0">
+                    <div data-slot="drawer-header" className="flex flex-col gap-1.5 mb-4 shrink-0">
                       {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-start justify-between gap-2">
                         <DrawerTitle className={cn(!title && 'sr-only')}>{title || 'Panel'}</DrawerTitle>
                         {showCloseButton && (
-                          <DrawerCloseButton aria-label="Close drawer panel" />
+                          <DrawerCloseButton className="-me-3 -mt-3 shrink-0" aria-label="Close drawer panel" />
                         )}
                       </div>
                       {description && <DrawerDescription>{description}</DrawerDescription>}
                     </div>
-                    <div data-slot="drawer-body" className="flex-1 overflow-y-auto min-h-0 py-2">
+                    <div data-slot="drawer-body" className="flex-1 overflow-y-auto min-h-0">
                       {typeof children === 'function' ? children(renderProps) : children}
                     </div>
                     {footer ? (
-                      <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant mt-6 shrink-0">{footer}</div>
+                      <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant mt-4 shrink-0">{footer}</div>
                     ) : (
-                      <div data-slot="drawer-footer" className="pt-6 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-6 shrink-0">
+                      <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4 shrink-0">
                         <BaseDrawer.Close data-slot="drawer-close" className="inline-flex items-center justify-center font-label text-sm font-semibold rounded h-11 px-5 min-h-[44px] bg-surface text-on-surface border border-outline hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer">
                           Close panel
                         </BaseDrawer.Close>

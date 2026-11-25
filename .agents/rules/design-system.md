@@ -34,4 +34,4 @@ description: Project-level design system and WCAG 2.2 AA implementation rules fo
 - **Focus & CSS content:** Never remove `:focus-visible` outlines. Never convey meaningful text solely via CSS `content` without alternative speech text (WCAG F87).
 - **Motion:** Use `DESIGN.md` durations/easings, explicit `transition-[...]` (never `transition-all`), and mandatory `motion-reduce:transition-none` / `prefers-reduced-motion`. Restrict `--blur-*` to micro-primitives (`<TextSwap />`, `<Skeleton.Reveal />`, `<Icon.Toggle />`), never large text overlays.
 - **Plain-English UI copy:** 1–2 simple nouns per label, user-outcome phrasing, zero dev/DB/CSS jargon.
-- **Verification:** When a live page is available, audit contrast, focus order, and tap targets with the `a11y-debugging` skill (Chrome DevTools MCP).
+- **Verification:** When a live page is available, audit contrast, focus order, and tap targets with the `a11y-debugging` skill (Chrome DevTools MCP), and inspect desktop (initial + scrolled below-the-fold) and `390×844` mobile views for sticky-header separation and zero horizontal overflow.

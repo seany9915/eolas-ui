@@ -234,7 +234,7 @@ Reserved strictly for system, operational, and task state (including exercise co
   * **Roboto Mono** (Code, numeric data) → `font-mono`
 - **Scale & Floors:**
   * `display-lg` (`3rem`/48px, 700) for desktop/marketing heroes; `display-sm` (`2.5rem`/40px, 700) for compact/tablet heroes; `headline-lg` (`2rem`/32px, 600).
-  * **Body & prose floor:** Strict `1rem` (`16px`, `body-md`) minimum for primary instructions, tips, and paragraphs.
+  * **Body & prose floor:** Strict `1rem` (`16px`, `body-md`) minimum for primary instructions, tips, and paragraphs. Keep consecutive body paragraphs and body lists (`<ul>`/`<ol>`) at one consistent scale—never oversize a `.lead` paragraph above smaller copy or shrink body lists to `body-sm`.
   * **Dense tables & secondary metadata:** `body-sm` (`0.875rem`/14px, 400, 1.45 line-height; `caption` is alias). Never use for main prose.
   * **Compact badges/timestamps:** `label-md` (`0.8125rem`/13px) and `label-sm` (`0.75rem`/12px) with `font-semibold` (600 weight, never 700 at 12px). Avoid weights below 400.
 - **Formatting Rules:**
