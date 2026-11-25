@@ -139,7 +139,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     const [_open, _setOpen] = React.useState<boolean>(defaultOpen);
 
     React.useEffect(() => {
-      if (openProp !== undefined) return;
+      if (openProp !== undefined || isEmbedded) return;
       try {
         const stored = localStorage.getItem(SIDEBAR_COOKIE_NAME);
         if (stored !== null) {
@@ -148,7 +148,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
       } catch {
         // ignore storage errors
       }
-    }, [openProp]);
+    }, [openProp, isEmbedded]);
 
     const open = openProp ?? _open;
     const setOpen = React.useCallback(
@@ -160,14 +160,16 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
           _setOpen(nextOpen);
         }
 
-        try {
-          localStorage.setItem(SIDEBAR_COOKIE_NAME, String(nextOpen));
-          document.cookie = `${SIDEBAR_COOKIE_NAME}=${nextOpen}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-        } catch {
-          // ignore
+        if (!isEmbedded) {
+          try {
+            localStorage.setItem(SIDEBAR_COOKIE_NAME, String(nextOpen));
+            document.cookie = `${SIDEBAR_COOKIE_NAME}=${nextOpen}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+          } catch {
+            // ignore
+          }
         }
       },
-      [setOpenProp, open]
+      [setOpenProp, open, isEmbedded]
     );
 
     const toggleSidebar = React.useCallback(() => {
@@ -177,6 +179,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     }, [isMobile, mobileBehavior, setOpen, setOpenMobile]);
 
     React.useEffect(() => {
+      if (isEmbedded) return;
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
@@ -189,7 +192,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
 
       window.addEventListener('keydown', handleKeyDown);
       return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [toggleSidebar]);
+    }, [toggleSidebar, isEmbedded]);
 
     const state = open ? 'expanded' : 'collapsed';
 
@@ -408,15 +411,18 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           data-slot="sidebar"
           data-sidebar="sidebar"
           className={cn(
-            'duration-[var(--duration-slow)] transition-[left,right,width] ease-[var(--ease-standard)] motion-reduce:transition-none bg-surface',
+            'duration-[var(--duration-slow)] transition-[left,right,width] ease-[var(--ease-standard)] motion-reduce:transition-none',
             side === 'left'
-              ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] border-r border-outline-variant'
-              : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] border-l border-outline-variant',
-            variant === 'floating'
+              ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
+              : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+            variant === 'floating' || variant === 'inset'
               ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
-              : variant === 'inset'
-              ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
-              : 'group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]',
+              : cn(
+                  'bg-surface group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]',
+                  side === 'left'
+                    ? 'border-r border-outline-variant'
+                    : 'border-l border-outline-variant'
+                ),
             className,
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
             isEmbedded
@@ -553,7 +559,7 @@ export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
       props: {
         'data-slot': 'sidebar-inset',
         className: cn(
-          'relative flex flex-1 flex-col bg-surface',
+          'relative flex flex-1 flex-col bg-background',
           isEmbedded ? 'min-h-0 h-full' : 'min-h-svh',
           !isEmbedded && 'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)]',
           'md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
@@ -579,7 +585,7 @@ export const SidebarInput = React.forwardRef<
       data-slot="sidebar-input"
       data-sidebar="input"
       className={composeClassName(
-        'h-10 w-full bg-surface border-outline shadow-none focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+        'h-11 min-h-11 w-full bg-surface border-outline shadow-none focus-visible:border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary',
         className
       )}
       {...props}
@@ -661,8 +667,8 @@ export const SidebarContent = React.forwardRef<
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden p-2 scrollbar-thin',
-        'group-data-[collapsible=icon]:overflow-y-auto group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center',
+        'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden scrollbar-thin',
+        'group-data-[collapsible=icon]:overflow-y-auto group-data-[collapsible=icon]:items-center',
         className
       )}
       {...props}
@@ -830,7 +836,7 @@ export function sidebarMenuButtonVariants({
     default:
       'text-on-surface-variant hover:bg-state-hover hover:text-on-surface font-medium data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold data-[active=true]:hover:bg-primary-container data-[active=true]:hover:brightness-95',
     outline:
-      'bg-surface border border-outline-variant hover:bg-state-hover hover:text-on-surface text-on-surface-variant font-medium data-[active=true]:border-primary/40 data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold data-[active=true]:hover:bg-primary-container data-[active=true]:hover:brightness-95',
+      'bg-surface border border-outline-variant hover:bg-state-hover hover:text-on-surface text-on-surface-variant font-medium data-[active=true]:border-primary data-[active=true]:bg-primary-container data-[active=true]:text-on-primary-container data-[active=true]:font-semibold data-[active=true]:hover:bg-primary-container data-[active=true]:hover:brightness-95',
   }[variant];
 
   return cn(
@@ -842,9 +848,9 @@ export function sidebarMenuButtonVariants({
     // Leading icon tokens: Inactive uses on-surface-variant; Active lights up in Electric Blue (primary)
     '[&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:transition-colors [&>.material-symbols-outlined]:text-xl [&>.material-symbols-outlined]:shrink-0 [&>.material-symbols-outlined]:transition-colors',
     'data-[active=true]:[&>svg]:text-primary data-[active=true]:[&>.material-symbols-outlined]:text-primary hover:[&>svg]:text-on-surface hover:[&>.material-symbols-outlined]:text-on-surface',
-    'group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-h-[44px] group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center',
-    '[&>span:last-child]:truncate [&>span:last-child]:group-data-[collapsible=icon]:hidden',
     sizeClasses,
+    'group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-h-[44px] group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center',
+    '[&>span:not(.material-symbols-outlined):last-child]:truncate [&>span:not(.material-symbols-outlined)]:group-data-[collapsible=icon]:hidden',
     'has-[+[data-slot=sidebar-menu-badge]]:pe-9 group-data-[collapsible=icon]:has-[+[data-slot=sidebar-menu-badge]]:pe-0',
     variantClasses,
     className

@@ -24,6 +24,8 @@ export interface ScrollAreaProps
   fade?: boolean;
   viewportClassName?: string;
   contentClassName?: string;
+  /** Optional ref forwarded directly to the scrollable Viewport element */
+  viewportRef?: React.Ref<HTMLDivElement>;
 }
 
 const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
@@ -35,6 +37,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
   className,
   viewportClassName,
   contentClassName,
+  viewportRef,
   style,
   ...props
 }, ref) => {
@@ -64,6 +67,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
       {...props}
     >
       <BaseScrollArea.Viewport
+        ref={viewportRef}
         data-slot="scroll-area-viewport"
         style={maxHeight !== undefined ? { maxHeight } : undefined}
         className={cn(

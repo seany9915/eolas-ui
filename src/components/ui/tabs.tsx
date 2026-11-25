@@ -410,10 +410,12 @@ export interface TabsPanelProps extends React.ComponentPropsWithoutRef<typeof Ba
    * @default false
    */
   hiddenUntilFound?: boolean;
+  /** Removes default vertical padding (`py-4`) for edge-to-edge panel content. */
+  flush?: boolean;
 }
 
 export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
-  ({ value, keepMounted = false, hiddenUntilFound = false, children, className, ...props }, forwardedRef) => {
+  ({ value, keepMounted = false, hiddenUntilFound = false, flush = false, children, className, ...props }, forwardedRef) => {
     const internalRef = React.useRef<HTMLDivElement>(null);
     const resolvedKeepMounted = hiddenUntilFound || keepMounted;
 
@@ -472,7 +474,8 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
         keepMounted={resolvedKeepMounted}
         className={(state) =>
           cn(
-            'min-w-0 data-[orientation=vertical]:flex-1 py-4 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+            'min-w-0 data-[orientation=vertical]:flex-1 font-sans outline-none transition-opacity duration-[var(--duration-quick)] ease-[var(--ease-standard)] data-[starting-style]:opacity-0 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+            flush ? 'py-0' : 'py-4',
             '[&[hidden]:not([hidden="until-found"])]:hidden',
             typeof className === 'function' ? className(state) : className
           )

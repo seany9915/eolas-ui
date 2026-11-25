@@ -44,6 +44,8 @@ export interface SelectProps<Value = string, Multiple extends boolean | undefine
   placeholder?: React.ReactNode;
   /** Accessible name for the trigger when no visible label is rendered */
   'aria-label'?: string;
+  /** References an external label or heading ID for the trigger */
+  'aria-labelledby'?: string;
   error?: React.ReactNode;
   description?: React.ReactNode;
   disabled?: boolean;
@@ -119,6 +121,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
   isItemEqualToValue,
   placeholder = 'Select an option',
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   error,
   description,
   disabled,
@@ -266,6 +269,7 @@ function SelectComponentInner<Value = string, Multiple extends boolean | undefin
           data-slot="select-trigger"
           id={selectId}
           aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={cn(

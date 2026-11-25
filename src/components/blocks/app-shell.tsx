@@ -58,6 +58,8 @@ export interface AppShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   collapsible?: 'icon' | 'offcanvas' | 'none';
   /** When true, confines layout within parent container rather than taking full viewport screen */
   embedded?: boolean;
+  /** When true, removes default main workspace padding (`p-4 @md:p-6`) for full-bleed child layouts such as `ListDetailBlock variant="flush"` or chat panes */
+  flush?: boolean;
   className?: string;
 }
 
@@ -124,6 +126,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       collapsible = 'icon',
       defaultOpen,
       embedded = false,
+      flush = false,
       className,
       ...props
     },
@@ -283,7 +286,12 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             <div
               className={cn(
                 'flex items-center gap-2 min-w-0',
-                topBarNav && 'shrink max-w-36 sm:max-w-72'
+                topBarNav &&
+                  (embedded
+                    ? sizeClass === 'mobile'
+                      ? 'shrink max-w-36'
+                      : 'shrink max-w-72'
+                    : 'shrink max-w-36 sm:max-w-72')
               )}
             >
               {showSidebar && collapsible !== 'none' && (
@@ -299,9 +307,9 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 </div>
               )}
               {title && (
-                <span className="font-heading text-base font-semibold text-on-surface truncate">
+                <div className="min-w-0 font-heading text-base font-semibold text-on-surface truncate">
                   {title}
-                </span>
+                </div>
               )}
             </div>
 
@@ -334,38 +342,36 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           </header>
 
           {/* Main Workspace Body */}
-          {embedded ? (
-            <div
-              data-slot="app-shell-main"
-              className="@container flex-1 flex flex-col min-h-0 overflow-y-auto"
-            >
-              <div
-                className={cn(
-                  'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
-                  destinations.length > 0 && 'pb-4'
-                )}
+          {(() => {
+            const MainTag = embedded ? 'div' : 'main';
+            return (
+              <MainTag
+                id={!embedded ? 'main-content' : undefined}
+                tabIndex={!embedded ? -1 : undefined}
+                data-slot="app-shell-main"
+                className="@container flex-1 flex flex-col min-h-0 overflow-y-auto focus:outline-none"
               >
-                {children}
-              </div>
-            </div>
-          ) : (
-            <main
-              id="main-content"
-              data-slot="app-shell-main"
-              className="@container flex-1 flex flex-col min-h-0 overflow-y-auto"
-            >
-              <div
-                className={cn(
-                  'flex-1 flex flex-col min-h-0 p-4 @md:p-6',
-                  // Safe bottom padding on mobile over the fixed navigation bar
-                  destinations.length > 0 &&
-                    (canOpenSidebarOnShortMobile ? 'pb-28 sm:pb-6 short:pb-6' : 'pb-28 sm:pb-6')
-                )}
-              >
-                {children}
-              </div>
-            </main>
-          )}
+                <div
+                  className={cn(
+                    'flex-1 flex flex-col min-h-0',
+                    flush ? 'p-0' : 'p-4 @md:p-6',
+                    embedded
+                      ? !flush && destinations.length > 0 && 'pb-4'
+                      : destinations.length > 0 &&
+                          (flush
+                            ? canOpenSidebarOnShortMobile
+                              ? 'pb-24 sm:pb-0 short:pb-0'
+                              : 'pb-24 sm:pb-0'
+                            : canOpenSidebarOnShortMobile
+                              ? 'pb-28 sm:pb-6 short:pb-6'
+                              : 'pb-28 sm:pb-6')
+                  )}
+                >
+                  {children}
+                </div>
+              </MainTag>
+            );
+          })()}
 
           {/* Mobile Bottom Navigation Bar (Hidden on >=640px; hidden on compact height only when sidebar trigger can take over) */}
           {showMobileBar && (

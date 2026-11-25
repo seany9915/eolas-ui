@@ -138,7 +138,7 @@ export const TableHead = React.forwardRef<
     scope={scope}
     data-slot="table-head"
     className={cn(
-      'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.75rem)] text-start align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] text-start align-middle font-semibold text-on-surface font-label [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}
@@ -254,7 +254,7 @@ export const TableComponent = React.forwardRef<HTMLTableElement, TableProps<any>
                       scope="col"
                       data-slot="table-head"
                       className={cn(
-                        'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.75rem)] font-semibold',
+                        'h-12 px-[var(--density-table-cell-px,1rem)] py-[var(--density-table-cell-py,0.875rem)] font-semibold',
                         alignClass,
                         numericClass,
                         col.className

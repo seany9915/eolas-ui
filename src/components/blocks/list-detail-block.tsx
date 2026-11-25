@@ -31,6 +31,7 @@ import { Item } from '@/components/ui/item';
 import { Badge, type BadgeColorRole } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { Empty } from '@/components/ui/empty';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 export interface ListDetailItem {
@@ -41,10 +42,22 @@ export interface ListDetailItem {
   badge?: string;
   badgeColorRole?: BadgeColorRole;
   icon?: string;
+  /** Optional custom leading media (e.g. Avatar), rendered instead of `icon` in both list rows and the detail header. */
+  media?: React.ReactNode;
   disabled?: boolean;
 }
 
 export type ListDetailDensity = 'compact' | 'comfortable' | 'spacious';
+export type ListDetailVariant = 'card' | 'flush';
+export type ListDetailHeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5';
+
+const detailHeadingMap: Record<ListDetailHeadingTag, 'h2' | 'h3' | 'h4' | 'h5' | 'h6'> = {
+  h1: 'h2',
+  h2: 'h3',
+  h3: 'h4',
+  h4: 'h5',
+  h5: 'h6',
+};
 
 export interface ListDetailBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   items: ListDetailItem[];
@@ -52,6 +65,12 @@ export interface ListDetailBlockProps extends React.HTMLAttributes<HTMLDivElemen
   defaultSelectedId?: string | null;
   onSelectId?: (id: string | null) => void;
   title?: string;
+  /** Heading tag used for the list pane title. Defaults to `'h2'` (detail heading auto-steps down by 1). */
+  titleAs?: ListDetailHeadingTag;
+  /** Optional Material Symbol name rendered beside the list title. */
+  titleIcon?: string;
+  /** Optional count badge or status node rendered beside the list title. */
+  titleBadge?: React.ReactNode;
   headerAction?: React.ReactNode;
   detailActions?: React.ReactNode;
   searchable?: boolean;
@@ -60,10 +79,24 @@ export interface ListDetailBlockProps extends React.HTMLAttributes<HTMLDivElemen
   onSearchChange?: (query: string) => void;
   searchPlaceholder?: string;
   renderDetail?: (item: ListDetailItem) => React.ReactNode;
+  /** Shows skeleton rows in the list pane while items are loading. */
+  loading?: boolean;
+  /** Accessible status label announced while `loading` is true. */
+  loadingLabel?: string;
   emptyDetailTitle?: string;
   emptyDetailDescription?: string;
+  /** Optional action rendered inside the detail pane empty state. */
+  emptyDetailAction?: React.ReactNode;
   emptyListTitle?: string;
   emptyListDescription?: string;
+  /** Optional action rendered inside the list pane empty state when there is no active search query. */
+  emptyListAction?: React.ReactNode;
+  /** Container presentation: `'card'` (default bordered rounded surface) or `'flush'` (edge-to-edge inside `AppShell flush`). */
+  variant?: ListDetailVariant;
+  /** Skips default detail-body padding and inner scroll wrapper for full-height child layouts (e.g. `Tabs`). */
+  detailBodyFlush?: boolean;
+  /** Hides the secondary subtitle/meta bar below the detail header and moves subtitle inline into the header. */
+  hideDetailMetaBar?: boolean;
   /** Density mode ('compact' | 'comfortable' | 'spacious'). Also inherits `--density` via CSS container style queries. */
   density?: ListDetailDensity;
   className?: string;
@@ -79,6 +112,9 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       defaultSelectedId = null,
       onSelectId,
       title = 'Items',
+      titleAs = 'h2',
+      titleIcon,
+      titleBadge,
       headerAction,
       detailActions,
       searchable = true,
@@ -87,10 +123,17 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       onSearchChange,
       searchPlaceholder = 'Search...',
       renderDetail,
+      loading = false,
+      loadingLabel = 'Loading items...',
       emptyDetailTitle = 'No item selected',
       emptyDetailDescription = 'Choose an item from the list to view its details.',
+      emptyDetailAction,
       emptyListTitle,
       emptyListDescription,
+      emptyListAction,
+      variant = 'card',
+      detailBodyFlush = false,
+      hideDetailMetaBar = false,
       density,
       className,
       listWidthClassName = '@2xl:w-72 @4xl:w-80',
@@ -251,6 +294,8 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       }
     };
 
+    const TitleTag = titleAs;
+    const DetailHeadingTag = detailHeadingMap[titleAs];
     const hasSearchQuery = Boolean(currentSearch.trim());
     const resolvedEmptyListTitle =
       emptyListTitle ?? (hasSearchQuery ? 'No items found' : 'No items yet');
@@ -264,9 +309,13 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
       <div
         ref={ref}
         data-slot="list-detail-block"
+        data-variant={variant}
         data-density={density}
         className={cn(
-          '@container size-full min-h-120 short:min-h-0 bg-surface rounded-lg border border-outline-variant overflow-hidden flex flex-col',
+          '@container size-full bg-surface overflow-hidden flex flex-col',
+          variant === 'flush'
+            ? 'min-h-0'
+            : 'min-h-120 short:min-h-0 rounded-lg border border-outline-variant',
           className
         )}
         {...props}
@@ -288,16 +337,22 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
           {/* List Header */}
           <div className="flex flex-col shrink-0 bg-surface">
             <div className="min-h-16 short:min-h-14 py-2 px-4 border-b border-outline-variant flex items-center justify-between gap-2">
-              <h2 className="font-heading text-base font-semibold text-on-surface truncate">
-                {title}
-              </h2>
+              <div className="flex items-center gap-2 min-w-0">
+                {titleIcon && (
+                  <Icon name={titleIcon} size="md" className="text-on-surface-variant shrink-0" aria-hidden="true" />
+                )}
+                <TitleTag className="font-heading text-base font-semibold text-on-surface truncate">
+                  {title}
+                </TitleTag>
+                {titleBadge && <div className="shrink-0">{titleBadge}</div>}
+              </div>
               {headerAction && (
                 <div className="flex items-center gap-1.5 shrink-0">{headerAction}</div>
               )}
             </div>
 
             {searchable && (
-              <div className="px-3 py-2 border-b border-outline-variant bg-surface shrink-0">
+              <div className="px-4 py-2 border-b border-outline-variant bg-surface shrink-0">
                 <Field.Root>
                   <Field.Label htmlFor={searchInputId} className="sr-only">
                     Filter {title}
@@ -340,7 +395,28 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                   : `${filteredItems.length} ${filteredItems.length === 1 ? 'result' : 'results'} found`}
               </div>
             )}
-            {filteredItems.length === 0 ? (
+            {loading ? (
+              <div
+                role="status"
+                aria-live="polite"
+                aria-label={loadingLabel}
+                className="flex flex-col gap-1.5"
+              >
+                <span className="sr-only">{loadingLabel}</span>
+                {Array.from({ length: 5 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-4 px-4 py-4 min-h-14 rounded-md"
+                  >
+                    <Skeleton className="size-9 rounded-md shrink-0" />
+                    <div className="flex flex-col gap-2 flex-1 min-w-0">
+                      <Skeleton className="h-4 w-3/5" />
+                      <Skeleton className="h-3.5 w-4/5" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredItems.length === 0 ? (
               <Empty
                 variant="unboxed"
                 icon={hasSearchQuery ? 'search_off' : 'inbox'}
@@ -356,7 +432,9 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                     >
                       Clear search
                     </Button>
-                  ) : undefined
+                  ) : (
+                    emptyListAction
+                  )
                 }
                 className="my-0"
               />
@@ -381,11 +459,13 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                       onClick={() => !item.disabled && handleActivateItem(item.id)}
                       onKeyDown={(e) => handleItemKeyDown(e, item)}
                     >
-                      {item.icon && (
+                      {item.media ? (
+                        <Item.Media variant="default">{item.media}</Item.Media>
+                      ) : item.icon ? (
                         <Item.Media variant="icon">
                           <Icon name={item.icon} size="sm" />
                         </Item.Media>
-                      )}
+                      ) : null}
                       <Item.Content>
                         <Item.Title>{item.title}</Item.Title>
                         {item.subtitle && (
@@ -466,26 +546,38 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                     <Icon name="arrow_back" size="sm" directional />
                     <span>Back</span>
                   </Button>
-                  <h3 className="font-heading text-base font-semibold text-on-surface truncate min-w-0">
-                    {selectedItem.title}
-                  </h3>
-                  {selectedItem.badge && (
-                    <Badge
-                      variant="soft"
-                      colorRole={selectedItem.badgeColorRole || 'primary'}
-                      size="sm"
-                      className="hidden @2xl:inline-flex"
-                    >
-                      {selectedItem.badge}
-                    </Badge>
+                  {selectedItem.media && (
+                    <div className="shrink-0">{selectedItem.media}</div>
                   )}
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <DetailHeadingTag className="font-heading text-base font-semibold text-on-surface truncate min-w-0">
+                        {selectedItem.title}
+                      </DetailHeadingTag>
+                      {selectedItem.badge && (
+                        <Badge
+                          variant="soft"
+                          colorRole={selectedItem.badgeColorRole || 'primary'}
+                          size="sm"
+                          className={cn(hideDetailMetaBar ? 'inline-flex shrink-0' : 'hidden @2xl:inline-flex shrink-0')}
+                        >
+                          {selectedItem.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    {hideDetailMetaBar && selectedItem.subtitle && (
+                      <p className="font-sans text-sm text-on-surface-variant truncate">
+                        {selectedItem.subtitle}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 {detailActions && (
                   <div className="flex flex-wrap items-center gap-1.5 shrink-0 max-w-full">{detailActions}</div>
                 )}
               </div>
 
-              {(selectedItem.subtitle || selectedItem.meta || selectedItem.badge) && (
+              {!hideDetailMetaBar && (selectedItem.subtitle || selectedItem.meta || selectedItem.badge) && (
                 <div
                   className={cn(
                     'min-h-11 px-4 @md:px-6 py-2 border-b border-outline-variant flex flex-wrap items-center justify-between gap-2 bg-surface text-sm font-sans text-on-surface-variant shrink-0',
@@ -517,18 +609,40 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
               )}
 
               {/* Detail Body */}
-              <div data-slot="detail-body" className="flex-1 overflow-y-auto">
-                <div className="@container w-full">
-                  {renderDetail ? (
-                    renderDetail(selectedItem)
-                  ) : children ? (
-                    children
-                  ) : (
-                    <p className="font-sans text-base text-on-surface-variant">
-                      {selectedItem.subtitle || 'No additional details.'}
-                    </p>
-                  )}
-                </div>
+              <div
+                data-slot="detail-body"
+                data-flush={detailBodyFlush ? 'true' : undefined}
+                className={cn(
+                  detailBodyFlush
+                    ? 'flex-1 flex flex-col min-h-0 overflow-hidden'
+                    : 'flex-1 overflow-y-auto'
+                )}
+              >
+                {detailBodyFlush ? (
+                  <div className="@container flex-1 flex flex-col min-h-0 w-full">
+                    {renderDetail ? (
+                      renderDetail(selectedItem)
+                    ) : children ? (
+                      children
+                    ) : (
+                      <p className="font-sans text-base text-on-surface-variant p-6">
+                        {selectedItem.subtitle || 'No additional details.'}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="@container w-full">
+                    {renderDetail ? (
+                      renderDetail(selectedItem)
+                    ) : children ? (
+                      children
+                    ) : (
+                      <p className="font-sans text-base text-on-surface-variant">
+                        {selectedItem.subtitle || 'No additional details.'}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -544,6 +658,7 @@ export const ListDetailBlock = React.forwardRef<HTMLDivElement, ListDetailBlockP
                   icon="touch_app"
                   title={emptyDetailTitle}
                   description={emptyDetailDescription}
+                  action={emptyDetailAction}
                   className="my-0"
                 />
               </div>

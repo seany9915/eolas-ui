@@ -31,8 +31,12 @@ const ToolbarContext = React.createContext<ToolbarContextValue>({
   orientation: 'horizontal',
 });
 
+export type ToolbarVariant = 'default' | 'ghost';
+
 export interface ToolbarRootProps
   extends React.ComponentPropsWithoutRef<typeof BaseToolbar.Root> {
+  /** Visual chrome: `'default'` renders a bordered surface strip; `'ghost'` removes background, border, and padding for embedding inside headers/cards. */
+  variant?: ToolbarVariant;
   children?: React.ReactNode;
 }
 
@@ -40,6 +44,7 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
   (
     {
       orientation = 'horizontal',
+      variant = 'default',
       loopFocus = true,
       disabled = false,
       className,
@@ -52,12 +57,16 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
       <ToolbarContext.Provider value={{ orientation }}>
         <BaseToolbar.Root
           ref={ref}
+          data-variant={variant}
           orientation={orientation}
           loopFocus={loopFocus}
           disabled={disabled}
           className={composeClassName(
             cn(
-              'flex items-center gap-1.5 p-1.5 rounded-lg bg-surface border border-outline-variant w-max max-w-full overflow-x-auto scrollbar-none select-none',
+              'flex items-center gap-1.5 w-max max-w-full overflow-x-auto scrollbar-none select-none',
+              variant === 'ghost'
+                ? 'p-0 rounded-none bg-transparent border-0'
+                : 'p-1.5 rounded-lg bg-surface border border-outline-variant',
               orientation === 'vertical' && 'flex-col items-stretch overflow-x-visible'
             ),
             className
@@ -274,6 +283,7 @@ export interface ToolbarAction {
 
 export interface ToolbarProps
   extends React.ComponentPropsWithoutRef<typeof BaseToolbar.Root> {
+  variant?: ToolbarVariant;
   actions?: ToolbarAction[];
   children?: React.ReactNode;
 }
@@ -282,6 +292,7 @@ const ToolbarComponent = React.forwardRef<HTMLDivElement, ToolbarProps>(
   (
     {
       actions,
+      variant = 'default',
       orientation = 'horizontal',
       loopFocus = true,
       disabled = false,
@@ -294,6 +305,7 @@ const ToolbarComponent = React.forwardRef<HTMLDivElement, ToolbarProps>(
     return (
       <ToolbarRoot
         ref={ref}
+        variant={variant}
         orientation={orientation}
         loopFocus={loopFocus}
         disabled={disabled}

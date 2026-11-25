@@ -293,7 +293,8 @@
         "seany9915/eolas-ui/item",
         "seany9915/eolas-ui/badge",
         "seany9915/eolas-ui/icon",
-        "seany9915/eolas-ui/empty"
+        "seany9915/eolas-ui/empty",
+        "seany9915/eolas-ui/skeleton"
       ],
       "files": [
         {

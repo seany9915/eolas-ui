@@ -1671,8 +1671,8 @@ select:autofill {
     padding: var(--density-list-items-padding, 0.5rem);
   }
 
-  :where([data-slot="list-detail-block"] [data-slot="detail-body"]) {
-    padding: var(--density-detail-body-padding, 1rem);
+  :where([data-slot="list-detail-block"] [data-slot="detail-body"]:not([data-flush="true"])) {
+    padding: var(--density-detail-body-padding, 1.5rem);
   }
 
   @container style(--density: compact) {
