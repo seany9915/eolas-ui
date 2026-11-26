@@ -454,6 +454,24 @@ try {
         return <ContextMenuContent />;
       }
     `,
+    'src/components/blocks/bad-service-layer.tsx': `
+      import { fetchPatient } from '@/services/patients';
+      import { doc } from 'firebase/firestore';
+      export function BadServiceLayer() {
+        return String(Boolean(fetchPatient && doc));
+      }
+    `,
+    'src/nested-chart-card-bad.tsx': `
+      const ChartCard = ({ children }: { children?: unknown }) => children;
+      const Card = ({ children }: { children?: unknown }) => children;
+      export function BadNestedChartCard() {
+        return (
+          <ChartCard>
+            <Card>Inner</Card>
+          </ChartCard>
+        );
+      }
+    `,
     'src/wrapped-bad.tsx': `
       import { Dialog } from '@base-ui/react/dialog';
       export function BadWrapped() {
@@ -493,6 +511,13 @@ try {
     'src/icon-button-ok.tsx': `
       const Button = (_p: { size?: string; 'aria-label'?: string; children?: unknown }) => null;
       const Icon = (_p: { name: string }) => null;
+      export function WrappedIconBtn({ ...rest }: Record<string, unknown>) {
+        return (
+          <Button size="icon" {...rest}>
+            <Icon name="close" />
+          </Button>
+        );
+      }
       export function GoodIconBtns() {
         return (
           <div>
@@ -503,7 +528,21 @@ try {
               <Icon name="close" />
               <span className="sr-only">Close</span>
             </Button>
+            <Button size="icon" {...{ 'aria-label': 'Inspect' }}>
+              <Icon name="close" />
+            </Button>
           </div>
+        );
+      }
+    `,
+    'src/icon-button-spread-bad.tsx': `
+      const Button = (_p: { size?: string; children?: unknown }) => null;
+      const Icon = (_p: { name: string }) => null;
+      export function BadSpreadIconBtn({ extraProps }: { extraProps: Record<string, unknown> }) {
+        return (
+          <Button size="icon" {...extraProps}>
+            <Icon name="close" />
+          </Button>
         );
       }
     `,
@@ -734,6 +773,17 @@ try {
       !rulesForFile(diagnostics, 'src/components/blocks/ok-block-layer.tsx').includes('eolas(one-way-imports)'),
       'expected block importing blocks/ and ui/ to pass'
     );
+    const serviceLayerDiags = rulesForFile(diagnostics, 'src/components/blocks/bad-service-layer.tsx').filter(
+      (c) => c === 'eolas(one-way-imports)'
+    );
+    assert.equal(serviceLayerDiags.length, 2, `expected 2 one-way-imports errors for services/ and firebase/firestore, got ${serviceLayerDiags.length}`);
+  });
+
+  test('no-nested-card catches Card nested inside ChartCard', () => {
+    assert.ok(
+      rulesForFile(diagnostics, 'src/nested-chart-card-bad.tsx').includes('eolas(no-nested-card)'),
+      'expected <Card> inside <ChartCard> to be flagged by no-nested-card'
+    );
   });
 
   test('wrapped-libraries blocks direct headless UI imports outside ui/ while allowing type-only imports', () => {
@@ -769,7 +819,11 @@ try {
     );
     assert.ok(
       !rulesForFile(diagnostics, 'src/icon-button-ok.tsx').includes('eolas(icon-button-label)'),
-      'expected aria-label and sr-only labeled icon buttons to pass'
+      'expected aria-label, sr-only, wrapper rest spread, and object-literal aria-label to pass'
+    );
+    assert.ok(
+      rulesForFile(diagnostics, 'src/icon-button-spread-bad.tsx').includes('eolas(icon-button-label)'),
+      'expected arbitrary non-rest spread {...extraProps} without aria-label to be blocked'
     );
   });
 

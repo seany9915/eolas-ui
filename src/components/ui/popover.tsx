@@ -129,10 +129,15 @@ function PopoverComponentInner<Payload = unknown>(
     return hasPopoverCompoundChild(children);
   }, [trigger, anchor, title, description, children]);
 
+  const popoverContextValue = React.useMemo(
+    () => ({ openOnHover, delay, closeDelay }),
+    [openOnHover, delay, closeDelay]
+  );
+
   // If used as a composable compound root (<Popover open={...}><PopoverTrigger /><PopoverContent /></Popover>)
   if (isCompoundUsage) {
     return (
-      <PopoverContext.Provider value={{ openOnHover, delay, closeDelay }}>
+      <PopoverContext.Provider value={popoverContextValue}>
         <BasePopover.Root<Payload>
           open={open}
           defaultOpen={defaultOpen}

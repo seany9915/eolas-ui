@@ -38,17 +38,6 @@ import {
 } from './trace';
 import { useChatMessageContext } from './chat-message-context';
 import { cn, sanitizeUrl } from '@/lib/utils';
-import {
-  InlineCitation,
-  InlineCitationRoot,
-  InlineCitationText,
-  InlineCitationCardTrigger,
-  InlineCitationCard,
-  InlineCitationCardBody,
-  InlineCitationSource,
-  InlineCitationQuote,
-  InlineCitationBadge,
-} from './inline-citation';
 
 export type SourcesVariant = 'card' | 'ghost' | 'inline';
 
@@ -83,9 +72,13 @@ export const SourcesRoot = React.forwardRef<HTMLDivElement, SourcesRootProps>(
   ({ children, variant, className, ...props }, ref) => {
     const chatContext = useChatMessageContext();
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'card');
+    const contextValue = React.useMemo<SourcesContextValue>(
+      () => ({ variant: resolvedVariant }),
+      [resolvedVariant]
+    );
 
     return (
-      <SourcesContext.Provider value={{ variant: resolvedVariant }}>
+      <SourcesContext.Provider value={contextValue}>
         <div
           ref={ref}
           data-slot="sources-root"
@@ -177,7 +170,7 @@ const SourcesTrigger = React.forwardRef<HTMLButtonElement, SourcesTriggerProps>(
         {children ? (
           children
         ) : (
-          <TraceLine>
+          <TraceLine render={<span />}>
             <TraceIcon name="menu_book" className="text-secondary" />
             <TraceTitle>{label}</TraceTitle>
             {typeof count === 'number' && (
@@ -636,7 +629,6 @@ export const Sources = Object.assign(SourcesComponent, {
   Icon: SourceIcon,
   Favicon: SourceIcon,
   CitationRef: SourcesCitationRef,
-  Badge: InlineCitationBadge,
   Skeleton: SourcesSkeleton,
 });
 
@@ -647,14 +639,4 @@ export {
   // shadcn AI Elements direct aliases
   SourcesList as SourcesContent,
   SourcesItem as Source,
-  // Re-export InlineCitation primitives
-  InlineCitation,
-  InlineCitationRoot,
-  InlineCitationText,
-  InlineCitationCardTrigger,
-  InlineCitationCard,
-  InlineCitationCardBody,
-  InlineCitationSource,
-  InlineCitationQuote,
-  InlineCitationBadge,
 };

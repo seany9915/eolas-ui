@@ -58,36 +58,45 @@ export const dialogSizeClasses: Record<string, string> = {
   fullscreen: 'max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] h-full',
 };
 
-function DialogComponent<Payload = unknown>({
-  open,
-  defaultOpen,
-  onOpenChange,
-  onOpenChangeComplete,
-  modal = true,
-  disablePointerDismissal = false,
-  handle,
-  actionsRef,
-  triggerId,
-  defaultTriggerId,
-  trigger,
-  title,
-  description,
-  children,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
-  onConfirm,
-  closeOnConfirm = true,
-  size = 'md',
-  scroll = 'inside',
-  footer,
-  initialFocus,
-  finalFocus,
-  keepMounted,
-  container,
-  className,
-}: DialogProps<Payload>): React.JSX.Element {
+function DialogComponent<Payload = unknown>(rawProps: DialogProps<Payload>): React.JSX.Element {
+  const isShorthand =
+    'title' in rawProps ||
+    'description' in rawProps ||
+    'trigger' in rawProps ||
+    'footer' in rawProps ||
+    'onConfirm' in rawProps;
+
+  const {
+    open,
+    defaultOpen,
+    onOpenChange,
+    onOpenChangeComplete,
+    modal = true,
+    disablePointerDismissal = false,
+    handle,
+    actionsRef,
+    triggerId,
+    defaultTriggerId,
+    trigger,
+    title,
+    description,
+    children,
+    confirmLabel = 'Confirm',
+    cancelLabel = 'Cancel',
+    onConfirm,
+    closeOnConfirm = true,
+    size = 'md',
+    scroll = 'inside',
+    footer,
+    initialFocus,
+    finalFocus,
+    keepMounted,
+    container,
+    className,
+  } = rawProps;
+
   // If used as composable compound root (<Dialog open={...}><DialogContent>...</DialogContent></Dialog>)
-  if (!title && !description && !trigger && !footer && !onConfirm) {
+  if (!isShorthand) {
     return (
       <BaseDialog.Root<Payload>
         open={open}
@@ -105,8 +114,6 @@ function DialogComponent<Payload = unknown>({
       </BaseDialog.Root>
     );
   }
-
-  const isOutsideScroll = scroll === 'outside';
 
   return (
     <BaseDialog.Root<Payload>
@@ -133,78 +140,48 @@ function DialogComponent<Payload = unknown>({
               {!React.isValidElement(trigger) ? trigger : undefined}
             </BaseDialog.Trigger>
           )}
-          <BaseDialog.Portal container={container} keepMounted={keepMounted}>
-            <BaseDialog.Backdrop data-slot="dialog-overlay" className="fixed inset-0 bg-on-surface/40 z-50 overflow-hidden overscroll-contain transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
-            <BaseDialog.Viewport
-              data-slot="dialog-viewport"
-              className={cn(
-                'fixed inset-0 z-50 p-4',
-                isOutsideScroll
-                  ? 'overflow-y-auto flex min-h-full items-start justify-center'
-                  : 'flex items-center justify-center'
-              )}
-            >
-              <BaseDialog.Popup
-                data-slot="dialog-content"
-                initialFocus={initialFocus}
-                finalFocus={finalFocus}
-                className={composeClassName(
-                  cn(
-                    '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-                    isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
-                    dialogSizeClasses[size] || dialogSizeClasses.md
-                  ),
-                  className
-                )}
+          <DialogContent
+            size={size}
+            scroll={scroll}
+            showCloseButton={false}
+            keepMounted={keepMounted}
+            container={container}
+            initialFocus={initialFocus}
+            finalFocus={finalFocus}
+            className={className}
+          >
+            <div data-slot="dialog-header" className="flex items-start justify-between gap-2 mb-2">
+              <DialogTitle className={cn(!title && 'sr-only')}>
+                {title || 'Dialog'}
+              </DialogTitle>
+              <DialogClose
+                className="-me-3 -mt-3 shrink-0"
+                aria-label="Close dialog"
               >
-                <div data-slot="dialog-header" className="flex items-start justify-between gap-2 mb-2">
-                  <BaseDialog.Title data-slot="dialog-title" className={cn('text-headline-sm text-on-surface', !title && 'sr-only')}>
-                    {title || 'Dialog'}
-                  </BaseDialog.Title>
-                  <BaseDialog.Close
-                    data-slot="dialog-close"
-                    className="size-11 min-w-[44px] min-h-[44px] -me-3 -mt-3 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label="Close dialog"
-                  >
-                    <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
-                  </BaseDialog.Close>
-                </div>
-                {description && (
-                  <BaseDialog.Description data-slot="dialog-description" className="font-sans text-base text-on-surface-variant mb-6 leading-relaxed text-pretty">
-                    {description}
-                  </BaseDialog.Description>
-                )}
-                {typeof children === 'function' ? children(renderProps) : children}
-                {footer ? (
-                  <div data-slot="dialog-footer" className="mt-6">{footer}</div>
-                ) : (
-                  <div data-slot="dialog-footer" className="flex flex-wrap items-center justify-end gap-3 mt-6">
-                    <BaseDialog.Close
-                      data-slot="dialog-close"
+                <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
+              </DialogClose>
+            </div>
+            {description && (
+              <DialogDescription className="mb-6">
+                {description}
+              </DialogDescription>
+            )}
+            {typeof children === 'function' ? children(renderProps) : children}
+            {footer ? (
+              <div data-slot="dialog-footer" className="mt-6">{footer}</div>
+            ) : (
+              <DialogFooter>
+                <DialogClose
+                  render={
+                    <Button variant="outline" colorRole="neutral" size="md">
+                      {cancelLabel}
+                    </Button>
+                  }
+                />
+                {onConfirm &&
+                  (closeOnConfirm ? (
+                    <DialogClose
                       render={
-                        <Button variant="outline" colorRole="neutral" size="md">
-                          {cancelLabel}
-                        </Button>
-                      }
-                    />
-                    {onConfirm &&
-                      (closeOnConfirm ? (
-                        <BaseDialog.Close
-                          data-slot="dialog-close"
-                          render={
-                            <Button
-                              variant="filled"
-                              colorRole="primary"
-                              size="md"
-                              onClick={() => {
-                                onConfirm();
-                              }}
-                            >
-                              {confirmLabel}
-                            </Button>
-                          }
-                        />
-                      ) : (
                         <Button
                           variant="filled"
                           colorRole="primary"
@@ -215,12 +192,23 @@ function DialogComponent<Payload = unknown>({
                         >
                           {confirmLabel}
                         </Button>
-                      ))}
-                  </div>
-                )}
-              </BaseDialog.Popup>
-            </BaseDialog.Viewport>
-          </BaseDialog.Portal>
+                      }
+                    />
+                  ) : (
+                    <Button
+                      variant="filled"
+                      colorRole="primary"
+                      size="md"
+                      onClick={() => {
+                        onConfirm();
+                      }}
+                    >
+                      {confirmLabel}
+                    </Button>
+                  ))}
+              </DialogFooter>
+            )}
+          </DialogContent>
         </>
       )}
     </BaseDialog.Root>
@@ -246,6 +234,10 @@ export interface DialogContentProps
 export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className, children, size = 'md', scroll = 'inside', showCloseButton = true, keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => {
     const isOutsideScroll = scroll === 'outside';
+    const contentContextValue = React.useMemo(
+      () => ({ hasCloseButton: showCloseButton }),
+      [showCloseButton]
+    );
     return (
       <BaseDialog.Portal container={container} keepMounted={keepMounted}>
         <BaseDialog.Backdrop
@@ -280,7 +272,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
             )}
             {...props}
           >
-            <DialogContentContext.Provider value={{ hasCloseButton: showCloseButton }}>
+            <DialogContentContext.Provider value={contentContextValue}>
               {children}
             </DialogContentContext.Provider>
             {showCloseButton && (

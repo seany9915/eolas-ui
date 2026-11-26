@@ -24,7 +24,7 @@ import * as React from 'react';
 import { Input as BaseInput } from '@base-ui/react/input';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { Icon } from './icon';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, useMergedRefs } from '@/lib/utils';
 
 export type InputSize = 'sm' | 'md' | 'lg';
 
@@ -81,14 +81,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const innerRef = React.useRef<HTMLInputElement | null>(null);
-    const mergedRef = React.useCallback(
-      (node: HTMLInputElement | null) => {
-        innerRef.current = node;
-        if (typeof ref === 'function') ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref]
-    );
+    const mergedRef = useMergedRefs(innerRef, ref);
     const isControlled = value !== undefined;
     const [uncontrolledHasValue, setUncontrolledHasValue] = React.useState(Boolean(props.defaultValue));
     const hasLeading = Boolean(leadingIcon);

@@ -328,7 +328,7 @@ Never use `transition-all`. Target explicit properties:
 
 Pairings:
 - **Dialog / Popover / Menu / Select / Dropdown:** open `250ms` (`--duration-fast`), close `150ms` (`--duration-quick`). Anchored popups (`Popover`, `Menu`, `Select`, `Combobox`, `Tooltip`) scale from `origin-[var(--transform-origin)]`; centered modals (`Dialog`, `AlertDialog`) scale from center.
-- **Hover Gating & Tab Indicators:** Gate hover transforms/lifts behind `@media (hover: hover) and (pointer: fine)` to avoid sticky touch hovers, and guard sliding tab indicators with `transition-none` on first paint before enabling `transition-[left,width,top,height]`.
+- **Hover Gating & Tab Indicators:** Gate hover transforms/lifts behind `@media (hover: hover) and (pointer: fine)` to avoid sticky touch hovers, and guard sliding tab indicators with `transition-none` on first paint before enabling `transition-[translate,width,height]`.
 - **Drawer / Toast:** open `250ms` (`--duration-fast`), close `150ms`–`200ms` (canonical `150ms` / `--duration-quick`) with `--ease-standard` (`cubic-bezier(0.22, 1, 0.36, 1)`). Toast dismiss buttons: `min-w-11 min-h-11` (`44px`, WCAG 2.2 SC 2.5.5).
 - **Accordion:** `250ms` (`--duration-fast`) + `--ease-standard` on panel height and chevron.
 - **Emphasis-only (`500ms` / `--duration-emphasis`):** Reserved for milestones (`SuccessCheck`); high-frequency controls (Checkbox/Switch) use crisp `150ms` micro-transitions.

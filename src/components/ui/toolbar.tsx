@@ -54,8 +54,10 @@ export const ToolbarRoot = React.forwardRef<HTMLDivElement, ToolbarRootProps>(
     },
     ref
   ) => {
+    const toolbarContextValue = React.useMemo(() => ({ orientation }), [orientation]);
+
     return (
-      <ToolbarContext.Provider value={{ orientation }}>
+      <ToolbarContext.Provider value={toolbarContextValue}>
         <BaseToolbar.Root
           ref={ref}
           data-slot="toolbar"

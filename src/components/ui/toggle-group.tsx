@@ -263,8 +263,13 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
           : ({ '--toggle-spacing': spacing, ...style } as React.CSSProperties)
         : style;
 
+    const toggleGroupContextValue = React.useMemo(
+      () => ({ variant, size, orientation, multiple: isMultipleMode, spacing }),
+      [variant, size, orientation, isMultipleMode, spacing]
+    );
+
     return (
-      <ToggleGroupContext.Provider value={{ variant, size, orientation, multiple: isMultipleMode, spacing }}>
+      <ToggleGroupContext.Provider value={toggleGroupContextValue}>
         <BaseToggleGroup
           ref={ref}
           data-slot="toggle-group"

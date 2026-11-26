@@ -14,6 +14,7 @@
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/use-reduced-motion';
 
 interface TextsRevealContextValue {
   show: boolean;
@@ -95,12 +96,8 @@ export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsReveal
 
     React.useEffect(() => {
       if (mounted) return;
-      const prefersReducedMotion =
-        typeof window !== 'undefined' &&
-        typeof window.matchMedia === 'function' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (prefersReducedMotion) {
+      if (prefersReducedMotion()) {
         setMounted(true);
         if (show) setHasEntered(true);
         return;
@@ -128,8 +125,13 @@ export const TextsRevealComponent = React.forwardRef<HTMLDivElement, TextsReveal
       }
     }, [show, mounted]);
 
+    const contextValue = React.useMemo<TextsRevealContextValue>(
+      () => ({ show: visible, hasEntered }),
+      [visible, hasEntered]
+    );
+
     return (
-      <TextsRevealContext.Provider value={{ show: visible, hasEntered }}>
+      <TextsRevealContext.Provider value={contextValue}>
         <div
           ref={ref}
           data-slot="texts-reveal"

@@ -20,7 +20,7 @@ import {
   findNormalizedMatchRanges,
   type UseTextHighlightOptions,
 } from '@/lib/use-text-highlight';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
 
 export interface TextHighlightProps extends React.HTMLAttributes<HTMLDivElement>, UseTextHighlightOptions {
   /** Search query string to highlight within children */
@@ -80,17 +80,7 @@ export const TextHighlight = React.forwardRef<HTMLDivElement, TextHighlightProps
   ) => {
     const [containerEl, setContainerEl] = React.useState<HTMLDivElement | null>(null);
 
-    const setRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        setContainerEl(node);
-        if (typeof forwardedRef === 'function') {
-          forwardedRef(node);
-        } else if (forwardedRef) {
-          forwardedRef.current = node;
-        }
-      },
-      [forwardedRef]
-    );
+    const setRef = useMergedRefs(setContainerEl, forwardedRef);
 
     const { matchCount, isSupported } = useTextHighlight(containerEl, query, {
       highlightName,

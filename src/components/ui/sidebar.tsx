@@ -18,6 +18,7 @@
 import * as React from 'react';
 import { Drawer as BaseDrawer } from '@base-ui/react/drawer';
 import { Button as BaseButton } from '@base-ui/react/button';
+import { useDirection } from '@base-ui/react/direction-provider';
 import { useRender } from '@base-ui/react/use-render';
 import { Tooltip, TooltipProvider, type TooltipProps } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -63,20 +64,28 @@ export function useSidebar(): SidebarContext {
   return context;
 }
 
-function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = React.useState<boolean>(false);
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < breakpoint);
-    };
-    mql.addEventListener('change', onChange);
-    setIsMobile(window.innerWidth < breakpoint);
-    return () => mql.removeEventListener('change', onChange);
+function useIsMobile(breakpoint = 768) {
+  const subscribe = React.useCallback(
+    (callback: () => void) => {
+      if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+        return () => {};
+      }
+      const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+      mql.addEventListener('change', callback);
+      return () => mql.removeEventListener('change', callback);
+    },
+    [breakpoint]
+  );
+
+  const getSnapshot = React.useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < breakpoint;
   }, [breakpoint]);
 
-  return isMobile;
+  return React.useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
 
 function getDesktopBreakpointClasses(mobileBreakpoint: number) {
@@ -161,9 +170,18 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
     }, [openProp, shouldPersist, storageKey]);
 
     const open = openProp ?? _open;
+    const isUncontrolled = openProp === undefined;
+    const openRef = React.useRef(open);
+    useIsomorphicLayoutEffect(() => {
+      openRef.current = open;
+    }, [open]);
+
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
-        const nextOpen = typeof value === 'function' ? value(open) : value;
+        const nextOpen = typeof value === 'function' ? value(openRef.current) : value;
+        if (isUncontrolled) {
+          openRef.current = nextOpen;
+        }
         if (setOpenProp) {
           setOpenProp(nextOpen);
         } else {
@@ -179,7 +197,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
           }
         }
       },
-      [setOpenProp, open, shouldPersist, storageKey]
+      [isUncontrolled, setOpenProp, shouldPersist, storageKey]
     );
 
     const toggleSidebar = React.useCallback(() => {
@@ -325,6 +343,9 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
     const effectiveMobileBehavior = mobileBehavior ?? contextMobileBehavior;
     const { block: desktopVisibleClass, flex: desktopFlexClass } =
       getDesktopBreakpointClasses(mobileBreakpoint);
+    const direction = useDirection();
+    const isRtl = direction === 'rtl';
+    const physicalSide = isRtl ? (side === 'left' ? 'right' : 'left') : side;
 
     if (collapsible === 'none') {
       return (
@@ -333,9 +354,9 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           data-slot="sidebar"
           data-sidebar="sidebar"
           className={cn(
-            'flex w-[var(--sidebar-width)] flex-col bg-surface border-r border-outline-variant text-on-surface',
+            'flex w-[var(--sidebar-width)] flex-col bg-surface border-e border-outline-variant text-on-surface',
             isEmbedded ? 'h-full' : 'h-svh',
-            side === 'right' && 'border-r-0 border-l',
+            side === 'right' && 'border-e-0 border-s',
             className
           )}
           {...props}
@@ -350,7 +371,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
         <BaseDrawer.Root
           open={openMobile}
           onOpenChange={setOpenMobile}
-          swipeDirection={side === 'right' ? 'right' : 'left'}
+          swipeDirection={physicalSide === 'right' ? 'right' : 'left'}
         >
           <BaseDrawer.Portal>
             <BaseDrawer.Backdrop
@@ -361,7 +382,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
               data-slot="sidebar-viewport"
               className={cn(
                 'fixed inset-y-0 z-50 flex max-w-full',
-                side === 'right' ? 'right-0 justify-end' : 'left-0 justify-start'
+                side === 'right' ? 'end-0 justify-end' : 'start-0 justify-start'
               )}
             >
               <BaseDrawer.Popup
@@ -369,9 +390,10 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                 className={composeClassName(
                   [
                     'w-[var(--sidebar-width-mobile)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-y-auto outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
-                    side === 'right'
-                      ? 'border-l-2 border-outline-variant data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
-                      : 'border-r-2 border-outline-variant data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
+                    side === 'right' ? 'border-s-2 border-outline-variant' : 'border-e-2 border-outline-variant',
+                    physicalSide === 'right'
+                      ? 'data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
+                      : 'data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full',
                   ],
                   className
                 )}
@@ -382,10 +404,12 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                     Application navigation sidebar
                   </BaseDrawer.Description>
                   <div
+                    ref={ref}
                     data-slot="sidebar"
                     data-sidebar="sidebar"
                     data-mobile="true"
                     className="flex size-full flex-col bg-surface"
+                    {...props}
                   >
                     <SidebarSideContext.Provider value={side}>{children}</SidebarSideContext.Provider>
                   </div>
@@ -435,17 +459,17 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           data-slot="sidebar"
           data-sidebar="sidebar"
           className={cn(
-            'duration-[var(--duration-slow)] transition-[left,right,width] ease-[var(--ease-standard)] motion-reduce:transition-none',
+            'duration-[var(--duration-slow)] transition-[inset-inline-start,inset-inline-end,width] ease-[var(--ease-standard)] motion-reduce:transition-none',
             side === 'left'
-              ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
-              : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+              ? 'start-0 group-data-[collapsible=offcanvas]:-start-[var(--sidebar-width)]'
+              : 'end-0 group-data-[collapsible=offcanvas]:-end-[var(--sidebar-width)]',
             variant === 'floating' || variant === 'inset'
               ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
               : cn(
                   'bg-surface group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]',
                   side === 'left'
-                    ? 'border-r border-outline-variant'
-                    : 'border-l border-outline-variant'
+                    ? 'border-e border-outline-variant'
+                    : 'border-s border-outline-variant'
                 ),
             className,
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
@@ -533,32 +557,29 @@ export const SidebarRail = React.forwardRef<
   const { railFlex: desktopFlexClass } = getDesktopBreakpointClasses(mobileBreakpoint);
 
   return (
-    <Tooltip content="Toggle Sidebar">
-      <BaseButton
-        ref={ref}
-        data-slot="sidebar-rail"
-        data-sidebar="rail"
-        aria-label="Toggle Sidebar"
-        aria-hidden="true"
-        tabIndex={-1}
-        onClick={toggleSidebar}
-        render={render}
-        nativeButton={resolveNativeButton(render, nativeButton)}
-        className={composeClassName(
-          [
-            'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-[background-color,transform,left,right] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-right-4 group-data-[side=right]:left-0 cursor-ew-resize',
-            desktopFlexClass,
-            '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
-            '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-            'hover:group-data-[collapsible=offcanvas]:bg-surface group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
-            '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
-            '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
-          ],
-          className
-        )}
-        {...props}
-      />
-    </Tooltip>
+    <BaseButton
+      ref={ref}
+      data-slot="sidebar-rail"
+      data-sidebar="rail"
+      aria-hidden="true"
+      tabIndex={-1}
+      onClick={toggleSidebar}
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      className={composeClassName(
+        [
+          'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 rtl:translate-x-1/2 transition-[background-color,transform,inset-inline-start,inset-inline-end] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-end-4 group-data-[side=right]:start-0 cursor-ew-resize',
+          desktopFlexClass,
+          '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
+          '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
+          'hover:group-data-[collapsible=offcanvas]:bg-surface group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:start-full',
+          '[[data-side=left][data-collapsible=offcanvas]_&]:-end-2',
+          '[[data-side=right][data-collapsible=offcanvas]_&]:-start-2',
+        ],
+        className
+      )}
+      {...props}
+    />
   );
 });
 SidebarRail.displayName = 'SidebarRail';
@@ -941,8 +962,9 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
       </BaseButton>
     );
 
-    // Only wrap with Tooltip when in collapsed icon rail on desktop to avoid controlled/uncontrolled state switching
-    if (!tooltip || isMobile || state !== 'collapsed') {
+    // Keep Tooltip mounted whenever `tooltip` is provided and disable it when expanded or on mobile
+    // so collapsing/expanding never unmounts the underlying button or drops focus.
+    if (!tooltip) {
       return buttonElement;
     }
 
@@ -955,6 +977,7 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
         sideOffset={12}
         content={tooltipConfig.children}
         {...tooltipConfig}
+        disabled={tooltipConfig.disabled || isMobile || state !== 'collapsed'}
       >
         {buttonElement}
       </Tooltip>

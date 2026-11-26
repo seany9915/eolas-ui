@@ -67,8 +67,13 @@ const ConfirmationRoot = React.forwardRef<HTMLDivElement, ConfirmationRootProps>
     const isApproved = resolveApproved(status, approved);
     const isDenied = resolveDenied(status, approved);
 
+    const confirmationContextValue = React.useMemo(
+      () => ({ status, approved }),
+      [status, approved]
+    );
+
     return (
-      <ConfirmationContext.Provider value={{ status, approved }}>
+      <ConfirmationContext.Provider value={confirmationContextValue}>
         <div
           ref={ref}
           data-slot="confirmation-root"

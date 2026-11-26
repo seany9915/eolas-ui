@@ -11,7 +11,7 @@
       "name": "utils",
       "type": "registry:lib",
       "title": "Eolas UI Utilities",
-      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), mergeRefs(), useMergedRefs(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
       "categories": [
         "system"
       ],
@@ -132,6 +132,9 @@
       "categories": [
         "system"
       ],
+      "registryDependencies": [
+        "seany9915/eolas-ui/use-reduced-motion"
+      ],
       "files": [
         {
           "path": "src/lib/scroll-completion.ts",
@@ -153,6 +156,22 @@
           "path": "src/lib/use-horizontal-scroll-fade.ts",
           "type": "registry:lib",
           "target": "@lib/use-horizontal-scroll-fade.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-reduced-motion",
+      "type": "registry:lib",
+      "title": "Use Reduced Motion",
+      "description": "Shared reduced-motion utilities. Subscribes to both the OS-level `(prefers-reduced-motion: reduce)` media query and the document-level `:root[data-motion=\"reduce\"]` override attribute.",
+      "categories": [
+        "system"
+      ],
+      "files": [
+        {
+          "path": "src/lib/use-reduced-motion.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-reduced-motion.ts"
         }
       ]
     },
@@ -195,6 +214,9 @@
       "description": "React hook and helper wrapping document.startViewTransition with graceful reduced-motion and fallback handling.",
       "categories": [
         "system"
+      ],
+      "registryDependencies": [
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {

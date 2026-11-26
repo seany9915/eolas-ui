@@ -187,7 +187,8 @@
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/badge",
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -412,7 +413,8 @@
         "recharts@^3.0.0"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -1081,7 +1083,8 @@
         "layout"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -1350,7 +1353,8 @@
         "seany9915/eolas-ui/icon",
         "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/tooltip",
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -1775,7 +1779,7 @@
         "taxonomy": [
           "Use PromptInput for conversational AI prompts, multi-turn clinical query inputs, and structured message composition.",
           "Supports Model Selection (PromptInputModelSelect) and Reasoning Effort (PromptInputEffort) in the bottom-left action bar, alongside file attachments and tool toggles.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, 44x44px touch targets on primary submit/stop controls, and vertically expanded non-overlapping targets on dense secondary action-bar pills.",
           "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
           "Supports Enter to submit and Shift+Enter for newline insertion."
         ]
@@ -1852,7 +1856,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2115,7 +2120,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2167,7 +2173,8 @@
         "@dnd-kit/react"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2192,8 +2199,7 @@
         "seany9915/eolas-ui/button",
         "seany9915/eolas-ui/trace",
         "seany9915/eolas-ui/chat-message-context",
-        "seany9915/eolas-ui/utils",
-        "seany9915/eolas-ui/inline-citation"
+        "seany9915/eolas-ui/utils"
       ],
       "files": [
         {
@@ -2298,7 +2304,8 @@
         "motion"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2353,7 +2360,8 @@
       ],
       "registryDependencies": [
         "seany9915/eolas-ui/icon",
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2530,7 +2538,8 @@
         "motion"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2582,7 +2591,8 @@
         "motion"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {
@@ -2604,7 +2614,8 @@
         "thinking-orbs"
       ],
       "registryDependencies": [
-        "seany9915/eolas-ui/utils"
+        "seany9915/eolas-ui/utils",
+        "seany9915/eolas-ui/use-reduced-motion"
       ],
       "files": [
         {

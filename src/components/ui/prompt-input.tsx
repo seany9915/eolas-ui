@@ -16,7 +16,8 @@
  *   in the bottom-left action bar, alongside file attachments and tool toggles.
  * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring
  *   on the outer container, auto-growing height via modern CSS `field-sizing: content`,
- *   and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.
+ *   44x44px touch targets on primary submit/stop controls, and vertically expanded non-overlapping
+ *   targets on dense secondary action-bar pills.
  * - Strictly avoids double-border / double-focus artifacts by delegating focus styles
  *   exclusively to PromptInput.Root.
  * - Supports Enter to submit and Shift+Enter for newline insertion.
@@ -493,9 +494,7 @@ export const PromptInputEffort = React.forwardRef<HTMLButtonElement, PromptInput
           aria-pressed={isThinkingActive}
           className={cn(
             'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
-            isThinkingActive
-              ? 'bg-secondary-container text-on-secondary-container'
-              : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+            !isThinkingActive && 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
             className
           )}
           {...props}
@@ -532,9 +531,7 @@ export const PromptInputEffort = React.forwardRef<HTMLButtonElement, PromptInput
             aria-label={buttonLabel}
             className={cn(
               'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
-              isThinkingActive
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+              !isThinkingActive && 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
               className
             )}
             onClick={onClick}
@@ -700,9 +697,7 @@ export const PromptInputToolToggle = React.forwardRef<HTMLButtonElement, PromptI
           aria-label={label}
           className={cn(
             'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
-            active
-              ? 'bg-primary-container text-on-primary-container'
-              : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+            !active && 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
             className
           )}
           {...props}
@@ -731,8 +726,11 @@ export interface PromptInputVoiceToggleProps
 
 export const PromptInputVoiceToggle = React.forwardRef<HTMLButtonElement, PromptInputVoiceToggleProps>(
   ({ isRecording = false, onToggle, alwaysShowLabel = false, disabled = false, label = 'Voice input', className, onClick, ...props }, ref) => {
+    const visibleLabel = isRecording ? 'Stop' : label === 'Voice input' ? 'Voice' : label;
+    const accessibleLabel = isRecording ? 'Stop recording' : label;
+
     return (
-      <Tooltip content={isRecording ? 'Stop recording' : label}>
+      <Tooltip content={accessibleLabel}>
         <Button
           ref={ref}
           variant={isRecording ? 'soft' : 'text'}
@@ -744,12 +742,10 @@ export const PromptInputVoiceToggle = React.forwardRef<HTMLButtonElement, Prompt
             onToggle?.();
           }}
           aria-pressed={isRecording}
-          aria-label={isRecording ? 'Stop recording' : label}
+          aria-label={accessibleLabel}
           className={cn(
             'relative h-8 min-h-[32px] px-2.5 text-xs font-semibold gap-1.5 rounded-full transition-colors motion-reduce:transition-none after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[\'\']',
-            isRecording
-              ? 'bg-error-container text-on-error-container'
-              : 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
+            !isRecording && 'text-on-surface-variant hover:text-on-surface hover:bg-state-hover',
             className
           )}
           {...props}
@@ -760,7 +756,7 @@ export const PromptInputVoiceToggle = React.forwardRef<HTMLButtonElement, Prompt
             className={cn(isRecording && 'text-error animate-pulse motion-reduce:animate-none')}
             aria-hidden="true"
           />
-          <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{isRecording ? 'Listening...' : 'Voice'}</span>
+          <span className={alwaysShowLabel ? 'inline truncate max-w-28' : 'hidden @sm:inline'}>{visibleLabel}</span>
         </Button>
       </Tooltip>
     );
@@ -785,13 +781,14 @@ export const PromptInputStop = React.forwardRef<HTMLButtonElement, PromptInputSt
         variant="soft"
         colorRole="neutral"
         size="sm"
+        expandedTouchTarget
         onClick={(e) => {
           onClick?.(e);
           onStop?.();
         }}
         aria-label={label}
         className={cn(
-          'relative size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform motion-reduce:transition-none active:scale-95 motion-reduce:active:scale-100 bg-surface-container-high text-on-surface hover:bg-error-container hover:text-on-error-container after:absolute after:inset-x-0 after:-inset-y-1 after:content-[\'\']',
+          'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform motion-reduce:transition-none active:scale-95 motion-reduce:active:scale-100 bg-surface-container-high text-on-surface hover:bg-error-container hover:text-on-error-container',
           className
         )}
         {...props}
@@ -888,6 +885,7 @@ const PromptInputSubmit = React.forwardRef<HTMLButtonElement, PromptInputSubmitP
           variant="filled"
           colorRole="primary"
           size={showLabel ? 'md' : 'sm'}
+          expandedTouchTarget
           onClick={(e) => {
             onClick?.(e);
             onSubmit?.();
@@ -896,8 +894,8 @@ const PromptInputSubmit = React.forwardRef<HTMLButtonElement, PromptInputSubmitP
           aria-label={submitLabel}
           className={cn(
             showLabel
-              ? 'relative h-9 min-h-[36px] px-3.5 rounded-full font-semibold gap-1.5 shrink-0 after:absolute after:inset-x-0 after:-inset-y-1 after:content-[\'\']'
-              : 'relative size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform motion-reduce:transition-none active:scale-95 motion-reduce:active:scale-100 disabled:opacity-40 disabled:scale-100 after:absolute after:inset-x-0 after:-inset-y-1 after:content-[\'\']',
+              ? 'h-9 min-h-[36px] px-3.5 rounded-full font-semibold gap-1.5 shrink-0'
+              : 'size-9 min-h-[36px] min-w-[36px] p-0 rounded-full flex items-center justify-center shrink-0 transition-transform motion-reduce:transition-none active:scale-95 motion-reduce:active:scale-100 disabled:opacity-40 disabled:scale-100',
             className
           )}
           {...props}

@@ -77,8 +77,10 @@ export const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(({
       })()
     : style;
 
+  const avatarContextValue = React.useMemo(() => ({ size }), [size]);
+
   return (
-    <AvatarContext.Provider value={{ size }}>
+    <AvatarContext.Provider value={avatarContextValue}>
       <BaseAvatar.Root
         ref={ref}
         data-slot="avatar"

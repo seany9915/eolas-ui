@@ -112,7 +112,10 @@ function ComboboxComponentInner<
   Multiple extends boolean | undefined = false,
   Item = Value
 >(
-  {
+  rawProps: ComboboxProps<Value, Multiple, Item>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
+  const {
     label,
     placeholder = 'Select option...',
     options,
@@ -177,9 +180,7 @@ function ComboboxComponentInner<
     children,
     className,
     ...props
-  }: ComboboxProps<Value, Multiple, Item>,
-  ref: React.ForwardedRef<HTMLDivElement>
-): React.JSX.Element {
+  } = rawProps;
     // Unify onValueChange and onChange without suppressing eventDetails
     const handleValueChange = (
       val: ComboboxOutputValue<Value, Multiple> | (Multiple extends true ? never : null),
@@ -249,6 +250,22 @@ function ComboboxComponentInner<
       return items;
     }, [normalizedOptions, normalizedGroups, items]);
 
+    // Build O(1) value -> label lookup map for multi-select chips
+    const valueToLabelMap = React.useMemo(() => {
+      const map = new Map<string, string>();
+      for (const opt of normalizedOptions) {
+        map.set(opt.value, opt.label);
+      }
+      if (normalizedGroups) {
+        for (const group of normalizedGroups) {
+          for (const opt of group.items) {
+            map.set(opt.value, opt.label);
+          }
+        }
+      }
+      return map;
+    }, [normalizedOptions, normalizedGroups]);
+
     // If children are provided, this is a compositional/compound Combobox
     if (children) {
       const resolvedCompoundItems =
@@ -299,7 +316,7 @@ function ComboboxComponentInner<
         </BaseCombobox.Root>
       );
 
-      if (ref != null || className !== undefined || Object.keys(props).length > 0) {
+      if (ref != null || 'className' in rawProps || Object.keys(props).length > 0) {
         return (
           <div ref={ref} data-slot="combobox" className={className} {...props}>
             {rootNode}
@@ -406,28 +423,31 @@ function ComboboxComponentInner<
               return (
                 <ComboboxChips className="flex-1 min-w-0">
                   <BaseCombobox.Value>
-                    {(selected: unknown) =>
-                      Array.isArray(selected)
-                        ? selected.map((val, idx) => {
-                            const strVal =
-                              typeof val === 'object' && val !== null && 'value' in val
-                                ? String((val as { value: unknown }).value)
-                                : String(val);
-                            const chipLabel =
-                              typeof val === 'object' && val !== null && 'label' in val
-                                ? String((val as { label: unknown }).label)
-                                : normalizedOptions.find((o) => o.value === strVal)?.label ??
-                                  normalizedGroups?.flatMap((g) => g.items).find((o) => o.value === strVal)?.label ??
-                                  strVal;
-                            return (
-                              <ComboboxChip key={`${strVal}-${idx}`}>
-                                <span className="truncate">{chipLabel}</span>
-                                <ComboboxChipRemove />
-                              </ComboboxChip>
-                            );
-                          })
-                        : null
-                    }
+                    {(selected: unknown) => {
+                      if (!Array.isArray(selected)) return null;
+                      const seenCounts = new Map<string, number>();
+                      return selected.map((val) => {
+                        const strVal = itemToStringValue
+                          ? itemToStringValue(val as Value)
+                          : typeof val === 'object' && val !== null && 'value' in val
+                            ? String((val as { value: unknown }).value)
+                            : String(val);
+                        const chipLabel = itemToStringLabel
+                          ? itemToStringLabel(val as Value)
+                          : typeof val === 'object' && val !== null && 'label' in val
+                            ? String((val as { label: unknown }).label)
+                            : valueToLabelMap.get(strVal) ?? strVal;
+                        const count = (seenCounts.get(strVal) ?? 0) + 1;
+                        seenCounts.set(strVal, count);
+                        const chipKey = count === 1 ? strVal : `${strVal}__${count}`;
+                        return (
+                          <ComboboxChip key={chipKey}>
+                            <span className="truncate">{chipLabel}</span>
+                            <ComboboxChipRemove aria-label={`Remove ${chipLabel}`} />
+                          </ComboboxChip>
+                        );
+                      });
+                    }}
                   </BaseCombobox.Value>
                   {inputControl}
                 </ComboboxChips>
@@ -958,7 +978,7 @@ ComboboxChip.displayName = 'ComboboxChip';
 export const ComboboxChipRemove = React.forwardRef<
   React.ComponentRef<typeof BaseCombobox.ChipRemove>,
   React.ComponentPropsWithoutRef<typeof BaseCombobox.ChipRemove>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, 'aria-label': ariaLabel = 'Remove', ...props }, ref) => (
   <BaseCombobox.ChipRemove
     ref={ref}
     data-slot="combobox-chip-remove"
@@ -966,7 +986,7 @@ export const ComboboxChipRemove = React.forwardRef<
       'size-6 shrink-0 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer transition-colors motion-reduce:transition-none',
       className
     )}
-    aria-label="Remove"
+    aria-label={ariaLabel}
     {...props}
   >
     {children ?? <Icon name="close" size="xs" aria-hidden="true" />}

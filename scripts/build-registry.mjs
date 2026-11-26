@@ -216,7 +216,7 @@ if (fs.existsSync(path.join(LIB_DIR, 'utils.ts'))) {
     type: 'registry:lib',
     title: 'Eolas UI Utilities',
     description:
-      'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
+      'Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), mergeRefs(), useMergedRefs(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().',
     categories: [getCategory('utils', 'registry:lib')],
     dependencies: detectNpmDeps(utilsContent),
     files: [

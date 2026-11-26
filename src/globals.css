@@ -3,7 +3,6 @@
  * Consumer apps should include those <link> tags in their document <head>. */
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
 @custom-variant inverted (&:is([data-surface="inverted"] *, [data-prominence="inverted"] *));
 @custom-variant focus-visible (&:focus-visible, &[data-preview~="focus"]);
 @custom-variant active (&:active, &[data-preview~="active"]);
@@ -219,7 +218,7 @@ html {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  html {
+  html:not([data-motion="reduce"]) {
     scroll-behavior: smooth;
   }
 }
@@ -252,6 +251,33 @@ html {
   .animate-shimmer-sweep {
     animation: none !important;
   }
+}
+
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+}
+
+:root[data-motion="reduce"] .animate-badge-pop,
+:root[data-motion="reduce"] .animate-error-shake,
+:root[data-motion="reduce"] .animate-text-reveal,
+:root[data-motion="reduce"] .animate-step-forward,
+:root[data-motion="reduce"] .animate-step-backward,
+:root[data-motion="reduce"] .animate-roll-up,
+:root[data-motion="reduce"] .animate-roll-down,
+:root[data-motion="reduce"] .animate-check-pop,
+:root[data-motion="reduce"] .animate-success-check,
+:root[data-motion="reduce"] .animate-check-draw,
+:root[data-motion="reduce"] .animate-digit-pop {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+:root[data-motion="reduce"] .animate-shimmer-sweep {
+  animation: none !important;
 }
 
 @layer base {
@@ -355,8 +381,7 @@ html {
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Optical grade compensation for light-on-dark and inverted surfaces */
-  .dark .material-symbols-outlined,
+  /* Optical grade compensation for inverted surfaces */
   [data-surface="inverted"] .material-symbols-outlined,
   [data-prominence="inverted"] .material-symbols-outlined {
     --icon-grad: -25;
@@ -366,6 +391,10 @@ html {
     .material-symbols-outlined {
       transition: none;
     }
+  }
+
+  :root[data-motion="reduce"] .material-symbols-outlined {
+    transition: none;
   }
 
   /* Mirror directional icons (arrows, chevrons, undo/redo, speaker waves) in RTL without flipping checkmarks/clocks/media playback */
@@ -500,6 +529,15 @@ select:autofill {
     transition-property: opacity !important;
     transition-duration: var(--duration-quick, 150ms) !important;
   }
+}
+
+:root[data-motion="reduce"] {
+  scroll-behavior: auto !important;
+}
+
+:root[data-motion="reduce"] .transition-opacity {
+  transition-property: opacity !important;
+  transition-duration: var(--duration-quick, 150ms) !important;
 }
 
 /* Canonical Motion & Transition Utilities */
@@ -792,12 +830,7 @@ select:autofill {
 }
 
 @utility type-display-lg {
-  font-family: var(--font-heading);
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
+  @apply text-display-lg;
 }
 
 @utility text-display-sm {
@@ -810,12 +843,7 @@ select:autofill {
 }
 
 @utility type-display-sm {
-  font-family: var(--font-heading);
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
+  @apply text-display-sm;
 }
 
 @utility text-headline-lg {
@@ -827,11 +855,7 @@ select:autofill {
 }
 
 @utility type-headline-lg {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.25;
-  text-wrap: balance;
+  @apply text-headline-lg;
 }
 
 @utility text-headline-md {
@@ -843,11 +867,7 @@ select:autofill {
 }
 
 @utility type-headline-md {
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.35;
-  text-wrap: balance;
+  @apply text-headline-md;
 }
 
 @utility text-headline-sm {
@@ -859,11 +879,7 @@ select:autofill {
 }
 
 @utility type-headline-sm {
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.4;
-  text-wrap: balance;
+  @apply text-headline-sm;
 }
 
 @utility text-body-lg {
@@ -875,11 +891,7 @@ select:autofill {
 }
 
 @utility type-body-lg {
-  font-family: var(--font-sans);
-  font-size: 1.125rem;
-  font-weight: 400;
-  line-height: 1.55;
-  text-wrap: pretty;
+  @apply text-body-lg;
 }
 
 @utility text-body-md {
@@ -891,11 +903,7 @@ select:autofill {
 }
 
 @utility type-body-md {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  text-wrap: pretty;
+  @apply text-body-md;
 }
 
 @utility text-body-sm {
@@ -907,11 +915,7 @@ select:autofill {
 }
 
 @utility type-body-sm {
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.45;
-  text-wrap: pretty;
+  @apply text-body-sm;
 }
 
 @utility text-caption {
@@ -922,10 +926,7 @@ select:autofill {
 }
 
 @utility type-caption {
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.45;
+  @apply text-caption;
 }
 
 @utility text-code-md {
@@ -936,10 +937,7 @@ select:autofill {
 }
 
 @utility type-code-md {
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.5;
+  @apply text-code-md;
 }
 
 @utility text-label-lg {
@@ -951,11 +949,7 @@ select:autofill {
 }
 
 @utility type-label-lg {
-  font-family: var(--font-label);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.45;
-  letter-spacing: 0.01em;
+  @apply text-label-lg;
 }
 
 @utility text-label-md {
@@ -967,11 +961,7 @@ select:autofill {
 }
 
 @utility type-label-md {
-  font-family: var(--font-label);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
+  @apply text-label-md;
 }
 
 @utility text-label-sm {
@@ -983,11 +973,7 @@ select:autofill {
 }
 
 @utility type-label-sm {
-  font-family: var(--font-label);
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: 0.03em;
+  @apply text-label-sm;
 }
 
 /* Global Heading & Body Text-Wrap Defaults */
@@ -1308,7 +1294,7 @@ select:autofill {
 
 @media (prefers-reduced-motion: no-preference) {
   @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-    .reading-progress-root-driven {
+    :root:not([data-motion="reduce"]) .reading-progress-root-driven {
       transform-origin: left center;
       animation: reading-progress-scale auto linear;
       animation-timeline: scroll(root block);
@@ -1316,8 +1302,8 @@ select:autofill {
       will-change: transform;
     }
 
-    [dir="rtl"] .reading-progress-root-driven,
-    :dir(rtl) .reading-progress-root-driven {
+    :root:not([data-motion="reduce"])[dir="rtl"] .reading-progress-root-driven,
+    :root:not([data-motion="reduce"]) :dir(rtl) .reading-progress-root-driven {
       transform-origin: right center;
     }
   }
@@ -1329,6 +1315,10 @@ select:autofill {
   }
 }
 
+:root[data-motion="reduce"] .reading-progress-root-driven {
+  display: none;
+}
+
 /* View Transitions API (MWG: same-document-transitions) */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
@@ -1336,6 +1326,12 @@ select:autofill {
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+:root[data-motion="reduce"]::view-transition-group(*),
+:root[data-motion="reduce"]::view-transition-old(*),
+:root[data-motion="reduce"]::view-transition-new(*) {
+  animation: none !important;
 }
 
 /* Precise Text Alignment: trims font leading/ghost whitespace for optical centering (MWG: precise-text-alignment) */
@@ -1496,6 +1492,11 @@ select:autofill {
   .card-lift::after {
     transition: none !important;
   }
+}
+
+:root[data-motion="reduce"] .card-lift::before,
+:root[data-motion="reduce"] .card-lift::after {
+  transition: none !important;
 }
 
 /* CSS Subgrid Card Layouts (Good CSS #09) */
@@ -1797,6 +1798,6 @@ select:autofill {
 
 @supports (color: contrast-color(white)) {
   .contrast-auto {
-    color: contrast-color(var(--dynamic-bg));
+    color: contrast-color(var(--dynamic-bg, var(--surface)));
   }
 }

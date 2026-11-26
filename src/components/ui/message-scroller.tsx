@@ -24,18 +24,20 @@ import { Button } from './button';
 import { Icon } from './icon';
 import { ScrollArea } from './scroll-area';
 import { Tooltip } from './tooltip';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/use-reduced-motion';
 
 function resolveScrollBehavior(behavior: ScrollBehavior): ScrollBehavior {
-  if (
-    behavior === 'smooth' &&
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
+  if (behavior === 'smooth' && prefersReducedMotion()) {
     return 'auto';
   }
   return behavior;
+}
+
+function getOffsetTopWithinViewport(el: HTMLElement, vp: HTMLElement): number {
+  const elRect = el.getBoundingClientRect();
+  const vpRect = vp.getBoundingClientRect();
+  return elRect.top - vpRect.top - vp.clientTop + vp.scrollTop;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -126,6 +128,7 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
   const itemsRef = React.useRef<Map<string, HTMLElement>>(new Map());
   const prevHeightRef = React.useRef<number>(0);
   const observerRef = React.useRef<IntersectionObserver | null>(null);
+  const visibleIdsRef = React.useRef<Set<string>>(new Set());
   const isReadyRef = React.useRef(false);
   const autoScrollRef = React.useRef(autoScroll);
   const isAtBottomRef = React.useRef(isAtBottom);
@@ -164,11 +167,13 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       observerRef.current?.observe(node);
     } else {
       itemsRef.current.delete(id);
+      visibleIdsRef.current.delete(id);
     }
     return () => {
       const existing = itemsRef.current.get(id);
       if (existing) observerRef.current?.unobserve(existing);
       itemsRef.current.delete(id);
+      visibleIdsRef.current.delete(id);
     };
   }, []);
 
@@ -205,7 +210,10 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       const vp = viewportRef.current;
       const el = itemsRef.current.get(id);
       if (!vp || !el) return false;
-      const targetTop = Math.max(0, el.offsetTop - scrollPreviousItemPeek - scrollMargin);
+      const targetTop = Math.max(
+        0,
+        getOffsetTopWithinViewport(el, vp) - scrollPreviousItemPeek - scrollMargin
+      );
       vp.scrollTo({
         top: targetTop,
         behavior: resolveScrollBehavior(behavior),
@@ -228,7 +236,10 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       const anchorNodes = Array.from(vp.querySelectorAll<HTMLElement>('[data-scroll-anchor]'));
       const lastAnchor = anchorNodes[anchorNodes.length - 1];
       if (lastAnchor) {
-        vp.scrollTop = Math.max(0, lastAnchor.offsetTop - scrollPreviousItemPeek - scrollMargin);
+        vp.scrollTop = Math.max(
+          0,
+          getOffsetTopWithinViewport(lastAnchor, vp) - scrollPreviousItemPeek - scrollMargin
+        );
       }
       setPendingScroll(false);
     } else {
@@ -296,27 +307,45 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
     const vp = viewportEl;
     if (!vp || typeof IntersectionObserver === 'undefined') return;
 
+    const visibleIds = visibleIdsRef.current;
+    visibleIds.clear();
+
     const observer = new IntersectionObserver(
       (entries) => {
-        let anchorId: string | null = null;
-        setVisibleMessageIds((prev) => {
-          const next = new Set(prev);
-          for (const entry of entries) {
-            const target = entry.target as HTMLElement;
-            const messageId = target.dataset.messageId;
-            if (!messageId) continue;
+        let visibilityChanged = false;
+        for (const entry of entries) {
+          const target = entry.target as HTMLElement;
+          const messageId = target.dataset.messageId;
+          if (!messageId) continue;
 
-            if (entry.isIntersecting) {
-              next.add(messageId);
-              if (target.dataset.scrollAnchor !== undefined) anchorId = messageId;
-            } else {
-              next.delete(messageId);
+          if (entry.isIntersecting) {
+            if (!visibleIds.has(messageId)) {
+              visibleIds.add(messageId);
+              visibilityChanged = true;
             }
+          } else if (visibleIds.delete(messageId)) {
+            visibilityChanged = true;
           }
-          const changed = next.size !== prev.length || prev.some((id) => !next.has(id));
-          return changed ? Array.from(next) : prev;
-        });
-        if (anchorId) setCurrentAnchorId(anchorId);
+        }
+
+        let nextAnchorId: string | null = null;
+        let nextAnchorEl: HTMLElement | null = null;
+        for (const id of visibleIds) {
+          const el = itemsRef.current.get(id);
+          if (!el || el.dataset.scrollAnchor === undefined) continue;
+          if (
+            !nextAnchorEl ||
+            (nextAnchorEl.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
+          ) {
+            nextAnchorEl = el;
+            nextAnchorId = id;
+          }
+        }
+
+        if (visibilityChanged) {
+          setVisibleMessageIds(Array.from(visibleIds));
+        }
+        setCurrentAnchorId((prev) => (prev === nextAnchorId ? prev : nextAnchorId));
       },
       { root: vp, threshold: 0.1 }
     );
@@ -327,35 +356,57 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
     return () => {
       observer.disconnect();
       observerRef.current = null;
+      visibleIds.clear();
     };
   }, [viewportEl]);
+
+  const contextValue = React.useMemo<MessageScrollerContextValue>(
+    () => ({
+      isAtBottom,
+      autoScroll,
+      setAutoScroll,
+      scrollToBottom,
+      scrollToTop,
+      scrollToEnd: scrollToBottom,
+      scrollToStart: scrollToTop,
+      scrollToMessage,
+      registerItem,
+      viewportRef,
+      contentRef,
+      unreadCount,
+      scrollPreviousItemPeek,
+      scrollMargin,
+      scrollable,
+      visibleMessageIds,
+      currentAnchorId,
+      pendingScroll,
+      attachViewport,
+      attachContent,
+      notifyItemAdded,
+      isReadyRef,
+    }),
+    [
+      isAtBottom,
+      autoScroll,
+      scrollToBottom,
+      scrollToTop,
+      scrollToMessage,
+      registerItem,
+      unreadCount,
+      scrollPreviousItemPeek,
+      scrollMargin,
+      scrollable,
+      visibleMessageIds,
+      currentAnchorId,
+      pendingScroll,
+      attachViewport,
+      attachContent,
+      notifyItemAdded,
+    ]
+  );
+
   return (
-    <MessageScrollerContext.Provider
-      value={{
-        isAtBottom,
-        autoScroll,
-        setAutoScroll,
-        scrollToBottom,
-        scrollToTop,
-        scrollToEnd: scrollToBottom,
-        scrollToStart: scrollToTop,
-        scrollToMessage,
-        registerItem,
-        viewportRef,
-        contentRef,
-        unreadCount,
-        scrollPreviousItemPeek,
-        scrollMargin,
-        scrollable,
-        visibleMessageIds,
-        currentAnchorId,
-        pendingScroll,
-        attachViewport,
-        attachContent,
-        notifyItemAdded,
-        isReadyRef,
-      }}
-    >
+    <MessageScrollerContext.Provider value={contextValue}>
       {children}
     </MessageScrollerContext.Provider>
   );
@@ -490,23 +541,18 @@ export const MessageScrollerViewport = React.forwardRef<HTMLDivElement, MessageS
         container.contains(prev.el) &&
         vp.scrollTop < 100
       ) {
-        const delta = prev.el.offsetTop - prev.offsetTop;
+        const delta = getOffsetTopWithinViewport(prev.el, vp) - prev.offsetTop;
         if (delta > 0) {
           vp.scrollTop += delta;
         }
       }
 
-      prevFirstItemRef.current = firstItem ? { el: firstItem, offsetTop: firstItem.offsetTop } : null;
+      prevFirstItemRef.current = firstItem
+        ? { el: firstItem, offsetTop: getOffsetTopWithinViewport(firstItem, vp) }
+        : null;
     }, [children, preserveScrollOnPrepend, viewportRef, contentRef]);
 
-    const mergedRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        attachViewport(node);
-        if (typeof ref === 'function') ref(node);
-        else if (ref) ref.current = node;
-      },
-      [attachViewport, ref]
-    );
+    const mergedRef = useMergedRefs(attachViewport, ref);
 
     return (
       <ScrollArea
@@ -547,14 +593,7 @@ export const MessageScrollerContent = React.forwardRef<HTMLDivElement, MessageSc
   ({ children, className, ...props }, ref) => {
     const { attachContent } = useMessageScroller();
 
-    const mergedRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        attachContent(node);
-        if (typeof ref === 'function') ref(node);
-        else if (ref) ref.current = node;
-      },
-      [attachContent, ref]
-    );
+    const mergedRef = useMergedRefs(attachContent, ref);
 
     return (
       <div
@@ -611,7 +650,7 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
       if (scrollAnchor && isNewTurnRef.current && itemRef.current && viewportRef.current) {
         // Pin new user turns near the top, preserving scrollPreviousItemPeek pixels of previous item
         const vp = viewportRef.current;
-        const itemTop = itemRef.current.offsetTop;
+        const itemTop = getOffsetTopWithinViewport(itemRef.current, vp);
         const targetScrollTop = Math.max(0, itemTop - scrollPreviousItemPeek - scrollMargin);
         vp.scrollTo({ top: targetScrollTop, behavior: resolveScrollBehavior('smooth') });
       }
@@ -622,13 +661,11 @@ export const MessageScrollerItem = React.forwardRef<HTMLDivElement, MessageScrol
       return registerItem(messageId, itemRef.current);
     }, [messageId, registerItem]);
 
+    const mergedItemRef = useMergedRefs(itemRef, ref);
+
     return (
       <div
-        ref={(node) => {
-          itemRef.current = node;
-          if (typeof ref === 'function') ref(node);
-          else if (ref) ref.current = node;
-        }}
+        ref={mergedItemRef}
         data-slot="message-scroller-item"
         data-message-id={messageId}
         data-scroll-anchor={scrollAnchor ? '' : undefined}

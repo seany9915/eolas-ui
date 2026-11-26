@@ -12,17 +12,24 @@ export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {
 }
 
 export const BreadcrumbRoot = React.forwardRef<HTMLElement, BreadcrumbProps>(
-  ({ className, separator, ...props }, ref) => (
-    <BreadcrumbContext.Provider value={{ separator }}>
-      <nav
-        ref={ref}
-        aria-label="Breadcrumb"
-        data-slot="breadcrumb"
-        className={cn('@container relative w-full', className)}
-        {...props}
-      />
-    </BreadcrumbContext.Provider>
-  )
+  ({ className, separator, ...props }, ref) => {
+    const breadcrumbContextValue = React.useMemo(
+      () => ({ separator }),
+      [separator]
+    );
+
+    return (
+      <BreadcrumbContext.Provider value={breadcrumbContextValue}>
+        <nav
+          ref={ref}
+          aria-label="Breadcrumb"
+          data-slot="breadcrumb"
+          className={cn('@container relative w-full', className)}
+          {...props}
+        />
+      </BreadcrumbContext.Provider>
+    );
+  }
 );
 BreadcrumbRoot.displayName = 'Breadcrumb';
 

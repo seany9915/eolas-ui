@@ -180,7 +180,14 @@ export { createColumnHelper, flexRender };
 /* -------------------------------------------------------------------------------------------------
  * Helper: Row Selection Column Generator
  * -----------------------------------------------------------------------------------------------*/
-export function createSelectColumn<TData extends RowData>(): ColumnDef<DataTableFeatures, TData, unknown> {
+export interface DataTableRowColumnOptions<TData> {
+  /** Returns a human-readable identifier for the row (used in select checkbox and action menu labels). */
+  getRowLabel?: (row: TData) => string;
+}
+
+export function createSelectColumn<TData extends RowData>(
+  options?: DataTableRowColumnOptions<TData>
+): ColumnDef<DataTableFeatures, TData, unknown> {
   return {
     id: 'select',
     header: ({ table }) => (
@@ -196,13 +203,16 @@ export function createSelectColumn<TData extends RowData>(): ColumnDef<DataTable
         aria-label="Select all rows on current page"
       />
     ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
-        aria-label="Select row"
-      />
-    ),
+    cell: ({ row }) => {
+      const rowLabel = options?.getRowLabel?.(row.original);
+      return (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
+          aria-label={rowLabel ? `Select ${rowLabel}` : 'Select row'}
+        />
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   };
@@ -224,6 +234,8 @@ export interface DataTableRowAction<TData> {
 export interface DataTableRowActionsProps<TData extends RowData> {
   row: Row<DataTableFeatures, TData>;
   actions?: DataTableRowAction<TData>[];
+  /** Accessible label for the row actions menu trigger. Defaults to 'Open row actions'. */
+  menuLabel?: string;
   children?: React.ReactNode;
   className?: string;
 }
@@ -231,6 +243,7 @@ export interface DataTableRowActionsProps<TData extends RowData> {
 export function DataTableRowActions<TData extends RowData>({
   row,
   actions,
+  menuLabel = 'Open row actions',
   children,
   className,
 }: DataTableRowActionsProps<TData>) {
@@ -244,7 +257,7 @@ export function DataTableRowActions<TData extends RowData>({
             variant="text"
             size="icon"
             colorRole="neutral"
-            aria-label="Open menu"
+            aria-label={menuLabel}
           >
             <Icon name="more_horiz" size="xs" aria-hidden="true" />
           </Button>
@@ -278,7 +291,8 @@ export function DataTableRowActions<TData extends RowData>({
 export function createActionsColumn<TData extends RowData>(
   actions:
     | DataTableRowAction<TData>[]
-    | ((row: TData) => React.ReactNode)
+    | ((row: TData) => React.ReactNode),
+  options?: DataTableRowColumnOptions<TData>
 ): ColumnDef<DataTableFeatures, TData, unknown> {
   return {
     id: 'actions',
@@ -293,7 +307,14 @@ export function createActionsColumn<TData extends RowData>(
           </div>
         );
       }
-      return <DataTableRowActions row={row} actions={actions} />;
+      const rowLabel = options?.getRowLabel?.(row.original);
+      return (
+        <DataTableRowActions
+          row={row}
+          actions={actions}
+          menuLabel={rowLabel ? `Actions for ${rowLabel}` : undefined}
+        />
+      );
     },
   };
 }
@@ -859,8 +880,10 @@ export interface DataTableProps<TData extends RowData> {
   onSelectionChange?: (selectedRows: TData[]) => void;
   /** Stable unique id per row. Set it for server-paginated or reordered data so selection follows records, not indices. */
   getRowId?: (originalRow: TData, index: number, parent?: Row<DataTableFeatures, TData>) => string;
-  /** Callback emitted when activating a table row by click, or Enter/Space when the row itself has focus */
+  /** Callback emitted when activating a table row by click, or Enter/Space when the row itself has focus. For primary row navigation, prefer a link or button inside the primary cell. */
   onRowClick?: (row: TData) => void;
+  /** Optional accessible label applied to clickable rows (`onRowClick`) while preserving native `<tr>` row semantics. */
+  getRowAriaLabel?: (row: TData) => string;
   /** Displays a loading state with spinner in the table body */
   loading?: boolean;
   /** Accessible status text displayed and announced while `loading` is true. Defaults to 'Loading records…'. */
@@ -905,10 +928,39 @@ function useTableStateHandler<T>(
   );
 }
 
-export function DataTable<TData extends RowData>({
-  columns = [],
-  data = [],
-  table: propTable,
+interface DataTableViewProps<TData extends RowData>
+  extends Pick<
+    DataTableProps<TData>,
+    | 'searchKey'
+    | 'searchPlaceholder'
+    | 'enableGlobalFilter'
+    | 'facetedFilters'
+    | 'toolbarActions'
+    | 'showToolbar'
+    | 'showPagination'
+    | 'showColumnVisibility'
+    | 'showSelectedCount'
+    | 'pageSizeOptions'
+    | 'onSelectionChange'
+    | 'onRowClick'
+    | 'getRowAriaLabel'
+    | 'loading'
+    | 'loadingLabel'
+    | 'emptyMessage'
+    | 'caption'
+    | 'density'
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'className'
+    | 'containerClassName'
+  > {
+  table: TanStackTable<DataTableFeatures, TData>;
+  fallbackColumnCount?: number;
+}
+
+function DataTableView<TData extends RowData>({
+  table,
+  fallbackColumnCount = 1,
   searchKey,
   searchPlaceholder,
   enableGlobalFilter = true,
@@ -918,8 +970,230 @@ export function DataTable<TData extends RowData>({
   showPagination = true,
   showColumnVisibility = true,
   showSelectedCount = true,
-  pageSize = 10,
   pageSizeOptions = [10, 20, 30, 40, 50],
+  onSelectionChange,
+  onRowClick,
+  getRowAriaLabel,
+  loading = false,
+  loadingLabel = 'Loading records…',
+  emptyMessage = 'No records found.',
+  caption,
+  density,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  className,
+  containerClassName,
+}: DataTableViewProps<TData>) {
+  const colSpanCount = table.getVisibleLeafColumns().length || fallbackColumnCount;
+
+  // Deduplicate selection notifications by resolved row objects so filtered inline data does not loop
+  const rowSelectionState = table.state.rowSelection;
+  const tableData = table.options.data;
+  const tableRef = React.useRef(table);
+  const prevSelectedOriginalsRef = React.useRef<TData[] | null>(null);
+  const onSelectionChangeRef = React.useRef(onSelectionChange);
+  React.useEffect(() => {
+    tableRef.current = table;
+    onSelectionChangeRef.current = onSelectionChange;
+  });
+
+  React.useEffect(() => {
+    const nextSelected = tableRef.current.getSelectedRowModel().rows.map((r) => r.original);
+    const prevSelected = prevSelectedOriginalsRef.current;
+    if (prevSelected === null) {
+      prevSelectedOriginalsRef.current = nextSelected;
+      if (nextSelected.length > 0) {
+        onSelectionChangeRef.current?.(nextSelected);
+      }
+      return;
+    }
+    const unchanged =
+      prevSelected.length === nextSelected.length &&
+      prevSelected.every((item, idx) => Object.is(item, nextSelected[idx]));
+    if (!unchanged) {
+      prevSelectedOriginalsRef.current = nextSelected;
+      onSelectionChangeRef.current?.(nextSelected);
+    }
+  }, [rowSelectionState, tableData]);
+
+  return (
+    <div data-slot="data-table" className={cn('w-full flex flex-col gap-4 @container', className)}>
+      {showToolbar && (
+        <DataTableToolbar
+          table={table}
+          searchKey={searchKey}
+          searchPlaceholder={searchPlaceholder}
+          enableGlobalFilter={enableGlobalFilter}
+          facetedFilters={facetedFilters}
+          showColumnVisibility={showColumnVisibility}
+        >
+          {toolbarActions}
+        </DataTableToolbar>
+      )}
+
+      <Table
+        elevated
+        caption={caption}
+        density={density}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        containerClassName={containerClassName}
+      >
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                const meta = header.column.columnDef.meta as
+                  | { align?: 'left' | 'center' | 'right'; numeric?: boolean }
+                  | undefined;
+                const isNumeric = meta?.numeric || meta?.align === 'right';
+                const isCentered = meta?.align === 'center';
+
+                return (
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    aria-sort={
+                      header.column.getCanSort()
+                        ? header.column.getIsSorted() === 'asc'
+                          ? 'ascending'
+                          : header.column.getIsSorted() === 'desc'
+                            ? 'descending'
+                            : 'none'
+                        : undefined
+                    }
+                    className={cn(
+                      isNumeric && 'text-end',
+                      isCentered && 'text-center'
+                    )}
+                  >
+                    {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {loading ? (
+            <TableRow>
+              <TableCell
+                colSpan={colSpanCount}
+                className="text-center"
+              >
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="h-32 flex items-center justify-center gap-2 text-on-surface-variant font-sans text-sm"
+                >
+                  <Spinner size="sm" aria-hidden="true" />
+                  <span>{loadingLabel}</span>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => {
+              const isSelected = row.getIsSelected();
+
+              return (
+                <TableRow
+                  key={row.id}
+                  data-state={isSelected ? 'selected' : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  aria-label={onRowClick && getRowAriaLabel ? getRowAriaLabel(row.original) : undefined}
+                  onClick={
+                    onRowClick
+                      ? (event) => {
+                          if (event.defaultPrevented) return;
+                          // Ignore clicks from controls inside the row and events bubbling out of portals (menus)
+                          const target = event.target as HTMLElement;
+                          if (!event.currentTarget.contains(target)) return;
+                          if (
+                            target.closest(
+                              'button, a, input, select, textarea, label, [role="checkbox"], [role="menuitem"], [role="switch"], [role="combobox"], [role="radio"], [role="slider"], [role="button"], [role="option"], [contenteditable="true"]'
+                            )
+                          ) {
+                            return;
+                          }
+                          if (window.getSelection()?.toString().trim()) return;
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => {
+                          if (event.target !== event.currentTarget) return;
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            onRowClick(row.original);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={cn(
+                    onRowClick && 'cursor-pointer'
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const meta = cell.column.columnDef.meta as
+                      | { align?: 'left' | 'center' | 'right'; numeric?: boolean }
+                      | undefined;
+                    const isNumeric = meta?.numeric || meta?.align === 'right';
+                    const isCentered = meta?.align === 'center';
+
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          isNumeric && 'text-end font-mono tabular-nums',
+                          isCentered && 'text-center'
+                        )}
+                      >
+                        <table.FlexRender cell={cell} />
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={colSpanCount}
+                className="text-center"
+              >
+                <Empty variant="flush" className="my-0">
+                  <EmptyHeader>
+                    {typeof emptyMessage === 'string' ? (
+                      <EmptyTitle>{emptyMessage}</EmptyTitle>
+                    ) : (
+                      <EmptyDescription className="mb-0">{emptyMessage}</EmptyDescription>
+                    )}
+                  </EmptyHeader>
+                </Empty>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      {showPagination && (
+        <DataTablePagination
+          table={table}
+          pageSizeOptions={pageSizeOptions}
+          showSelectedCount={showSelectedCount}
+        />
+      )}
+    </div>
+  );
+}
+
+function ManagedDataTable<TData extends RowData>({
+  columns = [],
+  data = [],
+  facetedFilters,
+  pageSize = 10,
   pageCount,
   manualPagination,
   manualSorting,
@@ -932,19 +1206,9 @@ export function DataTable<TData extends RowData>({
   onPaginationChange: onPaginationChangeProp,
   globalFilter: globalFilterProp,
   onGlobalFilterChange: onGlobalFilterChangeProp,
-  onSelectionChange,
   getRowId,
-  onRowClick,
-  loading = false,
-  loadingLabel = 'Loading records…',
-  emptyMessage = 'No records found.',
-  caption,
-  density,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  className,
-  containerClassName,
-}: DataTableProps<TData>) {
+  ...viewProps
+}: Omit<DataTableProps<TData>, 'table'>) {
   const [internalSorting, setInternalSorting] = React.useState<SortingState>([]);
   const [internalColumnFilters, setInternalColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [internalColumnVisibility, setInternalColumnVisibility] = React.useState<ColumnVisibilityState>({});
@@ -1051,209 +1315,30 @@ export function DataTable<TData extends RowData>({
     onGlobalFilterChange: setGlobalFilter,
   });
 
-  const table = propTable ?? internalTable;
-  const colSpanCount = table.getVisibleLeafColumns().length || columns.length || 1;
-
-  // Deduplicate selection notifications by resolved row objects so filtered inline data does not loop
-  const rowSelectionState = table.state.rowSelection;
-  const tableData = table.options.data;
-  const tableRef = React.useRef(table);
-  const prevSelectedOriginalsRef = React.useRef<TData[] | null>(null);
-  const onSelectionChangeRef = React.useRef(onSelectionChange);
-  React.useEffect(() => {
-    tableRef.current = table;
-    onSelectionChangeRef.current = onSelectionChange;
-  });
-
-  React.useEffect(() => {
-    const nextSelected = tableRef.current.getSelectedRowModel().rows.map((r) => r.original);
-    const prevSelected = prevSelectedOriginalsRef.current;
-    if (prevSelected === null) {
-      prevSelectedOriginalsRef.current = nextSelected;
-      if (nextSelected.length > 0) {
-        onSelectionChangeRef.current?.(nextSelected);
-      }
-      return;
-    }
-    const unchanged =
-      prevSelected.length === nextSelected.length &&
-      prevSelected.every((item, idx) => Object.is(item, nextSelected[idx]));
-    if (!unchanged) {
-      prevSelectedOriginalsRef.current = nextSelected;
-      onSelectionChangeRef.current?.(nextSelected);
-    }
-  }, [rowSelectionState, tableData]);
-
   return (
-    <div data-slot="data-table" className={cn('w-full flex flex-col gap-4 @container', className)}>
-      {showToolbar && (
-        <DataTableToolbar
-          table={table}
-          searchKey={searchKey}
-          searchPlaceholder={searchPlaceholder}
-          enableGlobalFilter={enableGlobalFilter}
-          facetedFilters={facetedFilters}
-          showColumnVisibility={showColumnVisibility}
-        >
-          {toolbarActions}
-        </DataTableToolbar>
-      )}
-
-      <Table
-        elevated
-        caption={caption}
-        density={density}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        containerClassName={containerClassName}
-      >
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  const meta = header.column.columnDef.meta as
-                    | { align?: 'left' | 'center' | 'right'; numeric?: boolean }
-                    | undefined;
-                  const isNumeric = meta?.numeric || meta?.align === 'right';
-                  const isCentered = meta?.align === 'center';
-
-                  return (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      aria-sort={
-                        header.column.getCanSort()
-                          ? header.column.getIsSorted() === 'asc'
-                            ? 'ascending'
-                            : header.column.getIsSorted() === 'desc'
-                              ? 'descending'
-                              : 'none'
-                          : undefined
-                      }
-                      className={cn(
-                        isNumeric && 'text-end',
-                        isCentered && 'text-center'
-                      )}
-                    >
-                      {header.isPlaceholder ? null : <table.FlexRender header={header} />}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={colSpanCount}
-                  className="text-center"
-                >
-                  <div
-                    role="status"
-                    aria-live="polite"
-                    className="h-32 flex items-center justify-center gap-2 text-on-surface-variant font-sans text-sm"
-                  >
-                    <Spinner size="sm" aria-hidden="true" />
-                    <span>{loadingLabel}</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                const isSelected = row.getIsSelected();
-
-                return (
-                  <TableRow
-                    key={row.id}
-                    data-state={isSelected ? 'selected' : undefined}
-                    tabIndex={onRowClick ? 0 : undefined}
-                    onClick={
-                      onRowClick
-                        ? (event) => {
-                            if (event.defaultPrevented) return;
-                            // Ignore clicks from controls inside the row and events bubbling out of portals (menus)
-                            const target = event.target as HTMLElement;
-                            if (!event.currentTarget.contains(target)) return;
-                            if (
-                              target.closest(
-                                'button, a, input, select, textarea, label, [role="checkbox"], [role="menuitem"], [role="switch"], [role="combobox"], [role="radio"], [role="slider"], [role="button"], [role="option"], [contenteditable="true"]'
-                              )
-                            ) {
-                              return;
-                            }
-                            if (window.getSelection()?.toString().trim()) return;
-                            onRowClick(row.original);
-                          }
-                        : undefined
-                    }
-                    onKeyDown={
-                      onRowClick
-                        ? (event) => {
-                            if (event.target !== event.currentTarget) return;
-                            if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault();
-                              onRowClick(row.original);
-                            }
-                          }
-                        : undefined
-                    }
-                    className={cn(
-                      onRowClick && 'cursor-pointer'
-                    )}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      const meta = cell.column.columnDef.meta as
-                        | { align?: 'left' | 'center' | 'right'; numeric?: boolean }
-                        | undefined;
-                      const isNumeric = meta?.numeric || meta?.align === 'right';
-                      const isCentered = meta?.align === 'center';
-
-                      return (
-                        <TableCell
-                          key={cell.id}
-                          className={cn(
-                            isNumeric && 'text-end font-mono tabular-nums',
-                            isCentered && 'text-center'
-                          )}
-                        >
-                          <table.FlexRender cell={cell} />
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={colSpanCount}
-                  className="text-center"
-                >
-                  <Empty variant="flush" className="my-0">
-                    <EmptyHeader>
-                      {typeof emptyMessage === 'string' ? (
-                        <EmptyTitle>{emptyMessage}</EmptyTitle>
-                      ) : (
-                        <EmptyDescription className="mb-0">{emptyMessage}</EmptyDescription>
-                      )}
-                    </EmptyHeader>
-                  </Empty>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-
-      {showPagination && (
-        <DataTablePagination
-          table={table}
-          pageSizeOptions={pageSizeOptions}
-          showSelectedCount={showSelectedCount}
-        />
-      )}
-    </div>
+    <DataTableView
+      {...viewProps}
+      facetedFilters={facetedFilters}
+      table={internalTable}
+      fallbackColumnCount={columns.length || 1}
+    />
   );
+}
+
+export function DataTable<TData extends RowData>({
+  table: propTable,
+  ...props
+}: DataTableProps<TData>) {
+  if (propTable) {
+    return (
+      <DataTableView
+        {...props}
+        table={propTable}
+        fallbackColumnCount={props.columns?.length || 1}
+      />
+    );
+  }
+  return <ManagedDataTable {...props} />;
 }
 
 export default DataTable;

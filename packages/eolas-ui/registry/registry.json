@@ -7,7 +7,7 @@
       "name": "utils",
       "type": "registry:lib",
       "title": "Eolas UI Utilities",
-      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+      "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), mergeRefs(), useMergedRefs(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
       "categories": [
         "system"
       ],
@@ -128,6 +128,9 @@
       "categories": [
         "system"
       ],
+      "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
+      ],
       "files": [
         {
           "path": "lib/scroll-completion.ts",
@@ -149,6 +152,22 @@
           "path": "lib/use-horizontal-scroll-fade.ts",
           "type": "registry:lib",
           "target": "@lib/use-horizontal-scroll-fade.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-reduced-motion",
+      "type": "registry:lib",
+      "title": "Use Reduced Motion",
+      "description": "Shared reduced-motion utilities. Subscribes to both the OS-level `(prefers-reduced-motion: reduce)` media query and the document-level `:root[data-motion=\"reduce\"]` override attribute.",
+      "categories": [
+        "system"
+      ],
+      "files": [
+        {
+          "path": "lib/use-reduced-motion.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-reduced-motion.ts"
         }
       ]
     },
@@ -191,6 +210,9 @@
       "description": "React hook and helper wrapping document.startViewTransition with graceful reduced-motion and fallback handling.",
       "categories": [
         "system"
+      ],
+      "registryDependencies": [
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -607,7 +629,8 @@
       ],
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/badge.json",
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -832,7 +855,8 @@
         "recharts@^3.0.0"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -1501,7 +1525,8 @@
         "layout"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -1770,7 +1795,8 @@
         "https://seany9915.github.io/eolas-ui/r/icon.json",
         "https://seany9915.github.io/eolas-ui/r/scroll-area.json",
         "https://seany9915.github.io/eolas-ui/r/tooltip.json",
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -2195,7 +2221,7 @@
         "taxonomy": [
           "Use PromptInput for conversational AI prompts, multi-turn clinical query inputs, and structured message composition.",
           "Supports Model Selection (PromptInputModelSelect) and Reasoning Effort (PromptInputEffort) in the bottom-left action bar, alongside file attachments and tool toggles.",
-          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+          "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, 44x44px touch targets on primary submit/stop controls, and vertically expanded non-overlapping targets on dense secondary action-bar pills.",
           "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
           "Supports Enter to submit and Shift+Enter for newline insertion."
         ]
@@ -2272,7 +2298,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -2535,7 +2562,8 @@
         "@base-ui/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -2587,7 +2615,8 @@
         "@dnd-kit/react"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -2612,8 +2641,7 @@
         "https://seany9915.github.io/eolas-ui/r/button.json",
         "https://seany9915.github.io/eolas-ui/r/trace.json",
         "https://seany9915.github.io/eolas-ui/r/chat-message-context.json",
-        "https://seany9915.github.io/eolas-ui/r/utils.json",
-        "https://seany9915.github.io/eolas-ui/r/inline-citation.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json"
       ],
       "files": [
         {
@@ -2718,7 +2746,8 @@
         "motion"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -2773,7 +2802,8 @@
       ],
       "registryDependencies": [
         "https://seany9915.github.io/eolas-ui/r/icon.json",
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -2950,7 +2980,8 @@
         "motion"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -3002,7 +3033,8 @@
         "motion"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {
@@ -3024,7 +3056,8 @@
         "thinking-orbs"
       ],
       "registryDependencies": [
-        "https://seany9915.github.io/eolas-ui/r/utils.json"
+        "https://seany9915.github.io/eolas-ui/r/utils.json",
+        "https://seany9915.github.io/eolas-ui/r/use-reduced-motion.json"
       ],
       "files": [
         {

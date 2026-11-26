@@ -31,7 +31,7 @@ import {
   CarouselItem,
   useCarousel,
 } from './carousel';
-import { cn, composeClassName, sanitizeUrl } from '@/lib/utils';
+import { cn, composeClassName, sanitizeUrl, useMergedRefs } from '@/lib/utils';
 
 export interface CitationSourceItem {
   id?: string | number;
@@ -75,8 +75,9 @@ const InlineCitationRoot: React.FC<InlineCitationProps> = ({
   closeDelay = 150,
   ...props
 }) => {
+  const contextValue = React.useMemo(() => ({ delay, closeDelay }), [delay, closeDelay]);
   return (
-    <InlineCitationContext.Provider value={{ delay, closeDelay }}>
+    <InlineCitationContext.Provider value={contextValue}>
       <BasePreviewCard.Root {...props}>
         {children}
       </BasePreviewCard.Root>
@@ -135,16 +136,7 @@ const InlineCitationCardTrigger = React.forwardRef<
   const defaultLabel = label || (index !== undefined ? `Citation [${index}]` : 'Citation');
   const safeHref = sanitizeUrl(href);
 
-  const setTriggerRef = React.useCallback<React.RefCallback<HTMLElement>>(
-    (node) => {
-      if (typeof ref === 'function') {
-        ref(node);
-      } else if (ref) {
-        ref.current = node;
-      }
-    },
-    [ref]
-  );
+  const setTriggerRef = useMergedRefs<HTMLElement>(ref);
 
   const baseTriggerClassName = cn(
     'group relative inline-flex items-center align-baseline -top-[0.25em] p-0.5 rounded cursor-pointer touch-target-expanded',

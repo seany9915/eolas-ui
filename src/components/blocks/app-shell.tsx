@@ -23,7 +23,7 @@ import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { NavigationBar } from '@/components/ui/navigation-bar';
 import { Button, UnstyledButton } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
 
 export interface AppShellDestination {
   id: string;
@@ -167,17 +167,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     const sidebarTriggerRef = React.useRef<HTMLButtonElement | null>(null);
     const focusRestoreRafRef = React.useRef<number | null>(null);
 
-    const assignRefs = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        rootRef.current = node;
-        if (typeof ref === 'function') {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const assignRefs = useMergedRefs(rootRef, ref);
 
     const viewportSizeClass = React.useSyncExternalStore(
       subscribeViewportResize,

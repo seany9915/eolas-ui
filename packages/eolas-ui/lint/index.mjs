@@ -140,9 +140,61 @@ function getFileLayer(filename) {
   return null;
 }
 
+const BANNED_LAYER_PACKAGES = [
+  /^firebase(?:\/|$)/,
+  /^@firebase(?:\/|$)/,
+  /^@supabase(?:\/|$)/,
+  /^@tanstack\/react-query(?:\/|$)/,
+];
+
+const CARD_SURFACE_COMPONENTS = new Set([
+  'Card',
+  'Card.Root',
+  'ChartCard',
+  'AreaChartCard',
+  'BarChartCard',
+  'LineChartCard',
+  'PieChartCard',
+  'RadarChartCard',
+  'RadialChartCard',
+]);
+
+const REST_PROP_SPREAD_NAMES = new Set(['props', 'rest', 'restProps']);
+
+function isRestParamBoundIdentifier(node, name) {
+  let curr = node?.parent;
+  while (curr) {
+    if (
+      curr.type === 'FunctionDeclaration' ||
+      curr.type === 'FunctionExpression' ||
+      curr.type === 'ArrowFunctionExpression'
+    ) {
+      for (const param of curr.params || []) {
+        if (param?.type === 'RestElement' && param.argument?.type === 'Identifier' && param.argument.name === name) {
+          return true;
+        }
+        if (param?.type === 'ObjectPattern') {
+          for (const prop of param.properties || []) {
+            if (prop?.type === 'RestElement' && prop.argument?.type === 'Identifier' && prop.argument.name === name) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    curr = curr.parent;
+  }
+  return false;
+}
+
 function getImportTargetLayer(specifier, filename) {
   if (typeof specifier !== 'string' || !specifier) return null;
   const normSpec = specifier.replace(/\\/g, '/');
+
+  if (BANNED_LAYER_PACKAGES.some((re) => re.test(normSpec))) {
+    return 'package';
+  }
+
   let target = normSpec;
 
   if (normSpec.startsWith('./') || normSpec.startsWith('../')) {
@@ -155,6 +207,10 @@ function getImportTargetLayer(specifier, filename) {
   if (/(?:^|\/)(?:src\/)?components\/blocks(?:\/|$)/i.test(target)) return 'blocks';
   if (/(?:^|\/)(?:src\/)?features(?:\/|$)/i.test(target)) return 'features';
   if (/(?:^|\/)(?:src\/)?views(?:\/|$)/i.test(target)) return 'views';
+  if (/(?:^|\/)(?:src\/)?(services|api|auth)(?:\/|$)/i.test(target)) {
+    const match = target.match(/(?:^|\/)(?:src\/)?(services|api|auth)(?:\/|$)/i);
+    return match ? match[1].toLowerCase() : 'services';
+  }
   return null;
 }
 
@@ -1800,15 +1856,14 @@ export const plugin = {
         const cardStack = [];
         return {
           JSXElement(node) {
-            const isCard =
-              node.openingElement?.name?.type === 'JSXIdentifier' && node.openingElement.name.name === 'Card';
+            const tagFull = getJsxTagParts(node.openingElement?.name).full;
+            const isCard = CARD_SURFACE_COMPONENTS.has(tagFull);
             cardStack.push(isCard);
             if (!isCard) return;
             if (cardDepth > 0) {
               context.report({
                 node: node.openingElement,
-                message:
-                  'Nested <Card> detected. DESIGN.md bans nesting Cards inside Cards; use unboxed layout, dividers, or <ClinicianTip />.',
+                message: `Nested <${tagFull}> detected. DESIGN.md bans nesting Cards inside Cards; use unboxed layout, dividers, or <ClinicianTip />.`,
               });
             }
             cardDepth += 1;
@@ -2181,6 +2236,16 @@ export const plugin = {
               node,
               message: `Layer violation: composite blocks cannot import from ${targetLayer}/. Keep blocks pure and controlled (props in, callbacks out).`,
             });
+          } else if (targetLayer === 'services' || targetLayer === 'api' || targetLayer === 'auth') {
+            context.report({
+              node,
+              message: `Layer violation: ${fileLayer === 'ui' ? 'UI primitives' : 'composite blocks'} cannot import from ${targetLayer}/ (zero network/DB/auth coupling).`,
+            });
+          } else if (targetLayer === 'package') {
+            context.report({
+              node,
+              message: `Layer violation: ${fileLayer === 'ui' ? 'UI primitives' : 'composite blocks'} cannot import network/DB/query package "${specifier}". Pass data via props and callbacks instead.`,
+            });
           }
         };
 
@@ -2318,21 +2383,50 @@ export const plugin = {
         schema: [],
       },
       create(context) {
-        const hasLabelAttr = (attrs) => {
+        const isNonEmptyLabelValue = (valNode) => {
+          if (!valNode) return false;
+          if (valNode.type === 'Literal') {
+            return typeof valNode.value === 'string' && valNode.value.trim().length > 0;
+          }
+          if (valNode.type === 'JSXExpressionContainer') {
+            const staticVal = getStaticStringFromExpr(valNode.expression);
+            return staticVal === null || staticVal.trim().length > 0;
+          }
+          const staticVal = getStaticStringFromExpr(valNode);
+          return staticVal === null || staticVal.trim().length > 0;
+        };
+
+        const hasLabelAttr = (attrs, jsxNode) => {
           for (const attr of attrs) {
-            if (attr.type === 'JSXSpreadAttribute') return true;
+            if (attr.type === 'JSXSpreadAttribute') {
+              const arg = unwrapTypeExpr(attr.argument);
+              if (arg?.type === 'Identifier') {
+                if (REST_PROP_SPREAD_NAMES.has(arg.name) || isRestParamBoundIdentifier(jsxNode, arg.name)) {
+                  return true;
+                }
+              } else if (arg?.type === 'ObjectExpression') {
+                for (const prop of arg.properties || []) {
+                  if (prop?.type !== 'Property' || prop.computed) continue;
+                  const keyName =
+                    prop.key?.type === 'Identifier'
+                      ? prop.key.name
+                      : prop.key?.type === 'Literal'
+                        ? String(prop.key.value)
+                        : null;
+                  if (
+                    (keyName === 'aria-label' || keyName === 'aria-labelledby' || keyName === 'title') &&
+                    isNonEmptyLabelValue(prop.value)
+                  ) {
+                    return true;
+                  }
+                }
+              }
+              continue;
+            }
             if (attr.type !== 'JSXAttribute') continue;
             const name = attr.name?.name;
             if (name !== 'aria-label' && name !== 'aria-labelledby' && name !== 'title') continue;
-            if (!attr.value) continue;
-            if (attr.value.type === 'Literal') {
-              if (typeof attr.value.value === 'string' && attr.value.value.trim().length > 0) return true;
-              continue;
-            }
-            if (attr.value.type === 'JSXExpressionContainer') {
-              const staticVal = getStaticStringFromExpr(attr.value.expression);
-              if (staticVal === null || staticVal.trim().length > 0) return true;
-            }
+            if (isNonEmptyLabelValue(attr.value)) return true;
           }
           return false;
         };
@@ -2342,7 +2436,7 @@ export const plugin = {
             const tagFull = getJsxTagParts(node.openingElement?.name).full;
             if (!ICON_BUTTON_COMPONENT_NAMES.has(tagFull)) return;
             const attrs = node.openingElement?.attributes || [];
-            if (hasLabelAttr(attrs)) return;
+            if (hasLabelAttr(attrs, node)) return;
 
             let hasIconChild = false;
             let hasAccessibleContent = false;

@@ -10,6 +10,7 @@ import {
 } from 'bot-avatars';
 import { Badge } from './badge';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export { botAvatarTypes };
 export type { BotAvatarType, BotAvatarState, BotAvatarFace };
@@ -22,25 +23,6 @@ const SIZE_MAP: Record<'sm' | 'md' | 'lg' | 'xl', number> = {
   lg: 64,
   xl: 80,
 };
-
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const listener = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', listener);
-    return () => mediaQuery.removeEventListener('change', listener);
-  }, []);
-
-  return prefersReducedMotion;
-}
 
 export interface BotAvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The 3D body shape archetype */

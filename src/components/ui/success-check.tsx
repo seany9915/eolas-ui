@@ -17,6 +17,7 @@
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export interface SuccessCheckProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: 'sm' | 'md' | 'lg' | number;
@@ -81,11 +82,7 @@ export const SuccessCheck = React.forwardRef<HTMLDivElement, SuccessCheckProps>(
 
     React.useEffect(() => {
       if (!animating) return;
-      const prefersReducedMotion =
-        typeof window !== 'undefined' &&
-        typeof window.matchMedia === 'function' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!prefersReducedMotion) return;
+      if (!prefersReducedMotion()) return;
 
       let cancelled = false;
       queueMicrotask(() => {

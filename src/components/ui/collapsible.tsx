@@ -136,8 +136,13 @@ const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(
 }, ref) => {
   const isCard = variant === 'card' || (variant === undefined && Boolean(title));
 
+  const collapsibleContextValue = React.useMemo(
+    () => ({ hiddenUntilFound, keepMounted }),
+    [hiddenUntilFound, keepMounted]
+  );
+
   return (
-    <CollapsibleContext.Provider value={{ hiddenUntilFound, keepMounted }}>
+    <CollapsibleContext.Provider value={collapsibleContextValue}>
       <BaseCollapsible.Root
         ref={ref}
         data-slot="collapsible"

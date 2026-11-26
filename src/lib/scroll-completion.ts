@@ -8,6 +8,8 @@
  * return `undefined`. Prevents premature focus shifts or post-scroll highlights mid-animation.
  */
 
+import { prefersReducedMotion } from './use-reduced-motion';
+
 export interface ScrollCompletionOptions {
   /** Scroll container used for `scrollend` fallback listening. Defaults to `window`. */
   scroller?: HTMLElement | Window;
@@ -178,14 +180,7 @@ function getScrollOffsets(scroller: HTMLElement | Window): { x: number; y: numbe
 function isInstantBehavior(behavior?: ScrollBehavior): boolean {
   if (behavior === 'instant') return true;
   if (behavior === 'smooth') return false;
-  if (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
-    return true;
-  }
-  return false;
+  return prefersReducedMotion();
 }
 
 function awaitScrollSettlement(

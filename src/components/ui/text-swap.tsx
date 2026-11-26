@@ -15,7 +15,8 @@
  * Complies with WCAG 2.2 and motion-reduce:transition-none.
  */
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export interface TextSwapProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** The current text or string value to display */
@@ -72,17 +73,7 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
     }, [clearScheduledTimers]);
 
     // Merge external ref with internal ref
-    const setRefs = React.useCallback(
-      (node: HTMLSpanElement | null) => {
-        spanRef.current = node;
-        if (typeof ref === 'function') {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const setRefs = useMergedRefs(spanRef, ref);
 
     const resolvedKey: string | number | undefined =
       swapKey !== undefined
@@ -98,14 +89,9 @@ export const TextSwap = React.forwardRef<HTMLSpanElement, TextSwapProps>(
         prevKeyRef.current = resolvedKey;
 
         // Check prefers-reduced-motion
-        const prefersReducedMotion =
-          typeof window !== 'undefined' &&
-          typeof window.matchMedia === 'function' &&
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
         clearScheduledTimers();
 
-        if (prefersReducedMotion) {
+        if (prefersReducedMotion()) {
           setDisplayedText(children);
           setPhase('idle');
           return;

@@ -15,7 +15,8 @@
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { Icon } from './icon';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export interface SwipeRevealProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The primary content pane (snapped to start) */
@@ -49,11 +50,7 @@ const SwipeRevealContext = React.createContext<SwipeRevealContextValue>({
 const SwipeRevealPanelSideContext = React.createContext<'start' | 'end' | null>(null);
 
 function getPreferredScrollBehavior(): ScrollBehavior {
-  if (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
+  if (prefersReducedMotion()) {
     return 'instant';
   }
   return 'smooth';
@@ -303,15 +300,12 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
 
     const toggleControlsId = hasTrailing ? `${panelId}-end` : `${panelId}-start`;
     const contextValue = React.useMemo(() => ({ openSide, isOpen }), [openSide, isOpen]);
+    const mergedScrollerRef = useMergedRefs(scrollerRef, ref);
 
     return (
       <SwipeRevealContext.Provider value={contextValue}>
         <div
-          ref={(node) => {
-            scrollerRef.current = node;
-            if (typeof ref === 'function') ref(node);
-            else if (ref) ref.current = node;
-          }}
+          ref={mergedScrollerRef}
           className={cn(
             'relative swipe-reveal-scroller grid overflow-x-auto [scroll-snap-type:x_mandatory] [scrollbar-width:none] motion-safe:scroll-smooth',
             gridColumns,

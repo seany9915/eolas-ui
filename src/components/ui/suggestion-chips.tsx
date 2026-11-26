@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { Button } from './button';
 import { Icon } from './icon';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
 
 export interface SuggestionItem {
   id?: string | number;
@@ -75,14 +75,7 @@ const SuggestionChipsList = React.forwardRef<HTMLDivElement, SuggestionChipsList
   ({ children, layout = 'wrap', align = 'start', className, onKeyDown, ...props }, ref) => {
     const listRef = React.useRef<HTMLDivElement | null>(null);
 
-    const setCombinedRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        listRef.current = node;
-        if (typeof ref === 'function') ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref]
-    );
+    const setCombinedRef = useMergedRefs(listRef, ref);
 
     // Maintain a single Tab stop across enabled chips via roving tabIndex.
     React.useEffect(() => {

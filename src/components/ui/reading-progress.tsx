@@ -16,6 +16,7 @@
 import * as React from 'react';
 import { Progress as BaseProgress } from '@base-ui/react/progress';
 import { cn, composeClassName } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export type ReadingProgressColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error';
 export type ReadingProgressHeight = 'xs' | 'sm' | 'md';
@@ -23,7 +24,9 @@ export type ReadingProgressPosition = 'fixed' | 'sticky' | 'relative';
 
 export interface ReadingProgressProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseProgress.Root>, 'value'> {
-  /** Optional scroll container to track. If omitted, tracks document/window scroll */
+  /** Optional scroll container element (preferred for late-mounted elements). */
+  target?: HTMLElement | null;
+  /** Optional scroll container ref to track. If both `target` and `targetRef` are omitted, tracks document/window scroll. */
   targetRef?: React.RefObject<HTMLElement | null>;
   /** Semantic color role conforming to DESIGN.md */
   colorRole?: ReadingProgressColor;
@@ -64,6 +67,7 @@ const positionClasses: Record<ReadingProgressPosition, string> = {
 const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgressProps>(
   (
     {
+      target,
       targetRef,
       colorRole = 'primary',
       height = 'sm',
@@ -84,28 +88,21 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
     const [progress, setProgress] = React.useState(0);
     const [announcedProgress, setAnnouncedProgress] = React.useState(0);
     const [supportsCssScrollTimeline, setSupportsCssScrollTimeline] = React.useState(false);
-    const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+    const prefersReducedMotion = usePrefersReducedMotion();
 
-    // Feature-detect CSS scroll-driven animations & reduced-motion preference
+    // Feature-detect CSS scroll-driven animations
     React.useEffect(() => {
       if (typeof window === 'undefined') return;
       if ('CSS' in window && typeof CSS.supports === 'function') {
         const isSupported = CSS.supports('(animation-timeline: scroll()) and (animation-range: 0% 100%)');
         setSupportsCssScrollTimeline(isSupported);
       }
-      if (typeof window.matchMedia === 'function') {
-        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        setPrefersReducedMotion(mediaQuery.matches);
-        const onChange = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
-        mediaQuery.addEventListener('change', onChange);
-        return () => mediaQuery.removeEventListener('change', onChange);
-      }
     }, []);
 
-    const hasTargetRef = Boolean(targetRef);
+    const hasCustomTarget = target !== undefined || targetRef !== undefined;
     const useCssDriven =
       supportsCssScrollTimeline &&
-      !hasTargetRef &&
+      !hasCustomTarget &&
       !showPercentage &&
       !announceProgress &&
       !prefersReducedMotion;
@@ -118,8 +115,15 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
 
       let rafId = 0;
       let lastAnnouncedTime = 0;
+      let latestRounded = 0;
       let throttleTimerId: ReturnType<typeof setTimeout> | undefined;
+      let attachedTarget: EventTarget | null = null;
+      let resizeObserver: ResizeObserver | undefined;
+      let mountObserver: MutationObserver | undefined;
       const ANNOUNCE_THROTTLE_MS = 250;
+
+      const resolveContainer = (): HTMLElement | null =>
+        target !== undefined ? target : targetRef?.current ?? null;
 
       const commitAnnounced = (rounded: number) => {
         lastAnnouncedTime = Date.now();
@@ -127,7 +131,10 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
       };
 
       const updateProgress = () => {
-        const customEl = targetRef?.current;
+        const customEl = resolveContainer();
+        if (hasCustomTarget && !customEl) {
+          return;
+        }
         let pct = 0;
         if (customEl) {
           const totalHeight = customEl.scrollHeight - customEl.clientHeight;
@@ -141,6 +148,7 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         }
 
         const rounded = Math.round(pct);
+        latestRounded = rounded;
         setProgress(rounded);
 
         if (announceProgress) {
@@ -154,7 +162,7 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
           } else if (throttleTimerId === undefined) {
             throttleTimerId = setTimeout(() => {
               throttleTimerId = undefined;
-              commitAnnounced(rounded);
+              commitAnnounced(latestRounded);
             }, ANNOUNCE_THROTTLE_MS - (now - lastAnnouncedTime));
           }
         }
@@ -165,39 +173,57 @@ const ReadingProgressComponent = React.forwardRef<HTMLDivElement, ReadingProgres
         rafId = requestAnimationFrame(updateProgress);
       };
 
-      updateProgress();
+      const attachListeners = () => {
+        const customEl = resolveContainer();
+        if (hasCustomTarget && !customEl) {
+          return false;
+        }
 
-      const customEl = targetRef?.current;
-      const target: EventTarget = customEl || window;
-      target.addEventListener('scroll', handleScroll, { passive: true });
-      window.addEventListener('resize', handleScroll, { passive: true });
+        updateProgress();
 
-      const resizeObserver =
-        typeof ResizeObserver === 'function'
-          ? new ResizeObserver(() => handleScroll())
-          : undefined;
-      if (resizeObserver) {
-        if (customEl) {
-          resizeObserver.observe(customEl);
-          if (customEl.firstElementChild) {
-            resizeObserver.observe(customEl.firstElementChild);
-          }
-        } else {
-          resizeObserver.observe(document.documentElement);
-          if (document.body) {
-            resizeObserver.observe(document.body);
+        const nextTarget: EventTarget = customEl || window;
+        attachedTarget = nextTarget;
+        nextTarget.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll, { passive: true });
+
+        if (typeof ResizeObserver === 'function') {
+          resizeObserver = new ResizeObserver(() => handleScroll());
+          if (customEl) {
+            resizeObserver.observe(customEl);
+            if (customEl.firstElementChild) {
+              resizeObserver.observe(customEl.firstElementChild);
+            }
+          } else {
+            resizeObserver.observe(document.documentElement);
+            if (document.body) {
+              resizeObserver.observe(document.body);
+            }
           }
         }
+        return true;
+      };
+
+      if (!attachListeners() && target === undefined && targetRef && typeof MutationObserver === 'function' && document.body) {
+        mountObserver = new MutationObserver(() => {
+          if (targetRef.current && attachListeners()) {
+            mountObserver?.disconnect();
+            mountObserver = undefined;
+          }
+        });
+        mountObserver.observe(document.body, { childList: true, subtree: true });
       }
 
       return () => {
         cancelAnimationFrame(rafId);
         if (throttleTimerId !== undefined) clearTimeout(throttleTimerId);
-        target.removeEventListener('scroll', handleScroll);
-        window.removeEventListener('resize', handleScroll);
+        if (attachedTarget) {
+          attachedTarget.removeEventListener('scroll', handleScroll);
+          window.removeEventListener('resize', handleScroll);
+        }
         resizeObserver?.disconnect();
+        mountObserver?.disconnect();
       };
-    }, [targetRef, useCssDriven, announceProgress]);
+    }, [target, targetRef, hasCustomTarget, useCssDriven, announceProgress]);
 
     const colors = colorStyles[colorRole] || colorStyles.primary;
     const isDecorative = !announceProgress;

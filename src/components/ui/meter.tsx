@@ -41,16 +41,20 @@ export const MeterRoot = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseMeter.Root> & {
     colorRole?: MeterProps['colorRole'];
   }
->(({ className, colorRole = 'primary', ...props }, ref) => (
-  <MeterContext.Provider value={{ colorRole }}>
-    <BaseMeter.Root
-      ref={ref}
-      data-slot="meter"
-      className={composeClassName('flex flex-col gap-1.5 w-full', className)}
-      {...props}
-    />
-  </MeterContext.Provider>
-));
+>(({ className, colorRole = 'primary', ...props }, ref) => {
+  const meterContextValue = React.useMemo(() => ({ colorRole }), [colorRole]);
+
+  return (
+    <MeterContext.Provider value={meterContextValue}>
+      <BaseMeter.Root
+        ref={ref}
+        data-slot="meter"
+        className={composeClassName('flex flex-col gap-1.5 w-full', className)}
+        {...props}
+      />
+    </MeterContext.Provider>
+  );
+});
 MeterRoot.displayName = 'MeterRoot';
 
 export const MeterLabel = React.forwardRef<

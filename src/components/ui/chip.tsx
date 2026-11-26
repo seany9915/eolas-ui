@@ -223,19 +223,20 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
       typeof className === 'function' ? className({ disabled }) : className;
 
     if (hasSeparateTriggerAndRemove) {
+      const startPadClass =
+        size === 'sm' ? 'ps-2.5' : size === 'lg' ? 'ps-3.5' : 'ps-3';
+
       return (
         <div
           ref={ref as React.Ref<HTMLDivElement>}
           data-slot="chip"
           role={role}
           aria-disabled={disabled ? true : undefined}
-          onClick={(e) => {
-            if (!disabled) onClick?.(e);
-          }}
           onKeyDown={onKeyDown}
           style={dynamicStyle}
           className={cn(
             sharedBaseClasses,
+            'ps-0',
             !disabled && 'hover:brightness-95',
             disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
             resolvedStaticClassName
@@ -248,13 +249,10 @@ export const Chip = React.forwardRef<HTMLElement, ChipProps>(
             aria-label={ariaLabel}
             aria-pressed={isFilter ? isCurrentlySelected : undefined}
             tabIndex={tabIndex}
-            onClick={() => {
-              if (!disabled && onSelect) {
-                onSelect(!selected);
-              }
-            }}
+            onClick={handleInteractiveClick}
             className={cn(
-              'inline-flex items-center gap-[inherit] min-w-0 bg-transparent border-0 p-0 text-current cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+              'inline-flex items-center self-stretch h-full gap-[inherit] min-w-0 bg-transparent border-0 p-0 text-current cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+              startPadClass,
               touchTargetClass
             )}
           >

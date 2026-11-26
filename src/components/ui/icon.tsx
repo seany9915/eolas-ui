@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'inline';
 
@@ -232,7 +233,37 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
     ...style,
   } as React.CSSProperties;
 
-  const iconElement = (
+  if (srLabel) {
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          size === 'inline' ? 'inline-block align-baseline' : 'inline-flex items-center',
+          sizeClasses[size],
+          className
+        )}
+        style={iconStyle}
+        role={role}
+        {...props}
+      >
+        <span
+          className={cn(
+            'material-symbols-outlined select-none leading-none text-[inherit]',
+            size === 'inline'
+              ? 'inline-block align-baseline'
+              : 'inline-flex size-[1em] shrink-0 items-center justify-center',
+            directional && 'icon-directional'
+          )}
+          aria-hidden="true"
+        >
+          {name}
+        </span>
+        <span className="sr-only">{srLabel}</span>
+      </span>
+    );
+  }
+
+  return (
     <span
       ref={ref}
       className={cn(
@@ -245,25 +276,14 @@ const BaseIcon = React.forwardRef<HTMLSpanElement, IconProps>(({
         className
       )}
       style={iconStyle}
-      role={role ?? (hasAriaLabel && !srLabel ? 'img' : undefined)}
-      aria-hidden={isDecorative || srLabel ? 'true' : undefined}
+      role={role ?? (hasAriaLabel ? 'img' : undefined)}
+      aria-hidden={isDecorative ? 'true' : undefined}
       aria-label={props['aria-label']}
       {...props}
     >
       {name}
     </span>
   );
-
-  if (srLabel) {
-    return (
-      <span className="inline-flex items-center">
-        {iconElement}
-        <span className="sr-only">{srLabel}</span>
-      </span>
-    );
-  }
-
-  return iconElement;
 });
 
 BaseIcon.displayName = 'Icon';
@@ -346,24 +366,6 @@ export const ToggleIcon = React.forwardRef<HTMLSpanElement, ToggleIconProps>(({
 
 ToggleIcon.displayName = 'ToggleIcon';
 
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-
-function subscribeIconReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return () => {};
-  }
-  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
-  mq.addEventListener('change', callback);
-  return () => mq.removeEventListener('change', callback);
-}
-
-function getIconReducedMotionSnapshot(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
-
 export interface CrossFadeIconProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   name: string;
   size?: IconSize;
@@ -387,11 +389,7 @@ export const CrossFadeIcon = React.forwardRef<HTMLSpanElement, CrossFadeIconProp
   role,
   ...props
 }, ref) => {
-  const prefersReducedMotion = React.useSyncExternalStore(
-    subscribeIconReducedMotion,
-    getIconReducedMotionSnapshot,
-    () => false
-  );
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [currentName, setCurrentName] = React.useState(name);
   const [prevName, setPrevName] = React.useState<string | null>(null);
   const [entered, setEntered] = React.useState(true);

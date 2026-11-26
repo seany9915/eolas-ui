@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
 import { Icon } from './icon';
 import { useHorizontalScrollFade } from '@/lib/use-horizontal-scroll-fade';
 
@@ -90,8 +90,12 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
     },
     ref
   ) => {
+    const tabsContextValue = React.useMemo(
+      () => ({ variant, colorRole, size, orientation, showIndicator }),
+      [variant, colorRole, size, orientation, showIndicator]
+    );
     return (
-      <TabsContext.Provider value={{ variant, colorRole, size, orientation, showIndicator }}>
+      <TabsContext.Provider value={tabsContextValue}>
         <BaseTabs.Root
           ref={ref}
           data-slot="tabs"
@@ -168,16 +172,25 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       };
     }, []);
 
+    const tabsListContextValue = React.useMemo(
+      () => ({
+        variant: effectiveVariant,
+        colorRole: effectiveColorRole,
+        size: effectiveSize,
+        orientation: parentContext.orientation,
+        showIndicator: effectiveShowIndicator,
+      }),
+      [
+        effectiveVariant,
+        effectiveColorRole,
+        effectiveSize,
+        parentContext.orientation,
+        effectiveShowIndicator,
+      ]
+    );
+
     return (
-      <TabsContext.Provider
-        value={{
-          variant: effectiveVariant,
-          colorRole: effectiveColorRole,
-          size: effectiveSize,
-          orientation: parentContext.orientation,
-          showIndicator: effectiveShowIndicator,
-        }}
-      >
+      <TabsContext.Provider value={tabsListContextValue}>
         <BaseTabs.List
           ref={listRef}
           data-slot="tabs-list"
@@ -212,10 +225,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                   'absolute rounded-sm z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
                   indicatorReady
-                    ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
+                    ? 'transition-[translate,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
                     : 'transition-none',
-                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-1',
-                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-1',
+                  'data-[orientation=horizontal]:left-0 data-[orientation=horizontal]:translate-x-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-1',
+                  'data-[orientation=vertical]:top-0 data-[orientation=vertical]:translate-y-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-1',
                   indicatorClassName
                 )}
               />
@@ -226,10 +239,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                   'absolute rounded-full z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary-container' : 'bg-primary-container',
                   indicatorReady
-                    ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
+                    ? 'transition-[translate,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
                     : 'transition-none',
-                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-0',
-                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-0',
+                  'data-[orientation=horizontal]:left-0 data-[orientation=horizontal]:translate-x-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:inset-y-0',
+                  'data-[orientation=vertical]:top-0 data-[orientation=vertical]:translate-y-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:inset-x-0',
                   indicatorClassName
                 )}
               />
@@ -240,10 +253,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                   'absolute rounded-none z-10 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
                   indicatorReady
-                    ? 'transition-[left,width,top,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
+                    ? 'transition-[translate,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
                     : 'transition-none',
-                  'data-[orientation=horizontal]:left-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2px]',
-                  'data-[orientation=vertical]:top-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:end-0 data-[orientation=vertical]:w-[2px]',
+                  'data-[orientation=horizontal]:left-0 data-[orientation=horizontal]:translate-x-[var(--active-tab-left)] data-[orientation=horizontal]:w-[var(--active-tab-width)] data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-[2px]',
+                  'data-[orientation=vertical]:top-0 data-[orientation=vertical]:translate-y-[var(--active-tab-top)] data-[orientation=vertical]:h-[var(--active-tab-height)] data-[orientation=vertical]:end-0 data-[orientation=vertical]:w-[2px]',
                   indicatorClassName
                 )}
               />
@@ -417,17 +430,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
     const internalRef = React.useRef<HTMLDivElement>(null);
     const resolvedKeepMounted = hiddenUntilFound || keepMounted;
 
-    const mergedPanelRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        internalRef.current = node;
-        if (typeof forwardedRef === 'function') {
-          forwardedRef(node);
-        } else if (forwardedRef) {
-          forwardedRef.current = node;
-        }
-      },
-      [forwardedRef]
-    );
+    const mergedPanelRef = useMergedRefs(internalRef, forwardedRef);
 
     React.useEffect(() => {
       const panel = internalRef.current;

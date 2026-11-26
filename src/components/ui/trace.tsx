@@ -102,8 +102,13 @@ export const TraceRoot = React.forwardRef<HTMLDivElement, TraceRootProps>(
         ? props['aria-label'] ?? (props['aria-labelledby'] ? undefined : 'Execution trace')
         : undefined;
 
+    const traceContextValue = React.useMemo(
+      () => ({ isNested: true, variant: resolvedVariant }),
+      [resolvedVariant]
+    );
+
     return (
-      <TraceContext.Provider value={{ isNested: true, variant: resolvedVariant }}>
+      <TraceContext.Provider value={traceContextValue}>
         <div
           ref={ref}
           role={computedRole}
@@ -143,8 +148,9 @@ export interface TraceLineProps extends React.HTMLAttributes<HTMLElement> {
 
 export const TraceLine = React.forwardRef<HTMLDivElement, TraceLineProps>(
   ({ status = 'default', render, children, className, ...props }, ref) => {
+    const traceLineContextValue = React.useMemo(() => ({ status }), [status]);
     const content = (
-      <TraceLineContext.Provider value={{ status }}>{children}</TraceLineContext.Provider>
+      <TraceLineContext.Provider value={traceLineContextValue}>{children}</TraceLineContext.Provider>
     );
     return useRender({
       render,
@@ -471,6 +477,8 @@ export interface TraceCollapsibleContentProps
   variant?: 'default' | 'flush' | 'unboxed';
 }
 
+const NESTED_TRACE_CONTEXT = { isNested: true } as const;
+
 export const TraceCollapsibleContent = React.forwardRef<
   HTMLDivElement,
   TraceCollapsibleContentProps
@@ -479,7 +487,7 @@ export const TraceCollapsibleContent = React.forwardRef<
   const isUnboxed = variant === 'unboxed';
 
   return (
-    <TraceContext.Provider value={{ isNested: true }}>
+    <TraceContext.Provider value={NESTED_TRACE_CONTEXT}>
       <BaseCollapsible.Panel
         ref={ref}
         data-slot="trace-collapsible-content"

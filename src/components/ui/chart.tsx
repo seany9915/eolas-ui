@@ -3,9 +3,12 @@
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
+
+export { usePrefersReducedMotion };
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: '', dark: '.dark', inverted: '[data-surface="inverted"]' } as const;
+const THEMES = { light: '', inverted: '[data-surface="inverted"]' } as const;
 
 export type ChartConfig = {
   [k in string]: {
@@ -14,35 +17,9 @@ export type ChartConfig = {
     avatar?: string;
   } & (
     | { color?: string; theme?: never }
-    | { color?: never; theme: Record<'light' | 'dark', string> & Partial<Record<'inverted', string>> }
+    | { color?: never; theme: Record<'light', string> & Partial<Record<'dark' | 'inverted', string>> }
   );
 };
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-
-function subscribeReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return () => {};
-  }
-  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
-  mq.addEventListener('change', callback);
-  return () => mq.removeEventListener('change', callback);
-}
-
-function getReducedMotionSnapshot(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
-
-export function usePrefersReducedMotion(): boolean {
-  return React.useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    () => false
-  );
-}
 
 const FALLBACK_SERIES_COLORS = [
   'var(--color-primary)',
@@ -125,8 +102,10 @@ export const ChartContainer = React.forwardRef<
   const resolvedRole =
     role ?? (props['aria-label'] || props['aria-labelledby'] ? 'figure' : undefined);
 
+  const chartContextValue = React.useMemo(() => ({ config }), [config]);
+
   return (
-    <ChartContext.Provider value={{ config }}>
+    <ChartContext.Provider value={chartContextValue}>
       <div
         data-slot="chart"
         data-chart={chartId}
@@ -178,13 +157,14 @@ export const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) 
       const declarations = colorConfig
         .map(([key, itemConfig]) => {
           const color =
-            itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-            itemConfig.color;
+            theme === 'inverted'
+              ? itemConfig.theme?.inverted || itemConfig.theme?.dark
+              : itemConfig.theme?.light || itemConfig.color;
           return color && isSafeCssColor(color) ? `  --color-${key}: ${color.trim()};` : null;
         })
         .filter(Boolean);
       if (declarations.length === 0) return '';
-      return `\n${prefix} [data-chart="${safeId}"] {\n${declarations.join('\n')}\n}\n`;
+      return `\n${prefix ? `${prefix} ` : ''}[data-chart="${safeId}"] {\n${declarations.join('\n')}\n}\n`;
     })
     .filter(Boolean)
     .join('');

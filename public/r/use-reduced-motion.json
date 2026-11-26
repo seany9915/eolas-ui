@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-reduced-motion",
+  "type": "registry:lib",
+  "title": "Use Reduced Motion",
+  "description": "Shared reduced-motion utilities. Subscribes to both the OS-level `(prefers-reduced-motion: reduce)` media query and the document-level `:root[data-motion=\"reduce\"]` override attribute.",
+  "categories": [
+    "system"
+  ],
+  "files": [
+    {
+      "path": "lib/use-reduced-motion.ts",
+      "content": "'use client';\n\n/**\n * Shared reduced-motion utilities.\n *\n * Subscribes to both the OS-level `(prefers-reduced-motion: reduce)` media query\n * and the document-level `:root[data-motion=\"reduce\"]` override attribute.\n */\nimport * as React from 'react';\n\nconst REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';\n\n/**\n * Synchronously checks whether reduced motion is currently active via either\n * `:root[data-motion=\"reduce\"]` or `(prefers-reduced-motion: reduce)`.\n */\nexport function prefersReducedMotion(): boolean {\n  if (typeof window === 'undefined') {\n    return false;\n  }\n  if (\n    typeof document !== 'undefined' &&\n    document.documentElement?.getAttribute('data-motion') === 'reduce'\n  ) {\n    return true;\n  }\n  if (typeof window.matchMedia === 'function') {\n    return window.matchMedia(REDUCED_MOTION_QUERY).matches;\n  }\n  return false;\n}\n\nfunction subscribeReducedMotion(callback: () => void): () => void {\n  if (typeof window === 'undefined') {\n    return () => {};\n  }\n\n  const cleanups: Array<() => void> = [];\n\n  if (typeof window.matchMedia === 'function') {\n    const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);\n    mediaQuery.addEventListener('change', callback);\n    cleanups.push(() => mediaQuery.removeEventListener('change', callback));\n  }\n\n  if (typeof MutationObserver === 'function' && typeof document !== 'undefined' && document.documentElement) {\n    const observer = new MutationObserver(callback);\n    observer.observe(document.documentElement, {\n      attributes: true,\n      attributeFilter: ['data-motion'],\n    });\n    cleanups.push(() => observer.disconnect());\n  }\n\n  return () => {\n    for (const cleanup of cleanups) {\n      cleanup();\n    }\n  };\n}\n\n/**\n * React hook returning `true` when reduced motion is preferred via OS settings\n * or `:root[data-motion=\"reduce\"]`.\n */\nexport function usePrefersReducedMotion(): boolean {\n  return React.useSyncExternalStore(\n    subscribeReducedMotion,\n    prefersReducedMotion,\n    () => false\n  );\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/use-reduced-motion.ts"
+    }
+  ]
+}

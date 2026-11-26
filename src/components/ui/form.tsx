@@ -13,7 +13,7 @@
  */
 import * as React from 'react';
 import { Form as BaseForm } from '@base-ui/react/form';
-import { composeClassName } from '@/lib/utils';
+import { composeClassName, useMergedRefs } from '@/lib/utils';
 
 export interface FormProps<FormValues extends Record<string, unknown> = Record<string, unknown>>
   extends BaseForm.Props<FormValues> {
@@ -88,14 +88,7 @@ const FormComponent = React.forwardRef<HTMLFormElement, FormProps<Record<string,
     ref
   ) => {
     const internalRef = React.useRef<HTMLFormElement | null>(null);
-    const mergedRef = React.useCallback(
-      (node: HTMLFormElement | null) => {
-        internalRef.current = node;
-        if (typeof ref === 'function') ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref]
-    );
+    const mergedRef = useMergedRefs(internalRef, ref);
 
     const handleInvalidCapture = React.useCallback(
       (event: Parameters<NonNullable<BaseForm.Props<Record<string, unknown>>['onInvalidCapture']>>[0]) => {

@@ -15,7 +15,7 @@
  *   (background-color, border-color, box-shadow, and backdrop-blur).
  */
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
 
 export interface StickyContainerProps extends React.ComponentPropsWithoutRef<'div'> {
   /** Top offset distance when stuck in pixels. Defaults to 0 */
@@ -82,17 +82,7 @@ export const StickyContainer = React.forwardRef<HTMLDivElement, StickyContainerP
 
     const needsJsTracking = !supportsScrollState || Boolean(onStuckChange) || Boolean(stuckClassName);
 
-    const setContainerRef = React.useCallback(
-      (node: HTMLDivElement | null) => {
-        containerRef.current = node;
-        if (typeof ref === 'function') {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const setContainerRef = useMergedRefs(containerRef, ref);
 
     React.useEffect(() => {
       if (!needsJsTracking) {

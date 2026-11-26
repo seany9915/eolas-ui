@@ -53,8 +53,13 @@ const ChatMessageRoot = React.forwardRef<HTMLDivElement, ChatMessageRootProps>(
           (child.type as { displayName?: string })?.displayName === 'ChatMessage.Avatar')
     );
 
+    const contextValue = React.useMemo<ChatMessageContextValue>(
+      () => ({ inMessage: true, role }),
+      [role]
+    );
+
     return (
-      <ChatMessageContext.Provider value={{ inMessage: true, role }}>
+      <ChatMessageContext.Provider value={contextValue}>
         <div
           ref={ref}
           data-slot="message"
@@ -679,11 +684,8 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                   size="sm"
                   onClick={onBookmark}
                   expandedTouchTarget
-                  aria-label={
-                    isBookmarked
-                      ? 'Saved to library'
-                      : 'Save response to library'
-                  }
+                  aria-pressed={Boolean(isBookmarked)}
+                  aria-label="Save response to library"
                   className="text-xs gap-1 h-8 min-h-[32px] px-2"
                 >
                   <Icon

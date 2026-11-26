@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ThinkingOrb as RawThinkingOrb, type OrbState, type OrbSize } from 'thinking-orbs';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export type { OrbState, OrbSize };
 
@@ -25,30 +26,6 @@ const DEFAULT_STATE_LABELS: Record<OrbState, string> = {
   breathing: 'Ready',
   shaping: 'Formatting output...',
 };
-
-function subscribeReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return () => {};
-  }
-  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  mediaQuery.addEventListener('change', callback);
-  return () => mediaQuery.removeEventListener('change', callback);
-}
-
-function getReducedMotionSnapshot(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function usePrefersReducedMotion(): boolean {
-  return React.useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    () => false
-  );
-}
 
 export interface ThinkingOrbProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The current agent activity state */

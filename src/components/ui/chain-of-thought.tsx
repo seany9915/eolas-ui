@@ -243,8 +243,13 @@ export const ChainOfThoughtRoot = React.forwardRef<HTMLDivElement, ChainOfThough
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'embedded');
     const resolvedDefaultOpen = defaultOpen ?? isStreaming;
 
+    const chainOfThoughtContextValue = React.useMemo(
+      () => ({ isStreaming }),
+      [isStreaming]
+    );
+
     return (
-      <ChainOfThoughtContext.Provider value={{ isStreaming }}>
+      <ChainOfThoughtContext.Provider value={chainOfThoughtContextValue}>
         <div ref={ref} data-slot="chain-of-thought" className={cn('w-full', className)} {...props}>
           <Trace variant={resolvedVariant}>
             <TraceCollapsible

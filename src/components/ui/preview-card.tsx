@@ -196,10 +196,15 @@ function PreviewCardComponentInner<Payload = unknown>(
   }: PreviewCardProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
 ): React.JSX.Element {
+  const previewCardContextValue = React.useMemo(
+    () => ({ delay, closeDelay }),
+    [delay, closeDelay]
+  );
+
   // If used as compound container without shorthand trigger (<PreviewCard><PreviewCard.Trigger>...</PreviewCard>)
   if (!trigger && !title && !description) {
     return (
-      <PreviewCardContext.Provider value={{ delay, closeDelay }}>
+      <PreviewCardContext.Provider value={previewCardContextValue}>
         <BasePreviewCard.Root<Payload>
           open={open}
           defaultOpen={defaultOpen}
@@ -218,7 +223,7 @@ function PreviewCardComponentInner<Payload = unknown>(
   }
 
   return (
-    <PreviewCardContext.Provider value={{ delay, closeDelay }}>
+    <PreviewCardContext.Provider value={previewCardContextValue}>
       <BasePreviewCard.Root<Payload>
         open={open}
         defaultOpen={defaultOpen}

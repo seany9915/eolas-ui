@@ -92,10 +92,15 @@ function TooltipComponentInner<Payload = unknown>(
   }: TooltipProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
 ): React.JSX.Element {
+  const contextValue = React.useMemo<TooltipContextValue>(
+    () => ({ delay, closeDelay, closeOnClick }),
+    [delay, closeDelay, closeOnClick]
+  );
+
   // If used as a compound Root container without shorthand content prop (<Tooltip><TooltipTrigger /><TooltipContent /></Tooltip>)
   if (content === undefined) {
     return (
-      <TooltipContext.Provider value={{ delay, closeDelay, closeOnClick }}>
+      <TooltipContext.Provider value={contextValue}>
         <BaseTooltip.Root<Payload>
           open={open}
           defaultOpen={defaultOpen}
@@ -116,32 +121,8 @@ function TooltipComponentInner<Payload = unknown>(
   }
 
   // Shorthand convenience wrapper: <Tooltip content="..."><button>Hover</button></Tooltip>
-  const popup = (
-    <BaseTooltip.Positioner
-      side={side}
-      align={align}
-      sideOffset={sideOffset}
-      alignOffset={alignOffset}
-      collisionPadding={collisionPadding}
-      className="z-[70] outline-none max-w-[min(var(--available-width),calc(100vw-1rem))]"
-    >
-      <BaseTooltip.Popup
-        ref={ref}
-        data-slot="tooltip-content"
-        data-surface="inverted"
-        className={composeClassName(
-          'relative max-w-[min(20rem,var(--available-width),calc(100vw-1rem))] text-pretty px-3 py-1.5 rounded bg-on-surface text-surface font-label text-xs font-medium shadow-ambient outline-none select-none transition-[opacity,transform] duration-[var(--duration-quick)] data-[ending-style]:duration-[var(--duration-micro)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-          className
-        )}
-      >
-        {showArrow && <TooltipArrow />}
-        {content}
-      </BaseTooltip.Popup>
-    </BaseTooltip.Positioner>
-  );
-
   return (
-    <TooltipContext.Provider value={{ delay, closeDelay, closeOnClick }}>
+    <TooltipContext.Provider value={contextValue}>
       <BaseTooltip.Root<Payload>
         open={open}
         defaultOpen={defaultOpen}
@@ -164,7 +145,21 @@ function TooltipComponentInner<Payload = unknown>(
         >
           {!React.isValidElement(children) && typeof children !== 'function' ? children : undefined}
         </BaseTooltip.Trigger>
-        {portal ? <BaseTooltip.Portal container={container} keepMounted={keepMounted}>{popup}</BaseTooltip.Portal> : popup}
+        <TooltipContent
+          ref={ref}
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          alignOffset={alignOffset}
+          collisionPadding={collisionPadding}
+          showArrow={showArrow}
+          portal={portal}
+          container={container}
+          keepMounted={keepMounted}
+          className={className}
+        >
+          {content}
+        </TooltipContent>
       </BaseTooltip.Root>
     </TooltipContext.Provider>
   );

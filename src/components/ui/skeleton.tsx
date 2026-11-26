@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRender } from '@base-ui/react/use-render';
 import { cn } from '@/lib/utils';
+import { prefersReducedMotion } from '@/lib/use-reduced-motion';
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLElement> {
   /**
@@ -88,10 +89,7 @@ export const SkeletonReveal = React.forwardRef<HTMLDivElement, SkeletonRevealPro
     React.useEffect(() => {
       if (prevLoadingRef.current === loading) return;
       prevLoadingRef.current = loading;
-      if (
-        typeof window !== 'undefined' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ) {
+      if (prefersReducedMotion()) {
         setIsTransitioning(false);
         return;
       }

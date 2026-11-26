@@ -115,8 +115,13 @@ const ToolRoot = React.forwardRef<HTMLDivElement, ToolRootProps>(
     const chatContext = useChatMessageContext();
     const resolvedVariant = variant ?? (chatContext.inMessage ? 'ghost' : 'default');
 
+    const toolContextValue = React.useMemo(
+      () => ({ variant: resolvedVariant }),
+      [resolvedVariant]
+    );
+
     return (
-      <ToolContext.Provider value={{ variant: resolvedVariant }}>
+      <ToolContext.Provider value={toolContextValue}>
         <Trace
           ref={ref}
           variant={resolvedVariant}

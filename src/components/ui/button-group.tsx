@@ -31,8 +31,13 @@ export const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupProps
   ({ className, orientation = 'horizontal', children, ...props }, ref) => {
     const isHorizontal = orientation === 'horizontal';
 
+    const buttonGroupContextValue = React.useMemo(
+      () => ({ orientation }),
+      [orientation]
+    );
+
     return (
-      <ButtonGroupContext.Provider value={{ orientation }}>
+      <ButtonGroupContext.Provider value={buttonGroupContextValue}>
         <div
           ref={ref}
           role="group"

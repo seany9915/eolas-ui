@@ -16,7 +16,8 @@ import {
   type UseSortableInput,
 } from '@dnd-kit/react/sortable';
 import { arrayMove, arraySwap, move } from '@dnd-kit/helpers';
-import { cn, resolveNativeButton, useRender } from '@/lib/utils';
+import { cn, resolveNativeButton, useMergedRefs, useRender } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
 
 /**
  * Accessible drag-and-drop sortable list, grid, and multi-container primitive built on `@dnd-kit/react` and DESIGN.md tokens.
@@ -43,27 +44,8 @@ const SortableContext = React.createContext<SortableContextValue>({
   registerOverlay: () => () => {},
 });
 
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() =>
-    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false
-  );
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(media.matches);
-    const onChange = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
-    media.addEventListener('change', onChange);
-    return () => media.removeEventListener('change', onChange);
-  }, []);
-
-  return prefersReducedMotion;
-}
-
 interface SortableItemContextValue {
-  handleRef: (element: Element | null) => void;
+  handleRef: ReturnType<typeof useSortable>['handleRef'];
   isDragging: boolean;
   isDragSource: boolean;
   isDropTarget: boolean;
@@ -78,25 +60,6 @@ export function useSortableItemContext() {
     throw new Error('Sortable.Handle must be used within a Sortable.Item.');
   }
   return ctx;
-}
-
-function useMergedRefs<T>(
-  first: React.Ref<T> | ((node: T | null) => void) | undefined,
-  second: React.Ref<T> | ((node: T | null) => void) | undefined
-) {
-  return React.useCallback(
-    (node: T | null) => {
-      for (const ref of [first, second]) {
-        if (!ref) continue;
-        if (typeof ref === 'function') {
-          ref(node);
-        } else {
-          ref.current = node;
-        }
-      }
-    },
-    [first, second]
-  );
 }
 
 export type SortableRootProps = React.ComponentProps<typeof DragDropProvider> & {

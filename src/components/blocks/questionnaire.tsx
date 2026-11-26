@@ -25,7 +25,7 @@
  *   fieldset/legend semantics, inert inactive items, live error regions, and container-query responsiveness (@container).
  */
 import * as React from 'react';
-import { cn } from '@/lib/utils';
+import { cn, useMergedRefs } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -897,17 +897,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
     const fieldsetRef = React.useRef<HTMLFieldSetElement | null>(null);
 
     // Merge internal and forwarded refs
-    const setRefs = React.useCallback(
-      (node: HTMLFieldSetElement | null) => {
-        fieldsetRef.current = node;
-        if (typeof ref === 'function') {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const setRefs = useMergedRefs(fieldsetRef, ref);
 
     // Register item name with initial metadata once per mount so metadata updates never reorder declared items
     const initialMetaRef = React.useRef({ required, type });

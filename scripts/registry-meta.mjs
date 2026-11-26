@@ -146,6 +146,7 @@ export const CATEGORY_MAP = {
   announce: 'system',
   contrast: 'system',
   'use-horizontal-scroll-fade': 'system',
+  'use-reduced-motion': 'system',
   'use-text-highlight': 'system',
   'use-web-otp': 'system',
   'view-transitions': 'system',

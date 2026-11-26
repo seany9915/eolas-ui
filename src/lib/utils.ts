@@ -1,6 +1,6 @@
 'use client';
 
-import { isValidElement } from 'react';
+import { isValidElement, useRef, type Ref, type RefCallback } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
@@ -162,3 +162,109 @@ export {
   makeEventPreventable,
 } from '@base-ui/react/merge-props';
 export { useRender } from '@base-ui/react/use-render';
+
+type PossibleRef<T> = Ref<T> | undefined | null;
+
+function assignMergedRefs<T>(
+  refs: readonly PossibleRef<T>[],
+  instance: T
+): () => void {
+  const cleanups: Array<(() => void) | null> = refs.map(() => null);
+  for (let i = 0; i < refs.length; i += 1) {
+    const ref = refs[i];
+    if (ref == null) continue;
+    if (typeof ref === 'function') {
+      const cleanup = ref(instance);
+      if (typeof cleanup === 'function') {
+        cleanups[i] = cleanup;
+      }
+    } else if (typeof ref === 'object') {
+      (ref as { current: T | null }).current = instance;
+    }
+  }
+
+  let disposed = false;
+  return () => {
+    if (disposed) return;
+    disposed = true;
+    for (let i = 0; i < refs.length; i += 1) {
+      const ref = refs[i];
+      if (ref == null) continue;
+      if (typeof ref === 'function') {
+        const cleanup = cleanups[i];
+        if (typeof cleanup === 'function') {
+          cleanup();
+        } else {
+          // Legacy callback ref without attach-time cleanup
+          ref(null);
+        }
+      } else if (typeof ref === 'object') {
+        (ref as { current: T | null }).current = null;
+      }
+    }
+  };
+}
+
+/**
+ * Merges multiple React refs (callback refs with or without React 19 cleanups, and RefObjects)
+ * into a single React 19-safe callback ref. Prefer `useMergedRefs` inside components so the
+ * callback identity stays stable across re-renders.
+ */
+export function mergeRefs<T>(...refs: PossibleRef<T>[]): RefCallback<T> {
+  let cleanup: (() => void) | null = null;
+  return (instance: T | null) => {
+    if (cleanup) {
+      cleanup();
+      cleanup = null;
+    }
+    if (instance != null) {
+      cleanup = assignMergedRefs(refs, instance);
+      return cleanup;
+    }
+    return undefined;
+  };
+}
+
+interface MergedRefsState<T> {
+  refs: PossibleRef<T>[];
+  callback: RefCallback<T> | null;
+  cleanup: (() => void) | null;
+}
+
+/**
+ * Memoized hook that merges multiple React refs into a stable callback ref (or `null` when
+ * all input refs are nullish), preventing React 19 cleanup/re-attach churn across renders.
+ */
+export function useMergedRefs<T>(...refs: PossibleRef<T>[]): RefCallback<T> | null {
+  const stateRef = useRef<MergedRefsState<T> | null>(null);
+  if (stateRef.current === null) {
+    stateRef.current = { refs: [], callback: null, cleanup: null };
+  }
+  const state = stateRef.current;
+
+  const changed =
+    state.refs.length !== refs.length ||
+    refs.some((ref, index) => ref !== state.refs[index]);
+
+  if (changed) {
+    state.refs = refs;
+    if (refs.every((ref) => ref == null)) {
+      state.callback = null;
+    } else {
+      const capturedRefs = refs;
+      state.callback = (instance: T | null) => {
+        if (state.cleanup) {
+          state.cleanup();
+          state.cleanup = null;
+        }
+        if (instance != null) {
+          state.cleanup = assignMergedRefs(capturedRefs, instance);
+          return state.cleanup;
+        }
+        return undefined;
+      };
+    }
+  }
+
+  return state.callback;
+}

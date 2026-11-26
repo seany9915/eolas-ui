@@ -109,8 +109,13 @@ export const InputGroupRoot = React.forwardRef<HTMLDivElement, InputGroupProps>(
       className
     );
 
+    const inputGroupContextValue = React.useMemo(
+      () => ({ size, disabled }),
+      [size, disabled]
+    );
+
     return (
-      <InputGroupContext.Provider value={{ size, disabled }}>
+      <InputGroupContext.Provider value={inputGroupContextValue}>
         {useRender({
           render,
           ref,

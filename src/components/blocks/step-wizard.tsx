@@ -82,10 +82,12 @@ const useIsomorphicLayoutEffect =
 const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, canReveal, direction, onSelect }) => {
   const panelRef = React.useRef<HTMLDivElement>(null);
   const onSelectRef = React.useRef(onSelect);
+  const isSelectedRef = React.useRef(isSelected);
 
   useIsomorphicLayoutEffect(() => {
     onSelectRef.current = onSelect;
-  }, [onSelect]);
+    isSelectedRef.current = isSelected;
+  }, [onSelect, isSelected]);
 
   // Upgrade inactive searchable panels to hidden="until-found" synchronously before paint.
   useIsomorphicLayoutEffect(() => {
@@ -103,12 +105,30 @@ const StepPanel: React.FC<StepPanelProps> = ({ step, isSelected, canReveal, dire
     const el = panelRef.current;
     if (!el || !canReveal) return;
 
+    let revertTimer: ReturnType<typeof setTimeout> | undefined;
+    let revertRaf = 0;
+
     const handleBeforeMatch = () => {
       onSelectRef.current();
+      if (revertTimer !== undefined) clearTimeout(revertTimer);
+      if (revertRaf) cancelAnimationFrame(revertRaf);
+
+      // If the parent ignores onStepChange (or omitted it), restore hidden="until-found" after browser measurement.
+      revertTimer = setTimeout(() => {
+        revertTimer = undefined;
+        revertRaf = window.requestAnimationFrame(() => {
+          revertRaf = 0;
+          if (!isSelectedRef.current && el.isConnected) {
+            el.setAttribute('hidden', 'until-found');
+          }
+        });
+      }, 0);
     };
 
     el.addEventListener('beforematch', handleBeforeMatch);
     return () => {
+      if (revertTimer !== undefined) clearTimeout(revertTimer);
+      if (revertRaf) cancelAnimationFrame(revertRaf);
       el.removeEventListener('beforematch', handleBeforeMatch);
     };
   }, [canReveal]);

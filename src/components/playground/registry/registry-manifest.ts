@@ -6,7 +6,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "id": "utils",
     "name": "utils",
     "title": "Eolas UI Utilities",
-    "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
+    "description": "Core utility library exporting cn(), assetUrl(), sanitizeUrl(), composeClassName(), resolveNativeButton(), mergeRefs(), useMergedRefs(), and Base UI authoring hooks: mergeProps(), mergePropsN(), mergeClassNames(), makeEventPreventable(), and useRender().",
     "category": "system",
     "tier": "utility",
     "basePrimitive": "Eolas Utility Module",
@@ -1312,7 +1312,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "taxonomy": [
       "Use PromptInput for conversational AI prompts, multi-turn clinical query inputs, and structured message composition.",
       "Supports Model Selection (PromptInputModelSelect) and Reasoning Effort (PromptInputEffort) in the bottom-left action bar, alongside file attachments and tool toggles.",
-      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, and WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets.",
+      "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring on the outer container, auto-growing height via modern CSS `field-sizing: content`, 44x44px touch targets on primary submit/stop controls, and vertically expanded non-overlapping targets on dense secondary action-bar pills.",
       "Strictly avoids double-border / double-focus artifacts by delegating focus styles exclusively to PromptInput.Root.",
       "Supports Enter to submit and Shift+Enter for newline insertion."
     ],

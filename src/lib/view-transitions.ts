@@ -11,6 +11,7 @@
  */
 import * as React from 'react';
 import { flushSync } from 'react-dom';
+import { prefersReducedMotion } from './use-reduced-motion';
 
 export type ViewTransitionUpdateCallback = () => Promise<void> | void;
 
@@ -138,11 +139,7 @@ function releaseTargetTransitionName(
 }
 
 function isReducedMotionPreferred(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  );
+  return prefersReducedMotion();
 }
 
 /**

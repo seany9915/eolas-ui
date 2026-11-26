@@ -32,33 +32,43 @@ export interface AlertDialogProps<Payload = unknown> {
   className?: BaseAlertDialog.Popup.Props['className'];
 }
 
-function AlertDialogComponent<Payload = unknown>({
-  open,
-  defaultOpen,
-  onOpenChange,
-  onOpenChangeComplete,
-  handle,
-  actionsRef,
-  triggerId,
-  defaultTriggerId,
-  trigger,
-  title,
-  description,
-  children,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
-  onConfirm,
-  closeOnConfirm = true,
-  size = 'md',
-  scroll = 'inside',
-  initialFocus,
-  finalFocus,
-  keepMounted,
-  container,
-  className,
-}: AlertDialogProps<Payload>): React.JSX.Element {
+function AlertDialogComponent<Payload = unknown>(
+  rawProps: AlertDialogProps<Payload>
+): React.JSX.Element {
+  const isShorthand =
+    'title' in rawProps ||
+    'description' in rawProps ||
+    'trigger' in rawProps ||
+    'onConfirm' in rawProps;
+
+  const {
+    open,
+    defaultOpen,
+    onOpenChange,
+    onOpenChangeComplete,
+    handle,
+    actionsRef,
+    triggerId,
+    defaultTriggerId,
+    trigger,
+    title,
+    description,
+    children,
+    confirmLabel = 'Confirm',
+    cancelLabel = 'Cancel',
+    onConfirm,
+    closeOnConfirm = true,
+    size = 'md',
+    scroll = 'inside',
+    initialFocus,
+    finalFocus,
+    keepMounted,
+    container,
+    className,
+  } = rawProps;
+
   // If used as composable compound root (<AlertDialog open={...}><AlertDialogContent>...</AlertDialogContent></AlertDialog>)
-  if (!title && !description && !trigger && !onConfirm) {
+  if (!isShorthand) {
     return (
       <BaseAlertDialog.Root<Payload>
         open={open}

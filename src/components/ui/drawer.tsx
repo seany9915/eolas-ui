@@ -377,8 +377,13 @@ export function DrawerRoot<Payload = unknown>({
   swipeDirection = 'right',
   ...props
 }: BaseDrawer.Root.Props<Payload>): React.JSX.Element {
+  const drawerRootContextValue = React.useMemo(
+    () => ({ swipeDirection }),
+    [swipeDirection]
+  );
+
   return (
-    <DrawerContext.Provider value={{ swipeDirection }}>
+    <DrawerContext.Provider value={drawerRootContextValue}>
       <BaseDrawer.Root<Payload> swipeDirection={swipeDirection} {...props} />
     </DrawerContext.Provider>
   );
@@ -417,27 +422,38 @@ function DrawerComponentInner<Payload = unknown>(
   }: DrawerProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
 ): React.JSX.Element {
-  const combinedPopupClassName: BaseDrawer.Popup.Props['className'] =
-    typeof popupClassName === 'function' || typeof className === 'function'
-      ? (state) =>
-          cn(
-            typeof popupClassName === 'function' ? popupClassName(state) : popupClassName,
-            typeof className === 'function' ? className(state) : className
-          )
-      : cn(popupClassName, className) || undefined;
+  const combinedPopupClassName = React.useMemo<BaseDrawer.Popup.Props['className']>(
+    () =>
+      typeof popupClassName === 'function' || typeof className === 'function'
+        ? (state) =>
+            cn(
+              typeof popupClassName === 'function' ? popupClassName(state) : popupClassName,
+              typeof className === 'function' ? className(state) : className
+            )
+        : cn(popupClassName, className) || undefined,
+    [popupClassName, className]
+  );
+
+  const isCompound = !title && !description && !trigger && !footer;
+  const compoundPopupProps = Object.keys(props).length > 0 ? props : undefined;
+  const compoundDrawerContextValue = React.useMemo(
+    () => ({
+      swipeDirection,
+      popupRef: ref,
+      popupClassName: combinedPopupClassName,
+      popupProps: compoundPopupProps,
+    }),
+    [swipeDirection, ref, combinedPopupClassName, compoundPopupProps]
+  );
+  const shorthandDrawerContextValue = React.useMemo(
+    () => ({ swipeDirection }),
+    [swipeDirection]
+  );
 
   // If used as pure headless compound root without shorthand config
-  if (!title && !description && !trigger && !footer) {
-    const compoundPopupProps = Object.keys(props).length > 0 ? props : undefined;
+  if (isCompound) {
     return (
-      <DrawerContext.Provider
-        value={{
-          swipeDirection,
-          popupRef: ref,
-          popupClassName: combinedPopupClassName,
-          popupProps: compoundPopupProps,
-        }}
-      >
+      <DrawerContext.Provider value={compoundDrawerContextValue}>
         <BaseDrawer.Root<Payload>
           open={open}
           defaultOpen={defaultOpen}
@@ -463,7 +479,7 @@ function DrawerComponentInner<Payload = unknown>(
   }
 
   return (
-    <DrawerContext.Provider value={{ swipeDirection }}>
+    <DrawerContext.Provider value={shorthandDrawerContextValue}>
       <BaseDrawer.Root<Payload>
         open={open}
         defaultOpen={defaultOpen}
