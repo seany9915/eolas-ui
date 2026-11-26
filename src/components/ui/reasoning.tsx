@@ -250,15 +250,18 @@ export const ReasoningRoot = React.forwardRef<HTMLDivElement, ReasoningProps>(
           (child.type as { displayName?: string })?.displayName === 'ReasoningContent')
     );
 
+    const reasoningContextValue = React.useMemo<ReasoningContextValue>(
+      () => ({
+        isStreaming,
+        computedStatus,
+        displayTitle,
+        formattedDuration,
+      }),
+      [isStreaming, computedStatus, displayTitle, formattedDuration]
+    );
+
     return (
-      <ReasoningContext.Provider
-        value={{
-          isStreaming,
-          computedStatus,
-          displayTitle,
-          formattedDuration,
-        }}
-      >
+      <ReasoningContext.Provider value={reasoningContextValue}>
         <div ref={ref} data-slot="reasoning" className={cn('w-full', className)} {...props}>
           <Trace variant={resolvedVariant}>
             <TraceCollapsible

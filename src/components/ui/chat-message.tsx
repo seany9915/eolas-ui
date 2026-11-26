@@ -693,7 +693,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
                     size="xs"
                     aria-hidden="true"
                   />
-                  <span>{isBookmarked ? 'Saved' : 'Save'}</span>
+                  <span>Save</span>
                 </Button>
               </Tooltip>
             )}

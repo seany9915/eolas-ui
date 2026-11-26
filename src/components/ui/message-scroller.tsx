@@ -268,7 +268,11 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       if (vp) {
         const canScrollUp = vp.scrollTop > edgeThreshold;
         const canScrollDown = vp.scrollHeight - vp.scrollTop - vp.clientHeight > edgeThreshold;
-        setScrollable({ start: canScrollUp, end: canScrollDown });
+        setScrollable((prev) =>
+          prev.start === canScrollUp && prev.end === canScrollDown
+            ? prev
+            : { start: canScrollUp, end: canScrollDown }
+        );
       }
     });
 
@@ -287,7 +291,11 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
       const atBottom = !canScrollDown;
 
       setIsAtBottom(atBottom);
-      setScrollable({ start: canScrollUp, end: canScrollDown });
+      setScrollable((prev) =>
+        prev.start === canScrollUp && prev.end === canScrollDown
+          ? prev
+          : { start: canScrollUp, end: canScrollDown }
+      );
 
       if (atBottom) {
         setUnreadCount(0);

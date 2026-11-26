@@ -153,15 +153,18 @@ const CardComponent = React.forwardRef<HTMLDivElement, CardProps>(({
     affordanceStyles = '';
   }
 
+  const cardContextValue = React.useMemo<CardContextValue>(
+    () => ({
+      prominence: effectiveProminence,
+      invertedAccent: resolvedAccent,
+      isSelectable,
+      selected,
+    }),
+    [effectiveProminence, resolvedAccent, isSelectable, selected]
+  );
+
   return (
-    <CardContext.Provider
-      value={{
-        prominence: effectiveProminence,
-        invertedAccent: resolvedAccent,
-        isSelectable,
-        selected,
-      }}
-    >
+    <CardContext.Provider value={cardContextValue}>
       <div
         ref={ref}
         data-slot="card"

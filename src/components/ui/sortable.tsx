@@ -238,20 +238,21 @@ export interface SortableHandleProps extends React.ButtonHTMLAttributes<HTMLButt
 
 export const SortableHandle = React.forwardRef<HTMLButtonElement, SortableHandleProps>(
   (
-    { className, label = 'Reorder item', disabled: disabledProp, render, children, ...props },
+    { className, label = 'Reorder item', disabled: disabledProp, render, type, children, ...props },
     forwardedRef
   ) => {
     const { handleRef, disabled: itemDisabled } = useSortableItemContext();
     const disabled = Boolean(disabledProp ?? itemDisabled);
     const mergedHandleRef = useMergedRefs(handleRef, forwardedRef);
     const isNativeButton = resolveNativeButton(render);
+    const resolvedType = type ?? (isNativeButton !== false ? ('button' as const) : undefined);
 
     return useRender({
       defaultTagName: 'button',
       render,
       ref: mergedHandleRef,
       props: {
-        ...(isNativeButton ? { type: 'button' as const } : {}),
+        ...(resolvedType !== undefined ? { type: resolvedType } : {}),
         disabled,
         'aria-label': label,
         'data-slot': 'sortable-handle',

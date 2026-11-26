@@ -61,6 +61,10 @@ export interface AppShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   embedded?: boolean;
   /** When true, removes default main workspace padding (`p-4 @md:p-6`) for full-bleed child layouts such as `ListDetailBlock variant="flush"` or chat panes */
   flush?: boolean;
+  /** Resets scroll position (and optionally moves focus to `<main>`) whenever the key changes across route transitions */
+  scrollResetKey?: string | number;
+  /** Moves keyboard focus to `<main>` (`preventScroll: true`) when `scrollResetKey` changes; defaults to `true` (set `false` when binding `scrollResetKey` to tabs, filters, or pagination) */
+  focusMainOnReset?: boolean;
   /** Accessible label for the skip-to-content link. Defaults to 'Skip to content'. */
   skipToContentLabel?: string;
   /** Accessible label for the mobile bottom navigation landmark. */
@@ -152,6 +156,8 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       defaultOpen,
       embedded = false,
       flush = false,
+      scrollResetKey,
+      focusMainOnReset = true,
       skipToContentLabel = 'Skip to content',
       navigationBarLabel,
       closeSidebarLabel = 'Close navigation',
@@ -164,7 +170,26 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       destinations[0]?.id || ''
     );
     const rootRef = React.useRef<HTMLDivElement | null>(null);
+    const mainRef = React.useRef<HTMLElement | null>(null);
+    const attachMainRef = React.useCallback((node: HTMLElement | null) => {
+      mainRef.current = node;
+    }, []);
+    const prevScrollResetKeyRef = React.useRef(scrollResetKey);
     const sidebarTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+
+    React.useEffect(() => {
+      if (Object.is(prevScrollResetKeyRef.current, scrollResetKey)) return;
+      prevScrollResetKeyRef.current = scrollResetKey;
+      if (mainRef.current) {
+        mainRef.current.scrollTop = 0;
+      }
+      if (!embedded && typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+      if (focusMainOnReset) {
+        mainRef.current?.focus({ preventScroll: true });
+      }
+    }, [scrollResetKey, embedded, focusMainOnReset]);
     const focusRestoreRafRef = React.useRef<number | null>(null);
 
     const assignRefs = useMergedRefs(rootRef, ref);
@@ -431,8 +456,13 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             const MainTag = embedded ? 'div' : 'main';
             return (
               <MainTag
+                ref={attachMainRef}
                 id={!embedded ? 'main-content' : undefined}
-                tabIndex={!embedded ? -1 : undefined}
+                tabIndex={
+                  !embedded || (scrollResetKey !== undefined && focusMainOnReset)
+                    ? -1
+                    : undefined
+                }
                 data-slot="app-shell-main"
                 className={cn(
                   '@container flex-1 flex flex-col min-h-0 overflow-y-auto focus:outline-none',

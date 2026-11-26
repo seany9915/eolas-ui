@@ -782,8 +782,9 @@ export interface SidebarGroupActionProps extends React.ButtonHTMLAttributes<HTML
 }
 
 export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGroupActionProps>(
-  ({ className, render, ...props }, ref) => {
+  ({ className, render, type, ...props }, ref) => {
     const isNativeButton = resolveNativeButton(render);
+    const resolvedType = type ?? (isNativeButton !== false ? ('button' as const) : undefined);
     const classes = cn(
       'absolute end-3 top-2.5 flex size-7 items-center justify-center rounded p-0 text-on-surface-variant outline-none transition-transform motion-reduce:transition-none hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2 after:content-[\'\']',
       'group-data-[collapsible=icon]:hidden',
@@ -795,7 +796,7 @@ export const SidebarGroupAction = React.forwardRef<HTMLButtonElement, SidebarGro
       ref,
       defaultTagName: 'button',
       props: {
-        ...(isNativeButton ? { type: 'button' as const } : {}),
+        ...(resolvedType !== undefined ? { type: resolvedType } : {}),
         'data-slot': 'sidebar-group-action',
         'data-sidebar': 'group-action',
         className: classes,

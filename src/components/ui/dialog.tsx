@@ -37,6 +37,8 @@ export interface DialogProps<Payload = unknown> {
   onConfirm?: () => void;
   closeOnConfirm?: boolean;
   size?: DialogSize;
+  /** Removes popup padding; when paired with `size="fullscreen"`, renders an edge-to-edge `h-dvh` viewport modal without outer margins, border, or radius. Callers should still provide a visible or `sr-only` `<DialogTitle>`. */
+  flush?: boolean;
   scroll?: 'inside' | 'outside';
   footer?: React.ReactNode;
   initialFocus?: BaseDialog.Popup.Props['initialFocus'];
@@ -86,6 +88,7 @@ function DialogComponent<Payload = unknown>(rawProps: DialogProps<Payload>): Rea
     onConfirm,
     closeOnConfirm = true,
     size = 'md',
+    flush = false,
     scroll = 'inside',
     footer,
     initialFocus,
@@ -142,6 +145,7 @@ function DialogComponent<Payload = unknown>(rawProps: DialogProps<Payload>): Rea
           )}
           <DialogContent
             size={size}
+            flush={flush}
             scroll={scroll}
             showCloseButton={false}
             keepMounted={keepMounted}
@@ -222,6 +226,8 @@ const DialogContentContext = React.createContext<{ hasCloseButton: boolean }>({
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseDialog.Popup> {
   size?: DialogSize;
+  /** Removes popup padding; when paired with `size="fullscreen"`, renders an edge-to-edge `h-dvh` viewport modal without outer margins, border, or radius. Callers should still provide a visible or `sr-only` `<DialogTitle>`. */
+  flush?: boolean;
   scroll?: 'inside' | 'outside';
   showCloseButton?: boolean;
   keepMounted?: boolean;
@@ -232,8 +238,9 @@ export interface DialogContentProps
 
 // Standard composable compound slots
 export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
-  ({ className, children, size = 'md', scroll = 'inside', showCloseButton = true, keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => {
+  ({ className, children, size = 'md', flush = false, scroll = 'inside', showCloseButton = true, keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => {
     const isOutsideScroll = scroll === 'outside';
+    const isEdgeToEdge = flush && size === 'fullscreen';
     const contentContextValue = React.useMemo(
       () => ({ hasCloseButton: showCloseButton }),
       [showCloseButton]
@@ -251,7 +258,8 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
           data-slot="dialog-viewport"
           className={composeClassName(
             cn(
-              'fixed inset-0 z-50 p-4',
+              'fixed inset-0 z-50',
+              isEdgeToEdge ? 'p-0' : 'p-4',
               isOutsideScroll
                 ? 'overflow-y-auto flex min-h-full items-start justify-center'
                 : 'flex items-center justify-center'
@@ -264,9 +272,14 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
             data-slot="dialog-content"
             className={composeClassName(
               cn(
-                '@container relative w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-                isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
-                dialogSizeClasses[size] || dialogSizeClasses.md
+                isEdgeToEdge
+                  ? '@container relative w-full max-w-none h-dvh min-h-dvh max-h-dvh p-0 rounded-none bg-surface border-0 shadow-none overflow-y-auto overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none'
+                  : cn(
+                      '@container relative w-full rounded-lg bg-surface border border-outline-variant shadow-modal overscroll-contain transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+                      flush ? 'p-0' : 'p-6',
+                      isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
+                      dialogSizeClasses[size] || dialogSizeClasses.md
+                    )
               ),
               className
             )}

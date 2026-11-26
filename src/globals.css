@@ -1801,3 +1801,29 @@ select:autofill {
     color: contrast-color(var(--dynamic-bg, var(--surface)));
   }
 }
+
+/* 6. Print Pagination Safety: unclip flex/dvh AppShell and ScrollArea containers and hide fixed navigation chrome */
+@media print {
+  [data-slot="sidebar-wrapper"],
+  [data-slot="sidebar-inset"],
+  [data-slot="app-shell-main"],
+  [data-slot="scroll-area-viewport"] {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  [data-slot="sidebar"],
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-rail"],
+  [data-slot="navigation-bar"],
+  [data-slot="scroll-area-scrollbar"] {
+    display: none !important;
+  }
+
+  [data-slot="app-shell-header"] {
+    position: static !important;
+  }
+}
