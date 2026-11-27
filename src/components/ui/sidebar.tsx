@@ -323,6 +323,8 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   overlay?: boolean;
   /** Overrides `SidebarProvider`'s `mobileBehavior` for this sidebar (`'drawer' | 'hidden' | 'inline'`). */
   mobileBehavior?: SidebarMobileBehavior;
+  /** Removes outer sidebar and header borders so AppShell can render a continuous L-shaped chrome into a rounded main pane. */
+  seamless?: boolean;
 }
 
 export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
@@ -334,6 +336,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
       embedded,
       overlay = false,
       mobileBehavior,
+      seamless = false,
       className,
       children,
       ...props
@@ -369,10 +372,14 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           ref={ref}
           data-slot="sidebar"
           data-sidebar="sidebar"
+          data-seamless={seamless ? 'true' : undefined}
           className={cn(
-            'flex w-[var(--sidebar-width)] flex-col bg-surface border-e border-outline-variant text-on-surface',
+            'group peer flex w-[var(--sidebar-width)] flex-col bg-surface text-on-surface',
+            !seamless &&
+              (side === 'right'
+                ? 'border-s border-outline-variant'
+                : 'border-e border-outline-variant'),
             isEmbedded ? 'h-full' : 'h-dvh',
-            side === 'right' && 'border-e-0 border-s',
             className
           )}
           {...props}
@@ -455,6 +462,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
         data-collapsible={state === 'collapsed' ? collapsible : ''}
         data-variant={variant}
         data-side={side}
+        data-seamless={seamless ? 'true' : undefined}
       >
         {/* Layout gap spacer to keep document flow steady during transitions */}
         <div
@@ -483,9 +491,10 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
               ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]'
               : cn(
                   'bg-surface group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]',
-                  side === 'left'
-                    ? 'border-e border-outline-variant'
-                    : 'border-s border-outline-variant'
+                  !seamless &&
+                    (side === 'left'
+                      ? 'border-e border-outline-variant'
+                      : 'border-s border-outline-variant')
                 ),
             className,
             // Positioning placed after className so that isEmbedded absolute overrides any relative/static in className
@@ -584,7 +593,7 @@ export const SidebarRail = React.forwardRef<
       nativeButton={resolveNativeButton(render, nativeButton)}
       className={composeClassName(
         [
-          'absolute inset-y-0 z-20 hidden w-4 transition-[background-color,transform,inset-inline-start,inset-inline-end] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:start-0 after:w-[2px] group-data-[side=right]:after:start-auto group-data-[side=right]:after:end-0 hover:after:bg-outline group-data-[side=left]:start-full group-data-[side=right]:end-full cursor-ew-resize',
+          'absolute inset-y-0 group-data-[seamless=true]:top-20 short:group-data-[seamless=true]:top-18 z-20 hidden w-4 transition-[background-color,transform,inset-inline-start,inset-inline-end] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:start-0 after:w-[2px] group-data-[side=right]:after:start-auto group-data-[side=right]:after:end-0 hover:after:bg-outline group-data-[side=left]:start-full group-data-[side=right]:end-full cursor-ew-resize',
           desktopFlexClass,
           '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
           '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
@@ -621,7 +630,7 @@ export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
       props: {
         'data-slot': 'sidebar-inset',
         className: cn(
-          'relative flex flex-1 flex-col bg-background',
+          'relative flex flex-1 flex-col bg-background peer-data-[seamless=true]:bg-surface',
           isEmbedded ? 'min-h-0 h-full' : 'min-h-dvh',
           !isEmbedded && 'peer-data-[variant=inset]:min-h-[calc(100dvh-1rem)]',
           'md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
@@ -669,7 +678,7 @@ export const SidebarHeader = React.forwardRef<
       data-slot="sidebar-header"
       data-sidebar="header"
       className={cn(
-        'flex flex-col gap-2 px-2 py-1.5 short:py-1 shrink-0 border-b border-outline-variant bg-surface group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:items-center',
+        'flex flex-col gap-2 px-2 py-1.5 short:py-1 shrink-0 border-b border-outline-variant group-data-[seamless=true]:border-b-0 bg-surface group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:items-center',
         className
       )}
       {...props}

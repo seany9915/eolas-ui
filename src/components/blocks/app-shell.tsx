@@ -265,6 +265,10 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     const shouldShowMobileTrigger =
       showSidebarTriggerOnMobile ??
       Boolean(sidebarContent || sidebarFooter || destinations.length === 0);
+    const hasDockedSidebar =
+      showSidebar &&
+      sizeClass !== 'mobile' &&
+      !(effectiveCollapsible === 'offcanvas' && !sidebarOpen);
 
     const closeEmbeddedOverlay = React.useCallback(() => {
       setUserSidebarOpen(false);
@@ -341,6 +345,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
             collapsible={effectiveCollapsible}
             embedded={embedded}
             overlay={isEmbeddedMobileOverlay}
+            seamless={hasDockedSidebar}
           >
             {(sidebarHeader || isEmbeddedMobileOverlay) && (
               <Sidebar.Header className="min-h-16 short:min-h-14 justify-center">
@@ -390,7 +395,10 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           {/* Top App Bar */}
           <header
             data-slot="app-shell-header"
-            className="sticky top-0 z-20 flex items-center justify-between gap-3 px-4 py-0 min-h-16 short:min-h-14 bg-surface border-b border-outline-variant transition-colors duration-quick ease-standard motion-reduce:transition-none shrink-0"
+            className={cn(
+              'sticky top-0 z-20 flex items-center justify-between gap-3 px-4 py-0 min-h-16 short:min-h-14 bg-surface transition-colors duration-quick ease-standard motion-reduce:transition-none shrink-0',
+              !hasDockedSidebar && 'border-b border-outline-variant'
+            )}
           >
             <div
               className={cn(
@@ -464,7 +472,8 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 }
                 data-slot="app-shell-main"
                 className={cn(
-                  '@container flex-1 flex flex-col min-h-0 overflow-y-auto overscroll-contain focus:outline-none',
+                  '@container flex-1 flex flex-col min-h-0 overflow-y-auto overscroll-contain bg-background focus:outline-none',
+                  hasDockedSidebar && 'rounded-ss-lg border-t border-s border-outline-variant',
                   !embedded &&
                     destinations.length > 0 &&
                     (flush
