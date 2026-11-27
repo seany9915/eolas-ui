@@ -125,6 +125,20 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
         : { minWidth: '100%', ...contentPropStyle }
       : contentPropStyle;
 
+  const viewportPropStyle = viewportProps?.style;
+  const viewportAxisOverflow: React.CSSProperties | undefined =
+    orientation === 'vertical'
+      ? { overflowX: 'hidden', overflowY: 'scroll' }
+      : orientation === 'horizontal'
+        ? { overflowX: 'scroll', overflowY: 'hidden' }
+        : undefined;
+  const resolvedViewportStyle: React.ComponentPropsWithoutRef<typeof BaseScrollArea.Viewport>['style'] =
+    viewportAxisOverflow
+      ? typeof viewportPropStyle === 'function'
+        ? (state) => ({ ...viewportAxisOverflow, ...viewportPropStyle(state) })
+        : { ...viewportAxisOverflow, ...viewportPropStyle }
+      : viewportPropStyle;
+
   return (
     <BaseScrollArea.Root
       ref={ref}
@@ -144,6 +158,7 @@ const ScrollAreaComponent = React.forwardRef<HTMLDivElement, ScrollAreaProps>(({
         ref={viewportRef}
         data-slot="scroll-area-viewport"
         {...viewportProps}
+        style={resolvedViewportStyle}
         className={composeClassName(
           cn(
             VIEWPORT_BASE_CLASSES,

@@ -306,12 +306,11 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
         mobileBreakpoint={640}
         mobileBehavior={embedded ? 'inline' : 'drawer'}
         embedded={embedded}
+        data-app-shell={!embedded ? 'viewport' : undefined}
         className={cn(
           embedded
             ? 'relative overflow-hidden h-full min-h-0'
-            : flush
-              ? 'w-full h-dvh min-h-0 overflow-hidden'
-              : 'w-full min-h-svh',
+            : 'w-full h-dvh min-h-0 overflow-hidden',
           className
         )}
         {...props}
@@ -385,7 +384,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           inert={isOverlayActive}
           className={cn(
             'flex flex-col flex-1 min-w-0',
-            flush && !embedded && 'h-full min-h-0'
+            !embedded && 'h-full min-h-0'
           )}
         >
           {/* Top App Bar */}
@@ -465,7 +464,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 }
                 data-slot="app-shell-main"
                 className={cn(
-                  '@container flex-1 flex flex-col min-h-0 overflow-y-auto focus:outline-none',
+                  '@container flex-1 flex flex-col min-h-0 overflow-y-auto overscroll-contain focus:outline-none',
                   !embedded &&
                     destinations.length > 0 &&
                     (flush

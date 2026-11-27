@@ -247,7 +247,16 @@ export const CarouselContent = React.forwardRef<
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div ref={carouselRef} data-slot="carousel-content" className="overflow-hidden p-1 -m-1">
+    <div
+      ref={carouselRef}
+      data-slot="carousel-content"
+      className={cn(
+        'overflow-hidden p-1 -m-1',
+        orientation === 'horizontal'
+          ? 'touch-pan-y touch-pinch-zoom'
+          : 'touch-pan-x touch-pinch-zoom'
+      )}
+    >
       <div
         ref={ref}
         className={cn(

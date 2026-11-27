@@ -130,7 +130,7 @@ export const SwipeRevealAction = React.forwardRef<HTMLButtonElement, SwipeReveal
         tabIndex={tabIndex ?? (isRevealed ? 0 : -1)}
         aria-hidden={ariaHiddenProp ?? (!isRevealed ? true : undefined)}
         className={cn(
-          'min-w-[48px] min-h-[44px] px-4 flex items-center justify-center font-label text-sm font-semibold cursor-pointer select-none',
+          'min-w-[48px] min-h-[44px] px-4 flex items-center justify-center font-label text-sm font-semibold cursor-pointer select-none touch-manipulation active:brightness-90',
           'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary transition-colors duration-[var(--duration-quick)] motion-reduce:transition-none',
           'disabled:opacity-40 disabled:cursor-not-allowed',
           variantStyles[variant],
@@ -340,7 +340,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
                     aria-controls={toggleControlsId}
                     aria-label={toggleLabel}
                     onClick={handleToggleActions}
-                    className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded text-on-surface-variant hover:text-on-surface hover:bg-state-hover cursor-pointer transition-colors duration-[var(--duration-quick)] motion-reduce:transition-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="shrink-0 me-1 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation cursor-pointer transition-colors duration-[var(--duration-quick)] motion-reduce:transition-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Icon name={isOpen ? 'close' : 'more_vert'} size="sm" aria-hidden="true" />
                   </BaseButton>
@@ -356,7 +356,7 @@ const SwipeRevealComponent = React.forwardRef<HTMLDivElement, SwipeRevealProps>(
                     aria-controls={toggleControlsId}
                     aria-label={toggleLabel}
                     onClick={handleToggleActions}
-                    className="sr-only focus:not-sr-only focus:absolute focus:end-2 focus:top-1/2 focus:-translate-y-1/2 focus:z-20 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded bg-surface text-on-surface shadow-ambient cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="sr-only focus:not-sr-only focus:absolute focus:end-2 focus:top-1/2 focus:-translate-y-1/2 focus:z-20 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded bg-surface text-on-surface shadow-ambient active:bg-surface-container-high touch-manipulation cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Icon name={isOpen ? 'close' : 'more_vert'} size="sm" aria-hidden="true" />
                   </BaseButton>

@@ -33,6 +33,7 @@ Never erode component APIs, strip `ref` / `render` props, drop compound subcompo
 | Color/type/spacing/motion tokens & component specs | project-root `DESIGN.md` |
 | Adding/installing registry items via shadcn CLI | `shadcn` CLI (`npx shadcn@latest add @eolas/...`) — **never** use generic shadcn/Lucide styling patterns; always follow `DESIGN.md` + `design-system.md` |
 | Responsive layout, RTL/i18n spacing, or worst-case UI stress testing | `better-layout` / `break-ui` skills |
+| Mobile/tablet touch feel or drag/swipe gesture primitives | `mobile-native` / `gestures` skills (always obey `DESIGN.md` motion restraint & WCAG 2.5.1 fallbacks) |
 | Motion implementation / tuning | `DESIGN.md` Motion section + `src/globals.css` & `src/components/ui/` motion primitives |
 | Live a11y/browser debugging | `a11y-debugging` / `chrome-devtools` skills + Chrome DevTools MCP |
 | Plain-English / patient / Easy Read / GDPR copy | `govuk-style` / `patient-communication` / `easy-read` / `gdpr-data-handling` skills |

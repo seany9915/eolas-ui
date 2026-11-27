@@ -90,15 +90,31 @@ function useIsMobile(breakpoint = 768) {
 
 function getDesktopBreakpointClasses(mobileBreakpoint: number) {
   if (mobileBreakpoint <= 640) {
-    return { block: 'hidden sm:block', flex: 'hidden sm:flex', railFlex: 'sm:flex' };
+    return {
+      block: 'hidden sm:block',
+      flex: 'hidden sm:flex',
+      railFlex: '[@media(any-hover:hover)_and_(any-pointer:fine)]:sm:flex',
+    };
   }
   if (mobileBreakpoint >= 1280) {
-    return { block: 'hidden xl:block', flex: 'hidden xl:flex', railFlex: 'xl:flex' };
+    return {
+      block: 'hidden xl:block',
+      flex: 'hidden xl:flex',
+      railFlex: '[@media(any-hover:hover)_and_(any-pointer:fine)]:xl:flex',
+    };
   }
   if (mobileBreakpoint >= 1024) {
-    return { block: 'hidden lg:block', flex: 'hidden lg:flex', railFlex: 'lg:flex' };
+    return {
+      block: 'hidden lg:block',
+      flex: 'hidden lg:flex',
+      railFlex: '[@media(any-hover:hover)_and_(any-pointer:fine)]:lg:flex',
+    };
   }
-  return { block: 'hidden md:block', flex: 'hidden md:flex', railFlex: 'md:flex' };
+  return {
+    block: 'hidden md:block',
+    flex: 'hidden md:flex',
+    railFlex: '[@media(any-hover:hover)_and_(any-pointer:fine)]:md:flex',
+  };
 }
 
 const SidebarSideContext = React.createContext<'left' | 'right'>('left');
@@ -280,7 +296,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
             }
             className={cn(
               'group/sidebar-wrapper flex w-full has-[[data-variant=inset]]:bg-surface',
-              isEmbedded ? 'h-full min-h-0' : 'min-h-svh',
+              isEmbedded ? 'h-full min-h-0' : 'min-h-dvh',
               className
             )}
             ref={ref}
@@ -355,7 +371,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           data-sidebar="sidebar"
           className={cn(
             'flex w-[var(--sidebar-width)] flex-col bg-surface border-e border-outline-variant text-on-surface',
-            isEmbedded ? 'h-full' : 'h-svh',
+            isEmbedded ? 'h-full' : 'h-dvh',
             side === 'right' && 'border-e-0 border-s',
             className
           )}
@@ -389,7 +405,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                 data-slot="sidebar-popup"
                 className={composeClassName(
                   [
-                    'w-[var(--sidebar-width-mobile)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-y-auto outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                    'w-[var(--sidebar-width-mobile,18rem)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-hidden outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
                     side === 'right' ? 'border-s-2 border-outline-variant' : 'border-e-2 border-outline-variant',
                     physicalSide === 'right'
                       ? 'data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
@@ -398,7 +414,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                   className
                 )}
               >
-                <BaseDrawer.Content className="h-full flex flex-col justify-between">
+                <BaseDrawer.Content className="h-full min-h-0 flex flex-col justify-between">
                   <BaseDrawer.Title className="sr-only">Sidebar Navigation</BaseDrawer.Title>
                   <BaseDrawer.Description className="sr-only">
                     Application navigation sidebar
@@ -408,7 +424,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                     data-slot="sidebar"
                     data-sidebar="sidebar"
                     data-mobile="true"
-                    className="flex size-full flex-col bg-surface"
+                    className="flex size-full min-h-0 flex-col bg-surface"
                     {...props}
                   >
                     <SidebarSideContext.Provider value={side}>{children}</SidebarSideContext.Provider>
@@ -445,7 +461,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           data-slot="sidebar-gap"
           className={cn(
             'duration-[var(--duration-slow)] relative w-[var(--sidebar-width)] bg-transparent transition-[width] ease-[var(--ease-standard)] motion-reduce:transition-none',
-            isEmbedded ? 'h-full' : 'h-svh',
+            isEmbedded ? 'h-full' : 'h-dvh',
             overlay && 'w-0',
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
@@ -479,7 +495,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                   overlay ? 'z-30 shadow-modal' : 'z-20',
                   asideVisibilityClass
                 )
-              : cn('fixed inset-y-0 z-20 flex-col h-svh w-[var(--sidebar-width)]', asideVisibilityClass)
+              : cn('fixed inset-y-0 z-20 flex-col h-dvh w-[var(--sidebar-width)]', asideVisibilityClass)
           )}
           {...props}
         >
@@ -568,13 +584,13 @@ export const SidebarRail = React.forwardRef<
       nativeButton={resolveNativeButton(render, nativeButton)}
       className={composeClassName(
         [
-          'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 rtl:translate-x-1/2 transition-[background-color,transform,inset-inline-start,inset-inline-end] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-outline group-data-[side=left]:-end-4 group-data-[side=right]:start-0 cursor-ew-resize',
+          'absolute inset-y-0 z-20 hidden w-4 transition-[background-color,transform,inset-inline-start,inset-inline-end] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none after:absolute after:inset-y-0 after:start-0 after:w-[2px] group-data-[side=right]:after:start-auto group-data-[side=right]:after:end-0 hover:after:bg-outline group-data-[side=left]:start-full group-data-[side=right]:end-full cursor-ew-resize',
           desktopFlexClass,
           '[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize',
           '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-          'hover:group-data-[collapsible=offcanvas]:bg-surface group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:start-full',
-          '[[data-side=left][data-collapsible=offcanvas]_&]:-end-2',
-          '[[data-side=right][data-collapsible=offcanvas]_&]:-start-2',
+          'hover:group-data-[collapsible=offcanvas]:bg-surface',
+          '[[data-side=left][data-collapsible=offcanvas]_&]:start-full',
+          '[[data-side=right][data-collapsible=offcanvas]_&]:end-full',
         ],
         className
       )}
@@ -606,8 +622,8 @@ export const SidebarInset = React.forwardRef<HTMLElement, SidebarInsetProps>(
         'data-slot': 'sidebar-inset',
         className: cn(
           'relative flex flex-1 flex-col bg-background',
-          isEmbedded ? 'min-h-0 h-full' : 'min-h-svh',
-          !isEmbedded && 'peer-data-[variant=inset]:min-h-[calc(100svh-1rem)]',
+          isEmbedded ? 'min-h-0 h-full' : 'min-h-dvh',
+          !isEmbedded && 'peer-data-[variant=inset]:min-h-[calc(100dvh-1rem)]',
           'md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ms-2 md:peer-data-[variant=inset]:ms-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-outline-variant',
           className
         ),
@@ -756,9 +772,9 @@ export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLDivElem
 export const SidebarGroupLabel = React.forwardRef<HTMLDivElement, SidebarGroupLabelProps>(
   ({ className, render, ...props }, ref) => {
     const classes = cn(
-      'duration-[var(--duration-fast)] flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-semibold font-label text-on-surface-variant select-none outline-none transition-[margin,opacity] ease-[var(--ease-standard)] motion-reduce:transition-none',
+      'duration-[var(--duration-fast)] flex h-8 max-w-full overflow-hidden shrink-0 items-center rounded-md px-2 text-xs font-semibold font-label text-on-surface-variant select-none outline-none transition-[margin,opacity] ease-[var(--ease-standard)] motion-reduce:transition-none',
       '[&>svg]:size-4 [&>svg]:shrink-0 [&>.material-symbols-outlined]:text-base [&>.material-symbols-outlined]:shrink-0',
-      'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:pointer-events-none',
+      'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:pointer-events-none',
       className
     );
 
@@ -892,7 +908,7 @@ export function sidebarMenuButtonVariants({
   }[variant];
 
   return cn(
-    'peer/menu-button relative flex w-full items-center rounded font-label transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none outline-none select-none cursor-pointer',
+    'peer/menu-button relative flex w-full items-center rounded font-label transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none outline-none select-none touch-manipulation active:bg-state-hover cursor-pointer',
     // Focus indicator: Floating 2px outer outline (WCAG 2.2 SC 2.4.7)
     'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
     'disabled:pointer-events-none disabled:opacity-50',
@@ -902,7 +918,7 @@ export function sidebarMenuButtonVariants({
     'data-[active=true]:[&>svg]:text-primary data-[active=true]:[&>.material-symbols-outlined]:text-primary hover:[&>svg]:text-on-surface hover:[&>.material-symbols-outlined]:text-on-surface',
     sizeClasses,
     'group-data-[collapsible=icon]:size-11 group-data-[collapsible=icon]:min-h-[44px] group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center',
-    '[&>span:not(.material-symbols-outlined):last-child]:truncate [&>span:not(.material-symbols-outlined)]:group-data-[collapsible=icon]:hidden',
+    '[&>span:not(.material-symbols-outlined):last-child]:truncate [&>span:not(.material-symbols-outlined)]:group-data-[collapsible=icon]:sr-only',
     'has-[+[data-slot=sidebar-menu-badge]]:pe-9 group-data-[collapsible=icon]:has-[+[data-slot=sidebar-menu-badge]]:pe-0',
     variantClasses,
     className
@@ -995,14 +1011,14 @@ export interface SidebarMenuActionProps
 export const SidebarMenuAction = React.forwardRef<HTMLButtonElement, SidebarMenuActionProps>(
   ({ className, showOnHover = false, render, nativeButton, children, ...props }, ref) => {
     const baseClasses = cn(
-      'absolute end-1 top-2 flex aspect-square w-7 items-center justify-center rounded p-0 text-on-surface-variant outline-none transition-transform motion-reduce:transition-none hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
+      'absolute end-1 top-2 flex aspect-square w-7 items-center justify-center rounded p-0 text-on-surface-variant outline-none touch-manipulation transition-transform motion-reduce:transition-none hover:bg-state-hover hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary',
       'after:absolute after:-inset-2 after:content-[\'\']',
       'peer-data-[size=sm]/menu-button:top-1',
       'peer-data-[size=default]/menu-button:top-1.5',
       'peer-data-[size=lg]/menu-button:top-2',
       'group-data-[collapsible=icon]:hidden',
       showOnHover &&
-        'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[popup-open]:opacity-100 md:opacity-0 transition-opacity motion-reduce:transition-none'
+        'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[popup-open]:opacity-100 [@media(hover:hover)_and_(pointer:fine)]:opacity-0 transition-opacity motion-reduce:transition-none'
     );
 
     return (

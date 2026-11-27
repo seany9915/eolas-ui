@@ -91,9 +91,9 @@ export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string
   left:
     '@container w-full max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   down:
-    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   up:
-    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
 };
 
 // Visual grab handle pill
@@ -102,7 +102,7 @@ export const DrawerHandlePill = React.forwardRef<HTMLDivElement, React.HTMLAttri
     <div
       ref={ref}
       className={cn(
-        'mx-auto my-3 h-1.5 w-12 rounded-full bg-outline-variant shrink-0 select-none cursor-grab',
+        'mx-auto my-3 h-1.5 w-12 rounded-full bg-outline-variant shrink-0 select-none touch-none cursor-grab',
         className
       )}
       aria-hidden="true"
@@ -127,7 +127,7 @@ export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerClose
         render
           ? className
           : composeClassName(
-              'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
+              'size-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:bg-state-hover active:bg-surface-container-high active:opacity-80 touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer',
               className
             )
       }
@@ -301,7 +301,7 @@ export const DrawerPopup = React.forwardRef<
   } = React.useContext(DrawerContext);
   const mergedRef = popupRef ? mergeDrawerRefs(popupRef, ref) : ref;
   const baseClasses = cn(
-    'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto will-change-[transform]',
+    'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto has-[[data-slot=drawer-body]]:overflow-hidden will-change-[transform]',
     drawerPopupClasses[swipeDirection ?? contextDirection]
   );
   return (
@@ -323,7 +323,7 @@ export const DrawerContent = React.forwardRef<
   <BaseDrawer.Content
     ref={ref}
     data-slot="drawer-content"
-    className={composeClassName('flex flex-col justify-between h-full', className)}
+    className={composeClassName('flex flex-col justify-between h-full min-h-0', className)}
     {...props}
   />
 ));

@@ -179,14 +179,14 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
                       ? `${labelText} thumb ${thumbIndex + 1}`
                       : `Slider value ${thumbIndex + 1}`
                 }
-                className="relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+                className="relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
               />
             ))
           ) : (
             <BaseSlider.Thumb
               data-slot="slider-thumb"
               aria-label={!label && !props['aria-labelledby'] ? (props['aria-label'] ?? 'Slider value') : undefined}
-              className="relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+              className="relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
             />
           )}
         </BaseSlider.Track>
@@ -297,7 +297,7 @@ export const SliderThumb = React.forwardRef<
     ref={ref}
     data-slot="slider-thumb"
     className={composeClassName(
-      "relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
+      "relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
       className
     )}
     {...props}

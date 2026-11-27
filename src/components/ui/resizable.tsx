@@ -109,9 +109,11 @@ export const ResizableHandle = React.forwardRef<
         // Vertical Separator (Horizontal Layout: panels placed side-by-side)
         'h-full w-px cursor-col-resize [&[aria-orientation=vertical]]:w-px [&[aria-orientation=vertical]]:cursor-col-resize',
         'after:absolute after:inset-y-0 after:left-1/2 after:w-6 pointer-coarse:after:w-11 after:-translate-x-1/2 after:content-[\'\']',
+        'before:pointer-events-none before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-0.5 before:bg-primary before:opacity-0 before:transition-opacity before:duration-quick before:motion-reduce:transition-none data-[separator=active]:before:opacity-100',
         // Horizontal Separator (Vertical Layout: panels stacked vertically)
         '[&[aria-orientation=horizontal]]:h-px [&[aria-orientation=horizontal]]:w-full [&[aria-orientation=horizontal]]:cursor-row-resize',
         '[&[aria-orientation=horizontal]]:after:inset-x-0 [&[aria-orientation=horizontal]]:after:inset-y-auto [&[aria-orientation=horizontal]]:after:left-0 [&[aria-orientation=horizontal]]:after:top-1/2 [&[aria-orientation=horizontal]]:after:h-6 [&[aria-orientation=horizontal]]:pointer-coarse:after:h-11 [&[aria-orientation=horizontal]]:after:w-full [&[aria-orientation=horizontal]]:after:translate-x-0 [&[aria-orientation=horizontal]]:after:-translate-y-1/2',
+        '[&[aria-orientation=horizontal]]:before:inset-x-0 [&[aria-orientation=horizontal]]:before:inset-y-auto [&[aria-orientation=horizontal]]:before:left-0 [&[aria-orientation=horizontal]]:before:top-1/2 [&[aria-orientation=horizontal]]:before:translate-x-0 [&[aria-orientation=horizontal]]:before:-translate-y-1/2 [&[aria-orientation=horizontal]]:before:w-full [&[aria-orientation=horizontal]]:before:h-0.5',
         className
       )}
       {...props}

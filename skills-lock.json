@@ -25,6 +25,12 @@
       "skillPath": "skills/find-animation-opportunities/SKILL.md",
       "computedHash": "cf6fab655f95a99dbf438ee0ebcf17cf7e1cf4700ee83b3ff4f9fe131f05dd47"
     },
+    "gestures": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/gestures/SKILL.md",
+      "computedHash": "f701935046c6d5f122a3977968c49b3aeed432f9746e098950336d33a66b3c18"
+    },
     "improve-animations": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -36,6 +42,12 @@
       "sourceType": "github",
       "skillPath": "skills/make-interfaces-feel-better/SKILL.md",
       "computedHash": "ee95073d274bd8f792f917a2b2c2963d46c1b31c81723e6ef3c63ffe33bd681c"
+    },
+    "mobile-native": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mobile-native/SKILL.md",
+      "computedHash": "5a848356e54c9aea29faade0d39589ff5ffc609207c403706795783b41d670b4"
     },
     "review-animations": {
       "source": "emilkowalski/skills",

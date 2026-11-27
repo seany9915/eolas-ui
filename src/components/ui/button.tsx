@@ -111,13 +111,13 @@ const outlinedStyles: Record<ButtonColorRole, string> = {
 };
 
 const textStyles: Record<ButtonColorRole, string> = {
-  primary: 'bg-transparent text-primary hover:bg-primary-container/30 inverted:text-primary-container inverted:hover:bg-primary-container/15',
-  secondary: 'bg-transparent text-secondary hover:bg-secondary-container/30 inverted:text-secondary-container inverted:hover:bg-secondary-container/15',
-  tertiary: 'bg-tertiary-container text-on-tertiary-container hover:brightness-95 active:brightness-90 inverted:bg-transparent inverted:text-tertiary inverted:hover:bg-tertiary/15', // container pill fallback on light surfaces; amber text on dark inverted surfaces
-  error: 'bg-transparent text-error hover:bg-error-container/30 inverted:text-error-container inverted:hover:bg-error-container/15',
-  warning: 'bg-transparent text-warning hover:bg-warning-container/30 inverted:text-warning-container inverted:hover:bg-warning-container/15',
-  success: 'bg-transparent text-success hover:bg-success-container/30 inverted:text-success-container inverted:hover:bg-success-container/15',
-  neutral: 'bg-transparent text-on-surface hover:bg-state-hover inverted:text-on-neutral inverted:hover:bg-surface/10',
+  primary: 'bg-transparent text-primary hover:bg-primary-container/30 active:bg-primary-container/50 active:opacity-80 inverted:text-primary-container inverted:hover:bg-primary-container/15 inverted:active:bg-primary-container/25',
+  secondary: 'bg-transparent text-secondary hover:bg-secondary-container/30 active:bg-secondary-container/50 active:opacity-80 inverted:text-secondary-container inverted:hover:bg-secondary-container/15 inverted:active:bg-secondary-container/25',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container hover:brightness-95 active:brightness-90 inverted:bg-transparent inverted:text-tertiary inverted:hover:bg-tertiary/15 inverted:active:bg-tertiary/25', // container pill fallback on light surfaces; amber text on dark inverted surfaces
+  error: 'bg-transparent text-error hover:bg-error-container/30 active:bg-error-container/50 active:opacity-80 inverted:text-error-container inverted:hover:bg-error-container/15 inverted:active:bg-error-container/25',
+  warning: 'bg-transparent text-warning hover:bg-warning-container/30 active:bg-warning-container/50 active:opacity-80 inverted:text-warning-container inverted:hover:bg-warning-container/15 inverted:active:bg-warning-container/25',
+  success: 'bg-transparent text-success hover:bg-success-container/30 active:bg-success-container/50 active:opacity-80 inverted:text-success-container inverted:hover:bg-success-container/15 inverted:active:bg-success-container/25',
+  neutral: 'bg-transparent text-on-surface hover:bg-state-hover active:bg-surface-container-high active:opacity-80 inverted:text-on-neutral inverted:hover:bg-surface/10 inverted:active:bg-surface/20',
 };
 
 export interface ButtonVariantsProps {
@@ -148,7 +148,7 @@ export function buttonVariants({
 
   if (normalizedVariant === 'unstyled') {
     return cn(
-      'cursor-pointer select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-50 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'cursor-pointer select-none touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-50 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       expandedTouchTarget && 'touch-target-expanded',
       className
     );

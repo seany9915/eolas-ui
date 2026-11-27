@@ -23,6 +23,8 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 
 ### Interaction, Focus & Accessibility
 - **Banned: Hover-only actions or pointer-only drag-and-drop** → **Use:** `:focus-within`, persistent visible touch controls, and keyboard move actions.
+- **Banned: Width-based hover reveals (`md:opacity-0`) or primary `(pointer: coarse)` React branching that breaks hybrid iPads** → **Use:** `[@media(hover:hover)_and_(pointer:fine)]` / `[@media(any-hover:hover)_and_(any-pointer:fine)]` CSS capability queries, and keep `<Tooltip>` mounted (`mouseOnly` + `:focus-visible`).
+- **Banned: `touch-pan-*` on generic `ScrollArea`, bare `touch-pan-y` without `touch-pinch-zoom`, `-webkit-touch-callout: none` on `<a>`, or dual scroll owners (`min-h-svh` shell + `overflow-y-auto` `<main>`)** → **Use:** Cross-axis `overflow-*-hidden` on `ScrollArea`, `touch-pan-* touch-pinch-zoom` on JS carousels, `touch-none` only on dedicated drag handles, `-webkit-touch-callout: none` strictly on buttons, and a single bounded `h-dvh` scroll owner.
 - **Banned: Focus vs. selection ambiguity** (`outline-offset: 0` on selectable containers) → **Use:** Floating `outline-offset: 2px` for focus; flush `2px` border + surface wash for selection.
 - **Banned: Unlabelled inputs or placeholder-only labels** → **Use:** `<FieldGroup>` + `<Field>` + `<FieldLabel>` (and `<FieldDescription>`/`<FieldError>`).
 - **Banned: Trigger downgrades (`render={<span />}`)** → **Use:** Real `<button>` triggers ("Behavior Wraps the Line").

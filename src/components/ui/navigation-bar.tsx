@@ -84,7 +84,7 @@ export const NavigationBarRoot = React.forwardRef<HTMLElement, NavigationBarProp
         'data-slot': 'navigation-bar',
         className: cn(
           'w-full bg-surface border-t border-outline-variant flex items-center justify-evenly gap-1 px-2 py-1.5 select-none',
-          fixed ? 'fixed bottom-0 inset-x-0 z-30 pb-[max(0.5rem,env(safe-area-inset-bottom))]' : 'relative',
+          fixed ? 'fixed bottom-0 inset-x-0 z-30 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pl-[max(0.5rem,env(safe-area-inset-left,0px))] pr-[max(0.5rem,env(safe-area-inset-right,0px))]' : 'relative',
           className
         ),
         children,
@@ -163,7 +163,7 @@ export const NavigationBarItem = React.forwardRef<HTMLButtonElement, NavigationB
           onClick={handleClick}
           className={composeClassName(
             cn(
-              'group relative flex-1 max-w-28 flex flex-col items-center justify-center min-h-11 min-w-11 py-1 px-1.5 rounded',
+              'group relative flex-1 max-w-28 flex flex-col items-center justify-center min-h-11 min-w-11 py-1 px-1.5 rounded touch-manipulation',
               'cursor-pointer transition-[color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
               'active:scale-[var(--scale-large)] motion-reduce:active:scale-100 motion-reduce:transition-none',
               'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',

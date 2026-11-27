@@ -206,6 +206,7 @@
 
 /* Document-level overscroll containment, sticky anchor clearance & motion rules (Good CSS #45, #46) */
 html {
+  -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none;
   scroll-padding-block-start: calc(var(--header-height, 4rem) + 1rem);
   scroll-padding-block-end: calc(var(--footer-height, 4rem) + 1rem);
@@ -215,6 +216,13 @@ html {
   html {
     overscroll-behavior-y: auto;
   }
+}
+
+/* Lock root scroll and rubber-banding when a full-viewport AppShell owns scrolling */
+html:has([data-app-shell="viewport"]),
+body:has([data-app-shell="viewport"]) {
+  overscroll-behavior: none;
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -315,11 +323,19 @@ html {
     display: none;
   }
 
-  /* Prevent text selection highlight during rapid control activation (Good CSS #01) */
+  /* Eliminate 300ms double-tap delay on interactive controls & links without blocking pinch-zoom */
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection & callout highlight on buttons/controls (keep native link preview on <a>) */
   button,
   [role="button"] {
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 }
 
@@ -1407,6 +1423,7 @@ select:autofill {
 /* Swipe-to-reveal scroll container & initial target (MWG: swipe-to-reveal) */
 .swipe-reveal-scroller {
   overscroll-behavior: auto;
+  overscroll-behavior: chain;
 }
 
 .swipe-reveal-content {
@@ -1804,6 +1821,11 @@ select:autofill {
 
 /* 6. Print Pagination Safety: unclip flex/dvh AppShell and ScrollArea containers and hide fixed navigation chrome */
 @media print {
+  html,
+  body {
+    overflow: visible !important;
+  }
+
   [data-slot="sidebar-wrapper"],
   [data-slot="sidebar-inset"],
   [data-slot="app-shell-main"],

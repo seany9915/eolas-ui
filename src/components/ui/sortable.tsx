@@ -25,6 +25,7 @@ import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
  * TAXONOMY / USAGE:
  * - Reorderable task queues, care plans, priority lists, and multi-column boards.
  * - Supports pointer, touch, and keyboard reordering (`Space`/`Enter` + Arrow keys) out of the box.
+ * - Always pair `<Sortable.Handle />` (which scopes `touch-none` to the 44px drag handle) on touch lists rather than marking entire scrollable rows `touch-none`.
  * - Pair `<Sortable.Handle />` with visible move up/down `<Button />` controls for complex lists (WCAG 2.2 AA).
  */
 
@@ -259,7 +260,7 @@ export const SortableHandle = React.forwardRef<HTMLButtonElement, SortableHandle
         className: cn(
           'inline-flex size-11 shrink-0 items-center justify-center rounded text-on-surface-variant',
           'cursor-grab active:cursor-grabbing touch-none select-none',
-          'hover:bg-state-hover hover:text-on-surface',
+          'hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:text-on-surface',
           'transition-[background-color,color] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           'disabled:cursor-not-allowed disabled:opacity-40',
