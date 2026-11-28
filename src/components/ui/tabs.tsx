@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
-import { cn, useMergedRefs } from '@/lib/utils';
+import { cn, resolveNativeButton, useMergedRefs } from '@/lib/utils';
 import { Icon } from './icon';
 import { useHorizontalScrollFade } from '@/lib/use-horizontal-scroll-fade';
 
@@ -51,6 +51,7 @@ interface TabsContextValue {
   size: TabsSize;
   orientation: 'horizontal' | 'vertical';
   showIndicator: boolean;
+  bordered: boolean;
 }
 
 const TabsContext = React.createContext<TabsContextValue>({
@@ -59,6 +60,7 @@ const TabsContext = React.createContext<TabsContextValue>({
   size: 'md',
   orientation: 'horizontal',
   showIndicator: true,
+  bordered: true,
 });
 
 export interface TabsRootProps<Value extends TabValue = TabValue>
@@ -71,6 +73,7 @@ export interface TabsRootProps<Value extends TabValue = TabValue>
   colorRole?: TabsColorRole;
   size?: TabsSize;
   showIndicator?: boolean;
+  bordered?: boolean;
 }
 
 export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>>(
@@ -81,6 +84,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
       size = 'md',
       orientation = 'horizontal',
       showIndicator = true,
+      bordered = true,
       children,
       className,
       value,
@@ -91,8 +95,8 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps<TabValue>
     ref
   ) => {
     const tabsContextValue = React.useMemo(
-      () => ({ variant, colorRole, size, orientation, showIndicator }),
-      [variant, colorRole, size, orientation, showIndicator]
+      () => ({ variant, colorRole, size, orientation, showIndicator, bordered }),
+      [variant, colorRole, size, orientation, showIndicator, bordered]
     );
     return (
       <TabsContext.Provider value={tabsContextValue}>
@@ -125,6 +129,8 @@ export interface TabsListProps extends React.ComponentPropsWithoutRef<typeof Bas
   colorRole?: TabsColorRole;
   size?: TabsSize;
   showIndicator?: boolean;
+  bordered?: boolean;
+  renderBeforeHydration?: boolean;
   indicatorClassName?: string;
 }
 
@@ -138,6 +144,8 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       colorRole,
       size,
       showIndicator,
+      bordered,
+      renderBeforeHydration = false,
       indicatorClassName,
       className,
       ...props
@@ -149,6 +157,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
     const effectiveColorRole = colorRole ?? parentContext.colorRole ?? 'primary';
     const effectiveSize = size ?? parentContext.size ?? 'md';
     const effectiveShowIndicator = showIndicator ?? parentContext.showIndicator ?? true;
+    const effectiveBordered = bordered ?? parentContext.bordered ?? true;
     const isPills = effectiveVariant === 'pills' || effectiveVariant === 'pill';
     const isContained =
       effectiveVariant === 'contained' ||
@@ -179,6 +188,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
         size: effectiveSize,
         orientation: parentContext.orientation,
         showIndicator: effectiveShowIndicator,
+        bordered: effectiveBordered,
       }),
       [
         effectiveVariant,
@@ -186,6 +196,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
         effectiveSize,
         parentContext.orientation,
         effectiveShowIndicator,
+        effectiveBordered,
       ]
     );
 
@@ -206,10 +217,15 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
                   : isPills
                     ? 'p-1 -m-1 gap-1.5 w-max max-w-full overflow-x-auto scrollbar-none select-none data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
                     : cn(
-                        'gap-1 border-outline-variant overflow-x-auto overflow-y-hidden pt-1 -mt-1 px-1 -mx-1 scrollbar-none select-none',
+                        'gap-1 overflow-x-auto overflow-y-hidden scrollbar-none select-none',
                         enableScrollFade && 'scroll-fade-x',
-                        'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:border-b data-[orientation=horizontal]:w-full',
-                        'data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-e data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch'
+                        'data-[orientation=horizontal]:flex-row data-[orientation=horizontal]:w-full',
+                        'data-[orientation=vertical]:flex-col data-[orientation=vertical]:w-max data-[orientation=vertical]:items-stretch',
+                        effectiveBordered &&
+                          cn(
+                            "data-[orientation=horizontal]:before:content-[''] data-[orientation=horizontal]:before:pointer-events-none data-[orientation=horizontal]:before:absolute data-[orientation=horizontal]:before:inset-x-0 data-[orientation=horizontal]:before:bottom-0 data-[orientation=horizontal]:before:h-px data-[orientation=horizontal]:before:bg-outline-variant forced-colors:data-[orientation=horizontal]:before:bg-[CanvasText]",
+                            "data-[orientation=vertical]:before:content-[''] data-[orientation=vertical]:before:pointer-events-none data-[orientation=vertical]:before:absolute data-[orientation=vertical]:before:inset-y-0 data-[orientation=vertical]:before:end-0 data-[orientation=vertical]:before:w-px data-[orientation=vertical]:before:bg-outline-variant forced-colors:data-[orientation=vertical]:before:bg-[CanvasText]"
+                          )
                       ),
               typeof className === 'function' ? className(state) : className
             )
@@ -221,6 +237,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             isContained ? (
               <BaseTabs.Indicator
                 data-slot="tabs-indicator"
+                renderBeforeHydration={renderBeforeHydration}
                 className={cn(
                   'absolute rounded-sm z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
@@ -235,6 +252,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             ) : isPills ? (
               <BaseTabs.Indicator
                 data-slot="tabs-indicator"
+                renderBeforeHydration={renderBeforeHydration}
                 className={cn(
                   'absolute rounded-full z-0 pointer-events-none motion-reduce:transition-none',
                   effectiveColorRole === 'secondary' ? 'bg-secondary-container' : 'bg-primary-container',
@@ -249,8 +267,9 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
             ) : (
               <BaseTabs.Indicator
                 data-slot="tabs-indicator"
+                renderBeforeHydration={renderBeforeHydration}
                 className={cn(
-                  'absolute rounded-none z-10 pointer-events-none motion-reduce:transition-none',
+                  'absolute rounded-none z-10 pointer-events-none motion-reduce:transition-none forced-colors:bg-[Highlight]',
                   effectiveColorRole === 'secondary' ? 'bg-secondary' : 'bg-primary',
                   indicatorReady
                     ? 'transition-[translate,width,height] duration-[var(--duration-fast)] ease-[var(--ease-standard)]'
@@ -277,7 +296,10 @@ export interface TabProps extends React.ComponentPropsWithoutRef<typeof BaseTabs
 }
 
 export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
-  ({ value, children, icon, disabled, variant, colorRole, size, className, ...props }, ref) => {
+  (
+    { value, children, icon, disabled, variant, colorRole, size, render, nativeButton, className, ...props },
+    ref
+  ) => {
     const context = React.useContext(TabsContext);
     const effectiveVariant = variant ?? context.variant ?? 'line';
     const effectiveColorRole = colorRole ?? context.colorRole ?? 'primary';
@@ -317,6 +339,8 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         data-slot="tabs-trigger"
         value={value}
         disabled={disabled}
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
         className={(state) =>
           cn(
             // Retain font-semibold across both active and inactive to prevent layout shift
@@ -383,14 +407,20 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
                           )
                     )
                 : cn(
-                    'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-state-hover border-b-2 border-transparent',
+                    'rounded-t-sm rounded-b-none text-on-surface-variant hover:text-on-surface hover:bg-state-hover border-b-2 border-transparent data-[orientation=vertical]:rounded-s-sm data-[orientation=vertical]:rounded-e-none data-[orientation=vertical]:border-b-0 data-[orientation=vertical]:border-e-2',
                     hasSlidingIndicator
                       ? effectiveColorRole === 'secondary'
                         ? cn('data-[active]:text-secondary', 'aria-selected:text-secondary')
                         : cn('data-[active]:text-primary', 'aria-selected:text-primary')
                       : effectiveColorRole === 'secondary'
-                        ? cn('data-[active]:text-secondary data-[active]:border-secondary -mb-px', 'aria-selected:text-secondary aria-selected:border-secondary')
-                        : cn('data-[active]:text-primary data-[active]:border-primary -mb-px', 'aria-selected:text-primary aria-selected:border-primary')
+                        ? cn(
+                            'z-10 data-[active]:text-secondary data-[active]:border-secondary',
+                            'aria-selected:text-secondary aria-selected:border-secondary'
+                          )
+                        : cn(
+                            'z-10 data-[active]:text-primary data-[active]:border-primary',
+                            'aria-selected:text-primary aria-selected:border-primary'
+                          )
                   ),
             isPills
               ? 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-20'
@@ -402,7 +432,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(
         {...props}
       >
         {icon && (
-          <Icon name={icon} size="sm" className="shrink-0" />
+          <Icon name={icon} size="sm" className="shrink-0" aria-hidden="true" />
         )}
         {children}
       </BaseTabs.Tab>
@@ -495,20 +525,14 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(
 );
 TabsPanel.displayName = 'TabsPanel';
 
-export interface TabsProps<Value extends TabValue = string> {
+export interface TabsProps<Value extends TabValue = string>
+  extends Omit<TabsRootProps<Value>, 'children' | 'className'> {
   items?: TabItemData<Value>[];
   /** Legacy alias for items */
   tabs?: TabItemData<Value>[];
-  value?: Value;
-  defaultValue?: Value;
-  onValueChange?: (value: Value, eventDetails: BaseTabs.Root.ChangeEventDetails) => void;
-  orientation?: 'horizontal' | 'vertical';
   activateOnFocus?: boolean;
   loopFocus?: boolean;
-  variant?: TabsVariant;
-  colorRole?: TabsColorRole;
-  size?: TabsSize;
-  showIndicator?: boolean;
+  renderBeforeHydration?: boolean;
   indicatorClassName?: string;
   /** When true, shrink-wraps the tabs container rather than stretching across full width */
   inline?: boolean;
@@ -534,6 +558,8 @@ function TabsComponentInner<Value extends TabValue = string>(
     colorRole = 'primary',
     size = 'md',
     showIndicator = true,
+    bordered = true,
+    renderBeforeHydration = false,
     indicatorClassName,
     inline = false,
     hiddenUntilFound = false,
@@ -568,6 +594,7 @@ function TabsComponentInner<Value extends TabValue = string>(
       colorRole={colorRole}
       size={size}
       showIndicator={showIndicator}
+      bordered={bordered}
       className={cn(
         inline ? 'w-max max-w-full items-start' : 'w-full',
         className
@@ -585,6 +612,8 @@ function TabsComponentInner<Value extends TabValue = string>(
             colorRole={colorRole}
             size={size}
             showIndicator={showIndicator}
+            bordered={bordered}
+            renderBeforeHydration={renderBeforeHydration}
             indicatorClassName={indicatorClassName}
             className={listClassName}
           >

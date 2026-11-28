@@ -22,7 +22,7 @@ import * as React from 'react';
 import { Toolbar as BaseToolbar } from '@base-ui/react/toolbar';
 import { Tooltip } from './tooltip';
 import { Icon } from './icon';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 
 interface ToolbarContextValue {
   orientation: 'horizontal' | 'vertical';
@@ -102,6 +102,8 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
       size = 'md',
       disabled = false,
       focusableWhenDisabled = true,
+      render,
+      nativeButton,
       className,
       children,
       ...props
@@ -123,6 +125,8 @@ export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonPr
         data-slot="toolbar-button"
         disabled={disabled}
         focusableWhenDisabled={focusableWhenDisabled}
+        render={render}
+        nativeButton={resolveNativeButton(render, nativeButton)}
         aria-pressed={active !== undefined ? active : undefined}
         className={composeClassName(
           cn(

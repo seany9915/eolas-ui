@@ -6,10 +6,10 @@
  * Horizontal form micro-shake wrapper based on transitions.dev (12-error-state-shake.md).
  * Platform Reference: https://transitions.dev/detail.html?t=error-state-shake
  *
- * Shakes invalid form inputs or blocked actions using a decaying overshoot curve:
- * 0% -> 20% (-6px) -> 40% (+4px) -> 60% (-2px) -> 80% (+1px) -> 100% (0)
+ * Shakes invalid form inputs or blocked actions using a gentle damped curve:
+ * 0% -> 22% (-5px) -> 48% (+4px) -> 74% (-2px) -> 100% (0)
  *
- * Synchronized with the 300ms animate-error-shake keyframe in src/globals.css.
+ * Synchronized with the 400ms animate-error-shake keyframe in src/globals.css.
  * Supports coordinated error message reveals and auto-revert timers.
  * Complies with WCAG 2.2 and motion-reduce:animate-none.
  */
@@ -77,7 +77,7 @@ export const ErrorShake = React.forwardRef<HTMLDivElement, ErrorShakeProps>(
       const shakeTimer = setTimeout(() => {
         setIsShaking(false);
         onShakeEndRef.current?.();
-      }, 300);
+      }, 400);
 
       return () => {
         clearTimeout(shakeTimer);

@@ -325,6 +325,8 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   mobileBehavior?: SidebarMobileBehavior;
   /** Removes outer sidebar and header borders so AppShell can render a continuous L-shaped chrome into a rounded main pane. */
   seamless?: boolean;
+  /** Optional portal container for mobile slide-over Drawer mode. */
+  drawerContainer?: BaseDrawer.Portal.Props['container'];
 }
 
 export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
@@ -337,6 +339,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
       overlay = false,
       mobileBehavior,
       seamless = false,
+      drawerContainer,
       className,
       children,
       ...props
@@ -396,10 +399,10 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
           onOpenChange={setOpenMobile}
           swipeDirection={physicalSide === 'right' ? 'right' : 'left'}
         >
-          <BaseDrawer.Portal>
+          <BaseDrawer.Portal container={drawerContainer}>
             <BaseDrawer.Backdrop
               data-slot="sidebar-backdrop"
-              className="fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none"
+              className="fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] data-[swiping]:duration-0 data-[instant]:transition-none data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none"
             />
             <BaseDrawer.Viewport
               data-slot="sidebar-viewport"
@@ -412,7 +415,7 @@ export const SidebarComponent = React.forwardRef<HTMLDivElement, SidebarProps>(
                 data-slot="sidebar-popup"
                 className={composeClassName(
                   [
-                    'w-[var(--sidebar-width-mobile,18rem)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-hidden outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none',
+                    'w-[var(--sidebar-width-mobile,18rem)] max-w-[85vw] h-full rounded-none bg-surface shadow-modal flex flex-col justify-between overflow-hidden outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[swiping]:select-none data-[swiping]:duration-0 will-change-transform transition-transform duration-[var(--duration-medium)] data-[ending-style]:duration-[var(--duration-fast)] data-[instant]:transition-none data-[instant]:transform-none ease-[var(--ease-standard)] motion-reduce:transition-none',
                     side === 'right' ? 'border-s-2 border-outline-variant' : 'border-e-2 border-outline-variant',
                     physicalSide === 'right'
                       ? 'data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full'
@@ -563,7 +566,7 @@ export const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTrigger
           }}
           {...props}
         >
-          {children ?? icon ?? <Icon name={isOpen ? 'menu_open' : 'menu'} size="md" directional={isOpen} />}
+          {children ?? icon ?? <Icon name={isOpen ? 'menu_open' : 'menu'} size="md" directional={isOpen} aria-hidden="true" />}
         </Button>
       </Tooltip>
     );

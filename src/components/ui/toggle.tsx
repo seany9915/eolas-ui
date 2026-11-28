@@ -15,7 +15,7 @@
  */
 import * as React from 'react';
 import { Toggle as BaseToggle } from '@base-ui/react/toggle';
-import { cn } from '@/lib/utils';
+import { cn, resolveNativeButton } from '@/lib/utils';
 
 export type ToggleVariant = 'default' | 'outline' | 'ghost' | 'subtle';
 export type ToggleSize = 'sm' | 'md' | 'lg';
@@ -58,56 +58,64 @@ const sizeStyles: Record<ToggleSize, string> = {
   lg: 'h-14 px-6 min-w-[56px] min-h-[56px] text-base gap-2.5 rounded',
 };
 
-const ToggleComponent = React.forwardRef<HTMLButtonElement, ToggleProps<string>>(
-  (
-    {
-      pressed,
-      defaultPressed,
-      onPressedChange,
-      variant = 'default',
-      size = 'md',
-      ariaLabel,
-      'aria-label': ariaLabelProp,
-      children,
-      disabled = false,
-      className,
-      value,
-      ...props
-    },
-    ref
-  ) => {
-    const label = ariaLabel ?? ariaLabelProp;
+function ToggleComponentInner<Value extends string = string>(
+  {
+    pressed,
+    defaultPressed,
+    onPressedChange,
+    variant = 'default',
+    size = 'md',
+    ariaLabel,
+    'aria-label': ariaLabelProp,
+    children,
+    disabled = false,
+    render,
+    nativeButton,
+    className,
+    value,
+    ...props
+  }: ToggleProps<Value>,
+  ref: React.ForwardedRef<HTMLButtonElement>
+) {
+  const label = ariaLabel ?? ariaLabelProp;
 
-    return (
-      <BaseToggle
-        ref={ref}
-        data-slot="toggle"
-        value={value}
-        pressed={pressed}
-        defaultPressed={defaultPressed}
-        onPressedChange={onPressedChange}
-        aria-label={label}
-        disabled={disabled}
-        className={(state) =>
-          cn(
-            'inline-flex items-center justify-center font-label font-semibold cursor-pointer select-none',
-            'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
-            'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
-            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
-            'forced-colors:data-[pressed]:border-[Highlight] forced-colors:data-[pressed]:bg-[Highlight] forced-colors:data-[pressed]:text-[HighlightText]',
-            'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
-            variantStyles[variant],
-            sizeStyles[size],
-            typeof className === 'function' ? className(state) : className
-          )
-        }
-        {...props}
-      >
-        {children}
-      </BaseToggle>
-    );
-  }
-);
+  return (
+    <BaseToggle
+      ref={ref}
+      data-slot="toggle"
+      value={value}
+      pressed={pressed}
+      defaultPressed={defaultPressed}
+      onPressedChange={onPressedChange}
+      aria-label={label}
+      disabled={disabled}
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      className={(state) =>
+        cn(
+          'inline-flex items-center justify-center font-label font-semibold cursor-pointer select-none',
+          'transition-[color,background-color,border-color,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)]',
+          'active:scale-[var(--scale-small)] motion-reduce:transform-none motion-reduce:transition-none',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary focus-visible:z-10',
+          'forced-colors:data-[pressed]:border-[Highlight] forced-colors:data-[pressed]:bg-[Highlight] forced-colors:data-[pressed]:text-[HighlightText]',
+          'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+          variantStyles[variant],
+          sizeStyles[size],
+          typeof className === 'function' ? className(state) : className
+        )
+      }
+      {...props}
+    >
+      {children}
+    </BaseToggle>
+  );
+}
+
+const ToggleComponent = React.forwardRef(ToggleComponentInner) as (<
+  Value extends string = string,
+>(
+  props: ToggleProps<Value> & React.RefAttributes<HTMLButtonElement>
+) => React.ReactNode) & { displayName?: string };
 ToggleComponent.displayName = 'Toggle';
 
 // Compound export mapping Base UI primitives

@@ -573,12 +573,24 @@ export const ToggleGroupDemo: React.FC<ComponentDemoProps> = () => {
 export const SliderDemo: React.FC<ComponentDemoProps> = () => {
   const [val, setVal] = React.useState(20);
   return (
-    <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
-      <div className="flex items-center justify-between">
-        <label className="font-label text-xs font-bold text-on-surface">Daily Practice Goal</label>
-        <span className="font-mono text-xs font-bold text-primary">{Math.round(val)} minutes</span>
-      </div>
-      <Slider value={val} onValueChange={setVal} min={5} max={60} step={5} />
+    <div className="flex flex-col gap-6 w-full max-w-md mx-auto">
+      <Slider
+        label="Daily Practice Goal"
+        value={val}
+        onValueChange={setVal}
+        min={5}
+        max={60}
+        step={5}
+        showValue
+        formatValue={([v]) => `${v} min`}
+      />
+      <Slider label="Microphone Sensitivity" defaultValue={65} />
+      <Slider
+        label="Target Pitch Range"
+        defaultValue={[25, 75]}
+        showValue
+        formatValue={([low, high]) => `${low}% – ${high}%`}
+      />
     </div>
   );
 };
@@ -839,7 +851,7 @@ export const CalendarDemo: React.FC<ComponentDemoProps> = () => {
               1. Today when Selected (Zero Ring Clash)
             </span>
             <span className="font-sans text-xs text-on-surface-variant text-center">
-              When today is selected, solid primary overrides the neutral outline border cleanly.
+              When today is selected, the primary fill cleanly inverts the today dot to white (on-primary) instead of hiding or clashing with it.
             </span>
             <Calendar
               mode="single"

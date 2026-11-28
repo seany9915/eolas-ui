@@ -216,7 +216,7 @@ Reserved strictly for system, operational, and task state (including exercise co
 
 ### 4. Tonal & Callout Backdrops
 * Never place saturated fills under small body text without `on-primary`/`on-secondary`/`on-error`/`on-warning`/`on-success` (white) or `on-tertiary` (`#1C1A18` warm charcoal—never white on Amber).
-* Use `<InlineAlert />` (`rounded-s-none rounded-e`, `4px` start accent bar) for urgent/stateful alerts; use `<ClinicianTip />` for routine tips.
+* Use `<InlineAlert />` (`rounded-md`, soft wash inside cards or `surface` + tinted semantic icon badge on canvas) for urgent/stateful alerts; use `<ClinicianTip />` for routine tips.
 * Reserve `bg-primary-container` (`#E0E9FF`) + `2px` `primary` border for active selection on interactive containers (`<Card affordance="selectable" selected />`).
 
 ## Voice & Tone
@@ -302,7 +302,7 @@ Fluid grid on an `0.5rem` (8px) baseline:
 - **Floating Container Tiers:**
   - **Tier A — Modal (Dialog, Drawer):** `shadow-modal` + scrim. `Dialog` uses `rounded.lg` (`16px`) + `1px` `outline-variant` border. Full-height `Drawer` uses `rounded-none` + single dividing `2px` border.
   - **Tier B — Anchored (Popover, Menu, Select, Combobox):** `rounded.DEFAULT` (`8px`), `1px` `outline-variant` border, `shadow-ambient`.
-  - **Tier C — Ambient (Toast):** `rounded-s-none rounded-e`, `4px` start accent bar (`border-s-4`), `shadow-ambient`.
+  - **Tier C — Ambient (Toast):** `rounded.md` (`12px`), `1px` `outline-variant` border, `shadow-ambient`, tinted semantic icon badge.
 - **Focus States vs. Active Selection:**
   - **Hollow form controls** (`Input`, `Select`, `Textarea`, `OTPField`, `Combobox`, `Autocomplete`, `NumberField`): `border-primary focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-primary`.
   - **Buttons, Cards, Checkbox, Switch:** Floating `outline-offset: 2px` (`focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`). Circular **Radio** uses a `3px` outline offset (`outline-offset: 3px` inside `radio.tsx`).
@@ -344,8 +344,8 @@ Every transition must include `@media (prefers-reduced-motion: reduce)` / `motio
 - **Nested Corner Radii:**
   - **Nested Cards, Media & Panels:** $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$ — clamps to `rounded` (`8px` / `rounded.DEFAULT`) on `p-4`/`p-6` cards rather than `0px` sharp corners.
   - **Tight Segmented Shells:** Outer `rounded` (`8px`) + `p-1` (`4px`) $\implies$ inner items `rounded-sm` (`4px`).
-- **Radius Roles:** `rounded.sm` (`4px`) for inner segmented/menu rows; `rounded.DEFAULT` (`8px`) for Buttons, Inputs, Menus, Popovers, Comboboxes, outer segmented shells, and clamped nested media; `rounded.md` (`12px`) for intermediate callout panels; `rounded.lg` (`16px`) for Cards and Dialogs; `rounded-none` (`0px`) for edge-docked Drawers/Sheets; `rounded-s-none rounded-e` for Toasts & InlineAlerts; `rounded.full` (`9999px`) for Chips, Badges, Avatars, and Radios.
-- **Border Width Roles:** `borderWidth.default` (`1px`) for Dialogs, Menus, Popovers, resting Inputs/Checkboxes/Radios, and segmented shells; `borderWidth.emphasis` (`2px`) for Drawer dividing edges, Selected Cards, Outlined buttons, standalone `Toggle`, and checked Radio ring; `borderWidth.accent` (`4px`) strictly for InlineAlert and Toast start accent bars.
+- **Radius Roles:** `rounded.sm` (`4px`) for inner segmented/menu rows and `8px` badge/icon tiles; `rounded.DEFAULT` (`8px`) for Buttons, Inputs, Menus, Popovers, Comboboxes, outer segmented shells, and clamped nested media; `rounded.md` (`12px`) for intermediate callout panels, `InlineAlert`s, and `Toast`s; `rounded.lg` (`16px`) for Cards and Dialogs; `rounded-none` (`0px`) for edge-docked Drawers/Sheets; `rounded.full` (`9999px`) for Chips, Badges, Avatars, and Radios.
+- **Border Width Roles:** `borderWidth.default` (`1px`) for Dialogs, Menus, Popovers, surface `InlineAlert`s, `Toast`s, resting Inputs/Checkboxes/Radios, and segmented shells; `borderWidth.emphasis` (`2px`) for Drawer dividing edges, Selected Cards, Outlined buttons, standalone `Toggle`, and checked Radio ring.
 
 ## Navigation, Command & Selection Architecture
 
@@ -469,21 +469,21 @@ Practice tips, pronunciation cues, and helpful advice provide simple, in-context
 
 Inline alerts communicate urgent, time-sensitive, or state-dependent feedback: system status, operational warnings, blocking issues, or confirmation notices. They are **not** general-purpose text containers for static educational tips or regular body copy.
 
-They feature an asymmetric rectangular shape (`rounded-s-none rounded-e`, using logical start/end properties for RTL parity) with either `appearance="wash"` (default inside white `<Card>`s: `bg-surface-container-low` for `neutral`, `bg-*-container/60` for `warning`/`error`/`success`) or `appearance="surface"` (`bg-surface border border-outline-variant shadow-card` when placed directly on the `background` canvas), paired with a solid vertical `4px` (`borderWidth.accent`, `border-s-4`) accent bar in the state role color along the start edge:
-- **Straight vertical start accent bar:** A pure vertical `4px` stripe along the start edge (`border-s-4 border-s-[role]`), rendered in the state/status role's solid accent color:
+They feature symmetric `rounded-md` (`12px`) corners with either `appearance="wash"` (default inside white `<Card>`s: soft `bg-surface-container-low` for `neutral`, `bg-warning-container/65` for `warning`, `bg-error-container/60` or `bg-success-container/60` for `error`/`success`, with `border border-transparent` and a semantic-colored leading `<Icon>`) or `appearance="surface"` (for placement directly on the `background` canvas: white `bg-surface border border-outline-variant shadow-card` paired with a soft tinted `28×28px` semantic icon badge containing a `20px` `size="md"` icon in `bg-*-container text-*`, or `bg-surface-container-high text-on-surface` for `neutral`):
+- **Semantic Role Tokens:**
   - `error` (`#C4161C`): Destructive, blocked actions, or critical failures.
   - `warning` (`#A64B00`): Cautionary notices, unsaved changes, expiring sessions.
   - `success` (`#157331`): Confirmation of completed workflows or saved states.
   - `neutral` (`#1C1A18`, `on-surface`): System and operational status notices (e.g. offline mode, sync status, background connectivity).
-  *Role Restriction:* Brand and content roles (`primary` Electric Blue, `secondary` Rich Emerald, `tertiary` Sunny Amber) are **strictly excluded** from Inline Alerts. Operational alerts use state tokens (`error`, `warning`, `success`) or neutral charcoal (`on-surface`), preserving `primary` exclusively for interactive controls and brand hierarchy. Because the container uses asymmetric rounding (`rounded-s-none rounded-e`), the accent bar remains a crisp, perfectly straight vertical edge without corner-miter distortion, while the end corners gently align with surrounding 0.5rem controls.
-- **Surface & Text:** Soft surface wash (`appearance="wash"`, `bg-surface-container-low` or `bg-*-container/60`) or white card fill (`appearance="surface"`), `on-surface` (`#1C1A18`) headline text, `on-surface-variant` (`#4C4A47`) body text, and a matching role-colored leading icon for instant visual recognition.
+  *Role Restriction:* Brand and content roles (`primary` Electric Blue, `secondary` Rich Emerald, `tertiary` Sunny Amber) are **strictly excluded** from Inline Alerts. Operational alerts use state tokens (`error`, `warning`, `success`) or neutral charcoal (`on-surface`), preserving `primary` exclusively for interactive controls and brand hierarchy.
+- **Surface & Text:** Soft container wash (`appearance="wash"`) or neutral-bordered white `surface` card (`appearance="surface"`), `on-surface` (`#1C1A18`) headline text, and `on-surface-variant` (`#4C4A47`) body text — omitting heavy perimeter stripes or full-hue border boxes.
 - **Appropriate triggers:**
   - *Warning / Actionable:* "Microphone access blocked — tap to enable."
   - *Time-sensitive alert:* "Session expiring in 2 minutes."
   - *System status:* "Offline mode active — exercises will sync when reconnected."
   - *Stateful prompt:* "You have unsaved notes from earlier today."
-- **Accessibility & Interactive Slots:** Implements dynamic ARIA live regions: `role="alert"` (`aria-live="assertive"`) for `error` to immediately announce critical failures, and `role="status"` (`aria-live="polite"`) for `warning`, `success`, and `neutral`. Supports an optional `onClose` dismiss trigger (accessible icon button with floating focus ring) and an optional inline `action` button slot.
-- **Anti-pattern guard (Never an Asymmetric Card):** Inline alerts use asymmetric rounding (`rounded-s-none rounded-e`) specifically to keep the 4px start accent border completely straight. Never apply a 4px start accent border to a fully rounded container (`rounded.lg`/`rounded.md`), which distorts corner geometry. For static educational tips, strategy guides, or exercise instructions, use the unboxed `<ClinicianTip />` pattern or Low-Prominence typography instead.
+- **Accessibility & Interactive Slots:** Implements dynamic ARIA live regions: `role="alert"` (`aria-live="assertive"`) for `error` to immediately announce critical failures, and `role="status"` (`aria-live="polite"`) for `warning`, `success`, and `neutral`. Supports an optional `onClose` dismiss trigger (`44×44px` circular icon button with floating focus ring) and an optional inline `action` button slot.
+- **Anti-pattern guard:** Never place saturated or dark perimeter borders around alerts or stack multi-layer borders on tinted washes. For static educational tips, strategy guides, or exercise instructions, use the unboxed `<ClinicianTip />` pattern or Low-Prominence typography instead.
 
 ### Semantic Spacing Ladder
 
@@ -502,8 +502,8 @@ To eliminate arbitrary spacing utilities (`py-7`, `gap-5`, `space-y-3`), all lay
 | :--- | :--- | :--- | :--- |
 | **`none`** | 0px | Square corners, docked `Drawer` / `Sheet` viewport-edge panels, table outer cells, drill canvases | Used for edge-docked overlays (`Drawer`/`Sheet`) and flush full-bleed canvases. |
 | **`sm`** | 4px (`0.25rem`) | Inner concentric items (`ToggleGroup.Item`), micro-accents, tooltip arrow pins, progress tracks | Follows $R_{\text{inner}} = R_{\text{outer}} - \text{padding}$ for tight `p-1` shells. Inside a `rounded` (8px) container with `p-1` (4px padding), inner items take $8\text{px} - 4\text{px} = 4\text{px}$ (`rounded-sm`). |
-| **`DEFAULT`** | 8px (`0.5rem`) | Interactive controls (`Button`, `Input`, `Select` triggers, `Menu` popups, `Popover`), outer segmented control containers (`ToggleGroup`), clamped nested media | The core baseline for all Tier B interactive controls and the `8px` floor for nested elements inside padded cards ($R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$). Concentric end corners match asymmetric alerts (`rounded-e`). |
-| **`md`** | 12px (`0.75rem`) | Intermediate standalone cards, medium containers, callout panels (e.g., inset `<ClinicianTip />`) | Used where `0.5rem` is too tight and `1rem` is too large. |
+| **`DEFAULT`** | 8px (`0.5rem`) | Interactive controls (`Button`, `Input`, `Select` triggers, `Menu` popups, `Popover`), outer segmented control containers (`ToggleGroup`), clamped nested media, alert/toast semantic icon badges | The core baseline for all Tier B interactive controls and the `8px` floor for nested elements inside padded cards ($R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$). |
+| **`md`** | 12px (`0.75rem`) | Intermediate standalone cards, medium containers, callout panels (`InlineAlert`, `Toast`, inset `<ClinicianTip />`) | Used where `0.5rem` is too tight and `1rem` is too large. |
 | **`lg`** | 16px (`1rem`) | Standard content cards, `Dialog`, `AlertDialog` modal surfaces | Outer elevation boundaries. Padded child media/containers clamp to the `8px` inner floor (`rounded`, $R_{\text{inner}} = \max(8\text{px}, R_{\text{outer}} - \text{padding})$). |
 | **`full`** | 9999px | Badges, pill chips, circular icon buttons, avatars | Complete circular/pill rounding. Passive `<Badge />` and interactive `<Chip />` both share `rounded-full`. |
 
@@ -609,7 +609,7 @@ Built on `bot-avatars` via the `<BotAvatar />` design system wrapper (`src/compo
 - **Reduced Motion:** Continuous movement can be distracting or uncomfortable for motion-sensitive users. The component automatically suppresses jumping and rapid rotation when `prefers-reduced-motion` is active.
 
 ### Toasts & Notifications
-Tier C floating container (see Elevation & Depth) — deliberately distinct from Card rather than matching it: `surface` background, `1px` `outline-variant` perimeter border (`border border-outline-variant`, keeping crisp edge definition and `forced-colors` visibility), asymmetric rounding (`rounded-s-none rounded-e`), paired with a permanent ambient shadow (`shadow-ambient`). Always paired with a leading functional icon and, for `error`/`success`/`warning`/`neutral` states, an `error`/`success`/`warning`/`neutral` (`on-surface` / `#1C1A18`) colored icon plus a matching `4px` (`borderWidth.accent`, `border-s-4`) start accent bar (`border-s-error`, `border-s-success`, `border-s-warning`, `border-s-neutral`) — the exact asymmetric rectangle and accent-bar treatment as Inline Alerts — never a full-bleed colored background, which reduces text contrast. Note that neutral/info alerts use `border-s-neutral` rather than `border-s-primary` to preserve primary blue strictly for actionable interactive elements. Auto-dismiss non-critical toasts; keep error toasts until manually dismissed. **Dismiss action buttons must strictly maintain a minimum 44×44px touch target (`size-11 min-w-11 min-h-11`) to comply with WCAG 2.2 SC 2.5.5 (exceeding SC 2.5.8).**
+Tier C floating container (see Elevation & Depth) — deliberately distinct from Card rather than matching it: white `bg-surface` background, `1px` `outline-variant` perimeter border (`border border-outline-variant`, keeping crisp edge definition and `forced-colors` visibility), symmetric `rounded-md` (`12px`) corners, paired with a permanent ambient shadow (`shadow-ambient`). Always paired with a leading `28×28px` rounded (`8px`) tinted semantic icon badge containing a `20px` (`size="md"`) glyph (`bg-error-container text-error`, `bg-warning-container text-warning`, `bg-success-container text-success`, `bg-primary-container text-primary` for loading, or `bg-surface-container-high text-on-surface` for `neutral`/`info`) — never a heavy side accent bar or full-bleed colored card background, preserving primary blue strictly for interactive controls and loading indicators while keeping body copy high contrast. Auto-dismiss non-critical toasts; keep error toasts persistent (`timeout: 0`, `priority: 'high'`) until manually dismissed. **Dismiss action buttons must strictly maintain a minimum 44×44px touch target (`size-11 min-w-11 min-h-11`) to comply with WCAG 2.2 SC 2.5.5 (exceeding SC 2.5.8).**
 
 ## Brand Logos & Usage
 

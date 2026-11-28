@@ -18,7 +18,7 @@ description: Banned UI/code/copy anti-patterns and required alternatives. Self-c
 ### Color, Badges & Surfaces
 - **Banned: Static status dots or text-less indicators** → **Use:** Plain text, `<Badge />`, or functional icons (dots are strictly for live/recording presence paired with text).
 - **Banned: `surface-container-low`/`high` fill + `outline-variant` border** → **Use:** `outline` (`#706E6B`) when a neutral tinted surface needs a boundary.
-- **Banned: Single-sided accent borders on rounded cards** → **Use:** `border border-transparent` cards; reserve `rounded-s-none rounded-e` + `border-s-4` for `<InlineAlert />` and `<Toast />`.
+- **Banned: Single-sided accent borders on rounded cards, alerts, or toasts** → **Use:** `border border-transparent` cards, soft semantic container washes (`appearance="wash"`), or neutral-bordered `surface` containers (`border border-outline-variant`) paired with a tinted semantic icon badge (`appearance="surface"` and floating `<Toast />`).
 - **Banned: `InlineAlert` for routine tips** → **Use:** `<ClinicianTip />` (`unboxed` in cards; `surface`/`inset` on canvas).
 
 ### Interaction, Focus & Accessibility

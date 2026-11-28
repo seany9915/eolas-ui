@@ -14,6 +14,7 @@
 import * as React from 'react';
 import { Collapsible as BaseCollapsible } from '@base-ui/react/collapsible';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
+import { Icon } from './icon';
 
 interface CollapsibleContextValue {
   hiddenUntilFound?: boolean;
@@ -108,12 +109,12 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
       >
         {children}
         {shouldShowChevron && (
-          <span
-            className="material-symbols-outlined text-xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none shrink-0"
+          <Icon
+            name="expand_more"
+            size="md"
+            className="text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none shrink-0"
             aria-hidden="true"
-          >
-            expand_more
-          </span>
+          />
         )}
       </BaseCollapsible.Trigger>
     );

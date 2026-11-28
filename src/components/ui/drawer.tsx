@@ -7,7 +7,7 @@
  *
  * TAXONOMY & USAGE:
  * - Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures,
- *   snap points, and background indent effects.
+ *   snap points, non-modal inspectors, and background indent effects.
  * - For focused modal dialogs without swipe gestures, use Dialog instead.
  * - Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring,
  *   WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint.
@@ -36,25 +36,36 @@ export interface DrawerProps<Payload = unknown>
   snapToSequentialPoints?: boolean;
   snapPoint?: BaseDrawer.Root.SnapPoint | null;
   defaultSnapPoint?: BaseDrawer.Root.SnapPoint | null;
-  onSnapPointChange?: (snapPoint: BaseDrawer.Root.SnapPoint | null, eventDetails?: BaseDrawer.Root.SnapPointChangeEventDetails) => void;
+  onSnapPointChange?: (
+    snapPoint: BaseDrawer.Root.SnapPoint | null,
+    eventDetails?: BaseDrawer.Root.SnapPointChangeEventDetails
+  ) => void;
   modal?: boolean | 'trap-focus';
   disablePointerDismissal?: boolean;
   actionsRef?: React.RefObject<BaseDrawer.Root.Actions | null>;
   handle?: BaseDrawer.Handle<Payload>;
   triggerId?: string | null;
   defaultTriggerId?: string | null;
+  initialFocus?: BaseDrawer.Popup.Props['initialFocus'];
+  finalFocus?: BaseDrawer.Popup.Props['finalFocus'];
+  showBackdrop?: boolean;
   showCloseButton?: boolean;
   showHandle?: boolean;
+  virtualKeyboardAware?: boolean;
   keepMounted?: boolean;
   container?: BaseDrawer.Portal.Props['container'];
   className?: BaseDrawer.Popup.Props['className'];
   popupClassName?: BaseDrawer.Popup.Props['className'];
+  backdropClassName?: BaseDrawer.Backdrop.Props['className'];
+  viewportClassName?: BaseDrawer.Viewport.Props['className'];
 }
 
 type DrawerSwipeDirection = 'right' | 'left' | 'down' | 'up';
 
 interface DrawerContextValue {
   swipeDirection: DrawerSwipeDirection;
+  modal: boolean | 'trap-focus';
+  hasSnapPoints: boolean;
   popupRef?: React.Ref<HTMLDivElement>;
   popupClassName?: BaseDrawer.Popup.Props['className'];
   popupProps?: Record<string, unknown>;
@@ -62,7 +73,11 @@ interface DrawerContextValue {
 
 const DrawerContext = React.createContext<DrawerContextValue>({
   swipeDirection: 'right',
+  modal: true,
+  hasSnapPoints: false,
 });
+
+const DrawerPortalScopeContext = React.createContext(false);
 
 function mergeDrawerRefs<T>(
   ...refs: Array<React.Ref<T> | undefined>
@@ -81,28 +96,32 @@ function mergeDrawerRefs<T>(
 export const drawerViewportClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right: 'fixed inset-0 z-50 flex max-w-full ltr:justify-end rtl:justify-start',
   left: 'fixed inset-0 z-50 flex max-w-full ltr:justify-start rtl:justify-end',
-  down: 'fixed inset-x-0 bottom-0 z-50 flex max-h-full items-end justify-center',
-  up: 'fixed inset-x-0 top-0 z-50 flex max-h-full items-start justify-center',
+  down: 'fixed inset-x-0 bottom-0 top-0 z-50 flex max-h-full items-end justify-center',
+  up: 'fixed inset-x-0 top-0 bottom-0 z-50 flex max-h-full items-start justify-center',
 };
 
 export const drawerPopupClasses: Record<'right' | 'left' | 'down' | 'up', string> = {
   right:
-    '@container w-full max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+    '@container w-full max-w-md h-full flex flex-col rounded-none border-l-2 border-y-0 border-r-0 border-outline-variant bg-surface shadow-modal pr-[calc(1.5rem+env(safe-area-inset-right,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 data-[nested-drawer-swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:[transition-duration:calc(var(--drawer-swipe-strength,1)*var(--duration-fast))] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   left:
-    '@container w-full max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+    '@container w-full max-w-md h-full flex flex-col rounded-none border-r-2 border-y-0 border-l-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full data-[swiping]:select-none data-[swiping]:duration-0 data-[nested-drawer-swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:[transition-duration:calc(var(--drawer-swipe-strength,1)*var(--duration-fast))] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   down:
-    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-t-2 border-x-0 border-b-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] [transform:translateY(calc(var(--drawer-snap-point-offset,0px)+var(--drawer-swipe-movement-y,0px)))] data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 data-[nested-drawer-swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:[transition-duration:calc(var(--drawer-swipe-strength,1)*var(--duration-fast))] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
   up:
-    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+    '@container w-full max-h-[88dvh] flex flex-col rounded-none border-b-2 border-x-0 border-t-0 border-outline-variant bg-surface shadow-modal pl-[calc(1.5rem+env(safe-area-inset-left,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] [transform:translateY(calc(var(--drawer-snap-point-offset,0px)+var(--drawer-swipe-movement-y,0px)))] data-[starting-style]:-translate-y-full data-[ending-style]:-translate-y-full data-[swiping]:select-none data-[swiping]:duration-0 data-[nested-drawer-swiping]:duration-0 transition-transform duration-[var(--duration-fast)] data-[ending-style]:[transition-duration:calc(var(--drawer-swipe-strength,1)*var(--duration-fast))] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
 };
+
+const snapPointDownClasses =
+  "relative h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] overflow-visible pb-[max(1.5rem,calc(var(--drawer-snap-point-offset,0px)+var(--drawer-swipe-movement-y,0px)+1.5rem+env(safe-area-inset-bottom,0px)))] transition-[transform,padding-bottom] data-[starting-style]:pb-6 data-[ending-style]:pb-6 data-[starting-style]:[transform:translateY(calc(100%+2px))] data-[ending-style]:[transform:translateY(calc(100%+2px))] after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-12 after:bg-surface after:content-['']";
 
 // Visual grab handle pill
 export const DrawerHandlePill = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
+      data-slot="drawer-handle-pill"
       className={cn(
-        'mx-auto my-3 h-1.5 w-12 rounded-full bg-outline-variant shrink-0 select-none touch-none cursor-grab',
+        'mx-auto my-3 h-1.5 w-12 rounded-full bg-outline-variant shrink-0 select-none touch-none cursor-grab active:cursor-grabbing',
         className
       )}
       aria-hidden="true"
@@ -134,27 +153,44 @@ export const DrawerCloseButton = React.forwardRef<HTMLButtonElement, DrawerClose
       aria-label={ariaLabel ?? (!render && !children ? 'Close drawer' : undefined)}
       {...props}
     >
-      {children || (
-        <Icon name="close" size="lg" aria-hidden="true" />
-      )}
+      {children || <Icon name="close" size="md" aria-hidden="true" />}
     </BaseDrawer.Close>
   )
 );
 DrawerCloseButton.displayName = 'DrawerCloseButton';
 
-export const DrawerTrigger = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof BaseDrawer.Trigger>
->(({ render, nativeButton, ...props }, ref) => (
-  <BaseDrawer.Trigger
-    ref={ref}
-    data-slot="drawer-trigger"
-    render={render}
-    nativeButton={resolveNativeButton(render, nativeButton)}
-    {...props}
-  />
-));
+export const DrawerTrigger = React.forwardRef(function DrawerTrigger<Payload = unknown>(
+  {
+    render,
+    nativeButton,
+    ...props
+  }: BaseDrawer.Trigger.Props<Payload>,
+  ref: React.ForwardedRef<HTMLButtonElement>
+) {
+  return (
+    <BaseDrawer.Trigger
+      ref={ref}
+      data-slot="drawer-trigger"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      {...props}
+    />
+  );
+}) as (<Payload = unknown>(
+  props: BaseDrawer.Trigger.Props<Payload> & React.RefAttributes<HTMLButtonElement>
+) => React.JSX.Element) & { displayName?: string };
 DrawerTrigger.displayName = 'DrawerTrigger';
+
+export const DrawerPortal = React.forwardRef<HTMLDivElement, BaseDrawer.Portal.Props>(
+  ({ container, keepMounted, children, ...props }, ref) => (
+    <DrawerPortalScopeContext.Provider value={Boolean(container)}>
+      <BaseDrawer.Portal ref={ref} container={container} keepMounted={keepMounted} {...props}>
+        {children}
+      </BaseDrawer.Portal>
+    </DrawerPortalScopeContext.Provider>
+  )
+);
+DrawerPortal.displayName = 'DrawerPortal';
 
 export const DrawerClose = React.forwardRef<
   HTMLButtonElement,
@@ -204,7 +240,15 @@ DrawerBody.displayName = 'DrawerBody';
 
 export const DrawerFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="drawer-footer" className={cn('pt-4 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4', className)} {...props} />
+    <div
+      ref={ref}
+      data-slot="drawer-footer"
+      className={cn(
+        'pt-4 pb-[var(--drawer-keyboard-inset,0px)] border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4 shrink-0',
+        className
+      )}
+      {...props}
+    />
   )
 );
 DrawerFooter.displayName = 'DrawerFooter';
@@ -238,17 +282,23 @@ DrawerDescription.displayName = 'DrawerDescription';
 export const DrawerBackdrop = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseDrawer.Backdrop>
->(({ className, ...props }, ref) => (
-  <BaseDrawer.Backdrop
-    ref={ref}
-    data-slot="drawer-overlay"
-    className={composeClassName(
-      'fixed inset-0 bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => {
+  const isScoped = React.useContext(DrawerPortalScopeContext);
+  return (
+    <BaseDrawer.Backdrop
+      ref={ref}
+      data-slot="drawer-overlay"
+      className={composeClassName(
+        cn(
+          isScoped ? 'absolute inset-0' : 'fixed inset-0 min-h-dvh',
+          'bg-on-surface/40 z-50 opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-[var(--duration-fast)] data-[ending-style]:[transition-duration:calc(var(--drawer-swipe-strength,1)*var(--duration-fast))] data-[swiping]:duration-0 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none'
+        ),
+        className
+      )}
+      {...props}
+    />
+  );
+});
 DrawerBackdrop.displayName = 'DrawerBackdrop';
 
 export const DrawerOverlay = DrawerBackdrop;
@@ -257,14 +307,24 @@ export const DrawerViewport = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseDrawer.Viewport> & {
     swipeDirection?: DrawerSwipeDirection;
+    modal?: boolean | 'trap-focus';
   }
->(({ className, swipeDirection, ...props }, ref) => {
-  const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
+>(({ className, swipeDirection, modal, ...props }, ref) => {
+  const { swipeDirection: contextDirection, modal: contextModal } = React.useContext(DrawerContext);
+  const isScoped = React.useContext(DrawerPortalScopeContext);
+  const resolvedModal = modal ?? contextModal;
   return (
     <BaseDrawer.Viewport
       ref={ref}
       data-slot="drawer-viewport"
-      className={composeClassName(drawerViewportClasses[swipeDirection ?? contextDirection], className)}
+      className={composeClassName(
+        cn(
+          drawerViewportClasses[swipeDirection ?? contextDirection],
+          isScoped && 'absolute',
+          resolvedModal === false && 'pointer-events-none'
+        ),
+        className
+      )}
       {...props}
     />
   );
@@ -291,18 +351,25 @@ export const DrawerPopup = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseDrawer.Popup> & {
     swipeDirection?: DrawerSwipeDirection;
+    hasSnapPoints?: boolean;
   }
->(({ className, swipeDirection, ...props }, ref) => {
+>(({ className, swipeDirection, hasSnapPoints: hasSnapPointsProp, ...props }, ref) => {
   const {
     swipeDirection: contextDirection,
+    hasSnapPoints: contextHasSnapPoints,
     popupRef,
     popupClassName,
     popupProps,
   } = React.useContext(DrawerContext);
+  const resolvedDirection = swipeDirection ?? contextDirection;
+  const resolvedHasSnapPoints = hasSnapPointsProp ?? contextHasSnapPoints;
+  const isSnapBottomSheet = resolvedHasSnapPoints && resolvedDirection === 'down';
   const mergedRef = popupRef ? mergeDrawerRefs(popupRef, ref) : ref;
   const baseClasses = cn(
-    'p-6 bg-surface shadow-modal flex flex-col justify-between overflow-y-auto has-[[data-slot=drawer-body]]:overflow-hidden will-change-[transform]',
-    drawerPopupClasses[swipeDirection ?? contextDirection]
+    'pointer-events-auto p-6 bg-surface shadow-modal flex flex-col justify-between overscroll-contain touch-auto outline-none will-change-[transform]',
+    !isSnapBottomSheet && 'overflow-y-auto has-[[data-slot=drawer-body]]:overflow-hidden',
+    drawerPopupClasses[resolvedDirection],
+    isSnapBottomSheet && snapPointDownClasses
   );
   return (
     <BaseDrawer.Popup
@@ -323,7 +390,7 @@ export const DrawerContent = React.forwardRef<
   <BaseDrawer.Content
     ref={ref}
     data-slot="drawer-content"
-    className={composeClassName('flex flex-col justify-between h-full min-h-0', className)}
+    className={composeClassName('flex flex-col justify-between flex-1 h-full min-h-0 overflow-hidden', className)}
     {...props}
   />
 ));
@@ -334,8 +401,10 @@ export interface DrawerPanelProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseDrawer.Popup>, 'children'> {
   children: React.ReactNode;
   swipeDirection?: DrawerSwipeDirection;
+  showBackdrop?: boolean;
   showHandle?: boolean;
   backdropClassName?: BaseDrawer.Backdrop.Props['className'];
+  viewportClassName?: BaseDrawer.Viewport.Props['className'];
   keepMounted?: boolean;
   container?: BaseDrawer.Portal.Props['container'];
 }
@@ -345,21 +414,24 @@ export const DrawerPanel = React.forwardRef<HTMLDivElement, DrawerPanelProps>(
     {
       children,
       swipeDirection: swipeDirectionProp,
+      showBackdrop,
       showHandle = true,
       className,
       backdropClassName,
+      viewportClassName,
       keepMounted,
       container,
       ...props
     },
     ref
   ) => {
-    const { swipeDirection: contextDirection } = React.useContext(DrawerContext);
+    const { swipeDirection: contextDirection, modal } = React.useContext(DrawerContext);
     const swipeDirection = swipeDirectionProp ?? contextDirection;
+    const shouldRenderBackdrop = showBackdrop ?? modal !== false;
     return (
-      <BaseDrawer.Portal container={container} keepMounted={keepMounted}>
-        <DrawerBackdrop className={backdropClassName} />
-        <DrawerViewport swipeDirection={swipeDirection}>
+      <DrawerPortal container={container} keepMounted={keepMounted}>
+        {shouldRenderBackdrop && <DrawerBackdrop className={backdropClassName} />}
+        <DrawerViewport swipeDirection={swipeDirection} modal={modal} className={viewportClassName}>
           <DrawerPopup ref={ref} swipeDirection={swipeDirection} className={className} {...props}>
             <DrawerContent>
               {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
@@ -367,7 +439,7 @@ export const DrawerPanel = React.forwardRef<HTMLDivElement, DrawerPanelProps>(
             </DrawerContent>
           </DrawerPopup>
         </DrawerViewport>
-      </BaseDrawer.Portal>
+      </DrawerPortal>
     );
   }
 );
@@ -375,19 +447,69 @@ DrawerPanel.displayName = 'DrawerPanel';
 
 export function DrawerRoot<Payload = unknown>({
   swipeDirection = 'right',
+  modal = true,
+  snapPoints,
   ...props
 }: BaseDrawer.Root.Props<Payload>): React.JSX.Element {
+  const hasSnapPoints = Boolean(snapPoints && snapPoints.length > 0);
   const drawerRootContextValue = React.useMemo(
-    () => ({ swipeDirection }),
-    [swipeDirection]
+    () => ({ swipeDirection, modal, hasSnapPoints }),
+    [swipeDirection, modal, hasSnapPoints]
   );
 
   return (
     <DrawerContext.Provider value={drawerRootContextValue}>
-      <BaseDrawer.Root<Payload> swipeDirection={swipeDirection} {...props} />
+      <BaseDrawer.Root<Payload>
+        swipeDirection={swipeDirection}
+        modal={modal}
+        snapPoints={snapPoints}
+        {...props}
+      />
     </DrawerContext.Provider>
   );
 }
+
+export const DrawerSwipeArea = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseDrawer.SwipeArea>
+>(({ className, ...props }, ref) => (
+  <BaseDrawer.SwipeArea
+    ref={ref}
+    data-slot="drawer-swipe-area"
+    className={composeClassName('touch-none select-none', className)}
+    {...props}
+  />
+));
+DrawerSwipeArea.displayName = 'DrawerSwipeArea';
+
+export const DrawerIndent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseDrawer.Indent>
+>(({ className, ...props }, ref) => (
+  <BaseDrawer.Indent
+    ref={ref}
+    data-slot="drawer-indent"
+    className={composeClassName(
+      'relative bg-surface origin-top transition-[transform,border-radius] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[active]:scale-[0.985] data-[active]:translate-y-2 data-[active]:rounded-t-lg motion-reduce:transition-none motion-reduce:transform-none',
+      className
+    )}
+    {...props}
+  />
+));
+DrawerIndent.displayName = 'DrawerIndent';
+
+export const DrawerIndentBackground = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseDrawer.IndentBackground>
+>(({ className, ...props }, ref) => (
+  <BaseDrawer.IndentBackground
+    ref={ref}
+    data-slot="drawer-indent-background"
+    className={composeClassName('absolute inset-0 bg-neutral/90', className)}
+    {...props}
+  />
+));
+DrawerIndentBackground.displayName = 'DrawerIndentBackground';
 
 function DrawerComponentInner<Payload = unknown>(
   {
@@ -412,16 +534,25 @@ function DrawerComponentInner<Payload = unknown>(
     handle,
     triggerId,
     defaultTriggerId,
+    initialFocus,
+    finalFocus,
+    showBackdrop,
     showCloseButton = true,
     showHandle = true,
+    virtualKeyboardAware = false,
     keepMounted,
     container,
     className,
     popupClassName,
+    backdropClassName,
+    viewportClassName,
     ...props
   }: DrawerProps<Payload>,
   ref: React.ForwardedRef<HTMLDivElement>
 ): React.JSX.Element {
+  const hasSnapPoints = Boolean(snapPoints && snapPoints.length > 0);
+  const shouldRenderBackdrop = showBackdrop ?? modal !== false;
+
   const combinedPopupClassName = React.useMemo<BaseDrawer.Popup.Props['className']>(
     () =>
       typeof popupClassName === 'function' || typeof className === 'function'
@@ -439,15 +570,17 @@ function DrawerComponentInner<Payload = unknown>(
   const compoundDrawerContextValue = React.useMemo(
     () => ({
       swipeDirection,
+      modal,
+      hasSnapPoints,
       popupRef: ref,
       popupClassName: combinedPopupClassName,
       popupProps: compoundPopupProps,
     }),
-    [swipeDirection, ref, combinedPopupClassName, compoundPopupProps]
+    [swipeDirection, modal, hasSnapPoints, ref, combinedPopupClassName, compoundPopupProps]
   );
   const shorthandDrawerContextValue = React.useMemo(
-    () => ({ swipeDirection }),
-    [swipeDirection]
+    () => ({ swipeDirection, modal, hasSnapPoints }),
+    [swipeDirection, modal, hasSnapPoints]
   );
 
   // If used as pure headless compound root without shorthand config
@@ -498,32 +631,31 @@ function DrawerComponentInner<Payload = unknown>(
         triggerId={triggerId}
         defaultTriggerId={defaultTriggerId}
       >
-        {(renderProps) => (
-          <>
-            {trigger && (
-              <BaseDrawer.Trigger
-                data-slot="drawer-trigger"
-                render={React.isValidElement(trigger) ? trigger : undefined}
-                nativeButton={resolveNativeButton(trigger)}
-                className={!React.isValidElement(trigger) ? 'inline-flex cursor-pointer' : undefined}
+        {(renderProps) => {
+          const portalNode = (
+            <DrawerPortal container={container} keepMounted={keepMounted}>
+              {shouldRenderBackdrop && <DrawerBackdrop className={backdropClassName} />}
+              <DrawerViewport
+                swipeDirection={swipeDirection}
+                modal={modal}
+                className={viewportClassName}
               >
-                {!React.isValidElement(trigger) ? trigger : undefined}
-              </BaseDrawer.Trigger>
-            )}
-            <BaseDrawer.Portal container={container} keepMounted={keepMounted}>
-              <DrawerBackdrop />
-              <DrawerViewport swipeDirection={swipeDirection}>
                 <DrawerPopup
                   ref={ref}
                   swipeDirection={swipeDirection}
+                  hasSnapPoints={hasSnapPoints}
+                  initialFocus={initialFocus}
+                  finalFocus={finalFocus}
                   className={combinedPopupClassName}
                   {...props}
                 >
                   <DrawerContent className="flex flex-col h-full min-h-0">
                     <div data-slot="drawer-header" className="flex flex-col gap-1.5 mb-4 shrink-0">
-                      {showHandle && swipeDirection === 'down' && <DrawerHandlePill />}
+                      {showHandle && swipeDirection === 'down' && <DrawerHandlePill className="mt-0 mb-2" />}
                       <div className="flex items-start justify-between gap-2">
-                        <DrawerTitle className={cn(!title && 'sr-only')}>{title || 'Panel'}</DrawerTitle>
+                        <DrawerTitle className={cn(!title && 'sr-only')}>
+                          {title || 'Panel'}
+                        </DrawerTitle>
                         {showCloseButton && (
                           <DrawerCloseButton className="-me-3 -mt-3 shrink-0" aria-label="Close drawer" />
                         )}
@@ -534,9 +666,17 @@ function DrawerComponentInner<Payload = unknown>(
                       {typeof children === 'function' ? children(renderProps) : children}
                     </DrawerBody>
                     {footer ? (
-                      <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant mt-4 shrink-0">{footer}</div>
+                      <div
+                        data-slot="drawer-footer"
+                        className="pt-4 pb-[var(--drawer-keyboard-inset,0px)] border-t border-outline-variant mt-4 shrink-0"
+                      >
+                        {footer}
+                      </div>
                     ) : (
-                      <div data-slot="drawer-footer" className="pt-4 border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4 shrink-0">
+                      <div
+                        data-slot="drawer-footer"
+                        className="pt-4 pb-[var(--drawer-keyboard-inset,0px)] border-t border-outline-variant flex flex-wrap items-center justify-end gap-3 mt-4 shrink-0"
+                      >
                         <BaseDrawer.Close
                           data-slot="drawer-close"
                           render={
@@ -550,9 +690,29 @@ function DrawerComponentInner<Payload = unknown>(
                   </DrawerContent>
                 </DrawerPopup>
               </DrawerViewport>
-            </BaseDrawer.Portal>
-          </>
-        )}
+            </DrawerPortal>
+          );
+
+          return (
+            <>
+              {trigger && (
+                <BaseDrawer.Trigger
+                  data-slot="drawer-trigger"
+                  render={React.isValidElement(trigger) ? trigger : undefined}
+                  nativeButton={resolveNativeButton(trigger)}
+                  className={!React.isValidElement(trigger) ? 'inline-flex cursor-pointer' : undefined}
+                >
+                  {!React.isValidElement(trigger) ? trigger : undefined}
+                </BaseDrawer.Trigger>
+              )}
+              {virtualKeyboardAware ? (
+                <BaseDrawer.VirtualKeyboardProvider>{portalNode}</BaseDrawer.VirtualKeyboardProvider>
+              ) : (
+                portalNode
+              )}
+            </>
+          );
+        }}
       </BaseDrawer.Root>
     </DrawerContext.Provider>
   );
@@ -567,7 +727,7 @@ DrawerComponent.displayName = 'Drawer';
 export const Drawer = Object.assign(DrawerComponent, {
   Root: DrawerRoot,
   Trigger: DrawerTrigger,
-  Portal: BaseDrawer.Portal,
+  Portal: DrawerPortal,
   Backdrop: DrawerBackdrop,
   Overlay: DrawerOverlay,
   Viewport: DrawerViewport,
@@ -582,9 +742,9 @@ export const Drawer = Object.assign(DrawerComponent, {
   Close: DrawerClose,
   CloseButton: DrawerCloseButton,
   HandlePill: DrawerHandlePill,
-  SwipeArea: BaseDrawer.SwipeArea,
-  Indent: BaseDrawer.Indent,
-  IndentBackground: BaseDrawer.IndentBackground,
+  SwipeArea: DrawerSwipeArea,
+  Indent: DrawerIndent,
+  IndentBackground: DrawerIndentBackground,
   VirtualKeyboardProvider: BaseDrawer.VirtualKeyboardProvider,
   Provider: BaseDrawer.Provider,
   createHandle: BaseDrawer.createHandle,
@@ -594,10 +754,6 @@ export const Drawer = Object.assign(DrawerComponent, {
 // Re-export Base UI primitives for compound composition
 export { BaseDrawer };
 
-export const DrawerPortal = BaseDrawer.Portal;
-export const DrawerSwipeArea = BaseDrawer.SwipeArea;
-export const DrawerIndent = BaseDrawer.Indent;
-export const DrawerIndentBackground = BaseDrawer.IndentBackground;
 export const DrawerVirtualKeyboardProvider = BaseDrawer.VirtualKeyboardProvider;
 export const DrawerProvider = BaseDrawer.Provider;
 export const DrawerHandle = BaseDrawer.Handle;

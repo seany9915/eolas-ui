@@ -23,6 +23,8 @@ export interface SliderProps<Value extends number | readonly number[] = number |
   label?: React.ReactNode;
   description?: React.ReactNode;
   showValue?: boolean;
+  formatValue?: (formattedValues: readonly string[], values: readonly number[]) => React.ReactNode;
+  getAriaValueText?: BaseSlider.Thumb.Props['getAriaValueText'];
   value?: Value;
   defaultValue?: Value;
   onValueChange?: (
@@ -43,6 +45,8 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
     label,
     description,
     showValue,
+    formatValue,
+    getAriaValueText,
     value,
     defaultValue,
     onValueChange,
@@ -60,6 +64,8 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
     children,
     className,
     id,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     'aria-describedby': ariaDescribedBy,
     ...props
   }: SliderProps<Value>,
@@ -80,17 +86,18 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
   const effectiveMinSteps = minStepsBetweenValues ?? (isRange ? 1 : 0);
   const effectiveCollision = thumbCollisionBehavior ?? (isRange ? 'none' : 'push');
   const labelText = typeof label === 'string' && label.trim() ? label.trim() : undefined;
+  const resolvedRangeLabel = labelText ?? ariaLabel;
   const rootClassName = composeClassName(SLIDER_ROOT_BASE_CLASS, className);
-  const shouldShowHeader = Boolean(
-    showValue ?? (label !== undefined || value !== undefined || defaultValue !== undefined)
-  );
+  const hasLabel = label !== undefined && label !== null && label !== false;
+  const shouldShowValue = showValue ?? false;
+  const shouldShowHeader = hasLabel || shouldShowValue;
 
   // Composable compound usage
   if (children) {
     return (
       <BaseSlider.Root<Value>
         ref={ref}
-        id={sliderId}
+        id={id}
         data-slot="slider"
         value={value}
         defaultValue={effectiveDefaultValue}
@@ -99,13 +106,15 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
         min={min}
         max={max}
         step={step}
-        minStepsBetweenValues={effectiveMinSteps}
-        thumbCollisionBehavior={effectiveCollision}
+        minStepsBetweenValues={minStepsBetweenValues}
+        thumbCollisionBehavior={thumbCollisionBehavior}
         format={format}
         locale={locale}
         orientation={orientation}
         name={name}
         disabled={disabled}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
         aria-describedby={ariaDescribedBy}
         className={rootClassName}
         {...props}
@@ -134,20 +143,23 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
       orientation={orientation}
       name={name}
       disabled={disabled}
+      aria-labelledby={ariaLabelledBy}
       aria-describedby={combinedDescribedBy}
       className={rootClassName}
       {...props}
     >
       {shouldShowHeader && (
         <div className="flex justify-between items-center font-label text-sm font-semibold text-on-surface">
-          {label && <BaseSlider.Label>{label}</BaseSlider.Label>}
-          <BaseSlider.Value className="text-on-surface-variant font-mono text-sm font-medium tabular-nums ms-auto">
-            {(formattedValues, values) =>
-              formattedValues.length > 0
-                ? formattedValues.join(' - ')
-                : values.join(' - ')
-            }
-          </BaseSlider.Value>
+          {hasLabel && <BaseSlider.Label>{label}</BaseSlider.Label>}
+          {shouldShowValue && (
+            <BaseSlider.Value className="text-on-surface-variant font-mono text-sm font-medium tabular-nums ms-auto">
+              {formatValue ??
+                ((formattedValues, values) =>
+                  formattedValues.length > 0
+                    ? formattedValues.join(' – ')
+                    : values.join(' – '))}
+            </BaseSlider.Value>
+          )}
         </div>
       )}
 
@@ -158,35 +170,37 @@ function SliderComponentInner<Value extends number | readonly number[] = number 
       )}
 
       <BaseSlider.Control data-slot="slider-control" className="relative flex items-center w-full h-11 touch-none select-none cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[orientation=vertical]:justify-center data-[orientation=vertical]:w-11 data-[orientation=vertical]:h-full">
-        <BaseSlider.Track data-slot="slider-track" className="relative h-2 w-full rounded-full bg-surface-container-high border border-outline forced-colors:border-[CanvasText] data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
-          <BaseSlider.Indicator data-slot="slider-range" className="rounded-full bg-primary forced-colors:bg-[Highlight] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
+        <BaseSlider.Track data-slot="slider-track" className="relative h-2 w-full rounded-full bg-surface-container-high border border-outline data-[invalid]:border-error forced-colors:border-[CanvasText] data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2">
+          <BaseSlider.Indicator data-slot="slider-range" className="rounded-full bg-primary data-[invalid]:bg-error forced-colors:bg-[Highlight] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full" />
           {isRange ? (
             Array.from({ length: thumbCount }, (_, thumbIndex) => (
               <BaseSlider.Thumb
                 key={thumbIndex}
                 data-slot="slider-thumb"
                 index={thumbIndex}
+                getAriaValueText={getAriaValueText}
                 aria-label={
                   thumbCount === 2
                     ? thumbIndex === 0
-                      ? labelText
-                        ? `${labelText} minimum`
+                      ? resolvedRangeLabel
+                        ? `${resolvedRangeLabel} minimum`
                         : 'Minimum value'
-                      : labelText
-                        ? `${labelText} maximum`
+                      : resolvedRangeLabel
+                        ? `${resolvedRangeLabel} maximum`
                         : 'Maximum value'
-                    : labelText
-                      ? `${labelText} thumb ${thumbIndex + 1}`
+                    : resolvedRangeLabel
+                      ? `${resolvedRangeLabel} thumb ${thumbIndex + 1}`
                       : `Slider value ${thumbIndex + 1}`
                 }
-                className="relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+                className="relative block size-5 rounded-full border-2 border-on-primary bg-primary data-[invalid]:bg-error forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
               />
             ))
           ) : (
             <BaseSlider.Thumb
               data-slot="slider-thumb"
-              aria-label={!label && !props['aria-labelledby'] ? (props['aria-label'] ?? 'Slider value') : undefined}
-              className="relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
+              getAriaValueText={getAriaValueText}
+              aria-label={!hasLabel && !ariaLabelledBy ? (ariaLabel ?? 'Slider value') : undefined}
+              className="relative block size-5 rounded-full border-2 border-on-primary bg-primary data-[invalid]:bg-error forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
             />
           )}
         </BaseSlider.Track>
@@ -202,17 +216,25 @@ const SliderComponent = React.forwardRef(SliderComponentInner) as (<
 ) => React.JSX.Element) & { displayName?: string };
 SliderComponent.displayName = 'Slider';
 
-export const SliderRoot = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof BaseSlider.Root>
->(({ className, ...props }, ref) => (
-  <BaseSlider.Root
-    ref={ref}
-    data-slot="slider"
-    className={composeClassName(SLIDER_ROOT_BASE_CLASS, className)}
-    {...props}
-  />
-));
+function SliderRootInner<Value extends number | readonly number[] = number | readonly number[]>(
+  { className, ...props }: BaseSlider.Root.Props<Value>,
+  ref: React.ForwardedRef<HTMLDivElement>
+): React.JSX.Element {
+  return (
+    <BaseSlider.Root<Value>
+      ref={ref}
+      data-slot="slider"
+      className={composeClassName(SLIDER_ROOT_BASE_CLASS, className)}
+      {...props}
+    />
+  );
+}
+
+export const SliderRoot = React.forwardRef(SliderRootInner) as (<
+  Value extends number | readonly number[] = number | readonly number[]
+>(
+  props: BaseSlider.Root.Props<Value> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
 SliderRoot.displayName = 'SliderRoot';
 
 export const SliderLabel = React.forwardRef<
@@ -265,7 +287,7 @@ export const SliderTrack = React.forwardRef<
     ref={ref}
     data-slot="slider-track"
     className={composeClassName(
-      'relative h-2 w-full rounded-full bg-surface-container-high border border-outline forced-colors:border-[CanvasText] data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2',
+      'relative h-2 w-full rounded-full bg-surface-container-high border border-outline data-[invalid]:border-error forced-colors:border-[CanvasText] data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2',
       className
     )}
     {...props}
@@ -281,7 +303,7 @@ export const SliderIndicator = React.forwardRef<
     ref={ref}
     data-slot="slider-range"
     className={composeClassName(
-      'rounded-full bg-primary forced-colors:bg-[Highlight] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full',
+      'rounded-full bg-primary data-[invalid]:bg-error forced-colors:bg-[Highlight] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full',
       className
     )}
     {...props}
@@ -297,7 +319,7 @@ export const SliderThumb = React.forwardRef<
     ref={ref}
     data-slot="slider-thumb"
     className={composeClassName(
-      "relative block size-5 rounded-full border-2 border-on-primary bg-primary forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
+      "relative block size-5 rounded-full border-2 border-on-primary bg-primary data-[invalid]:bg-error forced-colors:bg-[Highlight] forced-colors:border-[HighlightText] hover:brightness-95 transition-[filter,transform,box-shadow] duration-[var(--duration-micro)] ease-[var(--ease-standard)] active:scale-110 data-[dragging]:scale-110 data-[dragging]:ring-4 data-[dragging]:ring-primary/20 motion-reduce:transition-none motion-reduce:active:scale-100 motion-reduce:data-[dragging]:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary cursor-pointer after:absolute after:-inset-3 after:content-[''] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
       className
     )}
     {...props}

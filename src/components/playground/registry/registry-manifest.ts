@@ -297,7 +297,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "Use Calendar for date, multiple date, and date range selections.",
       "Integrates with React DayPicker v9/v10 while maintaining complete shadcn/ui API compatibility.",
       "Commonly paired with Popover and Button to form a DatePicker.",
-      "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, surface-container-high range fills, and WCAG 2.2 AA contrast."
+      "Follows DESIGN.md tokens: Lexend body/cell font (font-sans), Atkinson Hyperlegible Next headings, primary brand selection, primary-container range fills, and WCAG 2.2 AA contrast."
     ],
     "dependencies": [
       "react-day-picker@^10.0.0"
@@ -718,7 +718,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "basePrimitive": "@base-ui/react/drawer",
     "sourcePath": "src/components/ui/drawer.tsx",
     "taxonomy": [
-      "Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures, snap points, and background indent effects.",
+      "Use Drawer for slide-over side panels or bottom sheets with swipe dismissal gestures, snap points, non-modal inspectors, and background indent effects.",
       "For focused modal dialogs without swipe gestures, use Dialog instead.",
       "Follows DESIGN.md Tier B interactive controls: concentric radius, floating 2px focus ring, WCAG 2.2 SC 2.5.8 compliant 44x44px touch targets, and motion restraint."
     ],
@@ -855,7 +855,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
     "sourcePath": "src/components/ui/inline-alert.tsx",
     "taxonomy": [
       "Use InlineAlert for high-visibility system event or validation banners (neutral, warning, error, success).",
-      "Implements a mathematically straight 4px vertical accent bar, ambient elevation, and accessible live regions.",
+      "Implements symmetric rounded-md geometry with either a soft container wash (`appearance=\"wash\"`) or a neutral-bordered white surface with a tinted semantic icon badge (`appearance=\"surface\"`), plus accessible live regions.",
       "Supports both monolithic props (title, action, onClose) and compound subcomponents (InlineAlert.Title, InlineAlert.Description, InlineAlert.Action, InlineAlert.Close).",
       "Distinct from ClinicianTip (which is low-prominence instructional micro-guidance) and AlertDialog (modal interrupt).",
       "Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles."
@@ -2228,7 +2228,7 @@ export const REGISTRY_ENTRIES: RegistryEntry[] = [
       "On large containers (`@2xl:` / `>=672px`): Side-by-side two-pane split with selectable list and detail view.",
       "On compact containers (`<672px`): Stack navigation. Renders list full-width; pushes detail view with an accessible back button when an item is selected.",
       "Active selection: 2px flush primary border + primary-container wash (`Item variant=\"selected\"`).",
-      "Touch targets: All list items maintain >=56px height (`Item size=\"lg\"`, WCAG 2.2 SC 2.5.8).",
+      "Touch targets: All list items maintain >=56px height (`Item size=\"md\"` + `min-h-14`, WCAG 2.2 SC 2.5.8).",
       "Accessible keyboard navigation: Listbox roving focus via ArrowDown / ArrowUp / Home / End, selection via Enter / Space / click, and Escape to return on compact views.",
       "Zero direct `<button>` or `<input>` tags outside primitives."
     ],

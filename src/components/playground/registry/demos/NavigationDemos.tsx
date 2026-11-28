@@ -44,7 +44,7 @@ export const TabsDemo: React.FC<ComponentDemoProps> = () => {
           </p>
         </div>
         <Tabs.Root defaultValue="assessment" variant="line">
-          <Tabs.List className="w-full border-b border-outline-variant">
+          <Tabs.List className="w-full">
             <Tabs.Tab value="assessment" icon="assignment">
               Assessment
             </Tabs.Tab>
@@ -282,11 +282,11 @@ export const NavigationMenuDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-2xl mx-auto rounded-lg border border-outline-variant bg-surface overflow-visible">
       {/* Navigation Header Chrome */}
-      <div className="h-12 bg-surface px-4 border-b border-outline-variant rounded-t-[15px]">
+      <div className="relative h-12 bg-surface px-4 rounded-t-[15px] before:pointer-events-none before:content-[''] before:absolute before:inset-x-0 before:bottom-0 before:h-px before:bg-outline-variant">
         <NavigationMenu
           items={navigationItems}
           activeId={activeId}
-          className="justify-start"
+          className="relative z-10 justify-start"
         />
       </div>
 
@@ -479,32 +479,34 @@ export const SidebarDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
-  const [currentStep, setCurrentStep] = React.useState(0);
-  const [isCompleted, setIsCompleted] = React.useState(false);
+  const [numberedStep, setNumberedStep] = React.useState(0);
+  const [numberedCompleted, setNumberedCompleted] = React.useState(false);
+  const [progressStep, setProgressStep] = React.useState(0);
+  const [progressCompleted, setProgressCompleted] = React.useState(false);
 
-  const steps = [
+  const buildSteps = (completed: boolean) => [
     {
       id: 'step-1',
       title: 'Initial Assessment',
       description: 'Record baseline articulation accuracy and target sounds',
       content: (
         <div className="flex flex-col gap-4 font-sans text-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-surface-container-low border border-outline-variant/60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-lg bg-surface-container-low">
             <div>
-              <span className="font-mono text-xs text-on-surface-variant block">Sound Accuracy</span>
-              <span className="text-base font-bold text-on-surface font-mono tabular-nums">84% Baseline</span>
+              <span className="font-label text-xs font-medium text-on-surface-variant block">Sound Accuracy</span>
+              <span className="text-base font-bold text-on-surface font-sans tabular-nums">84% Baseline</span>
             </div>
             <div>
-              <span className="font-mono text-xs text-on-surface-variant block">Practice Rhythm</span>
-              <span className="text-base font-bold text-on-surface font-mono tabular-nums">92% Pace</span>
+              <span className="font-label text-xs font-medium text-on-surface-variant block">Practice Rhythm</span>
+              <span className="text-base font-bold text-on-surface font-sans tabular-nums">92% Pace</span>
             </div>
             <div>
-              <span className="font-mono text-xs text-on-surface-variant block">Target Sounds</span>
-              <span className="text-base font-bold text-on-surface font-mono">/r/ and /s/ blends</span>
+              <span className="font-label text-xs font-medium text-on-surface-variant block">Target Sounds</span>
+              <span className="text-base font-bold text-on-surface font-sans">/r/ and /s/ blends</span>
             </div>
             <div>
-              <span className="font-mono text-xs text-on-surface-variant block">Session Target</span>
-              <span className="text-base font-bold text-on-surface font-mono">15 min / day</span>
+              <span className="font-label text-xs font-medium text-on-surface-variant block">Session Target</span>
+              <span className="text-base font-bold text-on-surface font-sans tabular-nums">15 min / day</span>
             </div>
           </div>
           <p className="text-body-md text-on-surface-variant leading-relaxed">
@@ -519,10 +521,10 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       description: 'Review sound clarity scores and practice recommendations',
       content: (
         <div className="flex flex-col gap-4 font-sans text-sm">
-          <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 flex flex-col gap-2">
+          <div className="p-4 rounded-lg bg-surface-container-low flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="font-label font-semibold text-on-surface">Articulation Score</span>
-              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-primary-container text-on-primary-container">
+              <span className="font-label text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary-container">
                 Level 2 Target
               </span>
             </div>
@@ -530,7 +532,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
               Pronunciation of vowel sounds is clear and consistent. Maximum sustained sound duration was 18 seconds.
             </p>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant/40">
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-container-low">
             <Icon name="verified_user" size="sm" className="text-secondary shrink-0" />
             <span className="text-body-md text-on-surface">Reviewed by C. Doherty, Speech-Language Pathologist</span>
           </div>
@@ -543,7 +545,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
       description: 'Confirm practice exercises and session schedule',
       content: (
         <div className="flex flex-col gap-4 font-sans text-sm">
-          <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 flex flex-col gap-2">
+          <div className="p-4 rounded-lg bg-surface-container-low flex flex-col gap-2">
             <span className="font-label font-semibold text-on-surface block">Practice Plan Details</span>
             <ul className="flex flex-col gap-1.5 text-body-md text-on-surface-variant list-disc pl-5">
               <li>Two review sessions each week (Clinic Room 2B)</li>
@@ -551,7 +553,7 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
               <li>Progress review at the end of week two</li>
             </ul>
           </div>
-          {isCompleted && (
+          {completed && (
             <div className="p-3 rounded-lg bg-success-container text-on-success-container font-sans text-body-md font-medium flex items-center gap-2">
               <Icon name="check_circle" size="sm" className="text-success shrink-0" />
               <span>Practice plan saved successfully</span>
@@ -565,18 +567,18 @@ export const StepWizardDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="w-full max-w-xl mx-auto py-4 flex flex-col gap-6">
       <StepWizard
-        steps={steps}
-        currentStepIndex={currentStep}
-        onStepChange={setCurrentStep}
-        onComplete={() => setIsCompleted(true)}
+        steps={buildSteps(numberedCompleted)}
+        currentStepIndex={numberedStep}
+        onStepChange={setNumberedStep}
+        onComplete={() => setNumberedCompleted(true)}
         completeLabel="Save Plan"
         allowStepClick
       />
       <StepWizard
-        steps={steps}
-        currentStepIndex={currentStep}
-        onStepChange={setCurrentStep}
-        onComplete={() => setIsCompleted(true)}
+        steps={buildSteps(progressCompleted)}
+        currentStepIndex={progressStep}
+        onStepChange={setProgressStep}
+        onComplete={() => setProgressCompleted(true)}
         completeLabel="Save Plan"
         indicator="progress"
       />

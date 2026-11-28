@@ -15,6 +15,7 @@
 import * as React from 'react';
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
+import { Icon } from './icon';
 
 export interface AccordionItemData {
   id: string;
@@ -83,12 +84,12 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
     >
       {children}
       {!hideChevron && (
-        <span
-          className="material-symbols-outlined text-2xl text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none select-none shrink-0"
+        <Icon
+          name="expand_more"
+          size="lg"
+          className="text-on-surface-variant group-data-[panel-open]:rotate-180 transition-transform duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none shrink-0"
           aria-hidden="true"
-        >
-          expand_more
-        </span>
+        />
       )}
     </BaseAccordion.Trigger>
   )
@@ -134,8 +135,8 @@ export interface AccordionProps
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseAccordion.Root>, 'value' | 'defaultValue' | 'onValueChange'> {
   items?: AccordionItemData[];
   level?: 1 | 2;
-  value?: string | string[] | null;
-  defaultValue?: string | string[] | null;
+  value?: string | readonly string[] | null;
+  defaultValue?: string | readonly string[] | null;
   onValueChange?: (value: string | string[], eventDetails?: BaseAccordion.Root.ChangeEventDetails) => void;
   multiple?: boolean;
   type?: 'single' | 'multiple';
@@ -181,13 +182,13 @@ const AccordionComponent = React.forwardRef<HTMLDivElement, AccordionProps>(({
   const normalizedValue = React.useMemo(() => {
     if (value === undefined) return undefined;
     if (value === null) return [];
-    return Array.isArray(value) ? value : [value];
+    return typeof value === 'string' ? [value] : [...value];
   }, [value]);
 
   const normalizedDefaultValue = React.useMemo(() => {
     if (defaultValue === undefined) return undefined;
     if (defaultValue === null) return [];
-    return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+    return typeof defaultValue === 'string' ? [defaultValue] : [...defaultValue];
   }, [defaultValue]);
 
   const handleValueChange = React.useCallback(

@@ -16,6 +16,7 @@
 import * as React from 'react';
 import { Button as BaseButton } from '@base-ui/react/button';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
+import { Icon } from './icon';
 
 export type ButtonVariant =
   | 'filled'
@@ -224,20 +225,23 @@ const ButtonComponent = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             <span className="opacity-0 inline-flex items-center justify-center">{children}</span>
             <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-              <span className="material-symbols-outlined motion-safe:animate-spin motion-reduce:animate-pulse text-base shrink-0">
-                progress_activity
-              </span>
+              <Icon
+                name="progress_activity"
+                size="sm"
+                className="motion-safe:animate-spin motion-reduce:animate-pulse shrink-0"
+                aria-hidden="true"
+              />
             </span>
           </>
         ) : (
           <>
             {loading && (
-              <span
-                className="material-symbols-outlined motion-safe:animate-spin motion-reduce:animate-pulse text-base shrink-0"
+              <Icon
+                name="progress_activity"
+                size="sm"
+                className="motion-safe:animate-spin motion-reduce:animate-pulse shrink-0"
                 aria-hidden="true"
-              >
-                progress_activity
-              </span>
+              />
             )}
             {children}
           </>

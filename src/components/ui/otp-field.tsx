@@ -218,7 +218,6 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
       form={form}
       required={required}
       readOnly={readOnly}
-      autoFocus={autoFocus}
       disabled={disabled}
       autoSubmit={autoSubmit}
       mask={mask}
@@ -250,6 +249,7 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
             )}
             <BaseOTPField.Input
               pattern={pattern}
+              autoFocus={idx === 0 ? autoFocus : undefined}
               aria-label={idx === 0 ? undefined : `Character ${idx + 1} of ${length}`}
               className={cn(
                 'text-center font-mono font-bold tabular-nums rounded shrink-0',
@@ -280,6 +280,8 @@ const OTPFieldComponent = React.forwardRef<HTMLDivElement, OTPFieldProps>(({
   return (
     <BaseField.Root
       ref={containerRef}
+      name={name}
+      disabled={disabled}
       invalid={Boolean(error)}
       className={cn('@container flex flex-col gap-1.5 w-full', !isClassNameFn ? className : undefined)}
     >

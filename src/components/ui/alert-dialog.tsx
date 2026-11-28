@@ -3,8 +3,11 @@
 import * as React from 'react';
 import { AlertDialog as BaseAlertDialog } from '@base-ui/react/alert-dialog';
 import { Button } from './button';
+import { Icon } from './icon';
 import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 import { dialogSizeClasses, type DialogSize } from './dialog';
+
+const AlertDialogPortalScopeContext = React.createContext(false);
 
 export interface AlertDialogProps<Payload = unknown> {
   open?: boolean;
@@ -29,11 +32,106 @@ export interface AlertDialogProps<Payload = unknown> {
   finalFocus?: BaseAlertDialog.Popup.Props['finalFocus'];
   keepMounted?: boolean;
   container?: BaseAlertDialog.Portal.Props['container'];
+  containerClassName?: BaseAlertDialog.Viewport.Props['className'];
+  backdropClassName?: BaseAlertDialog.Backdrop.Props['className'];
   className?: BaseAlertDialog.Popup.Props['className'];
 }
 
-function AlertDialogComponent<Payload = unknown>(
-  rawProps: AlertDialogProps<Payload>
+export const AlertDialogPortal = React.forwardRef<HTMLDivElement, BaseAlertDialog.Portal.Props>(
+  ({ container, keepMounted, children, ...props }, ref) => (
+    <AlertDialogPortalScopeContext.Provider value={Boolean(container)}>
+      <BaseAlertDialog.Portal ref={ref} container={container} keepMounted={keepMounted} {...props}>
+        {children}
+      </BaseAlertDialog.Portal>
+    </AlertDialogPortalScopeContext.Provider>
+  )
+);
+AlertDialogPortal.displayName = 'AlertDialogPortal';
+
+export const AlertDialogBackdrop = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseAlertDialog.Backdrop>
+>(({ className, ...props }, ref) => {
+  const isScoped = React.useContext(AlertDialogPortalScopeContext);
+  return (
+    <BaseAlertDialog.Backdrop
+      ref={ref}
+      data-slot="alert-dialog-overlay"
+      className={composeClassName(
+        cn(
+          isScoped ? 'absolute inset-0' : 'fixed inset-0',
+          'bg-on-surface/50 z-50 transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none'
+        ),
+        className
+      )}
+      {...props}
+    />
+  );
+});
+AlertDialogBackdrop.displayName = 'AlertDialogBackdrop';
+
+export interface AlertDialogViewportProps
+  extends React.ComponentPropsWithoutRef<typeof BaseAlertDialog.Viewport> {
+  scroll?: 'inside' | 'outside';
+}
+
+export const AlertDialogViewport = React.forwardRef<HTMLDivElement, AlertDialogViewportProps>(
+  ({ className, scroll = 'inside', ...props }, ref) => {
+    const isScoped = React.useContext(AlertDialogPortalScopeContext);
+    const isOutsideScroll = scroll === 'outside';
+
+    return (
+      <BaseAlertDialog.Viewport
+        ref={ref}
+        data-slot="alert-dialog-viewport"
+        className={composeClassName(
+          cn(
+            isScoped ? 'absolute inset-0 z-50 p-4' : 'fixed inset-0 z-50 p-4',
+            isOutsideScroll
+              ? 'overflow-y-auto flex min-h-full items-start justify-center'
+              : 'flex items-center justify-center'
+          ),
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+AlertDialogViewport.displayName = 'AlertDialogViewport';
+
+export interface AlertDialogPopupProps
+  extends React.ComponentPropsWithoutRef<typeof BaseAlertDialog.Popup> {
+  size?: DialogSize;
+  scroll?: 'inside' | 'outside';
+}
+
+export const AlertDialogPopup = React.forwardRef<HTMLDivElement, AlertDialogPopupProps>(
+  ({ className, size = 'md', scroll = 'inside', ...props }, ref) => {
+    const isOutsideScroll = scroll === 'outside';
+
+    return (
+      <BaseAlertDialog.Popup
+        ref={ref}
+        data-slot="alert-dialog-content"
+        className={composeClassName(
+          cn(
+            '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
+            isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
+            dialogSizeClasses[size] || dialogSizeClasses.md
+          ),
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+AlertDialogPopup.displayName = 'AlertDialogPopup';
+
+function AlertDialogComponentInner<Payload = unknown>(
+  rawProps: AlertDialogProps<Payload>,
+  ref: React.ForwardedRef<HTMLDivElement>
 ): React.JSX.Element {
   const isShorthand =
     'title' in rawProps ||
@@ -64,6 +162,8 @@ function AlertDialogComponent<Payload = unknown>(
     finalFocus,
     keepMounted,
     container,
+    containerClassName,
+    backdropClassName,
     className,
   } = rawProps;
 
@@ -84,8 +184,6 @@ function AlertDialogComponent<Payload = unknown>(
       </BaseAlertDialog.Root>
     );
   }
-
-  const isOutsideScroll = scroll === 'outside';
 
   return (
     <BaseAlertDialog.Root<Payload>
@@ -110,34 +208,21 @@ function AlertDialogComponent<Payload = unknown>(
               {!React.isValidElement(trigger) ? trigger : undefined}
             </BaseAlertDialog.Trigger>
           )}
-          <BaseAlertDialog.Portal container={container} keepMounted={keepMounted}>
-            <BaseAlertDialog.Backdrop data-slot="alert-dialog-overlay" className="fixed inset-0 bg-on-surface/50 z-50 transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none" />
-            <BaseAlertDialog.Viewport
-              data-slot="alert-dialog-viewport"
-              className={cn(
-                'fixed inset-0 z-50 p-4',
-                isOutsideScroll
-                  ? 'overflow-y-auto flex min-h-full items-start justify-center'
-                  : 'flex items-center justify-center'
-              )}
-            >
-              <BaseAlertDialog.Popup
-                data-slot="alert-dialog-content"
+          <AlertDialogPortal container={container} keepMounted={keepMounted}>
+            <AlertDialogBackdrop className={backdropClassName} />
+            <AlertDialogViewport scroll={scroll} className={containerClassName}>
+              <AlertDialogPopup
+                ref={ref}
+                size={size}
+                scroll={scroll}
                 initialFocus={initialFocus}
                 finalFocus={finalFocus}
-                className={composeClassName(
-                  cn(
-                    '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-                    isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
-                    dialogSizeClasses[size] || dialogSizeClasses.md
-                  ),
-                  className
-                )}
+                className={className}
               >
                 <div data-slot="alert-dialog-header" className="flex items-start gap-3">
-                  <span className="material-symbols-outlined text-error text-2xl mt-0.5 shrink-0" aria-hidden="true">
-                    warning
-                  </span>
+                  <div className="size-7 rounded-sm bg-error-container text-error flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon name="warning" size="md" aria-hidden="true" />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <BaseAlertDialog.Title data-slot="alert-dialog-title" className={cn('text-headline-sm text-on-surface', !title && 'sr-only')}>
                       {title || 'Alert'}
@@ -189,14 +274,19 @@ function AlertDialogComponent<Payload = unknown>(
                     </Button>
                   )}
                 </div>
-              </BaseAlertDialog.Popup>
-            </BaseAlertDialog.Viewport>
-          </BaseAlertDialog.Portal>
+              </AlertDialogPopup>
+            </AlertDialogViewport>
+          </AlertDialogPortal>
         </>
       )}
     </BaseAlertDialog.Root>
   );
 }
+
+const AlertDialogComponent = React.forwardRef(AlertDialogComponentInner) as (<Payload = unknown>(
+  props: AlertDialogProps<Payload> & React.RefAttributes<HTMLDivElement>
+) => React.JSX.Element) & { displayName?: string };
+AlertDialogComponent.displayName = 'AlertDialog';
 
 export interface AlertDialogContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseAlertDialog.Popup> {
@@ -210,63 +300,37 @@ export interface AlertDialogContentProps
 
 // Standard composable compound slots
 export const AlertDialogContent = React.forwardRef<HTMLDivElement, AlertDialogContentProps>(
-  ({ className, children, size = 'md', scroll = 'inside', keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => {
-    const isOutsideScroll = scroll === 'outside';
-    return (
-      <BaseAlertDialog.Portal container={container} keepMounted={keepMounted}>
-        <BaseAlertDialog.Backdrop
-          data-slot="alert-dialog-overlay"
-          className={composeClassName(
-            'fixed inset-0 bg-on-surface/50 z-50 transition-opacity duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
-            backdropClassName
-          )}
-        />
-        <BaseAlertDialog.Viewport
-          data-slot="alert-dialog-viewport"
-          className={composeClassName(
-            cn(
-              'fixed inset-0 z-50 p-4',
-              isOutsideScroll
-                ? 'overflow-y-auto flex min-h-full items-start justify-center'
-                : 'flex items-center justify-center'
-            ),
-            containerClassName
-          )}
-        >
-          <BaseAlertDialog.Popup
-            ref={ref}
-            data-slot="alert-dialog-content"
-            className={composeClassName(
-              cn(
-                '@container w-full p-6 rounded-lg bg-surface border border-outline-variant shadow-modal flex flex-col gap-4 will-change-[opacity,transform] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-large)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-large)] data-[nested-dialog-open]:scale-[0.97] data-[nested-dialog-open]:opacity-80 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-                isOutsideScroll ? 'my-auto' : 'max-h-[calc(100dvh-2rem)] overflow-y-auto',
-                dialogSizeClasses[size] || dialogSizeClasses.md
-              ),
-              className
-            )}
-            {...props}
-          >
-            {children}
-          </BaseAlertDialog.Popup>
-        </BaseAlertDialog.Viewport>
-      </BaseAlertDialog.Portal>
-    );
-  }
+  ({ className, children, size = 'md', scroll = 'inside', keepMounted, container, containerClassName, backdropClassName, ...props }, ref) => (
+    <AlertDialogPortal container={container} keepMounted={keepMounted}>
+      <AlertDialogBackdrop className={backdropClassName} />
+      <AlertDialogViewport scroll={scroll} className={containerClassName}>
+        <AlertDialogPopup ref={ref} size={size} scroll={scroll} className={className} {...props}>
+          {children}
+        </AlertDialogPopup>
+      </AlertDialogViewport>
+    </AlertDialogPortal>
+  )
 );
 AlertDialogContent.displayName = 'AlertDialogContent';
 
-export const AlertDialogTrigger = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof BaseAlertDialog.Trigger>
->(({ render, nativeButton, ...props }, ref) => (
-  <BaseAlertDialog.Trigger
-    ref={ref}
-    data-slot="alert-dialog-trigger"
-    render={render}
-    nativeButton={resolveNativeButton(render, nativeButton)}
-    {...props}
-  />
-));
+export type AlertDialogTriggerProps<Payload = unknown> = BaseAlertDialog.Trigger.Props<Payload>;
+
+export const AlertDialogTrigger = React.forwardRef(function AlertDialogTrigger<Payload = unknown>(
+  { render, nativeButton, ...props }: AlertDialogTriggerProps<Payload>,
+  ref: React.ForwardedRef<HTMLButtonElement>
+) {
+  return (
+    <BaseAlertDialog.Trigger
+      ref={ref}
+      data-slot="alert-dialog-trigger"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      {...props}
+    />
+  );
+}) as (<Payload = unknown>(
+  props: AlertDialogTriggerProps<Payload> & React.RefAttributes<HTMLButtonElement>
+) => React.JSX.Element) & { displayName?: string };
 AlertDialogTrigger.displayName = 'AlertDialogTrigger';
 
 export const AlertDialogHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -293,7 +357,7 @@ AlertDialogMedia.displayName = 'AlertDialogMedia';
 
 export const AlertDialogBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} data-slot="alert-dialog-body" className={cn('py-2 font-sans text-sm text-on-surface-variant leading-relaxed', className)} {...props} />
+    <div ref={ref} data-slot="alert-dialog-body" className={cn('py-2 font-sans text-base text-on-surface-variant leading-relaxed', className)} {...props} />
   )
 );
 AlertDialogBody.displayName = 'AlertDialogBody';
@@ -401,11 +465,11 @@ AlertDialogClose.displayName = 'AlertDialogClose';
 export const AlertDialog = Object.assign(AlertDialogComponent, {
   Root: BaseAlertDialog.Root,
   Trigger: AlertDialogTrigger,
-  Portal: BaseAlertDialog.Portal,
-  Backdrop: BaseAlertDialog.Backdrop,
-  Overlay: BaseAlertDialog.Backdrop,
-  Viewport: BaseAlertDialog.Viewport,
-  Popup: BaseAlertDialog.Popup,
+  Portal: AlertDialogPortal,
+  Backdrop: AlertDialogBackdrop,
+  Overlay: AlertDialogBackdrop,
+  Viewport: AlertDialogViewport,
+  Popup: AlertDialogPopup,
   Content: AlertDialogContent,
   Header: AlertDialogHeader,
   Media: AlertDialogMedia,
@@ -423,11 +487,11 @@ export const AlertDialog = Object.assign(AlertDialogComponent, {
 // Re-export Base UI primitives for compound composition
 export { BaseAlertDialog };
 export const AlertDialogRoot = BaseAlertDialog.Root;
-export const AlertDialogPortal = BaseAlertDialog.Portal;
-export const AlertDialogBackdrop = BaseAlertDialog.Backdrop;
-export const AlertDialogOverlay = BaseAlertDialog.Backdrop;
-export const AlertDialogViewport = BaseAlertDialog.Viewport;
-export const AlertDialogPopup = BaseAlertDialog.Popup;
+export const AlertDialogPortalPrimitive = BaseAlertDialog.Portal;
+export const AlertDialogBackdropPrimitive = BaseAlertDialog.Backdrop;
+export const AlertDialogOverlay = AlertDialogBackdrop;
+export const AlertDialogViewportPrimitive = BaseAlertDialog.Viewport;
+export const AlertDialogPopupPrimitive = BaseAlertDialog.Popup;
 export const createAlertDialogHandle = BaseAlertDialog.createHandle;
 export const AlertDialogHandle = BaseAlertDialog.Handle;
 

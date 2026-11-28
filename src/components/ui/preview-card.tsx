@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import { PreviewCard as BasePreviewCard } from '@base-ui/react/preview-card';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, sanitizeUrl } from '@/lib/utils';
+import { Badge } from './badge';
 import { Icon } from './icon';
 import { ScrollArea } from './scroll-area';
 
@@ -14,39 +15,46 @@ interface PreviewCardContextValue {
 const PreviewCardContext = React.createContext<PreviewCardContextValue>({});
 export const usePreviewCardContext = () => React.useContext(PreviewCardContext);
 
-export interface PreviewCardTriggerProps
-  extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Trigger> {}
+export type PreviewCardTriggerProps<Payload = unknown> = BasePreviewCard.Trigger.Props<Payload>;
 
-export const PreviewCardTrigger = React.forwardRef<HTMLAnchorElement, PreviewCardTriggerProps>(
-  ({ className, children, delay, closeDelay, render, href, ...props }, ref) => {
-    const context = React.useContext(PreviewCardContext);
-    const resolvedDelay = delay ?? context.delay;
-    const resolvedCloseDelay = closeDelay ?? context.closeDelay;
-    const isFallbackButton = href === undefined && render === undefined;
-    const resolvedRender = isFallbackButton ? <button type="button" /> : render;
+export const PreviewCardTrigger = React.forwardRef(function PreviewCardTrigger<Payload = unknown>(
+  { className, children, delay, closeDelay, render, href, ...props }: PreviewCardTriggerProps<Payload>,
+  ref: React.ForwardedRef<HTMLAnchorElement>
+) {
+  const context = React.useContext(PreviewCardContext);
+  const resolvedDelay = delay ?? context.delay;
+  const resolvedCloseDelay = closeDelay ?? context.closeDelay;
+  const isFallbackButton = href === undefined && render === undefined;
+  const resolvedRender = isFallbackButton ? <button type="button" /> : render;
+  const safeHref = !isFallbackButton && href !== undefined ? sanitizeUrl(href) : undefined;
 
-    return (
-      <BasePreviewCard.Trigger
-        ref={ref}
-        data-slot="preview-card-trigger"
-        render={resolvedRender}
-        {...(!isFallbackButton && href !== undefined ? { href } : {})}
-        {...(resolvedDelay !== undefined ? { delay: resolvedDelay } : {})}
-        {...(resolvedCloseDelay !== undefined ? { closeDelay: resolvedCloseDelay } : {})}
-        className={composeClassName(
-          cn(
-            'inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded transition-colors motion-reduce:transition-none',
-            isFallbackButton && 'bg-transparent border-0 p-0'
-          ),
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </BasePreviewCard.Trigger>
-    );
-  }
-);
+  return (
+    <BasePreviewCard.Trigger
+      ref={ref}
+      data-slot="preview-card-trigger"
+      render={resolvedRender}
+      {...(safeHref !== undefined ? { href: safeHref } : {})}
+      {...(resolvedDelay !== undefined ? { delay: resolvedDelay } : {})}
+      {...(resolvedCloseDelay !== undefined ? { closeDelay: resolvedCloseDelay } : {})}
+      className={
+        render
+          ? className
+          : composeClassName(
+              cn(
+                'inline-flex cursor-pointer text-primary underline underline-offset-2 hover:text-primary/80 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded transition-colors motion-reduce:transition-none',
+                isFallbackButton && 'bg-transparent border-0 p-0'
+              ),
+              className
+            )
+      }
+      {...props}
+    >
+      {children}
+    </BasePreviewCard.Trigger>
+  );
+}) as (<Payload = unknown>(
+  props: PreviewCardTriggerProps<Payload> & React.RefAttributes<HTMLAnchorElement>
+) => React.JSX.Element) & { displayName?: string };
 PreviewCardTrigger.displayName = 'PreviewCardTrigger';
 
 export interface PreviewCardPositionerProps
@@ -56,10 +64,11 @@ export const PreviewCardPositioner = React.forwardRef<HTMLDivElement, PreviewCar
   ({ className, sideOffset = 8, collisionPadding = 8, ...props }, ref) => (
     <BasePreviewCard.Positioner
       ref={ref}
+      data-slot="preview-card-positioner"
       sideOffset={sideOffset}
       collisionPadding={collisionPadding}
       className={composeClassName(
-        'z-50 outline-none max-w-[min(var(--available-width),calc(100vw-1rem))]',
+        'z-50 outline-none max-w-[min(var(--available-width),calc(100vw-1rem))] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none',
         className
       )}
       {...props}
@@ -101,14 +110,46 @@ export const PreviewCardArrow = React.forwardRef<HTMLDivElement, PreviewCardArro
 );
 PreviewCardArrow.displayName = 'PreviewCardArrow';
 
+export const PreviewCardBackdrop = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BasePreviewCard.Backdrop>
+>(({ className, ...props }, ref) => (
+  <BasePreviewCard.Backdrop
+    ref={ref}
+    data-slot="preview-card-backdrop"
+    className={composeClassName(
+      'fixed inset-0 bg-on-surface/20 z-50 transition-opacity duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 ease-[var(--ease-standard)] motion-reduce:transition-none',
+      className
+    )}
+    {...props}
+  />
+));
+PreviewCardBackdrop.displayName = 'PreviewCardBackdrop';
+
+export const PreviewCardViewport = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BasePreviewCard.Viewport>
+>(({ className, ...props }, ref) => (
+  <BasePreviewCard.Viewport
+    ref={ref}
+    data-slot="preview-card-viewport"
+    className={composeClassName('relative size-full overflow-hidden rounded-[inherit]', className)}
+    {...props}
+  />
+));
+PreviewCardViewport.displayName = 'PreviewCardViewport';
+
 export interface PreviewCardPopupProps
-  extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Popup> {}
+  extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Popup> {
+  scrollable?: boolean;
+}
 
 export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopupProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, scrollable = true, ...props }, ref) => {
     const childArray = React.Children.toArray(children);
     const arrowChildren: React.ReactNode[] = [];
     const bodyChildren: React.ReactNode[] = [];
+    let hasViewportChild = false;
 
     for (const child of childArray) {
       if (
@@ -117,29 +158,41 @@ export const PreviewCardPopup = React.forwardRef<HTMLDivElement, PreviewCardPopu
       ) {
         arrowChildren.push(child);
       } else {
+        if (
+          React.isValidElement(child) &&
+          (child.type === PreviewCardViewport || child.type === BasePreviewCard.Viewport)
+        ) {
+          hasViewportChild = true;
+        }
         bodyChildren.push(child);
       }
     }
+
+    const useScrollBody = scrollable && !hasViewportChild;
 
     return (
       <BasePreviewCard.Popup
         ref={ref}
         data-slot="preview-card-content"
         className={composeClassName(
-          'relative w-72 max-w-full max-h-[var(--available-height)] p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col transition-[opacity,transform] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98] motion-reduce:transition-none motion-reduce:transform-none',
+          'relative w-72 max-w-full max-h-[var(--available-height)] p-4 rounded bg-surface border border-outline-variant shadow-ambient flex flex-col transition-[opacity,transform,width,height] duration-[var(--duration-quick)] ease-[var(--ease-standard)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
           className
         )}
         {...props}
       >
         {arrowChildren}
-        <ScrollArea
-          data-slot="preview-card-body"
-          className="min-h-0 flex-[0_1_auto]"
-          viewportClassName="overscroll-contain"
-          contentClassName="flex flex-col gap-2"
-        >
-          {bodyChildren}
-        </ScrollArea>
+        {useScrollBody ? (
+          <ScrollArea
+            data-slot="preview-card-body"
+            className="min-h-0 flex-[0_1_auto]"
+            viewportClassName="overscroll-contain"
+            contentClassName="flex flex-col gap-2"
+          >
+            {bodyChildren}
+          </ScrollArea>
+        ) : (
+          bodyChildren
+        )}
       </BasePreviewCard.Popup>
     );
   }
@@ -157,6 +210,13 @@ export interface PreviewCardProps<Payload = unknown>
   align?: BasePreviewCard.Positioner.Props['align'];
   sideOffset?: BasePreviewCard.Positioner.Props['sideOffset'];
   alignOffset?: BasePreviewCard.Positioner.Props['alignOffset'];
+  anchor?: BasePreviewCard.Positioner.Props['anchor'];
+  sticky?: BasePreviewCard.Positioner.Props['sticky'];
+  collisionPadding?: BasePreviewCard.Positioner.Props['collisionPadding'];
+  collisionBoundary?: BasePreviewCard.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BasePreviewCard.Positioner.Props['collisionAvoidance'];
+  arrowPadding?: BasePreviewCard.Positioner.Props['arrowPadding'];
+  disableAnchorTracking?: BasePreviewCard.Positioner.Props['disableAnchorTracking'];
   showArrow?: boolean;
   keepMounted?: boolean;
   container?: BasePreviewCard.Portal.Props['container'];
@@ -177,6 +237,13 @@ function PreviewCardComponentInner<Payload = unknown>(
     align,
     sideOffset = 8,
     alignOffset,
+    anchor,
+    sticky,
+    collisionPadding = 8,
+    collisionBoundary,
+    collisionAvoidance,
+    arrowPadding,
+    disableAnchorTracking,
     showArrow = false,
     keepMounted,
     container,
@@ -248,6 +315,13 @@ function PreviewCardComponentInner<Payload = unknown>(
                 align={align}
                 sideOffset={sideOffset}
                 alignOffset={alignOffset}
+                anchor={anchor}
+                sticky={sticky}
+                collisionPadding={collisionPadding}
+                collisionBoundary={collisionBoundary}
+                collisionAvoidance={collisionAvoidance}
+                arrowPadding={arrowPadding}
+                disableAnchorTracking={disableAnchorTracking}
               >
                 <PreviewCardPopup ref={ref} className={className}>
                   {showArrow && <PreviewCardArrow />}
@@ -263,9 +337,9 @@ function PreviewCardComponentInner<Payload = unknown>(
                           {title && <h4 className="font-heading text-sm font-bold text-on-surface truncate">{title}</h4>}
                         </div>
                         {badgeText && (
-                          <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label text-xs font-semibold shrink-0">
+                          <Badge variant="soft" colorRole="neutral" size="sm">
                             {badgeText}
-                          </span>
+                          </Badge>
                         )}
                       </div>
                       {description && (
@@ -285,9 +359,9 @@ function PreviewCardComponentInner<Payload = unknown>(
   );
 }
 
-export const PreviewCardComponent = React.forwardRef(PreviewCardComponentInner) as <Payload = unknown>(
+export const PreviewCardComponent = React.forwardRef(PreviewCardComponentInner) as (<Payload = unknown>(
   props: PreviewCardProps<Payload> & React.RefAttributes<HTMLDivElement>
-) => React.JSX.Element;
+) => React.JSX.Element) & { displayName?: string };
 
 // Compound export mapping Base UI primitives
 export const PreviewCard = Object.assign(PreviewCardComponent, {
@@ -297,8 +371,8 @@ export const PreviewCard = Object.assign(PreviewCardComponent, {
   Positioner: PreviewCardPositioner,
   Popup: PreviewCardPopup,
   Arrow: PreviewCardArrow,
-  Backdrop: BasePreviewCard.Backdrop,
-  Viewport: BasePreviewCard.Viewport,
+  Backdrop: PreviewCardBackdrop,
+  Viewport: PreviewCardViewport,
   createHandle: BasePreviewCard.createHandle,
   Handle: BasePreviewCard.Handle,
 });
@@ -308,8 +382,8 @@ export { BasePreviewCard };
 export const PreviewCardRoot = BasePreviewCard.Root;
 export const PreviewCardPortal = BasePreviewCard.Portal;
 export const PreviewCardArrowPrimitive = BasePreviewCard.Arrow;
-export const PreviewCardBackdrop = BasePreviewCard.Backdrop;
-export const PreviewCardViewport = BasePreviewCard.Viewport;
+export const PreviewCardBackdropPrimitive = BasePreviewCard.Backdrop;
+export const PreviewCardViewportPrimitive = BasePreviewCard.Viewport;
 export const createPreviewCardHandle = BasePreviewCard.createHandle;
 export const PreviewCardHandle = BasePreviewCard.Handle;
 export const PreviewCardTriggerPrimitive = BasePreviewCard.Trigger;

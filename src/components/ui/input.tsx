@@ -84,6 +84,20 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
     const mergedRef = useMergedRefs(innerRef, ref);
     const isControlled = value !== undefined;
     const [uncontrolledHasValue, setUncontrolledHasValue] = React.useState(Boolean(props.defaultValue));
+
+    if (props.type === 'hidden') {
+      return (
+        <BaseInput
+          ref={mergedRef}
+          value={value}
+          disabled={disabled}
+          data-slot="input"
+          {...props}
+          type="hidden"
+        />
+      );
+    }
+
     const hasLeading = Boolean(leadingIcon);
     const showClear = clearable && (isControlled ? Boolean(value) : uncontrolledHasValue);
 

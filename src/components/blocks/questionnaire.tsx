@@ -105,6 +105,15 @@ const EMPTY_VALUES: Record<string, QuestionnaireValue> = {};
  * Root Context
  * -----------------------------------------------------------------------------------------------*/
 
+export interface QuestionnaireMessages {
+  required?: string;
+  cannotSkip?: string;
+  questionProgress?: (current: number, total: number) => string;
+  progressAriaLabel?: (current: number, total: number) => string;
+  otherAnswerLabel?: string;
+  otherAnswerPlaceholder?: string;
+}
+
 export interface QuestionnaireContextValue {
   itemNames: string[];
   registerItem: (name: string, meta?: QuestionnaireItemMeta) => () => void;
@@ -131,6 +140,8 @@ export interface QuestionnaireContextValue {
   setAnswer: (fieldName: string, value: QuestionnaireValue, itemName?: string) => void;
   errors: Record<string, string>;
   setError: (name: string, error: string | null) => void;
+  errorShakeKey: number;
+  messages?: QuestionnaireMessages;
   shortcuts?: 'letters' | 'numbers' | boolean;
   items?: QuestionnaireItemDef[];
   hiddenUntilFound?: boolean;
@@ -242,6 +253,8 @@ export interface QuestionnaireProps
   variant?: 'card' | 'plain';
   /** Supports hidden="until-found" so browser search (Ctrl+F) finds inactive questions */
   hiddenUntilFound?: boolean;
+  /** Optional localized/custom validation and progress strings */
+  messages?: QuestionnaireMessages;
   children?: React.ReactNode;
 }
 
@@ -273,6 +286,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       onStatusChange,
       variant = 'card',
       hiddenUntilFound = false,
+      messages,
       children,
       ...props
     },
@@ -419,10 +433,14 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
     const valuesRef = React.useRef(values);
     valuesRef.current = values;
 
-    // Error state per item
+    // Error state per item (+ monotonic shake key so repeated validation attempts replay the error shake)
     const [errors, setErrors] = React.useState<Record<string, string>>({});
+    const [errorShakeKey, setErrorShakeKey] = React.useState(0);
 
     const setError = React.useCallback((name: string, error: string | null) => {
+      if (error) {
+        setErrorShakeKey((prev) => prev + 1);
+      }
       setErrors((prev) => {
         if (!error) {
           if (!prev[name]) return prev;
@@ -512,12 +530,12 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
     // Validation for current step on user actions (e.g. Next, Submit)
     const validateCurrent = React.useCallback((): boolean => {
       if (!isCurrentValid()) {
-        setError(activeItem, 'Please select or provide an answer to continue.');
+        setError(activeItem, messages?.required ?? 'Please select or provide an answer to continue.');
         return false;
       }
       setError(activeItem, null);
       return true;
-    }, [activeItem, isCurrentValid, setError]);
+    }, [activeItem, isCurrentValid, messages?.required, setError]);
 
     const goToPrevious = React.useCallback(() => {
       if (!canGoBack) return;
@@ -541,7 +559,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
 
     const skipCurrent = React.useCallback(() => {
       if (!canSkip) {
-        setError(activeItem, 'This question is required and cannot be skipped.');
+        setError(activeItem, messages?.cannotSkip ?? 'This question is required and cannot be skipped.');
         return;
       }
       setError(activeItem, null);
@@ -555,7 +573,7 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
         onSkip?.(activeItem);
         onComplete?.(valuesRef.current);
       }
-    }, [canSkip, isLast, itemNames, activeIndex, activeItem, changeActiveItem, onSkip, onComplete, setError]);
+    }, [canSkip, isLast, itemNames, activeIndex, activeItem, changeActiveItem, messages?.cannotSkip, onSkip, onComplete, setError]);
 
     const resetQuestionnaire = React.useCallback(() => {
       setErrors({});
@@ -652,6 +670,8 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
         setAnswer,
         errors,
         setError,
+        errorShakeKey,
+        messages,
         shortcuts,
         items,
         hiddenUntilFound,
@@ -683,6 +703,8 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
         setAnswer,
         errors,
         setError,
+        errorShakeKey,
+        messages,
         shortcuts,
         items,
         hiddenUntilFound,
@@ -699,12 +721,12 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
           val.forEach((entry, idx) => {
             if (entry !== undefined && entry !== null && entry !== '') {
               nodes.push(
-                <Input key={`${key}-${idx}`} type="hidden" name={key} value={String(entry)} />
+                <Input.Root key={`${key}-${idx}`} type="hidden" name={key} value={String(entry)} />
               );
             }
           });
         } else if (val !== undefined && val !== null && val !== '') {
-          nodes.push(<Input key={key} type="hidden" name={key} value={String(val)} />);
+          nodes.push(<Input.Root key={key} type="hidden" name={key} value={String(val)} />);
         }
       }
       return nodes;
@@ -767,20 +789,19 @@ export const QuestionnaireRoot = React.forwardRef<HTMLFormElement, Questionnaire
       <QuestionnaireContext.Provider value={contextValue}>
         <form
           ref={ref}
-          role="form"
           data-state={isLast ? 'last' : isFirst ? 'first' : 'in-progress'}
           data-status={isLast && isCurrentStepValid ? 'can-submit' : 'answering'}
           onSubmit={handleSubmit}
           className={cn(
-            '@container w-full max-w-2xl mx-auto flex flex-col',
+            '@container w-full flex flex-col',
             variant === 'card' &&
-              'bg-surface rounded-lg border border-transparent shadow-card forced-colors:border-on-surface',
+              'max-w-2xl mx-auto bg-surface rounded-lg border border-transparent shadow-card forced-colors:border-on-surface',
             className
           )}
           {...props}
         >
           {unmountedValueInputs}
-          <div className={cn('w-full flex flex-col', variant === 'card' && 'p-4 @sm:p-6 @md:p-8')}>
+          <div className={cn('w-full flex flex-col overflow-x-clip', variant === 'card' && 'p-4 @sm:p-6 @md:p-8')}>
             {renderedChildren}
           </div>
         </form>
@@ -800,48 +821,51 @@ export interface QuestionnaireProgressProps extends React.HTMLAttributes<HTMLDiv
   showBar?: boolean;
 }
 
-export const QuestionnaireProgress: React.FC<QuestionnaireProgressProps> = ({
-  className,
-  format,
-  showIndicator = true,
-  showBar = true,
-  ...props
-}) => {
-  const { activeIndex, totalItems, percentage, isLast } = useQuestionnaire();
+export const QuestionnaireProgress = React.forwardRef<HTMLDivElement, QuestionnaireProgressProps>(
+  ({ className, format, showIndicator = true, showBar = true, ...props }, ref) => {
+    const { activeIndex, totalItems, percentage, isLast, messages } = useQuestionnaire();
 
-  if (totalItems === 0) return null;
+    if (totalItems === 0) return null;
 
-  return (
-    <div
-      data-status={isLast ? 'complete' : 'in-progress'}
-      data-active-step={activeIndex + 1}
-      data-total-steps={totalItems}
-      className={cn('flex flex-col gap-2 w-full mb-6', className)}
-      {...props}
-    >
-      {showIndicator && (
-        <div className="flex items-center justify-between font-sans text-sm font-medium text-on-surface-variant">
-          <span>
-            {format
-              ? format({ current: activeIndex + 1, total: totalItems, percentage })
-              : `Question ${activeIndex + 1} of ${totalItems}`}
-          </span>
-          <span className="font-mono text-xs tabular-nums text-on-surface-variant">
-            {Math.round(percentage)}%
-          </span>
-        </div>
-      )}
-      {showBar && (
-        <Progress
-          value={percentage}
-          max={100}
-          size="sm"
-          aria-label={`Questionnaire progress: ${activeIndex + 1} of ${totalItems}`}
-        />
-      )}
-    </div>
-  );
-};
+    const current = activeIndex + 1;
+    const labelText = format
+      ? format({ current, total: totalItems, percentage })
+      : messages?.questionProgress
+        ? messages.questionProgress(current, totalItems)
+        : `Question ${current} of ${totalItems}`;
+    const barAriaLabel = messages?.progressAriaLabel
+      ? messages.progressAriaLabel(current, totalItems)
+      : `Questionnaire progress: ${current} of ${totalItems}`;
+
+    return (
+      <div
+        ref={ref}
+        data-status={isLast ? 'complete' : 'in-progress'}
+        data-active-step={current}
+        data-total-steps={totalItems}
+        className={cn('flex flex-col gap-2 w-full mb-6', className)}
+        {...props}
+      >
+        {showIndicator && (
+          <div className="flex items-center justify-between font-sans text-sm font-medium text-on-surface-variant">
+            <span>{labelText}</span>
+            <span className="font-mono text-xs font-semibold tabular-nums text-on-surface-variant">
+              {Math.round(percentage)}%
+            </span>
+          </div>
+        )}
+        {showBar && (
+          <Progress
+            value={percentage}
+            max={100}
+            size="sm"
+            aria-label={barAriaLabel}
+          />
+        )}
+      </div>
+    );
+  }
+);
 QuestionnaireProgress.displayName = 'QuestionnaireProgress';
 
 /* -------------------------------------------------------------------------------------------------
@@ -963,7 +987,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       if (isActive) {
         el.removeAttribute('inert');
         if (!prevIsActiveRef.current && hasUserNavigatedRef.current) {
-          el.focus();
+          el.focus({ preventScroll: true });
         }
       } else if (canRevealUntilFound) {
         el.removeAttribute('inert');
@@ -1003,7 +1027,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
       if (!isActive || !shortcuts) return;
 
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.defaultPrevented) return;
+        if (event.defaultPrevented || event.isComposing || event.keyCode === 229) return;
 
         // Only react to keys pressed inside this questionnaire form,
         // and never while a native control (text entry, button, link, select) has focus
@@ -1085,12 +1109,12 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
         ? (Array.isArray(rawValue) ? rawValue : [])
             .filter((val) => val !== undefined && val !== null && val !== '')
             .map((val) => (
-              <Input key={String(val)} type="hidden" name={name} value={String(val)} />
+              <Input.Root key={String(val)} type="hidden" name={name} value={String(val)} />
             ))
         : rawValue !== undefined &&
           rawValue !== null &&
           rawValue !== '' && (
-            <Input type="hidden" name={name} value={String(rawValue)} />
+            <Input.Root type="hidden" name={name} value={String(rawValue)} />
           );
 
     // Free-text inputs unmount with inactive items, so keep their answers in the form
@@ -1100,7 +1124,7 @@ export const QuestionnaireItem = React.forwardRef<HTMLFieldSetElement, Questionn
         return v !== undefined && v !== null && v !== '';
       })
       .map((fieldName) => (
-        <Input key={fieldName} type="hidden" name={fieldName} value={String(values[fieldName])} />
+        <Input.Root key={fieldName} type="hidden" name={fieldName} value={String(values[fieldName])} />
       ));
 
     if (!isActive && !shouldHiddenUntilFound) {
@@ -1308,7 +1332,7 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (disabled) return;
       if (onKeyDown) onKeyDown(e);
-      if (e.defaultPrevented) return;
+      if (e.defaultPrevented || e.nativeEvent.isComposing || e.keyCode === 229) return;
 
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
@@ -1399,7 +1423,7 @@ export const QuestionnaireChoice = React.forwardRef<HTMLDivElement, Questionnair
             'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
             // Constant 2px border eliminates 1px layout shift when toggling selection
             isSelected
-              ? 'border-2 border-primary bg-primary-container text-on-surface'
+              ? 'border-2 border-primary bg-primary-container text-on-primary-container'
               : 'border-2 border-outline-variant bg-surface hover:border-outline hover:bg-state-hover text-on-surface',
             disabled && 'opacity-50 pointer-events-none cursor-not-allowed',
             className
@@ -1430,40 +1454,40 @@ QuestionnaireChoice.displayName = 'QuestionnaireChoice';
 
 export interface QuestionnaireChoiceInputProps extends React.HTMLAttributes<HTMLSpanElement> {}
 
-export const QuestionnaireChoiceInput: React.FC<QuestionnaireChoiceInputProps> = ({
-  className,
-  ...props
-}) => {
-  const choiceContext = useQuestionnaireChoice();
-  const isSelected = choiceContext?.isSelected ?? false;
-  const isMultiple = choiceContext?.isMultiple ?? false;
+export const QuestionnaireChoiceInput = React.forwardRef<HTMLSpanElement, QuestionnaireChoiceInputProps>(
+  ({ className, ...props }, ref) => {
+    const choiceContext = useQuestionnaireChoice();
+    const isSelected = choiceContext?.isSelected ?? false;
+    const isMultiple = choiceContext?.isMultiple ?? false;
 
-  return (
-    <span
-      aria-hidden="true"
-      data-state={isSelected ? 'checked' : 'unchecked'}
-      data-checked={isSelected ? '' : undefined}
-      className={cn(
-        'relative flex items-center justify-center shrink-0 mt-0.5 transition-colors duration-quick ease-standard motion-reduce:transition-none',
-        isMultiple ? 'size-5 rounded-sm' : 'size-5 rounded-full',
-        isSelected
-          ? isMultiple
-            ? 'border-2 border-primary bg-primary text-on-primary'
-            : 'border-2 border-primary bg-surface'
-          : 'border border-outline group-hover:border-on-surface-variant bg-surface',
-        className
-      )}
-      {...props}
-    >
-      {isSelected &&
-        (isMultiple ? (
-          <Icon name="check" size="xs" aria-hidden="true" />
-        ) : (
-          <span className="size-2.5 rounded-full bg-primary" />
-        ))}
-    </span>
-  );
-};
+    return (
+      <span
+        ref={ref}
+        aria-hidden="true"
+        data-state={isSelected ? 'checked' : 'unchecked'}
+        data-checked={isSelected ? '' : undefined}
+        className={cn(
+          'relative flex items-center justify-center shrink-0 mt-0.5 border-2 transition-colors duration-quick ease-standard motion-reduce:transition-none',
+          isMultiple ? 'size-5 rounded-sm' : 'size-5 rounded-full',
+          isSelected
+            ? isMultiple
+              ? 'border-primary bg-primary text-on-primary'
+              : 'border-primary bg-surface'
+            : 'border-outline group-hover:border-on-surface-variant bg-surface',
+          className
+        )}
+        {...props}
+      >
+        {isSelected &&
+          (isMultiple ? (
+            <Icon name="check" size="xs" aria-hidden="true" />
+          ) : (
+            <span className="size-2.5 rounded-full bg-primary" />
+          ))}
+      </span>
+    );
+  }
+);
 QuestionnaireChoiceInput.displayName = 'QuestionnaireChoiceInput';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1474,34 +1498,38 @@ export interface QuestionnaireChoiceLabelProps extends React.HTMLAttributes<HTML
   description?: React.ReactNode;
 }
 
-export const QuestionnaireChoiceLabel: React.FC<QuestionnaireChoiceLabelProps> = ({
-  className,
-  children,
-  description,
-  ...props
-}) => {
-  const choiceContext = useQuestionnaireChoice();
-  const desc = description ?? choiceContext?.description;
+export const QuestionnaireChoiceLabel = React.forwardRef<HTMLDivElement, QuestionnaireChoiceLabelProps>(
+  ({ className, children, description, ...props }, ref) => {
+    const choiceContext = useQuestionnaireChoice();
+    const desc = description ?? choiceContext?.description;
+    const isSelected = choiceContext?.isSelected ?? false;
 
-  return (
-    <div className={cn('flex flex-col flex-1 text-start min-w-0', className)} {...props}>
-      <span
-        id={choiceContext?.labelId}
-        className="font-sans text-base font-medium select-none leading-snug text-on-surface"
-      >
-        {children}
-      </span>
-      {desc && (
+    return (
+      <div ref={ref} className={cn('flex flex-col flex-1 text-start min-w-0', className)} {...props}>
         <span
-          id={choiceContext?.descriptionId}
-          className="font-sans text-sm select-none mt-0.5 leading-normal text-on-surface-variant"
+          id={choiceContext?.labelId}
+          className={cn(
+            'font-sans text-base font-medium select-none leading-snug',
+            isSelected ? 'text-on-primary-container' : 'text-on-surface'
+          )}
         >
-          {desc}
+          {children}
         </span>
-      )}
-    </div>
-  );
-};
+        {desc && (
+          <span
+            id={choiceContext?.descriptionId}
+            className={cn(
+              'font-sans text-sm select-none mt-0.5 leading-normal',
+              isSelected ? 'text-on-primary-container/85' : 'text-on-surface-variant'
+            )}
+          >
+            {desc}
+          </span>
+        )}
+      </div>
+    );
+  }
+);
 QuestionnaireChoiceLabel.displayName = 'QuestionnaireChoiceLabel';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1510,22 +1538,20 @@ QuestionnaireChoiceLabel.displayName = 'QuestionnaireChoiceLabel';
 
 export interface QuestionnaireChoiceShortcutProps extends React.HTMLAttributes<HTMLElement> {}
 
-export const QuestionnaireChoiceShortcut: React.FC<QuestionnaireChoiceShortcutProps> = ({
-  className,
-  children,
-  ...props
-}) => {
-  const choiceContext = useQuestionnaireChoice();
-  const shortcutKey = children || choiceContext?.shortcutKey;
+export const QuestionnaireChoiceShortcut = React.forwardRef<HTMLElement, QuestionnaireChoiceShortcutProps>(
+  ({ className, children, ...props }, ref) => {
+    const choiceContext = useQuestionnaireChoice();
+    const shortcutKey = children || choiceContext?.shortcutKey;
 
-  if (!shortcutKey) return null;
+    if (!shortcutKey) return null;
 
-  return (
-    <Kbd aria-hidden="true" size="sm" className={cn('shrink-0 select-none', className)} {...props}>
-      {shortcutKey}
-    </Kbd>
-  );
-};
+    return (
+      <Kbd ref={ref} aria-hidden="true" size="sm" className={cn('shrink-0 select-none', className)} {...props}>
+        {shortcutKey}
+      </Kbd>
+    );
+  }
+);
 QuestionnaireChoiceShortcut.displayName = 'QuestionnaireChoiceShortcut';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1539,58 +1565,67 @@ export interface QuestionnaireInputProps
   placeholder?: string;
 }
 
-export const QuestionnaireInput: React.FC<QuestionnaireInputProps> = ({
-  name,
-  label,
-  placeholder = 'Type another answer…',
-  className,
-  value,
-  onChange,
-  error,
-  ...props
-}) => {
-  const itemContext = useQuestionnaireItem();
-  const rootContext = useQuestionnaire();
-  const fieldName = name || (itemContext ? `${itemContext.name}_text` : 'custom_input');
-  const generatedId = React.useId();
-  const inputId = props.id ?? generatedId;
-  const registerInput = rootContext.registerInput;
-  const itemName = itemContext?.name;
+export const QuestionnaireInput = React.forwardRef<HTMLInputElement, QuestionnaireInputProps>(
+  (
+    {
+      name,
+      label,
+      placeholder,
+      className,
+      value,
+      onChange,
+      error,
+      ...props
+    },
+    ref
+  ) => {
+    const itemContext = useQuestionnaireItem();
+    const rootContext = useQuestionnaire();
+    const fieldName = name || (itemContext ? `${itemContext.name}_text` : 'custom_input');
+    const generatedId = React.useId();
+    const inputId = props.id ?? generatedId;
+    const registerInput = rootContext.registerInput;
+    const itemName = itemContext?.name;
+    const resolvedPlaceholder =
+      placeholder ?? rootContext.messages?.otherAnswerPlaceholder ?? 'Type another answer…';
+    const resolvedFallbackLabel = rootContext.messages?.otherAnswerLabel ?? 'Another answer';
 
-  React.useEffect(() => {
-    if (itemName) registerInput(itemName, fieldName);
-  }, [registerInput, itemName, fieldName]);
+    React.useEffect(() => {
+      if (itemName) registerInput(itemName, fieldName);
+    }, [registerInput, itemName, fieldName]);
 
-  const rawValue = value !== undefined ? value : rootContext?.values[fieldName];
-  const textValue = (typeof rawValue === 'boolean' ? '' : rawValue) ?? '';
+    const rawValue = value !== undefined ? value : rootContext?.values[fieldName];
+    const textValue = (typeof rawValue === 'boolean' ? '' : rawValue) ?? '';
 
-  const handleChange: React.ComponentPropsWithoutRef<typeof Input>['onChange'] = (e) => {
-    if (onChange) {
-      onChange(e);
-    }
-    if (rootContext) {
-      rootContext.setAnswer(fieldName, e.target.value, itemContext?.name);
-    }
-  };
+    const handleChange: React.ComponentPropsWithoutRef<typeof Input>['onChange'] = (e) => {
+      if (onChange) {
+        onChange(e);
+      }
+      if (rootContext) {
+        rootContext.setAnswer(fieldName, e.target.value, itemContext?.name);
+      }
+    };
 
-  return (
-    <Field.Root className={cn('w-full mt-3', className)}>
-      <Field.Label htmlFor={inputId} className={label ? undefined : 'sr-only'}>
-        {label ?? 'Another answer'}
-      </Field.Label>
-      <Input
-        name={fieldName}
-        value={textValue}
-        onChange={handleChange}
-        placeholder={placeholder}
-        error={error ?? Boolean(itemContext?.error)}
-        className="w-full"
-        {...props}
-        id={inputId}
-      />
-    </Field.Root>
-  );
-};
+    return (
+      <Field.Root className={cn('w-full mt-3', className)}>
+        <Field.Label htmlFor={inputId} className={label ? undefined : 'sr-only'}>
+          {label ?? resolvedFallbackLabel}
+        </Field.Label>
+        <Input
+          ref={ref}
+          name={fieldName}
+          value={textValue}
+          onChange={handleChange}
+          placeholder={resolvedPlaceholder}
+          error={error ?? Boolean(itemContext?.error)}
+          className="w-full"
+          {...props}
+          id={inputId}
+        />
+      </Field.Root>
+    );
+  }
+);
 QuestionnaireInput.displayName = 'QuestionnaireInput';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1601,45 +1636,44 @@ export interface QuestionnaireErrorProps extends React.HTMLAttributes<HTMLDivEle
   name?: string;
 }
 
-export const QuestionnaireError: React.FC<QuestionnaireErrorProps> = ({
-  name,
-  className,
-  children,
-  ...props
-}) => {
-  const itemContext = useQuestionnaireItem();
-  const rootContext = useQuestionnaire();
+export const QuestionnaireError = React.forwardRef<HTMLDivElement, QuestionnaireErrorProps>(
+  ({ name, className, children, ...props }, ref) => {
+    const itemContext = useQuestionnaireItem();
+    const rootContext = useQuestionnaire();
 
-  const itemName = name || itemContext?.name;
-  const errorText = children || (itemName ? rootContext.errors[itemName] : itemContext?.error);
+    const itemName = name || itemContext?.name;
+    const errorText = children || (itemName ? rootContext.errors[itemName] : itemContext?.error);
 
-  if (!errorText) return null;
+    if (!errorText) return null;
 
-  const resolvedErrorId =
-    props.id ??
-    (itemContext && (!name || name === itemContext.name)
-      ? itemContext.errorId
-      : itemName
-        ? `${itemName}-error`
-        : undefined);
+    const resolvedErrorId =
+      props.id ??
+      (itemContext && (!name || name === itemContext.name)
+        ? itemContext.errorId
+        : itemName
+          ? `${itemName}-error`
+          : undefined);
 
-  return (
-    <div
-      role="alert"
-      id={resolvedErrorId}
-      aria-live="assertive"
-      data-state="visible"
-      className={cn(
-        'flex items-center gap-1.5 font-sans text-sm font-medium text-error select-none mt-3 animate-error-shake motion-reduce:animate-none',
-        className
-      )}
-      {...props}
-    >
-      <Icon name="error" size="sm" aria-hidden="true" />
-      <span>{errorText}</span>
-    </div>
-  );
-};
+    return (
+      <div
+        key={`${itemName ?? 'err'}-${rootContext.errorShakeKey}`}
+        ref={ref}
+        role="alert"
+        id={resolvedErrorId}
+        aria-live="assertive"
+        data-state="visible"
+        className={cn(
+          'flex items-center gap-1.5 font-sans text-sm font-medium text-error select-none mt-3 animate-error-shake motion-reduce:animate-none',
+          className
+        )}
+        {...props}
+      >
+        <Icon name="error" size="sm" aria-hidden="true" />
+        <span>{errorText}</span>
+      </div>
+    );
+  }
+);
 QuestionnaireError.displayName = 'QuestionnaireError';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1677,48 +1711,54 @@ export interface QuestionnairePreviousProps
   hideWhenFirst?: boolean;
 }
 
-export const QuestionnairePrevious: React.FC<QuestionnairePreviousProps> = ({
-  className,
-  showIcon = true,
-  hideWhenDisabled = false,
-  hideWhenFirst = false,
-  children = 'Previous',
-  disabled,
-  onClick,
-  type = 'button',
-  ...props
-}) => {
-  const rootContext = useQuestionnaire();
-  const canGoBack = rootContext ? rootContext.canGoBack : false;
-  const isFirst = rootContext ? rootContext.isFirst : false;
-  const isDisabled = disabled ?? !canGoBack;
+export const QuestionnairePrevious = React.forwardRef<HTMLButtonElement, QuestionnairePreviousProps>(
+  (
+    {
+      className,
+      showIcon = true,
+      hideWhenDisabled = false,
+      hideWhenFirst = false,
+      children = 'Previous',
+      disabled,
+      onClick,
+      type = 'button',
+      ...props
+    },
+    ref
+  ) => {
+    const rootContext = useQuestionnaire();
+    const canGoBack = rootContext ? rootContext.canGoBack : false;
+    const isFirst = rootContext ? rootContext.isFirst : false;
+    const isDisabled = disabled ?? !canGoBack;
 
-  if ((hideWhenDisabled && isDisabled) || (hideWhenFirst && isFirst)) {
-    return null;
+    if ((hideWhenDisabled && isDisabled) || (hideWhenFirst && isFirst)) {
+      return null;
+    }
+
+    return (
+      <Button
+        ref={ref}
+        type={type}
+        variant="outline"
+        colorRole="neutral"
+        disabled={isDisabled}
+        data-state={isDisabled ? 'disabled' : 'enabled'}
+        onClick={(e) => {
+          onClick?.(e);
+          if (!e.defaultPrevented && rootContext) {
+            e.preventDefault();
+            rootContext.goToPrevious();
+          }
+        }}
+        className={className}
+        {...props}
+      >
+        {showIcon && <Icon name="arrow_back" size="md" directional aria-hidden="true" />}
+        <span>{children}</span>
+      </Button>
+    );
   }
-
-  return (
-    <Button
-      type={type}
-      variant="outline"
-      colorRole="neutral"
-      disabled={isDisabled}
-      data-state={isDisabled ? 'disabled' : 'enabled'}
-      onClick={(e) => {
-        onClick?.(e);
-        if (!e.defaultPrevented && rootContext) {
-          e.preventDefault();
-          rootContext.goToPrevious();
-        }
-      }}
-      className={className}
-      {...props}
-    >
-      {showIcon && <Icon name="arrow_back" size="sm" directional aria-hidden="true" />}
-      <span>{children}</span>
-    </Button>
-  );
-};
+);
 QuestionnairePrevious.displayName = 'QuestionnairePrevious';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1731,46 +1771,52 @@ export interface QuestionnaireSkipProps
   hideWhenDisabled?: boolean;
 }
 
-export const QuestionnaireSkip: React.FC<QuestionnaireSkipProps> = ({
-  className,
-  showIcon = true,
-  hideWhenDisabled = true,
-  children = 'Skip',
-  disabled,
-  onClick,
-  type = 'button',
-  ...props
-}) => {
-  const rootContext = useQuestionnaire();
-  const canSkip = rootContext ? rootContext.canSkip : true;
-  const isDisabled = disabled ?? !canSkip;
+export const QuestionnaireSkip = React.forwardRef<HTMLButtonElement, QuestionnaireSkipProps>(
+  (
+    {
+      className,
+      showIcon = true,
+      hideWhenDisabled = true,
+      children = 'Skip',
+      disabled,
+      onClick,
+      type = 'button',
+      ...props
+    },
+    ref
+  ) => {
+    const rootContext = useQuestionnaire();
+    const canSkip = rootContext ? rootContext.canSkip : true;
+    const isDisabled = disabled ?? !canSkip;
 
-  if (hideWhenDisabled && isDisabled) {
-    return null;
+    if (hideWhenDisabled && isDisabled) {
+      return null;
+    }
+
+    return (
+      <Button
+        ref={ref}
+        type={type}
+        variant="text"
+        colorRole="neutral"
+        disabled={isDisabled}
+        data-state={isDisabled ? 'disabled' : 'enabled'}
+        onClick={(e) => {
+          onClick?.(e);
+          if (!e.defaultPrevented && rootContext) {
+            e.preventDefault();
+            rootContext.skipCurrent();
+          }
+        }}
+        className={className}
+        {...props}
+      >
+        <span>{children}</span>
+        {showIcon && <Icon name="skip_next" size="md" directional aria-hidden="true" />}
+      </Button>
+    );
   }
-
-  return (
-    <Button
-      type={type}
-      variant="text"
-      colorRole="neutral"
-      disabled={isDisabled}
-      data-state={isDisabled ? 'disabled' : 'enabled'}
-      onClick={(e) => {
-        onClick?.(e);
-        if (!e.defaultPrevented && rootContext) {
-          e.preventDefault();
-          rootContext.skipCurrent();
-        }
-      }}
-      className={className}
-      {...props}
-    >
-      <span>{children}</span>
-      {showIcon && <Icon name="skip_next" size="sm" directional aria-hidden="true" />}
-    </Button>
-  );
-};
+);
 QuestionnaireSkip.displayName = 'QuestionnaireSkip';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1783,45 +1829,51 @@ export interface QuestionnaireNextProps
   hideWhenLast?: boolean;
 }
 
-export const QuestionnaireNext: React.FC<QuestionnaireNextProps> = ({
-  className,
-  showIcon = true,
-  hideWhenLast = true,
-  children = 'Next',
-  disabled,
-  onClick,
-  type = 'button',
-  ...props
-}) => {
-  const rootContext = useQuestionnaire();
-  const isLast = rootContext ? rootContext.isLast : false;
+export const QuestionnaireNext = React.forwardRef<HTMLButtonElement, QuestionnaireNextProps>(
+  (
+    {
+      className,
+      showIcon = true,
+      hideWhenLast = true,
+      children = 'Next',
+      disabled,
+      onClick,
+      type = 'button',
+      ...props
+    },
+    ref
+  ) => {
+    const rootContext = useQuestionnaire();
+    const isLast = rootContext ? rootContext.isLast : false;
 
-  if (hideWhenLast && isLast) {
-    return null;
+    if (hideWhenLast && isLast) {
+      return null;
+    }
+
+    return (
+      <Button
+        ref={ref}
+        type={type}
+        variant="filled"
+        colorRole="primary"
+        disabled={disabled}
+        data-state="enabled"
+        onClick={(e) => {
+          onClick?.(e);
+          if (!e.defaultPrevented && rootContext) {
+            e.preventDefault();
+            rootContext.goToNext();
+          }
+        }}
+        className={className}
+        {...props}
+      >
+        <span>{children}</span>
+        {showIcon && <Icon name="arrow_forward" size="md" directional aria-hidden="true" />}
+      </Button>
+    );
   }
-
-  return (
-    <Button
-      type={type}
-      variant="filled"
-      colorRole="primary"
-      disabled={disabled}
-      data-state="enabled"
-      onClick={(e) => {
-        onClick?.(e);
-        if (!e.defaultPrevented && rootContext) {
-          e.preventDefault();
-          rootContext.goToNext();
-        }
-      }}
-      className={className}
-      {...props}
-    >
-      <span>{children}</span>
-      {showIcon && <Icon name="arrow_forward" size="sm" directional aria-hidden="true" />}
-    </Button>
-  );
-};
+);
 QuestionnaireNext.displayName = 'QuestionnaireNext';
 
 /* -------------------------------------------------------------------------------------------------
@@ -1834,35 +1886,41 @@ export interface QuestionnaireSubmitProps
   showOnlyWhenLast?: boolean;
 }
 
-export const QuestionnaireSubmit: React.FC<QuestionnaireSubmitProps> = ({
-  className,
-  showIcon = true,
-  showOnlyWhenLast = true,
-  children = 'Submit',
-  type = 'submit',
-  ...props
-}) => {
-  const rootContext = useQuestionnaire();
-  const isLast = rootContext ? rootContext.isLast : true;
+export const QuestionnaireSubmit = React.forwardRef<HTMLButtonElement, QuestionnaireSubmitProps>(
+  (
+    {
+      className,
+      showIcon = true,
+      showOnlyWhenLast = true,
+      children = 'Submit',
+      type = 'submit',
+      ...props
+    },
+    ref
+  ) => {
+    const rootContext = useQuestionnaire();
+    const isLast = rootContext ? rootContext.isLast : true;
 
-  if (showOnlyWhenLast && !isLast) {
-    return null;
+    if (showOnlyWhenLast && !isLast) {
+      return null;
+    }
+
+    return (
+      <Button
+        ref={ref}
+        variant="filled"
+        colorRole="primary"
+        type={type}
+        data-state="enabled"
+        className={className}
+        {...props}
+      >
+        <span>{children}</span>
+        {showIcon && <Icon name="check" size="md" aria-hidden="true" />}
+      </Button>
+    );
   }
-
-  return (
-    <Button
-      variant="filled"
-      colorRole="primary"
-      type={type}
-      data-state="enabled"
-      className={className}
-      {...props}
-    >
-      <span>{children}</span>
-      {showIcon && <Icon name="check" size="sm" aria-hidden="true" />}
-    </Button>
-  );
-};
+);
 QuestionnaireSubmit.displayName = 'QuestionnaireSubmit';
 
 /* -------------------------------------------------------------------------------------------------

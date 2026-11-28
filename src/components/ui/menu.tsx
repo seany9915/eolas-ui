@@ -2,8 +2,11 @@
 
 import * as React from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
+import { Icon } from './icon';
 import { ScrollArea } from './scroll-area';
-import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton, sanitizeUrl } from '@/lib/utils';
+
+const MenuFilterScopeContext = React.createContext(false);
 
 export interface MenuItemData {
   id: string;
@@ -36,11 +39,7 @@ export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>(
       )}
       {...props}
     >
-      {icon && (
-        <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-          {icon}
-        </span>
-      )}
+      {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
       <span className="truncate flex-1">{children}</span>
     </BaseMenu.Item>
   )
@@ -80,15 +79,74 @@ export const MenuArrow = React.forwardRef<HTMLDivElement, MenuArrowProps>(
 );
 MenuArrow.displayName = 'MenuArrow';
 
+const basePositionerClasses =
+  'z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none';
+
+const basePopupClasses =
+  'relative flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform,width,height] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none';
+
+export const MenuPositioner = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Positioner>
+>(({ className, sideOffset = 4, collisionPadding = 8, ...props }, ref) => (
+  <BaseMenu.Positioner
+    ref={ref}
+    data-slot="menu-positioner"
+    sideOffset={sideOffset}
+    collisionPadding={collisionPadding}
+    className={composeClassName(basePositionerClasses, className)}
+    {...props}
+  />
+));
+MenuPositioner.displayName = 'MenuPositioner';
+
+export const MenuPopup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Popup>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.Popup
+    ref={ref}
+    data-slot="menu-content"
+    className={composeClassName(basePopupClasses, className)}
+    {...props}
+  />
+));
+MenuPopup.displayName = 'MenuPopup';
+
+export const MenuViewport = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseMenu.Viewport>
+>(({ className, ...props }, ref) => (
+  <BaseMenu.Viewport
+    ref={ref}
+    data-slot="menu-viewport"
+    className={composeClassName(
+      'relative size-full overflow-hidden rounded-[inherit]',
+      className
+    )}
+    {...props}
+  />
+));
+MenuViewport.displayName = 'MenuViewport';
+
 export interface MenuContentProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Popup> {
   side?: BaseMenu.Positioner.Props['side'];
-  align?: 'start' | 'center' | 'end';
-  sideOffset?: number;
-  alignOffset?: number;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  align?: BaseMenu.Positioner.Props['align'];
+  sideOffset?: BaseMenu.Positioner.Props['sideOffset'];
+  alignOffset?: BaseMenu.Positioner.Props['alignOffset'];
+  anchor?: BaseMenu.Positioner.Props['anchor'];
+  positionMethod?: BaseMenu.Positioner.Props['positionMethod'];
+  sticky?: BaseMenu.Positioner.Props['sticky'];
+  collisionPadding?: BaseMenu.Positioner.Props['collisionPadding'];
+  collisionBoundary?: BaseMenu.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BaseMenu.Positioner.Props['collisionAvoidance'];
+  arrowPadding?: BaseMenu.Positioner.Props['arrowPadding'];
+  disableAnchorTracking?: BaseMenu.Positioner.Props['disableAnchorTracking'];
   container?: BaseMenu.Portal.Props['container'];
   containerClassName?: BaseMenu.Positioner.Props['className'];
   keepMounted?: boolean;
+  showArrow?: boolean;
+  scrollable?: boolean;
 }
 
 export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
@@ -100,47 +158,81 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
       align,
       sideOffset = 4,
       alignOffset,
+      anchor,
+      positionMethod,
+      sticky,
       collisionPadding = 8,
+      collisionBoundary,
+      collisionAvoidance,
+      arrowPadding,
+      disableAnchorTracking,
       container,
       containerClassName,
       keepMounted,
+      showArrow = false,
+      scrollable = true,
       ...props
     },
     ref
-  ) => (
-    <BaseMenu.Portal container={container} keepMounted={keepMounted}>
-      <BaseMenu.Positioner
-        side={side}
-        align={align}
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
-        collisionPadding={collisionPadding}
-        className={composeClassName('z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none', containerClassName)}
-      >
-        <BaseMenu.Popup
-          ref={ref}
-          data-slot="menu-content"
-          className={composeClassName(
-            'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-            className
-          )}
-          {...props}
+  ) => {
+    const isFilterable = React.useContext(MenuFilterScopeContext);
+    const childList = React.Children.toArray(children);
+    const arrowChildren: React.ReactNode[] = [];
+    const bodyChildren: React.ReactNode[] = [];
+
+    for (const child of childList) {
+      if (React.isValidElement(child) && (child.type === MenuArrow || child.type === BaseMenu.Arrow)) {
+        arrowChildren.push(child);
+      } else {
+        bodyChildren.push(child);
+      }
+    }
+
+    const useOuterScroll = scrollable && !isFilterable;
+
+    return (
+      <BaseMenu.Portal container={container} keepMounted={keepMounted}>
+        <MenuPositioner
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          alignOffset={alignOffset}
+          anchor={anchor}
+          positionMethod={positionMethod}
+          sticky={sticky}
+          collisionPadding={collisionPadding}
+          collisionBoundary={collisionBoundary}
+          collisionAvoidance={collisionAvoidance}
+          arrowPadding={arrowPadding}
+          disableAnchorTracking={disableAnchorTracking}
+          className={containerClassName}
         >
-          <ScrollArea
-            className="min-h-0 flex-[0_1_auto]"
-            viewportClassName="overscroll-contain scroll-py-1"
-            viewportProps={{
-              tabIndex: -1,
-              onMouseDown: (e) => e.preventDefault(),
-            }}
-            contentClassName="p-1"
-          >
-            {children}
-          </ScrollArea>
-        </BaseMenu.Popup>
-      </BaseMenu.Positioner>
-    </BaseMenu.Portal>
-  )
+          <MenuPopup ref={ref} className={className} {...props}>
+            {arrowChildren.length > 0 ? arrowChildren : showArrow ? <MenuArrow /> : null}
+            {useOuterScroll ? (
+              <ScrollArea
+                className="min-h-0 flex-[0_1_auto]"
+                viewportClassName="overscroll-contain scroll-py-1"
+                viewportProps={{
+                  tabIndex: -1,
+                  onMouseDown: (e) => {
+                    const target = e.target as HTMLElement | null;
+                    if (target?.closest('input, textarea, [contenteditable]')) return;
+                    e.preventDefault();
+                  },
+                }}
+                contentClassName="p-1"
+              >
+                {bodyChildren}
+              </ScrollArea>
+            ) : (
+              bodyChildren
+            )}
+          </MenuPopup>
+        </MenuPositioner>
+      </BaseMenu.Portal>
+    );
+  }
 );
 MenuContent.displayName = 'MenuContent';
 
@@ -170,8 +262,8 @@ export const MenuShortcut = React.forwardRef<
 ));
 MenuShortcut.displayName = 'MenuShortcut';
 
-export interface MenuTriggerProps
-  extends React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger> {
+export interface MenuTriggerProps<Payload = unknown>
+  extends BaseMenu.Trigger.Props<Payload> {
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -181,8 +273,11 @@ const menuTriggerSizeClasses: Record<'sm' | 'md' | 'lg', string> = {
   lg: 'h-14 px-5 min-h-[56px] text-base',
 };
 
-export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
-  ({ className, children, size = 'sm', render, nativeButton, ...props }, ref) => (
+export const MenuTrigger = React.forwardRef(function MenuTrigger<Payload = unknown>(
+  { className, children, size = 'sm', render, nativeButton, ...props }: MenuTriggerProps<Payload>,
+  ref: React.ForwardedRef<HTMLButtonElement>
+) {
+  return (
     <BaseMenu.Trigger
       ref={ref}
       data-slot="menu-trigger"
@@ -203,8 +298,10 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
     >
       {children}
     </BaseMenu.Trigger>
-  )
-);
+  );
+}) as (<Payload = unknown>(
+  props: MenuTriggerProps<Payload> & React.RefAttributes<HTMLButtonElement>
+) => React.JSX.Element) & { displayName?: string };
 MenuTrigger.displayName = 'MenuTrigger';
 
 export interface MenuCheckboxItemProps
@@ -224,17 +321,11 @@ export const MenuCheckboxItem = React.forwardRef<HTMLDivElement, MenuCheckboxIte
       {...props}
     >
       <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
         <span className="truncate flex-1">{children}</span>
       </div>
       <BaseMenu.CheckboxItemIndicator className="shrink-0 text-primary flex items-center justify-center">
-        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
-          check
-        </span>
+        <Icon name="check" size="sm" aria-hidden="true" />
       </BaseMenu.CheckboxItemIndicator>
     </BaseMenu.CheckboxItem>
   )
@@ -258,17 +349,11 @@ export const MenuRadioItem = React.forwardRef<HTMLDivElement, MenuRadioItemProps
       {...props}
     >
       <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
         <span className="truncate flex-1">{children}</span>
       </div>
       <BaseMenu.RadioItemIndicator className="shrink-0 text-primary flex items-center justify-center">
-        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
-          radio_button_checked
-        </span>
+        <Icon name="radio_button_checked" size="sm" aria-hidden="true" />
       </BaseMenu.RadioItemIndicator>
     </BaseMenu.RadioItem>
   )
@@ -292,19 +377,10 @@ export const MenuSubmenuTrigger = React.forwardRef<HTMLDivElement, MenuSubmenuTr
       {...props}
     >
       <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
         <span className="truncate flex-1">{children}</span>
       </div>
-      <span
-        className="material-symbols-outlined icon-directional text-base text-on-surface-variant shrink-0"
-        aria-hidden="true"
-      >
-        chevron_right
-      </span>
+      <Icon name="chevron_right" size="sm" directional className="text-on-surface-variant shrink-0" aria-hidden="true" />
     </BaseMenu.SubmenuTrigger>
   )
 );
@@ -342,10 +418,11 @@ MenuRadioGroup.displayName = 'MenuRadioGroup';
 export const MenuLinkItem = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithoutRef<typeof BaseMenu.LinkItem>
->(({ className, ...props }, ref) => (
+>(({ className, href, ...props }, ref) => (
   <BaseMenu.LinkItem
     ref={ref}
     data-slot="menu-link-item"
+    href={href === undefined ? undefined : sanitizeUrl(href)}
     className={composeClassName(
       'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       className
@@ -372,16 +449,22 @@ export interface MenuProps<Payload = unknown> {
   orientation?: 'horizontal' | 'vertical';
   disabled?: boolean;
   closeParentOnEsc?: boolean;
+  openOnHover?: boolean;
+  delay?: number;
+  closeDelay?: number;
   actionsRef?: React.RefObject<BaseMenu.Root.Actions | null>;
   handle?: BaseMenu.Handle<Payload>;
   triggerId?: string | null;
   defaultTriggerId?: string | null;
+  finalFocus?: BaseMenu.Popup.Props['finalFocus'];
+  keepMounted?: boolean;
+  showArrow?: boolean;
   container?: BaseMenu.Portal.Props['container'];
   side?: BaseMenu.Positioner.Props['side'];
-  align?: 'start' | 'center' | 'end';
-  sideOffset?: number;
-  alignOffset?: number;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+  align?: BaseMenu.Positioner.Props['align'];
+  sideOffset?: BaseMenu.Positioner.Props['sideOffset'];
+  alignOffset?: BaseMenu.Positioner.Props['alignOffset'];
+  collisionPadding?: BaseMenu.Positioner.Props['collisionPadding'];
   fullWidth?: boolean;
   triggerClassName?: BaseMenu.Trigger.Props['className'];
   popupClassName?: BaseMenu.Popup.Props['className'];
@@ -406,10 +489,16 @@ function MenuComponent<Payload = unknown>({
   orientation = 'vertical',
   disabled = false,
   closeParentOnEsc = false,
+  openOnHover,
+  delay,
+  closeDelay,
   actionsRef,
   handle,
   triggerId,
   defaultTriggerId,
+  finalFocus,
+  keepMounted,
+  showArrow = false,
   container,
   side,
   align,
@@ -457,6 +546,15 @@ function MenuComponent<Payload = unknown>({
     return children;
   };
 
+  const combinedPopupClassName: BaseMenu.Popup.Props['className'] =
+    typeof className === 'function' || typeof popupClassName === 'function'
+      ? (state) =>
+          cn(
+            typeof className === 'function' ? className(state) : className,
+            typeof popupClassName === 'function' ? popupClassName(state) : popupClassName
+          )
+      : cn(className, popupClassName) || undefined;
+
   const menuTree = (
     <BaseMenu.Root<Payload>
       open={open}
@@ -481,6 +579,9 @@ function MenuComponent<Payload = unknown>({
             <BaseMenu.Trigger
               id={menuId}
               data-slot="menu-trigger"
+              openOnHover={openOnHover}
+              delay={delay}
+              closeDelay={closeDelay}
               render={React.isValidElement(trigger) ? trigger : undefined}
               nativeButton={resolveNativeButton(trigger)}
             >
@@ -490,6 +591,9 @@ function MenuComponent<Payload = unknown>({
             <BaseMenu.Trigger
               id={menuId}
               data-slot="menu-trigger"
+              openOnHover={openOnHover}
+              delay={delay}
+              closeDelay={closeDelay}
               className={composeClassName(
                 cn(
                   'inline-flex items-center justify-between gap-2 h-11 px-4 min-h-[44px] rounded border border-outline bg-surface text-on-surface font-label text-sm font-semibold hover:bg-state-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors motion-reduce:transition-none cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed',
@@ -499,43 +603,29 @@ function MenuComponent<Payload = unknown>({
               )}
             >
               <span>{triggerLabel}</span>
-              <span className="material-symbols-outlined text-lg text-on-surface-variant" aria-hidden="true">
-                arrow_drop_down
-              </span>
+              <Icon name="arrow_drop_down" size="md" className="text-on-surface-variant" aria-hidden="true" />
             </BaseMenu.Trigger>
           )}
-          <BaseMenu.Portal container={container}>
-            <BaseMenu.Positioner
+          <BaseMenu.Portal container={container} keepMounted={keepMounted}>
+            <MenuPositioner
               side={side}
               align={align}
               sideOffset={sideOffset}
               alignOffset={alignOffset}
               collisionPadding={collisionPadding}
-              className="z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none"
             >
-              <BaseMenu.Popup
-                data-slot="menu-content"
-                className={
-                  typeof className === 'function' || typeof popupClassName === 'function'
-                    ? (state) =>
-                        cn(
-                          'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-                          typeof className === 'function' ? className(state) : className,
-                          typeof popupClassName === 'function' ? popupClassName(state) : popupClassName
-                        )
-                    : cn(
-                        'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-                        className,
-                        popupClassName
-                      )
-                }
-              >
+              <MenuPopup finalFocus={finalFocus} className={combinedPopupClassName}>
+                {showArrow && <MenuArrow />}
                 <ScrollArea
                   className="min-h-0 flex-[0_1_auto]"
                   viewportClassName="overscroll-contain scroll-py-1"
                   viewportProps={{
                     tabIndex: -1,
-                    onMouseDown: (e) => e.preventDefault(),
+                    onMouseDown: (e) => {
+                      const target = e.target as HTMLElement | null;
+                      if (target?.closest('input, textarea, [contenteditable]')) return;
+                      e.preventDefault();
+                    },
                   }}
                   contentClassName="p-1"
                 >
@@ -557,8 +647,8 @@ function MenuComponent<Payload = unknown>({
                     </MenuGroup>
                   ) : null}
                 </ScrollArea>
-              </BaseMenu.Popup>
-            </BaseMenu.Positioner>
+              </MenuPopup>
+            </MenuPositioner>
           </BaseMenu.Portal>
         </>
       )}
@@ -586,25 +676,26 @@ function MenuComponent<Payload = unknown>({
   return menuTree;
 }
 
-
-export interface MenuInputProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Input> {}
+export interface MenuInputProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Input> {
+  showClear?: boolean;
+  endAddon?: React.ReactNode;
+}
 
 export const MenuInput = React.forwardRef<HTMLInputElement, MenuInputProps>(
-  ({ className, enterKeyHint = 'search', ...props }, ref) => (
-    <div className="flex items-center gap-2 px-3 py-2 border-b border-outline-variant">
-      <span className="material-symbols-outlined text-lg text-on-surface-variant select-none" aria-hidden="true">
-        search
-      </span>
+  ({ className, enterKeyHint = 'search', showClear = false, endAddon, ...props }, ref) => (
+    <div className="flex items-center gap-2 px-3 py-2 border-b border-outline-variant shrink-0">
+      <Icon name="search" size="md" className="text-on-surface-variant shrink-0 select-none" aria-hidden="true" />
       <BaseMenu.Input
         ref={ref}
         data-slot="menu-input"
         enterKeyHint={enterKeyHint}
         className={composeClassName(
-          'w-full bg-transparent font-sans text-base sm:text-sm text-on-surface placeholder:text-on-surface-variant/80 outline-none disabled:cursor-not-allowed disabled:opacity-50',
+          'w-full min-w-0 bg-transparent font-sans text-base sm:text-sm text-on-surface placeholder:text-on-surface-variant/80 outline-none disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
         {...props}
       />
+      {endAddon ?? (showClear ? <MenuClear /> : null)}
     </div>
   )
 );
@@ -621,6 +712,7 @@ export const MenuList = React.forwardRef<HTMLDivElement, MenuListProps>(
         tabIndex: -1,
         onMouseDown: (e) => e.preventDefault(),
       }}
+      contentClassName="p-1"
     >
       <BaseMenu.List
         ref={ref}
@@ -636,22 +728,20 @@ MenuList.displayName = 'MenuList';
 export interface MenuClearProps extends React.ComponentPropsWithoutRef<typeof BaseMenu.Clear> {}
 
 export const MenuClear = React.forwardRef<HTMLButtonElement, MenuClearProps>(
-  ({ className, children, 'aria-label': ariaLabel, ...props }, ref) => (
+  ({ className, children, render, nativeButton, 'aria-label': ariaLabel, ...props }, ref) => (
     <BaseMenu.Clear
       ref={ref}
       data-slot="menu-clear"
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
       aria-label={ariaLabel ?? (children ? undefined : 'Clear filter')}
       className={composeClassName(
-        "relative inline-flex items-center justify-center size-6 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors motion-reduce:transition-none cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
+        "relative inline-flex items-center justify-center size-6 shrink-0 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover transition-colors motion-reduce:transition-none cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary after:absolute after:-inset-2.5 after:content-['']",
         className
       )}
       {...props}
     >
-      {children || (
-        <span className="material-symbols-outlined text-base select-none" aria-hidden="true">
-          close
-        </span>
-      )}
+      {children || <Icon name="close" size="sm" aria-hidden="true" />}
     </BaseMenu.Clear>
   )
 );
@@ -671,7 +761,13 @@ export const MenuEmpty = React.forwardRef<HTMLDivElement, MenuEmptyProps>(
 );
 MenuEmpty.displayName = 'MenuEmpty';
 
-export const MenuFilterProvider = BaseMenu.FilterProvider;
+export function MenuFilterProvider({ children, ...props }: BaseMenu.FilterProvider.Props): React.JSX.Element {
+  return (
+    <MenuFilterScopeContext.Provider value={true}>
+      <BaseMenu.FilterProvider {...props}>{children}</BaseMenu.FilterProvider>
+    </MenuFilterScopeContext.Provider>
+  );
+}
 export const useMenuFilter = BaseMenu.useFilter;
 
 // Compound export mapping Base UI primitives and styled composites
@@ -679,8 +775,8 @@ export const Menu = Object.assign(MenuComponent, {
   Root: BaseMenu.Root,
   Trigger: MenuTrigger,
   Portal: BaseMenu.Portal,
-  Positioner: BaseMenu.Positioner,
-  Popup: BaseMenu.Popup,
+  Positioner: MenuPositioner,
+  Popup: MenuPopup,
   Content: MenuContent,
   Item: MenuItem,
   LinkItem: MenuLinkItem,
@@ -697,14 +793,14 @@ export const Menu = Object.assign(MenuComponent, {
   RadioItemIndicator: BaseMenu.RadioItemIndicator,
   Arrow: MenuArrow,
   Backdrop: BaseMenu.Backdrop,
-  Viewport: BaseMenu.Viewport,
+  Viewport: MenuViewport,
   createHandle: BaseMenu.createHandle,
   Handle: BaseMenu.Handle,
   Input: MenuInput,
   List: MenuList,
   Clear: MenuClear,
   Empty: MenuEmpty,
-  FilterProvider: BaseMenu.FilterProvider,
+  FilterProvider: MenuFilterProvider,
   useFilter: BaseMenu.useFilter,
 });
 
@@ -712,15 +808,15 @@ export const Menu = Object.assign(MenuComponent, {
 export { BaseMenu };
 export const MenuRoot = BaseMenu.Root;
 export const MenuPortal = BaseMenu.Portal;
-export const MenuPositioner = BaseMenu.Positioner;
-export const MenuPopup = BaseMenu.Popup;
+export const MenuPositionerPrimitive = BaseMenu.Positioner;
+export const MenuPopupPrimitive = BaseMenu.Popup;
+export const MenuViewportPrimitive = BaseMenu.Viewport;
 export const MenuItemPrimitive = BaseMenu.Item;
 export const MenuSubmenuRoot = BaseMenu.SubmenuRoot;
 export const MenuCheckboxItemIndicator = BaseMenu.CheckboxItemIndicator;
 export const MenuRadioItemIndicator = BaseMenu.RadioItemIndicator;
 export const MenuArrowPrimitive = BaseMenu.Arrow;
 export const MenuBackdrop = BaseMenu.Backdrop;
-export const MenuViewport = BaseMenu.Viewport;
 export const createMenuHandle = BaseMenu.createHandle;
 export const MenuHandle = BaseMenu.Handle;
 export const MenuInputPrimitive = BaseMenu.Input;

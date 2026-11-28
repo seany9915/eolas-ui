@@ -250,6 +250,7 @@
         "seany9915/eolas-ui/empty",
         "seany9915/eolas-ui/scroll-area",
         "seany9915/eolas-ui/skeleton",
+        "seany9915/eolas-ui/tooltip",
         "seany9915/eolas-ui/utils"
       ],
       "files": [
@@ -266,7 +267,7 @@
           "On large containers (`@2xl:` / `>=672px`): Side-by-side two-pane split with selectable list and detail view.",
           "On compact containers (`<672px`): Stack navigation. Renders list full-width; pushes detail view with an accessible back button when an item is selected.",
           "Active selection: 2px flush primary border + primary-container wash (`Item variant=\"selected\"`).",
-          "Touch targets: All list items maintain >=56px height (`Item size=\"lg\"`, WCAG 2.2 SC 2.5.8).",
+          "Touch targets: All list items maintain >=56px height (`Item size=\"md\"` + `min-h-14`, WCAG 2.2 SC 2.5.8).",
           "Accessible keyboard navigation: Listbox roving focus via ArrowDown / ArrowUp / Home / End, selection via Enter / Space / click, and Escape to return on compact views.",
           "Zero direct `<button>` or `<input>` tags outside primitives."
         ]
@@ -424,6 +425,7 @@
         "seany9915/eolas-ui/icon",
         "seany9915/eolas-ui/badge",
         "seany9915/eolas-ui/scroll-area",
+        "seany9915/eolas-ui/tooltip",
         "seany9915/eolas-ui/utils"
       ],
       "files": [

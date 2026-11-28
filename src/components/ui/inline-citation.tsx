@@ -63,27 +63,28 @@ function useInlineCitation() {
 /* -------------------------------------------------------------------------------------------------
  * InlineCitation (Root)
  * -----------------------------------------------------------------------------------------------*/
-export interface InlineCitationProps extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Root> {
-  children?: React.ReactNode;
+export interface InlineCitationProps<Payload = unknown>
+  extends BasePreviewCard.Root.Props<Payload> {
+  children?: BasePreviewCard.Root.Props<Payload>['children'];
   delay?: number;
   closeDelay?: number;
 }
 
-const InlineCitationRoot: React.FC<InlineCitationProps> = ({
+function InlineCitationRoot<Payload = unknown>({
   children,
   delay = 200,
   closeDelay = 150,
   ...props
-}) => {
+}: InlineCitationProps<Payload>): React.JSX.Element {
   const contextValue = React.useMemo(() => ({ delay, closeDelay }), [delay, closeDelay]);
   return (
     <InlineCitationContext.Provider value={contextValue}>
-      <BasePreviewCard.Root {...props}>
+      <BasePreviewCard.Root<Payload> {...props}>
         {children}
       </BasePreviewCard.Root>
     </InlineCitationContext.Provider>
   );
-};
+}
 InlineCitationRoot.displayName = 'InlineCitation';
 
 /* -------------------------------------------------------------------------------------------------
@@ -115,8 +116,8 @@ InlineCitationText.displayName = 'InlineCitationText';
 /* -------------------------------------------------------------------------------------------------
  * InlineCitationCardTrigger (Interactive citation pill)
  * -----------------------------------------------------------------------------------------------*/
-export interface InlineCitationCardTriggerProps
-  extends Omit<React.ComponentPropsWithoutRef<typeof BasePreviewCard.Trigger>, 'children'> {
+export interface InlineCitationCardTriggerProps<Payload = unknown>
+  extends Omit<BasePreviewCard.Trigger.Props<Payload>, 'children' | 'ref'> {
   children?: React.ReactNode;
   index?: number | string;
   label?: string;
@@ -126,10 +127,20 @@ export interface InlineCitationCardTriggerProps
   href?: string;
 }
 
-const InlineCitationCardTrigger = React.forwardRef<
-  HTMLElement,
-  InlineCitationCardTriggerProps
->(({ children, index, label, href, delay: propDelay, closeDelay: propCloseDelay, className, render, ...props }, ref) => {
+const InlineCitationCardTrigger = React.forwardRef(function InlineCitationCardTrigger<Payload = unknown>(
+  {
+    children,
+    index,
+    label,
+    href,
+    delay: propDelay,
+    closeDelay: propCloseDelay,
+    className,
+    render,
+    ...props
+  }: InlineCitationCardTriggerProps<Payload>,
+  ref: React.ForwardedRef<HTMLElement>
+) {
   const context = useInlineCitation();
   const delay = propDelay ?? context?.delay ?? 200;
   const closeDelay = propCloseDelay ?? context?.closeDelay ?? 150;
@@ -153,7 +164,7 @@ const InlineCitationCardTrigger = React.forwardRef<
         ? { href: safeHref, target: '_blank', rel: 'noopener noreferrer' }
         : {})}
       render={render ?? (safeHref ? undefined : <UnstyledButton />)}
-      className={composeClassName(baseTriggerClassName, className)}
+      className={render ? className : composeClassName(baseTriggerClassName, className)}
       {...props}
     >
       {children || (
@@ -169,7 +180,9 @@ const InlineCitationCardTrigger = React.forwardRef<
       )}
     </BasePreviewCard.Trigger>
   );
-});
+}) as (<Payload = unknown>(
+  props: InlineCitationCardTriggerProps<Payload> & React.RefAttributes<HTMLElement>
+) => React.JSX.Element) & { displayName?: string };
 InlineCitationCardTrigger.displayName = 'InlineCitationCardTrigger';
 
 /* -------------------------------------------------------------------------------------------------
@@ -179,21 +192,64 @@ export interface InlineCitationCardProps
   extends React.ComponentPropsWithoutRef<typeof BasePreviewCard.Popup> {
   children?: React.ReactNode;
   container?: BasePreviewCard.Portal.Props['container'];
+  keepMounted?: BasePreviewCard.Portal.Props['keepMounted'];
+  anchor?: BasePreviewCard.Positioner.Props['anchor'];
   side?: BasePreviewCard.Positioner.Props['side'];
   align?: BasePreviewCard.Positioner.Props['align'];
-  sideOffset?: number;
+  sideOffset?: BasePreviewCard.Positioner.Props['sideOffset'];
+  alignOffset?: BasePreviewCard.Positioner.Props['alignOffset'];
+  collisionPadding?: BasePreviewCard.Positioner.Props['collisionPadding'];
+  collisionBoundary?: BasePreviewCard.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BasePreviewCard.Positioner.Props['collisionAvoidance'];
+  arrowPadding?: BasePreviewCard.Positioner.Props['arrowPadding'];
+  sticky?: BasePreviewCard.Positioner.Props['sticky'];
+  disableAnchorTracking?: BasePreviewCard.Positioner.Props['disableAnchorTracking'];
+  positionerClassName?: BasePreviewCard.Positioner.Props['className'];
+  hasArrow?: boolean;
 }
 
 const InlineCitationCard = React.forwardRef<HTMLDivElement, InlineCitationCardProps>(
-  ({ children, className, container, side, align, sideOffset = 8, ...props }, ref) => {
+  (
+    {
+      children,
+      className,
+      container,
+      keepMounted,
+      anchor,
+      side,
+      align,
+      sideOffset = 8,
+      alignOffset,
+      collisionPadding = 8,
+      collisionBoundary,
+      collisionAvoidance,
+      arrowPadding,
+      sticky,
+      disableAnchorTracking,
+      positionerClassName,
+      hasArrow = false,
+      ...props
+    },
+    ref
+  ) => {
     return (
-      <BasePreviewCard.Portal container={container}>
+      <BasePreviewCard.Portal container={container} keepMounted={keepMounted}>
         <BasePreviewCard.Positioner
+          anchor={anchor}
           side={side}
           align={align}
           sideOffset={sideOffset}
-          collisionPadding={8}
-          className="z-50 outline-none max-w-[min(var(--available-width),calc(100vw-1rem))]"
+          alignOffset={alignOffset}
+          collisionPadding={collisionPadding}
+          collisionBoundary={collisionBoundary}
+          collisionAvoidance={collisionAvoidance}
+          arrowPadding={arrowPadding}
+          sticky={sticky}
+          disableAnchorTracking={disableAnchorTracking}
+          className={composeClassName(
+            'z-50 outline-none max-w-[min(var(--available-width),calc(100vw-1rem))] transition-[top,left,right,bottom] duration-[var(--duration-fast)] ease-[var(--ease-standard)] data-[instant]:transition-none motion-reduce:transition-none',
+            positionerClassName
+          )}
         >
           <BasePreviewCard.Popup
             ref={ref}
@@ -203,12 +259,25 @@ const InlineCitationCard = React.forwardRef<HTMLDivElement, InlineCitationCardPr
                 'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] ease-standard origin-[var(--transform-origin)]',
                 'data-[starting-style]:opacity-0 data-[starting-style]:scale-[0.98]',
                 'data-[ending-style]:opacity-0 data-[ending-style]:scale-[0.98]',
-                'motion-reduce:transition-none motion-reduce:transform-none'
+                'motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none'
               ),
               className
             )}
             {...props}
           >
+            {hasArrow && (
+              <BasePreviewCard.Arrow className="z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90">
+                <svg
+                  width="10"
+                  height="5"
+                  viewBox="0 0 10 5"
+                  className="block fill-surface stroke-outline-variant"
+                  aria-hidden="true"
+                >
+                  <path d="M0 5 L5 0 L10 5" />
+                </svg>
+              </BasePreviewCard.Arrow>
+            )}
             <ScrollArea
               className="min-h-0 flex-[0_1_auto]"
               viewportClassName="overscroll-contain"

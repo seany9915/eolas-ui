@@ -9,36 +9,28 @@ import type {
   ToastManagerPromiseOptions,
   ToastManagerPositionerProps,
 } from '@base-ui/react/toast';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 
 export type ToastType = 'neutral' | 'info' | 'success' | 'warning' | 'error' | (string & {});
 
-export interface ToastProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'className'> {
+export interface ToastProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof BaseToast.Root>, 'toast' | 'title' | 'children'> {
   title?: React.ReactNode;
   description?: React.ReactNode;
   type?: ToastType;
   onClose?: () => void;
   closeLabel?: string;
-  className?: BaseToast.Root.Props['className'];
+  children?: React.ReactNode;
 }
 
-const accentBorder: Record<string, string> = {
-  neutral: 'before:border-s-neutral',
-  info: 'before:border-s-neutral', // alias to neutral to preserve primary blue strictly for interactive controls
-  success: 'before:border-s-success',
-  warning: 'before:border-s-warning',
-  error: 'before:border-s-error',
-  loading: 'before:border-s-primary',
-};
-
-const iconMap: Record<string, { name: string; color: string }> = {
-  neutral: { name: 'info', color: 'text-on-surface' },
-  info: { name: 'info', color: 'text-on-surface' },
-  success: { name: 'check_circle', color: 'text-success' },
-  warning: { name: 'warning', color: 'text-warning' },
-  error: { name: 'error', color: 'text-error' },
-  loading: { name: 'progress_activity', color: 'text-primary' },
+const toastIconStyles: Record<string, { name: string; badge: string }> = {
+  neutral: { name: 'info', badge: 'bg-surface-container-high text-on-surface' },
+  info: { name: 'info', badge: 'bg-surface-container-high text-on-surface' },
+  success: { name: 'check_circle', badge: 'bg-success-container text-success' },
+  warning: { name: 'warning', badge: 'bg-warning-container text-warning' },
+  error: { name: 'error', badge: 'bg-error-container text-error' },
+  loading: { name: 'progress_activity', badge: 'bg-primary-container text-primary' },
 };
 
 /**
@@ -52,12 +44,13 @@ const ToastComponent = React.forwardRef<HTMLDivElement, ToastProps>(
       type = 'info',
       onClose,
       closeLabel = 'Dismiss toast',
+      children,
       className,
       ...props
     },
     ref
   ) => {
-    const currentIcon = iconMap[type] || iconMap.info;
+    const currentIcon = toastIconStyles[type] || toastIconStyles.info;
     const toastId = React.useId();
 
     const toastObj = React.useMemo(
@@ -77,45 +70,47 @@ const ToastComponent = React.forwardRef<HTMLDivElement, ToastProps>(
           data-slot="toast"
           toast={toastObj}
           className={composeClassName(
-            [
-              "relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
-              accentBorder[type] || accentBorder.info,
-            ],
+            'relative flex items-start gap-3 p-4 rounded-md bg-surface border border-outline-variant shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none forced-colors:border-[Highlight]',
             className
           )}
           {...props}
         >
           <BaseToast.Content data-slot="toast-content" className="flex items-start gap-3 w-full">
-            <Icon
-              name={currentIcon.name}
-              size="lg"
-              className={cn('shrink-0 mt-0.5 select-none', currentIcon.color)}
-              aria-hidden="true"
-            />
-            <div className="flex-1 min-w-0 pe-1">
-              {title && (
-                <BaseToast.Title data-slot="toast-title" className="font-heading text-sm font-bold text-on-surface leading-snug">
-                  {title}
-                </BaseToast.Title>
+            <div
+              className={cn(
+                'size-7 -mt-0.5 rounded flex items-center justify-center shrink-0 select-none',
+                currentIcon.badge
               )}
-              {description && (
-                <BaseToast.Description
-                  data-slot="toast-description"
-                  className={cn('font-sans text-sm text-on-surface-variant leading-normal', title && 'mt-1')}
-                >
-                  {description}
-                </BaseToast.Description>
+              aria-hidden="true"
+            >
+              <Icon
+                name={currentIcon.name}
+                size="md"
+                className={type === 'loading' ? 'animate-spin motion-reduce:animate-none' : undefined}
+                aria-hidden="true"
+              />
+            </div>
+            <div className="flex-1 min-w-0 pe-1">
+              {children ?? (
+                <>
+                  {title && (
+                    <BaseToast.Title data-slot="toast-title" className="font-heading text-sm font-bold text-on-surface leading-snug">
+                      {title}
+                    </BaseToast.Title>
+                  )}
+                  {description && (
+                    <BaseToast.Description
+                      data-slot="toast-description"
+                      className={cn('font-sans text-sm text-on-surface-variant leading-normal', title && 'mt-1')}
+                    >
+                      {description}
+                    </BaseToast.Description>
+                  )}
+                </>
               )}
             </div>
             {onClose && (
-              <BaseToast.Close
-                data-slot="toast-close"
-                onClick={onClose}
-                className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
-                aria-label={closeLabel}
-              >
-                <Icon name="close" size="sm" aria-hidden="true" />
-              </BaseToast.Close>
+              <ToastClose onClick={onClose} aria-label={closeLabel} />
             )}
           </BaseToast.Content>
         </BaseToast.Root>
@@ -145,30 +140,48 @@ export interface ToastOptions extends ToastManagerAddOptions<ToastCustomData> {
 // Global Toast Manager and Dispatcher
 export const globalToastManager = BaseToast.createToastManager<ToastCustomData>();
 
+function resolveToastActionProps(
+  action?: ToastActionOption,
+  actionProps?: React.ComponentPropsWithoutRef<'button'>
+) {
+  if (actionProps || !action) return actionProps;
+  if (isActionConfig(action)) {
+    return {
+      children: action.label,
+      onClick: action.onClick,
+    };
+  }
+  return action;
+}
+
 function normalizeToastOptions(options: ToastOptions | string, defaultType = 'info'): ToastOptions {
   if (typeof options === 'string') {
     return { title: options, type: defaultType };
   }
   const { action, actionProps, data, ...rest } = options;
 
-  // Seamlessly bridge both Base UI's native actionProps and convenience action config
-  let resolvedActionProps = actionProps;
-  if (!resolvedActionProps && action) {
-    if (isActionConfig(action)) {
-      resolvedActionProps = {
-        children: action.label,
-        onClick: action.onClick,
-      };
-    } else {
-      resolvedActionProps = action;
-    }
-  }
-
   return {
     ...rest,
-    actionProps: resolvedActionProps,
+    actionProps: resolveToastActionProps(action, actionProps),
     type: options.type ?? defaultType,
     data: action ? { action, ...data } : data,
+  };
+}
+
+export interface ToastUpdateOptions extends ToastManagerUpdateOptions<ToastCustomData> {
+  action?: ToastActionOption;
+}
+
+function normalizeUpdateOptions(updates: ToastUpdateOptions): ToastManagerUpdateOptions<ToastCustomData> {
+  const { action, actionProps, data, ...rest } = updates;
+  return {
+    ...rest,
+    ...(action !== undefined || actionProps !== undefined
+      ? { actionProps: resolveToastActionProps(action, actionProps) }
+      : {}),
+    ...(action !== undefined || data !== undefined
+      ? { data: action ? { action, ...data } : data }
+      : {}),
   };
 }
 
@@ -242,9 +255,10 @@ toast.error = (
   description?: React.ReactNode,
   options?: Omit<ToastOptions, 'title' | 'description' | 'type'>
 ) => {
-  // Errors persist until dismissed (timeout: 0); callers may still override.
+  // Errors persist until dismissed (timeout: 0) and default to high priority; callers may still override.
   return toast.add({
     timeout: 0,
+    priority: 'high',
     ...options,
     title,
     description,
@@ -256,23 +270,25 @@ toast.close = (id?: string) => globalToastManager.close(id);
 
 toast.update = (
   id: string,
-  updates:
-    | ToastManagerUpdateOptions<ToastCustomData>
-    | ((prevToast: ToastItem) => ToastManagerUpdateOptions<ToastCustomData>)
+  updates: ToastUpdateOptions | ((prevToast: ToastItem) => ToastUpdateOptions)
 ) => {
-  globalToastManager.update(id, updates);
+  if (typeof updates === 'function') {
+    globalToastManager.update(id, (prevToast) => normalizeUpdateOptions(updates(prevToast)));
+  } else {
+    globalToastManager.update(id, normalizeUpdateOptions(updates));
+  }
 };
 
 export interface ToastPromiseOptions<Value> {
-  loading: string | ToastManagerUpdateOptions<ToastCustomData>;
+  loading: string | ToastUpdateOptions;
   success:
     | string
-    | ToastManagerUpdateOptions<ToastCustomData>
-    | ((result: Value) => string | ToastManagerUpdateOptions<ToastCustomData>);
+    | ToastUpdateOptions
+    | ((result: Value) => string | ToastUpdateOptions);
   error:
     | string
-    | ToastManagerUpdateOptions<ToastCustomData>
-    | ((error: unknown) => string | ToastManagerUpdateOptions<ToastCustomData>);
+    | ToastUpdateOptions
+    | ((error: unknown) => string | ToastUpdateOptions);
 }
 
 toast.promise = <Value,>(
@@ -280,13 +296,13 @@ toast.promise = <Value,>(
   options: ToastPromiseOptions<Value>
 ): Promise<Value> => {
   const mapUpdate = (
-    val: string | ToastManagerUpdateOptions<ToastCustomData>
+    val: string | ToastUpdateOptions
   ): ToastManagerUpdateOptions<ToastCustomData> => {
     // Upstream Base UI spec: string arguments in promise states are shortcuts for description
     if (typeof val === 'string') {
       return { description: val };
     }
-    return val;
+    return normalizeUpdateOptions(val);
   };
 
   const managerPromiseOptions: ToastManagerPromiseOptions<Value, ToastCustomData> = {
@@ -323,6 +339,48 @@ function isActionConfig(action: ToastActionOption): action is ToastActionConfig 
   return typeof action === 'object' && action !== null && 'label' in action && 'onClick' in action;
 }
 
+export const ToastPositioner = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Positioner>
+>(({ className, collisionPadding = 8, ...props }, ref) => (
+  <BaseToast.Positioner
+    ref={ref}
+    data-slot="toast-positioner"
+    collisionPadding={collisionPadding}
+    className={composeClassName(
+      'z-[60] pointer-events-auto max-w-[var(--available-width)] outline-none',
+      className
+    )}
+    {...props}
+  />
+));
+ToastPositioner.displayName = 'ToastPositioner';
+
+export const ToastArrow = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseToast.Arrow>
+>(({ className, children, ...props }, ref) => (
+  <BaseToast.Arrow
+    ref={ref}
+    data-slot="toast-arrow"
+    className={composeClassName(
+      cn(
+        'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+        'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+      ),
+      className
+    )}
+    {...props}
+  >
+    {children ?? (
+      <svg width="10" height="5" viewBox="0 0 10 5" className="block fill-surface stroke-outline-variant" aria-hidden="true">
+        <path d="M0 5 L5 0 L10 5" />
+      </svg>
+    )}
+  </BaseToast.Arrow>
+));
+ToastArrow.displayName = 'ToastArrow';
+
 /**
  * Toast item inside global Toaster with Base UI stacked deck physics & gestures
  */
@@ -331,7 +389,7 @@ const ActiveToastItem: React.FC<{
   position: ToasterPosition;
 }> = ({ toast: t, position }) => {
   const toastType = t.type || 'info';
-  const currentIcon = iconMap[toastType] || iconMap.info;
+  const currentIcon = toastIconStyles[toastType] || toastIconStyles.info;
   const isTopPosition = position.startsWith('top');
   const actionOption = t.data?.action;
   const isAnchored = Boolean(t.positionerProps?.anchor);
@@ -366,8 +424,7 @@ const ActiveToastItem: React.FC<{
   );
 
   const commonDeckClasses = cn(
-    "pointer-events-auto flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-sm w-full select-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
-    accentBorder[toastType] || accentBorder.info,
+    'pointer-events-auto flex items-start gap-3 p-4 rounded-md bg-surface border border-outline-variant shadow-ambient max-w-sm w-full select-none forced-colors:border-[Highlight]',
     // Calibrated 250ms enter / 150ms exit asymmetry (DESIGN.md)
     '[transition:transform_var(--duration-fast)_var(--ease-standard),opacity_var(--duration-fast)_var(--ease-standard),height_var(--duration-quick),box-shadow_var(--duration-quick)]',
     'data-[ending-style]:[transition:transform_var(--duration-quick)_var(--ease-standard),opacity_var(--duration-quick)_var(--ease-standard),height_var(--duration-quick)]',
@@ -393,17 +450,14 @@ const ActiveToastItem: React.FC<{
     <BaseToast.Root
       data-slot="toast"
       toast={t}
-      swipeDirection={isTopPosition ? ['up', 'right', 'left'] : ['down', 'right', 'left']}
+      swipeDirection={isAnchored ? undefined : isTopPosition ? ['up', 'right', 'left'] : ['down', 'right', 'left']}
       className={
         isAnchored
-          ? cn(
-              "pointer-events-auto relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-[min(24rem,var(--available-width))] w-full select-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
-              'transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none',
-              accentBorder[toastType] || accentBorder.info
-            )
+          ? 'pointer-events-auto relative flex items-start gap-3 p-4 rounded-md bg-surface border border-outline-variant shadow-ambient max-w-[min(24rem,var(--available-width))] w-full select-none forced-colors:border-[Highlight] transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-small)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-small)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none'
           : cn(commonDeckClasses, isTopPosition ? topDeckClasses : bottomDeckClasses)
       }
     >
+      {isAnchored && <ToastArrow />}
       <BaseToast.Content
         data-slot="toast-content"
         className={cn(
@@ -413,17 +467,21 @@ const ActiveToastItem: React.FC<{
         )}
       >
 
-        {/* Semantic Icon with rotation animation on loading */}
-        <Icon
-          name={currentIcon.name}
-          size="lg"
+        {/* Tinted semantic icon badge with rotation animation on loading */}
+        <div
           className={cn(
-            'shrink-0 mt-0.5 select-none',
-            currentIcon.color,
-            toastType === 'loading' && 'animate-spin motion-reduce:animate-none'
+            'size-7 -mt-0.5 rounded flex items-center justify-center shrink-0 select-none',
+            currentIcon.badge
           )}
           aria-hidden="true"
-        />
+        >
+          <Icon
+            name={currentIcon.name}
+            size="md"
+            className={toastType === 'loading' ? 'animate-spin motion-reduce:animate-none' : undefined}
+            aria-hidden="true"
+          />
+        </div>
 
         {/* Toast Body */}
         <div className="flex-1 min-w-0 pe-1">
@@ -455,7 +513,7 @@ const ActiveToastItem: React.FC<{
         {/* Dismiss Close button with WCAG 2.2 44x44px target */}
         <BaseToast.Close
           data-slot="toast-close"
-          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
+          className="size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2.5 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none"
           aria-label="Dismiss toast"
         >
           <Icon name="close" size="sm" aria-hidden="true" />
@@ -464,30 +522,21 @@ const ActiveToastItem: React.FC<{
     </BaseToast.Root>
   );
 
-  // If anchored toast, wrap in BaseToast.Positioner and add BaseToast.Arrow
-  if (t.positionerProps?.anchor) {
+  if (isAnchored) {
     const {
       className: positionerClassName,
       collisionPadding = 8,
       ...restPositionerProps
-    } = t.positionerProps;
+    } = t.positionerProps ?? {};
     return (
-      <BaseToast.Positioner
+      <ToastPositioner
         toast={t}
         collisionPadding={collisionPadding}
         {...restPositionerProps}
-        className={composeClassName(
-          'z-[60] pointer-events-auto max-w-[var(--available-width)]',
-          positionerClassName
-        )}
+        className={positionerClassName}
       >
         {toastCardContent}
-        <BaseToast.Arrow className="data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px] data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90">
-          <svg width="10" height="5" viewBox="0 0 10 5" className="block fill-surface stroke-outline-variant" aria-hidden="true">
-            <path d="M0 5 L5 0 L10 5" />
-          </svg>
-        </BaseToast.Arrow>
-      </BaseToast.Positioner>
+      </ToastPositioner>
     );
   }
 
@@ -508,53 +557,48 @@ export interface ToasterProps {
   position?: ToasterPosition;
   limit?: number; // default 5
   timeout?: number; // default 5000
+  toastManager?: ReturnType<typeof BaseToast.createToastManager<ToastCustomData>>;
+  container?: BaseToast.Portal.Props['container'];
+  viewportProps?: Omit<BaseToast.Viewport.Props, 'className'>;
   className?: BaseToast.Viewport.Props['className'];
 }
 
 const positionClasses: Record<ToasterPosition, string> = {
   'bottom-right': 'bottom-4 right-4 sm:bottom-6 sm:right-6',
   'bottom-left': 'bottom-4 left-4 sm:bottom-6 sm:left-6',
-  'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2 sm:bottom-6',
+  'bottom-center': 'bottom-4 inset-x-0 mx-auto sm:bottom-6',
   'top-right': 'top-4 right-4 sm:top-6 sm:right-6',
   'top-left': 'top-4 left-4 sm:top-6 sm:left-6',
-  'top-center': 'top-4 left-1/2 -translate-x-1/2 sm:top-6',
+  'top-center': 'top-4 inset-x-0 mx-auto sm:top-6',
 };
 
 const ToasterViewportContent: React.FC<{
   position: ToasterPosition;
+  container?: BaseToast.Portal.Props['container'];
+  viewportProps?: Omit<BaseToast.Viewport.Props, 'className'>;
   className?: BaseToast.Viewport.Props['className'];
-}> = ({ position, className }) => {
+}> = ({ position, container, viewportProps, className }) => {
   const { toasts } = BaseToast.useToastManager<ToastCustomData>();
-  const viewportToasts = toasts.filter((t) => !t.positionerProps?.anchor);
-  const anchoredToasts = toasts.filter((t) => Boolean(t.positionerProps?.anchor));
 
   return (
-    <>
-      <BaseToast.Portal>
-        {/* High z-index z-[60] so toasts float above modal dialogs and sheets (z-50) */}
-        <BaseToast.Viewport
-          data-slot="toast-viewport"
-          className={composeClassName(
-            [
-              'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 pb-[env(safe-area-inset-bottom,0px)] pt-[env(safe-area-inset-top,0px)] ps-[env(safe-area-inset-left,0px)] pe-[env(safe-area-inset-right,0px)] focus:outline-none',
-              positionClasses[position],
-            ],
-            className
-          )}
-        >
-          {viewportToasts.map((t) => (
-            <ActiveToastItem key={t.id} toast={t} position={position} />
-          ))}
-        </BaseToast.Viewport>
-      </BaseToast.Portal>
-      {anchoredToasts.length > 0 && (
-        <BaseToast.Portal>
-          {anchoredToasts.map((t) => (
-            <ActiveToastItem key={t.id} toast={t} position={position} />
-          ))}
-        </BaseToast.Portal>
-      )}
-    </>
+    <BaseToast.Portal container={container}>
+      {/* High z-index z-[60] so toasts float above modal dialogs and sheets (z-50) */}
+      <BaseToast.Viewport
+        data-slot="toast-viewport"
+        {...viewportProps}
+        className={composeClassName(
+          [
+            'fixed z-[60] max-w-sm w-[calc(100vw-2rem)] sm:w-90 pointer-events-none p-0 pb-[env(safe-area-inset-bottom,0px)] pt-[env(safe-area-inset-top,0px)] ps-[env(safe-area-inset-left,0px)] pe-[env(safe-area-inset-right,0px)] focus:outline-none',
+            positionClasses[position],
+          ],
+          className
+        )}
+      >
+        {toasts.map((t) => (
+          <ActiveToastItem key={t.id} toast={t} position={position} />
+        ))}
+      </BaseToast.Viewport>
+    </BaseToast.Portal>
   );
 };
 
@@ -565,11 +609,19 @@ export const Toaster: React.FC<ToasterProps> = ({
   position = 'bottom-right',
   limit = 5,
   timeout = 5000,
+  toastManager = globalToastManager,
+  container,
+  viewportProps,
   className,
 }) => {
   return (
-    <BaseToast.Provider toastManager={globalToastManager} timeout={timeout} limit={limit}>
-      <ToasterViewportContent position={position} className={className} />
+    <BaseToast.Provider toastManager={toastManager} timeout={timeout} limit={limit}>
+      <ToasterViewportContent
+        position={position}
+        container={container}
+        viewportProps={viewportProps}
+        className={className}
+      />
     </BaseToast.Provider>
   );
 };
@@ -583,10 +635,7 @@ export const ToastRoot = React.forwardRef<
     data-slot="toast"
     toast={toast}
     className={composeClassName(
-      [
-        "relative flex items-start gap-3 p-4 ps-5 rounded-s-none rounded-e bg-surface border-y border-e border-s-0 border-outline-variant shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none before:pointer-events-none before:content-[''] before:absolute before:-inset-y-px before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
-        accentBorder[toast?.type || 'info'] || accentBorder.info,
-      ],
+      'relative flex items-start gap-3 p-4 rounded-md bg-surface border border-outline-variant shadow-ambient max-w-sm w-full transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] data-[starting-style]:opacity-0 data-[starting-style]:translate-y-4 data-[ending-style]:opacity-0 data-[ending-style]:translate-y-2 ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none forced-colors:border-[Highlight]',
       className
     )}
     {...props}
@@ -636,31 +685,49 @@ ToastDescription.displayName = 'ToastDescription';
 export const ToastClose = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof BaseToast.Close>
->(({ className, 'aria-label': ariaLabel = 'Dismiss toast', ...props }, ref) => (
+>(({ className, children, render, nativeButton, 'aria-label': ariaLabel = 'Dismiss toast', ...props }, ref) => (
   <BaseToast.Close
     ref={ref}
     data-slot="toast-close"
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
     aria-label={ariaLabel}
-    className={composeClassName(
-      'size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none',
-      className
-    )}
+    className={
+      render
+        ? className
+        : composeClassName(
+            'size-11 min-w-[44px] min-h-[44px] shrink-0 -me-2 -mt-2.5 inline-flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation transition-colors motion-reduce:transition-none cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary select-none',
+            className
+          )
+    }
     {...props}
-  />
+  >
+    {children !== undefined ? (
+      children
+    ) : render ? undefined : (
+      <Icon name="close" size="sm" aria-hidden="true" />
+    )}
+  </BaseToast.Close>
 ));
 ToastClose.displayName = 'ToastClose';
 
 export const ToastAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof BaseToast.Action>
->(({ className, ...props }, ref) => (
+>(({ className, render, nativeButton, ...props }, ref) => (
   <BaseToast.Action
     ref={ref}
     data-slot="toast-action"
-    className={composeClassName(
-      'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high touch-manipulation focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer shrink-0 touch-target-expanded',
-      className
-    )}
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
+    className={
+      render
+        ? className
+        : composeClassName(
+            'relative font-label text-xs font-semibold px-2.5 py-1.5 rounded text-primary hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high touch-manipulation focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none cursor-pointer shrink-0 touch-target-expanded',
+            className
+          )
+    }
     {...props}
   />
 ));
@@ -682,10 +749,10 @@ export const ToastViewport = React.forwardRef<
 ));
 ToastViewport.displayName = 'ToastViewport';
 
-export const ToastArrow = BaseToast.Arrow;
 export const ToastProvider = BaseToast.Provider;
 export const ToastPortal = BaseToast.Portal;
-export const ToastPositioner = BaseToast.Positioner;
+export const ToastPositionerPrimitive = BaseToast.Positioner;
+export const ToastArrowPrimitive = BaseToast.Arrow;
 
 // Compound export mapping styled Eolas Toast primitives
 export const Toast = Object.assign(ToastComponent, {
@@ -698,8 +765,8 @@ export const Toast = Object.assign(ToastComponent, {
   Close: ToastClose,
   Action: ToastAction,
   Portal: BaseToast.Portal,
-  Positioner: BaseToast.Positioner,
-  Arrow: BaseToast.Arrow,
+  Positioner: ToastPositioner,
+  Arrow: ToastArrow,
   useToastManager: BaseToast.useToastManager,
   createToastManager: BaseToast.createToastManager,
 });

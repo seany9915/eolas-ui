@@ -13,7 +13,7 @@
  */
 import * as React from 'react';
 import { NumberField as BaseNumberField } from '@base-ui/react/number-field';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, resolveNativeButton } from '@/lib/utils';
 import { Icon } from './icon';
 
 export type NumberFieldSize = 'sm' | 'md' | 'lg';
@@ -68,7 +68,7 @@ const NumberFieldComponent = React.forwardRef<HTMLDivElement, NumberFieldProps>(
         allowWheelScrub={allowWheelScrub}
         snapOnStep={snapOnStep}
         required={required}
-        id={inputId}
+        id={id}
         className={rootClassName}
         {...props}
       >
@@ -220,21 +220,31 @@ NumberFieldInput.displayName = 'NumberFieldInput';
 export const NumberFieldDecrement = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof BaseNumberField.Decrement> & { size?: NumberFieldSize }
->(({ className, size = 'md', children, ...props }, ref) => (
+>(({ className, size = 'md', children, render, nativeButton, 'aria-label': ariaLabel = 'Decrease value', ...props }, ref) => (
   <BaseNumberField.Decrement
     ref={ref}
     data-slot="number-field-decrement"
-    aria-label="Decrease value"
-    className={composeClassName(
-      cn(
-        numberFieldSizeStyles[size].button,
-        'flex items-center justify-center text-on-surface-variant hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:scale-[0.96] motion-reduce:active:scale-100 transition-colors motion-reduce:transition-none disabled:opacity-40 data-[disabled]:opacity-40 border-e border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container-low focus-visible:text-primary forced-colors:border-[ButtonText] cursor-pointer select-none'
-      ),
-      className
-    )}
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
+    aria-label={ariaLabel}
+    className={
+      render
+        ? className
+        : composeClassName(
+            cn(
+              numberFieldSizeStyles[size].button,
+              'flex items-center justify-center text-on-surface-variant hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:scale-[0.96] motion-reduce:active:scale-100 transition-colors motion-reduce:transition-none disabled:opacity-40 data-[disabled]:opacity-40 border-e border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container-low focus-visible:text-primary forced-colors:border-[ButtonText] cursor-pointer select-none'
+            ),
+            className
+          )
+    }
     {...props}
   >
-    {children ?? <Icon name="remove" size="sm" aria-hidden="true" />}
+    {children !== undefined ? (
+      children
+    ) : render ? undefined : (
+      <Icon name="remove" size="sm" aria-hidden="true" />
+    )}
   </BaseNumberField.Decrement>
 ));
 NumberFieldDecrement.displayName = 'NumberFieldDecrement';
@@ -242,21 +252,31 @@ NumberFieldDecrement.displayName = 'NumberFieldDecrement';
 export const NumberFieldIncrement = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<typeof BaseNumberField.Increment> & { size?: NumberFieldSize }
->(({ className, size = 'md', children, ...props }, ref) => (
+>(({ className, size = 'md', children, render, nativeButton, 'aria-label': ariaLabel = 'Increase value', ...props }, ref) => (
   <BaseNumberField.Increment
     ref={ref}
     data-slot="number-field-increment"
-    aria-label="Increase value"
-    className={composeClassName(
-      cn(
-        numberFieldSizeStyles[size].button,
-        'flex items-center justify-center text-on-surface-variant hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:scale-[0.96] motion-reduce:active:scale-100 transition-colors motion-reduce:transition-none disabled:opacity-40 data-[disabled]:opacity-40 border-s border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container-low focus-visible:text-primary forced-colors:border-[ButtonText] cursor-pointer select-none'
-      ),
-      className
-    )}
+    render={render}
+    nativeButton={resolveNativeButton(render, nativeButton)}
+    aria-label={ariaLabel}
+    className={
+      render
+        ? className
+        : composeClassName(
+            cn(
+              numberFieldSizeStyles[size].button,
+              'flex items-center justify-center text-on-surface-variant hover:bg-state-hover hover:text-on-surface active:bg-surface-container-high active:scale-[0.96] motion-reduce:active:scale-100 transition-colors motion-reduce:transition-none disabled:opacity-40 data-[disabled]:opacity-40 border-s border-outline-variant focus-visible:outline-none focus-visible:bg-surface-container-low focus-visible:text-primary forced-colors:border-[ButtonText] cursor-pointer select-none'
+            ),
+            className
+          )
+    }
     {...props}
   >
-    {children ?? <Icon name="add" size="sm" aria-hidden="true" />}
+    {children !== undefined ? (
+      children
+    ) : render ? undefined : (
+      <Icon name="add" size="sm" aria-hidden="true" />
+    )}
   </BaseNumberField.Increment>
 ));
 NumberFieldIncrement.displayName = 'NumberFieldIncrement';
@@ -274,6 +294,38 @@ export const NumberFieldScrubArea = React.forwardRef<
 ));
 NumberFieldScrubArea.displayName = 'NumberFieldScrubArea';
 
+export const NumberFieldScrubAreaCursor = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof BaseNumberField.ScrubAreaCursor>
+>(({ className, children, ...props }, ref) => (
+  <BaseNumberField.ScrubAreaCursor
+    ref={ref}
+    data-slot="number-field-scrub-area-cursor"
+    className={composeClassName('drop-shadow-sm text-on-surface', className)}
+    {...props}
+  >
+    {children ?? (
+      <svg
+        width="26"
+        height="14"
+        viewBox="0 0 26 14"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          d="M19.5 5.5L23.5 7L19.5 8.5M6.5 5.5L2.5 7L6.5 8.5M4 7H22"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    )}
+  </BaseNumberField.ScrubAreaCursor>
+));
+NumberFieldScrubAreaCursor.displayName = 'NumberFieldScrubAreaCursor';
+
 // Compound export mapping Base UI primitives
 export const NumberField = Object.assign(NumberFieldComponent, {
   Root: NumberFieldRoot,
@@ -282,11 +334,11 @@ export const NumberField = Object.assign(NumberFieldComponent, {
   Increment: NumberFieldIncrement,
   Decrement: NumberFieldDecrement,
   ScrubArea: NumberFieldScrubArea,
-  ScrubAreaCursor: BaseNumberField.ScrubAreaCursor,
+  ScrubAreaCursor: NumberFieldScrubAreaCursor,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseNumberField };
-export const NumberFieldScrubAreaCursor = BaseNumberField.ScrubAreaCursor;
+export const NumberFieldScrubAreaCursorPrimitive = BaseNumberField.ScrubAreaCursor;
 
 export default NumberField;

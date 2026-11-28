@@ -10,6 +10,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { PreviewCard } from '@/components/ui/preview-card';
 import { Confirmation } from '@/components/ui/confirmation';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import {
   Command,
@@ -26,28 +27,58 @@ import { Kbd } from '@/components/ui/kbd';
 import { ComponentDemoProps } from '../types';
 
 export const DialogDemo: React.FC<ComponentDemoProps> = () => {
+  const [bgClicks, setBgClicks] = React.useState(0);
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 py-8">
+    <div className="flex flex-wrap items-center justify-center gap-3 py-8">
+      <Button
+        variant="text"
+        colorRole="neutral"
+        size="sm"
+        onClick={() => setBgClicks((c) => c + 1)}
+      >
+        Test page click ({bgClicks})
+      </Button>
+
       <Dialog
         title="Schedule Practice Session"
         description="Configure session time, assigned therapist, and practice goals."
         trigger={
           <Button colorRole="primary">
-            <Icon name="event" size="xs" />
+            <Icon name="event" size="sm" />
             Open Consultation Dialog
           </Button>
         }
         confirmLabel="Confirm Session"
         cancelLabel="Discard"
       >
-        <div className="flex flex-col gap-3 py-2 text-xs font-sans text-on-surface-variant">
+        <div className="flex flex-col gap-3 py-2 text-base font-sans text-on-surface-variant">
           <p>
             Learner P-2024-819 has been scheduled for sound practice evaluation under Sarah Jenkins, Speech-Language Pathologist.
           </p>
-          <div className="p-3 rounded-lg bg-surface-container-low border border-outline-variant font-mono text-xs">
-            Room: Studio B | Focus: /r/ Blends | Format: Individual
+          <div className="p-3 rounded-md bg-surface-container-low border border-outline-variant text-sm text-on-surface">
+            Room: Studio B · Focus: /r/ Blends · Format: Individual
           </div>
         </div>
+      </Dialog>
+
+      <Dialog
+        modal={false}
+        disablePointerDismissal
+        containerClassName="items-end justify-end p-6"
+        size="sm"
+        title="Quick Session Note"
+        description="Non-modal dialogs leave the workspace interactive behind them."
+        trigger={
+          <Button variant="outline" colorRole="neutral">
+            <Icon name="dock_to_bottom" size="sm" />
+            Non-Modal Dialog
+          </Button>
+        }
+      >
+        <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
+          Background page clicks recorded while open: <span className="font-semibold text-on-surface">{bgClicks}</span>
+        </p>
       </Dialog>
     </div>
   );
@@ -114,27 +145,94 @@ export const AlertDialogDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const DrawerDemo: React.FC<ComponentDemoProps> = () => {
+  const [pageClicks, setPageClicks] = React.useState(0);
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 py-8">
+    <div className="flex flex-wrap items-center justify-center gap-3 py-8">
+      <Button
+        variant="text"
+        colorRole="neutral"
+        size="sm"
+        onClick={() => setPageClicks((c) => c + 1)}
+      >
+        Test page click ({pageClicks})
+      </Button>
+
       <Drawer
         title="Learner Profile Drawer"
         description="Practice history and recent audio recordings."
         swipeDirection="right"
         trigger={
           <Button variant="outline" colorRole="secondary">
-            <Icon name="menu_open" size="xs" />
-            Open Profile Drawer
+            <Icon name="menu_open" size="sm" />
+            Side Drawer
           </Button>
         }
       >
-        <div className="flex flex-col gap-4 py-4 text-xs font-sans text-on-surface-variant">
-          <div className="p-3 rounded-lg bg-surface-container-low border border-outline-variant">
-            <span className="font-bold text-on-surface block mb-1">Practice Status: Active</span>
-            <span>Accuracy: 92% | Streak: 5 days | Weekly Goal: Met</span>
+        <div className="flex flex-col gap-3 py-2 text-sm font-sans text-on-surface-variant">
+          <div className="p-3.5 rounded-md bg-surface-container-low border border-outline-variant flex flex-col gap-1">
+            <span className="font-heading font-semibold text-on-surface">Practice Status: Active</span>
+            <span>Accuracy: 92% · Streak: 5 days · Weekly Goal: Met</span>
           </div>
-          <div className="p-3 rounded-lg bg-surface-container-low border border-outline-variant">
-            <span className="font-bold text-on-surface block mb-1">Recent Practice Sessions:</span>
-            <span>Session 12: 95% | Session 11: 88% | Session 10: 91%</span>
+          <div className="p-3.5 rounded-md bg-surface-container-low border border-outline-variant flex flex-col gap-1">
+            <span className="font-heading font-semibold text-on-surface">Recent Practice Sessions</span>
+            <span>Session 12: 95% · Session 11: 88% · Session 10: 91%</span>
+          </div>
+        </div>
+      </Drawer>
+
+      <Drawer
+        title="Session cues"
+        description="Drag up or down to switch between peek height and full sheet view."
+        swipeDirection="down"
+        snapPoints={['280px', 0.85]}
+        trigger={
+          <Button variant="outline" colorRole="primary">
+            <Icon name="drag_handle" size="sm" />
+            Snap Points Sheet
+          </Button>
+        }
+      >
+        <div className="flex flex-col gap-3 py-2 text-sm font-sans text-on-surface-variant">
+          <div className="p-3.5 rounded-md bg-surface-container-low flex items-center justify-between gap-2">
+            <span className="font-heading font-semibold text-on-surface">Vocalic /r/ cue</span>
+            <Badge variant="soft" colorRole="primary" size="sm">Level 2</Badge>
+          </div>
+          <p className="text-base text-on-surface leading-relaxed">
+            Ask the learner to pull the tongue blade back slightly while keeping both sides braced against the upper molars.
+          </p>
+          <div className="p-3.5 rounded-md bg-surface-container-low flex flex-col gap-1">
+            <span className="font-heading font-semibold text-on-surface">Practice words</span>
+            <span>Rabbit · Road · River · Car · Star · Door</span>
+          </div>
+          <div className="p-3.5 rounded-md bg-surface-container-low flex flex-col gap-1">
+            <span className="font-heading font-semibold text-on-surface">Listening prompt</span>
+            <span>Keep vowel onset steady for 2 seconds before releasing into the word.</span>
+          </div>
+        </div>
+      </Drawer>
+
+      <Drawer
+        title="Quick reference"
+        description="This non-modal drawer leaves the page interactive and stays open on outside clicks."
+        swipeDirection="right"
+        modal={false}
+        disablePointerDismissal
+        trigger={
+          <Button variant="soft" colorRole="neutral">
+            <Icon name="dock_to_right" size="sm" />
+            Non-Modal Inspector
+          </Button>
+        }
+      >
+        <div className="flex flex-col gap-3 py-2 text-sm font-sans text-on-surface-variant">
+          <div className="p-3.5 rounded-md bg-surface-container-low border border-outline-variant flex flex-col gap-1">
+            <span className="font-heading font-semibold text-on-surface">Interactive workspace</span>
+            <span>Try clicking “Test page click” in the preview behind this panel without dismissing it.</span>
+          </div>
+          <div className="p-3.5 rounded-md bg-surface-container-low border border-outline-variant flex flex-col gap-1">
+            <span className="font-heading font-semibold text-on-surface">Live counter check</span>
+            <span>Current background click count: {pageClicks}</span>
           </div>
         </div>
       </Drawer>
@@ -147,49 +245,111 @@ export const PopoverDemo: React.FC<ComponentDemoProps> = () => {
     <div className="flex flex-wrap items-center justify-center gap-4 py-8">
       <Popover.Root>
         <Popover.Trigger render={<Button variant="outline">Practice Scoring Rules</Button>} />
-        <Popover.Portal>
-          <Popover.Positioner side="bottom" sideOffset={8}>
-            <Popover.Popup className="p-4 max-w-sm rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2">
-              <h4 className="font-heading text-xs font-bold text-on-surface block">
-                Scoring Rubric
-              </h4>
-              <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                Pronunciation scoring evaluates initial consonant clarity and sustained vowel duration. Accuracy scores reflect therapist-verified target sounds.
-              </p>
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
+        <Popover.Content side="bottom" sideOffset={8}>
+          <Popover.Title>Scoring Rubric</Popover.Title>
+          <Popover.Description className="mb-0">
+            Pronunciation scoring evaluates initial consonant clarity and sustained vowel duration. Accuracy scores reflect therapist-verified target sounds.
+          </Popover.Description>
+        </Popover.Content>
       </Popover.Root>
     </div>
   );
 };
 
 export const MenuDemo: React.FC<ComponentDemoProps> = () => {
+  const [notifyEmail, setNotifyEmail] = React.useState(true);
+  const [lastAction, setLastAction] = React.useState<string | null>(null);
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 py-8">
-      <Menu.Root>
-        <Menu.Trigger render={<Button variant="soft">Actions Menu <Icon name="expand_more" size="xs" /></Button>} />
-        <Menu.Portal>
-          <Menu.Positioner sideOffset={4}>
-            <Menu.Popup className="p-1 min-w-48 rounded-xl bg-surface border border-outline-variant shadow-ambient">
-              <Menu.Group>
-                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-state-hover rounded-lg cursor-pointer">
-                  Export Progress Report
-                </Menu.Item>
-                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-on-surface hover:bg-state-hover rounded-lg cursor-pointer">
-                  Assign Practice Group
-                </Menu.Item>
-              </Menu.Group>
-              <Menu.Separator className="h-px bg-outline-variant my-1" />
-              <Menu.Group>
-                <Menu.Item className="px-3 py-2 text-xs font-sans font-medium text-error hover:bg-error-container rounded-lg cursor-pointer">
-                  Archive Learner Profile
-                </Menu.Item>
-              </Menu.Group>
-            </Menu.Popup>
-          </Menu.Positioner>
-        </Menu.Portal>
-      </Menu.Root>
+    <div className="flex flex-col items-center justify-center gap-4 py-8">
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Menu.Root>
+          <Menu.Trigger
+            render={
+              <Button variant="soft">
+                <span>Actions Menu</span>
+                <Icon name="expand_more" size="sm" />
+              </Button>
+            }
+          />
+          <Menu.Content align="start">
+            <Menu.Group>
+              <Menu.GroupLabel>Learner record</Menu.GroupLabel>
+              <Menu.Item icon="download" onClick={() => setLastAction('Exported progress report')}>
+                Export Progress Report
+              </Menu.Item>
+              <Menu.SubmenuRoot>
+                <Menu.SubmenuTrigger icon="group_add">Assign Practice Group</Menu.SubmenuTrigger>
+                <Menu.Content>
+                  <Menu.Item onClick={() => setLastAction('Assigned to Morning Blends')}>
+                    Morning Blends
+                  </Menu.Item>
+                  <Menu.Item onClick={() => setLastAction('Assigned to Vocalic /r/ Cohort')}>
+                    Vocalic /r/ Cohort
+                  </Menu.Item>
+                </Menu.Content>
+              </Menu.SubmenuRoot>
+              <Menu.CheckboxItem
+                checked={notifyEmail}
+                onCheckedChange={(checked) => setNotifyEmail(Boolean(checked))}
+                icon="notifications"
+              >
+                Email Guardian Summary
+              </Menu.CheckboxItem>
+            </Menu.Group>
+            <Menu.Separator />
+            <Menu.Group>
+              <Menu.Item
+                destructive
+                icon="archive"
+                onClick={() => setLastAction('Archived learner profile')}
+              >
+                Archive Learner Profile
+              </Menu.Item>
+            </Menu.Group>
+          </Menu.Content>
+        </Menu.Root>
+
+        <Menu.FilterProvider>
+          <Menu.Root>
+            <Menu.Trigger
+              render={
+                <Button variant="outline" colorRole="neutral">
+                  <Icon name="search" size="sm" />
+                  <span>Filterable Menu</span>
+                </Button>
+              }
+            />
+            <Menu.Content align="start">
+              <Menu.Input showClear aria-label="Filter actions" placeholder="Filter actions..." />
+              <Menu.Empty>No matching actions found.</Menu.Empty>
+              <Menu.List>
+                <Menu.Group>
+                  <Menu.GroupLabel>Session tools</Menu.GroupLabel>
+                  <Menu.Item icon="record_voice_over" onClick={() => setLastAction('Started sound drill')}>
+                    Start Sound Drill
+                  </Menu.Item>
+                  <Menu.Item icon="mic" onClick={() => setLastAction('Recorded baseline audio')}>
+                    Record Baseline Audio
+                  </Menu.Item>
+                  <Menu.Item icon="schedule" onClick={() => setLastAction('Scheduled next check-in')}>
+                    Schedule Next Check-in
+                  </Menu.Item>
+                  <Menu.Item icon="summarize" onClick={() => setLastAction('Drafted session note')}>
+                    Draft Session Note
+                  </Menu.Item>
+                </Menu.Group>
+              </Menu.List>
+            </Menu.Content>
+          </Menu.Root>
+        </Menu.FilterProvider>
+      </div>
+
+      {lastAction && (
+        <span className="font-sans text-sm text-on-surface-variant">
+          Last selected: <span className="font-medium text-on-surface">{lastAction}</span>
+        </span>
+      )}
     </div>
   );
 };
@@ -321,29 +481,51 @@ export const MenubarDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const ContextMenuDemo: React.FC<ComponentDemoProps> = () => {
+  const [selectedAction, setSelectedAction] = React.useState<string | null>(null);
+
   return (
-    <div className="w-full max-w-md mx-auto py-8">
+    <div className="w-full max-w-md mx-auto py-8 flex flex-col gap-3">
       <ContextMenu.Root>
-        <ContextMenu.Trigger className="w-full h-32 rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center text-center p-4 cursor-context-menu select-none">
-          <Icon name="touch_app" size="md" className="text-primary mb-2" />
-          <span className="font-heading text-xs font-bold text-on-surface">Right Click or Long Press Here</span>
-          <span className="font-sans text-[11px] text-on-surface-variant">Triggers Base UI ContextMenu popup</span>
+        <ContextMenu.Trigger className="w-full min-h-36 rounded-lg border-2 border-dashed border-outline-variant bg-surface-container-low flex flex-col items-center justify-center gap-1.5 text-center p-6 cursor-context-menu select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          <Icon name="touch_app" size="md" className="text-primary" />
+          <span className="font-heading text-sm font-semibold text-on-surface">
+            Right-click or long-press this area
+          </span>
+          <span className="font-sans text-sm text-on-surface-variant">
+            Opens the pointer-anchored context menu
+          </span>
         </ContextMenu.Trigger>
-        <ContextMenu.Portal>
-          <ContextMenu.Positioner>
-            <ContextMenu.Popup className="p-1 min-w-40 rounded-xl bg-surface border border-outline-variant shadow-ambient text-xs">
-              <ContextMenu.Group>
-                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-state-hover cursor-pointer">
-                  View Session History
+        <ContextMenu.Content>
+          <ContextMenu.Group>
+            <ContextMenu.Item icon="history" shortcut="⌘H" onClick={() => setSelectedAction('Viewed session history')}>
+              View Session History
+            </ContextMenu.Item>
+            <ContextMenu.SubmenuRoot>
+              <ContextMenu.SubmenuTrigger icon="person">Assign Clinician</ContextMenu.SubmenuTrigger>
+              <ContextMenu.Content>
+                <ContextMenu.Item onClick={() => setSelectedAction('Assigned Dr. Sarah Adams')}>
+                  Dr. Sarah Adams
                 </ContextMenu.Item>
-                <ContextMenu.Item className="px-3 py-2 rounded-lg hover:bg-state-hover cursor-pointer">
-                  Assign Therapist
+                <ContextMenu.Item onClick={() => setSelectedAction('Assigned Dr. Michael Ryan')}>
+                  Dr. Michael Ryan
                 </ContextMenu.Item>
-              </ContextMenu.Group>
-            </ContextMenu.Popup>
-          </ContextMenu.Positioner>
-        </ContextMenu.Portal>
+              </ContextMenu.Content>
+            </ContextMenu.SubmenuRoot>
+          </ContextMenu.Group>
+          <ContextMenu.Separator />
+          <ContextMenu.Group>
+            <ContextMenu.Item destructive icon="delete" onClick={() => setSelectedAction('Removed note')}>
+              Remove Session Note
+            </ContextMenu.Item>
+          </ContextMenu.Group>
+        </ContextMenu.Content>
       </ContextMenu.Root>
+
+      {selectedAction && (
+        <span className="font-sans text-sm text-center text-on-surface-variant">
+          Last action: <span className="font-medium text-on-surface">{selectedAction}</span>
+        </span>
+      )}
     </div>
   );
 };
@@ -357,8 +539,8 @@ export const TooltipDemo: React.FC<ComponentDemoProps> = () => {
           <Tooltip.Trigger render={<Button variant="outline" size="sm">Compound Tooltip (with Arrow)</Button>} />
           <Tooltip.Portal>
             <Tooltip.Positioner side="top" sideOffset={8}>
-              <Tooltip.Popup className="relative px-3 py-1.5 rounded-md bg-on-surface text-surface font-label text-xs font-medium shadow-ambient">
-                <Tooltip.Arrow className="text-on-surface" />
+              <Tooltip.Popup>
+                <Tooltip.Arrow />
                 Pronunciation Guide: Section 2.1 Sound Blends
               </Tooltip.Popup>
             </Tooltip.Positioner>
@@ -384,22 +566,22 @@ export const PreviewCardDemo: React.FC<ComponentDemoProps> = () => {
   return (
     <div className="flex flex-wrap items-center justify-center gap-6 py-8">
       <PreviewCard.Root>
-        <PreviewCard.Trigger href="#" className="font-sans text-sm font-bold text-primary underline underline-offset-4">
+        <PreviewCard.Trigger href="#clinician-alex-rivera">
           Hover over Alex Rivera (Therapist Card)
         </PreviewCard.Trigger>
         <PreviewCard.Portal>
           <PreviewCard.Positioner side="bottom" sideOffset={8}>
-            <PreviewCard.Popup className="p-4 max-w-xs rounded-xl bg-surface border border-outline-variant shadow-ambient flex flex-col gap-2">
+            <PreviewCard.Popup>
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold">
+                <div className="size-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-semibold shrink-0">
                   AR
                 </div>
-                <div>
-                  <h4 className="font-heading text-xs font-bold text-on-surface">Dr. Alex Rivera</h4>
-                  <span className="font-sans text-[11px] text-on-surface-variant">Speech-Language Pathologist</span>
+                <div className="min-w-0">
+                  <h4 className="font-heading text-sm font-semibold text-on-surface">Dr. Alex Rivera</h4>
+                  <span className="font-sans text-sm text-on-surface-variant">Speech-Language Pathologist</span>
                 </div>
               </div>
-              <p className="font-sans text-xs text-on-surface-variant">
+              <p className="font-sans text-sm text-on-surface-variant leading-relaxed">
                 Specializes in child speech and language development. Outpatient Clinic Team.
               </p>
             </PreviewCard.Popup>

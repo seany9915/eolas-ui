@@ -38,6 +38,11 @@ export interface StepWizardStep {
   completed?: boolean;
 }
 
+export interface StepWizardLabels {
+  completed?: string;
+  current?: string;
+}
+
 export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   steps: StepWizardStep[];
   currentStepIndex: number;
@@ -56,16 +61,22 @@ export interface StepWizardProps extends React.HTMLAttributes<HTMLDivElement> {
   previousLabel?: string;
   /** Accessible label for the step indicator navigation landmark. Defaults to 'Step progress'. */
   navLabel?: string;
+  /** Custom formatter for the step progress text (e.g. `Step 1 of 3`). */
+  formatStepCount?: (current: number, total: number) => React.ReactNode;
+  /** Optional localized strings for accessible step status descriptions. */
+  labels?: StepWizardLabels;
   /** Heading tag used for the active step title. Defaults to `'h3'`. */
   titleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   showNavigationButtons?: boolean;
   variant?: 'card' | 'embedded';
-  /** "numbered" shows a clickable circle per step. "progress" shows a slim progress bar, which suits longer flows. */
+  /** "numbered" shows connected step circles. "progress" shows a slim progress bar, which suits longer flows. */
   indicator?: 'numbered' | 'progress';
   /** Lets users jump to upcoming steps from the step indicators. Completed steps are always clickable. */
   allowStepClick?: boolean;
   /** When true, keeps wizard steps in the DOM with hidden="until-found" so browser search (Ctrl+F) can find them. Only completed steps (or all steps when allowStepClick is set) are searchable, so find-in-page cannot skip guarded progression. */
   hiddenUntilFound?: boolean;
+  /** Optional class override for the step content viewport container. */
+  contentClassName?: string;
 }
 
 interface StepPanelProps {
@@ -168,12 +179,15 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
       nextLabel = 'Next step',
       previousLabel = 'Back',
       navLabel = 'Step progress',
+      formatStepCount,
+      labels,
       titleAs = 'h3',
       showNavigationButtons = true,
       variant = 'card',
       indicator = 'numbered',
       allowStepClick = false,
       hiddenUntilFound = false,
+      contentClassName,
       ...props
     },
     ref
@@ -194,6 +208,15 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
     }
     const direction = navState.direction;
 
+    const stepHeadingRef = React.useRef<HTMLDivElement | null>(null);
+    const hasUserNavigatedRef = React.useRef(false);
+
+    React.useEffect(() => {
+      if (!hasUserNavigatedRef.current) return;
+      hasUserNavigatedRef.current = false;
+      stepHeadingRef.current?.focus({ preventScroll: true });
+    }, [safeIndex]);
+
     if (totalSteps === 0) {
       return null;
     }
@@ -201,48 +224,79 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
     const isFirstStep = safeIndex === 0;
     const isLastStep = safeIndex === totalSteps - 1;
     const currentStep = steps[safeIndex];
+    const completedSuffix = labels?.completed ?? 'completed';
+    const currentSuffix = labels?.current ?? 'current';
+    const stepCountNode = formatStepCount
+      ? formatStepCount(safeIndex + 1, totalSteps)
+      : `Step ${safeIndex + 1} of ${totalSteps}`;
 
     const handleNext = () => {
       if (isLastStep) {
         onComplete?.();
       } else {
+        hasUserNavigatedRef.current = true;
         onStepChange?.(safeIndex + 1);
       }
     };
 
     const handlePrevious = () => {
       if (!isFirstStep) {
+        hasUserNavigatedRef.current = true;
         onStepChange?.(safeIndex - 1);
       }
     };
 
-    const wizardContent = (
+    const handleIndicatorSelect = (idx: number) => {
+      hasUserNavigatedRef.current = true;
+      onStepChange?.(idx);
+    };
+
+    const TitleTag = titleAs;
+    const isEmbedded = variant === 'embedded';
+
+    const headerInner = (
       <>
-        {/* Step Wizard Header / Navigation Indicator */}
-        <Card.Header>
-          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <div className="flex flex-col min-w-0" aria-live="polite" aria-atomic="true">
-              <span className="font-mono text-xs font-semibold text-primary tabular-nums">
-                Step {safeIndex + 1} of {totalSteps}
-              </span>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div
+            ref={stepHeadingRef}
+            tabIndex={-1}
+            className="flex flex-col min-w-0 focus:outline-none"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {isEmbedded ? (
+              <TitleTag className="font-heading text-lg font-semibold leading-snug text-on-surface text-balance">
+                {currentStep.title}
+              </TitleTag>
+            ) : (
               <Card.Title as={titleAs}>
                 {currentStep.title}
               </Card.Title>
-            </div>
-            {indicator === 'numbered' && (
-              <nav aria-label={navLabel} className="flex flex-wrap items-center gap-1">
-                {steps.map((s, idx) => {
-                  const isSelected = idx === safeIndex;
-                  const isCompleted = s.completed !== undefined ? s.completed : idx < safeIndex;
-                  const canNavigate = allowStepClick || idx < safeIndex || isCompleted;
+            )}
+          </div>
+          {indicator === 'numbered' ? (
+            <nav aria-label={navLabel} className="flex flex-wrap items-center">
+              {steps.map((s, idx) => {
+                const isSelected = idx === safeIndex;
+                const isCompleted = s.completed !== undefined ? s.completed : idx < safeIndex;
+                const canNavigate = allowStepClick || idx < safeIndex || isCompleted;
 
-                  return (
+                return (
+                  <React.Fragment key={s.id}>
+                    {idx > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'hidden @sm:block h-0.5 w-3 rounded-full transition-colors duration-quick ease-standard motion-reduce:transition-none',
+                          idx <= safeIndex ? 'bg-primary' : 'bg-outline-variant'
+                        )}
+                      />
+                    )}
                     <UnstyledButton
-                      key={s.id}
                       type="button"
-                      onClick={() => canNavigate && onStepChange?.(idx)}
+                      onClick={() => canNavigate && handleIndicatorSelect(idx)}
                       disabled={!canNavigate && !isSelected}
-                      aria-label={`Step ${idx + 1}: ${s.title}${isCompleted ? ' (completed)' : isSelected ? ' (current)' : ''}`}
+                      aria-label={`Step ${idx + 1}: ${s.title}${isCompleted ? ` (${completedSuffix})` : isSelected ? ` (${currentSuffix})` : ''}`}
                       aria-current={isSelected ? 'step' : undefined}
                       className={cn(
                         'flex min-w-11 min-h-11 items-center justify-center disabled:cursor-not-allowed disabled:pointer-events-none',
@@ -251,7 +305,7 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                     >
                       <span
                         className={cn(
-                          'size-7 rounded-full flex items-center justify-center font-mono text-xs font-semibold tabular-nums transition-colors duration-quick ease-standard motion-reduce:transition-none select-none',
+                          'size-7 rounded-full flex items-center justify-center font-label text-xs font-semibold tabular-nums transition-colors duration-quick ease-standard motion-reduce:transition-none select-none',
                           isSelected
                             ? 'bg-primary text-on-primary'
                             : isCompleted
@@ -268,94 +322,131 @@ export const StepWizard = React.forwardRef<HTMLDivElement, StepWizardProps>(
                         )}
                       </span>
                     </UnstyledButton>
-                  );
-                })}
-              </nav>
-            )}
-          </div>
-          {indicator === 'progress' && (
-            <Progress
-              value={safeIndex + 1}
-              max={totalSteps}
-              size="sm"
-              aria-label={navLabel}
-              aria-valuetext={`Step ${safeIndex + 1} of ${totalSteps}`}
-            />
+                  </React.Fragment>
+                );
+              })}
+            </nav>
+          ) : (
+            <span className="font-sans text-sm font-medium text-on-surface-variant tabular-nums">
+              {stepCountNode}
+            </span>
           )}
-          {currentStep.description && (
+        </div>
+        {indicator === 'progress' && (
+          <Progress
+            value={safeIndex + 1}
+            max={totalSteps}
+            size="sm"
+            aria-label={navLabel}
+            aria-valuetext={typeof stepCountNode === 'string' ? stepCountNode : `Step ${safeIndex + 1} of ${totalSteps}`}
+          />
+        )}
+        {currentStep.description && (
+          isEmbedded ? (
+            <p className="font-sans text-base text-on-surface-variant leading-relaxed text-pretty">
+              {currentStep.description}
+            </p>
+          ) : (
             <Card.Description>
               {currentStep.description}
             </Card.Description>
-          )}
-        </Card.Header>
+          )
+        )}
+      </>
+    );
 
+    const bodyInner = hiddenUntilFound ? (
+      steps.map((s, idx) => (
+        <StepPanel
+          key={s.id}
+          step={s}
+          isSelected={idx === safeIndex}
+          canReveal={idx < safeIndex || Boolean(s.completed) || allowStepClick}
+          direction={direction}
+          onSelect={() => handleIndicatorSelect(idx)}
+        />
+      ))
+    ) : (
+      <div
+        key={currentStep.id || safeIndex}
+        className={cn(
+          'w-full px-1',
+          direction === 'forward'
+            ? 'animate-step-forward'
+            : 'animate-step-backward',
+          'motion-reduce:animate-none'
+        )}
+      >
+        {currentStep.content}
+      </div>
+    );
+
+    const footerInner = (
+      <>
+        {!isFirstStep && (
+          <Button
+            type="button"
+            variant="outline"
+            colorRole="neutral"
+            size="md"
+            onClick={handlePrevious}
+          >
+            <Icon name="chevron_left" size="md" directional aria-hidden="true" />
+            <span>{previousLabel}</span>
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="filled"
+          size="md"
+          disabled={isLastStep ? completeDisabled : nextDisabled}
+          loading={isLastStep ? completeLoading : nextLoading}
+          onClick={handleNext}
+          className="ms-auto"
+        >
+          <span>{isLastStep ? completeLabel : nextLabel}</span>
+          {!isLastStep && <Icon name="chevron_right" size="md" directional aria-hidden="true" />}
+        </Button>
+      </>
+    );
+
+    const wizardContent = isEmbedded ? (
+      <>
+        <div className="flex flex-col gap-2">
+          {headerInner}
+        </div>
         <Separator />
-
-        {/* Directional Sliding Step Viewport */}
-        <Card.Content className="relative min-h-50 pb-1 overflow-x-clip">
-          {hiddenUntilFound ? (
-            steps.map((s, idx) => (
-              <StepPanel
-                key={s.id}
-                step={s}
-                isSelected={idx === safeIndex}
-                canReveal={idx < safeIndex || Boolean(s.completed) || allowStepClick}
-                direction={direction}
-                onSelect={() => onStepChange?.(idx)}
-              />
-            ))
-          ) : (
-            <div
-              key={currentStep.id || safeIndex}
-              className={cn(
-                'w-full px-1',
-                direction === 'forward'
-                  ? 'animate-step-forward'
-                  : 'animate-step-backward',
-                'motion-reduce:animate-none'
-              )}
-            >
-              {currentStep.content}
+        <div className={cn('relative pb-1 overflow-x-clip', contentClassName)}>
+          {bodyInner}
+        </div>
+        {showNavigationButtons && (
+          <>
+            <Separator />
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              {footerInner}
             </div>
-          )}
+          </>
+        )}
+      </>
+    ) : (
+      <>
+        <Card.Header>{headerInner}</Card.Header>
+        <Separator />
+        <Card.Content className={cn('relative pb-1 overflow-x-clip', contentClassName)}>
+          {bodyInner}
         </Card.Content>
-
-        {/* Footer Navigation Controls */}
         {showNavigationButtons && (
           <>
             <Separator />
             <Card.Footer className="flex-wrap justify-between gap-3">
-              {!isFirstStep && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  colorRole="neutral"
-                  size="md"
-                  onClick={handlePrevious}
-                >
-                  <Icon name="chevron_left" size="sm" directional aria-hidden="true" />
-                  <span>{previousLabel}</span>
-                </Button>
-              )}
-              <Button
-                type="button"
-                variant="filled"
-                size="md"
-                disabled={isLastStep ? completeDisabled : nextDisabled}
-                loading={isLastStep ? completeLoading : nextLoading}
-                onClick={handleNext}
-                className="ms-auto"
-              >
-                <span>{isLastStep ? completeLabel : nextLabel}</span>
-                {!isLastStep && <Icon name="chevron_right" size="sm" directional aria-hidden="true" />}
-              </Button>
+              {footerInner}
             </Card.Footer>
           </>
         )}
       </>
     );
 
-    if (variant === 'embedded') {
+    if (isEmbedded) {
       return (
         <div
           ref={ref}

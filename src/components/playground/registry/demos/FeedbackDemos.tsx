@@ -23,7 +23,7 @@ export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
     <BlockDemoShell
       name="Inline Alert"
       badge="Tier A Feedback"
-      description="High-prominence feedback container with a solid 4px vertical accent bar on the left. Communicates critical system state, warnings, expiring sessions, or blocking errors."
+      description="High-prominence feedback container with symmetric rounded-md geometry — rendered either as a soft container wash inside cards or a neutral-bordered white surface with a tinted semantic icon badge on the canvas."
       whenToUse="Urgent state-dependent notifications, hardware permission prompts, or expiring sessions. Never use for routine clinician tips or static advice (use ClinicianTip instead)."
       typicalExample={
         <div className="w-full max-w-xl">
@@ -44,19 +44,33 @@ export const InlineAlertDemo: React.FC<ComponentDemoProps> = () => {
         </div>
       }
       variantsSection={
-        <div className="flex flex-col gap-3 w-full max-w-xl">
-          <InlineAlert role="warning" title="Warning: Microphone Latency High">
-            Audio buffer exceeds 120ms. Ensure a stable network connection during articulation recording.
-          </InlineAlert>
-          <InlineAlert role="error" title="Error: Recording Interrupted">
-            Could not save vocalic audio sample. The local storage quota was exceeded.
-          </InlineAlert>
-          <InlineAlert role="success" title="Success: Practice Goal Met">
-            All 15 daily articulation exercises were saved and added to the patient chart.
-          </InlineAlert>
-          <InlineAlert role="neutral" title="Notice: Offline Mode Active">
-            Drills are saved locally on this device and will sync automatically when you reconnect.
-          </InlineAlert>
+        <div className="flex flex-col gap-5 w-full max-w-xl">
+          <div className="flex flex-col gap-3">
+            <InlineAlert role="warning" title="Warning: Microphone Latency High">
+              Audio buffer exceeds 120ms. Ensure a stable network connection during articulation recording.
+            </InlineAlert>
+            <InlineAlert role="error" title="Error: Recording Interrupted">
+              Could not save vocalic audio sample. The local storage quota was exceeded.
+            </InlineAlert>
+            <InlineAlert role="success" title="Success: Practice Goal Met">
+              All 15 daily articulation exercises were saved and added to the patient chart.
+            </InlineAlert>
+            <InlineAlert role="neutral" title="Notice: Offline Mode Active">
+              Drills are saved locally on this device and will sync automatically when you reconnect.
+            </InlineAlert>
+          </div>
+
+          <div className="bg-background p-4 rounded-lg flex flex-col gap-3">
+            <span className="font-heading text-xs font-bold text-on-surface">
+              Surface Appearance (For Page Canvas)
+            </span>
+            <InlineAlert appearance="surface" role="warning" title="Session Expiring Soon">
+              Your consultation closes in 5 minutes. Save any notes before disconnecting.
+            </InlineAlert>
+            <InlineAlert appearance="surface" role="error" title="Microphone Access Blocked">
+              Allow microphone permissions in your browser settings to continue practice.
+            </InlineAlert>
+          </div>
         </div>
       }
       sizeLadderSection={
@@ -199,13 +213,13 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
-            variant="filled"
-            colorRole="primary"
+            variant="outline"
+            colorRole="neutral"
             onClick={() =>
               toast.success('Notes Saved', 'Observation notes were added to the chart.')
             }
           >
-            <Icon name="check_circle" size="xs" className="text-success" />
+            <Icon name="check_circle" size="sm" className="text-success" />
             Success Toast
           </Button>
 
@@ -217,7 +231,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.warning('Audio Level Low', 'Please verify your microphone before recording.')
             }
           >
-            <Icon name="warning" size="xs" className="text-warning" />
+            <Icon name="warning" size="sm" className="text-warning" />
             Warning Toast
           </Button>
 
@@ -229,7 +243,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.error('Sync Interrupted', 'Could not establish connection to the care portal.')
             }
           >
-            <Icon name="error" size="xs" className="text-error" />
+            <Icon name="error" size="sm" className="text-error" />
             Error Toast
           </Button>
 
@@ -241,7 +255,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
               toast.neutral('New Update', 'Clinical guideline v3 is now active.')
             }
           >
-            <Icon name="info" size="xs" className="text-on-surface-variant" />
+            <Icon name="info" size="sm" className="text-on-surface-variant" />
             Neutral Toast
           </Button>
         </div>
@@ -259,7 +273,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
             colorRole="primary"
             onClick={triggerPromiseToast}
           >
-            <Icon name="cloud_upload" size="xs" />
+            <Icon name="cloud_upload" size="sm" />
             Async Promise Toast
           </Button>
 
@@ -269,7 +283,7 @@ export const ToastDemo: React.FC<ComponentDemoProps> = () => {
             colorRole="neutral"
             onClick={triggerActionToast}
           >
-            <Icon name="undo" size="xs" />
+            <Icon name="undo" size="sm" />
             Toast with Action (Undo)
           </Button>
         </div>

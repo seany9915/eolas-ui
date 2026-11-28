@@ -30,6 +30,7 @@ import {
   QuestionnaireSkip,
   QuestionnaireNext,
   QuestionnaireSubmit,
+  type QuestionnaireValue,
 } from '@/components/blocks/questionnaire';
 import { FilterToolbar } from '@/components/blocks/filter-toolbar';
 import { ListDetailBlock, type ListDetailItem } from '@/components/blocks/list-detail-block';
@@ -87,7 +88,7 @@ export const FilterToolbarDemo: React.FC<ComponentDemoProps> = () => {
 };
 
 export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
-  const [completedData, setCompletedData] = React.useState<Record<string, any> | null>(null);
+  const [completedData, setCompletedData] = React.useState<Record<string, QuestionnaireValue> | null>(null);
 
   if (completedData) {
     return (
@@ -102,7 +103,7 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
               Your responses have been recorded successfully.
             </p>
           </div>
-          <div className="bg-surface-container-low rounded-md p-4 text-left font-mono text-xs text-on-surface-variant border border-outline-variant overflow-x-auto">
+          <div className="bg-surface-container-low rounded-md p-4 text-left font-mono text-xs text-on-surface-variant border border-outline overflow-x-auto">
             {JSON.stringify(completedData, null, 2)}
           </div>
           <Button
@@ -171,7 +172,7 @@ export const QuestionnaireDemo: React.FC<ComponentDemoProps> = () => {
             <QuestionnaireChoice
               value="standard"
               label="Standard walkthrough"
-              description="Balanced balance of context and actions."
+              description="Balanced mix of context and actions."
             />
             <QuestionnaireChoice
               value="deep"
@@ -900,6 +901,7 @@ export const ListDetailBlockDemo: React.FC<ComponentDemoProps> = () => {
           onSelectId={setSelected}
           title="Patients"
           searchPlaceholder="Search patients by name..."
+          collapsible
           detailActions={
             <>
               <Button variant="outline" colorRole="neutral" size="icon" aria-label="Edit plan">
@@ -1072,13 +1074,14 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
   const targetWords = ['Rabbit', 'Road', 'River'];
 
   return (
-    <div className="w-full rounded-lg border border-outline-variant overflow-hidden bg-surface flex flex-col min-h-136">
+    <div className="w-full">
       <SupportingPaneBlock
+          variant="card"
           title="Pronunciation Practice"
           supportingTitle="Guidance"
           supportingBadge="Vocalic /r/"
           supportingBadgeColorRole="primary"
-          className="flex-1"
+          className="min-h-136"
           canvasToolbar={
             <div className="flex items-center justify-between gap-2 w-full">
               <div className="flex items-center gap-2 min-w-0">
@@ -1217,10 +1220,7 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
           <div className="flex flex-col gap-6 items-center justify-center p-4 @md:p-8 text-center my-auto min-h-80">
             {/* Target Phrase Callout */}
             <div className="w-full max-w-lg p-6 rounded-lg bg-surface-container-low flex flex-col gap-2">
-              <span className="text-sm font-sans font-semibold text-primary">
-                Practice sentence
-              </span>
-              <p className="font-heading text-headline-sm @md:text-headline-md font-semibold text-on-surface">
+              <p className="font-heading text-headline-sm @md:text-headline-md font-semibold text-on-surface text-balance">
                 “Red {targetWord.toLowerCase()}s run rapidly down the rocky road.”
               </p>
               <span className="text-sm font-sans text-on-surface-variant">
@@ -1233,19 +1233,15 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
               aria-hidden="true"
               className="flex items-center justify-center gap-1.5 h-12 px-5 rounded-lg bg-surface-container-low w-full max-w-xs"
             >
-              {[12, 22, 34, 18, 28, 36, 24, 30, 16, 26].map((barHeight, idx) => (
+              {['h-3', 'h-5', 'h-8', 'h-4', 'h-7', 'h-9', 'h-6', 'h-7', 'h-4', 'h-6'].map((heightClass, idx) => (
                 <div
                   key={idx}
                   className={cn(
                     'w-1.5 rounded-full transition-[height] duration-micro ease-standard motion-reduce:transition-none motion-reduce:animate-none',
                     isRecording
-                      ? 'bg-primary animate-pulse'
+                      ? cn('bg-primary animate-pulse', heightClass)
                       : 'bg-outline/50 h-2'
                   )}
-                  style={{
-                    height: isRecording ? `${barHeight}px` : undefined,
-                    animationDelay: `${(idx % 5) * 40}ms`,
-                  }}
                 />
               ))}
             </div>
@@ -1259,7 +1255,7 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
                 onClick={handlePlayExample}
                 disabled={isRecording}
               >
-                <Icon name="volume_up" size="sm" />
+                <Icon name="volume_up" size="md" />
                 <span>{isPlayingExample ? 'Playing example...' : 'Play example'}</span>
               </Button>
 
@@ -1273,7 +1269,7 @@ export const SupportingPaneBlockDemo: React.FC<ComponentDemoProps> = () => {
                   active={isRecording}
                   onName="stop"
                   offName="mic"
-                  size="sm"
+                  size="md"
                 />
                 <span>{isRecording ? 'Stop recording' : 'Start recording'}</span>
               </Button>

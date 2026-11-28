@@ -25,7 +25,10 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Badge, type BadgeColorRole } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+
+export type SupportingPaneVariant = 'flush' | 'card';
 
 export interface SupportingPaneBlockProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -49,6 +52,8 @@ export interface SupportingPaneBlockProps
   supportingBadgeColorRole?: BadgeColorRole;
   /** Side where the supporting pane docks on large screens ('right' default, 'left' supported) */
   side?: 'left' | 'right';
+  /** Container presentation: 'flush' (default edge-to-edge) or 'card' (rounded bordered standalone shell) */
+  variant?: SupportingPaneVariant;
   /** Controlled open state for the supporting pane */
   open?: boolean;
   /** Default open state if uncontrolled */
@@ -72,13 +77,14 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       children,
       supportingContent,
       title,
-      supportingTitle = 'Supporting Details',
+      supportingTitle = 'Details',
       titleAs = 'h2',
       showLabel,
       hideLabel,
       supportingBadge,
       supportingBadgeColorRole = 'neutral',
       side = 'right',
+      variant = 'flush',
       open: controlledOpen,
       defaultOpen = true,
       onOpenChange,
@@ -133,10 +139,16 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         key="primary-canvas"
         data-slot="primary-canvas"
         aria-label={typeof title === 'string' ? title : 'Workspace'}
-        className="flex-1 flex flex-col min-w-0 min-h-0 bg-surface"
+        className={cn(
+          'flex-1 flex flex-col min-w-0 min-h-0 bg-surface',
+          isOpen &&
+            (side === 'left'
+              ? 'border-t border-outline-variant @3xl:border-t-0 @3xl:border-s'
+              : 'border-b border-outline-variant @3xl:border-b-0 @3xl:border-e')
+        )}
       >
         {canvasToolbar && (
-          <div className="px-4 @md:px-6 py-2.5 border-b border-outline-variant/60 flex flex-wrap items-center justify-between gap-3 bg-surface shrink-0 min-w-0">
+          <div className="min-h-12 px-4 @md:px-6 py-2 border-b border-outline-variant flex flex-wrap items-center justify-between gap-3 bg-surface shrink-0 min-w-0">
             {canvasToolbar}
           </div>
         )}
@@ -159,26 +171,24 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
         inert={!isOpen}
         aria-hidden={!isOpen}
         aria-labelledby={supportingTitle ? supportingHeadingId : undefined}
-        aria-label={!supportingTitle ? 'Supporting details' : undefined}
+        aria-label={!supportingTitle ? 'Details' : undefined}
         className={cn(
-          'flex flex-col bg-surface-container-low shrink-0 min-w-0 overflow-hidden',
+          'flex flex-col bg-surface-container-low shrink-0 min-w-0 overflow-hidden ease-standard motion-reduce:transition-none',
+          'transition-[opacity,max-height,visibility] @3xl:transition-[opacity,width,visibility]',
           isOpen
             ? cn(
                 // Compact (<768px) stacked panel caps height so primary canvas keeps majority height
-                'w-full h-auto max-h-64 @sm:max-h-72 short:max-h-40 @3xl:max-h-none opacity-100 transition-opacity duration-quick ease-standard motion-reduce:transition-none',
+                'w-full h-auto max-h-64 @sm:max-h-72 short:max-h-40 @3xl:max-h-none opacity-100 visible duration-fast',
                 paneWidthClassName,
                 // Wide (@3xl+) full-height side panel
-                '@3xl:h-full',
-                side === 'left'
-                  ? 'border-b border-outline @3xl:border-b-0 @3xl:border-e'
-                  : 'border-t border-outline @3xl:border-t-0 @3xl:border-s'
+                '@3xl:h-full'
               )
-            : 'w-full h-0 border-0 @3xl:w-0 @3xl:h-full @3xl:border-0 opacity-0 invisible pointer-events-none'
+            : 'w-full max-h-0 @3xl:w-0 @3xl:max-h-none @3xl:h-full opacity-0 invisible pointer-events-none duration-quick'
         )}
       >
         <div className={cn('w-full flex flex-col flex-1 min-h-0 shrink-0 min-w-0', paneWidthClassName)}>
           {/* Supporting Pane Header */}
-          <div className="px-4 pt-4 pb-3 border-b border-outline-variant/60 flex items-center justify-between gap-2 bg-surface-container-low shrink-0">
+          <div className="min-h-12 px-4 @md:px-6 py-2 border-b border-outline-variant flex items-center justify-between gap-2 bg-surface shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               {supportingTitle && (
                 <SupportingHeadingTag
@@ -211,7 +221,7 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
             className="flex-1 min-w-0 min-h-0"
             viewportClassName="overscroll-contain"
           >
-            <div className="p-4">{supportingContent}</div>
+            <div className="p-4 @md:p-6">{supportingContent}</div>
           </ScrollArea>
         </div>
       </aside>
@@ -221,8 +231,10 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
       <div
         ref={ref}
         data-slot="supporting-pane-block"
+        data-variant={variant}
         className={cn(
           '@container size-full bg-surface flex flex-col min-w-0',
+          variant === 'card' && 'rounded-lg border border-outline-variant overflow-hidden',
           className
         )}
         {...props}
@@ -239,28 +251,30 @@ export const SupportingPaneBlock = React.forwardRef<HTMLDivElement, SupportingPa
 
           <div className="flex items-center gap-2 shrink-0">
             {actions}
-            <Button
-              ref={toggleButtonRef}
-              variant={isOpen ? 'soft' : 'outline'}
-              colorRole={isOpen ? 'primary' : 'neutral'}
-              size="sm"
-              onClick={handleToggle}
-              aria-expanded={isOpen}
-              aria-controls={paneId}
-              aria-label={isOpen ? resolvedHideLabel : resolvedShowLabel}
-              className="min-w-11"
-            >
-              <Icon.Toggle
-                active={isOpen}
-                onName={side === 'left' ? 'left_panel_close' : 'right_panel_close'}
-                offName={side === 'left' ? 'left_panel_open' : 'right_panel_open'}
+            <Tooltip content={isOpen ? resolvedHideLabel : resolvedShowLabel}>
+              <Button
+                ref={toggleButtonRef}
+                variant="outline"
+                colorRole="neutral"
                 size="sm"
-                directional
-              />
-              <span className="hidden @sm:inline">
-                {isOpen ? resolvedHideLabel : resolvedShowLabel}
-              </span>
-            </Button>
+                onClick={handleToggle}
+                aria-expanded={isOpen}
+                aria-controls={paneId}
+                aria-label={isOpen ? resolvedHideLabel : resolvedShowLabel}
+                className="min-w-11"
+              >
+                <Icon.Toggle
+                  active={isOpen}
+                  onName={side === 'left' ? 'left_panel_close' : 'right_panel_close'}
+                  offName={side === 'left' ? 'left_panel_open' : 'right_panel_open'}
+                  size="sm"
+                  directional
+                />
+                <span className="hidden @sm:inline">
+                  {isOpen ? resolvedHideLabel : resolvedShowLabel}
+                </span>
+              </Button>
+            </Tooltip>
           </div>
         </div>
 

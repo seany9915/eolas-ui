@@ -8,7 +8,7 @@
  *
  * TAXONOMY & USAGE:
  * - Use InlineAlert for high-visibility system event or validation banners (neutral, warning, error, success).
- * - Implements a mathematically straight 4px vertical accent bar, ambient elevation, and accessible live regions.
+ * - Implements symmetric rounded-md geometry with either a soft container wash (`appearance="wash"`) or a neutral-bordered white surface with a tinted semantic icon badge (`appearance="surface"`), plus accessible live regions.
  * - Supports both monolithic props (title, action, onClose) and compound subcomponents (InlineAlert.Title, InlineAlert.Description, InlineAlert.Action, InlineAlert.Close).
  * - Distinct from ClinicianTip (which is low-prominence instructional micro-guidance) and AlertDialog (modal interrupt).
  * - Follows DESIGN.md tokens: Atkinson Hyperlegible Next headings (font-heading), Lexend body (font-sans), and semantic color roles.
@@ -106,7 +106,7 @@ export const InlineAlertClose = React.forwardRef<HTMLButtonElement, InlineAlertC
         data-slot="inline-alert-close"
         aria-label="Dismiss alert"
         className={composeClassName(
-          'shrink-0 min-h-[44px] min-w-[44px] size-11 -me-2 -mt-2 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm cursor-pointer select-none',
+          'shrink-0 min-h-[44px] min-w-[44px] size-11 -me-2 -mt-2.5 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-state-hover active:bg-surface-container-high touch-manipulation transition-colors motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 cursor-pointer select-none',
           className
         )}
         {...props}
@@ -117,6 +117,34 @@ export const InlineAlertClose = React.forwardRef<HTMLButtonElement, InlineAlertC
   }
 );
 InlineAlertClose.displayName = 'InlineAlertClose';
+
+const surfaceWashBg: Record<InlineAlertRole, string> = {
+  neutral: 'bg-surface-container-low',
+  warning: 'bg-warning-container/65',
+  error: 'bg-error-container/60',
+  success: 'bg-success-container/60',
+};
+
+const iconColorClasses: Record<InlineAlertRole, string> = {
+  neutral: 'text-on-surface',
+  warning: 'text-warning',
+  error: 'text-error',
+  success: 'text-success',
+};
+
+const iconBadgeClasses: Record<InlineAlertRole, string> = {
+  neutral: 'bg-surface-container-high text-on-surface',
+  warning: 'bg-warning-container text-warning',
+  error: 'bg-error-container text-error',
+  success: 'bg-success-container text-success',
+};
+
+const defaultIcons: Record<InlineAlertRole, string> = {
+  neutral: 'info',
+  warning: 'warning',
+  error: 'error',
+  success: 'check_circle',
+};
 
 const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(({
   title,
@@ -138,34 +166,6 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
     variant === 'destructive' ? 'error' : variant === 'default' ? 'neutral' : (variant ?? 'neutral')
   );
 
-  const accentBorderClasses: Record<InlineAlertRole, string> = {
-    neutral: 'before:border-s-on-surface',
-    warning: 'before:border-s-warning',
-    error: 'before:border-s-error',
-    success: 'before:border-s-success',
-  };
-
-  const surfaceWashBg: Record<InlineAlertRole, string> = {
-    neutral: 'bg-surface-container-low',
-    warning: 'bg-warning-container/60',
-    error: 'bg-error-container/60',
-    success: 'bg-success-container/60',
-  };
-
-  const iconColorClasses: Record<InlineAlertRole, string> = {
-    neutral: 'text-on-surface',
-    warning: 'text-warning',
-    error: 'text-error',
-    success: 'text-success',
-  };
-
-  const defaultIcons: Record<InlineAlertRole, string> = {
-    neutral: 'info',
-    warning: 'warning',
-    error: 'error',
-    success: 'check_circle',
-  };
-
   const hasIcon = icon !== null && icon !== 'none' && icon !== false && icon !== '';
   const ariaRole = ariaRoleProp ?? (resolvedRole === 'error' ? 'alert' : 'status');
   const ariaLive =
@@ -174,13 +174,36 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
   const renderIcon = () => {
     if (!hasIcon) return null;
     if (React.isValidElement(icon)) {
-      return (
+      return appearance === 'surface' ? (
+        <div
+          className={cn(
+            'size-7 -mt-0.5 rounded flex items-center justify-center shrink-0 select-none',
+            iconBadgeClasses[resolvedRole]
+          )}
+          aria-hidden="true"
+        >
+          {icon}
+        </div>
+      ) : (
         <div className={cn('mt-0.5 shrink-0', iconColorClasses[resolvedRole])} aria-hidden="true">
           {icon}
         </div>
       );
     }
     const iconName = typeof icon === 'string' && icon !== 'none' ? icon : defaultIcons[resolvedRole];
+    if (appearance === 'surface') {
+      return (
+        <div
+          className={cn(
+            'size-7 -mt-0.5 rounded flex items-center justify-center shrink-0 select-none',
+            iconBadgeClasses[resolvedRole]
+          )}
+          aria-hidden="true"
+        >
+          <Icon name={iconName} size="md" aria-hidden="true" />
+        </div>
+      );
+    }
     return (
       <Icon
         name={iconName}
@@ -202,11 +225,10 @@ const InlineAlertComponent = React.forwardRef<HTMLDivElement, InlineAlertProps>(
       data-role={resolvedRole}
       data-appearance={appearance}
       className={cn(
-        "relative flex items-start gap-4 p-5 ps-6 rounded-s-none rounded-e text-start before:pointer-events-none before:content-[''] before:absolute before:start-0 before:border-s-4 forced-colors:before:border-s-[Highlight]",
-        accentBorderClasses[resolvedRole],
+        'relative flex items-start gap-3.5 p-4 rounded-md text-start',
         appearance === 'surface'
-          ? 'bg-surface border-y border-e border-s-0 border-outline-variant shadow-card before:-inset-y-px'
-          : [surfaceWashBg[resolvedRole], 'before:inset-y-0'],
+          ? 'bg-surface border border-outline-variant shadow-card'
+          : [surfaceWashBg[resolvedRole], 'border border-transparent forced-colors:border-[CanvasText]'],
         className
       )}
       {...props}

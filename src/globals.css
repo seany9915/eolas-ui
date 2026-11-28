@@ -606,7 +606,7 @@ select:autofill {
 }
 
 @utility animate-error-shake {
-  animation: error-shake 300ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: error-shake 400ms ease-in-out both;
 }
 
 @utility animate-text-reveal {
@@ -674,25 +674,14 @@ select:autofill {
   0% {
     transform: translateX(0);
   }
-  16% {
-    transform: translateX(calc(var(--shake-distance, 6px) * -1));
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  22% {
+    transform: translateX(calc(var(--shake-distance, 5px) * -1));
   }
-  33% {
+  48% {
     transform: translateX(var(--shake-overshoot, 4px));
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  50% {
-    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.75));
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  66% {
-    transform: translateX(calc(var(--shake-overshoot, 4px) * 0.5));
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  83% {
-    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.25));
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  74% {
+    transform: translateX(calc(var(--shake-overshoot, 4px) * -0.5));
   }
   100% {
     transform: translateX(0);

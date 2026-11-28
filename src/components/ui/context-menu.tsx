@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { ContextMenu as BaseContextMenu } from '@base-ui/react/context-menu';
+import { Icon } from './icon';
 import { ScrollArea } from './scroll-area';
-import { cn, composeClassName } from '@/lib/utils';
+import { cn, composeClassName, sanitizeUrl } from '@/lib/utils';
 
 export interface ContextMenuItemData {
   id: string;
@@ -39,11 +40,7 @@ export const ContextMenuItem = React.forwardRef<HTMLDivElement, ContextMenuItemP
       )}
       {...props}
     >
-      {icon && (
-        <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-          {icon}
-        </span>
-      )}
+      {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
       <span className="truncate flex-1">{children}</span>
       {shortcut && (
         <span data-slot="context-menu-shortcut" className="font-mono text-xs text-on-surface-variant font-medium tracking-wider ms-auto">
@@ -68,13 +65,90 @@ export const ContextMenuShortcut = React.forwardRef<
 ));
 ContextMenuShortcut.displayName = 'ContextMenuShortcut';
 
-export interface ContextMenuContentProps extends React.ComponentPropsWithoutRef<typeof BaseContextMenu.Popup> {
-  sideOffset?: number;
-  alignOffset?: number;
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number };
+export interface ContextMenuArrowProps
+  extends React.ComponentPropsWithoutRef<typeof BaseContextMenu.Arrow> {}
+
+export const ContextMenuArrow = React.forwardRef<HTMLDivElement, ContextMenuArrowProps>(
+  ({ className, children, ...props }, ref) => (
+    <BaseContextMenu.Arrow
+      ref={ref}
+      data-slot="context-menu-arrow"
+      className={composeClassName(
+        cn(
+          'z-10 data-[side=top]:bottom-[-5px] data-[side=bottom]:top-[-5px] data-[side=left]:right-[-7.5px] data-[side=right]:left-[-7.5px] data-[side=inline-start]:end-[-7.5px] data-[side=inline-end]:start-[-7.5px]',
+          'data-[side=top]:rotate-180 data-[side=left]:rotate-90 data-[side=right]:-rotate-90 data-[side=inline-start]:rotate-90 rtl:data-[side=inline-start]:-rotate-90 data-[side=inline-end]:-rotate-90 rtl:data-[side=inline-end]:rotate-90'
+        ),
+        className
+      )}
+      {...props}
+    >
+      {children ?? (
+        <svg
+          width="10"
+          height="5"
+          viewBox="0 0 10 5"
+          className="block fill-surface stroke-outline-variant"
+          aria-hidden="true"
+        >
+          <path d="M0 5 L5 0 L10 5" />
+        </svg>
+      )}
+    </BaseContextMenu.Arrow>
+  )
+);
+ContextMenuArrow.displayName = 'ContextMenuArrow';
+
+const basePositionerClasses =
+  'z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none';
+
+const basePopupClasses =
+  'relative flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none';
+
+export const ContextMenuPositioner = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseContextMenu.Positioner>
+>(({ className, collisionPadding = 8, ...props }, ref) => (
+  <BaseContextMenu.Positioner
+    ref={ref}
+    data-slot="context-menu-positioner"
+    collisionPadding={collisionPadding}
+    className={composeClassName(basePositionerClasses, className)}
+    {...props}
+  />
+));
+ContextMenuPositioner.displayName = 'ContextMenuPositioner';
+
+export const ContextMenuPopup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<typeof BaseContextMenu.Popup>
+>(({ className, ...props }, ref) => (
+  <BaseContextMenu.Popup
+    ref={ref}
+    data-slot="context-menu-content"
+    className={composeClassName(basePopupClasses, className)}
+    {...props}
+  />
+));
+ContextMenuPopup.displayName = 'ContextMenuPopup';
+
+export interface ContextMenuContentProps
+  extends React.ComponentPropsWithoutRef<typeof BaseContextMenu.Popup> {
+  side?: BaseContextMenu.Positioner.Props['side'];
+  align?: BaseContextMenu.Positioner.Props['align'];
+  sideOffset?: BaseContextMenu.Positioner.Props['sideOffset'];
+  alignOffset?: BaseContextMenu.Positioner.Props['alignOffset'];
+  anchor?: BaseContextMenu.Positioner.Props['anchor'];
+  arrowPadding?: BaseContextMenu.Positioner.Props['arrowPadding'];
+  sticky?: BaseContextMenu.Positioner.Props['sticky'];
+  collisionPadding?: BaseContextMenu.Positioner.Props['collisionPadding'];
+  collisionBoundary?: BaseContextMenu.Positioner.Props['collisionBoundary'];
+  collisionAvoidance?: BaseContextMenu.Positioner.Props['collisionAvoidance'];
+  disableAnchorTracking?: BaseContextMenu.Positioner.Props['disableAnchorTracking'];
   containerClassName?: BaseContextMenu.Positioner.Props['className'];
   container?: BaseContextMenu.Portal.Props['container'];
   keepMounted?: boolean;
+  showArrow?: boolean;
+  scrollable?: boolean;
 }
 
 export const ContextMenuContent = React.forwardRef<HTMLDivElement, ContextMenuContentProps>(
@@ -82,47 +156,80 @@ export const ContextMenuContent = React.forwardRef<HTMLDivElement, ContextMenuCo
     {
       className,
       children,
-      sideOffset = 4,
+      side,
+      align,
+      sideOffset,
       alignOffset,
+      anchor,
+      arrowPadding,
+      sticky,
       collisionPadding = 8,
+      collisionBoundary,
+      collisionAvoidance,
+      disableAnchorTracking,
       containerClassName,
       container,
       keepMounted,
+      showArrow = false,
+      scrollable = true,
       ...props
     },
     ref
-  ) => (
-    <BaseContextMenu.Portal container={container} keepMounted={keepMounted}>
-      <BaseContextMenu.Positioner
-        sideOffset={sideOffset}
-        alignOffset={alignOffset}
-        collisionPadding={collisionPadding}
-        className={composeClassName('z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none', containerClassName)}
-      >
-        <BaseContextMenu.Popup
-          ref={ref}
-          data-slot="context-menu-content"
-          className={composeClassName(
-            'flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none',
-            className
-          )}
-          {...props}
+  ) => {
+    const childList = React.Children.toArray(children);
+    const arrowChildren: React.ReactNode[] = [];
+    const bodyChildren: React.ReactNode[] = [];
+
+    for (const child of childList) {
+      if (React.isValidElement(child) && (child.type === ContextMenuArrow || child.type === BaseContextMenu.Arrow)) {
+        arrowChildren.push(child);
+      } else {
+        bodyChildren.push(child);
+      }
+    }
+
+    return (
+      <BaseContextMenu.Portal container={container} keepMounted={keepMounted}>
+        <ContextMenuPositioner
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          alignOffset={alignOffset}
+          anchor={anchor}
+          arrowPadding={arrowPadding}
+          sticky={sticky}
+          collisionPadding={collisionPadding}
+          collisionBoundary={collisionBoundary}
+          collisionAvoidance={collisionAvoidance}
+          disableAnchorTracking={disableAnchorTracking}
+          className={containerClassName}
         >
-          <ScrollArea
-            className="min-h-0 flex-[0_1_auto]"
-            viewportClassName="overscroll-contain scroll-py-1"
-            viewportProps={{
-              tabIndex: -1,
-              onMouseDown: (e) => e.preventDefault(),
-            }}
-            contentClassName="p-1"
-          >
-            {children}
-          </ScrollArea>
-        </BaseContextMenu.Popup>
-      </BaseContextMenu.Positioner>
-    </BaseContextMenu.Portal>
-  )
+          <ContextMenuPopup ref={ref} className={className} {...props}>
+            {arrowChildren.length > 0 ? arrowChildren : showArrow ? <ContextMenuArrow /> : null}
+            {scrollable ? (
+              <ScrollArea
+                className="min-h-0 flex-[0_1_auto]"
+                viewportClassName="overscroll-contain scroll-py-1"
+                viewportProps={{
+                  tabIndex: -1,
+                  onMouseDown: (e) => {
+                    const target = e.target as HTMLElement | null;
+                    if (target?.closest('input, textarea, [contenteditable]')) return;
+                    e.preventDefault();
+                  },
+                }}
+                contentClassName="p-1"
+              >
+                {bodyChildren}
+              </ScrollArea>
+            ) : (
+              bodyChildren
+            )}
+          </ContextMenuPopup>
+        </ContextMenuPositioner>
+      </BaseContextMenu.Portal>
+    );
+  }
 );
 ContextMenuContent.displayName = 'ContextMenuContent';
 
@@ -164,17 +271,11 @@ export const ContextMenuCheckboxItem = React.forwardRef<HTMLDivElement, ContextM
       {...props}
     >
       <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
         <span className="truncate">{children}</span>
       </div>
       <BaseContextMenu.CheckboxItemIndicator className="shrink-0 text-primary flex items-center justify-center">
-        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
-          check
-        </span>
+        <Icon name="check" size="sm" aria-hidden="true" />
       </BaseContextMenu.CheckboxItemIndicator>
     </BaseContextMenu.CheckboxItem>
   )
@@ -198,17 +299,11 @@ export const ContextMenuRadioItem = React.forwardRef<HTMLDivElement, ContextMenu
       {...props}
     >
       <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
         <span className="truncate">{children}</span>
       </div>
       <BaseContextMenu.RadioItemIndicator className="shrink-0 text-primary flex items-center justify-center">
-        <span className="material-symbols-outlined text-base font-bold" aria-hidden="true">
-          radio_button_checked
-        </span>
+        <Icon name="radio_button_checked" size="sm" aria-hidden="true" />
       </BaseContextMenu.RadioItemIndicator>
     </BaseContextMenu.RadioItem>
   )
@@ -226,22 +321,16 @@ export const ContextMenuSubmenuTrigger = React.forwardRef<HTMLDivElement, Contex
       ref={ref}
       data-slot="context-menu-sub-trigger"
       className={composeClassName(
-        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-surface-container-low data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+        'flex items-center justify-between gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[popup-open]:bg-state-hover data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
         className
       )}
       {...props}
     >
       <div className="flex flex-1 min-w-0 items-center gap-2.5 truncate">
-        {icon && (
-          <span className="material-symbols-outlined text-lg shrink-0" aria-hidden="true">
-            {icon}
-          </span>
-        )}
+        {icon && <Icon name={icon} size="md" className="shrink-0" aria-hidden="true" />}
         <span className="truncate">{children}</span>
       </div>
-      <span className="material-symbols-outlined icon-directional text-base text-on-surface-variant shrink-0" aria-hidden="true">
-        chevron_right
-      </span>
+      <Icon name="chevron_right" size="sm" directional className="text-on-surface-variant shrink-0" aria-hidden="true" />
     </BaseContextMenu.SubmenuTrigger>
   )
 );
@@ -279,10 +368,11 @@ ContextMenuRadioGroup.displayName = 'ContextMenuRadioGroup';
 export const ContextMenuLinkItem = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithoutRef<typeof BaseContextMenu.LinkItem>
->(({ className, ...props }, ref) => (
+>(({ className, href, ...props }, ref) => (
   <BaseContextMenu.LinkItem
     ref={ref}
     data-slot="context-menu-link-item"
+    href={href === undefined ? undefined : sanitizeUrl(href)}
     className={composeClassName(
       'flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-sm font-sans text-sm font-medium cursor-pointer outline-none transition-colors motion-reduce:transition-none select-none text-on-surface hover:bg-state-hover focus:bg-state-hover data-[highlighted]:bg-state-hover data-[highlighted]:text-on-surface data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
       className
@@ -296,6 +386,15 @@ export interface ContextMenuProps
   extends React.ComponentPropsWithoutRef<typeof BaseContextMenu.Root> {
   items?: ContextMenuItemData[];
   container?: BaseContextMenu.Portal.Props['container'];
+  side?: BaseContextMenu.Positioner.Props['side'];
+  align?: BaseContextMenu.Positioner.Props['align'];
+  sideOffset?: BaseContextMenu.Positioner.Props['sideOffset'];
+  alignOffset?: BaseContextMenu.Positioner.Props['alignOffset'];
+  collisionPadding?: BaseContextMenu.Positioner.Props['collisionPadding'];
+  keepMounted?: boolean;
+  finalFocus?: BaseContextMenu.Popup.Props['finalFocus'];
+  showArrow?: boolean;
+  popupClassName?: BaseContextMenu.Popup.Props['className'];
   className?: BaseContextMenu.Trigger.Props['className'];
 }
 
@@ -305,6 +404,15 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
       children,
       items,
       container,
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding = 8,
+      keepMounted,
+      finalFocus,
+      showArrow = false,
+      popupClassName,
       open,
       defaultOpen,
       onOpenChange,
@@ -349,22 +457,26 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
         <BaseContextMenu.Trigger ref={ref} data-slot="context-menu-trigger" className={composeClassName('w-full', className)}>
           {children}
         </BaseContextMenu.Trigger>
-        <BaseContextMenu.Portal container={container}>
-          <BaseContextMenu.Positioner
-            sideOffset={4}
-            collisionPadding={8}
-            className="z-50 max-w-[min(var(--available-width),calc(100vw-1rem))] outline-none"
+        <BaseContextMenu.Portal container={container} keepMounted={keepMounted}>
+          <ContextMenuPositioner
+            side={side}
+            align={align}
+            sideOffset={sideOffset}
+            alignOffset={alignOffset}
+            collisionPadding={collisionPadding}
           >
-            <BaseContextMenu.Popup
-              data-slot="context-menu-content"
-              className="flex flex-col min-w-[200px] max-w-[min(var(--available-width),calc(100vw-1rem))] max-h-[min(24rem,var(--available-height))] rounded bg-surface border border-outline-variant shadow-ambient outline-none transition-[opacity,transform] duration-[var(--duration-fast)] data-[ending-style]:duration-[var(--duration-quick)] origin-[var(--transform-origin)] data-[starting-style]:opacity-0 data-[starting-style]:scale-[var(--scale-medium)] data-[ending-style]:opacity-0 data-[ending-style]:scale-[var(--scale-medium)] ease-[var(--ease-standard)] motion-reduce:transition-none motion-reduce:transform-none data-[instant]:transition-none data-[instant]:transform-none"
-            >
+            <ContextMenuPopup finalFocus={finalFocus} className={popupClassName}>
+              {showArrow && <ContextMenuArrow />}
               <ScrollArea
                 className="min-h-0 flex-[0_1_auto]"
                 viewportClassName="overscroll-contain scroll-py-1"
                 viewportProps={{
                   tabIndex: -1,
-                  onMouseDown: (e) => e.preventDefault(),
+                  onMouseDown: (e) => {
+                    const target = e.target as HTMLElement | null;
+                    if (target?.closest('input, textarea, [contenteditable]')) return;
+                    e.preventDefault();
+                  },
                 }}
                 contentClassName="p-1"
               >
@@ -383,8 +495,8 @@ const ContextMenuComponent = React.forwardRef<HTMLDivElement, ContextMenuProps>(
                   ))}
                 </ContextMenuGroup>
               </ScrollArea>
-            </BaseContextMenu.Popup>
-          </BaseContextMenu.Positioner>
+            </ContextMenuPopup>
+          </ContextMenuPositioner>
         </BaseContextMenu.Portal>
       </BaseContextMenu.Root>
     );
@@ -398,8 +510,8 @@ export const ContextMenu = Object.assign(ContextMenuComponent, {
   Root: BaseContextMenu.Root,
   Trigger: ContextMenuTrigger,
   Portal: BaseContextMenu.Portal,
-  Positioner: BaseContextMenu.Positioner,
-  Popup: BaseContextMenu.Popup,
+  Positioner: ContextMenuPositioner,
+  Popup: ContextMenuPopup,
   Content: ContextMenuContent,
   Item: ContextMenuItem,
   LinkItem: ContextMenuLinkItem,
@@ -415,19 +527,19 @@ export const ContextMenu = Object.assign(ContextMenuComponent, {
   SubmenuRoot: BaseContextMenu.SubmenuRoot,
   SubmenuTrigger: ContextMenuSubmenuTrigger,
   Backdrop: BaseContextMenu.Backdrop,
-  Arrow: BaseContextMenu.Arrow,
+  Arrow: ContextMenuArrow,
 });
 
 // Re-export Base UI primitives for compound composition
 export { BaseContextMenu };
 export const ContextMenuRoot = BaseContextMenu.Root;
 export const ContextMenuTriggerPrimitive = BaseContextMenu.Trigger;
-export const ContextMenuPositioner = BaseContextMenu.Positioner;
-export const ContextMenuPopup = BaseContextMenu.Popup;
+export const ContextMenuPositionerPrimitive = BaseContextMenu.Positioner;
+export const ContextMenuPopupPrimitive = BaseContextMenu.Popup;
 export const ContextMenuItemPrimitive = BaseContextMenu.Item;
 export const ContextMenuPortal = BaseContextMenu.Portal;
 export const ContextMenuBackdrop = BaseContextMenu.Backdrop;
-export const ContextMenuArrow = BaseContextMenu.Arrow;
+export const ContextMenuArrowPrimitive = BaseContextMenu.Arrow;
 export const ContextMenuGroupPrimitive = BaseContextMenu.Group;
 export const ContextMenuGroupLabelPrimitive = BaseContextMenu.GroupLabel;
 export const ContextMenuCheckboxItemIndicator = BaseContextMenu.CheckboxItemIndicator;

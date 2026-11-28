@@ -252,7 +252,7 @@ export const FieldError = React.forwardRef<HTMLDivElement, FieldErrorProps>(
           render ??
           ((elementProps) => (
             <div {...elementProps}>
-              <Icon name="error" size="sm" className={cn('shrink-0 text-error', isMultipleErrors && 'mt-0.5')} />
+              <Icon name="error" size="sm" className={cn('shrink-0 text-error', isMultipleErrors && 'mt-0.5')} aria-hidden="true" />
               <div className="min-w-0 flex-1">{elementProps.children}</div>
             </div>
           ))
@@ -309,16 +309,18 @@ function hasFieldCompoundChildren(children: React.ReactNode): boolean {
       t === FieldContent ||
       t === FieldError ||
       t === FieldItem ||
+      t === FieldValidity ||
       t === BaseField.Label ||
       t === BaseField.Control ||
       t === BaseField.Description ||
       t === BaseField.Error ||
-      t === BaseField.Item
+      t === BaseField.Item ||
+      t === BaseField.Validity
     ) {
       return true;
     }
     const name = typeof t === 'function' || typeof t === 'object' ? (t as { displayName?: string }).displayName : undefined;
-    return Boolean(name && /^Field(Label|Title|Control|Description|Content|Error|Item)/.test(name));
+    return Boolean(name && /^Field(Label|Title|Control|Description|Content|Error|Item|Validity)/.test(name));
   });
 }
 

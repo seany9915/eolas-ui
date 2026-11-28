@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { ToggleGroup as BaseToggleGroup } from '@base-ui/react/toggle-group';
 import { Toggle as BaseToggle } from '@base-ui/react/toggle';
-import { cn } from '@/lib/utils';
+import { cn, resolveNativeButton } from '@/lib/utils';
 import { Icon } from './icon';
 
 /**
@@ -44,9 +44,9 @@ const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
   spacing: 0,
 });
 
-export interface ToggleGroupItemProps
+export interface ToggleGroupItemProps<Value extends string = string>
   extends Omit<React.ComponentPropsWithoutRef<typeof BaseToggle>, 'children' | 'value'> {
-  value: string;
+  value: Value;
   ariaLabel?: string;
   'aria-label'?: string;
   children?: React.ReactNode;
@@ -56,22 +56,23 @@ export interface ToggleGroupItemProps
   size?: ToggleGroupSize;
 }
 
-export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
-  (
-    {
-      value,
-      ariaLabel,
-      'aria-label': ariaLabelProp,
-      children,
-      icon,
-      disabled,
-      variant,
-      size,
-      className,
-      ...props
-    },
-    ref
-  ) => {
+function ToggleGroupItemInner<Value extends string = string>(
+  {
+    value,
+    ariaLabel,
+    'aria-label': ariaLabelProp,
+    children,
+    icon,
+    disabled,
+    variant,
+    size,
+    render,
+    nativeButton,
+    className,
+    ...props
+  }: ToggleGroupItemProps<Value>,
+  ref: React.ForwardedRef<HTMLButtonElement>
+) {
     void variant; // Destructured to avoid forwarding deprecated prop to the DOM button
     const groupContext = React.useContext(ToggleGroupContext);
     const effectiveSize = size ?? groupContext.size;
@@ -118,36 +119,44 @@ export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupIt
       'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none'
     );
 
-    return (
-      <BaseToggle
-        ref={ref}
-        data-slot="toggle-group-item"
-        data-spacing={groupContext.spacing}
-        value={value}
-        aria-label={label}
-        disabled={disabled}
-        className={(state) =>
-          cn(baseItemClasses, typeof className === 'function' ? className(state) : className)
-        }
-        {...props}
-      >
-        {icon && <Icon name={icon} size="sm" className="shrink-0" />}
-        {children}
-      </BaseToggle>
-    );
-  }
-);
+  return (
+    <BaseToggle
+      ref={ref}
+      data-slot="toggle-group-item"
+      data-spacing={groupContext.spacing}
+      value={value}
+      aria-label={label}
+      disabled={disabled}
+      render={render}
+      nativeButton={resolveNativeButton(render, nativeButton)}
+      className={(state) =>
+        cn(baseItemClasses, typeof className === 'function' ? className(state) : className)
+      }
+      {...props}
+    >
+      {icon && <Icon name={icon} size="sm" className="shrink-0" aria-hidden="true" />}
+      {children}
+    </BaseToggle>
+  );
+}
+
+export const ToggleGroupItem = React.forwardRef(ToggleGroupItemInner) as (<
+  Value extends string = string,
+>(
+  props: ToggleGroupItemProps<Value> & React.RefAttributes<HTMLButtonElement>
+) => React.ReactNode) & { displayName?: string };
+ToggleGroupItem.displayName = 'ToggleGroupItem';
 ToggleGroupItem.displayName = 'ToggleGroupItem';
 
-export interface ToggleGroupItemData {
-  value: string;
+export interface ToggleGroupItemData<Value extends string = string> {
+  value: Value;
   label: React.ReactNode;
   icon?: string;
   disabled?: boolean;
   ariaLabel?: string;
 }
 
-interface BaseToggleGroupCommonProps
+interface BaseToggleGroupCommonProps<Value extends string = string>
   extends Omit<
     React.ComponentPropsWithoutRef<typeof BaseToggleGroup>,
     'defaultValue' | 'value' | 'onValueChange'
@@ -163,30 +172,36 @@ interface BaseToggleGroupCommonProps
   spacing?: number;
   ariaLabel?: string;
   'aria-label'?: string;
-  items?: ToggleGroupItemData[];
+  items?: ToggleGroupItemData<Value>[];
   children?: React.ReactNode;
 }
 
-export interface ToggleGroupSingleProps extends BaseToggleGroupCommonProps {
+export interface ToggleGroupSingleProps<Value extends string = string>
+  extends BaseToggleGroupCommonProps<Value> {
   type: 'single';
   multiple?: false;
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string, eventDetails: BaseToggleGroup.ChangeEventDetails) => void;
+  value?: Value;
+  defaultValue?: Value;
+  onValueChange?: (value: Value, eventDetails: BaseToggleGroup.ChangeEventDetails) => void;
 }
 
-export interface ToggleGroupMultipleProps extends BaseToggleGroupCommonProps {
+export interface ToggleGroupMultipleProps<Value extends string = string>
+  extends BaseToggleGroupCommonProps<Value> {
   type?: 'multiple';
   multiple?: boolean;
-  value?: readonly string[];
-  defaultValue?: readonly string[];
-  onValueChange?: (value: string[], eventDetails: BaseToggleGroup.ChangeEventDetails) => void;
+  value?: readonly Value[];
+  defaultValue?: readonly Value[];
+  onValueChange?: (value: Value[], eventDetails: BaseToggleGroup.ChangeEventDetails) => void;
 }
 
-export type ToggleGroupProps = ToggleGroupSingleProps | ToggleGroupMultipleProps;
+export type ToggleGroupProps<Value extends string = string> =
+  | ToggleGroupSingleProps<Value>
+  | ToggleGroupMultipleProps<Value>;
 
-const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
-  (props, ref) => {
+function ToggleGroupComponentInner<Value extends string = string>(
+  props: ToggleGroupProps<Value>,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
     const {
       type,
       value,
@@ -217,13 +232,13 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
     // Normalize value into Base UI array contract
     const normalizedValue = React.useMemo(() => {
       if (value === undefined) return undefined;
-      if (Array.isArray(value)) return value;
+      if (Array.isArray(value)) return [...value];
       return typeof value === 'string' && value ? [value] : [];
     }, [value]);
 
     const normalizedDefaultValue = React.useMemo(() => {
       if (defaultValue === undefined) return undefined;
-      if (Array.isArray(defaultValue)) return defaultValue;
+      if (Array.isArray(defaultValue)) return [...defaultValue];
       return typeof defaultValue === 'string' && defaultValue ? [defaultValue] : [];
     }, [defaultValue]);
 
@@ -239,15 +254,15 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 
         if (isSingleStringMode) {
           // Unpack array to single string value for single-mode listeners
-          const singleVal = val.length > 0 ? val[val.length - 1] : '';
-          (onValueChange as (v: string, d: BaseToggleGroup.ChangeEventDetails) => void)(
+          const singleVal = (val.length > 0 ? val[val.length - 1] : '') as Value;
+          (onValueChange as (v: Value, d: BaseToggleGroup.ChangeEventDetails) => void)(
             singleVal,
             eventDetails
           );
         } else {
           // Multiple mode listeners receive array of strings
-          (onValueChange as (v: string[], d: BaseToggleGroup.ChangeEventDetails) => void)(
-            val,
+          (onValueChange as (v: Value[], d: BaseToggleGroup.ChangeEventDetails) => void)(
+            val as Value[],
             eventDetails
           );
         }
@@ -322,8 +337,13 @@ const ToggleGroupComponent = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
         </BaseToggleGroup>
       </ToggleGroupContext.Provider>
     );
-  }
-);
+}
+
+const ToggleGroupComponent = React.forwardRef(ToggleGroupComponentInner) as (<
+  Value extends string = string,
+>(
+  props: ToggleGroupProps<Value> & React.RefAttributes<HTMLDivElement>
+) => React.ReactNode) & { displayName?: string };
 ToggleGroupComponent.displayName = 'ToggleGroup';
 
 // Compound export mapping Base UI primitives
