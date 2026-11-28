@@ -146,7 +146,6 @@ export const ToggleGroupItem = React.forwardRef(ToggleGroupItemInner) as (<
   props: ToggleGroupItemProps<Value> & React.RefAttributes<HTMLButtonElement>
 ) => React.ReactNode) & { displayName?: string };
 ToggleGroupItem.displayName = 'ToggleGroupItem';
-ToggleGroupItem.displayName = 'ToggleGroupItem';
 
 export interface ToggleGroupItemData<Value extends string = string> {
   value: Value;

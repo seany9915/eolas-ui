@@ -1,6 +1,6 @@
 {
   "name": "@seany9915/eolas-ui",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "description": "Eolas UI CLI - Base UI design system component distributor",
   "type": "module",
   "engines": {

@@ -7,6 +7,7 @@
  * Foundation: Built strictly from primitives and design tokens:
  * - `Sidebar` compound primitives (`Sidebar.Provider`, `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Footer`, `Sidebar.Trigger`, `Sidebar.Rail`, `Sidebar.Inset`, `Sidebar.Menu`, `Sidebar.MenuItem`, `Sidebar.MenuButton`, `Sidebar.MenuBadge`) (`src/components/ui/sidebar.tsx`)
  * - `NavigationBar`, `NavigationBar.Item` (`src/components/ui/navigation-bar.tsx`)
+ * - `ScrollArea` (`src/components/ui/scroll-area.tsx`)
  * - `Icon` (`src/components/ui/icon.tsx`)
  *
  * TAXONOMY & USAGE:
@@ -23,6 +24,7 @@ import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 import { NavigationBar } from '@/components/ui/navigation-bar';
 import { Button, UnstyledButton } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, useMergedRefs } from '@/lib/utils';
 
 export interface AppShellDestination {
@@ -61,6 +63,8 @@ export interface AppShellProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   embedded?: boolean;
   /** When true, removes default main workspace padding (`p-4 @md:p-6`) for full-bleed child layouts such as `ListDetailBlock variant="flush"` or chat panes */
   flush?: boolean;
+  /** When true, wraps main workspace scrolling in `ScrollArea` for consistent overlay scrollbars without layout gutter shift on Windows. Defaults to `false` (native scrolling). */
+  scrollArea?: boolean;
   /** Resets scroll position (and optionally moves focus to `<main>`) whenever the key changes across route transitions */
   scrollResetKey?: string | number;
   /** Moves keyboard focus to `<main>` (`preventScroll: true`) when `scrollResetKey` changes; defaults to `true` (set `false` when binding `scrollResetKey` to tabs, filters, or pagination) */
@@ -156,6 +160,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       defaultOpen,
       embedded = false,
       flush = false,
+      scrollArea = false,
       scrollResetKey,
       focusMainOnReset = true,
       skipToContentLabel = 'Skip to content',
@@ -171,6 +176,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     );
     const rootRef = React.useRef<HTMLDivElement | null>(null);
     const mainRef = React.useRef<HTMLElement | null>(null);
+    const scrollViewportRef = React.useRef<HTMLDivElement | null>(null);
     const attachMainRef = React.useCallback((node: HTMLElement | null) => {
       mainRef.current = node;
     }, []);
@@ -180,8 +186,9 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
     React.useEffect(() => {
       if (Object.is(prevScrollResetKeyRef.current, scrollResetKey)) return;
       prevScrollResetKeyRef.current = scrollResetKey;
-      if (mainRef.current) {
-        mainRef.current.scrollTop = 0;
+      const scrollTarget = scrollArea ? scrollViewportRef.current : mainRef.current;
+      if (scrollTarget) {
+        scrollTarget.scrollTop = 0;
       }
       if (!embedded && typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -189,7 +196,7 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
       if (focusMainOnReset) {
         mainRef.current?.focus({ preventScroll: true });
       }
-    }, [scrollResetKey, embedded, focusMainOnReset]);
+    }, [scrollResetKey, embedded, focusMainOnReset, scrollArea]);
     const focusRestoreRafRef = React.useRef<number | null>(null);
 
     const assignRefs = useMergedRefs(rootRef, ref);
@@ -461,6 +468,31 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
           {/* Main Workspace Body */}
           {(() => {
             const MainTag = embedded ? 'div' : 'main';
+            const mobileScrollPbClass =
+              !embedded &&
+              destinations.length > 0 &&
+              (flush
+                ? canOpenSidebarOnShortMobile
+                  ? 'scroll-pb-24 sm:scroll-pb-0 short:scroll-pb-0'
+                  : 'scroll-pb-24 sm:scroll-pb-0'
+                : canOpenSidebarOnShortMobile
+                  ? 'scroll-pb-28 sm:scroll-pb-0 short:scroll-pb-0'
+                  : 'scroll-pb-28 sm:scroll-pb-0');
+            const innerContentClasses = cn(
+              'flex-1 flex flex-col min-h-0',
+              flush ? 'p-0' : 'p-4 @md:p-6',
+              embedded
+                ? !flush && destinations.length > 0 && 'pb-4 @md:pb-6'
+                : destinations.length > 0 &&
+                    (flush
+                      ? canOpenSidebarOnShortMobile
+                        ? 'pb-24 sm:pb-0 short:pb-0'
+                        : 'pb-24 sm:pb-0'
+                      : canOpenSidebarOnShortMobile
+                        ? 'pb-28 sm:pb-4 @md:pb-6 short:pb-4 @md:short:pb-6'
+                        : 'pb-28 sm:pb-4 @md:pb-6')
+            );
+
             return (
               <MainTag
                 ref={attachMainRef}
@@ -472,37 +504,24 @@ export const AppShell = React.forwardRef<HTMLDivElement, AppShellProps>(
                 }
                 data-slot="app-shell-main"
                 className={cn(
-                  '@container flex-1 flex flex-col min-h-0 overflow-y-auto overscroll-contain bg-background focus:outline-none',
+                  '@container flex-1 flex flex-col min-h-0 bg-background focus:outline-none',
+                  scrollArea ? 'overflow-hidden' : 'overflow-y-auto overscroll-contain',
                   hasDockedSidebar && 'rounded-ss-lg border-t border-s border-outline-variant',
-                  !embedded &&
-                    destinations.length > 0 &&
-                    (flush
-                      ? canOpenSidebarOnShortMobile
-                        ? 'scroll-pb-24 sm:scroll-pb-0 short:scroll-pb-0'
-                        : 'scroll-pb-24 sm:scroll-pb-0'
-                      : canOpenSidebarOnShortMobile
-                        ? 'scroll-pb-28 sm:scroll-pb-0 short:scroll-pb-0'
-                        : 'scroll-pb-28 sm:scroll-pb-0')
+                  !scrollArea && mobileScrollPbClass
                 )}
               >
-                <div
-                  className={cn(
-                    'flex-1 flex flex-col min-h-0',
-                    flush ? 'p-0' : 'p-4 @md:p-6',
-                    embedded
-                      ? !flush && destinations.length > 0 && 'pb-4 @md:pb-6'
-                      : destinations.length > 0 &&
-                          (flush
-                            ? canOpenSidebarOnShortMobile
-                              ? 'pb-24 sm:pb-0 short:pb-0'
-                              : 'pb-24 sm:pb-0'
-                            : canOpenSidebarOnShortMobile
-                              ? 'pb-28 sm:pb-4 @md:pb-6 short:pb-4 @md:short:pb-6'
-                              : 'pb-28 sm:pb-4 @md:pb-6')
-                  )}
-                >
-                  {children}
-                </div>
+                {scrollArea ? (
+                  <ScrollArea
+                    className="flex-1 min-h-0"
+                    viewportRef={scrollViewportRef}
+                    viewportClassName={cn('overscroll-contain', mobileScrollPbClass)}
+                    contentClassName="min-h-full flex flex-col"
+                  >
+                    <div className={innerContentClasses}>{children}</div>
+                  </ScrollArea>
+                ) : (
+                  <div className={innerContentClasses}>{children}</div>
+                )}
               </MainTag>
             );
           })()}

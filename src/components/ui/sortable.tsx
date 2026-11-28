@@ -103,6 +103,10 @@ export const SortableList = React.forwardRef<HTMLDivElement, SortableListProps>(
   ({ className, orientation: orientationProp, render, role = 'list', ...props }, ref) => {
     const ctx = React.useContext(SortableContext);
     const orientation = orientationProp ?? ctx.orientation;
+    const listContext = React.useMemo(
+      () => (orientation === ctx.orientation ? ctx : { ...ctx, orientation }),
+      [ctx, orientation]
+    );
 
     const layoutClasses =
       orientation === 'horizontal'
@@ -124,15 +128,16 @@ export const SortableList = React.forwardRef<HTMLDivElement, SortableListProps>(
       },
     });
 
-    if (orientation === 'grid') {
-      return (
+    const content =
+      orientation === 'grid' ? (
         <div data-slot="sortable-list-container" className="@container w-full">
           {listElement}
         </div>
+      ) : (
+        listElement
       );
-    }
 
-    return listElement;
+    return <SortableContext.Provider value={listContext}>{content}</SortableContext.Provider>;
   }
 );
 SortableList.displayName = 'Sortable.List';
@@ -168,7 +173,7 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
     },
     forwardedRef
   ) => {
-    const { hasOverlay, prefersReducedMotion } = React.useContext(SortableContext);
+    const { orientation, hasOverlay, prefersReducedMotion } = React.useContext(SortableContext);
     const resolvedRole =
       roleProp ?? (React.isValidElement(render) && render.type === 'li' ? undefined : 'listitem');
     const { ref, handleRef, isDragging, isDragSource, isDropTarget } = useSortable({
@@ -213,6 +218,7 @@ export const SortableItem = React.forwardRef<HTMLDivElement, SortableItemProps>(
         role: resolvedRole,
         className: cn(
           'relative flex min-w-0 items-center gap-3 rounded-md border border-outline-variant bg-surface p-3 text-on-surface',
+          orientation !== 'horizontal' && 'w-full',
           'transition-[border-color,background-color,box-shadow,opacity] duration-[var(--duration-quick)] ease-[var(--ease-standard)] motion-reduce:transition-none',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
           isDragging && hasOverlay && 'transition-none border-dashed border-outline-variant bg-surface-container-low [&>*]:opacity-0',

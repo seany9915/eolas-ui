@@ -1189,6 +1189,28 @@ function DataTableView<TData extends RowData>({
   );
 }
 
+function applyFacetedFilterFn<TData extends RowData>(
+  cols: ColumnDef<DataTableFeatures, TData, unknown>[],
+  facetedColumnIds: ReadonlySet<string>
+): ColumnDef<DataTableFeatures, TData, unknown>[] {
+  return cols.map((col) => {
+    if ('columns' in col && Array.isArray(col.columns)) {
+      return { ...col, columns: applyFacetedFilterFn(col.columns, facetedColumnIds) };
+    }
+    const accessorKey =
+      'accessorKey' in col && typeof col.accessorKey === 'string' ? col.accessorKey : undefined;
+    const resolvedId = col.id ?? accessorKey;
+    const normalizedAccessorId = accessorKey?.replace(/\./g, '_');
+    const matches =
+      (resolvedId && facetedColumnIds.has(resolvedId)) ||
+      (normalizedAccessorId && facetedColumnIds.has(normalizedAccessorId));
+    if (matches && !('filterFn' in col && col.filterFn)) {
+      return { ...col, filterFn: 'faceted' };
+    }
+    return col;
+  });
+}
+
 function ManagedDataTable<TData extends RowData>({
   columns = [],
   data = [],
@@ -1261,32 +1283,9 @@ function ManagedDataTable<TData extends RowData>({
     [facetedFilters]
   );
 
-  const applyFacetedFilterFn = React.useCallback(
-    (
-      cols: ColumnDef<DataTableFeatures, TData, unknown>[]
-    ): ColumnDef<DataTableFeatures, TData, unknown>[] =>
-      cols.map((col) => {
-        if ('columns' in col && Array.isArray(col.columns)) {
-          return { ...col, columns: applyFacetedFilterFn(col.columns) };
-        }
-        const accessorKey =
-          'accessorKey' in col && typeof col.accessorKey === 'string' ? col.accessorKey : undefined;
-        const resolvedId = col.id ?? accessorKey;
-        const normalizedAccessorId = accessorKey?.replace(/\./g, '_');
-        const matches =
-          (resolvedId && facetedColumnIds.has(resolvedId)) ||
-          (normalizedAccessorId && facetedColumnIds.has(normalizedAccessorId));
-        if (matches && !('filterFn' in col && col.filterFn)) {
-          return { ...col, filterFn: 'faceted' };
-        }
-        return col;
-      }),
-    [facetedColumnIds]
-  );
-
   const resolvedColumns = React.useMemo<ColumnDef<DataTableFeatures, TData, unknown>[]>(
-    () => (facetedColumnIds.size === 0 ? columns : applyFacetedFilterFn(columns)),
-    [columns, facetedColumnIds, applyFacetedFilterFn]
+    () => (facetedColumnIds.size === 0 ? columns : applyFacetedFilterFn(columns, facetedColumnIds)),
+    [columns, facetedColumnIds]
   );
 
   const internalTable = useTable({

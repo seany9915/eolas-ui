@@ -225,8 +225,8 @@ export const MessageScrollerProvider: React.FC<MessageScrollerProviderProps> = (
 
   // Initial scroll position resolution
   React.useEffect(() => {
-    const vp = viewportEl;
-    if (!vp) return;
+    const vp = viewportRef.current;
+    if (!viewportEl || !vp) return;
 
     if (defaultScrollPosition === 'end') {
       vp.scrollTop = vp.scrollHeight;

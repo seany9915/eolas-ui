@@ -14,13 +14,36 @@ import * as React from 'react';
 import { Separator as BaseSeparator } from '@base-ui/react/separator';
 import { cn, composeClassName } from '@/lib/utils';
 
+export type SeparatorSize = 'full' | 'sm' | 'md';
+
 export interface SeparatorProps extends React.ComponentPropsWithoutRef<typeof BaseSeparator> {
   orientation?: 'horizontal' | 'vertical';
+  /**
+   * Controls the separator length along its orientation axis:
+   * - `'full'` (default): stretches across the container (`w-full` horizontally, `h-full self-stretch` vertically; pair with `self-center` if overriding vertical height via `className`).
+   * - `'sm'`: compact `16px` (`w-4` / `h-4`) centered (`self-center`) divider for inline flex headers and toolbars.
+   * - `'md'`: medium `24px` (`w-6` / `h-6`) centered (`self-center`) divider for inline flex headers and toolbars.
+   */
+  size?: SeparatorSize;
   decorative?: boolean;
 }
 
+const SEPARATOR_CLASSES: Record<'horizontal' | 'vertical', Record<SeparatorSize, string>> = {
+  horizontal: {
+    full: 'h-px w-full',
+    sm: 'h-px w-4 self-center',
+    md: 'h-px w-6 self-center',
+  },
+  vertical: {
+    full: 'w-px h-full self-stretch',
+    sm: 'w-px h-4 self-center',
+    md: 'w-px h-6 self-center',
+  },
+};
+
 const SeparatorComponent = React.forwardRef<HTMLDivElement, SeparatorProps>(({
   orientation = 'horizontal',
+  size = 'full',
   decorative = true,
   className,
   ...props
@@ -36,7 +59,7 @@ const SeparatorComponent = React.forwardRef<HTMLDivElement, SeparatorProps>(({
       className={composeClassName(
         cn(
           'bg-outline-variant forced-colors:bg-[CanvasText] shrink-0',
-          orientation === 'horizontal' ? 'h-px w-full' : 'w-px h-full self-stretch'
+          SEPARATOR_CLASSES[orientation][size]
         ),
         className
       )}
